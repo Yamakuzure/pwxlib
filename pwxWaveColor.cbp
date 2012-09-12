@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pwxWaveColor" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testColor" prefix_auto="0" extension_auto="0" />
+				<Option object_output=".\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-pg" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+				</Linker>
+			</Target>
+			<Target title="Effective C++">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testColor" prefix_auto="0" extension_auto="0" />
+				<Option object_output=".\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Weffc++" />
+					<Add option="-pedantic" />
+					<Add option="-pg" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testColor" prefix_auto="0" extension_auto="0" />
+				<Option object_output=".\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="WinDebug">
+				<Option platforms="Windows;" />
+				<Option output=".\test\testColor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MTd" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/fp:precise" />
+					<Add option="/EHs" />
+					<Add option="/Od" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/Zi" />
+					<Add option="/DPWXLIB_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+				</Linker>
+			</Target>
+			<Target title="WinRelease">
+				<Option platforms="Windows;" />
+				<Option output=".\test\testColor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MT" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/fp:precise" />
+					<Add option="/EHs" />
+					<Add option="/Ox" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/DNDEBUG" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++0x" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename=".\pwxLib\CWaveColor.h" />
+		<Unit filename=".\pwxLib\internal\CWCexceptions.h" />
+		<Unit filename=".\pwxLib\internal\CWaveColorImpl.h" />
+		<Unit filename=".\pwxLib\internal\sWave.h" />
+		<Unit filename=".\pwxLib\tools\Exception.h" />
+		<Unit filename=".\test\testColor.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

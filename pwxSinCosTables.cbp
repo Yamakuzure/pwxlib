@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pwxSinCosTables" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-g" />
+					<Add option="-ggdb" />
+					<Add option="-O0" />
+					<Add option="-DPWXLIB_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Effective C++">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Weffc++" />
+					<Add option="-pedantic" />
+					<Add option="-g" />
+					<Add option="-ggdb" />
+					<Add option="-O0" />
+					<Add option="-DPWXLIB_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-march=native" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Graphite">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Graphite\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-march=native" />
+					<Add option="-floop-interchange" />
+					<Add option="-fgraphite-identity" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-floop-parallelize-all" />
+					<Add option="-floop-strip-mine" />
+					<Add option="-floop-block" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Debug32">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-g" />
+					<Add option="-ggdb" />
+					<Add option="-O0" />
+					<Add option="-m32" />
+					<Add option="-DPWXLIB_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add option="-L/lib32" />
+					<Add option="-L/usr/lib32" />
+				</Linker>
+			</Target>
+			<Target title="WinDebug">
+				<Option platforms="Windows;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MTd" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/Od" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/Zi" />
+					<Add option="/DPWXLIB_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+				</Linker>
+			</Target>
+			<Target title="WinRelease">
+				<Option platforms="Windows;" />
+				<Option output=".\test\testSCT" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MT" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/GA" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/Ox" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/DNDEBUG" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++0x" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename=".\pwxLib\CSinCosTables.h" />
+		<Unit filename=".\pwxLib\internal\CSCTImpl.h" />
+		<Unit filename=".\pwxLib\internal\DefaultTempTools.h" />
+		<Unit filename=".\pwxLib\tools\DefaultDefines.h" />
+		<Unit filename=".\pwxLib\tools\MathHelpers.h" />
+		<Unit filename=".\test\testSinCosTables.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

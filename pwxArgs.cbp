@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pwxArgs" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="debug">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testArgs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DPWXLIB_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Effective C++">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testArgs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Weffc++" />
+					<Add option="-g" />
+					<Add option="-DPWXLIB_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="release">
+				<Option platforms="Unix;" />
+				<Option output=".\test\testArgs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="WinDebug">
+				<Option platforms="Windows;" />
+				<Option output=".\test\testArgs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MTd" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/Od" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/Zi" />
+					<Add option="/DPWXLIB_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+				</Linker>
+			</Target>
+			<Target title="WinRelease">
+				<Option platforms="Windows;" />
+				<Option output=".\test\testArgs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MT" />
+					<Add option="/arch:SSE2" />
+					<Add option="/GA" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/Ox" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/DNDEBUG" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++0x" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename=".\pwxLib\internal\ArgImpl.h" />
+		<Unit filename=".\pwxLib\internal\ArgTypes.h" />
+		<Unit filename=".\pwxLib\internal\ArgTypesBase.h" />
+		<Unit filename=".\pwxLib\internal\DefaultTempTools.h" />
+		<Unit filename=".\pwxLib\internal\MSVCwarnPop.h" />
+		<Unit filename=".\pwxLib\internal\MSVCwarnPush.h" />
+		<Unit filename=".\pwxLib\internal\MSVCwrap.h" />
+		<Unit filename=".\pwxLib\tools\Args.h" />
+		<Unit filename=".\pwxLib\tools\DefaultDefines.h" />
+		<Unit filename=".\pwxLib\tools\Exception.h" />
+		<Unit filename=".\pwxLib\tools\StreamHelpers.h" />
+		<Unit filename=".\test\testArgs.cpp" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

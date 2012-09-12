@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="pwxLib">
+		<Project filename="pwxLib.cbp" />
+		<Project filename="pwxArgs.cbp" />
+		<Project filename="pwxCnfFile.cbp" />
+		<Project filename="pwxRandom.cbp" />
+		<Project filename="pwxMemRing.cbp" />
+		<Project filename="pwxSinCosTables.cbp" />
+		<Project filename="pwxWaveColor.cbp" />
+		<Project filename="tools/src/getRandomName/getRandomName.cbp" />
+		<Project filename="tools/src/makeSimplexTexture/makeSimplexTexture.cbp" />
+		<Project filename="tools/src/gravMat/gravMat.cbp" active="1" />
+	</Workspace>
+</CodeBlocks_workspace_file>
