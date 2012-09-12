@@ -1,0 +1,52 @@
+pwxLib install instructions
+---------------------------
+
+Being a JBoH (Just a Bunch of Headers) library, there isn't anything
+to be done for installation but copying the pwxLib sub folder somewhere
+your compiler can find the headers.
+
+However, pwxLib comes with a Makefile with various "build" targets:
+
+  documentation - use doxygen to build documentation in ./doc/html
+  docinstall    - install documentation into /usr/share/doc/pwxLib-0.8.6
+  clean         - remove object files, test programs and tools
+  help          - this help
+  install       - copy pwxLib to /usr/include
+  userinstall   - copy pwxLib to /usr/local/include
+  test          - build test programs in ./test
+  tools         - build tools in ./tools (see below!)
+
+Note: It is not necessary to _install_ the library to be able to
+      compile the test programs and tools.
+
+To use pwxLib, there is no build process necessary, because
+pwxLib is a JBoH library.
+
+#include <pwxLib/CCnfFileHandler.h> // To use pwx::CFH
+#include <pwxLib/CMemRingFactory.h> // To use pwx::MRF (*)
+#include <pwxLib/CRandom.h>         // To use pwx::RNG
+#include <pwxLib/CSinCosTables.h>   // To use pwx::SCT
+#include <pwxClib/CWaveColor.h>     // To provide the CWaveColor class
+
+Additionally there are some tools you might want to take a look at:
+#include <pwxLib/tools/Args.h>           // Helper functions for program argument parsing
+#include <pwxLib/tools/DefaultDefines.h> // Some helper macros and functions for comparisons,
+                                         // math and type traits
+#include <pwxLib/tools/Exception.h>      // The trace adding pwx base exception
+#include <pwxLib/tools/MathHelpers.h>    // Some mathematical helper functions
+#include <pwxLib/tools/MRInterface.h>    // Use the thread safe interface to MRF containers (*)
+#include <pwxLib/tools/StreamHelpers.h>  // Some helper functions for working with streams
+
+(*): It doesn't matter whether you include MRInterface.h or CMemRingFactory.h, both will
+     ensure the existence of another.
+
+Tools:
+------
+
+Although "get Random Name" (tools/getrn) is a command line tool with no
+dependencies but pwxLib, the other tools "make Simplex Texture" (tools/mkst)
+and "Gravitation Matters" (tools/gravMat) have two dependencies:
+1.: You need the Simple Fast Multimedia Library (http://sfml-dev.org/)
+2.: If you do not have freefont-ttf installed in /usr/share/fonts (linux) or
+    "Courier New" in C:\Windows\Fonts (Windows), then please change the main
+    Makefile according to your needs!

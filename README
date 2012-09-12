@@ -1,0 +1,556 @@
+PrydeWorX Library
+-----------------
+
+Welcome to the pwxLib README!
+
+This is a JBoH (Just a Bunch of Headers) library, that can be used to add some
+tools and utilities to your project - hopefully making your life as a programmer
+easier. For licenses see bottom of this file.
+
+
+Current Version: 0.8.6 - ??. April 2012
+
+
+Right now there are four objects, five tools and two programs included:
+
+  Objects:
+pwx::CFH - Static object to create, open, modify and save configuration files.
+           This object is produced by <pwxLib/CCnfDileHandler.h>
+pwx::MRF - Static object to produce and handle memory ring containers of variable types.
+           This object is produced by <pwxLib/CMemRingFactory.h> (*)
+pwx::RNG - Static object to produce unique or pseudo random numbers, hashes and names.
+           This object is produced by <pwxLib/CRandom.h>
+pwx::SCT - Static object which provides pre-calculated sine and cosine tables.
+           This object is produced by <pwxLib/CSinCosTables.h>
+
+
+  Classes:
+pwx::CWC::CWaveColor - Helper class to transform between frequencies, wavelengths and RGB.
+                       This class is provided by <pwxLib/CWaveColor.h>
+
+
+  Tools:
+<pwxLib/tools/Args.h>           - Helper functions for program argument parsing
+<pwxLib/tools/DefaultDefines.h> - Some helper macros and functions for comparisons, math
+                                  and type traits
+<pwxLib/tools/Exception.h>      - The trace adding pwx base exception
+<pwxLib/tools/MathHelpers.h>    - Some mathematical helper functions
+<pwxLib/tools/MRInterface.h>    - Use the thread safe interface to MRF containers (*)
+<pwxLib/tools/StreamHelpers.h>  - Some helper functions for working with streams
+
+
+(*): It doesn't matter whether you include MRInterface.h or CMemRingFactory.h, both will
+     ensure the existence of another.
+
+  Programs:
+getrn    - "get Random Name", tool built by "make tools" in the tools sub folder to generate
+           random names and print them out on stdout or write to a text file.
+gravMat  - "Gravitation Matters" is a program that calculates the gravitation between a
+           number of matter units, their movements and collisions. It renders and writes
+           sequenced images that can be put together for a movie, with ffmpeg f.ex.
+mkst     - "make Simplex Texture", tool built by "make tools" in the tools sub folder that
+           provides a simple way to generate textures and bump maps out of Simplex Noise.
+
+
+CFH: ([C]onfig [F]ile [H]andler)
+<pwxLib/CCnfFilehandler.h>
+------------------------------
+If you do not wish the automatic instance to be generated, define
+PWX_NO_CFH_INSTANCE before including this file.
+
+The work flow is as follows:
+
+- Use CFH.create(name, path, CFFlags, maxLineLength, doOverwrite) to
+  create a new configuration file
+   - name         : A name to identify the file internally.
+   - path         : The actual file to load or to create.
+   - CFFlags      : Flags defining the rules about how a configuration file is structured
+   - maxLineLength: If data exceeds the number of characters set here, data
+        is saved in multiple lines. The key and the separator are counted and indented
+        on the next line. The default is 80 chars. A value of 0 disables the max line
+        length limit.
+   - doOverwrite  : If set to true, an existing file at that path is overwritten.
+        if set to false, an existing file at that path leads to a
+        pwx::cfh::fileExists exception to be thrown.
+  Instead of specifying all flags by yourself, there are four preset combinations as follows:
+   - cfConfig : Simple configuration file, format 'key:"data1,data2,..." # comment', no groups supported
+   - cfINI    : Ini files, format 'key=data1,data2,... ; comment' with groups being mandatory (*)
+   - cfList   : List format configs, format "key data1 data2 ... # comment' without groups and line wrap
+   - cfRc     : Shell rc files, format 'key="data1 data2 ...." # comment', no groups but source entries supported
+  (*): INI files have no multiple line feature. They might, but only regarding Perl's
+       Config::IniFiles module with the Unix "Here-Document"-Syntax. Windows wouldn't
+       like that.
+- Use CFH.load(name, path, CFFlags, maxLineLength, doCreate)
+  to add a configuration file to the system.
+   - name         : A name to identify the file internally.
+   - path         : The actual file to load or to create.
+   - CFFlags      : Flags defining the rules about how a configuration file is structured
+   - maxLineLength: If data exceeds the number of characters set here, data
+        is saved in multiple lines. The key and the separator are counted and indented
+        on the next line. The default is 80 chars. A value of 0 disables the max line
+        length limit.
+   - doCreate     : If set to true, a new file will be created if none can be found
+        at the given @a path. If set to false, a non-existent file leads to a
+        pwx::cfh::fileNotFound exception to be thrown.
+     Instead of specifying all flags by yourself, you can use the same presets as with create().
+- Use CFH.setGroup([name, ]group) to set in which group of which file you are
+  working with after that call.
+- Retrieve data:
+   - Get data by using CFH.getData(key) to get the data from the set name and group.
+   - Get data by using CFH.getData(group, key) to get the data from the set
+     name and the specific group.
+   - Get data by using CFH.getData(name, group, key) to get data from
+     any config file and group.
+  The same scheme can be used to get single data items, if a configuration line holds multiple values:
+   - Get the count of data items with CFH.getDataCount([[name,] group,] key)
+   - Get one data item with CFH.getDataItem([[name,] group,] key, index number)
+- Changing and setting data:
+   - Set data by using CFH.setData(key, data) to set the data of the set name and group.
+   - Set data by using CFH.setData(group, key, data) to set the data of the set
+     name and the specific group.
+   - Set data by using CFH.setData(name, group, key, data) to set data of
+     any configuration file and group.
+  Note: all setData() methods have an optional parameter with which you can set a char to define
+        how data items are separated. The default is to not change the currently set value.
+- Adding data to a key:
+   - Add to existing data by using CFH.addData(key, data) to add to the data of the set name and group.
+   - Add to existing data by using CFH.addData(group, key, data) to add to the data of the set
+     name and the specific group.
+   - Add to existing data by using CFH.addData(name, group, key, data) to add to the data of
+     any configuration file and group.
+  Note: all addData() methods have an optional parameter with which you can set a char to define
+        how data items are separated. The default is to not change the currently set value.
+- To retrieve, change or set comments, the methods CFH.getComment(...), CFH.setComment(...) and
+  CFH.addComment(...)  work like CFH.getData(...) and CFH.setData(...) but with comments. Comments
+  are written behind the data they belong to and can stretch over multiple lines as well. If they
+  do use multiple lines, each line is started with a "commenter" char.
+- To change both the data and the comment at once, you can use
+  CFH.setKey([[name,] group,] key, data, comment).
+- Save configuration file
+   - With CFH.save(name) you can save a specific file identified by the set name.
+   - If the name is omitted, CFH.save() saves all opened files.
+   - Alternatively you can set CFH to automatically save all open files upon its
+   - destruction via CFH.setAutoSave(bool).
+  Warning: If you use CFH.setAutoSave(false) to disable automatic saving, all changes not
+  saved when CFH is destroyed will be lost without further notion. For this reason the
+  default is to turn automatic saving on.
+
+
+MRF: ([M]emory [R]ing [F]actory)
+<pwxLib/CMemRingFactory.h>
+-------------------------------
+This is a factory class which is responsible to create and maintain containers.
+As long as containers are handled by this object, they are automatically cleaned
+up on destruction of this object, which is normally the end of the program
+utilizing it.
+
+There are four ways of getting a container by their held data:
+1. : create(data, ...) will explicitly create a container with the given
+     data saved as the first item.
+2. : add(data, ...) will add a new item with the given data to the first
+     container available that holds this type of data. If no such container exists,
+     a new one will be created.
+3. : get(data) will return the first container in which the given data is
+     currently stored. If no such container exists, a new container will be created.
+4. : find(data) will return the first container in which the given data is
+     currently stored. If no such container exists, the method returns NULL.
+
+All four methods return a pointer to the container for further usage. The type
+of the container is pwx::mrf::TMemRing<T>, with T being the type of your data.
+
+For information on TMemRing<T> (the container) and TItem<T> (the data wrapper),
+see below.
+
+A note on multi-threaded access:
+If you plan to use threads to work with containers and their data, you should
+take a look at pwx::mrf::MRInterface<T> (pwxLib/tools/MRInterface.h), which is a
+thread safe interface to pwx::mrf::TMemRing<T>. To enable thread safety your program
+ought to be compiled with -DPWX_THREADS, or you have to define PWX_THREADS prior
+including the first header from pwxLib.
+For more information on how to use TMemRing<T> with threads, see tools/MRInterface.
+
+A Note on the stored data:
+Although there are wrapper methods to be used with values, you really should insert
+data as pointers only, created with their respective new operator. The reason is,
+that stored data is deleted with their delete operator. This means that the system
+is not aware of values.
+If you add values, they are used as arguments to the types new operator. So while
+pwxMemRing is not meant to store simple types like int or float, it can be used to
+do so.
+Important: Only create(), add(), get() and find() have wrappers for values.
+
+Internally the containers are handled like items in a container themselves, so
+you can get containers by their number, Id or name. Unlike the generated containers,
+the Id and name are not optional and handled by this object. But you can change the
+name of a container if you like. But you can get a pointer, the number, id or name
+of a container with the help of various getX() methods.
+
+All containers can utilize an id map and/or a name map. This makes it possible
+to identify a stored item by either its id and/or name. As a convenience MRF can
+be told how to set the usage of those maps, they are turned on by default, on
+creation. You can do this by defining PWX_MRF_USEIDMAP and/or PWX_MRF_USENAMEMAP
+as being "false" prior including this file.
+
+Although the number of an item unsigned, the methods using the number handle signed
+numbers, which then are normalized and wrapped. Those methods will only fail, by
+throwing an exception, if the container holds no items.
+
+If you do not want a static instance but create your own, you can define
+PWX_NO_MRF_INSTANCE prior including this file and build you own. Besides that
+you can use TMemRing directly, but have to maintain your containers yourself.
+
+The following are the templates that do "the stuff" internally:
+
+TMemRing<T> :
+This is the template that is responsible to handle typed items. The numbering of the items
+begins with 0, which is the root item. All methods that retrieve an item by its number can
+be used backwards by using a negative number, and wrap the number around the valid range.
+So if you want item 15, but there are only 10 items, You'll get item 5.
+
+TItem<T> :
+This is the template that is used as a shell around the held data.
+All items have a number, which identifies them by position in the memory ring they are
+stored within. They have an id, which, if used, identifies them within an id map, and a
+name to identify items within a name map if used.
+Ids and names are optional for the container. The container then is responsible to disallow
+unusable values if Id and/or name maps shall be used.
+Although it is possible to use items without making use of the id or name, they are the only
+reason why one might use MRF at all. On the other hand, if you do not use the id and
+the name for identification, you could use those as free tags, adding data to your items
+that do not hold such data on their own.
+
+
+RNG: ([R]andom [N]ame/umber [G]enerator)
+<pwxLib/CRandom.h>
+----------------------------------------
+This tool provides methods to generate real and pseudo random numbers and names on
+the fly.
+
+This class produces a static instance called pwx::RNG, meaning "Random Name/Noise/Number
+Generator", unless you have defined PWX_NO_RNG_INSTANCE.
+
+If you define PWX_NO_RNG_INSTANCE prior including this header, you have to instantiate
+your own version from pwx::SCT::CRandom.
+
+The following groups of methods are available:
+* hash()    Hashing functions for integer arguments, mostly taken from:
+            http://www.burtleburtle.net/bob/hash/index.html (Robert Jenkins)
+            http://www.cris.com/~Ttwang/tech/inthash.htm (Thomas Wang)
+            The result is always a positive number.
+* noise()   These are not the classic Perlin noise functions, but simple wrappers
+            that transform hash() results into a -1.0 to 1.0 double range.
+* random()  These return random numbers as int, long int, float, double and long double.
+            They can be used without or with up to two arguments to get results between
+            those two or from zero to the one argument.
+* rndName() A method that returns a random name built by combining random letters into
+            syllables following the ordering rules derived from hundreds of english texts.
+* simplex() This set of functions produce pseudo random numbers using Simplex Noise
+            (2D, 3D and 4D) by Ken Perlin, and are called simplex(). Documentation
+            taken from: http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
+            (Stefan Gustavson)
+
+
+
+SCT: ([S]ine-/[C]osine-[T]ables)
+<pwxLib/CSinCosTables.h>
+--------------------------------
+This tool provides methods to generate the sine and/or cosine out of degrees instead
+of radians. Both on-the-fly calculation and precalculated tables - with variable
+precision - are supported.
+
+If you set the precision to -1, there will be no predefined tables, but all sine and
+cosine values calculated on-the-fly. But you do not have to care about the range of
+your angles, and do not need to transform angles to radiants.
+
+Usage:
+* Set _PWX_SCT_INITIALPRECISION before including this file if you want to start with a
+  different precision. The default is a precision of 3. You can, however, change the
+  precision used later.
+* Set _PWX_SCT_INITIALPRECISION to -1 if you prefer life calculations over precalculated
+  tables from the beginning. You can switch to life calculation by using setPrecision(-1)
+  later, of course
+* Normally the initialization is done silent. But if you need a console output, when using
+  a higher initial precision for instance, you can predefine _PWX_SCT_WITH_OUTPUT to be
+  true instead of the default false. Please be aware that this means output if you change
+  the precision later in a way that makes a re-initialization of the tables necessary.
+* The file provides a static and initialized instance of the class, pwx::SCT - everything
+  is done with it - unless you define PWX_NO_SCT_INSTANCE
+* If you define PWX_NO_SCT_INSTANCE prior including this header, you have to instantiate
+  your own version from pwx::SCT::CSinCosTables
+* Use the following functions to get the values: sin() for sine, cos() for cosine, and
+  sincos() to get both at once.
+* Use setPrecision() to set a new precision. resetPrecision() resets it to the initial
+  value and getPrecision() returns the currently used value. Please be aware, however, that
+  changing the precision means a recalculation of the sine and cosine arrays. Switching
+  between -1 (life calculation) and the initial value does not trigger a reinitialization
+  of the tables.
+
+For more information please see the sources or build documentation with the provided
+Doxyfile. (See Makefile with "make help" for automatic building)
+
+
+pwx::CWC::CWaveColor
+<pwxLib/CWaveColor.h>
+----------------------
+A class to work with the frequencies any RGB color is made of.
+
+The main idea of this class is, to build an instance out of RGB values. The resulting
+frequencies can be modified by various effects, like Doppler or gravitation, and then mixed
+back into a resulting RGB color on demand.
+
+Instead of using RGB colors an empty instance can be used and filled with RGB colors or set
+to a specific wavelength or frequency.
+
+Important: Wavelengths are considered to be nanometers and frequencies are considered to be
+gigahertz by the methods of this class.
+
+
+Argument Parsing system
+<pwxLib/tools/Args.h>
+------------------------
+The functions in the namespace pwx::args are used to load up all program arguments by using
+a small number of functions.
+
+The work flow is as follows:
+a) Use addArg(...) for every argument/option you wish to be recognized
+b) Use loadArgs(argc, argv) to have the command line arguments parsed
+c) Process all loaded arguments by using procArgs()
+d) If you need space, you can clear up with clearArgs()
+
+To get help strings of an argument, you can use getArgHelp(...) to get a malloc'd C-String,
+or printArgHelp(ostream, ...) on an ostream to print the help text out directly.
+
+
+Thread safe access to MRF containers
+<pwxLib/tools/MRInterface.h>
+-----------------------------------
+This is an interface class to allow simultaneous access to a container
+from different parallel places like threads. When searching for an item
+the container saves which item has been retrieved last to speed up access
+to nearby items like in loops. Doing this from different threads invalidates
+this position on every access. This interface uses its own retrieval on
+a container. Therefore access is sped up greatly if every thread uses its own
+interface.
+
+Manipulating a container from different threads is possible by simply locking
+the container before every manipulation. But since many modifications involve
+a search for the right position the usage of this interface can help, too.
+When manipulating a container through the interface, container and item locking
+is done automatically and more fine grained.
+
+For data retrieval you can use the same method set as can be found in TMemRing.
+For data manipulation, however, only a small subset is provided to keep the
+complexity low. The methods for stack operation, loading, saving, merging,
+deleting and clearing a container have been removed. Furthermore there is no
+manipulating operator available via this interface. (operator[] is provided,
+though) You can neither set the usage of the maps via the interface nor disable
+the reference tracking.
+
+Additionally to the inherited (and sometimes overwritten) methods from TMemRing<T>,
+MRInterface<T> has four more methods. getCurrentNr() returns the number of the
+currently handled item, getUnsortedCount() reports the number of unsorted items
+found during running a sort, interruptSorting() stops the current sorting process
+and reset() tells the interface, that its currently used item is no longer save.
+These four methods can be used to control what is happening in a multi threaded
+environment. See the gravMat tool for how this can be done.
+
+
+getrn: ([getR]andom[N]ame(s))
+-----------------------------
+
+  Usage:
+getrn [options]
+
+The default behavior, when no options are given, is to write
+one random names with 1-3 parts, 2-5 syllables and  6-15
+characters to stdout.
+
+  Options:
+[-]x,y,z,w <value>          set value for the x,y,z or w coordinate. If
+                            no offset is set, the program uses random ones
+[-]c  [--]count <count>     Generate <count> names
+      [--]chars <value>     Set maximum characters to generate.
+[-]h  [--]help              Show this help and exit
+      [--]mod<xyzw> <value> set modifier for x, y, z or w coordinate
+                            instead of using random ones (*)
+[-]n  [--]norandom          Increase coordinates by 1 instead of random
+                            modifiers. (*)
+[-]o  [--]out <filename>    Write generated name(s) into <file>.
+      [--]parts <value>     Set maximum parts to generate.
+      [--]sylls <value>     Set maximum syllables to generate.
+[-]s  [--]seed <value>      Set the seed to <value>.
+[-]v  [--]version           Show program version and exit
+
+(*) : Note on mod* and norandom:
+      If you set at least one modifier, no random values will be used,
+      but the value(s) you set, and 0.0 for all you omit. The norandom
+      option is only taken into account if you do not set any modifier
+      and sets all four to 1.0.
+
+
+gravMat: ([grav]itation [Mat]ters
+---------------------------------
+
+  Usage:
+gravMat [options]
+
+The default behavior, when no options are given, is to open
+a 400x400 window, distribute material and let it flow until
+the escape key is pressed or only one matter unit is left.
+
+  Options:
+x/y/z   <value>           Set offset of the specified dimension.
+      [--]explode         Matter is not distributed but explodes from the
+                          center
+      [--]fps <FPS>       Set FPS between 1.0 and 200.0 (default 25.0)
+      [--]file <path>     File to load at program start from and to save
+                          on program end into
+   Note: Data will be saved before each gravitation calculation. If
+         goes wrong when loading data on program start, a new set of data
+         will be created and the old file overwritten.
+      [--]halfX           Matter is not distributed but explodes from the
+                          center
+      [--]halfY           Matter is not distributed but explodes from the
+                          center
+      [--]height <height> Set window height (minimum 100)
+      [--]help            Show this help and exit
+[-]o  [--]outfile <file>   Format string for the output file. The default
+          is "outfile_%06d.png". Supported are bmp, png and jpg.
+[-]R  [--]reduct <value>  Set the reduction on each wave (minimum 1.0,
+                          default 1.667)
+[-]s  [--]seed <value>    Set seed
+[-]S  [--]smooth <value>  Set the smoothing on each wave (minimum 1.0,
+                          default 1.337)
+      [--]version         Show the programs version and exit
+      [--]width <width>   Set window width (minimum 100)
+[-]W  [--]waves <value>   Set number of waves (minimum 1, default 5)
+[-]Z  [--]zoom <value>    Set the zoom factor (minimum 0.001, default
+                          29.7633)
+
+
+mkst: ([m]a[k]e[S]implex[T]exture)
+----------------------------------
+
+  Usage:
+mkst [options]
+
+The default behavior, when no options are given, is to open a
+800x600 window, generate one texture, and wait for a key press.
+
+  Options:
+x/y/z/w <value>           Set offset of the specified dimension.
+        All four dimensions default to 0.0 and use a stepping of one
+        per pixel, modified by zoom which defaults to 9.0. (This
+        means every pixel raises x and/or y by 1.0 / 9.0)
+        To use z, you have to set 3D or 4D, to use w 4D is needed.
+        See "sequence patterns" below about how to control z and w.
+3D / 4D                   Enable third/fourth dimension
+[-]B  [--]batch           Enable batch mode (no GUI)
+[-]h  [--]bordhi <value>  Set high border (-1.0 to 1.0)
+[-]l  [--]bordlo <value>  Set low border (-1.0 to 1.0)
+        The borders are the limit under/over which value the low and
+        high color are set. The middle color is always set in the
+        middle between those borders. The default sequence for
+        low->mid->high is -1.0->0.0->+1.0
+[-]H  [--]colhi <value>   Set the high color
+[-]M  [--]colmid <value>  Set the middle color
+[-]L  [--]collow <value>  Set the low color
+        Colors are needed as 0xRRGGBB and default to
+        0xffff00 for colHi, 0x7f7f00 for colMid and
+        0x000000 for colLow
+[-]e  [--]ext <ext>       Set the file extension to the desired image
+                          format. The default is "tif".
+      [--]height <height> Set window height (minimum 480)
+      [--]help            Show this help and exit
+[-]n  [--]no-bumpmap      Omit the calculation of a bumpmap
+[-]q  [--]quiet           No output to the console
+[-]R  [--]reduct <value>  Set the reduction on each wave (minimum 1.0)
+[-]s  [--]seed <value>    Set seed
+[-]S  [--]smooth <value>  Set the smoothing on each wave (minimum 1.0)
+[-]t  [--]threads <num>   Set number of threads (minimum 4, default 8)
+      [--]version         Show the programs version and exit
+      [--]width <width>   Set window width (minimum 640)
+[-]W  [--]waves <value>   Set number of waves (minimum 1)
+[-]Z  [--]zoom <value>    Set the zoom factor (minimum 0.001)
+
+The next set of arguments can be used to change the modifiers for
+the coordinates.
+Changing the modifier for w and/or z may lead to very strange results, because
+they are used with the *IncMod* sequence patterns, too.
+      [--]mod<zw>   <value> change the modification value for z or w
+
+  Sequence Patterns:
+The following options may be added to command line options or set
+via alt-z or alt-w at runtime. w and z are static values by default.
+ (to keep the output short, <xy> means either x or y.)
+ <wz>IncMod<XYZW> w/z is increased whenever x/y/z/w is modified
+ <wz>Is<XYZW>     Set w/z to be equal to x/y/z/w
+ <wz>IsXY         Set w/z to be equal to x * y
+ <wz>IsXYd<ZW>    Set w/z to be equal to (x * y) / <ZW>
+ <wz>IsXYm<ZW>    Set w/z to be equal to (x * y) % <ZW>
+ <wz>Is<XY>d<YX>  Set w/z to be either x / y or y / x
+ <wz>IsXaY        Set w/z to be equal to x + y
+ <wz>Is<XY>s<YX>  Set w/z to be either x - y or y - x
+ <wz>Is<XY>m<YX>  Set w/z to be either x % y or y % x
+
+  GUI key mapping:
+CURSOR: modify x with left/right, y with up/down cursor keys
+d/D   : increase/decrease dimensions (2-4)
+ESC   : quit program
+h     : show on-screen help
+R     : Render image with current settings
+s     : save current texture (and bumpmap unless -n is specified)
+SPACE : switch between texture and bumpmap. This does only work
+        if the -n/no-bumpmap isn't used.
+TAB   : Show stats of the current image
+w/W   : increase/decrease offset w by mod w. (defaults to 1.0)
+        press ctrl to increase/decrease with 10 times mod w.
+        press alt to toggle w coordinate sequence setting.
+z/Z   : increase/decrease offset z by mod z. (defaults to 1.0)
+        press alt to toggle z coordinate sequence setting.
+
+
+
+License:
+--------
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+See COPYING for the full license text.
+
+External licenses:
+------------------
+ISO C9x  compliant stdint.h for Microsoft Visual Studio   ("external/stdint.h")
+
+Copyright (c) 2006 Alexander Chemeris
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+
+   3. The name of the author may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

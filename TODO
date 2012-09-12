@@ -1,0 +1,68 @@
+List of current TODOs
+---------------------
+
+pwxLib :
+----------------------------------
+- Elevate to C++11 Standard
+  - Add Lambdas where applicable
+  - Switch to new Initialization where applicable
+  - Replace CRITICAL_SECTION and pthreads with C++ threads
+  -> Latest Version for the full change: 0.8.9999
+
+- Add threading functions and a class wrapper.
+
+- Add the possibility to compile a link library instead of enforcing
+  JBoH. This will need quite some restructuring.
+  -> It is the next major change and thus marking version 0.9
+
+- Re-add pwxVector3D
+  This was the first part of the PrydeWorX Library, but unfortunately it
+  wasn't designed for inclusion in a JBoH Library and got removed. To re-
+  add it it has to be rewritten from scratch. (But of course the math can
+  be reused ;-)
+  pwxVector3D organizes Vector 3D models consisting of dots, lines and
+  elipses and supports moving, rotating and morphing in 3D space, plus
+  calculating the coordinates into 2D for easier display. The latter is
+  supported by a method to loop through all components of an object ordered
+  by their current camera distance.
+  -> This being the last component for the first full version marks version
+     1.0
+
+CFH (CCnfFileHandler.h) :
+----------------------------------
+nothing right now
+
+
+MRF (CMemRingFactory.h) :
+----------------------------------
+- Add typedefs for more readable, though longer, names
+- Add a wrapper to use TMemRing like a Hash/Associative Array.
+- Add a wrapper to use TMemRing as a Stack.
+- Add a wrapper to use TMemRing as a Queue.
+
+
+RNG (CRandom.h) :
+----------------------------------
+- Add hash() functions for [C-]Strings
+
+
+SCT (CSinCosTables.h) :
+----------------------------------
+nothing right now
+
+
+tools/getrn (getRandomName) :
+----------------------------------
+nothing right now
+
+
+tools/gravMat :
+----------------------------------
+- Add a GUI-free console mode
+- Add rendering directly into videos using ffmpeg
+- ETA disabled for now, write a new ETA module. A new component perhaps?
+
+
+tools/mkst (makeSimplexTexture) :
+----------------------------------
+- add sequence generators to produce n textures in batch mode

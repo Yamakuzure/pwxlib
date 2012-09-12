@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pwxLib" />
+		<Option makefile_is_custom="1" />
+		<Option execution_dir="/home/sed/pryde/PrydeWorX/pwxLib" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="all">
+				<Option output="./pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./" />
+				<Option object_output="./.objrls/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="clean">
+				<Option output="./pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./" />
+				<Option object_output="./.objrls/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="documentation">
+				<Option output="./pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./" />
+				<Option object_output="./.objrls/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="help">
+				<Option output="./pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./" />
+				<Option object_output="./.objrls/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="test">
+				<Option output="./pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./" />
+				<Option object_output="./.objrls/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="tools">
+				<Option output="./pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="./" />
+				<Option object_output="./.objrls/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="./AUTHORS" />
+		<Unit filename="./COPYING" />
+		<Unit filename="./ChangeLog" />
+		<Unit filename="./Doxyfile" />
+		<Unit filename="./INSTALL" />
+		<Unit filename="./Makefile" />
+		<Unit filename="./README" />
+		<Unit filename="./TODO" />
+		<Unit filename="libpwx/libpwx.cpp" />
+		<Unit filename="pwxLib/CCnfFileHandler.h" />
+		<Unit filename="pwxLib/CMemRingFactory.h" />
+		<Unit filename="pwxLib/CRandom.h" />
+		<Unit filename="pwxLib/CSinCosTables.h" />
+		<Unit filename="pwxLib/CWaveColor.h" />
+		<Unit filename="pwxLib/external/stdint.h" />
+		<Unit filename="pwxLib/internal/ArgImpl.h" />
+		<Unit filename="pwxLib/internal/ArgTypes.h" />
+		<Unit filename="pwxLib/internal/ArgTypesBase.h" />
+		<Unit filename="pwxLib/internal/CConfigData.h" />
+		<Unit filename="pwxLib/internal/CConfigDataImpl.h" />
+		<Unit filename="pwxLib/internal/CConfigFile.h" />
+		<Unit filename="pwxLib/internal/CConfigFileImpl.h" />
+		<Unit filename="pwxLib/internal/CConfigGroup.h" />
+		<Unit filename="pwxLib/internal/CConfigGroupImpl.h" />
+		<Unit filename="pwxLib/internal/CFHexceptions.h" />
+		<Unit filename="pwxLib/internal/CItem.h" />
+		<Unit filename="pwxLib/internal/CMRFImpl.h" />
+		<Unit filename="pwxLib/internal/CMRIImpl.h" />
+		<Unit filename="pwxLib/internal/CMemRing.h" />
+		<Unit filename="pwxLib/internal/CRNGImpl.h" />
+		<Unit filename="pwxLib/internal/CRandomHash.h" />
+		<Unit filename="pwxLib/internal/CRandomName.h" />
+		<Unit filename="pwxLib/internal/CRandomNoise.h" />
+		<Unit filename="pwxLib/internal/CRandomRandom.h" />
+		<Unit filename="pwxLib/internal/CRandomSimplex.h" />
+		<Unit filename="pwxLib/internal/CRandomStatics.h" />
+		<Unit filename="pwxLib/internal/CRandomWordConstants.h" />
+		<Unit filename="pwxLib/internal/CSCTImpl.h" />
+		<Unit filename="pwxLib/internal/CWCexceptions.h" />
+		<Unit filename="pwxLib/internal/CWaveColorImpl.h" />
+		<Unit filename="pwxLib/internal/CfhImpl.h" />
+		<Unit filename="pwxLib/internal/CfhTypes.h" />
+		<Unit filename="pwxLib/internal/DefaultMutex.h" />
+		<Unit filename="pwxLib/internal/DefaultTempTools.h" />
+		<Unit filename="pwxLib/internal/MRFexceptions.h" />
+		<Unit filename="pwxLib/internal/MRIntImpl.h" />
+		<Unit filename="pwxLib/internal/MSVCwarnPop.h" />
+		<Unit filename="pwxLib/internal/MSVCwarnPush.h" />
+		<Unit filename="pwxLib/internal/MSVCwrap.h" />
+		<Unit filename="pwxLib/internal/TItem.h" />
+		<Unit filename="pwxLib/internal/TMRIImpl.h" />
+		<Unit filename="pwxLib/internal/TMRTImpl.h" />
+		<Unit filename="pwxLib/internal/TMRT_insert.h" />
+		<Unit filename="pwxLib/internal/TMemRing.h" />
+		<Unit filename="pwxLib/internal/sWave.h" />
+		<Unit filename="pwxLib/tools/Args.h" />
+		<Unit filename="pwxLib/tools/DefaultDefines.h" />
+		<Unit filename="pwxLib/tools/Exception.h" />
+		<Unit filename="pwxLib/tools/MRInterface.h" />
+		<Unit filename="pwxLib/tools/MathHelpers.h" />
+		<Unit filename="pwxLib/tools/StreamHelpers.h" />
+		<Unit filename="test/Makefile" />
+		<Unit filename="test/testArgs.cpp" />
+		<Unit filename="test/testCfHandler.cpp" />
+		<Unit filename="test/testColor.cpp" />
+		<Unit filename="test/testMemRing.cpp" />
+		<Unit filename="test/testRandom.cpp" />
+		<Unit filename="test/testSinCosTables.cpp" />
+		<Unit filename="tools/Makefile" />
+		<Unit filename="tools/src/getRandomName/Makefile" />
+		<Unit filename="tools/src/getRandomName/environment.cpp" />
+		<Unit filename="tools/src/getRandomName/environment.h" />
+		<Unit filename="tools/src/getRandomName/main.cpp" />
+		<Unit filename="tools/src/getRandomName/main.h" />
+		<Unit filename="tools/src/getRandomName/tools.cpp" />
+		<Unit filename="tools/src/getRandomName/tools.h" />
+		<Unit filename="tools/src/gravMat/Makefile" />
+		<Unit filename="tools/src/gravMat/colormap.h" />
+		<Unit filename="tools/src/gravMat/consoleui.cpp" />
+		<Unit filename="tools/src/gravMat/consoleui.h" />
+		<Unit filename="tools/src/gravMat/environment.cpp" />
+		<Unit filename="tools/src/gravMat/environment.h" />
+		<Unit filename="tools/src/gravMat/main.cpp" />
+		<Unit filename="tools/src/gravMat/main.h" />
+		<Unit filename="tools/src/gravMat/matter.cpp" />
+		<Unit filename="tools/src/gravMat/matter.h" />
+		<Unit filename="tools/src/gravMat/sfmlui.cpp" />
+		<Unit filename="tools/src/gravMat/sfmlui.h" />
+		<Unit filename="tools/src/makeSimplexTexture/Makefile" />
+		<Unit filename="tools/src/makeSimplexTexture/callback.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/callback.h" />
+		<Unit filename="tools/src/makeSimplexTexture/consoleui.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/consoleui.h" />
+		<Unit filename="tools/src/makeSimplexTexture/environment.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/environment.h" />
+		<Unit filename="tools/src/makeSimplexTexture/main.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/main.h" />
+		<Unit filename="tools/src/makeSimplexTexture/renderer.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/renderer.h" />
+		<Unit filename="tools/src/makeSimplexTexture/sfmlui.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/sfmlui.h" />
+		<Unit filename="tools/src/makeSimplexTexture/textbox.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/textbox.h" />
+		<Unit filename="tools/src/makeSimplexTexture/tools.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/tools.h" />
+		<Unit filename="tools/src/makeSimplexTexture/workloop.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/workloop.h" />
+		<Unit filename="tools/src/makeSimplexTexture/wzseq.cpp" />
+		<Unit filename="tools/src/makeSimplexTexture/wzseq.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

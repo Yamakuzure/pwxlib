@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="makeSimplexTexture" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objdbg\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="width 640 height 480" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-ggdb" />
+					<Add option="-O0" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+				</Linker>
+			</Target>
+			<Target title="Effective C++">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objdbg\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="width 640 height 480" />
+				<Compiler>
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Weffc++" />
+					<Add option="-pedantic" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-ggdb" />
+					<Add option="-O0" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objrls\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-march=native" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Debug32">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objdbg\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-pedantic" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-ggdb -m32" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg" />
+					<Add option="-m32 -L/lib32 -L/usr/lib32" />
+				</Linker>
+			</Target>
+			<Target title="Graphite">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objrls\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-march=native" />
+					<Add option="-floop-interchange" />
+					<Add option="-fgraphite-identity" />
+					<Add option="-ftree-loop-distribution" />
+					<Add option="-floop-parallelize-all" />
+					<Add option="-floop-strip-mine" />
+					<Add option="-floop-block" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="WinDebug">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objdbg\" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option parameters="width 640 height 480" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MTd" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/Od" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/Zi" />
+					<Add option="/c" />
+					<Add option="/DPWXLIB_DEBUG" />
+					<Add option="/DSFML_DYNAMIC" />
+					<Add directory="D:\PrydeWorX\pwxLib\" />
+					<Add directory="D:\SFML-1.6\include" />
+				</Compiler>
+				<Linker>
+					<Add option="/DEBUG" />
+					<Add library="sfml-system-d.lib" />
+					<Add library="sfml-window-d.lib" />
+					<Add library="sfml-graphics-d.lib" />
+					<Add directory="D:\SFML-1.6\lib" />
+				</Linker>
+			</Target>
+			<Target title="WinRelease">
+				<Option output="..\..\mkst" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\" />
+				<Option object_output=".\.objrls\" />
+				<Option type="1" />
+				<Option compiler="msvc10" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="/MT" />
+					<Add option="/TP" />
+					<Add option="/arch:SSE2" />
+					<Add option="/GA" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/Ox" />
+					<Add option="/W3" />
+					<Add option="/Zc:auto" />
+					<Add option="/DNDEBUG" />
+					<Add option="/DSFML_DYNAMIC" />
+					<Add directory="D:\PrydeWorX\pwxLib\" />
+				</Compiler>
+				<Linker>
+					<Add library="sfml-system.lib" />
+					<Add library="sfml-window.lib" />
+					<Add library="sfml-graphics.lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++0x" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-DPWX_THREADS" />
+		</Compiler>
+		<Linker>
+			<Add library="sfml-system" />
+			<Add library="sfml-window" />
+			<Add library="sfml-graphics" />
+		</Linker>
+		<Unit filename="Makefile" />
+		<Unit filename="callback.cpp" />
+		<Unit filename="callback.h" />
+		<Unit filename="consoleui.cpp" />
+		<Unit filename="consoleui.h" />
+		<Unit filename="environment.cpp" />
+		<Unit filename="environment.h" />
+		<Unit filename="icon.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="main.h" />
+		<Unit filename="renderer.cpp" />
+		<Unit filename="renderer.h" />
+		<Unit filename="sfmlui.cpp" />
+		<Unit filename="sfmlui.h" />
+		<Unit filename="textbox.cpp" />
+		<Unit filename="textbox.h" />
+		<Unit filename="tools.cpp" />
+		<Unit filename="tools.h" />
+		<Unit filename="workloop.cpp" />
+		<Unit filename="workloop.h" />
+		<Unit filename="wzseq.cpp" />
+		<Unit filename="wzseq.h" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
