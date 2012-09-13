@@ -26,8 +26,12 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   *
-  * History and changelog are maintained in pwx.h
+  * History and Changelog are maintained in pwx.h
 **/
+
+#include <pwx/types/CLockable.h>
+#include <pwx/general/macros.h>
+#include <pwx/container/TSingleList.h>
 
 namespace pwx {
 

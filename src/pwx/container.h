@@ -24,13 +24,16 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   *
-  * History and changelog are maintained in pwx.h
+  * History and Changelog are maintained in pwx.h
 **/
 
 #include <pwx/container/TSingleList.h>
+#include <pwx/container/TSingleRing.h>
 #include <pwx/container/TStack.h>
 #include <pwx/container/TDoubleList.h>
+#include <pwx/container/TDoubleRing.h>
 #include <pwx/container/TQueue.h>
+#include <pwx/container/TSet.h>
 
 #endif // PWX_LIBPWX_PWX_CONTAINER_H_INCLUDED
 
