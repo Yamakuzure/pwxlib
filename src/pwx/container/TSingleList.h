@@ -505,7 +505,7 @@ public:
     * @param[in] index_ the index of the element to find.
     * @return read-only pointer to the element, or nullptr if the list is empty.
   **/
-  const elem_t* operator[](const int32_t index_) const noexcept
+  virtual const elem_t* operator[](const int32_t index_) const noexcept
     {
       return privGetElementByIndex(index_);
     }
@@ -577,6 +577,8 @@ private:
    * === Private methods                         ===
    * ===============================================
   */
+
+  /// IMPORTANT: private methods do not lock, callers must have locked!
 
   /// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
   virtual const elem_t* privGetElementByIndex(int32_t index_) const noexcept
