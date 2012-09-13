@@ -12,7 +12,7 @@
   * to be used.
   *
   * (c) 2007 - 2012 PrydeWorX
-  * @author Sven Eden, PrydeWorX - Hamburg, Germany
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
   *
@@ -29,21 +29,7 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   *
-  @verbatim
-  * History and Changelog:
-  * ----------------------
-  * Version   Date        Maintainer      Change(s)
-  * 0.0.1     2010-11-03  sed, PrydeWorX  First Design
-  * 0.7.0     2010-11-09  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.7.1     2011-03-26  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.7.2     2011-04-07  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.8.0     2011-07-14  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.8.1     2011-09-30  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.8.2     2011-10-07  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.8.3     2011-10-16  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.8.5     2012-03-01  sed, PrydeWorX  Version bump to new pwxLib release version
-  * 0.8.6.1   2012-07-17  sed, PrydeWorX  Import into new library version
-  @endverbatim
+  * History and changelog are maintained in pwx.h
 **/
 
 #include <pwx/general/compiler.h>

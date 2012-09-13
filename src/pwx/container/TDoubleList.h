@@ -7,7 +7,7 @@
   * @brief Declaration of a basic template for doubly linked lists
   *
   * (c) 2007 - 2012 PrydeWorX
-  * @author Sven Eden, PrydeWorX - Hamburg, Germany
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
   *
@@ -23,6 +23,8 @@
   *
   *  You should have received a copy of the GNU General Public License
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  *
+  * History and changelog are maintained in pwx.h
 **/
 
 #include <pwx/container/TSingleList.h>
@@ -252,55 +254,6 @@ public:
       else
         // head is the new element
         return privAddPrev(nullptr);
-//      if (prev_ && (nullptr == find(prev_)) )
-//        // find sets curr to the correct value.
-//        PWX_THROW("ItemNotFound", "Item not found", "The searched item can not be found in this doubly linked list")
-//
-//      // First create a new element for data_
-//      elem_t* newElement = nullptr;
-//      PWX_TRY(newElement = new elem_t(data_, destroy))
-//      PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
-//
-//      if (nullptr == prev_)
-//        {
-//          if (head)
-//            {
-//              newElement->next = head;
-//              head->prev = newElement;
-//            }
-//          head = newElement;
-//          // In this case we need to raise eNr because an element
-//          // is inserted before curr in the list
-//          ++eNr;
-//        }
-//      else
-//        {
-//          PWX_LOCK_GUARD(elem_t, curr)
-//          // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
-//          if (curr->next)
-//            {
-//              curr->next->prev = newElement;
-//              newElement->next = curr->next;
-//            }
-//          else
-//            // If we have a new tail, it needs to be noted:
-//            tail = newElement;
-//
-//          newElement->prev = curr;
-//          curr->next       = newElement;
-//        }
-//
-//      // If we had no elements yet, head and tail need to be set:
-//      if (0 == eCount)
-//        {
-//          head = newElement;
-//          tail = newElement;
-//          curr = newElement;
-//          eNr  = 0;
-//        }
-//
-//      // Count the new element and give the number back
-//      return ++eCount;
     }
 
   /** @brief insert a new data pointer after the specified element
@@ -336,50 +289,6 @@ public:
       else
         // head is the new element
         return privAddPrev(nullptr);
-//      // First create a new element for data_
-//      elem_t* newElement = nullptr;
-//      PWX_TRY(newElement = new elem_t(data_, destroy))
-//      PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
-//
-//      if (prev_)
-//        {
-//          PWX_LOCK_GUARD(elem_t, curr)
-//          // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
-//          if (prev_->next)
-//            {
-//              prev_->next->prev = newElement;
-//              newElement->next  = prev_->next;
-//            }
-//          else
-//            // If we have a new tail, it needs to be noted:
-//            tail = newElement;
-//          newElement->prev  = prev_;
-//          prev_->next       = newElement;
-//
-//        }
-//      else
-//        {
-//          if (head)
-//            {
-//              head->prev = newElement;
-//              newElement->next = head;
-//            }
-//          head = newElement;
-//        }
-//
-//      // If we had no elements yet, head and tail need to be set:
-//      if (0 == eCount)
-//        {
-//          head = newElement;
-//          tail = newElement;
-//        }
-//
-//      // curr needs to be reseted, otherwise eNr is not maintainable
-//      curr = head;
-//      eNr  = 0;
-//
-//      // Count the new element and give the number back
-//      return ++eCount;
     }
 
   /** @brief insert a new data pointer before the specified data
@@ -558,57 +467,6 @@ public:
         // the old head is removed
         head->prev = nullptr;
       return toRemove;
-//      if (prev_ && (nullptr == find(prev_)) )
-//        // find sets curr to the correct value.
-//        PWX_THROW("ItemNotFound", "Item not found", "The searched item can not be found in this singly list")
-//
-//      if (prev_ && (nullptr == curr->next) )
-//        PWX_THROW("OutOfRange", "Item out of range", "There is no element behind element holding the given prev_ pointer")
-//
-//      elem_t* toRemove = prev_ ? curr->next : head;
-//
-//      // Lock both curr and the item to remove:
-//      PWX_DOUBLE_LOCK(elem_t, curr, elem_t, toRemove);
-//
-//      if (nullptr == prev_)
-//        {
-//          if (head == curr)
-//            // curr needs to stay valid on the current head, eNr stays being zero then
-//            curr = toRemove->next;
-//          else
-//            // Otherwise eNr needs to be lowered because an item before curr in the list is removed
-//            --eNr;
-//
-//          // if this was the last item, sanitize the list:
-//          if (nullptr == toRemove->next)
-//            {
-//              head = nullptr;
-//              curr = nullptr;
-//              tail = nullptr;
-//              eNr  = 0;
-//            }
-//          else
-//            {
-//              head = toRemove->next;
-//              head->prev = nullptr;
-//            }
-//        }
-//      else
-//        {
-//          curr->next = toRemove->next;
-//          if (curr->next)
-//            curr->next->prev = curr;
-//        }
-//
-//      // tail has to be checked now
-//      if (tail == toRemove)
-//        tail = curr;
-//
-//      toRemove->next = nullptr;
-//      toRemove->prev = nullptr;
-//      --eCount;
-//
-//      return toRemove;
     }
 
   /** @brief remove the element after the specified element
@@ -650,52 +508,6 @@ public:
         // the old head is removed
         head->prev = nullptr;
       return toRemove;
-
-//      if (prev_ && (nullptr == prev_->next) )
-//        PWX_THROW("OutOfRange", "Item out of range", "There is no element behind the given prev_ element")
-//
-//      if (0 == eCount)
-//        PWX_THROW("OutOfRange", "Item out of range", "The list is empty")
-//
-//      elem_t* toRemove = prev_ ? prev_->next : head;
-//
-//      // Lock the item to remove
-//      toRemove->lock();
-//
-//      if (prev_)
-//        prev_->next = toRemove->next;
-//      else
-//        {
-//          // if this was the last item, sanitize the list:
-//          if (nullptr == toRemove->next)
-//            {
-//              head = nullptr;
-//              curr = nullptr;
-//              tail = nullptr;
-//              eNr  = 0;
-//            }
-//          else
-//            {
-//              head = toRemove->next;
-//              head->prev = nullptr;
-//            }
-//        }
-//
-//      if (toRemove->next)
-//        toRemove->next->prev = toRemove->prev;
-//      else if (tail == toRemove)
-//        tail = prev_;
-//
-//      toRemove->next = nullptr;
-//      toRemove->prev = nullptr;
-//
-//      // curr is reseted to head, because we can't maintain eNr otherwise.
-//      curr = head;
-//      eNr  = 0;
-//      --eCount;
-//      toRemove->unlock();
-//
-//      return toRemove;
     }
 
   /** @brief remove the element before the element holding the specified data

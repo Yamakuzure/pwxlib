@@ -11,7 +11,7 @@
 	* be fully usable.
 	*
   * (c) 2007 - 2012 PrydeWorX
-  * @author Sven Eden, PrydeWorX - Hamburg, Germany
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
   *

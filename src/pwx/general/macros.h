@@ -7,7 +7,7 @@
   * @brief preprocessor macros for general usage.
   *
   * (c) 2007 - 2012 PrydeWorX
-  * @author Sven Eden, PrydeWorX - Hamburg, Germany
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
   *
@@ -24,13 +24,7 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   *
-  @verbatim
-  * History and Changelog:
-  * ----------------------
-  * Version   Date        Maintainer      Change(s)
-  * 0.0.1     2012-06-06  sed, PrydeWorX  first design
-  * 0.0.2     2012-07-19  sed, PrydeWorX  Added macros for locking and unlocking
-  @endverbatim
+  * History and changelog are maintained in pwx.h
 **/
 
 

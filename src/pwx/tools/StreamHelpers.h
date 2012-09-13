@@ -7,7 +7,7 @@
   * @brief This file defines some tools to work with streams.
   *
   * (c) 2007-2012 Sven Eden, PrydeWorX
-  * @author Sven Eden, PrydeWorX - Hamburg, Germany
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
   *
@@ -28,7 +28,6 @@
 **/
 
 #include <fstream>
-//#include <ostream>
 #include <sstream>
 
 #include <pwx/general/compiler.h>

@@ -4,13 +4,49 @@
 
 #include <pwx/container/TDoubleList.h>
 
+/** @file TQueue.h
+  *
+  * @brief Declaration of a basic template for stacks based on doubly linked lists
+  *
+  * (c) 2007 - 2012 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         yamakuzure@users.sourceforge.net
+  *         http://pwxlib.sourceforge.net
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+  *  the Free Software Foundation, either version 3 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *  GNU General Public License for more details.
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  *
+  * History and changelog are maintained in pwx.h
+**/
+
 namespace pwx {
 
 /** @class TQueue
   *
-  * @brief
+  * @brief Template to build queues of variable types
   *
-  * @todo : Describe properly
+  * The queue is a basic container using a doubly linked list to manage its data
+  * pointers.
+  *
+  * The constructor takes an optional destroy(T*) function pointer that is used
+  * to destroy the data when the element is deleted. If no such function was set,
+  * the standard delete operator is used instead.
+  *
+  * It is recommended that you use the much more advanced std::queue or std::deque
+  * unless you need to store a very large number of elements and can not live with
+  * the downside of every element having to be copied into the std container.
+  *
+  * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t>
 class TQueue

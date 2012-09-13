@@ -7,7 +7,7 @@
   * @brief Declaration of a basic template for singly linked lists
   *
   * (c) 2007 - 2012 PrydeWorX
-  * @author Sven Eden, PrydeWorX - Hamburg, Germany
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
   *
@@ -23,6 +23,8 @@
   *
   *  You should have received a copy of the GNU General Public License
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  *
+  * History and changelog are maintained in pwx.h
 **/
 
 #include <pwx/types/CLockable.h>
