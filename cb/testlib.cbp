@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="testlib" />
+		<Option makefile_is_custom="1" />
+		<Option execution_dir="/home/sed/pryde/PrydeWorX/pwxLibNG" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Script file="lib_finder.script" />
+			<Target title="clean">
+				<Option output="../test/testlib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../test" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="test">
+				<Option output="../test/testlib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../test" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../Makefile" />
+		<Unit filename="../test/Makefile" />
+		<Unit filename="../test/destroy.cpp" />
+		<Unit filename="../test/destroy.h" />
+		<Unit filename="../test/main.cpp" />
+		<Unit filename="../test/testLists.cpp" />
+		<Unit filename="../test/testLists.h" />
+		<Extensions>
+			<envvars set="libpwx" />
+			<code_completion>
+				<search_path add="../src" />
+				<search_path add="../test" />
+			</code_completion>
+			<lib_finder disable_auto="1" />
+			<debugger>
+				<search_path add="../src" />
+				<search_path add="../lib" />
+			</debugger>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

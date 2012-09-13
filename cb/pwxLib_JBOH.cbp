@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pwxLib_JBOH" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="clean">
+				<Option output="../lib/pwxLib_JBOH" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="all">
+				<Option output="../lib/pwxLib_JBOH" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../pwxLib_JBOH/pwxLib/CCnfFileHandler.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/CMemRingFactory.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/CRandom.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/CSinCosTables.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/CWaveColor.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/external/stdint.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/ArgImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/ArgTypes.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/ArgTypesBase.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CConfigData.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CConfigDataImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CConfigFile.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CConfigFileImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CConfigGroup.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CConfigGroupImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CFHexceptions.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CItem.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CMRFImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CMRIImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CMemRing.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRNGImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomHash.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomName.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomNoise.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomRandom.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomSimplex.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomStatics.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CRandomWordConstants.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CSCTImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CWCexceptions.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CWaveColorImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CfhImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/CfhTypes.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/DefaultMutex.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/DefaultTempTools.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/MRFexceptions.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/MRIntImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/MSVCwarnPop.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/MSVCwarnPush.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/MSVCwrap.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/TItem.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/TMRIImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/TMRTImpl.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/TMRT_insert.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/TMemRing.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/internal/sWave.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/tools/Args.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/tools/DefaultDefines.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/tools/Exception.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/tools/MRInterface.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/tools/MathHelpers.h" />
+		<Unit filename="../pwxLib_JBOH/pwxLib/tools/StreamHelpers.h" />
+		<Unit filename="../pwxLib_JBOH/test/Makefile" />
+		<Unit filename="../pwxLib_JBOH/test/testArgs.cpp" />
+		<Unit filename="../pwxLib_JBOH/test/testCfHandler.cpp" />
+		<Unit filename="../pwxLib_JBOH/test/testColor.cpp" />
+		<Unit filename="../pwxLib_JBOH/test/testMath.cpp" />
+		<Unit filename="../pwxLib_JBOH/test/testMemRing.cpp" />
+		<Unit filename="../pwxLib_JBOH/test/testRandom.cpp" />
+		<Unit filename="../pwxLib_JBOH/test/testSinCosTables.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/Makefile" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/Makefile" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/environment.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/environment.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/main.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/main.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/tools.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/getRandomName/tools.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/Makefile" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/colormap.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/consoleui.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/consoleui.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/dustpixel.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/environment.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/environment.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/icon.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/main.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/main.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/masspixel.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/matter.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/matter.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/sfmlui.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/sfmlui.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/gravMat/universe.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/Makefile" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/callback.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/callback.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/consoleui.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/consoleui.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/environment.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/environment.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/icon.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/main.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/main.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/renderer.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/renderer.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/sfmlui.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/sfmlui.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/textbox.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/textbox.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/tools.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/tools.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/workloop.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/workloop.h" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/wzseq.cpp" />
+		<Unit filename="../pwxLib_JBOH/tools/src/makeSimplexTexture/wzseq.h" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
