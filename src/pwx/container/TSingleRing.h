@@ -378,7 +378,7 @@ private:
   /// @brief simple private method to make sure the ring is closed
   void privConnectEnds() noexcept
     {
-      if (tail && (tail->next && head)
+      if (tail && (tail->next && head))
         tail->next = head;
     }
 

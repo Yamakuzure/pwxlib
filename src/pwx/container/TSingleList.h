@@ -206,22 +206,28 @@ public:
       if (curr->data == data_)
         return curr;
 
-      // Safe the current position so we can restore curr if we can't find data_
-      elem_t*  oldCurr = curr;
-      uint32_t oldNr   = eNr;
-      curr = head;
-      eNr  = 0;
-      while (curr)
+      // The next does only make sense if we have more than one element
+      if (eCount > 1)
         {
-          if (curr->data == data_)
-            return curr;
-          ++eNr;
-          curr = curr->next;
-        }
+          // Exit if head is wanted...
+          if (head->data == data_)
+            return head;
 
-      // If we are here, data_ can not be found. Restore curr and give nullptr back.
-      eNr  = oldNr;
-      curr = oldCurr;
+          // ...or tail
+          if (tail->data == data_)
+            return tail;
+
+          curr = head->next; // Because head is already checked
+          eNr  = 1;
+          while (curr != tail)
+            {
+              if (curr->data == data_)
+                return curr;
+              ++eNr;
+              curr = curr->next;
+            }
+        } // End of handling a search with more than one element
+
       return nullptr;
     }
 
@@ -253,7 +259,18 @@ public:
       PWX_TRY(newElement = new elem_t(data_, destroy))
       PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
 
-      if (nullptr == prev_)
+      if (prev_)
+        {
+          PWX_LOCK_GUARD(elem_t, curr)
+          // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
+          if (curr == tail)
+            // If we have a new tail, it needs to be noted:
+            tail = newElement;
+          else
+            newElement->next = curr->next;
+          curr->next = newElement;
+        }
+      else
         {
           if (head)
             newElement->next = head;
@@ -261,17 +278,6 @@ public:
           // In this case we need to raise eNr because an element
           // is inserted before curr in the list
           ++eNr;
-        }
-      else
-        {
-          PWX_LOCK_GUARD(elem_t, curr)
-          // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
-          if (curr->next)
-            newElement->next = curr->next;
-          else
-            // If we have a new tail, it needs to be noted:
-            tail = newElement;
-          curr->next       = newElement;
         }
 
       // If we had no elements yet, head and tail need to be set:
@@ -319,13 +325,12 @@ public:
         {
           PWX_LOCK_GUARD(elem_t, curr)
           // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
-          if (prev_->next)
-            newElement->next = prev_->next;
-          else
+          if (prev_ == tail)
             // If we have a new tail, it needs to be noted:
             tail = newElement;
-          prev_->next      = newElement;
-
+          else
+            newElement->next = prev_->next;
+          prev_->next = newElement;
         }
       else
         {
@@ -341,9 +346,18 @@ public:
           tail = newElement;
         }
 
-      // curr needs to be reseted, otherwise eNr is not maintainable
-      curr = head;
-      eNr  = 0;
+      // Unless we added a new tail, curr needs to be reseted.
+      // otherwise eNr is not maintainable
+      if (newElement == tail)
+        {
+          curr = newElement;
+          eNr  = eCount; // not raised, yet!
+        }
+      else
+        {
+          curr = head;
+          eNr  = 0;
+        }
 
       // Count the new element and give the number back
       return ++eCount;
@@ -393,7 +407,7 @@ public:
             --eNr;
 
           // if this was the last item, sanitize the list:
-          if (nullptr == toRemove->next)
+          if (1 == eCount)
             {
               head = nullptr;
               curr = nullptr;
@@ -454,7 +468,7 @@ public:
       else
         {
           // if this was the last item, sanitize the list:
-          if (nullptr == toRemove->next)
+          if (1 == eCount)
             {
               head = nullptr;
               curr = nullptr;
@@ -626,7 +640,7 @@ private:
               curr = head->next;
               eNr  = 1;
             }
-          // And the next of curr is already checked, so skip it
+          // Otherwise the next of curr is already checked, so skip it
           else
             {
               curr = curr->next;
