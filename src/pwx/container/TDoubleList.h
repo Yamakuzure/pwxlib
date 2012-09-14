@@ -73,7 +73,7 @@ public:
     *
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
-  TDoubleList(void (*destroy_)(data_t* data_)) noexcept
+  TDoubleList(void (*destroy_)(data_t* data)) noexcept
   : base_t(destroy_)
     { /* nothing to be done here */ }
 
@@ -96,97 +96,146 @@ public:
   */
 
   using base_t::clear;
+
+  /** @brief delete the element holding the specified data
+    *
+    * This method deletes the element in the list that holds @a data.
+    *
+    * If you intent to work with the element, use remData instead.
+    *
+    * @param[in] data the data the element that is to be deleted holds
+    * @return the number of elements remaining in the list after the deletion.
+  **/
+  virtual uint32_t delData(data_t* data)
+    {
+      PWX_LOCK_GUARD(base_t, this)
+      try
+        {
+          elem_t* removed = remData(data);
+          if (removed)
+            delete removed;
+          return eCount;
+        }
+      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delData() failed.")
+    }
+
+  /** @brief delete the specified element
+    *
+    * This method deletes the element @a elem.
+    *
+    * If you intent to work with the element, use remElem instead.
+    *
+    * If @a elem is no element of this list, the wrong list is updated
+    * and both element counts will be wrong then. So please make sure to
+    * use the correct element on the correct list!
+    *
+    * @param[in] elem the element that is to be deleted
+    * @return the number of elements remaining in the list after the deletion.
+  **/
+  virtual uint32_t delElem(elem_t* elem)
+    {
+      PWX_LOCK_GUARD(base_t, this)
+      try
+        {
+          elem_t* removed = remElem(elem);
+          if (removed)
+            delete removed;
+          return eCount;
+        }
+      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delElem() failed.")
+    }
+
   using base_t::delNext;
   using base_t::delNextElem;
 
   /** @brief delete the element before the element holding the specified data
     *
     * This method deletes the element in the list before the element
-    * that holds @a next_.
+    * that holds @a next.
     *
-    * If @a next_ is set to nullptr, the last element (aka tail) is
+    * If @a next is set to nullptr, the last element (aka tail) is
     * deleted.
     *
     * If you intent to work with the element, use remPrev instead.
     *
-    * If there is no item before the element holding @a next_, a
+    * If there is no item before the element holding @a next, a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
-    * @param[in] next_ the data the element that succeeds the element to delete holds
+    * @param[in] next the data the element that succeeds the element to delete holds
     * @return the number of elements remaining in the list after the deletion.
   **/
-  virtual uint32_t delPrev(data_t* next_)
+  virtual uint32_t delPrev(data_t* next)
     {
       PWX_LOCK_GUARD(base_t, this)
       try
         {
-          elem_t* removed = remPrev(next_);
+          elem_t* removed = remPrev(next);
           if (removed)
             delete removed;
           return eCount;
         }
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TListBase::delNext() failed.")
+      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delPrev() failed.")
     }
 
   /** @brief delete the element before the specified element
     *
     * This method deletes the element in the list before the element
-    * @a next_.
+    * @a next.
     *
-    * If @a next_ is set to nullptr, the last element (aka tail) is
+    * If @a next is set to nullptr, the last element (aka tail) is
     * deleted.
     *
     * If you intent to work with the element, use remPrevElem instead.
     *
-    * If @a next_ is no element of this list, the wrong list is updated
+    * If @a next is no element of this list, the wrong list is updated
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item before the element @a next_ a
+    * If there is no item before the element @a next a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
-    * @param[in] next_ the element that succeeds the element to delete
+    * @param[in] next the element that succeeds the element to delete
     * @return the number of elements remaining in the list after the deletion.
   **/
-  virtual uint32_t delPrevElem(elem_t* next_)
+  virtual uint32_t delPrevElem(elem_t* next)
     {
       PWX_LOCK_GUARD(base_t, this)
       try
         {
-          elem_t* removed = remPrevElem(next_);
+          elem_t* removed = remPrevElem(next);
           if (removed)
             delete removed;
           return eCount;
         }
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TListBase::delNextElem() failed.")
+      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delPrevElem() failed.")
     }
 
-  /** @brief find the item with the given @a data_
+  /** @brief find the item with the given @a data
     *
     * This method searches through the list and returns the item
-    * with the given @a data_ or nullptr if @a data_ is not stored in this
+    * with the given @a data or nullptr if @a data is not stored in this
     * list.
     *
-    * @param data_ pointer to the data to find
-    * @return return a pointer to the element storing @a data_
+    * @param data pointer to the data to find
+    * @return return a pointer to the element storing @a data
   **/
-  elem_t* find(data_t* data_) noexcept
+  elem_t* find(data_t* data) noexcept
     {
-      return const_cast<elem_t* >(find(static_cast<const data_t* >(data_)));
+      return const_cast<elem_t* >(find(static_cast<const data_t* >(data)));
     }
 
-  /** @brief find the item with the given @a data_
+  /** @brief find the item with the given @a data
     *
     * This method searches through the list and returns a const pointer
-    * to the item with the given @a data_ or nullptr if @a data_ is not stored
+    * to the item with the given @a data or nullptr if @a data is not stored
     * in this list.
     *
-    * @param data_ pointer to the data to find
-    * @return return a const pointer to the element storing @a data_
+    * @param data pointer to the data to find
+    * @return return a const pointer to the element storing @a data
   **/
-  const elem_t* find(const data_t* data_) const noexcept
+  const elem_t* find(const data_t* data) const noexcept
     {
       if (nullptr == curr)
         return nullptr;
@@ -195,168 +244,86 @@ public:
       PWX_LOCK_GUARD(list_t, const_cast<list_t* >(this))
 
       // Quick exit if curr is already what we want:
-      if (curr->data == data_)
+      if (curr->data == data)
         return curr;
 
-      // Safe the current position so we can restore curr if we can't find data_
-      elem_t*  oldCurr = curr;
-      uint32_t oldNr   = eNr;
-      while (curr->next)
+      // The next does only make sense if we have more than one element
+      if (eCount > 1)
         {
-          ++eNr;
-          curr = curr->next;
-          if (curr->data == data_)
-            return curr;
-        }
+          // Exit if head is wanted...
+          if (head->data == data)
+            {
+              curr = head;
+              eNr  = 0;
+              return head;
+            }
 
-      // As there is no positive result, yet, wander backwards from the old position:
-      eNr  = oldNr;
-      curr = oldCurr;
-      while (curr->prev)
-        {
-          --eNr;
-          curr = curr->prev;
-          if (curr->data == data_)
-            return curr;
-        }
+          // ...or tail
+          if (tail->data == data)
+            {
+              curr = tail;
+              eNr  = eCount - 1;
+              return tail;
+            }
 
-      // If we are here, data_ can not be found. Restore curr and give nullptr back.
-      eNr  = oldNr;
-      curr = oldCurr;
+          // Safe the current position so we can restore curr if we can't find data
+          elem_t*  oldCurr = curr;
+          uint32_t oldNr   = eNr;
+          while (curr != tail)
+            {
+              ++eNr;
+              curr = curr->next;
+              if (curr->data == data)
+                return curr;
+            }
+
+          // As there is no positive result, yet, wander backwards from the old position:
+          eNr  = oldNr;
+          curr = oldCurr;
+          while (curr != head)
+            {
+              --eNr;
+              curr = curr->prev;
+              if (curr->data == data)
+                return curr;
+            }
+        } // End of handling a search with more than one element
+
       return nullptr;
     }
 
-  /** @brief insert a new data pointer after the specified data
-    *
-    * This method inserts a new element in the list after the element
-    * holding @a prev_.
-    *
-    * If @a prev_ is set to nullptr, the new element will become the new
-    * head of the list.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
-    *
-    * @param[in] prev_ the data the element that should precede the new element holds
-    * @param[in] data_ the pointer that is to be added.
-    * @return the number of elements in this list after the insertion
-  **/
-  uint32_t insNext(data_t* prev_, data_t* data_)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insNext(prev_, data_))
-      PWX_THROW_FURTHER
-
-      // We need to maintain prev pointer(s) before returning eCount:
-      if (prev_)
-        // curr->next is now the new element:
-        return privAddPrev(curr);
-      else
-        // head is the new element
-        return privAddPrev(nullptr);
-    }
-
-  /** @brief insert a new data pointer after the specified element
-    *
-    * This method inserts a new element in the list after the element
-    * @a prev_.
-    *
-    * If @a prev_ is set to nullptr, the new element will become the new
-    * head of the list.
-    *
-    * If @a prev_ is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
-    *
-    * @param[in] prev_ the element that should precede the new element
-    * @param[in] data_ the pointer that is to be added.
-    * @return the number of elements in this list after the insertion
-  **/
-  uint32_t insNextElem(elem_t* prev_, data_t* data_)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-
-      PWX_TRY(base_t::insNextElem(prev_, data_))
-      PWX_THROW_FURTHER
-
-      // We need to maintain prev pointer(s) before returning eCount:
-      if (prev_)
-        // prev_->next is now the new element:
-        return privAddPrev(prev_);
-      else
-        // head is the new element
-        return privAddPrev(nullptr);
-    }
+  using base_t::insNext;
+  using base_t::insNextElem;
 
   /** @brief insert a new data pointer before the specified data
     *
     * This method inserts a new element in the list before the element
-    * holding @a next_.
+    * holding @a next.
     *
-    * If @a next_ is set to nullptr, the new element will become the new
+    * If @a next is set to nullptr, the new element will become the new
     * tail of the list.
     *
     * If the new element can not be created, a pwx::CException with
     * the name "ItemCreationFailed" is thrown.
     *
-    * @param[in] next_ the data the element that should succeed the new element
-    * @param[in] data_ the pointer that is to be added.
+    * @param[in] next the data the element that should succeed the new element
+    * @param[in] data the pointer that is to be added.
     * @return the number of elements in this list after the insertion
   **/
-  uint32_t insPrev(data_t* next_, data_t* data_)
+  uint32_t insPrev(data_t* next, data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
 
-      if (next_ && (nullptr == find(next_)) )
+      if (next && (nullptr == find(next)) )
         // find sets curr to the correct value.
         PWX_THROW("ItemNotFound", "Item not found", "The searched item can not be found in this doubly linked list")
 
-      // First create a new element for data_
+      // First create a new element for data
       elem_t* newElement = nullptr;
-      PWX_TRY(newElement = new elem_t(data_, destroy))
+      PWX_TRY(newElement = new elem_t(data, destroy))
       PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
 
-      if (nullptr == next_)
-        {
-          if (tail)
-            {
-              newElement->prev = tail;
-              tail->next = newElement;
-            }
-          tail = newElement;
-        }
-      else
-        {
-          PWX_LOCK_GUARD(elem_t, curr)
-          // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
-          if (curr->prev)
-            {
-              curr->prev->next = newElement;
-              newElement->prev = curr->prev;
-            }
-          else
-            // If we have a new tail, it needs to be noted:
-            tail = newElement;
-
-          // In this case a new element is inserted before curr,
-          // so eNr must be raised:
-          ++eNr;
-
-          newElement->next = curr;
-          curr->prev       = newElement;
-        }
-
-      // If we had no elements yet, head and tail need to be set:
-      if (0 == eCount)
-        {
-          head = newElement;
-          tail = newElement;
-          curr = newElement;
-          eNr  = 0;
-        }
+      privInsert(next ? curr->prev : nullptr, newElement);
 
       // Count the new element and give the number back
       return ++eCount;
@@ -365,222 +332,123 @@ public:
   /** @brief insert a new data pointer before the specified element
     *
     * This method inserts a new element in the list before the element
-    * @a next_.
+    * @a next.
     *
-    * If @a next_ is set to nullptr, the new element will become the new
+    * If @a next is set to nullptr, the new element will become the new
     * tail of the list.
     *
-    * If @a next_ is no element of this list, the wrong list is updated
+    * If @a next is no element of this list, the wrong list is updated
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
     * If the new element can not be created, a pwx::CException with
     * the name "ItemCreationFailed" is thrown.
     *
-    * @param[in] next_ the element that should succeed the new element
-    * @param[in] data_ the pointer that is to be added.
+    * @param[in] next the element that should succeed the new element
+    * @param[in] data the pointer that is to be added.
     * @return the number of elements in this list after the insertion
   **/
-  uint32_t insPrevElem(elem_t* next_, data_t* data_)
+  uint32_t insPrevElem(elem_t* next, data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
 
-      // First create a new element for data_
+      // First create a new element for data
       elem_t* newElement = nullptr;
-      PWX_TRY(newElement = new elem_t(data_, destroy))
+      PWX_TRY(newElement = new elem_t(data, destroy))
       PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
 
-      if (next_)
-        {
-          PWX_LOCK_GUARD(elem_t, curr)
-          // Note: newElement is not accessible from anywhere else, thus it does not need to be locked.
-          if (next_->prev)
-            {
-              next_->prev->next = newElement;
-              newElement->prev  = next_->prev;
-            }
-          else
-            // If we have a new head, it needs to be noted:
-            head = newElement;
-          newElement->next  = next_;
-          next_->prev       = newElement;
-
-        }
-      else
-        {
-          if (tail)
-            {
-              tail->next = newElement;
-              newElement->prev = tail;
-            }
-          tail = newElement;
-        }
-
-      // If we had no elements yet, head and tail need to be set:
-      if (0 == eCount)
-        {
-          head = newElement;
-          tail = newElement;
-        }
-
-      // curr needs to be reseted, otherwise eNr is not maintainable
-      curr = head;
-      eNr  = 0;
+      privInsert(next ? next->prev : nullptr, newElement);
 
       // Count the new element and give the number back
       return ++eCount;
     }
 
-  /** @brief remove the element after the element holding the specified data
+  /** @brief remove the element holding the specified data
     *
-    * This method removes the element in the list after the element
-    * that holds @a prev_ and returns a pointer to the removed element.
-    *
-    *
-    * If @a prev_ is set to nullptr, the root element (aka head) is
-    * removed.
+    * This method removes the element in the list that holds @a data
+    * and returns a pointer to the removed element.
     *
     * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delNext instead.
+    * to work with the removed element, use delData instead.
     *
-    * If there is no item behind the element @a prev_ holds, a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] prev_ the data the element that precedes the element to remove holds
+    * @param[in] data the data the element is to be removed holds
     * @return a pointer to the removed element
   **/
-  elem_t* remNext(data_t* prev_)
+  elem_t* remData(data_t* data) noexcept
     {
       elem_t* toRemove = nullptr;
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(toRemove = base_t::remNext(prev_))
-      PWX_THROW_FURTHER
 
-      // We need to maintain prev pointer(s) before returning toRemove:
-      if (prev_)
-        {
-          // curr->next is the former next of the element to remove:
-          if (curr->next)
-            curr->next->prev = curr;
-        }
-      else if (head)
-        // the old head is removed
-        head->prev = nullptr;
+      if (data)
+        toRemove = find(data);
+
+      // If we were successful, we have to detach toRemove first:
+      if (toRemove)
+        privRemove(toRemove->prev, toRemove);
+
       return toRemove;
     }
 
-  /** @brief remove the element after the specified element
+  /** @brief remove the specified element
     *
-    * This method removes the element in the list after the element
-    * @a prev_ and returns a pointer to the removed element.
-    *
-    * If @a prev_ is set to nullptr, the root element (aka head) is
-    * removed.
+    * This method removes the element @a elem and returns a pointer
+    * to the removed element.
     *
     * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delNextElem instead.
+    * to work with the removed element, use delElem instead.
     *
-    * If @a prev_ is no element of this list, the wrong list is updated
+    * If @a elem is no element of this list, the wrong list is updated
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item behind the  @a prev_ or if the list is empty,
-    * a pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] prev_ the element that precedes the element to remove
+    * @param[in] elem the element that is to be removed
     * @return a pointer to the removed element
   **/
-  elem_t* remNextElem(elem_t* prev_)
+  elem_t* remElem(elem_t* elem) noexcept
     {
-      elem_t* toRemove = nullptr;
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(toRemove = base_t::remNextElem(prev_))
-      PWX_THROW_FURTHER
-
-      // We need to maintain prev pointer(s) before returning toRemove:
-      if (prev_)
-        {
-          // prev_->next is the former next of the element to remove:
-          if (prev_->next)
-            prev_->next->prev = prev_;
-        }
-      else if (head)
-        // the old head is removed
-        head->prev = nullptr;
-      return toRemove;
+      if (elem)
+        privRemove(elem->prev, elem);
+      return elem;
     }
+
+  using base_t::remNext;
+  using base_t::remNextElem;
 
   /** @brief remove the element before the element holding the specified data
     *
     * This method removes the element in the list before the element
-    * that holds @a next_ and returns a pointer to the removed element.
+    * that holds @a next and returns a pointer to the removed element.
     *
-    * If @a next_ is set to nullptr, the last element (aka tail) is
+    * If @a next is set to nullptr, the last element (aka tail) is
     * removed.
     *
     * You have to delete the removed element by yourself. If you do not intent
     * to work with the removed element, use delPrev instead.
     *
-    * If there is no item before the element @a next_ holds, a
+    * If there is no item before the element @a next holds, a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
-    * @param[in] next_ the data the element that succeeds the element to remove holds
+    * @param[in] next the data the element that succeeds the element to remove holds
     * @return a pointer to the removed element
   **/
-  elem_t* remPrev(data_t* next_)
+  elem_t* remPrev(data_t* next)
     {
       PWX_LOCK_GUARD(list_t, this)
 
-      if (next_ && (nullptr == find(next_)) )
+      if (next && (nullptr == find(next)) )
         // find sets curr to the correct value.
         PWX_THROW("ItemNotFound", "Item not found", "The searched item can not be found in this doubly linked list")
 
-      if (next_ && (nullptr == curr->prev) )
-        PWX_THROW("OutOfRange", "Item out of range", "There is no element before the element holding the given next_ pointer")
+      if (next && (nullptr == curr->prev) )
+        PWX_THROW("OutOfRange", "Item out of range", "There is no element before the element holding the given next pointer")
 
-      elem_t* toRemove = next_ ? curr->prev : tail;
+      elem_t* toRemove = next ? curr->prev : tail;
 
       // Lock both curr and the item to remove:
       PWX_DOUBLE_LOCK(elem_t, curr, elem_t, toRemove);
 
-      if (nullptr == next_)
-        {
-          if (tail == curr)
-            // curr needs to stay valid on the current tail
-            curr = toRemove->prev;
+      // Now detach toRemove
+      privRemove(toRemove->prev, toRemove);
 
-          // if this was the last item, sanitize the list:
-          if (nullptr == toRemove->prev)
-            {
-              head = nullptr;
-              curr = nullptr;
-              tail = nullptr;
-              eNr  = 0;
-            }
-          else
-            {
-              tail = toRemove->prev;
-              tail->next = nullptr;
-            }
-        }
-      else
-        {
-          curr->prev = toRemove->prev;
-          if (curr->prev)
-            curr->prev->next = curr;
-        }
-
-      // head has to be checked now
-      if (head == toRemove)
-        head = curr;
-
-      // if eNr is greater than zero it needs to be lowered.
-      // - If tail is removed, curr has been set to the new tail
-      // - Otherwise an element before curr was removed
-      --eNr;
-
-      toRemove->next = nullptr;
-      toRemove->prev = nullptr;
       --eCount;
 
       return toRemove;
@@ -589,69 +457,40 @@ public:
   /** @brief remove the element before the specified element
     *
     * This method removes the element in the list before the element
-    * @a next_ and returns a pointer to the removed element.
+    * @a next and returns a pointer to the removed element.
     *
-    * If @a next_ is set to nullptr, the last element (aka tail) is
+    * If @a next is set to nullptr, the last element (aka tail) is
     * removed.
     *
     * You have to delete the removed element by yourself. If you do not intent
     * to work with the removed element, use delPrevElem instead.
     *
-    * If @a next_ is no element of this list, the wrong list is updated
+    * If @a next is no element of this list, the wrong list is updated
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item before @a next_ or if the list is empty,
+    * If there is no item before @a next or if the list is empty,
     * a pwx::CException with the name "OutOfRange" is thrown.
     *
-    * @param[in] next_ the element that succeeds the element to remove
+    * @param[in] next the element that succeeds the element to remove
     * @return a pointer to the removed element
   **/
-  elem_t* remPrevElem(elem_t* next_)
+  elem_t* remPrevElem(elem_t* next)
     {
       PWX_LOCK_GUARD(list_t, this)
 
-      if (next_ && (nullptr == next_->prev) )
-        PWX_THROW("OutOfRange", "Item out of range", "There is no element before the given prev_ element")
+      if (next && (nullptr == next->prev) )
+        PWX_THROW("OutOfRange", "Item out of range", "There is no element before the given prev element")
 
       if (0 == eCount)
         PWX_THROW("OutOfRange", "Item out of range", "The list is empty")
 
-      elem_t* toRemove = next_ ? next_->prev : tail;
+      elem_t* toRemove = next ? next->prev : tail;
 
-      // Lock the item to remove
+      // Lock the item to remove and then detach it out of the list
       toRemove->lock();
+      privRemove(toRemove->prev, toRemove);
 
-      if (next_)
-        next_->prev = toRemove->prev;
-      else
-        {
-          // if this was the last item, sanitize the list:
-          if (nullptr == toRemove->prev)
-            {
-              head = nullptr;
-              curr = nullptr;
-              tail = nullptr;
-              eNr  = 0;
-            }
-          else
-            {
-              tail = toRemove->prev;
-              tail->next = nullptr;
-            }
-        }
-
-      if (toRemove->prev)
-        toRemove->prev->next = toRemove->next;
-      else if (head == toRemove)
-        head = next_;
-
-      toRemove->next = nullptr;
-      toRemove->prev = nullptr;
-
-      // curr is reseted to head, because we can't maintain eNr otherwise.
-      curr = head;
-      eNr  = 0;
       --eCount;
       toRemove->unlock();
 
@@ -664,12 +503,12 @@ public:
   */
   list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
 
-  /** @brief return a read-only pointer to the element with the given @a index_
+  /** @brief return a read-only pointer to the element with the given @a index
     *
     * This operator retrieves an element by index like an array. The pointer given
     * back is read-only.
     *
-    * There will be no exception if the index_ is out of range, it will be wrapped
+    * There will be no exception if the index is out of range, it will be wrapped
     * to press it into the valid range. This means that an index of -1 can be used
     * to retrieve the last element (tail) for instance.
     *
@@ -679,20 +518,20 @@ public:
     * used internal pointer nor number are changed. Head and tail are given back
     * directly.
     *
-    * @param[in] index_ the index of the element to find.
+    * @param[in] index the index of the element to find.
     * @return read-only pointer to the element, or nullptr if the list is empty.
   **/
-  const elem_t* operator[](const int32_t index_) const noexcept
+  const elem_t* operator[](const int32_t index) const noexcept
     {
-      return privGetElementByIndex(index_);
+      return privGetElementByIndex(index);
     }
 
-  /** @brief return a read/write pointer to the element with the given @a index_
+  /** @brief return a read/write pointer to the element with the given @a index
     *
     * This operator retrieves an element by index like an array. The pointer given
     * back is write enabled, so use with care.
     *
-    * There will be no exception if the index_ is out of range, it will be wrapped
+    * There will be no exception if the index is out of range, it will be wrapped
     * to press it into the valid range. This means that an index of -1 can be used
     * to retrieve the last element (tail) for instance.
     *
@@ -702,12 +541,12 @@ public:
     * used internal pointer nor number are changed. Head and tail are given back
     * directly.
     *
-    * @param[in] index_ the index of the element to find.
+    * @param[in] index the index of the element to find.
     * @return read/write pointer to the element, or nullptr if the list is empty.
   **/
-  elem_t* operator[](int32_t index_) noexcept
+  elem_t* operator[](int32_t index) noexcept
     {
-      return const_cast<elem_t* >(privGetElementByIndex(static_cast<const int32_t>(index_)));
+      return const_cast<elem_t* >(privGetElementByIndex(static_cast<const int32_t>(index)));
     }
 
   /* ===============================================
@@ -755,37 +594,17 @@ private:
 
   /// IMPORTANT: private methods do not lock, callers must have locked!
 
-  /// @brief little method to maintain the prev pointers of @a prev_ or head and its next, returns eCount
-  virtual uint32_t privAddPrev(elem_t* prev_)
-    {
-      if (prev_)
-        {
-          // prev_ is the new element
-          if (prev_->next)
-            {
-              elem_t* newElement = prev_->next;
-              if (newElement->next)
-                newElement->next->prev = newElement;
-              newElement->prev = prev_;
-            }
-        }
-      else if (head && head->next)
-        head->next->prev = head;
-
-      return eCount;
-    }
-
   /// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
-  virtual const elem_t* privGetElementByIndex(int32_t index_) const noexcept
+  virtual const elem_t* privGetElementByIndex(int32_t index) const noexcept
     {
       if (eCount)
         {
-          // Mod index_ into range
-          uint32_t xIdx = static_cast<uint32_t>(index_ < 0
-                                                ? eCount - (::std::abs(index_) % eCount)
-                                                : index_ % eCount);
+          // Mod index into range
+          uint32_t xIdx = static_cast<uint32_t>(index < 0
+                                                ? eCount - (::std::abs(index) % eCount)
+                                                : index % eCount);
           // Unfortunately this results in xIdx equaling eCount
-          // (which is wrong) if index_ is a negative multiple of
+          // (which is wrong) if index is a negative multiple of
           // eCount:
           if (xIdx >= eCount)
             xIdx = xIdx % eCount;
@@ -883,6 +702,91 @@ private:
         }
 
       return nullptr;
+    }
+
+  /// @brief simple method to insert an element into the list
+  virtual void privInsert(elem_t* prev, elem_t* elem)
+    {
+      if (elem)
+        {
+          if (prev)
+            {
+              if (tail == prev)
+                tail = elem;
+              elem->next = prev->next;
+              if (elem->next)
+                elem->next->prev = elem;
+              prev->next = elem;
+              elem->prev = prev;
+              // curr is only maintainable if it is prev
+              if (curr != prev)
+                {
+                  // In which case it wouldn't have needed any change.
+                  curr = head;
+                  eNr  = 0;
+                }
+            }
+          else if (eCount)
+            {
+              elem->next = head;
+              if (head)
+                head->prev = elem;
+              head = elem;
+              ++eNr; // No matter what happened, curr has another element before it now.
+            }
+          else
+            {
+              // If we had no elements yet, head and tail need to be set:
+              head = elem;
+              tail = elem;
+              curr = head;
+            }
+        } // End of having an element to insert
+    }
+
+  /// @brief simple method to remove an element from the list
+  virtual void privRemove(elem_t* prev, elem_t* elem)
+    {
+      if (elem)
+        {
+          if (prev)
+            {
+              prev->next = elem->next;
+              if (tail == elem)
+                tail = prev;
+            }
+          else if (elem == head)
+            head = elem->next;
+
+          // curr needs to be valid
+          if (curr == elem)
+            {
+              if (elem->next)
+                curr = elem->next;
+              else if (prev)
+                {
+                  curr = prev;
+                  --eNr;
+                }
+              else
+                {
+                  curr = head;
+                  eNr  = 0;
+                }
+            } // End of maintaining curr
+
+          // if this was the last item, sanitize the list:
+          if (1 == eCount)
+            {
+              head = nullptr;
+              curr = nullptr;
+              tail = nullptr;
+              eNr  = 0;
+            }
+
+          // Finally elem does not need its next pointer any more
+          elem->next = nullptr;
+        } // end of having an element to remove
     }
 
   /* ===============================================

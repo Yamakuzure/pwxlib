@@ -2,9 +2,9 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="pwxLibNG">
 		<Project filename="cb/libpwx.cbp" />
+		<Project filename="cb/pwxLib_JBOH.cbp" />
 		<Project filename="cb/testlib.cbp">
 			<Depends filename="cb/libpwx.cbp" />
 		</Project>
-		<Project filename="cb/pwxLib_JBOH.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

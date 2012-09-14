@@ -133,7 +133,7 @@ int testSingleList(int& testCount, int& testSuccess, int& testFail)
       cout << " E) Speed test (" << MAXINTCOUNT << " elements) : "; cout.flush();
 
       // for this test we need a container that does delete data:
-      pwx::TDoubleList<uint32_t> uintList; // The list without the do-not-destroy-destroy()-method
+      pwx::TSingleList<uint32_t> uintList; // The list without the do-not-destroy-destroy()-method
 
       cout << "ins"; cout.flush();
 
@@ -267,7 +267,7 @@ int testDoubleList(int& testCount, int& testSuccess, int& testFail)
       ++testCount;
       intList.delNext(nullptr); // remove 1, which is head
       intList.delNextElem(intList.find(&numbers[1])); // remove 3 via pointer search for "2"
-      intList.delNext(&numbers[3]); // remove 5 via direct pointer to "4"
+      intList.delPrev(nullptr); // remove 5, which is tail
       intCount = intList.size();
       if (2 != intCount)
         {
