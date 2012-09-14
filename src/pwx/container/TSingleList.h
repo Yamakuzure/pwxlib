@@ -134,7 +134,7 @@ public:
           return eCount;
         }
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TListBase::delNext() failed.")
+      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TSingleList::delNext() failed.")
     }
 
   /** @brief delete the element after the specified element
@@ -168,7 +168,7 @@ public:
           return eCount;
         }
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TListBase::delNextElem() failed.")
+      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TSingleList::delNextElem() failed.")
     }
 
   /** @brief find the item with the given @a data_
