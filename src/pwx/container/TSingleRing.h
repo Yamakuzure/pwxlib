@@ -34,9 +34,20 @@ namespace pwx {
 
 /** @class TSingleRing
   *
-  * @brief
+  * @brief Template to build singly linked rings of variable types
   *
-  * @todo : Describe properly
+  * The singly linked ring is a singly linked list with a tail having a next
+  * pointer to head instead of being a nullptr.
+  *
+  * The constructor takes an optional destroy(T*) function pointer that is used
+  * to destroy the data when the element is deleted. If no such function was set,
+  * the standard delete operator is used instead.
+  *
+  * It is recommended that you use the much more advanced std::list unless you
+  * need to store a very large number of elements and can not live with the
+  * downside of every element having to be copied into the std::list.
+  *
+  * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
 class TSingleRing : public TSingleList<data_t, elem_t>
