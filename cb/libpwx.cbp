@@ -54,6 +54,7 @@
 		<Unit filename="../src/pwx/general.h" />
 		<Unit filename="../src/pwx/general/compiler.h" />
 		<Unit filename="../src/pwx/general/macros.h" />
+		<Unit filename="../src/pwx/general/templates.h" />
 		<Unit filename="../src/pwx/tools.h" />
 		<Unit filename="../src/pwx/tools/StreamHelpers.cpp" />
 		<Unit filename="../src/pwx/tools/StreamHelpers.h" />

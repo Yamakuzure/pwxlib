@@ -41,7 +41,8 @@
 		<Unit filename="../test/destroy.cpp" />
 		<Unit filename="../test/destroy.h" />
 		<Unit filename="../test/main.cpp" />
-		<Unit filename="../test/testLists.cpp" />
+		<Unit filename="../test/main.h" />
+		<Unit filename="../test/testBuckets.h" />
 		<Unit filename="../test/testLists.h" />
 		<Extensions>
 			<envvars set="libpwx" />
