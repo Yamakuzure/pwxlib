@@ -47,6 +47,9 @@
   *                                       TDoubleList added.
   * 0.8.6.3   2012-09-10  sed, PrydeWorX  Lists reorganized, StreamHelpers re-added, speed tests added.
   * 0.8.6.4   2012-09-11  sed, PrydeWorX  Added TStack and TQueue.
+  * 0.8.6.5   2012-09-13  sed, PrydeWorX  Added TSingelRing, TDoubleRing and TSet
+  * 0.8.6.6   2012-09-25  sed, PrydeWorX  Added general/templates.h and some more macros from old DefaultTempTools.h
+  * 0.8.6.7   2012-09-25  sed, PrydeWorX  Testing of the lists unified, lists, rings TStack and TQueue finished.
   @endverbatim
 **/
 

@@ -167,7 +167,7 @@ public:
   **/
   elem_t* shift()
     {
-      if (sList.size())
+      if (sList.size() > 1)
         {
           PWX_TRY(return sList.remNextElem(sList[-2]))
           PWX_THROW_FURTHER

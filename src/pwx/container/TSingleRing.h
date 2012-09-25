@@ -107,6 +107,7 @@ public:
       PWX_THROW_FURTHER
       PWX_THROW_STD_FURTHER("delete", "Deleting an element in TSingleRing::delNext() failed.")
       privConnectEnds();
+      return eCount;
     }
 
   /** @brief delete the element after the specified element
@@ -136,6 +137,7 @@ public:
       PWX_THROW_FURTHER
       PWX_THROW_STD_FURTHER("delete", "Deleting an element in TSingleRing::delNextElem() failed.")
       privConnectEnds();
+      return eCount;
     }
 
   /** @brief find the item with the given @a data_
@@ -345,7 +347,6 @@ protected:
    * === Protected methods                       ===
    * ===============================================
   */
-  void (*destroy)(data_t* data_);
 
   /* ===============================================
    * === Protected operators                     ===
@@ -357,8 +358,6 @@ protected:
    * ===============================================
   */
   using base_t::eCount;
-  using base_t::eNr;
-  using base_t::curr;
   using base_t::head;
   using base_t::tail;
 
@@ -378,7 +377,7 @@ private:
   /// @brief simple private method to make sure the ring is closed
   void privConnectEnds() noexcept
     {
-      if (tail && (tail->next && head))
+      if (tail && (tail->next != head))
         tail->next = head;
     }
 

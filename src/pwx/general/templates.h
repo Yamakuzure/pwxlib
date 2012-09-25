@@ -1,10 +1,10 @@
 #pragma once
-#ifndef PWX_LIBPWX_PWX_GENERAL_H_INCLUDED
-#define PWX_LIBPWX_PWX_GENERAL_H_INCLUDED 1
+#ifndef PWX_LIBPWX_PWX_GENERAL_TEMPLATES_H_INCLUDED
+#define PWX_LIBPWX_PWX_GENERAL_TEMPLATES_H_INCLUDED 1
 
-/** @file general.h
+/** @file templates.h
   *
-  * @brief Main include file to add everything from folder "general"
+  * @brief Helper templates and macros for various little issues
   *
   * (c) 2007 - 2012 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -27,9 +27,20 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
-#include <pwx/general/templates.h>
-#include <pwx/general/macros.h>
+#include <type_traits>
 
-#endif // PWX_LIBPWX_PWX_GENERAL_H_INCLUDED
+namespace pwx {
 
+/** @brief compile time assertion
+  *
+  * This little trick is taken from Andrei Alexandrescu: 'Modern C++ Design'.
+  * It can be used to check an expression at compile time.
+  * Of course this does not substitute cassert completely, only expressions
+  * that are ready while the compiler does its work can be checked with this.
+**/
+template <bool> struct pwxCompAssert;
+template <>     struct pwxCompAssert<true> {};
+#define compAssert(expression) (::pwx::pwxCompAssert<(expression) != 0>())
+
+} // namespace pwx
+#endif // PWX_LIBPWX_PWX_GENERAL_TEMPLATES_H_INCLUDED

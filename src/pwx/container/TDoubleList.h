@@ -749,14 +749,18 @@ private:
     {
       if (elem)
         {
-          if (prev)
-            {
-              prev->next = elem->next;
-              if (tail == elem)
-                tail = prev;
-            }
-          else if (elem == head)
+          // maintain tail and head first
+          if (tail == elem)
+            tail = elem->prev;
+
+          if (elem == head)
             head = elem->next;
+
+          // now maintain the neighbors
+          if (elem->next)
+            elem->next->prev = elem->prev;
+          if (elem->prev)
+            elem->prev->next = elem->next;
 
           // curr needs to be valid
           if (curr == elem)
@@ -768,11 +772,11 @@ private:
                   curr = prev;
                   --eNr;
                 }
-              else
-                {
-                  curr = head;
-                  eNr  = 0;
-                }
+            }
+          else
+            {
+              curr = head;
+              eNr  = 0;
             } // End of maintaining curr
 
           // if this was the last item, sanitize the list:
@@ -784,8 +788,9 @@ private:
               eNr  = 0;
             }
 
-          // Finally elem does not need its next pointer any more
+          // Finally elem does not need pointers to its neighbors any more
           elem->next = nullptr;
+          elem->prev = nullptr;
         } // end of having an element to remove
     }
 
