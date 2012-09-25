@@ -6,7 +6,7 @@
 
 /** @file TQueue.h
   *
-  * @brief Declaration of a basic template for stacks based on doubly linked lists
+  * @brief Declaration of a basic template for queues based on doubly linked lists
   *
   * (c) 2007 - 2012 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -71,7 +71,7 @@ public:
 
   /** @brief default constructor
     *
-    * The default constructor initializes an empty stack.
+    * The default constructor initializes an empty queue.
     *
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
@@ -269,7 +269,7 @@ private:
 /** @brief default destructor
   *
   * This destructor will delete all items currently stored. There is no
-  * need to clean up manually before deleting the list.
+  * need to clean up manually before deleting the queue.
 **/
 template<typename data_t>
 TQueue<data_t>::~TQueue() noexcept
