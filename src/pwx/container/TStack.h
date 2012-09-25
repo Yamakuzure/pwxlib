@@ -269,7 +269,7 @@ private:
 /** @brief default destructor
   *
   * This destructor will delete all items currently stored. There is no
-  * need to clean up manually before deleting the list.
+  * need to clean up manually before deleting the stack.
 **/
 template<typename data_t>
 TStack<data_t>::~TStack() noexcept
