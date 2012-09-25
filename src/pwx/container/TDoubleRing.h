@@ -34,9 +34,20 @@ namespace pwx {
 
 /** @class TDoubleRing
   *
-  * @brief
+  * @brief Template to build doubly linked rings of variable types
   *
-  * @todo : Describe properly
+  * The doubly linked ring is an extension to the singly linked ring.
+  * The head element has a prev pointer pointing to tail rather than nullptr.
+  *
+  * The constructor takes an optional destroy(T*) function pointer that is used
+  * to destroy the data when the element is deleted. If no such function was set,
+  * the standard delete operator is used instead.
+  *
+  * It is recommended that you use the much more advanced std::list unless you
+  * need to store a very large number of elements and can not live with the
+  * downside of every element having to be copied into the std::list.
+  *
+  * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TDoubleElement<data_t> >
 class TDoubleRing : public TDoubleList<data_t, elem_t>
