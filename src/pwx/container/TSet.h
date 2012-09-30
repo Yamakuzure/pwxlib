@@ -4,7 +4,7 @@
 
 /** @file TSet.h
   *
-  * @brief Declaration of the TSet template to store unique items
+  * @brief Declaration of the TSet template to store unique elements
   *
   * (c) 2007 - 2012 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -35,39 +35,38 @@ namespace pwx {
 
 /** @class TSet
   *
-  * @brief Template to build sorted and unsorted sets of variable types
+  * @brief Template to build sets of variable types
   *
-  * The set is a more advanced container using a doubly linked list to manage its
-  * data pointers. Every item is checked for uniqueness before storing it in a set.
-  * This means that every single item is unique within a set.
+  * A set is a group of elements, where each element exists exactly once. Two
+  * sets are equal, if their members are equal. Therefore the sets {1, 2, 3} and
+  * {3, 2, 1} are equal. Although sets are unordered, the default constructor
+  * will build an ordered set to speed up the access.
+  *
+  * If the set is needed to be unordered, it must be constructed with "false" as
+  * an argument.
+  *
+  * Unsorted sets will generally be much closer to O(n) on any insertion and
+  * random access than sorted sets.
+  *
+  * The set uses a doubly linked list to manage its data pointers. Every element is
+  * checked for uniqueness before storing it in a set.
   *
   * This is done on the data level, not pointer level. This makes it necessary for
   * any data to support operator==(T). Alternatively an operator==(T,T) must be
   * available.
   *
-  * On construction it can be decided to have the set being sorted, which is done
-  * on insertion. The push() and pop() operations mirror a set, thus it has to
-  * be decided whether to keep the set character of the set or gain speed on
-  * insertions and random access by ordering the items.
-  *
-  * Unsorted sets will generally be much closer to O(n) on any insertion and and
-  * random access than sorted sets.
-  *
-  * Apart from this the major difference to a set is the support for the random
-  * access using operator[].
-  *
   * The constructor takes an optional destroy(T*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
   * the standard delete operator is used instead.
   *
-  * It is recommended that you use the much more advanced std::set or std::deque
-  * unless you need to store a very large number of elements and can not live with
-  * the downside of every element having to be copied into the std container.
+  * It is recommended that you use the much more advanced std::set unless you need
+  * to store a very large number of elements and can not live with the downside of
+  * every element having to be copied into the std container.
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t>
-class TSet
+class TSet : public CLockable
 {
 public:
   /* ===============================================
@@ -89,7 +88,7 @@ public:
     *
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
-  TSet(void (*destroy_)(data_t* data_)) noexcept
+  TSet(void (*destroy_)(data_t* data)) noexcept
   : sList(destroy_)
     { /* nothing to be done here */ }
 
@@ -119,7 +118,7 @@ public:
     * @param[in] sorted_ whether the set should be sorted or not
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
-  TSet(bool sorted_, void (*destroy_)(data_t* data_)) noexcept
+  TSet(bool sorted_, void (*destroy_)(data_t* data)) noexcept
   : isSorted(sorted_),
     sList(destroy_)
     { /* nothing to be done here */ }
@@ -132,6 +131,75 @@ public:
    * === Public methods                          ===
    * ===============================================
   */
+
+  /** @brief add a new data pointer to the set
+    *
+    * If the set is sorted, the element will be moved to the correct
+    * location. If the set is not sorted, it will be added to the end.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ItemCreationFailed" is thrown.
+    *
+    * If there is an element with the same data stored in the set,
+    * the new pointer is not stored but silently ignored.
+    *
+    * @param[in] data data pointer to store.
+    * @return number of elements stored after the operation.
+  **/
+  uint32_t add(data_t* data)
+    {
+      uint32_t listSize = sList.size();
+
+      if (privFind(*data))
+        return listSize;
+
+
+      if (isSorted && listSize)
+        {
+          /// Case A: The new element is the new smallest element:
+          elem_t* head = sList[0];
+          if (**head > *data)
+            {
+              PWX_TRY(return sList.insNext(nullptr, data))
+              PWX_THROW_FURTHER
+            }
+
+          /// Case B: The new element is the new largest element:
+          elem_t* tail = sList[-1];
+          if (*data > **tail)
+            {
+              PWX_TRY(return sList.insPrev(nullptr, data))
+              PWX_THROW_FURTHER
+            }
+
+          /// Case C: We have to search for the right location:
+          if (nullptr == prev)
+            prev = head->next;
+
+          /* downwards: */
+          if (**prev > *data)
+            {
+              while (**prev > *data)
+                prev = prev->prev;
+              // Now prev is the first smaller element
+              PWX_TRY(return sList.insNextElem(prev, data))
+              PWX_THROW_FURTHER
+            }
+
+          /* upwards : */
+          while (*data > **prev)
+            prev = prev->next;
+          // Now prev is the first larger element
+          PWX_TRY(return sList.insPrevElem(prev, data))
+          PWX_THROW_FURTHER
+        }
+      else
+        {
+          PWX_TRY(return sList.insPrev(nullptr, data))
+          PWX_THROW_FURTHER
+        }
+    }
+
 
   /** @brief delete all elements
     *
@@ -146,139 +214,139 @@ public:
       sList.clear();
     }
 
-  /** @brief push a new data pointer onto the set
+
+  /// @brief return true if the set is empty, false otherwise
+  bool empty() const noexcept { return !sList.size(); }
+
+
+  /** @brief find the element with the given @a data
     *
-    * This is the regular set operation to add a new element.
-    * Being a set this new element is put on top of it.
+    * This method searches through the set and returns the element
+    * with the given @a data or nullptr if @a data is not stored in this
+    * set.
+    *
+    * <B>Important</B>: Sets work on data level searching for the data
+    * and <I>not</I> pointers. This is very different from the behavior
+    * of TSingleList and TDoubleList.
+    *
+    * @param data reference to find
+    * @return return a pointer to the element storing @a data
+  **/
+  elem_t* find(data_t &data) noexcept
+    {
+      return const_cast<elem_t* >(privFind(static_cast<const data_t>(data)));
+    }
+
+  /** @brief find the element with the given @a data
+    *
+    * This method searches through the set and returns a const pointer
+    * to the element with the given @a data or nullptr if @a data is not stored
+    * in this set.
+    *
+    * <B>Important</B>: Sets work on data level searching for the data
+    * and <I>not</I> pointers. This is very different from the behavior
+    * of TSingleList and TDoubleList.
+    *
+    * @param data reference to find
+    * @return return a const pointer to the element storing @a data
+  **/
+  const elem_t* find(const data_t &data) const noexcept
+    {
+      return privFind(data);
+    }
+
+
+  /** @brief alias to remove the last element (tail)
+    * @return the last element or nullptr if the set is empty
+  **/
+  elem_t* pop() noexcept
+    {
+      return remove(-1);
+    }
+
+
+  /** @brief add an element to the end of the set
     *
     * If the set is sorted, the element will be moved to the correct
-    * location and therefore not explicitly appear on top.
-    *
-    * To add a new data pointer to the bottom, use unshift().
+    * location. If the set is not sorted, it will be added to the end.
     *
     * If the new element can not be created, a pwx::CException with
     * the name "ItemCreationFailed" is thrown.
     *
-    * If there is an item with the same data stored in the set,
-    * a pwx::CException with the name "DataUniquenessFailed" is
-    * thrown.
+    * If there is an element with the same data stored in the set,
+    * the new pointer is not stored but silently ignored.
     *
-    * @param[in] data_ data pointer to store.
+    * @param[in] data data pointer to store.
     * @return number of elements stored after the operation.
   **/
-  uint32_t push(data_t* data_)
+  uint32_t push(data_t* data)
     {
-      /// @todo Add check
-      if (isSorted)
-        {
-          /// @todo implementation to be done
-        }
-      else
-        {
-          PWX_TRY(return sList.insNext(nullptr, data_))
-          PWX_THROW_FURTHER
-        }
-    }
-
-  /** @brief pop the last element from the set
-    *
-    * This is the regular set operation to get the oldest element.
-    * Being a set this element comes from the bottom. If the
-    * set is ordered, this is not explicitly the oldest, but the
-    * largest element from its data point of view.
-    *
-    * To get an element from the top, use shift(). For random access
-    * use operator[index].
-    *
-    * The element is removed from the set so you have to take
-    * care of its deletion once you are finished with it.
-    *
-    * If there is no element in the set a pwx::CException with the
-    * name "OutOfRange" is thrown.
-    *
-    * @return the bottom element on the set.
-  **/
-  elem_t* pop()
-    {
-      if (sList.size() > 1)
-        {
-          PWX_TRY(return sList.remPrev(nullptr))
-          PWX_THROW_FURTHER
-        }
-      else
-        {
-          PWX_TRY(return shift())
-          PWX_THROW_FURTHER
-        }
-    }
-
-  /** @brief shift the newest element from the top of the set
-    *
-    * This is the irregular set operation to get the newest
-    * element. If the set is ordered, this is not explicitly
-    * the newest, but the smallest element from its data point
-    * of view.
-    *
-    * The regular set operation to get the top element is
-    * pop (). For random access use operator[index].
-    *
-    * The element is removed from the set so you have to take
-    * care of its deletion once you are finished with it.
-    *
-    * If there is no element in the set a pwx::CException with the
-    * name "OutOfRange" is thrown.
-    *
-    * @return the top element from the set.
-  **/
-  elem_t* shift()
-    {
-      PWX_TRY(return sList.remNext(nullptr))
+      PWX_TRY(return add(data))
       PWX_THROW_FURTHER
     }
+
+
+  /** @brief remove an element from the set
+    *
+    * This method removes and returns the element with
+    * the index @a index. If the set is empty, a nullptr
+    * is returned.
+    *
+    * @param[in] idx index of the element, wrapped if negative or out of bounds.
+    * @return a pointer to the removed element or nullptr if the set is empty.
+  **/
+  elem_t* remove(int32_t index) noexcept
+    {
+      elem_t* toRemove = sList[index];
+
+      if (toRemove)
+        sList.remElem(toRemove);
+
+      return toRemove;
+    }
+
+
+  /** @brief alias to remove the first element (head)
+    * @return the first element or nullptr if the set is empty
+  **/
+  elem_t* shift() noexcept
+    {
+      return remove(0);
+    }
+
 
   /// @brief return the number of stored elements
   uint32_t size() const noexcept { return sList.size(); }
 
-  /** @brief unshift a new data pointer under the bottom of the set
-    *
-    * This is the irregular set operation to add a new data
-    * pointer under the set.
+
+  /** @brief add an element to the end of the set
     *
     * If the set is sorted, the element will be moved to the correct
-    * location and therefore not explicitly appear at the bottom.
-    *
-    * The regular set operation to add a new data pointer
-    * onto the top is push().
+    * location. If the set is not sorted, it will be added to the started.
     *
     * If the new element can not be created, a pwx::CException with
     * the name "ItemCreationFailed" is thrown.
     *
-    * If there is an item with the same data stored in the set,
-    * a pwx::CException with the name "DataUniquenessFailed" is
-    * thrown.
+    * If there is an element with the same data stored in the set,
+    * the new pointer is not stored but silently ignored.
     *
-    * @param[in] data_ data pointer to store.
+    * @param[in] data data pointer to store.
     * @return number of elements stored after the operation.
   **/
-  uint32_t unshift(data_t* data_)
+  uint32_t unshift(data_t* data)
     {
-      /// @todo : add check
       if (isSorted)
         {
-          PWX_TRY(return push(data_)) // Its the same if the set is sorted
-          PWX_THROW_FURTHER
-        }
-      else if (sList.size())
-        {
-          PWX_TRY(return sList.insPrev(nullptr, data_))
+          PWX_TRY(return add(data))
           PWX_THROW_FURTHER
         }
       else
         {
-          PWX_TRY(return push(data_))
+          PWX_TRY(return sList.insNext(nullptr, data))
           PWX_THROW_FURTHER
         }
     }
+
 
   /* ===============================================
    * === Public operators                        ===
@@ -360,6 +428,82 @@ private:
    * === Private methods                         ===
    * ===============================================
   */
+  elem_t* privFind(data_t &data) noexcept
+    {
+      PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+
+      uint32_t listSize = sList.size();
+      if (0 == listSize)
+        return nullptr;
+
+      // Allow a quick out if prev has been set and a neighbor (or prev) is wanted:
+      if (prev && prev->data)
+        {
+          if (**prev == data)
+            return prev;
+          else if (prev->next && (**prev->next == data))
+            {
+              prev = prev->next;
+              return prev;
+            }
+          else if (prev->prev && (**prev->prev == data))
+            {
+              prev = prev->prev;
+              return prev;
+            }
+        }
+
+      /* another quick exit if head or tail are wanted: */
+      elem_t* head = sList[0];
+      elem_t* tail = sList[-1];
+      if (**head == data)
+        return head;
+      if (listSize > 1)
+        {
+          if (**tail == data)
+            return tail;
+        }
+      else
+        return nullptr; // head is alone and not the searched one.
+
+      /* There are two completely different situations here:
+       * A) The set is sorted.
+       *    In this case we do not only search for the data but maintain this->prev
+       *    to point to the prev of the next larger element if data can not be found.
+       *    push()/unshift() then use this->prev for an sList.insNextElem()
+       * B) The set is unsorted.
+       *    Here we have to walk all the way through the whole sList until the
+       *    element is found or tail is reached.
+       *    However, prev stores the last accessed element for a speedier access to
+       *    its neighbors
+      */
+
+      /// Situation A)
+      if (isSorted)
+        {
+          if (nullptr == prev)
+            // Oh no, start from scratch
+            prev = head;
+
+          /* Go downwards: */
+          while ((head != prev) && (**prev > data))
+            prev = prev->prev;
+          /* Go upwards: */
+          while ((tail != prev) && (data > **prev))
+            prev = prev->next;
+
+          /* Return either prev or nullptr now */
+          return (**prev == data ? prev : nullptr);
+        } // End of find in a sorted set
+
+      /// Situation B)
+      prev = head->next;
+      while ((tail != prev) && !(data == **prev))
+        prev = prev->next;
+
+      /* Return either prev or nullptr now */
+      return (**prev == data ? prev : nullptr);
+    }
 
   /* ===============================================
    * === Private operators                       ===
@@ -370,14 +514,16 @@ private:
    * === Private members                         ===
    * ===============================================
   */
-  const bool          isSorted = false; //!< Whether to sort items on insertion or not.
+  const bool          isSorted = true;  //!< Whether to sort elements on insertion or not.
   TDoubleList<data_t> sList;            //!< Data is held by a doubly linked list.
+  mutable
+  elem_t*             prev     = nullptr; //!< Set by privFind and utilized by push() and unshift() if isSorted is true.
 
 }; // class TSet
 
 /** @brief default destructor
   *
-  * This destructor will delete all items currently stored. There is no
+  * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the set.
 **/
 template<typename data_t>

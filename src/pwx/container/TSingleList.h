@@ -267,10 +267,7 @@ public:
       PWX_TRY(newElement = new elem_t(data, destroy))
       PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
 
-      privInsert(prev ? curr : nullptr, newElement);
-
-      // Count the new element and give the number back
-      return ++eCount;
+      return privInsert(prev ? curr : nullptr, newElement);
     }
 
   /** @brief insert a new data pointer after the specified element
@@ -301,10 +298,7 @@ public:
       PWX_TRY(newElement = new elem_t(data, destroy))
       PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
 
-      privInsert(prev, newElement);
-
-      // Count the new element and give the number back
-      return ++eCount;
+      return privInsert(prev, newElement);
     }
 
   /** @brief remove the element after the element holding the specified data
@@ -341,7 +335,6 @@ public:
       // Lock both curr and the item to remove, then get it out
       PWX_DOUBLE_LOCK(elem_t, curr, elem_t, toRemove);
       privRemove(prev ? curr : nullptr, toRemove);
-      --eCount;
 
       return toRemove;
     }
@@ -379,7 +372,6 @@ public:
       // Lock and remove the item
       toRemove->lock();
       privRemove(prev, toRemove);
-      --eCount;
       toRemove->unlock();
 
       return toRemove;
@@ -551,7 +543,7 @@ private:
     }
 
   /// @brief simple method to insert an element into the list
-  virtual void privInsert(elem_t* prev, elem_t* elem)
+  virtual uint32_t privInsert(elem_t* prev, elem_t* elem)
     {
       if (elem)
         {
@@ -582,11 +574,13 @@ private:
               tail = elem;
               curr = head;
             }
+          ++eCount;
         } // End of having an element to insert
+      return eCount;
     }
 
   /// @brief simple method to remove an element from the list
-  virtual void privRemove(elem_t* prev, elem_t* elem)
+  virtual uint32_t privRemove(elem_t* prev, elem_t* elem)
     {
       if (elem)
         {
@@ -629,7 +623,9 @@ private:
 
           // Finally elem does not need pointers to its neighbors any more
           elem->next = nullptr;
+          --eCount;
         } // end of having an element to remove
+      return eCount;
     }
 
   /* ===============================================

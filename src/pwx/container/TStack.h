@@ -53,7 +53,7 @@ namespace pwx {
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t>
-class TStack
+class TStack : public CLockable
 {
 public:
   /* ===============================================

@@ -93,6 +93,25 @@ int32_t testBucket(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
       delete elemC;
     } // end of sub test B
 
+  /** B2) Try whether another "4" can be added **/
+  if (isSameType(list_t, set_t))
+    {
+      cout << adjRight(4,0) << ++testCount << " B2) unshift(&4) : ";
+      intCont.unshift(&numbers[3]);
+      cout << "new size " << intCont.size();
+      if (2 == intCont.size())
+        {
+          cout << " - Success" << endl;
+          ++testSuccess;
+        }
+      else
+        {
+          cout << " - FAIL" << endl;
+          ++testFail;
+          result = EXIT_FAILURE;
+        }
+    }
+
   /** C) Shift two integers, must be 5, 4 (Queue, Set) or 1, 2 (Stack)       **/
   if (EXIT_SUCCESS == result)
     {
