@@ -89,7 +89,8 @@ public:
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
   TSet(void (*destroy_)(data_t* data)) noexcept
-  : sList(destroy_)
+  : destroy(destroy_),
+    sList(destroy_)
     { /* nothing to be done here */ }
 
   /** @brief empty constructor
@@ -97,7 +98,7 @@ public:
     * The empty constructor sets the data destroy method to the null pointer.
   **/
   TSet() noexcept
-  : sList(nullptr)
+  : destroy(nullptr), sList(nullptr)
     { /* nothing to be done here */ }
 
   /** @brief bool constructor
@@ -107,7 +108,8 @@ public:
     * @param[in] sorted_ whether the set should be sorted or not
   **/
   TSet(bool sorted_) noexcept
-  : isSorted(sorted_),
+  : destroy(nullptr),
+    isSorted(sorted_),
     sList(nullptr)
     { /* nothing to be done here */ }
 
@@ -119,7 +121,8 @@ public:
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
   TSet(bool sorted_, void (*destroy_)(data_t* data)) noexcept
-  : isSorted(sorted_),
+  : destroy(destroy_),
+    isSorted(sorted_),
     sList(destroy_)
     { /* nothing to be done here */ }
 
@@ -138,7 +141,7 @@ public:
     * location. If the set is not sorted, it will be added to the end.
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * If there is an element with the same data stored in the set,
     * the new pointer is not stored but silently ignored.
@@ -256,6 +259,53 @@ public:
     }
 
 
+  /** @brief build the intersection of this set with another
+    *
+    * The intersection of two sets consists of all elements that
+    * are present in both sets.
+    *
+    * This method returns a newly build set consisting of copies
+    * of the elements that are present in both sets.
+    *
+    * If both sets do not intersect, an empty set is returned.
+    *
+    * If the new set can not be created, a pwx::CException with
+    * the name "SetCreationFailed" is thrown.
+    *
+    * If an intersecting element can not be created, a pwx::CException
+    * with the name "ElementCreationFailed" is thrown.
+    *
+    * If the data of an intersecting element could not be copied, a
+    * pwx::CException with the name "CopyingDataFailed" is thrown.
+    *
+    * @param rhs pointer to the set to compare with
+    * @return pointer to the intersecting set. You have to delete it yourself!
+  **/
+  list_t* intersects(list_t* rhs)
+    {
+      list_t* intersection = nullptr;
+      PWX_TRY(intersection = new list_t(isSorted, destroy))
+      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::intersects() could not create an intersection set.")
+
+      size_t lSize = sList.size();
+      for (size_t i = 0; i < lSize; ++i)
+        {
+          elem_t* curr = sList[i];
+          if (rhs->privFind(**curr))
+            {
+              // This element exists in both, so add a new element to the intersection:
+              data_t* newData = nullptr;
+              PWX_TRY(newData = new data_t(**curr))
+              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::intersects() could not copy intersecting data.")
+              PWX_TRY(intersection->add(newData))
+              PWX_THROW_FURTHER
+            }
+        } // End of walking through the elements
+
+      return intersection;
+    }
+
+
   /** @brief alias to remove the last element (tail)
     * @return the last element or nullptr if the set is empty
   **/
@@ -271,7 +321,7 @@ public:
     * location. If the set is not sorted, it will be added to the end.
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * If there is an element with the same data stored in the set,
     * the new pointer is not stored but silently ignored.
@@ -325,7 +375,7 @@ public:
     * location. If the set is not sorted, it will be added to the started.
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * If there is an element with the same data stored in the set,
     * the new pointer is not stored but silently ignored.
@@ -354,6 +404,7 @@ public:
   */
   list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
 
+
   /** @brief return a read-only pointer to the element with the given @a index
     *
     * This operator retrieves an element by index like an array. The pointer given
@@ -373,6 +424,7 @@ public:
       return sList[index];
     }
 
+
   /** @brief return a read/write pointer to the element with the given @a index
     *
     * This operator retrieves an element by index like an array. The pointer given
@@ -391,6 +443,50 @@ public:
     {
       return sList[index];
     }
+
+
+  /** @brief return true if this set equals another
+    *
+    * @param[in] rhs right hand side operand
+    * @return true if both sets are equal
+  **/
+  bool operator==(const list_t &rhs) const noexcept
+    {
+      size_t lSize  = sList.size();
+      size_t rSize  = rhs.size();
+
+      // Check A: Both sets must have equal size:
+      bool result = (lSize == rSize);
+
+      // Check B: The Intersection of both sets must have the same size
+      if (result)
+        {
+          result = false;
+          list_t* intersection = intersects(&rhs);
+
+          if (intersection)
+            {
+              if (intersection->size() == lSize)
+                result = true;
+              delete intersection;
+            }
+        } // End of check B
+
+      return result;
+    }
+
+
+  /** @brief return true if this set is different from another
+    *
+    * @param[in] rhs right hand side operand
+    * @return true if both sets are not equal
+  **/
+  bool operator!=(const list_t &rhs) const noexcept
+    {
+      return (!operator==(rhs));
+    }
+
+
 
   /* ===============================================
    * === Public members                          ===
@@ -428,6 +524,8 @@ private:
    * === Private methods                         ===
    * ===============================================
   */
+  void (*destroy)(data_t* data_);
+
   elem_t* privFind(data_t &data) noexcept
     {
       PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))

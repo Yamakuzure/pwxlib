@@ -93,10 +93,10 @@ int32_t testBucket(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
       delete elemC;
     } // end of sub test B
 
-  /** B2) Try whether another "4" can be added **/
+  /** C) Try whether another "4" can be added **/
   if (isSameType(list_t, set_t))
     {
-      cout << adjRight(4,0) << ++testCount << " B2) unshift(&4) : ";
+      cout << adjRight(4,0) << ++testCount << " C) unshift(&4) : ";
       intCont.unshift(&numbers[3]);
       cout << "new size " << intCont.size();
       if (2 == intCont.size())
@@ -112,10 +112,16 @@ int32_t testBucket(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
         }
     }
 
-  /** C) Shift two integers, must be 5, 4 (Queue, Set) or 1, 2 (Stack)       **/
+  /** C/D) Shift two integers, must be 5, 4 (Queue, Set) or 1, 2 (Stack)       **/
   if (EXIT_SUCCESS == result)
     {
-      cout << adjRight(4,0) << ++testCount << " C) Shift two times: ";
+      cout << adjRight(4,0) << ++testCount;
+
+      if (isSameType(list_t, set_t))
+        cout << " D) Shift two times: ";
+      else
+        cout << " C) Shift two times: ";
+
       auto elemA = intCont.shift();
       auto elemB = intCont.shift();
       cout << **elemA << ", " << **elemB << " - ";
