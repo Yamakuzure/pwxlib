@@ -188,7 +188,7 @@ public:
     * head of the list.
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * @param[in] prev_ the data the element that should precede the new element holds
     * @param[in] data_ the pointer that is to be added.
@@ -199,7 +199,7 @@ public:
       PWX_LOCK_GUARD(list_t, this)
       PWX_TRY(base_t::insNext(prev_, data_))
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
       privConnectEnds();
       return eCount;
     }
@@ -217,7 +217,7 @@ public:
     * use the correct element on the correct list!
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * @param[in] prev_ the element that should precede the new element
     * @param[in] data_ the pointer that is to be added.
@@ -228,7 +228,7 @@ public:
       PWX_LOCK_GUARD(list_t, this)
       PWX_TRY(base_t::insNextElem(prev_, data_))
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
       privConnectEnds();
       return eCount;
     }

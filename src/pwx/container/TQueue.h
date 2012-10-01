@@ -117,7 +117,7 @@ public:
     * To add a new data pointer to the bottom, use unshift().
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * @param[in] data_ data pointer to store.
     * @return number of elements stored after the operation.
@@ -191,7 +191,7 @@ public:
     * onto the top is push().
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * @param[in] data_ data pointer to store.
     * @return number of elements stored after the operation.

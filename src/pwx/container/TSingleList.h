@@ -248,7 +248,7 @@ public:
     * head of the list.
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * @param[in] prev the data the element that should precede the new element holds
     * @param[in] data the pointer that is to be added.
@@ -260,12 +260,12 @@ public:
 
       if (prev && (nullptr == find(prev)) )
         // find sets curr to the correct value.
-        PWX_THROW("ItemNotFound", "Item not found", "The searched item can not be found in this singly linked list")
+        PWX_THROW("ElementNotFound", "Element not found", "The searched item can not be found in this singly linked list")
 
       // First create a new element for data
       elem_t* newElement = nullptr;
       PWX_TRY(newElement = new elem_t(data, destroy))
-      PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
 
       return privInsert(prev ? curr : nullptr, newElement);
     }
@@ -283,7 +283,7 @@ public:
     * use the correct element on the correct list!
     *
     * If the new element can not be created, a pwx::CException with
-    * the name "ItemCreationFailed" is thrown.
+    * the name "ElementCreationFailed" is thrown.
     *
     * @param[in] prev the element that should precede the new element
     * @param[in] data the pointer that is to be added.
@@ -296,7 +296,7 @@ public:
       // First create a new element for data
       elem_t* newElement = nullptr;
       PWX_TRY(newElement = new elem_t(data, destroy))
-      PWX_THROW_STD_FURTHER("ItemCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
 
       return privInsert(prev, newElement);
     }
@@ -325,10 +325,10 @@ public:
 
       if (prev && (nullptr == find(prev)) )
         // find sets curr to the correct value.
-        PWX_THROW("ItemNotFound", "Item not found", "The searched item can not be found in this singly linked list")
+        PWX_THROW("ElementNotFound", "Element not found", "The searched item can not be found in this singly linked list")
 
       if (prev && (nullptr == curr->next) )
-        PWX_THROW("OutOfRange", "Item out of range", "There is no element behind element holding the given prev pointer")
+        PWX_THROW("OutOfRange", "Element out of range", "There is no element behind element holding the given prev pointer")
 
       elem_t* toRemove = prev ? curr->next : head;
 
@@ -362,10 +362,10 @@ public:
       PWX_LOCK_GUARD(list_t, this)
 
       if (prev && (nullptr == prev->next) )
-        PWX_THROW("OutOfRange", "Item out of range", "There is no element behind the given prev element")
+        PWX_THROW("OutOfRange", "Element out of range", "There is no element behind the given prev element")
 
       if (0 == eCount)
-        PWX_THROW("OutOfRange", "Item out of range", "The list is empty")
+        PWX_THROW("OutOfRange", "Element out of range", "The list is empty")
 
       elem_t* toRemove = prev ? prev->next : head;
 
