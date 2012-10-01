@@ -218,6 +218,58 @@ public:
     }
 
 
+  /** @brief build the difference of this set with another
+    *
+    * The difference of two sets consists of all elements that
+    * are present in this set but not the other.
+    *
+    * This method returns a newly build set consisting of copies
+    * of the elements that are present in this but not the other set.
+    *
+    * If both sets are equal, an empty set is returned.
+    *
+    * If the new set can not be created, a pwx::CException with
+    * the name "SetCreationFailed" is thrown.
+    *
+    * If an element can not be created, a pwx::CException with the
+    * name "ElementCreationFailed" is thrown.
+    *
+    * If the data of an element could not be copied, a pwx::CException
+    * with the name "CopyingDataFailed" is thrown.
+    *
+    * @param rhs pointer to the set to compare with
+    * @return pointer to the difference set. You have to delete it yourself!
+  **/
+  list_t* differenceFrom(list_t* rhs)
+    {
+      list_t* diff = nullptr;
+      PWX_TRY(diff = new list_t(isSorted, destroy))
+      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::differenceFrom() could not create a difference set.")
+
+      // Return an empty set if a difference with this is asked for:
+      if (this == rhs)
+        return diff;
+
+      // Otherwise build a difference
+      size_t lSize = sList.size();
+      for (size_t i = 0; i < lSize; ++i)
+        {
+          elem_t* curr = sList[i];
+          if (!rhs->privFind(**curr))
+            {
+              // This element exists only in this set, so add a new element to the difference:
+              data_t* newData = nullptr;
+              PWX_TRY(newData = new data_t(**curr))
+              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::differenceFrom() could not copy different data.")
+              PWX_TRY(diff->add(newData))
+              PWX_THROW_FURTHER
+            }
+        } // End of walking through the elements
+
+      return diff;
+    }
+
+
   /// @brief return true if the set is empty, false otherwise
   bool empty() const noexcept { return !sList.size(); }
 
@@ -239,6 +291,7 @@ public:
     {
       return const_cast<elem_t* >(privFind(static_cast<const data_t>(data)));
     }
+
 
   /** @brief find the element with the given @a data
     *
@@ -269,6 +322,10 @@ public:
     *
     * If both sets do not intersect, an empty set is returned.
     *
+    * The intersection of the set with itself is the set. This means
+    * that you will get a pointer to this set and not a copy if you
+    * write something like "foo = bar->intersects(bar);"
+    *
     * If the new set can not be created, a pwx::CException with
     * the name "SetCreationFailed" is thrown.
     *
@@ -281,12 +338,17 @@ public:
     * @param rhs pointer to the set to compare with
     * @return pointer to the intersecting set. You have to delete it yourself!
   **/
-  list_t* intersects(list_t* rhs)
+  list_t* intersectionWith(list_t* rhs)
     {
-      list_t* intersection = nullptr;
-      PWX_TRY(intersection = new list_t(isSorted, destroy))
-      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::intersects() could not create an intersection set.")
+      list_t* inters = nullptr;
+      PWX_TRY(inters = new list_t(isSorted, destroy))
+      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::intersectionWith() could not create an intersection set.")
 
+      // Return this if an intersection with this is asked for:
+      if (this == rhs)
+        return this;
+
+      // Otherwise build an intersection
       size_t lSize = sList.size();
       for (size_t i = 0; i < lSize; ++i)
         {
@@ -296,13 +358,13 @@ public:
               // This element exists in both, so add a new element to the intersection:
               data_t* newData = nullptr;
               PWX_TRY(newData = new data_t(**curr))
-              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::intersects() could not copy intersecting data.")
-              PWX_TRY(intersection->add(newData))
+              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::intersectionWith() could not copy intersecting data.")
+              PWX_TRY(inters->add(newData))
               PWX_THROW_FURTHER
             }
         } // End of walking through the elements
 
-      return intersection;
+      return inters;
     }
 
 
@@ -367,6 +429,86 @@ public:
 
   /// @brief return the number of stored elements
   uint32_t size() const noexcept { return sList.size(); }
+
+
+  /** @brief return true if this set is a subset of @a rhs
+    *
+    * The set is a subset of @a rhs if @a rhs contains all elements
+    * of this set.
+    *
+    * @param[in] rhs pointer to the set to compare with
+    * @return true if this is a subset of @a rhs, false otherwise
+  **/
+  bool subsetOf(list_t* rhs)
+    {
+      if (this == rhs)
+        return true;
+
+      size_t lSize  = sList.size();
+      bool   result = true;
+      for (size_t i = 0; result && (i < lSize); ++i)
+        {
+          if (!rhs->privFind(**sList[i]))
+            result = false;
+        } // End of walking through the elements
+      return result;
+    }
+
+
+  /** @brief build the union of this set with another
+    *
+    * The union of two sets consists of all elements that
+    * are present in either set.
+    *
+    * This method returns a newly build set consisting of copies
+    * of the elements that are present in either set.
+    *
+    * If the new set can not be created, a pwx::CException with
+    * the name "SetCreationFailed" is thrown.
+    *
+    * If an element can not be created, a pwx::CException with the
+    * name "ElementCreationFailed" is thrown.
+    *
+    * If the data of an element could not be copied, a pwx::CException
+    * with the name "CopyingDataFailed" is thrown.
+    *
+    * @param rhs pointer to the set to compare with
+    * @return pointer to the union set. You have to delete it yourself!
+  **/
+  list_t* unionWith(list_t* rhs)
+    {
+      list_t* unionSet = nullptr;
+      PWX_TRY(unionSet = new list_t(isSorted, destroy))
+      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::unionWith() could not create a union set.")
+
+      // Otherwise add all from this...
+      size_t lSize = sList.size();
+      for (size_t i = 0; i < lSize; ++i)
+        {
+          data_t* newData = nullptr;
+          PWX_TRY(newData = new data_t(**sList[i]))
+          PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::unionWith() could not copy uinion data.")
+          PWX_TRY(unionSet->add(newData))
+          PWX_THROW_FURTHER
+        } // End of walking through the elements
+
+      // Then add all from the other
+      lSize = rhs->size();
+      for (size_t i = 0; i < lSize; ++i)
+        {
+          elem_t* curr = *rhs[i];
+          if (!unionSet->privFind(**curr))
+            {
+              data_t* newData = nullptr;
+              PWX_TRY(newData = new data_t(**curr))
+              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::unionWith() could not copy uinion data.")
+              PWX_TRY(unionSet->add(newData))
+              PWX_THROW_FURTHER
+            }
+        } // End of walking through the elements
+
+      return unionSet;
+    }
 
 
   /** @brief add an element to the end of the set
@@ -458,19 +600,9 @@ public:
       // Check A: Both sets must have equal size:
       bool result = (lSize == rSize);
 
-      // Check B: The Intersection of both sets must have the same size
+      // Check B: The this must be a subset of rhs
       if (result)
-        {
-          result = false;
-          list_t* intersection = intersects(&rhs);
-
-          if (intersection)
-            {
-              if (intersection->size() == lSize)
-                result = true;
-              delete intersection;
-            }
-        } // End of check B
+        result = subsetOf(&rhs);
 
       return result;
     }
