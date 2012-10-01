@@ -67,7 +67,7 @@ struct PWX_API TDoubleElement : public CLockable
     * The default constructor only sets the data to point at. It does nothing special
     * otherwise and is the most minimal constructor available.
     *
-    * @param data_[in] A pointer to the data this list item is to hold.
+    * @param data_[in] A pointer to the data this list element is to hold.
     * @param destroy_[in] A pointer to a function that is to be used to destroy the data
   **/
   TDoubleElement(T* data_, void (*destroy_)(T* data_)) noexcept
@@ -79,7 +79,7 @@ struct PWX_API TDoubleElement : public CLockable
     *
     * Delegating ctor that calls the default ctor with destroy_ being the nullptr
     *
-    * @param data_[in] A pointer to the data this list item is to hold.
+    * @param data_[in] A pointer to the data this list element is to hold.
   **/
   explicit
   TDoubleElement(T* data_) noexcept
@@ -135,9 +135,9 @@ struct PWX_API TDoubleElement : public CLockable
    * === Public members                          ===
    * ===============================================
   */
-  T*      data = nullptr; //!< The data this list item points to
-  elem_t* next = nullptr; //!< The next item in the list or nullptr if this is the tail
-  elem_t* prev = nullptr; //!< The previous item in the list or nullptr if this is the head
+  T*      data = nullptr; //!< The data this list element points to
+  elem_t* next = nullptr; //!< The next element in the list or nullptr if this is the tail
+  elem_t* prev = nullptr; //!< The previous element in the list or nullptr if this is the head
 
 protected:
   /* ===============================================

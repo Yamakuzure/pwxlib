@@ -158,7 +158,7 @@ public:
     *
     * If you intent to work with the element, use remPrev instead.
     *
-    * If there is no item before the element holding @a next, a
+    * If there is no element before the element holding @a next, a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] next the data the element that succeeds the element to delete holds
@@ -192,7 +192,7 @@ public:
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item before the element @a next a
+    * If there is no element before the element @a next a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] next the element that succeeds the element to delete
@@ -212,9 +212,9 @@ public:
       PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delPrevElem() failed.")
     }
 
-  /** @brief find the item with the given @a data
+  /** @brief find the element with the given @a data
     *
-    * This method searches through the list and returns the item
+    * This method searches through the list and returns the element
     * with the given @a data or nullptr if @a data is not stored in this
     * list.
     *
@@ -226,10 +226,10 @@ public:
       return const_cast<elem_t* >(find(static_cast<const data_t* >(data)));
     }
 
-  /** @brief find the item with the given @a data
+  /** @brief find the element with the given @a data
     *
     * This method searches through the list and returns a const pointer
-    * to the item with the given @a data or nullptr if @a data is not stored
+    * to the element with the given @a data or nullptr if @a data is not stored
     * in this list.
     *
     * @param data pointer to the data to find
@@ -316,12 +316,12 @@ public:
 
       if (next && (nullptr == find(next)) )
         // find sets curr to the correct value.
-        PWX_THROW("ElementNotFound", "Element not found", "The searched item can not be found in this doubly linked list")
+        PWX_THROW("ElementNotFound", "Element not found", "The searched element can not be found in this doubly linked list")
 
       // First create a new element for data
       elem_t* newElement = nullptr;
       PWX_TRY(newElement = new elem_t(data, destroy))
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
 
       return privInsert(next ? curr->prev : nullptr, newElement);
     }
@@ -352,7 +352,7 @@ public:
       // First create a new element for data
       elem_t* newElement = nullptr;
       PWX_TRY(newElement = new elem_t(data, destroy))
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
 
       return privInsert(next ? next->prev : nullptr, newElement);
     }
@@ -418,7 +418,7 @@ public:
     * You have to delete the removed element by yourself. If you do not intent
     * to work with the removed element, use delPrev instead.
     *
-    * If there is no item before the element @a next holds, a
+    * If there is no element before the element @a next holds, a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] next the data the element that succeeds the element to remove holds
@@ -430,14 +430,14 @@ public:
 
       if (next && (nullptr == find(next)) )
         // find sets curr to the correct value.
-        PWX_THROW("ElementNotFound", "Element not found", "The searched item can not be found in this doubly linked list")
+        PWX_THROW("ElementNotFound", "Element not found", "The searched element can not be found in this doubly linked list")
 
       if (next && (nullptr == curr->prev) )
         PWX_THROW("OutOfRange", "Element out of range", "There is no element before the element holding the given next pointer")
 
       elem_t* toRemove = next ? curr->prev : tail;
 
-      // Lock both curr and the item to remove:
+      // Lock both curr and the element to remove:
       PWX_DOUBLE_LOCK(elem_t, curr, elem_t, toRemove);
 
       // Now detach toRemove
@@ -461,7 +461,7 @@ public:
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item before @a next or if the list is empty,
+    * If there is no element before @a next or if the list is empty,
     * a pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] next the element that succeeds the element to remove
@@ -479,7 +479,7 @@ public:
 
       elem_t* toRemove = next ? next->prev : tail;
 
-      // Lock the item to remove and then detach it out of the list
+      // Lock the element to remove and then detach it out of the list
       toRemove->lock();
       privRemove(toRemove->prev, toRemove);
 
@@ -772,7 +772,7 @@ private:
               eNr  = 0;
             } // End of maintaining curr
 
-          // if this was the last item, sanitize the list:
+          // if this was the last element, sanitize the list:
           if (1 == eCount)
             {
               head = nullptr;
@@ -802,7 +802,7 @@ private:
 
 /** @brief default destructor
   *
-  * This destructor will delete all items currently stored. There is no
+  * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the list.
 **/
 template<typename data_t, typename elem_t>

@@ -105,7 +105,7 @@ public:
     *
     * If you intent to work with the element, use remNext instead.
     *
-    * If there is no item behind the element holding @a prev_ a
+    * If there is no element behind the element holding @a prev_ a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] prev_ the data the element that precedes the element to delete holds
@@ -135,7 +135,7 @@ public:
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item behind the element @a prev_ a
+    * If there is no element behind the element @a prev_ a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] prev_ the element that precedes the element to delete
@@ -151,9 +151,9 @@ public:
       return eCount;
     }
 
-  /** @brief find the item with the given @a data_
+  /** @brief find the element with the given @a data_
     *
-    * This method searches through the list and returns the item
+    * This method searches through the list and returns the element
     * with the given @a data_ or nullptr if @a data_ is not stored in this
     * list.
     *
@@ -165,10 +165,10 @@ public:
       return const_cast<elem_t* >(base_t::find(static_cast<const data_t* >(data_)));
     }
 
-  /** @brief find the item with the given @a data_
+  /** @brief find the element with the given @a data_
     *
     * This method searches through the list and returns a const pointer
-    * to the item with the given @a data_ or nullptr if @a data_ is not stored
+    * to the element with the given @a data_ or nullptr if @a data_ is not stored
     * in this list.
     *
     * @param data_ pointer to the data to find
@@ -199,7 +199,7 @@ public:
       PWX_LOCK_GUARD(list_t, this)
       PWX_TRY(base_t::insNext(prev_, data_))
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
       privConnectEnds();
       return eCount;
     }
@@ -228,7 +228,7 @@ public:
       PWX_LOCK_GUARD(list_t, this)
       PWX_TRY(base_t::insNextElem(prev_, data_))
       PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list item failed.")
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
       privConnectEnds();
       return eCount;
     }
@@ -245,7 +245,7 @@ public:
     * You have to delete the removed element by yourself. If you do not intent
     * to work with the removed element, use delNext instead.
     *
-    * If there is no item behind the element @a prev_ a
+    * If there is no element behind the element @a prev_ a
     * pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] prev_ the data the element that precedes the element to remove holds
@@ -273,7 +273,7 @@ public:
     * and both element counts will be wrong then. So please make sure to
     * use the correct element on the correct list!
     *
-    * If there is no item behind the element @a prev_ or if the list is
+    * If there is no element behind the element @a prev_ or if the list is
     * empty, a pwx::CException with the name "OutOfRange" is thrown.
     *
     * @param[in] prev_ the element that precedes the element to remove
@@ -408,7 +408,7 @@ private:
 
 /** @brief default destructor
   *
-  * This destructor will delete all items currently stored. There is no
+  * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the list.
 **/
 template<typename data_t, typename elem_t>

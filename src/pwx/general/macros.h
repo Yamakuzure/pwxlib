@@ -166,7 +166,7 @@
 #endif
 
 
-/** @brief Lock two items simultaneously
+/** @brief Lock two elements simultaneously
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *

@@ -268,7 +268,7 @@ private:
 
 /** @brief default destructor
   *
-  * This destructor will delete all items currently stored. There is no
+  * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the queue.
 **/
 template<typename data_t>
