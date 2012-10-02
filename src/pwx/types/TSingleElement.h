@@ -67,8 +67,7 @@ struct PWX_API TSingleElement : public CLockable
 
   /** @brief default constructor
     *
-    * The explicit constructor only sets the data to point at. It does nothing special
-    * otherwise and is the most minimal constructor available.
+    * The default constructor sets both the data pointer and the destroy method.
     *
     * @param data_[in] A pointer to the data this list element is to hold.
     * @param destroy_[in] A pointer to a function that is to be used to destroy the data
@@ -79,7 +78,7 @@ struct PWX_API TSingleElement : public CLockable
 
   /** @brief explicit constructor
     *
-    * Delegating ctor that calls the default ctor with destroy_ beeing the nullptr
+    * Delegating ctor that calls the default ctor with destroy_ being the nullptr
     *
     * @param data_[in] A pointer to the data this list element is to hold.
   **/
