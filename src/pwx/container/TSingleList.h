@@ -58,6 +58,7 @@ public:
    * === Public types                            ===
    * ===============================================
   */
+  typedef CLockable                   base_t;
   typedef TSingleList<data_t, elem_t> list_t;
 
   /* ===============================================
@@ -84,9 +85,26 @@ public:
   : list_t(nullptr)
     { /* nothing to be done here */ }
 
-  virtual ~TSingleList() noexcept;
+  /** @brief copy constructor
+    *
+    * Builds a copy of all elements of @a src.
+    *
+    * @param[in] src reference of the list to copy.
+  **/
+  TSingleList(const list_t &src) noexcept
+  : base_t(src)
+    {
+      // lock the source list, it must not be changed now.
+      PWX_LOCK_GUARD(list_t, const_cast<list_t>(src))
+      uint32_t rSize = src.size();
+      for (int32_t i = 0; i < rSize; ++i)
+        {
+          PWX_TRY(insNextElem(tail, *src[i]))
+          PWX_THROW_FURTHER
+        }
+    }
 
-  TSingleList(const list_t &rhs) PWX_DELETE; // No copy ctor
+  virtual ~TSingleList() noexcept;
 
   /* ===============================================
    * === Public methods                          ===
@@ -270,6 +288,37 @@ public:
       return privInsert(prev ? curr : nullptr, newElement);
     }
 
+  /** @brief insert an element copy after the specified data
+    *
+    * This method inserts a new element in the list after the element
+    * holding @a prev that is a copy from element @a src.
+    *
+    * If @a prev is set to nullptr, the new element will become the new
+    * head of the list.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] prev the data the element that should precede the new element holds.
+    * @param[in] src a reference of the element to copy.
+    * @return the number of elements in this list after the insertion.
+  **/
+  virtual uint32_t insNext(data_t* prev, const elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+
+      if (prev && (nullptr == find(prev)) )
+        // find sets curr to the correct value.
+        PWX_THROW("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
+
+      // First create a new element for data
+      elem_t* newElement = nullptr;
+      PWX_TRY(newElement = new elem_t(src))
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
+
+      return privInsert(prev ? curr : nullptr, newElement);
+    }
+
   /** @brief insert a new data pointer after the specified element
     *
     * This method inserts a new element in the list after the element
@@ -296,6 +345,37 @@ public:
       // First create a new element for data
       elem_t* newElement = nullptr;
       PWX_TRY(newElement = new elem_t(data, destroy))
+      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
+
+      return privInsert(prev, newElement);
+    }
+
+  /** @brief insert an element copy after the specified element
+    *
+    * This method inserts a new element in the list after the element
+    * @a prev that is a copy of @a src.
+    *
+    * If @a prev is set to nullptr, the new element will become the new
+    * head of the list.
+    *
+    * If @a prev is no element of this list, the wrong list is updated
+    * and both element counts will be wrong then. So please make sure to
+    * use the correct element on the correct list!
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] prev the element that should precede the new element.
+    * @param[in] src reference of the lement to copy.
+    * @return the number of elements in this list after the insertion.
+  **/
+  virtual uint32_t insNextElem(elem_t* prev, const elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+
+      // First create a new element for data
+      elem_t* newElement = nullptr;
+      PWX_TRY(newElement = new elem_t(src))
       PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
 
       return privInsert(prev, newElement);
@@ -384,7 +464,27 @@ public:
    * === Public operators                        ===
    * ===============================================
   */
-  list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
+
+  /** @brief assignment operator
+    *
+    * Clears this list and copies all elements from @a rhs
+    * into this list.
+    *
+    * @param[in] rhs reference of the list to copy.
+    * @return reference to this.
+  **/
+  virtual list_t &operator=(const list_t &rhs) noexcept
+    {
+      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
+      int32_t rSize = rhs.size();
+      clear();
+      for (int32_t i = 0; i < rSize; ++i)
+        {
+          PWX_TRY(insNextElem(tail, *rhs[i]))
+          PWX_THROW_FURTHER
+        }
+      return *this;
+    }
 
   /** @brief return a read-only pointer to the element with the given @a index
     *
