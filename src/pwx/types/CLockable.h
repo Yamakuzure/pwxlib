@@ -67,7 +67,7 @@ public:
   explicit CLockable() noexcept;
   virtual ~CLockable() noexcept;
 
-  CLockable(const CLockable& src) PWX_DELETE;
+  CLockable(const CLockable&) noexcept;
 
   /* ===============================================
    * === Public methods                          ===
@@ -81,7 +81,7 @@ public:
    * === Public operators                        ===
    * ===============================================
   */
-  CLockable& operator=(const CLockable& src) PWX_DELETE;
+  CLockable& operator=(const CLockable&) noexcept;
 
 private:
   /* ===============================================

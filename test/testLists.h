@@ -81,7 +81,7 @@ int32_t testList(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
     {
       cout << adjRight(4,0) << ++testCount << " B) Print out element 1, 3, 5: ";
       int32_t intOne   = *intCont[0]->data;
-      int32_t intThree = *(*intCont[2]).data;
+      int32_t intThree = *(*intCont[2]).data.get();
       int32_t intFive  = **intCont[4];
       cout << intOne << ", " << intThree << ", " << intFive << " = ";
       if ((1 != intOne) || (3 != intThree) || (5 != intFive))

@@ -27,7 +27,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <memory>
 #include <pwx/types/CLockable.h>
+#include <pwx/types/TVarDeleter.h>
 
 namespace pwx {
 
@@ -48,14 +50,15 @@ namespace pwx {
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
-template<typename T>
+template<typename data_t>
 struct PWX_API TDoubleElement : public CLockable
 {
   /* ===============================================
    * === Public types                            ===
    * ===============================================
   */
-  typedef TDoubleElement<T> elem_t;
+  typedef TDoubleElement<data_t>    elem_t;
+  typedef ::std::shared_ptr<data_t> share_t;
 
   /* ===============================================
    * === Public Constructors and destructors     ===
@@ -70,9 +73,8 @@ struct PWX_API TDoubleElement : public CLockable
     * @param data_[in] A pointer to the data this list element is to hold.
     * @param destroy_[in] A pointer to a function that is to be used to destroy the data
   **/
-  TDoubleElement(T* data_, void (*destroy_)(T* data_)) noexcept
-  : data(data_),
-    destroy(destroy_)
+  TDoubleElement(data_t* data_, void (*destroy_)(data_t* data_)) noexcept
+  : data(data_, TVarDeleter<data_t>(destroy_))
   { }
 
   /** @brief explicit constructor
@@ -82,7 +84,7 @@ struct PWX_API TDoubleElement : public CLockable
     * @param data_[in] A pointer to the data this list element is to hold.
   **/
   explicit
-  TDoubleElement(T* data_) noexcept
+  TDoubleElement(data_t* data_) noexcept
   : elem_t(data_, nullptr)
     { }
 
@@ -90,7 +92,20 @@ struct PWX_API TDoubleElement : public CLockable
 
   virtual ~TDoubleElement() noexcept;
 
-  TDoubleElement(const elem_t &src) PWX_DELETE;
+  /** @brief copy ctor
+    *
+    * The copy ctor creates a stand-alone element without neighbors
+    * copying the data pointer and destroy method from @a src.
+    * Further it will notice all elements holding the same pointer
+    * of its presence.
+    * As the data is wrapped in a shared_ptr, data will not get
+    * deleted unless the last reference is gone.
+    *
+    * @param[in] src reference to the element to copy.
+  **/
+  TDoubleElement(const elem_t &src) noexcept
+  : data(src.data)
+    { }
 
   /* ===============================================
    * === Public methods                          ===
@@ -101,7 +116,17 @@ struct PWX_API TDoubleElement : public CLockable
    * === Public operators                        ===
    * ===============================================
   */
-  elem_t& operator=(const elem_t &rhs) PWX_DELETE;
+  /** @brief assignment operator
+    *
+    * The assignment operator copies over the element and
+    * the destroy method. This element will stay where it
+    * is, and not change its position.
+  **/
+  elem_t& operator=(const elem_t &src) noexcept
+    {
+      PWX_LOCK_GUARD(elem_t, this)
+      data = src.data;
+    }
 
   /** @brief dereferencing an element returns a reference to the stored data
     *
@@ -110,7 +135,7 @@ struct PWX_API TDoubleElement : public CLockable
     *
     * @return a read/write reference to the stored data.
   **/
-  T &operator*()
+  data_t &operator*()
     {
       if (nullptr == data)
         PWX_THROW("NullDataException", "nullptr TDoubleElement<T>->data", "The data pointer to dereference is nullptr.")
@@ -124,7 +149,7 @@ struct PWX_API TDoubleElement : public CLockable
     *
     * @return a read only reference to the stored data.
   **/
-  const T &operator*() const
+  const data_t &operator*() const
     {
       if (nullptr == data)
         PWX_THROW("NullDataException", "nullptr TDoubleElement<T>->data", "The data pointer to dereference is nullptr.")
@@ -135,52 +160,34 @@ struct PWX_API TDoubleElement : public CLockable
    * === Public members                          ===
    * ===============================================
   */
-  T*      data = nullptr; //!< The data this list element points to
+  share_t data;           //!< The data this list element points to, wrapped in a shared_ptr.
   elem_t* next = nullptr; //!< The next element in the list or nullptr if this is the tail
   elem_t* prev = nullptr; //!< The previous element in the list or nullptr if this is the head
-
-protected:
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
-
-private:
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
-  void (*destroy)(T* data_);
 }; // struct TDoubleElement
 
 
 /** @brief destructor
   *
-  * The destructor deletes the data pointed to. If a destroy method had been set
-  * by the constructor, it will be used for the data destruction. Otherwise it
-  * is assumed that the data pointer responds to the delete operator.
+  * The destructor invokes a lock on the instance to allow
+  * other threads to react before the object itself is gone.
+  *
+  * Because of the usage of shared_ptr wrapping the data this
+  * is only done if, and only if, this is the very last element
+  * referencing this data.
 **/
-template<typename T>
-TDoubleElement<T>::~TDoubleElement() noexcept
+template<typename data_t>
+TDoubleElement<data_t>::~TDoubleElement() noexcept
   {
-    if (data)
+    if (1 == data.use_count())
       {
+        this->lock();
+        data.reset(); // the shared_ptr will delete the data now
+        this->unlock();
+
+        // Do another locking, so that threads having had to wait while the data
+        // was destroyed have a chance now to react before the object is gone
         PWX_LOCK_GUARD(elem_t, this)
-        if (destroy)
-          {
-            PWX_TRY(destroy(data))
-            catch(...) { }
-          }
-        else
-          {
-            PWX_TRY(delete data)
-            catch(...) { }
-          }
-        data = nullptr;
       }
-    // Do another locking, so that threads having had to wait while the data
-    // was destroyed have a chance now to react before the object is gone
-    PWX_LOCK_GUARD(elem_t, this)
   }
 
 

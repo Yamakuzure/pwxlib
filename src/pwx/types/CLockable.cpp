@@ -6,12 +6,19 @@
 
 namespace pwx {
 
-/** @brief CLockable
-  *
-  * Default ctor
+/** @brief Default ctor
   */
 CLockable::CLockable() noexcept
 { /* --- nothing to do here. ---*/ }
+
+
+/** @brief Copy ctor
+  *
+  * Nothing to do, all objects have their private mutex.
+  */
+CLockable::CLockable(const CLockable&) noexcept
+{ /* --- nothing to do here. ---*/ }
+
 
 
 /** @brief ~CLockable
@@ -101,5 +108,12 @@ void CLockable::unlock()
     }
 #endif
 }
+
+/** @brief Assignment operator
+  *
+  * Nothing to do, all objects have their private mutex.
+  */
+CLockable &CLockable::operator=(const CLockable&) noexcept
+{ return *this; }
 
 } // namespace pwx

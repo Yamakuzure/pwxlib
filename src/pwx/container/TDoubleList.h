@@ -244,14 +244,14 @@ public:
       PWX_LOCK_GUARD(list_t, const_cast<list_t* >(this))
 
       // Quick exit if curr is already what we want:
-      if (curr->data == data)
+      if (curr->data.get() == data)
         return curr;
 
       // The next does only make sense if we have more than one element
       if (eCount > 1)
         {
           // Exit if head is wanted...
-          if (head->data == data)
+          if (head->data.get() == data)
             {
               curr = head;
               eNr  = 0;
@@ -259,7 +259,7 @@ public:
             }
 
           // ...or tail
-          if (tail->data == data)
+          if (tail->data.get() == data)
             {
               curr = tail;
               eNr  = eCount - 1;
@@ -273,7 +273,7 @@ public:
             {
               ++eNr;
               curr = curr->next;
-              if (curr->data == data)
+              if (curr->data.get() == data)
                 return curr;
             }
 
@@ -284,7 +284,7 @@ public:
             {
               --eNr;
               curr = curr->prev;
-              if (curr->data == data)
+              if (curr->data.get() == data)
                 return curr;
             }
         } // End of handling a search with more than one element
