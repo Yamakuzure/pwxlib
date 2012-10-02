@@ -65,6 +65,7 @@
 		<Unit filename="../src/pwx/types/CLockable.h" />
 		<Unit filename="../src/pwx/types/TDoubleElement.h" />
 		<Unit filename="../src/pwx/types/TSingleElement.h" />
+		<Unit filename="../src/pwx/types/TVarDeleter.h" />
 		<Unit filename="../src/pwx/worker.h" />
 		<Extensions>
 			<envvars />
