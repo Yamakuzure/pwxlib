@@ -126,7 +126,7 @@ public:
   **/
   virtual uint32_t delData(data_t* data)
     {
-      PWX_LOCK_GUARD(base_t, this)
+      PWX_LOCK_GUARD(list_t, this)
       try
         {
           elem_t* removed = remData(data);
@@ -152,7 +152,7 @@ public:
   **/
   virtual uint32_t delElem(elem_t* elem)
     {
-      PWX_LOCK_GUARD(base_t, this)
+      PWX_LOCK_GUARD(list_t, this)
       try
         {
           elem_t* removed = remElem(elem);
@@ -184,7 +184,7 @@ public:
   **/
   virtual uint32_t delPrev(data_t* next)
     {
-      PWX_LOCK_GUARD(base_t, this)
+      PWX_LOCK_GUARD(list_t, this)
       try
         {
           elem_t* removed = remPrev(next);
@@ -218,7 +218,7 @@ public:
   **/
   virtual uint32_t delPrevElem(elem_t* next)
     {
-      PWX_LOCK_GUARD(base_t, this)
+      PWX_LOCK_GUARD(list_t, this)
       try
         {
           elem_t* removed = remPrevElem(next);
@@ -583,7 +583,7 @@ public:
   list_t &operator=(const list_t &rhs) noexcept
     {
       PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t* >(&rhs))
-      uint32_t rSize = rhs.size();
+      int32_t rSize = rhs.size();
       clear();
       for (int32_t i = 0; i < rSize; ++i)
         {
