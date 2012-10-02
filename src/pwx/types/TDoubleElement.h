@@ -57,6 +57,7 @@ struct PWX_API TDoubleElement : public CLockable
    * === Public types                            ===
    * ===============================================
   */
+  typedef CLockable                 base_t;
   typedef TDoubleElement<data_t>    elem_t;
   typedef ::std::shared_ptr<data_t> share_t;
 
@@ -89,8 +90,6 @@ struct PWX_API TDoubleElement : public CLockable
 
   TDoubleElement() PWX_DELETE;
 
-  virtual ~TDoubleElement() noexcept;
-
   /** @brief copy ctor
     *
     * The copy ctor creates a stand-alone element without neighbors
@@ -103,8 +102,11 @@ struct PWX_API TDoubleElement : public CLockable
     * @param[in] src reference to the element to copy.
   **/
   TDoubleElement(const elem_t &src) noexcept
-  : data(src.data)
+  : base_t(src),
+    data(src.data)
     { }
+
+  virtual ~TDoubleElement() noexcept;
 
   /* ===============================================
    * === Public methods                          ===
@@ -136,7 +138,7 @@ struct PWX_API TDoubleElement : public CLockable
   **/
   data_t &operator*()
     {
-      if (nullptr == data)
+      if (nullptr == data.get())
         PWX_THROW("NullDataException", "nullptr TDoubleElement<T>->data", "The data pointer to dereference is nullptr.")
       return *data;
     }
@@ -150,7 +152,7 @@ struct PWX_API TDoubleElement : public CLockable
   **/
   const data_t &operator*() const
     {
-      if (nullptr == data)
+      if (nullptr == data.get())
         PWX_THROW("NullDataException", "nullptr TDoubleElement<T>->data", "The data pointer to dereference is nullptr.")
       return *data;
     }
