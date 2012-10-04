@@ -450,6 +450,7 @@ public:
   **/
   elem_t* remData(data_t* data) noexcept
     {
+      PWX_LOCK_GUARD(list_t, this)
       elem_t* toRemove = nullptr;
 
       if (data)
@@ -479,6 +480,7 @@ public:
   **/
   elem_t* remElem(elem_t* elem) noexcept
     {
+      PWX_LOCK_GUARD(list_t, this)
       if (elem)
         privRemove(elem->prev, elem);
       return elem;
