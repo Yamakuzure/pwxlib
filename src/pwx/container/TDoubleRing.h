@@ -321,7 +321,7 @@ public:
     * @param[in] src reference to the element to copy.
     * @return the number of elements in this list after the insertion.
   **/
-  virtual uint32_t insNext(data_t* prev, elem_t &src)
+  virtual uint32_t insNext(data_t* prev, const elem_t &src)
     {
       PWX_LOCK_GUARD(list_t, this)
       PWX_TRY(base_t::insNext(prev, src))
@@ -377,7 +377,7 @@ public:
     * @param[in] src reference to the element to copy.
     * @return the number of elements in this list after the insertion.
   **/
-  virtual uint32_t insNextElem(elem_t* prev, elem_t &src)
+  virtual uint32_t insNextElem(elem_t* prev, const elem_t &src)
     {
       PWX_LOCK_GUARD(list_t, this)
       PWX_TRY(base_t::insNextElem(prev, src))
