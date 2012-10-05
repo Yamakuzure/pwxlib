@@ -65,7 +65,9 @@ namespace pwx {
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
-template<typename data_t>
+template<typename data_t,
+         typename store_t = TDoubleList<data_t>,
+         typename elem_t = TDoubleElement<data_t>>
 class TSet : public CLockable
 {
 public:
@@ -73,9 +75,7 @@ public:
    * === Public types                            ===
    * ===============================================
   */
-
   typedef TSet<data_t>           list_t;
-  typedef TDoubleElement<data_t> elem_t;
 
   /* ===============================================
    * === Public Constructors and destructors     ===
@@ -84,7 +84,7 @@ public:
 
   /** @brief destroy function constructor
     *
-    * The destroy function constructor initializes an empty unsorted set.
+    * The destroy function constructor initializes an empty sorted set.
     *
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
@@ -126,9 +126,14 @@ public:
     sList(destroy_)
     { /* nothing to be done here */ }
 
-  virtual ~TSet() noexcept;
+  /// @brief copy contructor
+  TSet(const list_t &rhs)
+  : destroy(rhs.destroy),
+    isSorted(rhs.isSorted),
+    sList(rhs.sList)
+    { /* nothing to be done here */ }
 
-  TSet(const list_t &rhs) PWX_DELETE; // No copy ctor
+  virtual ~TSet() noexcept;
 
   /* ===============================================
    * === Public methods                          ===
@@ -151,56 +156,41 @@ public:
   **/
   uint32_t add(data_t* data)
     {
-      uint32_t listSize = sList.size();
+      PWX_LOCK_GUARD(list_t, this)
 
       if (privFind(*data))
-        return listSize;
+        return sList.size();
+
+      elem_t* newElem = nullptr;
+      PWX_TRY_STD_FURTHER(newElem = new elem_t(data), "ElementCreationFailed", "The Creation of a new set element failed.")
+      PWX_TRY_PWX_FURTHER(return privInsert(newElem))
+    }
 
 
-      if (isSorted && listSize)
-        {
-          /// Case A: The new element is the new smallest element:
-          elem_t* head = sList[0];
-          if (**head > *data)
-            {
-              PWX_TRY(return sList.insNext(nullptr, data))
-              PWX_THROW_FURTHER
-            }
+  /** @brief copy an element into the set
+    *
+    * If the set is sorted, the element will be moved to the correct
+    * location. If the set is not sorted, it will be added to the end.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * If there is an element with the same data stored in the set,
+    * the new pointer is not stored but silently ignored.
+    *
+    * @param[in] src reference to the element to copy.
+    * @return number of elements stored after the operation.
+  **/
+  uint32_t add(elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
 
-          /// Case B: The new element is the new largest element:
-          elem_t* tail = sList[-1];
-          if (*data > **tail)
-            {
-              PWX_TRY(return sList.insPrev(nullptr, data))
-              PWX_THROW_FURTHER
-            }
+      if (privFind(*src))
+        return sList.size();
 
-          /// Case C: We have to search for the right location:
-          if (nullptr == prev)
-            prev = head->next;
-
-          /* downwards: */
-          if (**prev > *data)
-            {
-              while (**prev > *data)
-                prev = prev->prev;
-              // Now prev is the first smaller element
-              PWX_TRY(return sList.insNextElem(prev, data))
-              PWX_THROW_FURTHER
-            }
-
-          /* upwards : */
-          while (*data > **prev)
-            prev = prev->next;
-          // Now prev is the first larger element
-          PWX_TRY(return sList.insPrevElem(prev, data))
-          PWX_THROW_FURTHER
-        }
-      else
-        {
-          PWX_TRY(return sList.insPrev(nullptr, data))
-          PWX_THROW_FURTHER
-        }
+      elem_t* newElem = nullptr;
+      PWX_TRY_STD_FURTHER(newElem = new elem_t(src), "ElementCreationFailed", "The Creation of a new set element failed.")
+      PWX_TRY_PWX_FURTHER(return privInsert(newElem))
     }
 
 
@@ -214,6 +204,7 @@ public:
   **/
   void clear() noexcept
     {
+      PWX_LOCK_GUARD(list_t, this)
       sList.clear();
     }
 
@@ -258,11 +249,7 @@ public:
           if (!rhs->privFind(**curr))
             {
               // This element exists only in this set, so add a new element to the difference:
-              data_t* newData = nullptr;
-              PWX_TRY(newData = new data_t(**curr))
-              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::differenceFrom() could not copy different data.")
-              PWX_TRY(diff->add(newData))
-              PWX_THROW_FURTHER
+              PWX_TRY_PWX_FURTHER(diff->add(*curr))
             }
         } // End of walking through the elements
 
@@ -340,27 +327,23 @@ public:
   **/
   list_t* intersectionWith(list_t* rhs)
     {
-      list_t* inters = nullptr;
-      PWX_TRY(inters = new list_t(isSorted, destroy))
-      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::intersectionWith() could not create an intersection set.")
-
       // Return this if an intersection with this is asked for:
       if (this == rhs)
         return this;
 
       // Otherwise build an intersection
-      size_t lSize = sList.size();
+      size_t  lSize  = sList.size();
+      list_t* inters = nullptr;
+      PWX_TRY(inters = new list_t(isSorted, destroy))
+      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::intersectionWith() could not create an intersection set.")
+
       for (size_t i = 0; i < lSize; ++i)
         {
           elem_t* curr = sList[i];
           if (rhs->privFind(**curr))
             {
               // This element exists in both, so add a new element to the intersection:
-              data_t* newData = nullptr;
-              PWX_TRY(newData = new data_t(**curr))
-              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::intersectionWith() could not copy intersecting data.")
-              PWX_TRY(inters->add(newData))
-              PWX_THROW_FURTHER
+              PWX_TRY_PWX_FURTHER(inters->add(*curr))
             }
         } // End of walking through the elements
 
@@ -393,8 +376,7 @@ public:
   **/
   uint32_t push(data_t* data)
     {
-      PWX_TRY(return add(data))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(return add(data))
     }
 
 
@@ -409,6 +391,8 @@ public:
   **/
   elem_t* remove(int32_t index) noexcept
     {
+      PWX_LOCK_GUARD(list_t, this)
+
       elem_t* toRemove = sList[index];
 
       if (toRemove)
@@ -462,6 +446,8 @@ public:
     *
     * This method returns a newly build set consisting of copies
     * of the elements that are present in either set.
+    * This means, that foo->unionWith(foo) will return a copy of
+    * foo.
     *
     * If the new set can not be created, a pwx::CException with
     * the name "SetCreationFailed" is thrown.
@@ -481,31 +467,31 @@ public:
       PWX_TRY(unionSet = new list_t(isSorted, destroy))
       PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::unionWith() could not create a union set.")
 
-      // Otherwise add all from this...
+      // First add all elements from this set
       size_t lSize = sList.size();
-      for (size_t i = 0; i < lSize; ++i)
+      if (lSize)
         {
-          data_t* newData = nullptr;
-          PWX_TRY(newData = new data_t(**sList[i]))
-          PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::unionWith() could not copy uinion data.")
-          PWX_TRY(unionSet->add(newData))
-          PWX_THROW_FURTHER
-        } // End of walking through the elements
-
-      // Then add all from the other
-      lSize = rhs->size();
-      for (size_t i = 0; i < lSize; ++i)
-        {
-          elem_t* curr = *rhs[i];
-          if (!unionSet->privFind(**curr))
+          PWX_LOCK_GUARD(list_t, this)
+          for (size_t i = 0; i < lSize; ++i)
             {
-              data_t* newData = nullptr;
-              PWX_TRY(newData = new data_t(**curr))
-              PWX_THROW_STD_FURTHER("CopyingDataFailed", "TSet::unionWith() could not copy uinion data.")
-              PWX_TRY(unionSet->add(newData))
-              PWX_THROW_FURTHER
+              PWX_TRY_PWX_FURTHER(unionSet->add(*sList[i]))
             }
-        } // End of walking through the elements
+        } // End of copying this
+
+      // if rhs equals this, we are done
+      if (this == rhs)
+        return unionSet;
+
+      // otherwise add all from the other
+      lSize = rhs->size();
+      if (lSize)
+        {
+          PWX_LOCK_GUARD(list_t, rhs)
+          for (size_t i = 0; i < lSize; ++i)
+            {
+              PWX_TRY_PWX_FURTHER(unionSet->add(*rhs[i]))
+            } // End of walking through the elements of this
+        } // End of copying rhs
 
       return unionSet;
     }
@@ -529,13 +515,11 @@ public:
     {
       if (isSorted)
         {
-          PWX_TRY(return add(data))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return add(data))
         }
       else
         {
-          PWX_TRY(return sList.insNext(nullptr, data))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, data))
         }
     }
 
@@ -600,7 +584,7 @@ public:
       // Check A: Both sets must have equal size:
       bool result = (lSize == rSize);
 
-      // Check B: The this must be a subset of rhs
+      // Check B: This set must be a subset of rhs
       if (result)
         result = subsetOf(&rhs);
 
@@ -658,28 +642,29 @@ private:
   */
   void (*destroy)(data_t* data_);
 
+  // Note: Lock before calling!
+  // Important: If the set is sorted last will point to the next smaller element
+  //            or nullptr if the searched data can not be found.
   elem_t* privFind(data_t &data) noexcept
     {
-      PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-
       uint32_t listSize = sList.size();
       if (0 == listSize)
         return nullptr;
 
-      // Allow a quick out if prev has been set and a neighbor (or prev) is wanted:
-      if (prev && prev->data)
+      // Allow a quick out if "last" has been set and a neighbor (or "last") is wanted:
+      if (last)
         {
-          if (**prev == data)
-            return prev;
-          else if (prev->next && (**prev->next == data))
+          if (**last == data)
+            return last;
+          else if (last->next && (**last->next == data))
             {
-              prev = prev->next;
-              return prev;
+              last = last->next;
+              return last;
             }
-          else if (prev->prev && (**prev->prev == data))
+          else if (last->prev && (**last->prev == data))
             {
-              prev = prev->prev;
-              return prev;
+              last = last->prev;
+              return last;
             }
         }
 
@@ -687,11 +672,17 @@ private:
       elem_t* head = sList[0];
       elem_t* tail = sList[-1];
       if (**head == data)
-        return head;
+        {
+          last = head;
+          return head;
+        }
       if (listSize > 1)
         {
           if (**tail == data)
-            return tail;
+            {
+              last = tail;
+              return tail;
+            }
         }
       else
         return nullptr; // head is alone and not the searched one.
@@ -711,28 +702,73 @@ private:
       /// Situation A)
       if (isSorted)
         {
-          if (nullptr == prev)
+          if (nullptr == last)
             // Oh no, start from scratch
-            prev = head;
+            last = head;
 
           /* Go downwards: */
-          while ((head != prev) && (**prev > data))
-            prev = prev->prev;
+          while ((head != last) && (**last > data))
+            last = last->prev;
           /* Go upwards: */
-          while ((tail != prev) && (data > **prev))
-            prev = prev->next;
+          while ((tail != last) && (data > **last))
+            last = last->next;
 
-          /* Return either prev or nullptr now */
-          return (**prev == data ? prev : nullptr);
+          /* Return either last or nullptr now */
+          return (**last == data ? last : nullptr);
         } // End of find in a sorted set
 
       /// Situation B)
-      prev = head->next;
-      while ((tail != prev) && !(data == **prev))
-        prev = prev->next;
+      last = head->next;
+      while ((tail != last) && !(data == **last))
+        last = last->next;
 
-      /* Return either prev or nullptr now */
-      return (**prev == data ? prev : nullptr);
+      /* Return either last or nullptr now */
+      return (**last == data ? last : nullptr);
+    }
+
+  // Note: elem must be valid, and its data not present in the current set.
+  // And : Lock before calling!
+  uint32_t privInsert(elem_t* elem)
+    {
+      if (isSorted && sList.size())
+        {
+          /// Case A: The new element is the new smallest element:
+          elem_t* head = sList[0];
+          if (**head > **elem)
+            {
+              PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, elem))
+            }
+
+          /// Case B: The new element is the new largest element:
+          elem_t* tail = sList[-1];
+          if (**elem > **tail)
+            {
+              PWX_TRY_PWX_FURTHER(return sList.insPrev(nullptr, elem))
+            }
+
+          /// Case C: We have to search for the right location:
+          if (nullptr == last)
+            last = head->next;
+
+          /* downwards: */
+          if (**last > **elem)
+            {
+              while (**last > **elem)
+                last = last->prev;
+              // Now "last" is the first smaller element
+              PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, elem))
+            }
+
+          /* upwards : */
+          while (**elem > **last)
+            last = last->next;
+          // Now "last" is the first larger element
+          PWX_TRY_PWX_FURTHER(return sList.insPrevElem(last, elem))
+        }
+      else
+        {
+          PWX_TRY_PWX_FURTHER(return sList.insPrev(nullptr, elem))
+        }
     }
 
   /* ===============================================
@@ -744,10 +780,10 @@ private:
    * === Private members                         ===
    * ===============================================
   */
-  const bool          isSorted = true;  //!< Whether to sort elements on insertion or not.
-  TDoubleList<data_t> sList;            //!< Data is held by a doubly linked list.
+  const bool isSorted = true;    //!< Whether to sort elements on insertion or not.
+  store_t    sList;              //!< Data is held by a doubly linked list.
   mutable
-  elem_t*             prev     = nullptr; //!< Set by privFind and utilized by push() and unshift() if isSorted is true.
+  elem_t*    last     = nullptr; //!< The last element in the list seen by this sets methods.
 
 }; // class TSet
 
@@ -756,8 +792,8 @@ private:
   * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the set.
 **/
-template<typename data_t>
-TSet<data_t>::~TSet() noexcept
+template<typename data_t, typename store_t, typename elem_t>
+TSet<data_t, store_t, elem_t>::~TSet() noexcept
   {
     sList.clear();
   }

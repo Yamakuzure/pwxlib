@@ -123,10 +123,8 @@ int32_t testList(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
     {
       cout << adjRight(4,0) << ++testCount << " D) Remaining elements: ";
       int32_t intOne, intTwo;
-      PWX_TRY(intOne = **intCont[0])
-      PWX_THROW_FURTHER
-      PWX_TRY(intTwo = **intCont[1])
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(intOne = **intCont[0])
+      PWX_TRY_PWX_FURTHER(intTwo = **intCont[1])
       cout << intOne << ", " << intTwo << " = ";
       if ((2 != intOne) || (4 != intTwo))
         {

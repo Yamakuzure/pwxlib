@@ -124,8 +124,7 @@ public:
   **/
   uint32_t push(data_t* data_)
     {
-      PWX_TRY(return sList.insNext(nullptr, data_))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, data_))
     }
 
   /** @brief pop the first element from the stack
@@ -145,8 +144,7 @@ public:
   **/
   elem_t* pop()
     {
-      PWX_TRY(return sList.remNext(nullptr))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(return sList.remNext(nullptr))
     }
 
   /** @brief shift the oldest element from the bottom of the stack
@@ -169,13 +167,11 @@ public:
     {
       if (sList.size() > 1)
         {
-          PWX_TRY(return sList.remNextElem(sList[-2]))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return sList.remNextElem(sList[-2]))
         }
       else
         {
-          PWX_TRY(return pop())
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return pop())
         }
     }
 
@@ -200,13 +196,11 @@ public:
     {
       if (sList.size() > 1)
         {
-          PWX_TRY(return sList.insNextElem(sList[-1], data_))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return sList.insNextElem(sList[-1], data_))
         }
       else
         {
-          PWX_TRY(return push(data_))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return push(data_))
         }
     }
 

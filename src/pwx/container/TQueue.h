@@ -124,8 +124,7 @@ public:
   **/
   uint32_t push(data_t* data_)
     {
-      PWX_TRY(return sList.insNext(nullptr, data_))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, data_))
     }
 
   /** @brief pop the last element from the queue
@@ -147,13 +146,11 @@ public:
     {
       if (sList.size() > 1)
         {
-          PWX_TRY(return sList.remPrev(nullptr))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return sList.remPrev(nullptr))
         }
       else
         {
-          PWX_TRY(return shift())
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return shift())
         }
     }
 
@@ -175,8 +172,7 @@ public:
   **/
   elem_t* shift()
     {
-      PWX_TRY(return sList.remNext(nullptr))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(return sList.remNext(nullptr))
     }
 
   /// @brief return the number of stored elements
@@ -200,13 +196,11 @@ public:
     {
       if (sList.size())
         {
-          PWX_TRY(return sList.insPrev(nullptr, data_))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return sList.insPrev(nullptr, data_))
         }
       else
         {
-          PWX_TRY(return push(data_))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(return push(data_))
         }
     }
 
