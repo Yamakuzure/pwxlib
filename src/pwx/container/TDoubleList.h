@@ -192,8 +192,7 @@ public:
             delete removed;
           return eCount;
         }
-      PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delPrev() failed.")
+      PWX_THROW_PWXSTD_FURTHER("delete", "Deleting an element in TDoubleList::delPrev() failed.")
     }
 
   /** @brief delete the element before the specified element
@@ -226,8 +225,7 @@ public:
             delete removed;
           return eCount;
         }
-      PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TDoubleList::delPrevElem() failed.")
+      PWX_THROW_PWXSTD_FURTHER("delete", "Deleting an element in TDoubleList::delPrevElem() failed.")
     }
 
   /** @brief find the element with the given @a data
@@ -437,6 +435,11 @@ public:
       return privInsert(next ? next->prev : nullptr, newElement);
     }
 
+  using base_t::pop_back;
+  using base_t::pop_front;
+  using base_t::push_back;
+  using base_t::push_front;
+
   /** @brief remove the element holding the specified data
     *
     * This method removes the element in the list that holds @a data
@@ -589,8 +592,7 @@ public:
       clear();
       for (int32_t i = 0; i < rSize; ++i)
         {
-          PWX_TRY(insNextElem(tail, *rhs[i]))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(insNextElem(tail, *rhs[i]))
           if (curr && tail)
             tail->prev = curr;
           // This works, because clear() sets curr=nullptr and eNr=0

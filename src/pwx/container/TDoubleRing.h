@@ -118,8 +118,7 @@ public:
   virtual uint32_t delData(data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::delData(data))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::delData(data))
       privConnectEnds();
       return eCount;
     }
@@ -140,8 +139,7 @@ public:
   virtual uint32_t delElem(elem_t* elem)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::delElem(elem))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::delElem(elem))
       privConnectEnds();
       return eCount;
     }
@@ -165,8 +163,7 @@ public:
   virtual uint32_t delNext(data_t* prev)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::delNext(prev))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::delNext(prev))
       privConnectEnds();
       return eCount;
     }
@@ -194,8 +191,7 @@ public:
   virtual uint32_t delNextElem(elem_t* prev)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::delNextElem(prev))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::delNextElem(prev))
       privConnectEnds();
       return eCount;
     }
@@ -219,8 +215,7 @@ public:
   virtual uint32_t delPrev(data_t* next)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::delPrev(next))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::delPrev(next))
       privConnectEnds();
       return eCount;
     }
@@ -248,8 +243,7 @@ public:
   virtual uint32_t delPrevElem(elem_t* next)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::delPrevElem(next))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::delPrevElem(next))
       privConnectEnds();
       return eCount;
     }
@@ -300,8 +294,7 @@ public:
   virtual uint32_t insNext(data_t* prev, data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insNext(prev, data))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insNext(prev, data))
       privConnectEnds();
       return eCount;
     }
@@ -324,8 +317,7 @@ public:
   virtual uint32_t insNext(data_t* prev, const elem_t &src)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insNext(prev, src))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insNext(prev, src))
       privConnectEnds();
       return eCount;
     }
@@ -352,8 +344,7 @@ public:
   virtual uint32_t insNextElem(elem_t* prev, data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insNextElem(prev, data))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insNextElem(prev, data))
       privConnectEnds();
       return eCount;
     }
@@ -380,8 +371,7 @@ public:
   virtual uint32_t insNextElem(elem_t* prev, const elem_t &src)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insNextElem(prev, src))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insNextElem(prev, src))
       privConnectEnds();
       return eCount;
     }
@@ -404,8 +394,7 @@ public:
   uint32_t insPrev(data_t* next, data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insPrev(next, data))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insPrev(next, data))
       privConnectEnds();
       return eCount;
     }
@@ -428,8 +417,7 @@ public:
   uint32_t insPrev(data_t* next, const elem_t &src)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insPrev(next, src))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insPrev(next, src))
       privConnectEnds();
       return eCount;
     }
@@ -456,8 +444,7 @@ public:
   uint32_t insPrevElem(elem_t* next, data_t* data)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insPrevElem(next, data))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insPrevElem(next, data))
       privConnectEnds();
       return eCount;
     }
@@ -484,8 +471,120 @@ public:
   uint32_t insPrevElem(elem_t* next, const elem_t &src)
     {
       PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY(base_t::insPrevElem(next, src))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(base_t::insPrevElem(next, src))
+      privConnectEnds();
+      return eCount;
+    }
+
+  /** @brief alias to remove the last element (tail)
+    *
+    * You have to delete the removed element by yourself. If you do not intent
+    * to work with the removed element, use delNext instead.
+    *
+    * If the ring is empty, nullptr is returned.
+    *
+    * @return a pointer to the removed element or nullptr if the ring is empty
+  **/
+  virtual elem_t* pop_back() noexcept
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      elem_t* toRemove = nullptr;
+      if (eCount > 1)
+        {
+          PWX_TRY(toRemove = base_t::remNextElem(this->privGetElementByIndex(-2)))
+          PWX_CATCH_AND_FORGET(CException)
+        }
+      else if (eCount)
+        {
+          PWX_TRY(toRemove = remNext(nullptr))
+          PWX_CATCH_AND_FORGET(CException)
+        }
+      privConnectEnds();
+      return toRemove;
+    }
+
+  /** @brief alias to remove the first element (head)
+    *
+    * You have to delete the removed element by yourself. If you do not intent
+    * to work with the removed element, use delNext instead.
+    *
+    * If the ring is empty, nullptr is returned.
+    *
+    * @return a pointer to the removed element or nullptr if the ring is empty
+  **/
+  virtual elem_t* pop_front() noexcept
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      elem_t* toRemove = nullptr;
+      if (eCount)
+        {
+          PWX_TRY(toRemove = base_t::remNext(nullptr))
+          PWX_CATCH_AND_FORGET(CException)
+        }
+      privConnectEnds();
+      return toRemove;
+    }
+
+  /** @brief alias to add a data pointer to the end of the ring.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] data the pointer that is to be added.
+    * @return the number of elements in this ring after the insertion
+  **/
+  virtual uint32_t push_back(data_t *data)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(base_t::insNextElem(tail, data))
+      privConnectEnds();
+      return eCount;
+    }
+
+  /** @brief alias to add an element copy to the end of the ring.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] src reference to the element to copy
+    * @return the number of elements in this ring after the insertion
+  **/
+  virtual uint32_t push_back(elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(base_t::insNextElem(tail, src))
+      privConnectEnds();
+      return eCount;
+    }
+
+  /** @brief alias to add a data pointer to the head of the ring.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] data the pointer that is to be added.
+    * @return the number of elements in this ring after the insertion
+  **/
+  virtual uint32_t push_front(data_t *data)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(base_t::insNext(nullptr, data))
+      privConnectEnds();
+      return eCount;
+    }
+
+  /** @brief alias to add an element copy to the head of the ring.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] src reference to the element to copy
+    * @return the number of elements in this ring after the insertion
+  **/
+  virtual uint32_t push_front(elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(base_t::insNext(nullptr, src))
       privConnectEnds();
       return eCount;
     }
@@ -554,8 +653,7 @@ public:
     {
       PWX_LOCK_GUARD(list_t, this)
       elem_t* toRemove = nullptr;
-      PWX_TRY(toRemove = base_t::remNext(prev))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(toRemove = base_t::remNext(prev))
       privConnectEnds();
       return toRemove;
     }
@@ -582,8 +680,7 @@ public:
     {
       PWX_LOCK_GUARD(list_t, this)
       elem_t* toRemove = nullptr;
-      PWX_TRY(toRemove = base_t::remNextElem(prev))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(toRemove = base_t::remNextElem(prev))
       privConnectEnds();
       return toRemove;
     }
@@ -609,8 +706,7 @@ public:
     {
       PWX_LOCK_GUARD(list_t, this)
       elem_t* toRemove = nullptr;
-      PWX_TRY(toRemove = base_t::remPrev(next))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(toRemove = base_t::remPrev(next))
       privConnectEnds();
       return toRemove;
     }
@@ -640,8 +736,7 @@ public:
     {
       PWX_LOCK_GUARD(list_t, this)
       elem_t* toRemove = nullptr;
-      PWX_TRY(toRemove = base_t::remPrevElem(next))
-      PWX_THROW_FURTHER
+      PWX_TRY_PWX_FURTHER(toRemove = base_t::remPrevElem(next))
       privConnectEnds();
       return toRemove;
     }

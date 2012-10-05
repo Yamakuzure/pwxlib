@@ -99,8 +99,7 @@ public:
       uint32_t rSize = src.size();
       for (int32_t i = 0; i < rSize; ++i)
         {
-          PWX_TRY(insNextElem(tail, *src[i]))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(insNextElem(tail, *src[i]))
         }
     }
 
@@ -151,8 +150,7 @@ public:
             delete removed;
           return eCount;
         }
-      PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TSingleList::delNext() failed.")
+      PWX_THROW_PWXSTD_FURTHER("delete", "Deleting an element in TSingleList::delNext() failed.")
     }
 
   /** @brief delete the element after the specified element
@@ -185,8 +183,7 @@ public:
             delete removed;
           return eCount;
         }
-      PWX_THROW_FURTHER
-      PWX_THROW_STD_FURTHER("delete", "Deleting an element in TSingleList::delNextElem() failed.")
+      PWX_THROW_PWXSTD_FURTHER("delete", "Deleting an element in TSingleList::delNextElem() failed.")
     }
 
   /** @brief find the element with the given @a data
@@ -381,11 +378,111 @@ public:
       return privInsert(prev, newElement);
     }
 
+  /** @brief alias to remove the last element (tail)
+    *
+    * You have to delete the removed element by yourself. If you do not intent
+    * to work with the removed element, use delNext instead.
+    *
+    * If the list is empty, nullptr is returned.
+    *
+    * @return a pointer to the removed element or nullptr if the list is empty
+  **/
+  virtual elem_t* pop_back() noexcept
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      if (eCount > 1)
+        {
+          PWX_TRY(return remNextElem(privGetElementByIndex(-2)))
+          PWX_CATCH_AND_FORGET(CException)
+        }
+      else if (eCount)
+        {
+          PWX_TRY(return remNext(nullptr))
+          PWX_CATCH_AND_FORGET(CException)
+        }
+      return nullptr;
+    }
+
+  /** @brief alias to remove the first element (head)
+    *
+    * You have to delete the removed element by yourself. If you do not intent
+    * to work with the removed element, use delNext instead.
+    *
+    * If the list is empty, nullptr is returned.
+    *
+    * @return a pointer to the removed element or nullptr if the list is empty
+  **/
+  virtual elem_t* pop_front() noexcept
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      if (eCount)
+        {
+          PWX_TRY(return remNext(nullptr))
+          PWX_CATCH_AND_FORGET(CException)
+        }
+      return nullptr;
+    }
+
+  /** @brief alias to add a data pointer to the end of the list.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] data the pointer that is to be added.
+    * @return the number of elements in this list after the insertion
+  **/
+  virtual uint32_t push_back(data_t *data)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(return insNextElem(tail, data))
+    }
+
+  /** @brief alias to add an element copy to the end of the list.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] src reference to the element to copy
+    * @return the number of elements in this list after the insertion
+  **/
+  virtual uint32_t push_back(elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(return insNextElem(tail, src))
+    }
+
+  /** @brief alias to add a data pointer to the head of the list.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] data the pointer that is to be added.
+    * @return the number of elements in this list after the insertion
+  **/
+  virtual uint32_t push_front(data_t *data)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(return insNext(nullptr, data))
+    }
+
+  /** @brief alias to add an element copy to the head of the list.
+    *
+    * If the new element can not be created, a pwx::CException with
+    * the name "ElementCreationFailed" is thrown.
+    *
+    * @param[in] src reference to the element to copy
+    * @return the number of elements in this list after the insertion
+  **/
+  virtual uint32_t push_front(elem_t &src)
+    {
+      PWX_LOCK_GUARD(list_t, this)
+      PWX_TRY_PWX_FURTHER(return insNext(nullptr, src))
+    }
+
   /** @brief remove the element after the element holding the specified data
     *
     * This method removes the element in the list after the element
     * that holds @a prev and returns a pointer to the removed element.
-    *
     *
     * If @a prev is set to nullptr, the root element (aka head) is
     * removed.
@@ -480,8 +577,7 @@ public:
       clear();
       for (int32_t i = 0; i < rSize; ++i)
         {
-          PWX_TRY(insNextElem(tail, *rhs[i]))
-          PWX_THROW_FURTHER
+          PWX_TRY_PWX_FURTHER(insNextElem(tail, *rhs[i]))
         }
       return *this;
     }
