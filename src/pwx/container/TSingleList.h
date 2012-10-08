@@ -27,8 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/types/CLockable.h>
-#include <pwx/general/macros.h>
+#include <pwx/base/VContainer.h>
 #include <pwx/types/TSingleElement.h>
 
 namespace pwx {
@@ -51,14 +50,14 @@ namespace pwx {
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
-class TSingleList : public CLockable
+class TSingleList : public VContainer
 {
 public:
   /* ===============================================
    * === Public types                            ===
    * ===============================================
   */
-  typedef CLockable                   base_t;
+  typedef VContainer                  base_t;
   typedef TSingleList<data_t, elem_t> list_t;
 
   /* ===============================================
@@ -240,15 +239,11 @@ public:
               return tail;
             }
 
-          curr = head->next; // Because head is already checked
-          eNr  = 1;
-          while (curr != tail)
-            {
-              if (curr->data.get() == data)
-                return curr;
-              ++eNr;
-              curr = curr->next;
-            }
+          // Otherwise search for the previous item, it's the next, then
+          elem_t* prev = privFindPrev(data);
+          // Note: privFindPrev returns the wanted element and sets curr to the next element.
+          if (prev)
+            return curr;
         } // End of handling a search with more than one element
 
       return nullptr;
@@ -392,7 +387,7 @@ public:
       PWX_LOCK_GUARD(list_t, this)
       if (eCount > 1)
         {
-          PWX_TRY(return remNextElem(privGetElementByIndex(-2)))
+          PWX_TRY(return remNextElem(const_cast<elem_t* >(privGetElementByIndex(-2))))
           PWX_CATCH_AND_FORGET(CException)
         }
       else if (eCount)
@@ -554,9 +549,6 @@ public:
       return toRemove;
     }
 
-  /// @brief return the number of stored elements
-  uint32_t size() const noexcept { return eCount; }
-
   /* ===============================================
    * === Public operators                        ===
    * ===============================================
@@ -570,16 +562,75 @@ public:
     * @param[in] rhs reference of the list to copy.
     * @return reference to this.
   **/
-  virtual list_t &operator=(const list_t &rhs) noexcept
+  virtual list_t &operator=(const list_t &rhs)
+    {
+      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
+      clear();
+      PWX_TRY_PWX_FURTHER(return this->operator+(rhs))
+    }
+
+  /** @brief addition operator
+    *
+    * Add all elements from @a rhs to this list.
+    *
+    * @param[in] rhs reference of the list to add.
+    * @return reference to this.
+  **/
+  virtual list_t &operator+ (const list_t &rhs)
     {
       PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
       int32_t rSize = rhs.size();
-      clear();
       for (int32_t i = 0; i < rSize; ++i)
         {
           PWX_TRY_PWX_FURTHER(insNextElem(tail, *rhs[i]))
         }
       return *this;
+    }
+
+  /** @brief addition assignment operator
+    *
+    * Add all elements from @a rhs to this list.
+    *
+    * @param[in] rhs reference of the list to add.
+    * @return reference to this.
+  **/
+  virtual list_t &operator+=(const list_t &rhs)
+    {
+      PWX_TRY_PWX_FURTHER(return this->operator+(rhs))
+    }
+
+  /** @brief substraction operator
+    *
+    * Remove all elements from @a rhs from this list.
+    *
+    * @param[in] rhs reference of the list to substract.
+    * @return reference to this.
+  **/
+  virtual list_t &operator- (const list_t &rhs)
+    {
+      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
+      int32_t rSize = rhs.size();
+      for (int32_t i = 0; i < rSize; ++i)
+        {
+          elem_t* prev = privFindPrev(rhs[i]->data.get());
+          if (prev)
+            {
+              PWX_TRY_PWX_FURTHER(delNextElem(prev))
+            }
+        }
+      return *this;
+    }
+
+  /** @brief substraction assignment operator
+    *
+    * Remove all elements from @a rhs from this list.
+    *
+    * @param[in] rhs reference of the list to substract.
+    * @return reference to this.
+  **/
+  virtual list_t &operator-=(const list_t &rhs)
+    {
+      PWX_TRY_PWX_FURTHER(return this->operator-(rhs))
     }
 
   /** @brief return a read-only pointer to the element with the given @a index
@@ -654,9 +705,6 @@ protected:
    * === Protected members                       ===
    * ===============================================
   */
-  uint32_t eCount = 0;         //!< Element count
-  mutable
-  uint32_t eNr    = 0;         //!< Number of the element curr points to
   mutable
   elem_t*  curr   = nullptr;   //!< pointer to the currently handled element
   elem_t*  head   = nullptr;   //!< pointer to the first element
@@ -674,6 +722,26 @@ private:
   */
 
   /// IMPORTANT: private methods do not lock, callers must have locked!
+
+  /// @brief Search until the next element contains the searched data
+  virtual elem_t* privFindPrev(const data_t* data) const noexcept
+    {
+      elem_t* prev = head;
+      curr = head->next;
+      eNr  = 1;
+      while (prev != tail)
+        {
+          if (curr->data.get() == data)
+            return prev;
+          ++eNr;
+          prev = curr;
+          curr = curr->next;
+        }
+      // If we are here, prev points to tail and curr is invalid:
+      curr = prev;
+      --eNr;
+      return nullptr;
+    }
 
   /// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
   virtual const elem_t* privGetElementByIndex(int32_t index) const noexcept

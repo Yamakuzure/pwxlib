@@ -491,7 +491,7 @@ public:
       elem_t* toRemove = nullptr;
       if (eCount > 1)
         {
-          PWX_TRY(toRemove = base_t::remNextElem(this->privGetElementByIndex(-2)))
+          PWX_TRY(toRemove = base_t::remNextElem(base_t::operator[](-2)))
           PWX_CATCH_AND_FORGET(CException)
         }
       else if (eCount)
@@ -755,12 +755,66 @@ public:
     * @param[in] rhs reference of the ring to copy.
     * @return reference to this.
   **/
-  virtual list_t &operator=(const list_t &rhs) noexcept
+  virtual list_t &operator=(const list_t &rhs)
     {
       PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
-      base_t::operator=(rhs); // base_t clears and copies
+      PWX_TRY_PWX_FURTHER(base_t::operator=(rhs)) // base_t clears and copies
       privConnectEnds(); // all we do ourself.
       return *this;
+    }
+
+  /** @brief addition operator
+    *
+    * Add all elements from @a rhs to this list.
+    *
+    * @param[in] rhs reference of the list to add.
+    * @return reference to this.
+  **/
+  virtual list_t &operator+ (const list_t &rhs)
+    {
+      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
+      PWX_TRY_PWX_FURTHER(base_t::operator+(rhs))
+      privConnectEnds();
+      return *this;
+    }
+
+  /** @brief addition assignment operator
+    *
+    * Add all elements from @a rhs to this list.
+    *
+    * @param[in] rhs reference of the list to add.
+    * @return reference to this.
+  **/
+  virtual list_t &operator+=(const list_t &rhs)
+    {
+      PWX_TRY_PWX_FURTHER(return this->operator+(rhs))
+    }
+
+  /** @brief substraction operator
+    *
+    * Remove all elements from @a rhs from this list.
+    *
+    * @param[in] rhs reference of the list to substract.
+    * @return reference to this.
+  **/
+  virtual list_t &operator- (const list_t &rhs)
+    {
+      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
+      PWX_TRY_PWX_FURTHER(base_t::operator-(rhs))
+      privConnectEnds();
+      return *this;
+    }
+
+  /** @brief substraction assignment operator
+    *
+    * Remove all elements from @a rhs from this list.
+    *
+    * @param[in] rhs reference of the list to substract.
+    * @return reference to this.
+  **/
+  virtual list_t &operator-=(const list_t &rhs)
+    {
+      PWX_TRY_PWX_FURTHER(return this->operator-(rhs))
     }
 
   /** @brief return a read-only pointer to the element with the given @a index_

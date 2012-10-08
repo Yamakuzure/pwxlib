@@ -602,6 +602,11 @@ public:
       return *this;
     }
 
+  using base_t::operator+;
+  using base_t::operator+=;
+  using base_t::operator-;
+  using base_t::operator-=;
+
   /** @brief return a read-only pointer to the element with the given @a index
     *
     * This operator retrieves an element by index like an array. The pointer given
@@ -692,6 +697,25 @@ private:
   */
 
   /// IMPORTANT: private methods do not lock, callers must have locked!
+
+  /// @brief Search until the next element contains the searched data
+  virtual elem_t* privFindPrev(const data_t* data) const noexcept
+    {
+      curr = head;
+      eNr  = 0;
+      while (curr != tail)
+        {
+          if (curr->data.get() == data)
+            return curr->prev;
+          ++eNr;
+          curr = curr->next;
+        }
+      // If we are here, curr points to tail, which is not checked, yet:
+      if (curr->data.get() == data)
+        return curr->prev;
+
+      return nullptr;
+    }
 
   /// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
   virtual const elem_t* privGetElementByIndex(int32_t index) const noexcept
