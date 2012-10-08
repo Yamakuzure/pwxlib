@@ -161,9 +161,10 @@ public:
       if (privFind(*data))
         return sList.size();
 
-      elem_t* newElem = nullptr;
-      PWX_TRY_STD_FURTHER(newElem = new elem_t(data), "ElementCreationFailed", "The Creation of a new set element failed.")
-      PWX_TRY_PWX_FURTHER(return privInsert(newElem))
+      // privFind sets "last" to point to the largest element
+      // that is smaller than data. Therefore:
+      PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, data))
+      // ... will do.
     }
 
 
@@ -187,10 +188,8 @@ public:
 
       if (privFind(*src))
         return sList.size();
-
-      elem_t* newElem = nullptr;
-      PWX_TRY_STD_FURTHER(newElem = new elem_t(src), "ElementCreationFailed", "The Creation of a new set element failed.")
-      PWX_TRY_PWX_FURTHER(return privInsert(newElem))
+      // same as above.
+      PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, src))
     }
 
 
@@ -206,6 +205,7 @@ public:
     {
       PWX_LOCK_GUARD(list_t, this)
       sList.clear();
+      last = nullptr;
     }
 
 
@@ -360,10 +360,10 @@ public:
     }
 
 
-  /** @brief add an element to the end of the set
+  /** @brief add an element to the start of the set
     *
     * If the set is sorted, the element will be moved to the correct
-    * location. If the set is not sorted, it will be added to the end.
+    * location. If the set is not sorted, it will be added to the start.
     *
     * If the new element can not be created, a pwx::CException with
     * the name "ElementCreationFailed" is thrown.
@@ -376,7 +376,16 @@ public:
   **/
   uint32_t push(data_t* data)
     {
-      PWX_TRY_PWX_FURTHER(return add(data))
+      if (isSorted)
+        {
+          PWX_TRY_PWX_FURTHER(return add(data))
+        }
+      else if (!privFind(*data))
+        {
+          PWX_TRY_PWX_FURTHER(return sList.push_front(data))
+        }
+      else
+        return sList.size();
     }
 
 
@@ -397,6 +406,9 @@ public:
 
       if (toRemove)
         sList.remElem(toRemove);
+
+      if (last == toRemove)
+        last = nullptr;
 
       return toRemove;
     }
@@ -500,7 +512,7 @@ public:
   /** @brief add an element to the end of the set
     *
     * If the set is sorted, the element will be moved to the correct
-    * location. If the set is not sorted, it will be added to the started.
+    * location. If the set is not sorted, it will be added to the end.
     *
     * If the new element can not be created, a pwx::CException with
     * the name "ElementCreationFailed" is thrown.
@@ -517,10 +529,12 @@ public:
         {
           PWX_TRY_PWX_FURTHER(return add(data))
         }
-      else
+      else if (!privFind(*data))
         {
-          PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, data))
+          PWX_TRY_PWX_FURTHER(return sList.push_back(data))
         }
+      else
+        return sList.size();
     }
 
 
@@ -640,11 +654,12 @@ private:
    * === Private methods                         ===
    * ===============================================
   */
-  void (*destroy)(data_t* data_);
+  void (*destroy)(data_t* data);
 
   // Note: Lock before calling!
   // Important: If the set is sorted last will point to the next smaller element
-  //            or nullptr if the searched data can not be found.
+  //            or nullptr if the searched data can not be found. If the set
+  //            is not sorted, it will be set to nullptr.
   elem_t* privFind(data_t &data) noexcept
     {
       uint32_t listSize = sList.size();
@@ -684,7 +699,7 @@ private:
               return tail;
             }
         }
-      else
+      else if (!isSorted)
         return nullptr; // head is alone and not the searched one.
 
       /* There are two completely different situations here:
@@ -706,15 +721,22 @@ private:
             // Oh no, start from scratch
             last = head;
 
-          /* Go downwards: */
-          while ((head != last) && (**last > data))
-            last = last->prev;
           /* Go upwards: */
           while ((tail != last) && (data > **last))
             last = last->next;
+          /* Go downwards: */
+          while ((head != last) && (**last > data))
+            last = last->prev;
+
+          // If last is larger than data now, it must be set to nullptr
+          // for privInsert to work properly:
+          if (**last > data)
+            last = nullptr;
 
           /* Return either last or nullptr now */
           return (**last == data ? last : nullptr);
+          // Note: due to the order above, if data is not found,
+          // last points to the next smaller element if any.
         } // End of find in a sorted set
 
       /// Situation B)
@@ -723,7 +745,9 @@ private:
         last = last->next;
 
       /* Return either last or nullptr now */
-      return (**last == data ? last : nullptr);
+      if (**last != data)
+        last = nullptr;
+      return last;
     }
 
   // Note: elem must be valid, and its data not present in the current set.
@@ -736,14 +760,14 @@ private:
           elem_t* head = sList[0];
           if (**head > **elem)
             {
-              PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, elem))
+              PWX_TRY_PWX_FURTHER(return sList.push_front(*elem))
             }
 
           /// Case B: The new element is the new largest element:
           elem_t* tail = sList[-1];
           if (**elem > **tail)
             {
-              PWX_TRY_PWX_FURTHER(return sList.insPrev(nullptr, elem))
+              PWX_TRY_PWX_FURTHER(return sList.push_back(*elem))
             }
 
           /// Case C: We have to search for the right location:
@@ -756,18 +780,18 @@ private:
               while (**last > **elem)
                 last = last->prev;
               // Now "last" is the first smaller element
-              PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, elem))
+              PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, *elem))
             }
 
           /* upwards : */
           while (**elem > **last)
             last = last->next;
           // Now "last" is the first larger element
-          PWX_TRY_PWX_FURTHER(return sList.insPrevElem(last, elem))
+          PWX_TRY_PWX_FURTHER(return sList.insPrevElem(last, *elem))
         }
       else
         {
-          PWX_TRY_PWX_FURTHER(return sList.insPrev(nullptr, elem))
+          PWX_TRY_PWX_FURTHER(return sList.push_front(elem))
         }
     }
 

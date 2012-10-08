@@ -67,17 +67,42 @@ int32_t testBucket(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
       ++testSuccess;
     }
 
-  /** B) Pop three integers, must be 1, 2, 3 (Queue, Set) or 5, 4, 3 (Stack) **/
   if (EXIT_SUCCESS == result)
     {
-      cout << adjRight(4,0) << ++testCount << " B) Pop three times: ";
+      int32_t check[5] = { **intCont[0], **intCont[1], **intCont[2], **intCont[3], **intCont[4] };
+      cout << adjRight(4,0) << ++testCount << " B) Elements are (";
+      if (isSameType(list_t, set_t))
+        cout << "1, 2, 3, 4, 5";
+      else
+        cout << "5, 4, 3, 2, 1";
+      cout << ") : " << check[0] << ", " << check[1] << ", " << check[2] << ", " << check[3] << ", " << check[4];
+      if ( (isSameType(list_t, set_t)
+            && (1 == check[0]) && (2 == check[1]) && (3 == check[2]) && (4 == check[3]) && (5 == check[4]) )
+        || ((5 == check[0]) && (4 == check[1]) && (3 == check[2]) && (2 == check[3]) && (1 == check[4])) )
+        {
+          cout << " - Success" << endl;
+          ++testSuccess;
+        }
+      else
+        {
+          cout << " - FAIL" << endl;
+          ++testFail;
+          result = EXIT_FAILURE;
+        }
+    }
+
+
+  /** B) Pop three integers, must be 1, 2, 3 (Queue) or 5, 4, 3 (Set, Stack) **/
+  if (EXIT_SUCCESS == result)
+    {
+      cout << adjRight(4,0) << ++testCount << " C) Pop three times: ";
       auto elemA = intCont.pop();
       auto elemB = intCont.pop();
       auto elemC = intCont.pop();
       cout << **elemA << ", " << **elemB << ", " << **elemC << " - ";
-      if ( (isSameType(list_t, stack_t)
-            && (5 == **elemA) && (4 == **elemB) && (3 == **elemC) )
-        || ( (1 == **elemA) && (2 == **elemB) && (3 == **elemC) ) )
+      if ( (isSameType(list_t, queue_t)
+            && (1 == **elemA) && (2 == **elemB) && (3 == **elemC) )
+        || ( (5 == **elemA) && (4 == **elemB) && (3 == **elemC) ) )
         {
           cout << "Success" << endl;
           ++testSuccess;
@@ -93,11 +118,11 @@ int32_t testBucket(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
       delete elemC;
     } // end of sub test B
 
-  /** C) Try whether another "4" can be added **/
-  if (isSameType(list_t, set_t))
+  /** C) Try whether another "2" can be added **/
+  if ((EXIT_SUCCESS == result) && isSameType(list_t, set_t))
     {
-      cout << adjRight(4,0) << ++testCount << " C) unshift(&4) : ";
-      intCont.unshift(&numbers[3]);
+      cout << adjRight(4,0) << ++testCount << " D) unshift(&2) : ";
+      PWX_TRY_PWX_FURTHER(intCont.unshift(&numbers[1]))
       cout << "new size " << intCont.size();
       if (2 == intCont.size())
         {
@@ -112,22 +137,22 @@ int32_t testBucket(int32_t& testCount, int32_t& testSuccess, int32_t& testFail)
         }
     }
 
-  /** C/D) Shift two integers, must be 5, 4 (Queue, Set) or 1, 2 (Stack)       **/
+  /** C/D) Shift two integers, must be 5, 4 (Queue), 1, 2 (Stack) or 2, 1 (       **/
   if (EXIT_SUCCESS == result)
     {
       cout << adjRight(4,0) << ++testCount;
 
       if (isSameType(list_t, set_t))
-        cout << " D) Shift two times: ";
+        cout << " E) Shift two times: ";
       else
-        cout << " C) Shift two times: ";
+        cout << " D) Shift two times: ";
 
       auto elemA = intCont.shift();
       auto elemB = intCont.shift();
       cout << **elemA << ", " << **elemB << " - ";
-      if ( (isSameType(list_t, stack_t)
-            && (1 == **elemA) && (2 == **elemB) )
-        || ( (5 == **elemA) && (4 == **elemB) ) )
+      if ( (isSameType(list_t, queue_t)
+            && (5 == **elemA) && (4 == **elemB) )
+        || ( (1 == **elemA) && (2 == **elemB) ) )
         {
           cout << "Success" << endl;
           ++testSuccess;
