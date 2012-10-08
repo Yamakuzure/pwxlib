@@ -66,7 +66,7 @@ USRINST   = /usr/local/include
 AR        = $(shell which ar)
 ARFLAGS   = rcs
 CXX       = $(shell which g++)
-CXXFLAGS += -std=c++0x -Wall -Wextra -fexceptions
+CXXFLAGS += -std=c++11 -Wall -Wextra -fexceptions
 INSTALL   = $(shell which install)
 DOXYGEN   = $(shell which doxygen)
 LIBDIR    = lib

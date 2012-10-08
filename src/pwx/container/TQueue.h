@@ -199,6 +199,47 @@ public:
   */
   list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
 
+
+  /** @brief return a read-only pointer to the element with the given @a index
+    *
+    * This operator retrieves an element by index like an array. The pointer given
+    * back is read-only.
+    *
+    * There will be no exception if the index is out of range, it will be wrapped
+    * to press it into the valid range. This means that an index of -1 can be used
+    * to retrieve the last element (tail) for instance.
+    *
+    * If the set is empty, the operator returns nullptr.
+    *
+    * @param[in] index the index of the element to find.
+    * @return read-only pointer to the element, or nullptr if the set is empty.
+  **/
+  const elem_t* operator[](const int32_t index) const noexcept
+    {
+      return sList[index];
+    }
+
+
+  /** @brief return a read/write pointer to the element with the given @a index
+    *
+    * This operator retrieves an element by index like an array. The pointer given
+    * back is write enabled, so use with care.
+    *
+    * There will be no exception if the index is out of range, it will be wrapped
+    * to press it into the valid range. This means that an index of -1 can be used
+    * to retrieve the last element (tail) for instance.
+    *
+    * If the set is empty, the operator returns nullptr.
+    *
+    * @param[in] index the index of the element to find.
+    * @return read/write pointer to the element, or nullptr if the set is empty.
+  **/
+  elem_t* operator[](int32_t index) noexcept
+    {
+      return sList[index];
+    }
+
+
   /* ===============================================
    * === Public members                          ===
    * ===============================================
