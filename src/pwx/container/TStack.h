@@ -75,7 +75,7 @@ public:
     *
     * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
   **/
-  TStack(void (*destroy_)(data_t* data_)) noexcept
+  TStack(void (*destroy_)(data_t* data)) noexcept
   : sList(destroy_)
     { /* nothing to be done here */ }
 
@@ -109,6 +109,9 @@ public:
       sList.clear();
     }
 
+  /// @brief return true if the stack is empty
+  bool empty() const noexcept { return !sList.size(); }
+
   /** @brief push a new data pointer onto the stack
     *
     * This is the regular stack operation to add a new element.
@@ -119,12 +122,12 @@ public:
     * If the new element can not be created, a pwx::CException with
     * the name "ElementCreationFailed" is thrown.
     *
-    * @param[in] data_ data pointer to store.
+    * @param[in] data data pointer to store.
     * @return number of elements stored after the operation.
   **/
-  uint32_t push(data_t* data_)
+  uint32_t push(data_t* data)
     {
-      PWX_TRY_PWX_FURTHER(return sList.insNext(nullptr, data_))
+      PWX_TRY_PWX_FURTHER(return sList.push_front(data))
     }
 
   /** @brief pop the first element from the stack
@@ -144,7 +147,7 @@ public:
   **/
   elem_t* pop()
     {
-      PWX_TRY_PWX_FURTHER(return sList.remNext(nullptr))
+      PWX_TRY_PWX_FURTHER(return sList.pop_front())
     }
 
   /** @brief shift the oldest element from the bottom of the stack
@@ -165,14 +168,7 @@ public:
   **/
   elem_t* shift()
     {
-      if (sList.size() > 1)
-        {
-          PWX_TRY_PWX_FURTHER(return sList.remNextElem(sList[-2]))
-        }
-      else
-        {
-          PWX_TRY_PWX_FURTHER(return pop())
-        }
+      PWX_TRY_PWX_FURTHER(return sList.pop_back())
     }
 
   /// @brief return the number of stored elements
@@ -189,19 +185,12 @@ public:
     * If the new element can not be created, a pwx::CException with
     * the name "ElementCreationFailed" is thrown.
     *
-    * @param[in] data_ data pointer to store.
+    * @param[in] data data pointer to store.
     * @return number of elements stored after the operation.
   **/
-  uint32_t unshift(data_t* data_)
+  uint32_t unshift(data_t* data)
     {
-      if (sList.size() > 1)
-        {
-          PWX_TRY_PWX_FURTHER(return sList.insNextElem(sList[-1], data_))
-        }
-      else
-        {
-          PWX_TRY_PWX_FURTHER(return push(data_))
-        }
+      PWX_TRY_PWX_FURTHER(return sList.push_back(data))
     }
 
   /* ===============================================
