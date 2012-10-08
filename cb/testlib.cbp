@@ -40,10 +40,12 @@
 		<Unit filename="../test/Makefile" />
 		<Unit filename="../test/destroy.cpp" />
 		<Unit filename="../test/destroy.h" />
+		<Unit filename="../test/env.h" />
 		<Unit filename="../test/main.cpp" />
 		<Unit filename="../test/main.h" />
-		<Unit filename="../test/testBuckets.h" />
-		<Unit filename="../test/testLists.h" />
+		<Unit filename="../test/testListRing.h" />
+		<Unit filename="../test/testSet.h" />
+		<Unit filename="../test/testStackQueue.h" />
 		<Extensions>
 			<envvars set="libpwx" />
 			<code_completion>
@@ -55,6 +57,15 @@
 				<search_path add="../src" />
 				<search_path add="../lib" />
 			</debugger>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
