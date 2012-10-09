@@ -29,6 +29,7 @@
 
 #include <pwx/types/CException.h>
 #include <pwx/types/CLockable.h>
+#include <pwx/types/TVarDeleter.h>
 #include <pwx/types/TSingleElement.h>
 #include <pwx/types/TDoubleElement.h>
 

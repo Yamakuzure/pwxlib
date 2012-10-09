@@ -52,13 +52,14 @@
   * 0.8.6.7   2012-09-27  sed, PrydeWorX  Testing of the lists unified, lists, rings TStack and TQueue finished.
   * 0.8.6.8   2012-09-30  sed, PrydeWorX  Basic TSet added and tested. Mathematical methods follow.
   * 0.8.6.9   2012-10-02  sed, PrydeWorX  Added TVarDeleter that delegates given destroy methods for shared_ptr
+  * 0.8.6.10  2012-10-08  sed, PrydeWorX  Added operator=/+/-/+=/-= to all containers and finished TSet implementation.
   @endverbatim
 **/
 
 #include <pwx/general.h>
+#include <pwx/tools.h>
 #include <pwx/types.h>
 #include <pwx/container.h>
 #include <pwx/worker.h>
-#include <pwx/tools.h>
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED

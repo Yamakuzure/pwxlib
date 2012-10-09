@@ -73,7 +73,7 @@ public:
   **/
   TSingleList(void (*destroy_)(data_t* data_)) noexcept
   : destroy(destroy_)
-    { /* nothing to be done here */ }
+    { }
 
   /** @brief empty constructor
     *
@@ -274,8 +274,9 @@ public:
 
       // First create a new element for data
       elem_t* newElement = nullptr;
-      PWX_TRY(newElement = new elem_t(data, destroy))
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
+      PWX_TRY_STD_FURTHER(newElement = new elem_t(data, destroy),
+						"ElementCreationFailed",
+						"The Creation of a new list element failed.")
 
       return privInsert(prev ? curr : nullptr, newElement);
     }
@@ -301,12 +302,15 @@ public:
 
       if (prev && (nullptr == find(prev)) )
         // find sets curr to the correct value.
-        PWX_THROW("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
+        PWX_THROW("ElementNotFound",
+				"Element not found",
+				"The searched element can not be found in this singly linked list")
 
       // First create a new element for data
       elem_t* newElement = nullptr;
-      PWX_TRY(newElement = new elem_t(src))
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
+      PWX_TRY_STD_FURTHER(newElement = new elem_t(src),
+						"ElementCreationFailed",
+						"The Creation of a new list element failed.")
 
       return privInsert(prev ? curr : nullptr, newElement);
     }
@@ -336,8 +340,9 @@ public:
 
       // First create a new element for data
       elem_t* newElement = nullptr;
-      PWX_TRY(newElement = new elem_t(data, destroy))
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
+      PWX_TRY_STD_FURTHER(newElement = new elem_t(data, destroy),
+						"ElementCreationFailed",
+						"The Creation of a new list element failed.")
 
       return privInsert(prev, newElement);
     }
@@ -367,8 +372,9 @@ public:
 
       // First create a new element for data
       elem_t* newElement = nullptr;
-      PWX_TRY(newElement = new elem_t(src))
-      PWX_THROW_STD_FURTHER("ElementCreationFailed", "The Creation of a new list element failed.")
+      PWX_TRY_STD_FURTHER(newElement = new elem_t(src),
+						"ElementCreationFailed",
+						"The Creation of a new list element failed.")
 
       return privInsert(prev, newElement);
     }
