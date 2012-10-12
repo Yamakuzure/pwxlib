@@ -43,57 +43,80 @@
   *
   * All PrydeWorX projects reside in this namespace and it's sub-namespaces.
 **/
-namespace pwx {
+namespace pwx
+{
 
-/** @brief base class for all exceptions
+/** @class CException
+  * @brief Basic exception class with tracing functionality
   *
-  * This is the base class all pwx exceptions are derived of. It is meant to provide
-  * a common interface to get as much information as possible.
+  * This class is meant to provide a tracing exception to get as much information as possible.
   *
-  * To make the most out of this system, the file "pwx/general/macros.h"
-  * provides the macros PWX_TRY(), PWX_THROW() and PWX_THROW_FURTHER.
+  * To make the most out of this system, the file "pwx/general/macros.h" provides many macros
+  * to try, catch and throw further exceptions with tracing informations
   *
-  * name() : This will return the name of the thrown exception, all decendants have to set a name.
-  * what() : This will return information about what went wrong
-  * where(): This will return the name of the method that threw the exception in
-  *          the style "file:line - method name"
-  * desc() : This will return a description that possibly contains data about what happened
-  * pfunc(): This will return the full function name and type of template parameters if applicable
-  * trace(): This will return a trace of all methods this exceptions passed through. If it didn't
-  *           pass through anywhere, the trace is empty.
+  * name() : Return the name of the thrown exception.
+  * what() : Return information about what went wrong
+  * where(): Return the name of the method that threw the exception in the style "file:line - method name"
+  * desc() : Return a description that possibly contains data about what happened
+  * pfunc(): Return the full function name and type of template parameters if applicable
+  * trace(): Return a trace of all methods this exceptions passed through. If it didn't pass through anywhere,
+  *          the trace is empty.
 **/
 class PWX_API CException : public ::std::exception
 {
+
 public:
-  /* --- constructors / destructor --- */
-  explicit
-  CException (const char* const name_, const char* const what_, const char* const where_,
-              const char* const func_, const char* const desc_) noexcept;
-  CException          (const CException &e) noexcept;
-  CException          () PWX_DELETE; // No empty ctor!
-  virtual ~CException() noexcept;
+
+	/* ===============================================
+	 * === Public Constructors and destructor      ===
+	 * ===============================================
+	*/
+
+	explicit
+	CException (const char* const name_, const char* const what_, const char* const where_,
+				const char* const func_, const char* const desc_) noexcept;
+	CException (const CException &src) noexcept;
+	CException () PWX_DELETE;          // No empty ctor!
+	virtual ~CException() noexcept;
 
 
-  /* --- public methods --- */
-  const char* name()  const noexcept { return eName;            }
-  const char* what()  const noexcept { return txtWhat;          }
-  const char* where() const noexcept { return txtWhere;         }
-  const char* desc()  const noexcept { return txtDesc;          }
-  const char* pfunc() const noexcept { return txtFunc;          }
-  const char* trace() const noexcept { return txtTrace.c_str(); }
-  PWX_INLINE void addToTrace (const char* trace_) noexcept;
 
-  /* --- operators --- */
-  CException &operator=(const CException &e) PWX_DELETE; // No assignment
+
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
+
+	const char* name       ()                   const noexcept;
+	const char* what       ()                   const noexcept;
+	const char* where      ()                   const noexcept;
+	const char* desc       ()                   const noexcept;
+	const char* pfunc      ()                   const noexcept;
+	const char* trace      ()                   const noexcept;
+	void        addToTrace (const char* trace_)       noexcept;
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	CException &operator= (const CException &e) PWX_DELETE; // No assignment
+
 
 private:
-  // Text Strings:
-  const char *const eName;    //!< the name of the exception
-  const char *const txtWhat;  //!< the classic what() text
-  const char *const txtWhere; //!< A malloc'd C-String with "file:line - method"
-  const char *const txtFunc;  //!< The result of __PRETTY_FUNC__
-  const char *const txtDesc;  //!< Optional description
-  ::std::string txtTrace;     //!< A trace, that can hopefully be added together
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	*/
+
+	const char *const txtName;  //!< the name of the exception
+	const char *const txtWhat;  //!< the classic what() text
+	const char *const txtWhere; //!< A malloc'd C-String with "file:line - method"
+	const char *const txtFunc;  //!< The result of __PRETTY_FUNC__
+	const char *const txtDesc;  //!< Optional description
+	::std::string txtTrace;     //!< A trace, that can hopefully be added together
 };
 
 
