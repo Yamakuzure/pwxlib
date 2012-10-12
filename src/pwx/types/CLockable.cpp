@@ -4,7 +4,8 @@
 #include <pwx/types/CLockable.h>
 #include <pwx/general/macros.h>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @brief Default ctor
   */
@@ -16,7 +17,7 @@ CLockable::CLockable() noexcept
   *
   * Nothing to do, all objects have their private mutex.
   */
-CLockable::CLockable(const CLockable&) noexcept
+CLockable::CLockable (const CLockable&) noexcept
 { /* --- nothing to do here. ---*/ }
 
 
@@ -47,14 +48,13 @@ CLockable::~CLockable() noexcept
 void CLockable::lock()
 {
 #if defined(PWX_THREADS)
-  PWX_TRY(mutex.lock())
-  catch (int &e)
-    {
-      if      (EINVAL  == e) PWX_THROW("LockFailed", "EINVAL",  "Invalid argument")
-      else if (EAGAIN  == e) PWX_THROW("LockFailed", "EAGAIN",  "Try again")
-      else if (EBUSY   == e) PWX_THROW("LockFailed", "EBUSY",   "Device or resource busy")
-      else if (EDEADLK == e) PWX_THROW("LockFailed", "EDEADLK", "Resource deadlock would occur")
-    }
+	PWX_TRY (mutex.lock())
+	catch (int &e) {
+		if      (EINVAL  == e) PWX_THROW ("LockFailed", "EINVAL",  "Invalid argument")
+		else if (EAGAIN  == e) PWX_THROW ("LockFailed", "EAGAIN",  "Try again")
+		else if (EBUSY   == e) PWX_THROW ("LockFailed", "EBUSY",   "Device or resource busy")
+		else if (EDEADLK == e) PWX_THROW ("LockFailed", "EDEADLK", "Resource deadlock would occur")
+	}
 #endif
 }
 
@@ -72,11 +72,11 @@ void CLockable::lock()
 bool CLockable::try_lock() noexcept
 {
 #if defined(PWX_THREADS)
-  PWX_TRY(return mutex.try_lock())
-  PWX_CATCH_AND_FORGET(int)
-  return false; // A system error occurred.
+	PWX_TRY (return mutex.try_lock())
+	PWX_CATCH_AND_FORGET (int)
+	return false; // A system error occurred.
 #else
-  return true;
+	return true;
 #endif
 }
 
@@ -99,13 +99,12 @@ bool CLockable::try_lock() noexcept
 void CLockable::unlock()
 {
 #if defined(PWC_THREADS)
-  PWX_TRY(mutex.unlock())
-  catch (int &e)
-    {
-      if      (EINVAL  == e) PWX_THROW("UnlockFailed", "EINVAL",  "Invalid argument")
-      else if (EAGAIN  == e) PWX_THROW("UnlockFailed", "EAGAIN",  "Try again")
-      else if (EBUSY   == e) PWX_THROW("UnlockFailed", "EBUSY",   "Device or resource busy")
-    }
+	PWX_TRY (mutex.unlock())
+	catch (int &e) {
+		if      (EINVAL  == e) PWX_THROW ("UnlockFailed", "EINVAL",  "Invalid argument")
+		else if (EAGAIN  == e) PWX_THROW ("UnlockFailed", "EAGAIN",  "Try again")
+		else if (EBUSY   == e) PWX_THROW ("UnlockFailed", "EBUSY",   "Device or resource busy")
+	}
 #endif
 }
 
@@ -113,7 +112,7 @@ void CLockable::unlock()
   *
   * Nothing to do, all objects have their private mutex.
   */
-CLockable &CLockable::operator=(const CLockable&) noexcept
+CLockable &CLockable::operator= (const CLockable&) noexcept
 { return *this; }
 
 } // namespace pwx

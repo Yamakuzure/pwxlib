@@ -34,7 +34,8 @@
 #  include <cstring>
 #endif
 
-namespace pwx {
+namespace pwx
+{
 
 /** @class CLockable
   *
@@ -55,41 +56,52 @@ namespace pwx {
   *
   * <B>Important</B>: It is strongly recommended that you use std::lock_guard
   * or std::unique_lock to do the locking of any object derived from
-  * pwx::CLockable.
+  * pwx::CLockable. You can use PWX_LOCK_GUARD(type, pointer) and
+  * PWX_DOUBLE_LOCK(typeA, ptrA, typeB, ptrB) to do this rather simply. They
+  * are defined in pwx/general/macros.h.
 **/
 class PWX_API CLockable
 {
+
 public:
-  /* ===============================================
-   * === Public Constructors and destructor      ===
-   * ===============================================
-  */
-  explicit CLockable() noexcept;
-  virtual ~CLockable() noexcept;
 
-  CLockable(const CLockable&) noexcept;
+	/* ===============================================
+	 * === Public Constructors and destructor      ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
-  void lock();
-  bool try_lock() noexcept;
-  void unlock();
+	explicit CLockable() noexcept;
+	CLockable (const CLockable&) noexcept;
+	virtual ~CLockable() noexcept;
 
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
-  CLockable& operator=(const CLockable&) noexcept;
+
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
+
+	void lock();
+	bool try_lock() noexcept;
+	void unlock();
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	CLockable& operator= (const CLockable&) noexcept;
+
 
 private:
-  /* ===============================================
-   * === Private members                         ===
-   * ===============================================
-  */
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	*/
+
 #if defined(PWX_THREADS)
-  ::std::recursive_mutex mutex;
+	::std::recursive_mutex mutex;
 #endif
 }; // class CLockable
 
