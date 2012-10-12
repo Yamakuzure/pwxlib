@@ -27,7 +27,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-namespace pwx {
+namespace pwx
+{
 
 
 /** @class TVarDeleter
@@ -50,72 +51,90 @@ namespace pwx {
   * is safe.
 **/
 template<typename data_t>
-class TVarDeleter
+class PWX_API TVarDeleter
 {
 public:
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-  /** @brief default constructor
-    *
-    * The default constructor sets a destroy method that is used by operator()
-    * to delete the given data.
-    *
-    * @param destroy_[in] A pointer to a function that is to be used to destroy the data
-  **/
-  TVarDeleter(void (*destroy_)(data_t* data_)) noexcept
-  : destroy(destroy_)
-    { }
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
 
-  /** @brief empty constructor
-    *
-    * The empty constructor sets the destroy method to nullptr. The operator()
-    * then uses the default delete operator to destroy the given data.
-  **/
-  TVarDeleter() noexcept
-  : destroy(nullptr)
-    { }
+	/** @brief default constructor
+	  *
+	  * The default constructor sets a destroy method that is used by operator()
+	  * to delete the given data.
+	  *
+	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
+	**/
+	TVarDeleter (void (*destroy_) (data_t* data_)) noexcept
+	: destroy (destroy_)
+	{ }
 
-  /** @brief copy constructor
-    *
-    * This simply copies the destroy method.
-  **/
-  TVarDeleter(const TVarDeleter &src) noexcept
-  : destroy(src.destroy)
-    { }
 
-  /// @brief destructor
-  ~TVarDeleter() noexcept
-    { }
+	/** @brief empty constructor
+	  *
+	  * The empty constructor sets the destroy method to nullptr. The operator()
+	  * then uses the default delete operator to destroy the given data.
+	**/
+	TVarDeleter() noexcept
+	: destroy (nullptr)
+	{ }
 
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
-  void operator()(data_t* data) noexcept
-    {
-      if (data)
-        {
-          if (destroy)
-            {
-              PWX_TRY(destroy(data))
-              catch(...) { }
-            }
-          else
-            {
-              PWX_TRY(delete data)
-              catch(...) { }
-            }
-        }
-    }
+
+	/** @brief copy constructor
+	  *
+	  * This simply copies the destroy method.
+	**/
+	TVarDeleter (const TVarDeleter &src) noexcept
+	: destroy (src.destroy)
+	{ }
+
+
+	/// @brief destructor
+	~TVarDeleter() noexcept
+	{ }
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	/** @brief function operator
+	  *
+	  * this operator allows an instance to be used like a function.
+	  * If @a data is not the nullptr and a destroy method was set,
+	  * the destroy method will be used on @a data. With @a data but
+	  * without a destroy method, the regular delete operator is
+	  * used on @a data.
+	  *
+	  * All exceptions are thrown away, so please provide safe
+	  * pointers and destroy methods only!
+	  *
+	  * @param[in] data pointer to the data to destroy.
+	**/
+	void operator() (data_t* data) noexcept
+	{
+		if (data) {
+			if (destroy) {
+				PWX_TRY (destroy (data))
+				catch (...) { }
+			} else {
+				PWX_TRY (delete data)
+				catch (...) { }
+			}
+		}
+	}
+
 
 private:
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
-  void (*destroy)(data_t* data_);
+
+	/* ===============================================
+	 * === Private methods                         ===
+	 * ===============================================
+	*/
+
+	void (*destroy) (data_t* data_);
 }; // class TVarDeleter
 
 
