@@ -30,7 +30,8 @@
 #include <pwx/types/CLockable.h>
 #include <pwx/general/macros.h>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @class VContainer
   *
@@ -42,85 +43,45 @@ namespace pwx {
 class VContainer : public CLockable
 {
 public:
-  /* ===============================================
-   * === Public types                            ===
-   * ===============================================
-  */
-  typedef CLockable  base_t;
-  typedef VContainer list_t;
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-  explicit VContainer() noexcept;
-  VContainer(const VContainer &src) noexcept;
-  virtual ~VContainer() noexcept;
+	typedef CLockable  base_t;
+	typedef VContainer list_t;
 
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
-  virtual
-  void     clear()       noexcept PWX_VIRTUAL_PURE;
-  bool     empty() const noexcept;
-  uint32_t size()  const noexcept;
 
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Public members                          ===
-   * ===============================================
-  */
+	explicit VContainer() noexcept;
+	VContainer (const VContainer &src) noexcept;
+	virtual ~VContainer() noexcept;
+
+
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
+
+	virtual
+	void     clear()       noexcept PWX_VIRTUAL_PURE;
+	bool     empty() const noexcept;
+	uint32_t size()  const noexcept;
+
 
 protected:
-  /* ===============================================
-   * === Protected Constructors and destructors  ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Protected methods                       ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Protected operators                     ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
-  uint32_t eCount = 0; //!< Element count
-  mutable
-  uint32_t eNr    = 0; //!< Number of the element curr points to
-
-private:
-  /* ===============================================
-   * === Private Constructors and destructors    ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Private operators                       ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Private members                         ===
-   * ===============================================
-  */
-
+	uint32_t eCount = 0; //!< Element count
+	mutable
+	uint32_t eNr    = 0; //!< Number of the element curr points to
 }; // class VContainer
 
 /// @brief ~VContainer default destructor.
