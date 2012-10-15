@@ -2,9 +2,9 @@
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED 1
 
-/** @file <filename>
+/** @file TDoubleRing.h
   *
-  * @brief <description>
+  * @brief Declaration of a basic template for doubly linked rings
   *
   * (c) 2007 - 2012 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -30,7 +30,8 @@
 
 #include <pwx/container/TDoubleList.h>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @class TDoubleRing
   *
@@ -53,878 +54,791 @@ template<typename data_t, typename elem_t = TDoubleElement<data_t> >
 class TDoubleRing : public TDoubleList<data_t, elem_t>
 {
 public:
-  /* ===============================================
-   * === Public types                            ===
-   * ===============================================
-  */
-  typedef TDoubleList<data_t, elem_t> base_t;
-  typedef TDoubleRing<data_t, elem_t> list_t;
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
+	typedef TDoubleList<data_t, elem_t> base_t;
+	typedef TDoubleRing<data_t, elem_t> list_t;
 
-  /** @brief default constructor
-    *
-    * The default constructor initializes an empty ring.
-    *
-    * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-  **/
-  TDoubleRing(void (*destroy_)(data_t* data)) noexcept
-  : base_t(destroy_)
-    { /* nothing to be done here */ }
 
-  /** @brief empty constructor
-    *
-    * The empty constructor uses the base constructor to set the data
-    * destroy method to the null pointer.
-  **/
-  TDoubleRing() noexcept
-  : base_t(nullptr)
-    { /* nothing to be done here */ }
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
 
-  /** @brief copy constructor
-    *
-    * Builds a copy of all elements of @a src.
-    *
-    * @param[in] src reference of the ring to copy.
-  **/
-  TDoubleRing(const list_t &src) noexcept
-  : base_t(src)
-    {
-      // TDoubleList copies the elements
-      privConnectEnds(); // All we have to do here!
-    }
+	/** @brief default constructor
+	  *
+	  * The default constructor initializes an empty ring.
+	  *
+	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
+	**/
+	TDoubleRing (void (*destroy_) (data_t* data)) noexcept :
+		base_t (destroy_)
+	{ }
 
-  virtual ~TDoubleRing() noexcept;
 
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
+	/** @brief empty constructor
+	  *
+	  * The empty constructor uses the base constructor to set the data
+	  * destroy method to the null pointer.
+	**/
+	TDoubleRing() noexcept :
+		base_t (nullptr)
+	{ }
 
-  using base_t::clear;
 
-  /** @brief delete the element holding the specified data
-    *
-    * This method deletes the element in the ring that holds @a data.
-    *
-    * If you intent to work with the element, use remData instead.
-    *
-    * @param[in] data the data the element that is to be deleted holds
-    * @return the number of elements remaining in the ring after the deletion.
-  **/
-  virtual uint32_t delData(data_t* data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::delData(data))
-      privConnectEnds();
-      return eCount;
-    }
+	/** @brief copy constructor
+	  *
+	  * Builds a copy of all elements of @a src.
+	  *
+	  * @param[in] src reference of the ring to copy.
+	**/
+	TDoubleRing (const list_t &src) noexcept :
+		base_t (src)
+	{
+		// TDoubleList copies the elements
+		privConnectEnds(); // All we have to do here!
+	}
 
-  /** @brief delete the specified element
-    *
-    * This method deletes the element @a elem.
-    *
-    * If you intent to work with the element, use remElem instead.
-    *
-    * If @a elem is no element of this ring, the wrong ring is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct ring!
-    *
-    * @param[in] elem the element that is to be deleted
-    * @return the number of elements remaining in the ring after the deletion.
-  **/
-  virtual uint32_t delElem(elem_t* elem)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::delElem(elem))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief delete the element after the element holding the specified data
-    *
-    * This method deletes the element in the list after the element
-    * that holds @a prev.
-    *
-    * If @a prev is set to nullptr, the root element (aka head) is
-    * deleted.
-    *
-    * If you intent to work with the element, use remNext instead.
-    *
-    * If there is no element behind the element holding @a prev a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] prev the data the element that precedes the element to delete holds
-    * @return the number of elements remaining in the list after the deletion.
-  **/
-  virtual uint32_t delNext(data_t* prev)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::delNext(prev))
-      privConnectEnds();
-      return eCount;
-    }
+	virtual ~TDoubleRing() noexcept;
 
-  /** @brief delete the element after the specified element
-    *
-    * This method deletes the element in the list after the element
-    * @a prev.
-    *
-    * If @a prev is set to nullptr, the root element (aka head) is
-    * deleted.
-    *
-    * If you intent to work with the element, use remNextElem instead.
-    *
-    * If @a prev is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If there is no element behind the element @a prev a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] prev the element that precedes the element to delete
-    * @return the number of elements remaining in the list after the deletion.
-  **/
-  virtual uint32_t delNextElem(elem_t* prev)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::delNextElem(prev))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief delete the element before the element holding the specified data
-    *
-    * This method deletes the element in the ring before the element
-    * that holds @a next.
-    *
-    * If @a next is set to nullptr, the last element (aka tail) is
-    * deleted.
-    *
-    * If you intent to work with the element, use remPrev instead.
-    *
-    * If there is no element before the element holding @a next, a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] next the data the element that succeeds the element to delete holds
-    * @return the number of elements remaining in the ring after the deletion.
-  **/
-  virtual uint32_t delPrev(data_t* next)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::delPrev(next))
-      privConnectEnds();
-      return eCount;
-    }
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
 
-  /** @brief delete the element before the specified element
-    *
-    * This method deletes the element in the ring before the element
-    * @a next.
-    *
-    * If @a next is set to nullptr, the last element (aka tail) is
-    * deleted.
-    *
-    * If you intent to work with the element, use remPrevElem instead.
-    *
-    * If @a next is no element of this ring, the wrong ring is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct ring!
-    *
-    * If there is no element before the element @a next a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] next the element that succeeds the element to delete
-    * @return the number of elements remaining in the ring after the deletion.
-  **/
-  virtual uint32_t delPrevElem(elem_t* next)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::delPrevElem(next))
-      privConnectEnds();
-      return eCount;
-    }
+	using base_t::clear;
 
-  /** @brief find the element with the given @a data_
-    *
-    * This method searches through the list and returns the element
-    * with the given @a data or nullptr if @a data is not stored in this
-    * list.
-    *
-    * @param data pointer to the data to find
-    * @return return a pointer to the element storing @a data_
-  **/
-  virtual elem_t* find(data_t* data) noexcept
-    {
-      return const_cast<elem_t* >(base_t::find(static_cast<const data_t* >(data)));
-    }
 
-  /** @brief find the element with the given @a data_
-    *
-    * This method searches through the list and returns a const pointer
-    * to the element with the given @a data or nullptr if @a data is not stored
-    * in this list.
-    *
-    * @param data pointer to the data to find
-    * @return return a const pointer to the element storing @a data_
-  **/
-  virtual const elem_t* find(const data_t* data) const noexcept
-    {
-      return base_t::find(data);
-    }
+	/** @brief delete the element holding the specified data
+	  *
+	  * This method deletes the element in the ring that holds @a data.
+	  *
+	  * If you intent to work with the element, use remData instead.
+	  *
+	  * @param[in] data the data the element that is to be deleted holds
+	  * @return the number of elements remaining in the ring after the deletion.
+	**/
+	virtual uint32_t delData (data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::delData (data))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief insert a new data pointer after the specified data
-    *
-    * This method inserts a new element in the list after the element
-    * holding @a prev.
-    *
-    * If @a prev is set to nullptr, the new element will become the new
-    * head of the list.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] prev the data the element that should precede the new element holds
-    * @param[in] data the pointer that is to be added.
-    * @return the number of elements in this list after the insertion
-  **/
-  virtual uint32_t insNext(data_t* prev, data_t* data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNext(prev, data))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief insert an element copy after the specified data
-    *
-    * This method inserts a new element in the list after the element
-    * holding @a prev that is a copy of @a src.
-    *
-    * If @a prev is set to nullptr, the new element will become the new
-    * head of the list.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] prev the data the element that should precede the new element holds.
-    * @param[in] src reference to the element to copy.
-    * @return the number of elements in this list after the insertion.
-  **/
-  virtual uint32_t insNext(data_t* prev, const elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNext(prev, src))
-      privConnectEnds();
-      return eCount;
-    }
+	/** @brief delete the specified element
+	  *
+	  * This method deletes the element @a elem.
+	  *
+	  * If you intent to work with the element, use remElem instead.
+	  *
+	  * If @a elem is no element of this ring, the wrong ring is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct ring!
+	  *
+	  * @param[in] elem the element that is to be deleted
+	  * @return the number of elements remaining in the ring after the deletion.
+	**/
+	virtual uint32_t delElem (elem_t* elem)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::delElem (elem))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief insert a new data pointer after the specified element
-    *
-    * This method inserts a new element in the list after the element
-    * @a prev.
-    *
-    * If @a prev is set to nullptr, the new element will become the new
-    * head of the list.
-    *
-    * If @a prev is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] prev the element that should precede the new element
-    * @param[in] data the pointer that is to be added.
-    * @return the number of elements in this list after the insertion
-  **/
-  virtual uint32_t insNextElem(elem_t* prev, data_t* data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNextElem(prev, data))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief insert an element copy after the specified element
-    *
-    * This method inserts a new element in the list after the element
-    * @a prev that is a copy of @a src.
-    *
-    * If @a prev is set to nullptr, the new element will become the new
-    * head of the list.
-    *
-    * If @a prev is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] prev the element that should precede the new element.
-    * @param[in] src reference to the element to copy.
-    * @return the number of elements in this list after the insertion.
-  **/
-  virtual uint32_t insNextElem(elem_t* prev, const elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNextElem(prev, src))
-      privConnectEnds();
-      return eCount;
-    }
+	/** @brief delete the element after the element holding the specified data
+	  *
+	  * This method deletes the element in the list after the element
+	  * that holds @a prev.
+	  *
+	  * If @a prev is set to nullptr, the root element (aka head) is
+	  * deleted.
+	  *
+	  * If you intent to work with the element, use remNext instead.
+	  *
+	  * If there is no element behind the element holding @a prev a
+	  * pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] prev the data the element that precedes the element to delete holds
+	  * @return the number of elements remaining in the list after the deletion.
+	**/
+	virtual uint32_t delNext (data_t* prev)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::delNext (prev))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief insert a new data pointer before the specified data
-    *
-    * This method inserts a new element in the list before the element
-    * holding @a next.
-    *
-    * If @a next is set to nullptr, the new element will become the new
-    * tail of the list.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] next the data the element that should succeed the new element
-    * @param[in] data the pointer that is to be added.
-    * @return the number of elements in this list after the insertion
-  **/
-  uint32_t insPrev(data_t* next, data_t* data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insPrev(next, data))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief insert an element copy before the specified data
-    *
-    * This method inserts a new element in the list before the element
-    * holding @a next as a copy of @a src.
-    *
-    * If @a next is set to nullptr, the new element will become the new
-    * tail of the list.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] next the data the element that should succeed the new element.
-    * @param[in] src reference to the element to copy.
-    * @return the number of elements in this list after the insertion.
-  **/
-  uint32_t insPrev(data_t* next, const elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insPrev(next, src))
-      privConnectEnds();
-      return eCount;
-    }
+	/** @brief delete the element after the specified element
+	  *
+	  * This method deletes the element in the list after the element
+	  * @a prev.
+	  *
+	  * If @a prev is set to nullptr, the root element (aka head) is
+	  * deleted.
+	  *
+	  * If you intent to work with the element, use remNextElem instead.
+	  *
+	  * If @a prev is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If there is no element behind the element @a prev a
+	  * pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] prev the element that precedes the element to delete
+	  * @return the number of elements remaining in the list after the deletion.
+	**/
+	virtual uint32_t delNextElem (elem_t* prev)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::delNextElem (prev))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief insert a new data pointer before the specified element
-    *
-    * This method inserts a new element in the list before the element
-    * @a next.
-    *
-    * If @a next is set to nullptr, the new element will become the new
-    * tail of the list.
-    *
-    * If @a next is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] next the element that should succeed the new element
-    * @param[in] data the pointer that is to be added.
-    * @return the number of elements in this list after the insertion
-  **/
-  uint32_t insPrevElem(elem_t* next, data_t* data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insPrevElem(next, data))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief insert an element copy before the specified element
-    *
-    * This method inserts a new element in the list before the element
-    * @a next as a copy of @a src.
-    *
-    * If @a next is set to nullptr, the new element will become the new
-    * tail of the list.
-    *
-    * If @a next is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] next the element that should succeed the new element.
-    * @param[in] src reference to the element to copy.
-    * @return the number of elements in this list after the insertion.
-  **/
-  uint32_t insPrevElem(elem_t* next, const elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insPrevElem(next, src))
-      privConnectEnds();
-      return eCount;
-    }
+	/** @brief delete the element before the element holding the specified data
+	  *
+	  * This method deletes the element in the ring before the element
+	  * that holds @a next.
+	  *
+	  * If @a next is set to nullptr, the last element (aka tail) is
+	  * deleted.
+	  *
+	  * If you intent to work with the element, use remPrev instead.
+	  *
+	  * If there is no element before the element holding @a next, a
+	  * pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] next the data the element that succeeds the element to delete holds
+	  * @return the number of elements remaining in the ring after the deletion.
+	**/
+	virtual uint32_t delPrev (data_t* next)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::delPrev (next))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief alias to remove the last element (tail)
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delNext instead.
-    *
-    * If the ring is empty, nullptr is returned.
-    *
-    * @return a pointer to the removed element or nullptr if the ring is empty
-  **/
-  virtual elem_t* pop_back() noexcept
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = nullptr;
-      if (eCount > 1)
-        {
-          PWX_TRY(toRemove = base_t::remNextElem(base_t::operator[](-2)))
-          PWX_CATCH_AND_FORGET(CException)
-        }
-      else if (eCount)
-        {
-          PWX_TRY(toRemove = remNext(nullptr))
-          PWX_CATCH_AND_FORGET(CException)
-        }
-      privConnectEnds();
-      return toRemove;
-    }
 
-  /** @brief alias to remove the first element (head)
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delNext instead.
-    *
-    * If the ring is empty, nullptr is returned.
-    *
-    * @return a pointer to the removed element or nullptr if the ring is empty
-  **/
-  virtual elem_t* pop_front() noexcept
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = nullptr;
-      if (eCount)
-        {
-          PWX_TRY(toRemove = base_t::remNext(nullptr))
-          PWX_CATCH_AND_FORGET(CException)
-        }
-      privConnectEnds();
-      return toRemove;
-    }
+	/** @brief delete the element before the specified element
+	  *
+	  * This method deletes the element in the ring before the element
+	  * @a next.
+	  *
+	  * If @a next is set to nullptr, the last element (aka tail) is
+	  * deleted.
+	  *
+	  * If you intent to work with the element, use remPrevElem instead.
+	  *
+	  * If @a next is no element of this ring, the wrong ring is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct ring!
+	  *
+	  * If there is no element before the element @a next a
+	  * pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] next the element that succeeds the element to delete
+	  * @return the number of elements remaining in the ring after the deletion.
+	**/
+	virtual uint32_t delPrevElem (elem_t* next)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::delPrevElem (next))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief alias to add a data pointer to the end of the ring.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] data the pointer that is to be added.
-    * @return the number of elements in this ring after the insertion
-  **/
-  virtual uint32_t push_back(data_t *data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNextElem(tail, data))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief alias to add an element copy to the end of the ring.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] src reference to the element to copy
-    * @return the number of elements in this ring after the insertion
-  **/
-  virtual uint32_t push_back(elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNextElem(tail, src))
-      privConnectEnds();
-      return eCount;
-    }
+	using base_t::find;
 
-  /** @brief alias to add a data pointer to the head of the ring.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] data the pointer that is to be added.
-    * @return the number of elements in this ring after the insertion
-  **/
-  virtual uint32_t push_front(data_t *data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNext(nullptr, data))
-      privConnectEnds();
-      return eCount;
-    }
 
-  /** @brief alias to add an element copy to the head of the ring.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] src reference to the element to copy
-    * @return the number of elements in this ring after the insertion
-  **/
-  virtual uint32_t push_front(elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      PWX_TRY_PWX_FURTHER(base_t::insNext(nullptr, src))
-      privConnectEnds();
-      return eCount;
-    }
+	/** @brief insert a new data pointer after the specified data
+	  *
+	  * This method inserts a new element in the list after the element
+	  * holding @a prev.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the data the element that should precede the new element holds
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insNext (data_t* prev, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNext (prev, data))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief remove the element holding the specified data
-    *
-    * This method removes the element in the list that holds @a data
-    * and returns a pointer to the removed element.
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delData instead.
-    *
-    * @param[in] data the data the element is to be removed holds
-    * @return a pointer to the removed element
-  **/
-  elem_t* remData(data_t* data) noexcept
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = base_t::remData(data);
-      privConnectEnds();
-      return toRemove;
-    }
 
-  /** @brief remove the specified element
-    *
-    * This method removes the element @a elem and returns a pointer
-    * to the removed element.
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delElem instead.
-    *
-    * If @a elem is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * @param[in] elem the element that is to be removed
-    * @return a pointer to the removed element
-  **/
-  elem_t* remElem(elem_t* elem) noexcept
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = base_t::remElem(elem);
-      privConnectEnds();
-      return toRemove;
-    }
+	/** @brief insert an element copy after the specified data
+	  *
+	  * This method inserts a new element in the list after the element
+	  * holding @a prev that is a copy of @a src.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the data the element that should precede the new element holds.
+	  * @param[in] src reference to the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	virtual uint32_t insNext (data_t* prev, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNext (prev, src))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief remove the element after the element holding the specified data
-    *
-    * This method removes the element in the list after the element
-    * that holds @a prev and returns a pointer to the removed element.
-    *
-    *
-    * If @a prev is set to nullptr, the root element (aka head) is
-    * removed.
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delNext instead.
-    *
-    * If there is no element behind the element @a prev a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] prev the data the element that precedes the element to remove holds
-    * @return a pointer to the removed element
-  **/
-  virtual elem_t* remNext(data_t* prev)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = nullptr;
-      PWX_TRY_PWX_FURTHER(toRemove = base_t::remNext(prev))
-      privConnectEnds();
-      return toRemove;
-    }
 
-  /** @brief remove the element after the specified element
-    *
-    * This method removes the element in the list after the element
-    * @a prev.
-    *
-    * If @a prev is set to nullptr, the root element (aka head) is
-    * removed.
-    *
-    * If @a prev is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If there is no element behind the element @a prev or if the list is
-    * empty, a pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] prev the element that precedes the element to remove
-    * @return a pointer to the removed element
-  **/
-  virtual elem_t* remNextElem(elem_t* prev)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = nullptr;
-      PWX_TRY_PWX_FURTHER(toRemove = base_t::remNextElem(prev))
-      privConnectEnds();
-      return toRemove;
-    }
+	/** @brief insert a new data pointer after the specified element
+	  *
+	  * This method inserts a new element in the list after the element
+	  * @a prev.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If @a prev is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the element that should precede the new element
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNextElem (prev, data))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief remove the element before the element holding the specified data
-    *
-    * This method removes the element in the list before the element
-    * that holds @a next and returns a pointer to the removed element.
-    *
-    * If @a next is set to nullptr, the last element (aka tail) is
-    * removed.
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delPrev instead.
-    *
-    * If there is no element before the element @a next holds, a
-    * pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] next the data the element that succeeds the element to remove holds
-    * @return a pointer to the removed element
-  **/
-  elem_t* remPrev(data_t* next)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = nullptr;
-      PWX_TRY_PWX_FURTHER(toRemove = base_t::remPrev(next))
-      privConnectEnds();
-      return toRemove;
-    }
 
-  /** @brief remove the element before the specified element
-    *
-    * This method removes the element in the list before the element
-    * @a next and returns a pointer to the removed element.
-    *
-    * If @a next is set to nullptr, the last element (aka tail) is
-    * removed.
-    *
-    * You have to delete the removed element by yourself. If you do not intent
-    * to work with the removed element, use delPrevElem instead.
-    *
-    * If @a next is no element of this list, the wrong list is updated
-    * and both element counts will be wrong then. So please make sure to
-    * use the correct element on the correct list!
-    *
-    * If there is no element before @a next or if the list is empty,
-    * a pwx::CException with the name "OutOfRange" is thrown.
-    *
-    * @param[in] next the element that succeeds the element to remove
-    * @return a pointer to the removed element
-  **/
-  elem_t* remPrevElem(elem_t* next)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      elem_t* toRemove = nullptr;
-      PWX_TRY_PWX_FURTHER(toRemove = base_t::remPrevElem(next))
-      privConnectEnds();
-      return toRemove;
-    }
+	/** @brief insert an element copy after the specified element
+	  *
+	  * This method inserts a new element in the list after the element
+	  * @a prev that is a copy of @a src.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If @a prev is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the element that should precede the new element.
+	  * @param[in] src reference to the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNextElem (prev, src))
+		privConnectEnds();
+		return eCount;
+	}
 
-  using base_t::size;
 
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
-  /** @brief assignment operator
-    *
-    * Clears this ring and copies all elements from @a rhs
-    * into this ring.
-    *
-    * @param[in] rhs reference of the ring to copy.
-    * @return reference to this.
-  **/
-  virtual list_t &operator=(const list_t &rhs)
-    {
-      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
-      PWX_TRY_PWX_FURTHER(base_t::operator=(rhs)) // base_t clears and copies
-      privConnectEnds(); // all we do ourself.
-      return *this;
-    }
+	/** @brief insert a new data pointer before the specified data
+	  *
+	  * This method inserts a new element in the list before the element
+	  * holding @a next.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the data the element that should succeed the new element
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	uint32_t insPrev (data_t* next, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insPrev (next, data))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief addition operator
-    *
-    * Add all elements from @a rhs to this list.
-    *
-    * @param[in] rhs reference of the list to add.
-    * @return reference to this.
-  **/
-  virtual list_t &operator+ (const list_t &rhs)
-    {
-      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
-      PWX_TRY_PWX_FURTHER(base_t::operator+(rhs))
-      privConnectEnds();
-      return *this;
-    }
 
-  /** @brief addition assignment operator
-    *
-    * Add all elements from @a rhs to this list.
-    *
-    * @param[in] rhs reference of the list to add.
-    * @return reference to this.
-  **/
-  virtual list_t &operator+=(const list_t &rhs)
-    {
-      PWX_TRY_PWX_FURTHER(return this->operator+(rhs))
-    }
+	/** @brief insert an element copy before the specified data
+	  *
+	  * This method inserts a new element in the list before the element
+	  * holding @a next as a copy of @a src.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the data the element that should succeed the new element.
+	  * @param[in] src reference to the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	uint32_t insPrev (data_t* next, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insPrev (next, src))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief substraction operator
-    *
-    * Remove all elements from @a rhs from this list.
-    *
-    * @param[in] rhs reference of the list to substract.
-    * @return reference to this.
-  **/
-  virtual list_t &operator- (const list_t &rhs)
-    {
-      PWX_DOUBLE_LOCK(list_t, this, list_t, const_cast<list_t*>(&rhs))
-      PWX_TRY_PWX_FURTHER(base_t::operator-(rhs))
-      privConnectEnds();
-      return *this;
-    }
 
-  /** @brief substraction assignment operator
-    *
-    * Remove all elements from @a rhs from this list.
-    *
-    * @param[in] rhs reference of the list to substract.
-    * @return reference to this.
-  **/
-  virtual list_t &operator-=(const list_t &rhs)
-    {
-      PWX_TRY_PWX_FURTHER(return this->operator-(rhs))
-    }
+	/** @brief insert a new data pointer before the specified element
+	  *
+	  * This method inserts a new element in the list before the element
+	  * @a next.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If @a next is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the element that should succeed the new element
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	uint32_t insPrevElem (elem_t* next, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insPrevElem (next, data))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /** @brief return a read-only pointer to the element with the given @a index_
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is read-only.
-    *
-    * There will be no exception if the index_ is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the list is empty, the operator returns nullptr.
-    *
-    * If you use this operator to quickly access head or tail, neither the currently
-    * used internal pointer nor number are changed. Head and tail are given back
-    * directly.
-    *
-    * @param[in] index_ the index of the element to find.
-    * @return read-only pointer to the element, or nullptr if the list is empty.
-  **/
-  virtual const elem_t* operator[](const int32_t index_) const noexcept
-    {
-      return base_t::operator[](index_);
-    }
 
-  /** @brief return a read/write pointer to the element with the given @a index_
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is write enabled, so use with care.
-    *
-    * There will be no exception if the index_ is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the list is empty, the operator returns nullptr.
-    *
-    * If you use this operator to quickly access head or tail, neither the currently
-    * used internal pointer nor number are changed. Head and tail are given back
-    * directly.
-    *
-    * @param[in] index_ the index of the element to find.
-    * @return read/write pointer to the element, or nullptr if the list is empty.
-  **/
-  virtual elem_t* operator[](int32_t index_) noexcept
-    {
-      return base_t::operator[](index_);
-    }
+	/** @brief insert an element copy before the specified element
+	  *
+	  * This method inserts a new element in the list before the element
+	  * @a next as a copy of @a src.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If @a next is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the element that should succeed the new element.
+	  * @param[in] src reference to the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	uint32_t insPrevElem (elem_t* next, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insPrevElem (next, src))
+		privConnectEnds();
+		return eCount;
+	}
 
-  /* ===============================================
-   * === Public members                          ===
-   * ===============================================
-  */
+
+	/** @brief alias to remove the last element (tail)
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the ring is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the ring is empty
+	**/
+	virtual elem_t* pop_back() noexcept
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = nullptr;
+		if (eCount > 1) {
+			PWX_TRY (toRemove = base_t::remNextElem (base_t::operator[] (-2)))
+			PWX_CATCH_AND_FORGET (CException)
+		} else if (eCount) {
+			PWX_TRY (toRemove = remNext (nullptr))
+			PWX_CATCH_AND_FORGET (CException)
+		}
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief alias to remove the first element (head)
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the ring is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the ring is empty
+	**/
+	virtual elem_t* pop_front() noexcept
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = nullptr;
+		if (eCount) {
+			PWX_TRY (toRemove = base_t::remNext (nullptr))
+			PWX_CATCH_AND_FORGET (CException)
+		}
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief alias to add a data pointer to the end of the ring.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this ring after the insertion
+	**/
+	virtual uint32_t push_back (data_t *data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, data))
+		privConnectEnds();
+		return eCount;
+	}
+
+
+	/** @brief alias to add an element copy to the end of the ring.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this ring after the insertion
+	**/
+	virtual uint32_t push_back (elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, src))
+		privConnectEnds();
+		return eCount;
+	}
+
+
+	/** @brief alias to add a data pointer to the head of the ring.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this ring after the insertion
+	**/
+	virtual uint32_t push_front (data_t *data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, data))
+		privConnectEnds();
+		return eCount;
+	}
+
+
+	/** @brief alias to add an element copy to the head of the ring.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this ring after the insertion
+	**/
+	virtual uint32_t push_front (elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, src))
+		privConnectEnds();
+		return eCount;
+	}
+
+
+	/** @brief remove the element holding the specified data
+	  *
+	  * This method removes the element in the list that holds @a data
+	  * and returns a pointer to the removed element.
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delData instead.
+	  *
+	  * @param[in] data the data the element is to be removed holds
+	  * @return a pointer to the removed element
+	**/
+	elem_t* remData (data_t* data) noexcept
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = base_t::remData (data);
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief remove the specified element
+	  *
+	  * This method removes the element @a elem and returns a pointer
+	  * to the removed element.
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delElem instead.
+	  *
+	  * If @a elem is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * @param[in] elem the element that is to be removed
+	  * @return a pointer to the removed element
+	**/
+	elem_t* remElem (elem_t* elem) noexcept
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = base_t::remElem (elem);
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief remove the element after the element holding the specified data
+	  *
+	  * This method removes the element in the list after the element
+	  * that holds @a prev and returns a pointer to the removed element.
+	  *
+	  *
+	  * If @a prev is set to nullptr, the root element (aka head) is
+	  * removed.
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If there is no element behind the element @a prev a
+	  * pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] prev the data the element that precedes the element to remove holds
+	  * @return a pointer to the removed element
+	**/
+	virtual elem_t* remNext (data_t* prev)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = nullptr;
+		PWX_TRY_PWX_FURTHER (toRemove = base_t::remNext (prev))
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief remove the element after the specified element
+	  *
+	  * This method removes the element in the list after the element
+	  * @a prev.
+	  *
+	  * If @a prev is set to nullptr, the root element (aka head) is
+	  * removed.
+	  *
+	  * If @a prev is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If there is no element behind the element @a prev or if the list is
+	  * empty, a pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] prev the element that precedes the element to remove
+	  * @return a pointer to the removed element
+	**/
+	virtual elem_t* remNextElem (elem_t* prev)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = nullptr;
+		PWX_TRY_PWX_FURTHER (toRemove = base_t::remNextElem (prev))
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief remove the element before the element holding the specified data
+	  *
+	  * This method removes the element in the list before the element
+	  * that holds @a next and returns a pointer to the removed element.
+	  *
+	  * If @a next is set to nullptr, the last element (aka tail) is
+	  * removed.
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delPrev instead.
+	  *
+	  * If there is no element before the element @a next holds, a
+	  * pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] next the data the element that succeeds the element to remove holds
+	  * @return a pointer to the removed element
+	**/
+	elem_t* remPrev (data_t* next)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = nullptr;
+		PWX_TRY_PWX_FURTHER (toRemove = base_t::remPrev (next))
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	/** @brief remove the element before the specified element
+	  *
+	  * This method removes the element in the list before the element
+	  * @a next and returns a pointer to the removed element.
+	  *
+	  * If @a next is set to nullptr, the last element (aka tail) is
+	  * removed.
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delPrevElem instead.
+	  *
+	  * If @a next is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If there is no element before @a next or if the list is empty,
+	  * a pwx::CException with the name "OutOfRange" is thrown.
+	  *
+	  * @param[in] next the element that succeeds the element to remove
+	  * @return a pointer to the removed element
+	**/
+	elem_t* remPrevElem (elem_t* next)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		elem_t* toRemove = nullptr;
+		PWX_TRY_PWX_FURTHER (toRemove = base_t::remPrevElem (next))
+		privConnectEnds();
+		return toRemove;
+	}
+
+
+	using base_t::size;
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	/** @brief assignment operator
+	  *
+	  * Clears this list and copies all elements from @a rhs
+	  * into this list.
+	  *
+	  * @param[in] rhs reference of the list to copy.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator= (const list_t &rhs)
+	{
+		if (&rhs != this) {
+			PWX_TRY_PWX_FURTHER (base_t::operator= (rhs))
+			privConnectEnds();
+		}
+		return *this;
+	}
+
+
+	/** @brief addition assignment operator
+	  *
+	  * Add all elements from @a rhs to this list.
+	  *
+	  * @param[in] rhs reference of the list to add.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator+= (const list_t &rhs)
+	{
+		if (&rhs != this) {
+			PWX_TRY_PWX_FURTHER (base_t::operator+= (rhs))
+			privConnectEnds();
+		}
+		return *this;
+	}
+
+
+	/** @brief substraction assignment operator
+	  *
+	  * Remove all elements from @a rhs from this list.
+	  *
+	  * @param[in] rhs reference of the list to substract.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator-= (const list_t &rhs)
+	{
+		if (&rhs != this) {
+			PWX_TRY_PWX_FURTHER (base_t::operator-= (rhs))
+			privConnectEnds();
+		} else
+			clear();
+		return *this;
+	}
+
+
+	using base_t::operator[];
+
 
 protected:
-  /* ===============================================
-   * === Protected Constructors and destructors  ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Protected methods                       ===
-   * ===============================================
-  */
+	using base_t::eCount;
+	using base_t::head;
+	using base_t::tail;
 
-  /* ===============================================
-   * === Protected operators                     ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
-  using base_t::eCount;
-  using base_t::head;
-  using base_t::tail;
 
 private:
-  /* ===============================================
-   * === Private Constructors and destructors    ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Private methods                         ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
+	/// IMPORTANT: private methods do not lock, callers must have locked!
 
-  /// IMPORTANT: private methods do not lock, callers must have locked!
-
-  /// @brief simple private method to make sure the ring is closed
-  void privConnectEnds() noexcept
-    {
-      if (head && (head->prev != tail))
-        head->prev = tail;
-      if (tail && (tail->next != head))
-        tail->next = head;
-    }
-
-  /* ===============================================
-   * === Private operators                       ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Private members                         ===
-   * ===============================================
-  */
-
+	/// @brief simple private method to make sure the ring is closed
+	void privConnectEnds() noexcept
+	{
+		if (head && (head->prev != tail))
+			head->prev = tail;
+		if (tail && (tail->next != head))
+			tail->next = head;
+	}
 }; // class TDoubleRing
+
 
 /** @brief default destructor
   *
@@ -933,10 +847,69 @@ private:
 **/
 template<typename data_t, typename elem_t>
 TDoubleRing<data_t, elem_t>::~TDoubleRing() noexcept
-  {
-    /* --- deletion is done in the TDoubleList dtor --- */
-  }
+{ }
 
+
+/** @brief addition operator
+  *
+  * Create and return a new ring consisting of all elements of @a lhs and @a rhs.
+  *
+  * The destroy method from @a lhs will be used in the result as well.
+  *
+  * Warning: For this to work a local ring is created on the stack. Giving it back
+  * means that it will be copied onto your result. In other words: All elements
+  * will be copied twice!
+  *
+  * @param[in] lhs left hand side reference
+  * @param[in] rhs right hand side reference
+  * @return the new ring.
+**/
+template<typename data_t, typename elem_t>
+TDoubleRing<data_t, elem_t> operator+ (const TDoubleRing<data_t, elem_t> &lhs, const TDoubleRing<data_t, elem_t> &rhs)
+{
+	typedef TDoubleRing<data_t, elem_t> ring_t;
+	lhs.lock();
+	ring_t result (lhs);
+	lhs.unlock();
+
+	if (&lhs != &rhs) {
+		PWX_LOCK_GUARD (ring_t, const_cast<ring_t*> (&rhs))
+		PWX_TRY_PWX_FURTHER (result += rhs)
+	}
+
+	return result;
+}
+
+
+/** @brief substraction operator
+  *
+  * Remove all elements from @a rhs from this ring.
+  *
+  * The destroy method from @a lhs will be used in the result as well.
+  *
+  * Warning: For this to work a local ring is created on the stack. Giving it back
+  * means that it will be copied onto your result. In other words: The difference
+  * elements are copied twice!
+  *
+  * @param[in] rhs reference of the ring to substract.
+  * @return reference to this.
+**/
+template<typename data_t, typename elem_t>
+TDoubleRing<data_t, elem_t> operator- (const TDoubleRing<data_t, elem_t> &lhs, const TDoubleRing<data_t, elem_t> &rhs)
+{
+	typedef TDoubleRing<data_t, elem_t> ring_t;
+	lhs.lock();
+	ring_t result (lhs);
+	lhs.unlock();
+
+	if (&lhs != &rhs) {
+		PWX_LOCK_GUARD (ring_t, const_cast<ring_t*> (&rhs))
+		PWX_TRY_PWX_FURTHER (result -= rhs)
+	} else
+		result.clear();
+
+	return result;
+}
 
 } // namespace pwx
 #endif // PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED
