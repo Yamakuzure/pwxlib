@@ -29,14 +29,15 @@
 
 #include <type_traits>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @brief compile time assertion
   *
   * This little trick is taken from Andrei Alexandrescu: 'Modern C++ Design'.
   * It can be used to check an expression at compile time.
   * Of course this does not substitute cassert completely, only expressions
-  * that are ready while the compiler does its work can be checked with this.
+  * that are known while the compiler does its work can be checked with this.
 **/
 template <bool> struct pwxCompAssert;
 template <>     struct pwxCompAssert<true> {};
