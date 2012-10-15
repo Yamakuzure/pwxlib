@@ -569,7 +569,7 @@ TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, c
 	typedef TSingleRing<data_t, elem_t> ring_t;
 	lhs.lock();
 	ring_t result (lhs);
-	lhd.unlock();
+	lhs.unlock();
 	if (&lhs != &rhs) {
 		PWX_LOCK_GUARD (ring_t, const_cast<ring_t*> (&rhs))
 		PWX_TRY_PWX_FURTHER (result += rhs)
