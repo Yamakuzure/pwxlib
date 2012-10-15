@@ -33,38 +33,40 @@
 #include <pwx/general/compiler.h>
 #include <pwx/general/macros.h>
 
-namespace pwx {
+namespace pwx
+{
 
 // --- forwarding for the prototypes
 class adjLeft;
 class adjRight;
 
-PWX_INLINE ::std::ostream PWX_API &operator<<  (::std::ostream &os, const adjLeft& l)  noexcept;
-PWX_INLINE ::std::ostream PWX_API &operator<<  (::std::ostream &os, const adjRight& r) noexcept;
-PWX_INLINE bool           PWX_API cropShell    (const char *key, ::std::string &data)  noexcept;
-PWX_INLINE void           PWX_API forwardTo    (::std::ifstream &is, char value)       noexcept;
-PWX_INLINE void           PWX_API ltrim        (::std::string &text, char extra = 0x0) noexcept;
-PWX_INLINE const char*            makeTemp     (const char *aPath, const char *aTemplate,
-                                                const char *aSuffix, ::std::ofstream &ofs,
-                                                ::std::ios_base::openmode mode = ::std::ios_base::out|::std::ios_base::trunc)
-                                                noexcept PWX_WARNUNUSED;
+PWX_INLINE ::std::ostream PWX_API &operator<< (::std::ostream &os, const adjLeft& l)  noexcept;
+PWX_INLINE ::std::ostream PWX_API &operator<< (::std::ostream &os, const adjRight& r) noexcept;
+PWX_INLINE bool           PWX_API cropShell (const char *key, ::std::string &data)  noexcept;
+PWX_INLINE void           PWX_API forwardTo (::std::ifstream &is, char value)       noexcept;
+PWX_INLINE void           PWX_API ltrim (::std::string &text, char extra = 0x0) noexcept;
+PWX_INLINE const char*            makeTemp (const char *aPath, const char *aTemplate,
+											const char *aSuffix, ::std::ofstream &ofs,
+											::std::ios_base::openmode mode = ::std::ios_base::out |::std::ios_base::trunc)
+											noexcept PWX_WARNUNUSED;
 template <typename Tval>
-PWX_INLINE bool          PWX_API readNextValue(Tval &value, ::std::ifstream &is, char separator,
-                                               bool search = false, bool emptyAllowed = true) noexcept PWX_WARNUNUSED;
-PWX_INLINE void          PWX_API rtrim        (::std::string &text, char extra = 0x0)         noexcept;
-PWX_INLINE bool          PWX_API skipLineBreak(::std::ifstream &is)                           noexcept PWX_WARNUNUSED;
-PWX_INLINE void          PWX_API tabToSpace   (::std::string &text, size_t spacePerTab = 1)   noexcept;
+PWX_INLINE bool           PWX_API readNextValue (Tval &value, ::std::ifstream &is, char separator,
+												bool search = false, bool emptyAllowed = true)
+												noexcept PWX_WARNUNUSED;
+PWX_INLINE void           PWX_API rtrim (::std::string &text, char extra = 0x0)	noexcept;
+PWX_INLINE bool           PWX_API skipLineBreak (::std::ifstream &is) noexcept PWX_WARNUNUSED;
+PWX_INLINE void           PWX_API tabToSpace (::std::string &text, size_t spacePerTab = 1) noexcept;
 template <typename T>
-PWX_INLINE double        PWX_API to_double    (const T val) noexcept;
+PWX_INLINE double         PWX_API to_double (const T val) noexcept;
 template <typename T>
-PWX_INLINE float         PWX_API to_float     (const T val) noexcept;
+PWX_INLINE float          PWX_API to_float (const T val) noexcept;
 template <typename T>
-PWX_INLINE int32_t       PWX_API to_int32     (const T val) noexcept;
+PWX_INLINE int32_t        PWX_API to_int32 (const T val) noexcept;
 template <typename T>
-PWX_INLINE int64_t       PWX_API to_int64     (const T val) noexcept;
+PWX_INLINE int64_t        PWX_API to_int64 (const T val) noexcept;
 template <typename T>
-PWX_INLINE ::std::string PWX_API to_string    (const T val) noexcept;
-PWX_INLINE void          PWX_API trim         (::std::string &text, char extra = 0x0) noexcept;
+PWX_INLINE ::std::string  PWX_API to_string (const T val) noexcept;
+PWX_INLINE void           PWX_API trim (::std::string &text, char extra = 0x0) noexcept;
 
 // --- Classes for stream manipulation ---
 
@@ -84,27 +86,27 @@ PWX_INLINE void          PWX_API trim         (::std::string &text, char extra =
 class PWX_API format
 {
 public:
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-  format(int32_t left_, int32_t right_) noexcept;
-  format() noexcept;
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+	format (int32_t left_, int32_t right_) noexcept;
+	format() noexcept;
 
-  virtual ~format() noexcept PWX_DEFAULT;
+	virtual ~format() noexcept PWX_DEFAULT;
 
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
-  void setFields(::std::ostream &os) const noexcept;
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
+	void setFields (::std::ostream &os) const noexcept;
 protected:
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
-  int32_t left  = 0; //!< The number of digits left of the floating point
-  int32_t right = 0; //!< The number of digits right of the floating point
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
+	int32_t left  = 0; //!< The number of digits left of the floating point
+	int32_t right = 0; //!< The number of digits right of the floating point
 }; // class format
 
 /** @brief adjLeft
@@ -117,14 +119,14 @@ protected:
 class PWX_API adjLeft: public format
 {
 public:
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-  adjLeft(int32_t left_, int32_t right_) noexcept;
-  adjLeft() noexcept;
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+	adjLeft (int32_t left_, int32_t right_) noexcept;
+	adjLeft() noexcept;
 
-  ~adjLeft() noexcept PWX_DEFAULT;
+	~adjLeft() noexcept PWX_DEFAULT;
 };
 
 /** @brief adjRight
@@ -137,14 +139,14 @@ public:
 class PWX_API adjRight: public format
 {
 public:
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-  adjRight(int32_t left_, int32_t right_) noexcept;
-  adjRight() noexcept;
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+	adjRight (int32_t left_, int32_t right_) noexcept;
+	adjRight() noexcept;
 
-  ~adjRight() noexcept PWX_DEFAULT;
+	~adjRight() noexcept PWX_DEFAULT;
 };
 
 
@@ -176,55 +178,48 @@ public:
   *
 **/
 template <typename Tval>
-bool readNextValue( Tval &value, ::std::ifstream &is, char separator,
-                    bool search, bool emptyAllowed) noexcept
-{
-  bool result   = false;
-  bool sepFound = true;
+bool readNextValue (Tval &value, ::std::ifstream &is, char separator,
+					bool search, bool emptyAllowed) noexcept {
+	bool result   = false;
+	bool sepFound = true;
 
-  if (is.good())
-    {
+	if (is.good()) {
 
-      // First check whether we have to jump behind a separator or not:
-      if (separator)
-        {
-          // We need a separator
-          if (search)
-            {
-              // How fortunate, we can fast forward if necessary
-              forwardTo(is, separator);
-              if (!is.good())
-                sepFound = false;
-            }
-          else
-            {
-              // The next one must be a separator value:
-              if (is.peek() == separator)
-                is.ignore(1);
-              else
-                sepFound = false;
-            }
-          // Now there could be the case of two separators:
-          if (is.peek() == separator)
-            {
-              // Aha... so we either fail, or are finished:
-              sepFound = false; // Skip the reading part
-              if (emptyAllowed)
-                result = true; // But it's alright
-            }
-        } // End of separator extraction
-      // Now we have succeeded if our separator is found or non needed:
-      if (sepFound && !is.eof())
-        result = true;
-    }
+		// First check whether we have to jump behind a separator or not:
+		if (separator) {
+			// We need a separator
+			if (search) {
+				// How fortunate, we can fast forward if necessary
+				forwardTo (is, separator);
+				if (!is.good())
+					sepFound = false;
+			} else {
+				// The next one must be a separator value:
+				if (is.peek() == separator)
+					is.ignore (1);
+				else
+					sepFound = false;
+			}
+			// Now there could be the case of two separators:
+			if (is.peek() == separator) {
+				// Aha... so we either fail, or are finished:
+				sepFound = false; // Skip the reading part
+				if (emptyAllowed)
+					result = true; // But it's alright
+			}
+		} // End of separator extraction
+		// Now we have succeeded if our separator is found or non needed:
+		if (sepFound && !is.eof())
+			result = true;
+	}
 
-  if (result && sepFound && is.good())
-    is >> value;
+	if (result && sepFound && is.good())
+		is >> value;
 
-  if (!is.good())
-    result = false;
+	if (!is.good())
+		result = false;
 
-  return (result);
+	return (result);
 }
 
 
@@ -239,17 +234,16 @@ bool readNextValue( Tval &value, ::std::ifstream &is, char separator,
   * @return the resulting float
 **/
 template <typename T>
-float to_float(const T val) noexcept
-  {
-    float result = 0.;
-    ::std::stringstream ss;
-    ss << val;
-    ss >> result;
-    return result;
-  }
+float to_float (const T val) noexcept {
+	float result = 0.;
+	::std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
 
 
-/** @brief convert a value to dlouble
+/** @brief convert a value to double
   *
   * This function uses a stringstream to convert @a val to a double.
   * The value will not be type-checked, so it is the users responsibility
@@ -260,14 +254,13 @@ float to_float(const T val) noexcept
   * @return the resulting double
 **/
 template <typename T>
-double to_double(const T val) noexcept
-  {
-    double result = 0.;
-    ::std::stringstream ss;
-    ss << val;
-    ss >> result;
-    return result;
-  }
+double to_double (const T val) noexcept {
+	double result = 0.;
+	::std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
 
 
 /** @brief convert a value to int32_t
@@ -281,14 +274,13 @@ double to_double(const T val) noexcept
   * @return the resulting int32_t
 **/
 template <typename T>
-int32_t to_int32(const T val) noexcept
-  {
-    int32_t result = 0;
-    ::std::stringstream ss;
-    ss << val;
-    ss >> result;
-    return result;
-  }
+int32_t to_int32 (const T val) noexcept {
+	int32_t result = 0;
+	::std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
 
 
 /** @brief convert a value to int64_t
@@ -302,14 +294,13 @@ int32_t to_int32(const T val) noexcept
   * @return the resulting int64_t
 **/
 template <typename T>
-int64_t to_int64(const T val) noexcept
-  {
-    int64_t result = 0;
-    ::std::stringstream ss;
-    ss << val;
-    ss >> result;
-    return result;
-  }
+int64_t to_int64 (const T val) noexcept {
+	int64_t result = 0;
+	::std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
 
 
 /** @brief convert a value to a string
@@ -323,12 +314,11 @@ int64_t to_int64(const T val) noexcept
   * @return the resulting int64_t
 **/
 template <typename T>
-::std::string to_string(const T val) noexcept
-  {
-    ::std::stringstream ss;
-    ss << val;
-    return ss.str();
-  }
+::std::string to_string (const T val) noexcept {
+	::std::stringstream ss;
+	ss << val;
+	return ss.str();
+}
 
 
 } // End of namespace pwx
