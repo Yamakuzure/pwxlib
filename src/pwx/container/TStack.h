@@ -56,7 +56,7 @@ namespace pwx
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t>
-class TStack : public TSingleList<data_t, TSingleElement<data_t>>
+class TStack : public TSingleList<data_t>
 {
 public:
 	/* ===============================================
@@ -64,9 +64,9 @@ public:
 	 * ===============================================
 	*/
 
+	typedef TSingleElement<data_t>      elem_t;
 	typedef TSingleList<data_t, elem_t> base_t;
 	typedef TStack<data_t>              list_t;
-	typedef TSingleElement<data_t>      elem_t;
 
 
 	/* ===============================================

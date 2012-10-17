@@ -55,7 +55,7 @@ namespace pwx
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
-class TQueue : public TDoubleList<data_t, TDoubleElement<data_t>>
+class TQueue : public TDoubleList<data_t>
 {
 public:
 	/* ===============================================
@@ -63,9 +63,9 @@ public:
 	 * ===============================================
 	*/
 
+	typedef TDoubleElement<data_t>      elem_t;
 	typedef TDoubleList<data_t, elem_t> base_t;
 	typedef TQueue<data_t>              list_t;
-	typedef TDoubleElement<data_t>      elem_t;
 
 
 	/* ===============================================
