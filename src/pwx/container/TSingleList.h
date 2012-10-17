@@ -196,6 +196,13 @@ public:
 	}
 
 
+	/// @brief return true if the list is empty
+	bool empty() const noexcept
+	{
+		return !eCount;
+	}
+
+
 	/** @brief find the element with the given @a data
 	  *
 	  * This method searches through the list and returns the element

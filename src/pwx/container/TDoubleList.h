@@ -236,6 +236,9 @@ public:
 	}
 
 
+	using base_t::empty;
+
+
 	/** @brief find the element with the given @a data
 	  *
 	  * This method searches through the list and returns the element
