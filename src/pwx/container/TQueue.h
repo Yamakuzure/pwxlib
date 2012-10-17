@@ -33,14 +33,17 @@
 #include <pwx/general/macros.h>
 #include <pwx/container/TDoubleList.h>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @class TQueue
   *
   * @brief Template to build queues of variable types
   *
-  * The queue is a basic container using a doubly linked list to manage its data
-  * pointers.
+  * The queue is a basic container deriving TDoubleList to manage its data
+  * pointers. The queue is deriving from (isA) instead of using (hasA) a
+  * a TDoubleList to enable it to be used like a list if necessary without
+  * having to copy a lot of code.
   *
   * The constructor takes an optional destroy(T*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
@@ -52,243 +55,159 @@ namespace pwx {
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
-template<typename data_t>
-class TQueue : public CLockable
+class TQueue : public TDoubleList<data_t, TDoubleElement<data_t>>
 {
 public:
-  /* ===============================================
-   * === Public types                            ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
 
-  typedef TQueue<data_t>         list_t;
-  typedef TDoubleElement<data_t> elem_t;
-
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-
-  /** @brief default constructor
-    *
-    * The default constructor initializes an empty queue.
-    *
-    * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-  **/
-  TQueue(void (*destroy_)(data_t* data)) noexcept
-  : sList(destroy_)
-    { /* nothing to be done here */ }
-
-  /** @brief empty constructor
-    *
-    * The empty constructor sets the data destroy method to the null pointer.
-  **/
-  TQueue() noexcept
-  : sList(nullptr)
-    { /* nothing to be done here */ }
-
-  virtual ~TQueue() noexcept;
-
-  TQueue(const list_t &rhs) PWX_DELETE; // No copy ctor
-
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
-
-  /** @brief delete all elements
-    *
-    * This is a quick way to get rid of all elements
-    * at once. If a destroy() function was set, it is
-    * used for the data deletion. Otherwise it is
-    * assumed that data_t responds to the delete
-    * operator.
-  **/
-  void clear() noexcept
-    {
-      sList.clear();
-    }
-
-  /// @brief return true if the queue is empty
-  bool empty() const noexcept { return !sList.size(); }
-
-  /** @brief push a new data pointer onto the queue
-    *
-    * This is the regular queue operation to add a new element.
-    * Being a queue this new element is put on top of it.
-    *
-    * To add a new data pointer to the bottom, use unshift().
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t push(data_t* data)
-    {
-      PWX_TRY_PWX_FURTHER(return sList.push_front(data))
-    }
-
-  /** @brief pop the last element from the queue
-    *
-    * This is the regular queue operation to get the oldest element.
-    * Being a queue this element comes from the bottom.
-    *
-    * To get an element from the top, use shift().
-    *
-    * The element is removed from the queue so you have to take
-    * care of its deletion once you are finished with it.
-    *
-    * If there is no element in the queue a pwx::CException with the
-    * name "OutOfRange" is thrown.
-    *
-    * @return the bottom element on the queue.
-  **/
-  elem_t* pop()
-    {
-      PWX_TRY_PWX_FURTHER(return sList.pop_back())
-    }
-
-  /** @brief shift the newest element from the top of the queue
-    *
-    * This is the irregular queue operation to get the newest
-    * element.
-    *
-    * The regular queue operation to get the top element is
-    * pop ().
-    *
-    * The element is removed from the queue so you have to take
-    * care of its deletion once you are finished with it.
-    *
-    * If there is no element in the queue a pwx::CException with the
-    * name "OutOfRange" is thrown.
-    *
-    * @return the top element from the queue.
-  **/
-  elem_t* shift()
-    {
-      PWX_TRY_PWX_FURTHER(return sList.pop_front())
-    }
-
-  /// @brief return the number of stored elements
-  uint32_t size() const noexcept { return sList.size(); }
-
-  /** @brief unshift a new data pointer under the bottom of the queue
-    *
-    * This is the irregular queue operation to add a new data
-    * pointer under the queue.
-    *
-    * The regular queue operation to add a new data pointer
-    * onto the top is push().
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t unshift(data_t* data)
-    {
-      PWX_TRY_PWX_FURTHER(return sList.push_back(data))
-    }
-
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
-  list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
+	typedef TDoubleList<data_t, elem_t> base_t;
+	typedef TQueue<data_t>              list_t;
+	typedef TDoubleElement<data_t>      elem_t;
 
 
-  /** @brief return a read-only pointer to the element with the given @a index
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is read-only.
-    *
-    * There will be no exception if the index is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the set is empty, the operator returns nullptr.
-    *
-    * @param[in] index the index of the element to find.
-    * @return read-only pointer to the element, or nullptr if the set is empty.
-  **/
-  const elem_t* operator[](const int32_t index) const noexcept
-    {
-      return sList[index];
-    }
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+
+	/** @brief default constructor
+	  *
+	  * The default constructor initializes an empty queue.
+	  *
+	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
+	**/
+	TQueue (void (*destroy_) (data_t* data)) noexcept :
+		base_t(destroy_)
+	{ }
 
 
-  /** @brief return a read/write pointer to the element with the given @a index
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is write enabled, so use with care.
-    *
-    * There will be no exception if the index is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the set is empty, the operator returns nullptr.
-    *
-    * @param[in] index the index of the element to find.
-    * @return read/write pointer to the element, or nullptr if the set is empty.
-  **/
-  elem_t* operator[](int32_t index) noexcept
-    {
-      return sList[index];
-    }
+	/** @brief empty constructor
+	  *
+	  * The empty constructor sets the data destroy method to the null pointer.
+	**/
+	TQueue() noexcept :
+		base_t (nullptr)
+	{ }
 
 
-  /* ===============================================
-   * === Public members                          ===
-   * ===============================================
-  */
+	/** @brief copy constructor
+	  *
+	  * Builds a copy of all elements of @a src.
+	  *
+	  * @param[in] src reference of the list to copy.
+	**/
+	TQueue (const list_t &src) noexcept :
+		base_t (src)
+	{
+		// The copy ctor of base_t has already copied all elements.
+	}
 
-protected:
-  /* ===============================================
-   * === Protected Constructors and destructors  ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Protected methods                       ===
-   * ===============================================
-  */
+	virtual ~TQueue() noexcept;
 
-  /* ===============================================
-   * === Protected operators                     ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
 
-private:
-  /* ===============================================
-   * === Private Constructors and destructors    ===
-   * ===============================================
-  */
+	using base_t::clear;
+	using base_t::delData;
+	using base_t::delElem;
+	using base_t::delNext;
+	using base_t::delNextElem;
+	using base_t::delPrev;
+	using base_t::delPrevElem;
+	using base_t::empty;
+	using base_t::find;
+	using base_t::insNext;
+	using base_t::insNextElem;
+	using base_t::insPrev;
+	using base_t::insPrevElem;
 
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Private operators                       ===
-   * ===============================================
-  */
+	/** @brief pop the last element from the queue
+	  *
+	  * This is the regular queue operation to get the last element.
+	  * Being a queue this element comes from the end.
+	  *
+	  * To get an element from the front, use pop_front().
+	  *
+	  * The element is removed from the queue so you have to take
+	  * care of its deletion once you are finished with it.
+	  *
+	  * If there is no element in the queue a pwx::CException with the
+	  * name "OutOfRange" is thrown.
+	  *
+	  * @return the last element on the queue.
+	**/
+	elem_t* pop()
+	{
+		PWX_TRY_PWX_FURTHER (return pop_back())
+	}
 
-  /* ===============================================
-   * === Private members                         ===
-   * ===============================================
-  */
-  TDoubleList<data_t> sList; //!< Data is held by a singly linked list.
 
+	using base_t::pop_back;
+	using base_t::pop_front;
+
+
+	/** @brief push a new data pointer onto the queue
+	  *
+	  * This is the regular queue operation to add a new element.
+	  * Being a queue this new element is put on top of it.
+	  *
+	  * To add a new data pointer to the bottom, use push_back().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	uint32_t push (data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER (return push_front (data))
+	}
+
+
+	using base_t::push_back;
+	using base_t::push_front;
+	using base_t::remData;
+	using base_t::remElem;
+	using base_t::remNext;
+	using base_t::remNextElem;
+	using base_t::remPrev;
+	using base_t::remPrevElem;
+	using base_t::size;
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	/** @brief assignment operator
+	  *
+	  * Clears this queue and copies all elements from @a rhs
+	  * onto this queue.
+	  *
+	  * @param[in] rhs reference of the queue to copy.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator= (const list_t &rhs)
+	{
+		PWX_TRY_PWX_FURTHER(return base_t::operator=(rhs))
+	}
+
+
+	using base_t::operator+=;
+	using base_t::operator-=;
+	using base_t::operator[];
 }; // class TQueue
+
 
 /** @brief default destructor
   *
@@ -297,9 +216,7 @@ private:
 **/
 template<typename data_t>
 TQueue<data_t>::~TQueue() noexcept
-  {
-    sList.clear();
-  }
+{ /* done in base_t dtor */ }
 
 
 } // namespace pwx
