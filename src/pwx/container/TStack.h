@@ -33,14 +33,17 @@
 #include <pwx/general/macros.h>
 #include <pwx/container/TSingleList.h>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @class TStack
   *
   * @brief Template to build stacks of variable types
   *
-  * The stack is a basic container using a singly linked list to manage its data
-  * pointers.
+  * The stack is a basic container deriving TSingleList to manage its data
+  * pointers. The stack is deriving from (isA) instead of using (hasA) a
+  * a TSingleList to enable it to be used like a list if necessary without
+  * having to copy a lot of code.
   *
   * The constructor takes an optional destroy(T*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
@@ -53,242 +56,149 @@ namespace pwx {
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t>
-class TStack : public CLockable
+class TStack : public TSingleList<data_t, TSingleElement<data_t>>
 {
 public:
-  /* ===============================================
-   * === Public types                            ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
 
-  typedef TStack<data_t>         list_t;
-  typedef TSingleElement<data_t> elem_t;
-
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-
-  /** @brief default constructor
-    *
-    * The default constructor initializes an empty stack.
-    *
-    * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-  **/
-  TStack(void (*destroy_)(data_t* data)) noexcept
-  : sList(destroy_)
-    { /* nothing to be done here */ }
-
-  /** @brief empty constructor
-    *
-    * The empty constructor sets the data destroy method to the null pointer.
-  **/
-  TStack() noexcept
-  : sList(nullptr)
-    { /* nothing to be done here */ }
-
-  virtual ~TStack() noexcept;
-
-  TStack(const list_t &rhs) PWX_DELETE; // No copy ctor
-
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
-
-  /** @brief delete all elements
-    *
-    * This is a quick way to get rid of all elements
-    * at once. If a destroy() function was set, it is
-    * used for the data deletion. Otherwise it is
-    * assumed that data_t responds to the delete
-    * operator.
-  **/
-  void clear() noexcept
-    {
-      sList.clear();
-    }
-
-  /// @brief return true if the stack is empty
-  bool empty() const noexcept { return !sList.size(); }
-
-  /** @brief push a new data pointer onto the stack
-    *
-    * This is the regular stack operation to add a new element.
-    * Being a stack this new element is put on top of it.
-    *
-    * To add a new data pointer to the bottom, use unshift().
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t push(data_t* data)
-    {
-      PWX_TRY_PWX_FURTHER(return sList.push_front(data))
-    }
-
-  /** @brief pop the first element from the stack
-    *
-    * This is the regular stack operation to get the newest element.
-    * Being a stack this element comes from the top.
-    *
-    * To get an element from the bottom, use shift().
-    *
-    * The element is removed from the stack so you have to take
-    * care of its deletion once you are finished with it.
-    *
-    * If there is no element in the stack a pwx::CException with the
-    * name "OutOfRange" is thrown.
-    *
-    * @return the top element on the stack.
-  **/
-  elem_t* pop()
-    {
-      PWX_TRY_PWX_FURTHER(return sList.pop_front())
-    }
-
-  /** @brief shift the oldest element from the bottom of the stack
-    *
-    * This is the irregular stack operation to get the oldest
-    * element.
-    *
-    * The regular stack operation to get the top element is
-    * pop ().
-    *
-    * The element is removed from the stack so you have to take
-    * care of its deletion once you are finished with it.
-    *
-    * If there is no element in the stack a pwx::CException with the
-    * name "OutOfRange" is thrown.
-    *
-    * @return the bottom element on the stack.
-  **/
-  elem_t* shift()
-    {
-      PWX_TRY_PWX_FURTHER(return sList.pop_back())
-    }
-
-  /// @brief return the number of stored elements
-  uint32_t size() const noexcept { return sList.size(); }
-
-  /** @brief unshift a new data pointer under the bottom of the stack
-    *
-    * This is the irregular stack operation to add a new data
-    * pointer under the stack.
-    *
-    * The regular stack operation to add a new data pointer
-    * onto the top is push().
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t unshift(data_t* data)
-    {
-      PWX_TRY_PWX_FURTHER(return sList.push_back(data))
-    }
-
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
-  list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
+	typedef TSingleList<data_t, elem_t> base_t;
+	typedef TStack<data_t>              list_t;
+	typedef TSingleElement<data_t>      elem_t;
 
 
-  /** @brief return a read-only pointer to the element with the given @a index
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is read-only.
-    *
-    * There will be no exception if the index is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the set is empty, the operator returns nullptr.
-    *
-    * @param[in] index the index of the element to find.
-    * @return read-only pointer to the element, or nullptr if the set is empty.
-  **/
-  const elem_t* operator[](const int32_t index) const noexcept
-    {
-      return sList[index];
-    }
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+
+	/** @brief default constructor
+	  *
+	  * The default constructor initializes an empty stack.
+	  *
+	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
+	**/
+	TStack (void (*destroy_) (data_t* data)) noexcept :
+		base_t(destroy_)
+	{ }
 
 
-  /** @brief return a read/write pointer to the element with the given @a index
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is write enabled, so use with care.
-    *
-    * There will be no exception if the index is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the set is empty, the operator returns nullptr.
-    *
-    * @param[in] index the index of the element to find.
-    * @return read/write pointer to the element, or nullptr if the set is empty.
-  **/
-  elem_t* operator[](int32_t index) noexcept
-    {
-      return sList[index];
-    }
+	/** @brief empty constructor
+	  *
+	  * The empty constructor sets the data destroy method to the null pointer.
+	**/
+	TStack() noexcept :
+		base_t (nullptr)
+	{ }
 
 
-  /* ===============================================
-   * === Public members                          ===
-   * ===============================================
-  */
+	/** @brief copy constructor
+	  *
+	  * Builds a copy of all elements of @a src.
+	  *
+	  * @param[in] src reference of the list to copy.
+	**/
+	TStack (const list_t &src) noexcept :
+		base_t (src)
+	{
+		// The copy ctor of base_t has already copied all elements.
+	}
 
-protected:
-  /* ===============================================
-   * === Protected Constructors and destructors  ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Protected methods                       ===
-   * ===============================================
-  */
+	virtual ~TStack() noexcept;
 
-  /* ===============================================
-   * === Protected operators                     ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
 
-private:
-  /* ===============================================
-   * === Private Constructors and destructors    ===
-   * ===============================================
-  */
+	using base_t::clear;
+	using base_t::delNext;
+	using base_t::delNextElem;
+	using base_t::empty;
+	using base_t::find;
+	using base_t::insNext;
+	using base_t::insNextElem;
 
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Private operators                       ===
-   * ===============================================
-  */
+	/** @brief pop the first element from the stack
+	  *
+	  * This is the regular stack operation to get the newest element.
+	  * Being a stack this element comes from the top.
+	  *
+	  * To get an element from the bottom, use pop_back().
+	  *
+	  * The element is removed from the stack so you have to take
+	  * care of its deletion once you are finished with it.
+	  *
+	  * If there is no element in the stack a pwx::CException with the
+	  * name "OutOfRange" is thrown.
+	  *
+	  * @return the top element on the stack.
+	**/
+	elem_t* pop()
+	{
+		PWX_TRY_PWX_FURTHER (return pop_front())
+	}
 
-  /* ===============================================
-   * === Private members                         ===
-   * ===============================================
-  */
-  TSingleList<data_t> sList; //!< Data is held by a singly linked list.
 
+	using base_t::pop_back;
+	using base_t::pop_front;
+
+
+	/** @brief push a new data pointer onto the stack
+	  *
+	  * This is the regular stack operation to add a new element.
+	  * Being a stack this new element is put on top of it.
+	  *
+	  * To add a new data pointer to the bottom, use push_back().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	uint32_t push (data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER (return push_front (data))
+	}
+
+
+	using base_t::push_back;
+	using base_t::push_front;
+	using base_t::remNext;
+	using base_t::remNextElem;
+	using base_t::size;
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	/** @brief assignment operator
+	  *
+	  * Clears this stack and copies all elements from @a rhs
+	  * onto this stack.
+	  *
+	  * @param[in] rhs reference of the stack to copy.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator= (const list_t &rhs)
+	{
+		PWX_TRY_PWX_FURTHER(return base_t::operator=(rhs))
+	}
+
+
+	using base_t::operator+=;
+	using base_t::operator-=;
+	using base_t::operator[];
 }; // class TStack
+
 
 /** @brief default destructor
   *
@@ -297,9 +207,7 @@ private:
 **/
 template<typename data_t>
 TStack<data_t>::~TStack() noexcept
-  {
-    sList.clear();
-  }
+{ /* done in base_t dtor */ }
 
 } // namespace pwx
 
