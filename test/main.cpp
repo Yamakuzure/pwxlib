@@ -9,30 +9,30 @@ int32_t main()
 	try {
 
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testListRing<single_list_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testListRing<single_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testListRing<double_list_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testListRing<double_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testListRing<single_ring_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testListRing<single_ring_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testListRing<double_ring_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testListRing<double_ring_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testStackQueue<stack_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testStackQueue<stack_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testStackQueue<queue_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testStackQueue<queue_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER(result = testSet<set_t>(env))
+			PWX_TRY_PWX_FURTHER (result = testSet<set_t> (env))
 		}
 
 
 		// End of giant try
-	} catch(pwx::CException &e) {
+	} catch (pwx::CException &e) {
 		cerr << "\n-----\npwx exception \"" << e.name() << "\" caught!" << endl;
 		cerr << "What : \"" << e.what() << "\"" << endl;
 		cerr << "What : \"" << e.desc() << "\"" << endl;
@@ -40,11 +40,11 @@ int32_t main()
 		cerr << "pFunc: \"" << e.pfunc() << "\"" << endl;
 		cerr << "\nTrace:\n" << e.trace() << "\n-----" << endl;
 		result = EXIT_FAILURE;
-	} catch(std::exception &e) {
+	} catch (std::exception &e) {
 		cerr << "\n-----\nstd exception caught!" << endl;
 		cerr << "What : \"" << e.what() << "\"" << endl;
 		result = EXIT_FAILURE;
-	} catch(...) {
+	} catch (...) {
 		cerr << "\n-----\nSomething completely unknown was caught!" << endl;
 		result = EXIT_FAILURE;
 	}

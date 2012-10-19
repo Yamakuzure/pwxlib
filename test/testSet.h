@@ -22,12 +22,12 @@ typedef pwx::TSet<data_t> set_t;
   ****************************************************************************
 **/
 template<typename list_t>
-int32_t testSet(sEnv& env)
+int32_t testSet (sEnv& env)
 {
 	int32_t result = EXIT_SUCCESS;
 
 	cout << "Test ";
-	if (isSameType(list_t, set_t))
+	if (isSameType (list_t, set_t))
 		cout << "sets" << endl;
 	else {
 		cout << " : nothing - the type is unknown!" << endl;
@@ -35,20 +35,20 @@ int32_t testSet(sEnv& env)
 	}
 	cout << "----------------------------" << endl;
 
-	list_t intCont(do_not_destroy); // The list
+	list_t intCont (do_not_destroy); // The list
 	int32_t numbers[5] = { 1, 2, 3, 4, 5 }; // The integers to store
 
 	/***************************************************************************
 	** A) Create a container and add 5 integers                               **
 	***************************************************************************/
-	cout << adjRight(4,0) << ++env.testCount << " A) Add five integers : ";
+	cout << adjRight (4, 0) << ++env.testCount << " A) Add five integers : ";
 
 	// Add the first via unshift (doesn't matter with the order)
-	uint32_t intCount = intCont.unshift(&numbers[0]);
+	uint32_t intCount = intCont.unshift (&numbers[0]);
 
 	// Add the remaining using push
 	for (int i = 1; i < 5; ++i)
-		intCount = intCont.push(&numbers[i]);
+		intCount = intCont.push (&numbers[i]);
 
 	cout << intCount << " elements added : ";
 	if (5 != intCount) {
@@ -61,13 +61,13 @@ int32_t testSet(sEnv& env)
 	}
 
 	/***************************************************************************
-	** B) List elements, must be 5, 4, 3, 2, 1                                **
+	** B) List elements, must be 1, 2, 3, 4, 5                                **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
 		int32_t check[5] = { **intCont[0], **intCont[1], **intCont[2], **intCont[3], **intCont[4] };
-		cout << adjRight(4,0) << ++env.testCount << " B) Elements are (1, 2, 3, 4, 5) : ";
+		cout << adjRight (4, 0) << ++env.testCount << " B) Elements are (1, 2, 3, 4, 5) : ";
 		cout << check[0] << ", " << check[1] << ", " << check[2] << ", " << check[3] << ", " << check[4];
-		if ( (1 == check[0]) && (2 == check[1]) && (3 == check[2]) && (4 == check[3]) && (5 == check[4]) ) {
+		if ( (1 == check[0]) && (2 == check[1]) && (3 == check[2]) && (4 == check[3]) && (5 == check[4])) {
 			cout << " - Success" << endl;
 			++env.testSuccess;
 		} else {
@@ -81,12 +81,12 @@ int32_t testSet(sEnv& env)
 	** C) Pop three integers, must be 1, 2, 3                                 **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
-		cout << adjRight(4,0) << ++env.testCount << " C) Pop three elements (1, 2, 3) : ";
+		cout << adjRight (4, 0) << ++env.testCount << " C) Pop three elements (1, 2, 3) : ";
 		auto elemA = intCont.pop();
 		auto elemB = intCont.pop();
 		auto elemC = intCont.pop();
 		cout << **elemA << ", " << **elemB << ", " << **elemC << " - ";
-		if ( (1 == **elemA) && (2 == **elemB) && (3 == **elemC) ) {
+		if ( (1 == **elemA) && (2 == **elemB) && (3 == **elemC)) {
 			cout << "Success" << endl;
 			++env.testSuccess;
 		} else {
@@ -100,11 +100,11 @@ int32_t testSet(sEnv& env)
 	} // end of sub test B
 
 	/***************************************************************************
-	** D) Try to add another "2", must not be possible.                       **
+	** D) Try to add another "4", must not be possible.                       **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
-		cout << adjRight(4,0) << ++env.testCount << " D) unshift another \"2\" - ";
-		PWX_TRY_PWX_FURTHER(intCont.unshift(&numbers[1]))
+		cout << adjRight (4, 0) << ++env.testCount << " D) unshift another \"4\" - ";
+		PWX_TRY_PWX_FURTHER (intCont.unshift (&numbers[3]))
 		cout << "new size (2) : " << intCont.size();
 		if (2 == intCont.size()) {
 			cout << " - Success" << endl;
@@ -120,11 +120,11 @@ int32_t testSet(sEnv& env)
 	** E) Shift two integers, must be 5, 4                                    **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
-		cout << adjRight(4,0) << ++env.testCount << " E) Shift two elements (1, 2) : ";
+		cout << adjRight (4, 0) << ++env.testCount << " E) Shift two elements (5, 4) : ";
 		auto elemA = intCont.shift();
 		auto elemB = intCont.shift();
 		cout << **elemA << ", " << **elemB << " - ";
-		if ( (1 == **elemA) && (2 == **elemB) ) {
+		if ( (5 == **elemA) && (4 == **elemB)) {
 			cout << "Success" << endl;
 			++env.testSuccess;
 		} else {

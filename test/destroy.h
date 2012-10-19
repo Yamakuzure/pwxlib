@@ -7,8 +7,10 @@
 */
 
 template<typename T>
-void do_not_destroy(T*)
-  { /* Don't you dare! */ }
+void do_not_destroy (T*)
+{
+	/* Don't you dare! */
+}
 
 
 #endif // PWX_TEST_DESTROY_H_INCLUDED
