@@ -51,7 +51,7 @@ namespace pwx
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TDoubleElement<data_t> >
-class TDoubleRing : public TDoubleList<data_t, elem_t>
+class PWX_API TDoubleRing : public TDoubleList<data_t, elem_t>
 {
 public:
 	/* ===============================================
@@ -262,6 +262,7 @@ public:
 	}
 
 
+	using base_t::empty;
 	using base_t::find;
 
 

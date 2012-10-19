@@ -53,7 +53,7 @@ namespace pwx
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TDoubleElement<data_t> >
-class TDoubleList : public TSingleList<data_t, elem_t>
+class PWX_API TDoubleList : public TSingleList<data_t, elem_t>
 {
 public:
 	/* ===============================================
@@ -248,10 +248,11 @@ public:
 	  * @param data pointer to the data to find
 	  * @return return a pointer to the element storing @a data
 	**/
-	elem_t* find (data_t* data) noexcept
+	virtual elem_t* find (data_t* data) noexcept
 	{
 		return const_cast<elem_t* > (find (static_cast<const data_t* > (data)));
 	}
+
 
 	/** @brief find the element with the given @a data
 	  *
@@ -262,7 +263,7 @@ public:
 	  * @param data pointer to the data to find
 	  * @return return a const pointer to the element storing @a data
 	**/
-	const elem_t* find (const data_t* data) const noexcept
+	virtual const elem_t* find (const data_t* data) const noexcept
 	{
 		if (nullptr == curr)
 			return nullptr;
@@ -334,7 +335,7 @@ public:
 	  * @param[in] data the pointer that is to be added.
 	  * @return the number of elements in this list after the insertion
 	**/
-	uint32_t insPrev (data_t* next, data_t* data)
+	virtual uint32_t insPrev (data_t* next, data_t* data)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
@@ -366,7 +367,7 @@ public:
 	  * @param[in] src reference to the element to copy.
 	  * @return the number of elements in this list after the insertion.
 	**/
-	uint32_t insPrev (data_t* next, const elem_t &src)
+	virtual uint32_t insPrev (data_t* next, const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
@@ -402,7 +403,7 @@ public:
 	  * @param[in] data the pointer that is to be added.
 	  * @return the number of elements in this list after the insertion
 	**/
-	uint32_t insPrevElem (elem_t* next, data_t* data)
+	virtual uint32_t insPrevElem (elem_t* next, data_t* data)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
@@ -434,7 +435,7 @@ public:
 	  * @param[in] src reference to the element to copy.
 	  * @return the number of elements in this list after the insertion.
 	**/
-	uint32_t insPrevElem (elem_t* next, const elem_t &src)
+	virtual uint32_t insPrevElem (elem_t* next, const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
@@ -464,7 +465,7 @@ public:
 	  * @param[in] data the data the element is to be removed holds
 	  * @return a pointer to the removed element
 	**/
-	elem_t* remData (data_t* data) noexcept
+	virtual elem_t* remData (data_t* data) noexcept
 	{
 		PWX_LOCK_GUARD (list_t, this)
 		elem_t* toRemove = nullptr;
@@ -495,7 +496,7 @@ public:
 	  * @param[in] elem the element that is to be removed
 	  * @return a pointer to the removed element
 	**/
-	elem_t* remElem (elem_t* elem) noexcept
+	virtual elem_t* remElem (elem_t* elem) noexcept
 	{
 		PWX_LOCK_GUARD (list_t, this)
 		if (elem)
@@ -525,7 +526,7 @@ public:
 	  * @param[in] next the data the element that succeeds the element to remove holds
 	  * @return a pointer to the removed element
 	**/
-	elem_t* remPrev (data_t* next)
+	virtual elem_t* remPrev (data_t* next)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
@@ -569,7 +570,7 @@ public:
 	  * @param[in] next the element that succeeds the element to remove
 	  * @return a pointer to the removed element
 	**/
-	elem_t* remPrevElem (elem_t* next)
+	virtual elem_t* remPrevElem (elem_t* next)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
@@ -638,7 +639,7 @@ public:
 	  * @param[in] index the index of the element to find.
 	  * @return read-only pointer to the element, or nullptr if the list is empty.
 	**/
-	const elem_t* operator[] (const int32_t index) const noexcept
+	virtual const elem_t* operator[] (const int32_t index) const noexcept
 	{
 		return privGetElementByIndex (index);
 	}
@@ -662,7 +663,7 @@ public:
 	  * @param[in] index the index of the element to find.
 	  * @return read/write pointer to the element, or nullptr if the list is empty.
 	**/
-	elem_t* operator[] (int32_t index) noexcept
+	virtual elem_t* operator[] (int32_t index) noexcept
 	{
 		return const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
 	}

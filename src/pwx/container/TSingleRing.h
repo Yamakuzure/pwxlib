@@ -51,7 +51,7 @@ namespace pwx
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
-class TSingleRing : public TSingleList<data_t, elem_t>
+class PWX_API TSingleRing : public TSingleList<data_t, elem_t>
 {
 public:
 	/* ===============================================
@@ -169,6 +169,7 @@ public:
 	}
 
 
+	using base_t::empty;
 	using base_t::find;
 
 

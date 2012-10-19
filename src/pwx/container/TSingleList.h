@@ -51,7 +51,7 @@ namespace pwx
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
-class TSingleList : public VContainer
+class PWX_API TSingleList : public VContainer
 {
 public:
 	/* ===============================================
@@ -197,7 +197,7 @@ public:
 
 
 	/// @brief return true if the list is empty
-	bool empty() const noexcept
+	virtual bool empty() const noexcept
 	{
 		return !eCount;
 	}
