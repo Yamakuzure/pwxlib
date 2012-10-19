@@ -39,8 +39,8 @@ namespace pwx
   * Of course this does not substitute cassert completely, only expressions
   * that are known while the compiler does its work can be checked with this.
 **/
-template <bool> struct pwxCompAssert;
-template <>     struct pwxCompAssert<true> {};
+template <bool> struct PWX_API pwxCompAssert;
+template <>     struct PWX_API pwxCompAssert<true> {};
 #define compAssert(expression) (::pwx::pwxCompAssert<(expression) != 0>())
 
 } // namespace pwx
