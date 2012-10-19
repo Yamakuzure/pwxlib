@@ -55,7 +55,8 @@ namespace pwx
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
-class TQueue : public TDoubleList<data_t>
+template<typename data_t>
+class PWX_API TQueue : public TDoubleList<data_t>
 {
 public:
 	/* ===============================================
@@ -134,7 +135,7 @@ public:
 	  * This is the regular queue operation to get the last element.
 	  * Being a queue this element comes from the end.
 	  *
-	  * To get an element from the front, use pop_front().
+	  * To get an element from the front, use pop_front() or shift().
 	  *
 	  * The element is removed from the queue so you have to take
 	  * care of its deletion once you are finished with it.
@@ -144,7 +145,7 @@ public:
 	  *
 	  * @return the last element on the queue.
 	**/
-	elem_t* pop()
+	virtual elem_t* pop()
 	{
 		PWX_TRY_PWX_FURTHER (return pop_back())
 	}
@@ -159,7 +160,8 @@ public:
 	  * This is the regular queue operation to add a new element.
 	  * Being a queue this new element is put on top of it.
 	  *
-	  * To add a new data pointer to the bottom, use push_back().
+	  * To add a new data pointer to the bottom, use push_back() or
+	  * unshift().
 	  *
 	  * If the new element can not be created, a pwx::CException with
 	  * the name "ElementCreationFailed" is thrown.
@@ -167,7 +169,7 @@ public:
 	  * @param[in] data data pointer to store.
 	  * @return number of elements stored after the operation.
 	**/
-	uint32_t push (data_t* data)
+	virtual uint32_t push (data_t* data)
 	{
 		PWX_TRY_PWX_FURTHER (return push_front (data))
 	}
@@ -181,7 +183,49 @@ public:
 	using base_t::remNextElem;
 	using base_t::remPrev;
 	using base_t::remPrevElem;
+
+
+	/** @brief shift an element from the queue
+	  *
+	  * This is the irregular queue operation shifting an element
+	  * from the head.
+	  *
+	  * To get an element from the tail, use pop() or pop_back().
+	  *
+	  * The element is removed from the queue so you have to take
+	  * care of its deletion once you are finished with it.
+	  *
+	  * If there is no element in the queue a pwx::CException with the
+	  * name "OutOfRange" is thrown.
+	  *
+	  * @return the top element on the queue.
+	**/
+	virtual elem_t* shift()
+	{
+		PWX_TRY_PWX_FURTHER(return pop_front())
+	}
+
+
 	using base_t::size;
+
+
+	/** @brief unshift an element to the end of the queue
+	  *
+	  * This is the irregular queue operation unshifting an element
+	  * to the end of the queue.
+	  *
+	  * To add an element to the front, use push() or push_front().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t unshift(data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER(return push_back(data))
+	}
 
 
 	/* ===============================================
@@ -199,13 +243,49 @@ public:
 	**/
 	virtual list_t &operator= (const list_t &rhs)
 	{
-		PWX_TRY_PWX_FURTHER(return base_t::operator=(rhs))
+		if (&rhs != this) {
+			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			clear();
+			destroy = rhs.destroy;
+			PWX_TRY_PWX_FURTHER (*this += rhs)
+		}
+		return *this;
 	}
 
 
-	using base_t::operator+=;
+	/** @brief addition assignment operator
+	  *
+	  * Add all elements from @a rhs to this list. Being a
+	  * queue the elements must be retrieved in reverse order
+	  * and pushed on the queue. Otherwise the ordering is
+	  * reversed and the FiFo structure damaged.
+	  *
+	  * @param[in] rhs reference of the list to add.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator+= (const list_t & rhs)
+	{
+		if (&rhs != this) {
+			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			int32_t rSize = rhs.size();
+			for (int32_t i = 1; i <= rSize; ++i) {
+				PWX_TRY_PWX_FURTHER (insNext (nullptr, *rhs[0 - i]))
+			}
+		}
+		return *this;
+	}
+
+
 	using base_t::operator-=;
 	using base_t::operator[];
+
+
+protected:
+	/* ===============================================
+	 * === Protected methods                       ===
+	 * ===============================================
+	*/
+	using base_t::destroy;
 }; // class TQueue
 
 

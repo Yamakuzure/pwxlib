@@ -31,7 +31,8 @@
 #include <pwx/general/macros.h>
 #include <pwx/container/TDoubleList.h>
 
-namespace pwx {
+namespace pwx
+{
 
 /** @class TSet
   *
@@ -40,7 +41,7 @@ namespace pwx {
   * A set is a group of elements, where each element exists exactly once. Two
   * sets are equal, if their members are equal. Therefore the sets {1, 2, 3} and
   * {3, 2, 1} are equal. Although sets are unordered, the default constructor
-  * will build an ordered set to speed up the access.
+  * will build an ordered set to speed up the access and several operations.
   *
   * If the set is needed to be unordered, it must be constructed with "false" as
   * an argument.
@@ -48,16 +49,18 @@ namespace pwx {
   * Unsorted sets will generally be much closer to O(n) on any insertion and
   * random access than sorted sets.
   *
-  * The set uses a doubly linked list to manage its data pointers. Every element is
+  * The set inherits from TDoubleList to manage its data pointers. Every element is
   * checked for uniqueness before storing it in a set.
   *
   * This is done on the data level, not pointer level. This makes it necessary for
-  * any data to support operator==(T). Alternatively an operator==(T,T) must be
-  * available.
+  * any data to support operator== and operator>.
   *
-  * The constructor takes an optional destroy(T*) function pointer that is used
+  * The constructor takes an optional destroy(data_t*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
   * the standard delete operator is used instead.
+  *
+  * Set operations to build unions, differences and intersections are implemented
+  * outside the class with functions prefixed with set_.
   *
   * It is recommended that you use the much more advanced std::set unless you need
   * to store a very large number of elements and can not live with the downside of
@@ -65,762 +68,718 @@ namespace pwx {
   *
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
-template<typename data_t,
-         typename store_t = TDoubleList<data_t>,
-         typename elem_t = TDoubleElement<data_t>>
-class TSet : public CLockable
+template<typename data_t>
+class PWX_API TSet : public TDoubleList<data_t>
 {
 public:
-  /* ===============================================
-   * === Public types                            ===
-   * ===============================================
-  */
-  typedef TSet<data_t>           list_t;
-
-  /* ===============================================
-   * === Public Constructors and destructors     ===
-   * ===============================================
-  */
-
-  /** @brief destroy function constructor
-    *
-    * The destroy function constructor initializes an empty sorted set.
-    *
-    * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-  **/
-  TSet(void (*destroy_)(data_t* data)) noexcept
-  : destroy(destroy_),
-    sList(destroy_)
-    { /* nothing to be done here */ }
-
-  /** @brief empty constructor
-    *
-    * The empty constructor sets the data destroy method to the null pointer.
-  **/
-  TSet() noexcept
-  : destroy(nullptr), sList(nullptr)
-    { /* nothing to be done here */ }
-
-  /** @brief bool constructor
-    *
-    * The bool constructor sets the data destroy method to the null pointer.
-    *
-    * @param[in] sorted_ whether the set should be sorted or not
-  **/
-  TSet(bool sorted_) noexcept
-  : destroy(nullptr),
-    isSorted(sorted_),
-    sList(nullptr)
-    { /* nothing to be done here */ }
-
-  /** @brief default constructor
-    *
-    * The default constructor initializes an empty set.
-    *
-    * @param[in] sorted_ whether the set should be sorted or not
-    * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-  **/
-  TSet(bool sorted_, void (*destroy_)(data_t* data)) noexcept
-  : destroy(destroy_),
-    isSorted(sorted_),
-    sList(destroy_)
-    { /* nothing to be done here */ }
-
-  /// @brief copy contructor
-  TSet(const list_t &rhs)
-  : destroy(rhs.destroy),
-    isSorted(rhs.isSorted),
-    sList(rhs.sList)
-    { /* nothing to be done here */ }
-
-  virtual ~TSet() noexcept;
-
-  /* ===============================================
-   * === Public methods                          ===
-   * ===============================================
-  */
-
-  /** @brief add a new data pointer to the set
-    *
-    * If the set is sorted, the element will be moved to the correct
-    * location. If the set is not sorted, it will be added to the end.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * If there is an element with the same data stored in the set,
-    * the new pointer is not stored but silently ignored.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t add(data_t* data)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-
-      if (privFind(*data))
-        return sList.size();
-
-      // privFind sets "last" to point to the largest element
-      // that is smaller than data. Therefore:
-      PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, data))
-      // ... will do.
-    }
-
-
-  /** @brief copy an element into the set
-    *
-    * If the set is sorted, the element will be moved to the correct
-    * location. If the set is not sorted, it will be added to the end.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * If there is an element with the same data stored in the set,
-    * the new pointer is not stored but silently ignored.
-    *
-    * @param[in] src reference to the element to copy.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t add(elem_t &src)
-    {
-      PWX_LOCK_GUARD(list_t, this)
-
-      if (privFind(*src))
-        return sList.size();
-      // same as above.
-      PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, src))
-    }
-
-
-  /** @brief delete all elements
-    *
-    * This is a quick way to get rid of all elements
-    * at once. If a destroy() function was set, it is
-    * used for the data deletion. Otherwise it is
-    * assumed that data_t responds to the delete
-    * operator.
-  **/
-  void clear() noexcept
-    {
-      PWX_LOCK_GUARD(list_t, this)
-      sList.clear();
-      last = nullptr;
-    }
-
-
-  /** @brief build the difference of this set with another
-    *
-    * The difference of two sets consists of all elements that
-    * are present in this set but not the other.
-    *
-    * This method returns a newly build set consisting of copies
-    * of the elements that are present in this but not the other set.
-    *
-    * If both sets are equal, an empty set is returned.
-    *
-    * If the new set can not be created, a pwx::CException with
-    * the name "SetCreationFailed" is thrown.
-    *
-    * If an element can not be created, a pwx::CException with the
-    * name "ElementCreationFailed" is thrown.
-    *
-    * If the data of an element could not be copied, a pwx::CException
-    * with the name "CopyingDataFailed" is thrown.
-    *
-    * @param rhs pointer to the set to compare with
-    * @return pointer to the difference set. You have to delete it yourself!
-  **/
-  list_t* differenceFrom(list_t* rhs)
-    {
-      list_t* diff = nullptr;
-      PWX_TRY(diff = new list_t(isSorted, destroy))
-      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::differenceFrom() could not create a difference set.")
-
-      // Return an empty set if a difference with this is asked for:
-      if (this == rhs)
-        return diff;
-
-      // Otherwise build a difference
-      size_t lSize = sList.size();
-      for (size_t i = 0; i < lSize; ++i)
-        {
-          elem_t* curr = sList[i];
-          if (!rhs->privFind(**curr))
-            {
-              // This element exists only in this set, so add a new element to the difference:
-              PWX_TRY_PWX_FURTHER(diff->add(*curr))
-            }
-        } // End of walking through the elements
-
-      return diff;
-    }
-
-
-  /// @brief return true if the set is empty, false otherwise
-  bool empty() const noexcept { return !sList.size(); }
-
-
-  /** @brief find the element with the given @a data
-    *
-    * This method searches through the set and returns the element
-    * with the given @a data or nullptr if @a data is not stored in this
-    * set.
-    *
-    * <B>Important</B>: Sets work on data level searching for the data
-    * and <I>not</I> pointers. This is very different from the behavior
-    * of TSingleList and TDoubleList.
-    *
-    * @param data reference to find
-    * @return return a pointer to the element storing @a data
-  **/
-  elem_t* find(data_t &data) noexcept
-    {
-      return const_cast<elem_t* >(privFind(static_cast<const data_t>(data)));
-    }
-
-
-  /** @brief find the element with the given @a data
-    *
-    * This method searches through the set and returns a const pointer
-    * to the element with the given @a data or nullptr if @a data is not stored
-    * in this set.
-    *
-    * <B>Important</B>: Sets work on data level searching for the data
-    * and <I>not</I> pointers. This is very different from the behavior
-    * of TSingleList and TDoubleList.
-    *
-    * @param data reference to find
-    * @return return a const pointer to the element storing @a data
-  **/
-  const elem_t* find(const data_t &data) const noexcept
-    {
-      return privFind(data);
-    }
-
-
-  /** @brief build the intersection of this set with another
-    *
-    * The intersection of two sets consists of all elements that
-    * are present in both sets.
-    *
-    * This method returns a newly build set consisting of copies
-    * of the elements that are present in both sets.
-    *
-    * If both sets do not intersect, an empty set is returned.
-    *
-    * The intersection of the set with itself is the set. This means
-    * that you will get a pointer to this set and not a copy if you
-    * write something like "foo = bar->intersects(bar);"
-    *
-    * If the new set can not be created, a pwx::CException with
-    * the name "SetCreationFailed" is thrown.
-    *
-    * If an intersecting element can not be created, a pwx::CException
-    * with the name "ElementCreationFailed" is thrown.
-    *
-    * If the data of an intersecting element could not be copied, a
-    * pwx::CException with the name "CopyingDataFailed" is thrown.
-    *
-    * @param rhs pointer to the set to compare with
-    * @return pointer to the intersecting set. You have to delete it yourself!
-  **/
-  list_t* intersectionWith(list_t* rhs)
-    {
-      // Return this if an intersection with this is asked for:
-      if (this == rhs)
-        return this;
-
-      // Otherwise build an intersection
-      size_t  lSize  = sList.size();
-      list_t* inters = nullptr;
-      PWX_TRY(inters = new list_t(isSorted, destroy))
-      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::intersectionWith() could not create an intersection set.")
-
-      for (size_t i = 0; i < lSize; ++i)
-        {
-          elem_t* curr = sList[i];
-          if (rhs->privFind(**curr))
-            {
-              // This element exists in both, so add a new element to the intersection:
-              PWX_TRY_PWX_FURTHER(inters->add(*curr))
-            }
-        } // End of walking through the elements
-
-      return inters;
-    }
-
-
-  /** @brief alias to remove the last element (tail)
-    * @return the last element or nullptr if the set is empty
-  **/
-  elem_t* pop() noexcept
-    {
-      return remove(-1);
-    }
-
-
-  /** @brief add an element to the start of the set
-    *
-    * If the set is sorted, the element will be moved to the correct
-    * location. If the set is not sorted, it will be added to the start.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * If there is an element with the same data stored in the set,
-    * the new pointer is not stored but silently ignored.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t push(data_t* data)
-    {
-      if (isSorted)
-        {
-          PWX_TRY_PWX_FURTHER(return add(data))
-        }
-      else if (!privFind(*data))
-        {
-          PWX_TRY_PWX_FURTHER(return sList.push_front(data))
-        }
-      else
-        return sList.size();
-    }
-
-
-  /** @brief remove an element from the set
-    *
-    * This method removes and returns the element with
-    * the index @a index. If the set is empty, a nullptr
-    * is returned.
-    *
-    * @param[in] idx index of the element, wrapped if negative or out of bounds.
-    * @return a pointer to the removed element or nullptr if the set is empty.
-  **/
-  elem_t* remove(int32_t index) noexcept
-    {
-      PWX_LOCK_GUARD(list_t, this)
-
-      elem_t* toRemove = sList[index];
-
-      if (toRemove)
-        sList.remElem(toRemove);
-
-      if (last == toRemove)
-        last = nullptr;
-
-      return toRemove;
-    }
-
-
-  /** @brief alias to remove the first element (head)
-    * @return the first element or nullptr if the set is empty
-  **/
-  elem_t* shift() noexcept
-    {
-      return remove(0);
-    }
-
-
-  /// @brief return the number of stored elements
-  uint32_t size() const noexcept { return sList.size(); }
-
-
-  /** @brief return true if this set is a subset of @a rhs
-    *
-    * The set is a subset of @a rhs if @a rhs contains all elements
-    * of this set.
-    *
-    * @param[in] rhs pointer to the set to compare with
-    * @return true if this is a subset of @a rhs, false otherwise
-  **/
-  bool subsetOf(list_t* rhs)
-    {
-      if (this == rhs)
-        return true;
-
-      size_t lSize  = sList.size();
-      bool   result = true;
-      for (size_t i = 0; result && (i < lSize); ++i)
-        {
-          if (!rhs->privFind(**sList[i]))
-            result = false;
-        } // End of walking through the elements
-      return result;
-    }
-
-
-  /** @brief build the union of this set with another
-    *
-    * The union of two sets consists of all elements that
-    * are present in either set.
-    *
-    * This method returns a newly build set consisting of copies
-    * of the elements that are present in either set.
-    * This means, that foo->unionWith(foo) will return a copy of
-    * foo.
-    *
-    * If the new set can not be created, a pwx::CException with
-    * the name "SetCreationFailed" is thrown.
-    *
-    * If an element can not be created, a pwx::CException with the
-    * name "ElementCreationFailed" is thrown.
-    *
-    * If the data of an element could not be copied, a pwx::CException
-    * with the name "CopyingDataFailed" is thrown.
-    *
-    * @param rhs pointer to the set to compare with
-    * @return pointer to the union set. You have to delete it yourself!
-  **/
-  list_t* unionWith(list_t* rhs)
-    {
-      list_t* unionSet = nullptr;
-      PWX_TRY(unionSet = new list_t(isSorted, destroy))
-      PWX_THROW_STD_FURTHER("SetCreationFailed", "TSet::unionWith() could not create a union set.")
-
-      // First add all elements from this set
-      size_t lSize = sList.size();
-      if (lSize)
-        {
-          PWX_LOCK_GUARD(list_t, this)
-          for (size_t i = 0; i < lSize; ++i)
-            {
-              PWX_TRY_PWX_FURTHER(unionSet->add(*sList[i]))
-            }
-        } // End of copying this
-
-      // if rhs equals this, we are done
-      if (this == rhs)
-        return unionSet;
-
-      // otherwise add all from the other
-      lSize = rhs->size();
-      if (lSize)
-        {
-          PWX_LOCK_GUARD(list_t, rhs)
-          for (size_t i = 0; i < lSize; ++i)
-            {
-              PWX_TRY_PWX_FURTHER(unionSet->add(*rhs[i]))
-            } // End of walking through the elements of this
-        } // End of copying rhs
-
-      return unionSet;
-    }
-
-
-  /** @brief add an element to the end of the set
-    *
-    * If the set is sorted, the element will be moved to the correct
-    * location. If the set is not sorted, it will be added to the end.
-    *
-    * If the new element can not be created, a pwx::CException with
-    * the name "ElementCreationFailed" is thrown.
-    *
-    * If there is an element with the same data stored in the set,
-    * the new pointer is not stored but silently ignored.
-    *
-    * @param[in] data data pointer to store.
-    * @return number of elements stored after the operation.
-  **/
-  uint32_t unshift(data_t* data)
-    {
-      if (isSorted)
-        {
-          PWX_TRY_PWX_FURTHER(return add(data))
-        }
-      else if (!privFind(*data))
-        {
-          PWX_TRY_PWX_FURTHER(return sList.push_back(data))
-        }
-      else
-        return sList.size();
-    }
-
-
-  /* ===============================================
-   * === Public operators                        ===
-   * ===============================================
-  */
-  list_t &operator=(const list_t &rhs) PWX_DELETE; // No assignment
-
-
-  /** @brief return a read-only pointer to the element with the given @a index
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is read-only.
-    *
-    * There will be no exception if the index is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the set is empty, the operator returns nullptr.
-    *
-    * @param[in] index the index of the element to find.
-    * @return read-only pointer to the element, or nullptr if the set is empty.
-  **/
-  const elem_t* operator[](const int32_t index) const noexcept
-    {
-      return sList[index];
-    }
-
-
-  /** @brief return a read/write pointer to the element with the given @a index
-    *
-    * This operator retrieves an element by index like an array. The pointer given
-    * back is write enabled, so use with care.
-    *
-    * There will be no exception if the index is out of range, it will be wrapped
-    * to press it into the valid range. This means that an index of -1 can be used
-    * to retrieve the last element (tail) for instance.
-    *
-    * If the set is empty, the operator returns nullptr.
-    *
-    * @param[in] index the index of the element to find.
-    * @return read/write pointer to the element, or nullptr if the set is empty.
-  **/
-  elem_t* operator[](int32_t index) noexcept
-    {
-      return sList[index];
-    }
-
-
-  /** @brief return true if this set equals another
-    *
-    * @param[in] rhs right hand side operand
-    * @return true if both sets are equal
-  **/
-  bool operator==(const list_t &rhs) const noexcept
-    {
-      size_t lSize  = sList.size();
-      size_t rSize  = rhs.size();
-
-      // Check A: Both sets must have equal size:
-      bool result = (lSize == rSize);
-
-      // Check B: This set must be a subset of rhs
-      if (result)
-        result = subsetOf(&rhs);
-
-      return result;
-    }
-
-
-  /** @brief return true if this set is different from another
-    *
-    * @param[in] rhs right hand side operand
-    * @return true if both sets are not equal
-  **/
-  bool operator!=(const list_t &rhs) const noexcept
-    {
-      return (!operator==(rhs));
-    }
-
-
-
-  /* ===============================================
-   * === Public members                          ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
+
+	typedef TDoubleElement<data_t>      elem_t;
+	typedef TDoubleList<data_t, elem_t> base_t;
+	typedef TSet<data_t>                list_t;
+
+
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+
+	/** @brief default constructor
+	  *
+	  * The default constructor initializes an empty set.
+	  *
+	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
+	  * @param[in] sorted defaults to true. Set to false to create an unordered set.
+	**/
+	TSet (void (*destroy_) (data_t* data), bool sorted = true) noexcept :
+		base_t(destroy_),
+		isSorted(sorted)
+	{ }
+
+
+	/** @brief empty constructor
+	  *
+	  * The empty constructor sets the data destroy method to the null pointer.
+	  * @param[in] sorted defaults to true. Set to false to create an unordered set.
+	**/
+	TSet(bool sorted = true) noexcept :
+		base_t (nullptr),
+		isSorted(sorted)
+	{ }
+
+
+	/** @brief copy constructor
+	  *
+	  * Builds a copy of all elements of @a src.
+	  *
+	  * @param[in] src reference of the list to copy.
+	**/
+	TSet (const list_t &src) noexcept :
+		base_t (src)
+	{
+		// The copy ctor of base_t has already copied all elements.
+	}
+
+
+	virtual ~TSet() noexcept;
+
+
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
+
+	using base_t::clear;
+	using base_t::delData;
+	using base_t::delElem;
+	using base_t::delNext;
+	using base_t::delNextElem;
+	using base_t::delPrev;
+	using base_t::delPrevElem;
+	using base_t::empty;
+	using base_t::find;
+
+
+	/** @brief find the element with the given @a data content
+	  *
+	  * This method searches through the set and returns the element
+	  * with the given @a data or nullptr if @a data is not stored in this
+	  * set.
+	  *
+	  * This is a search for the data and not a pointer. Stored objects must
+	  * therefore support operator== and operator> in a suitable way.
+	  *
+	  * @param data reference of the data to find
+	  * @return return a pointer to the element storing @a data
+	**/
+	virtual elem_t* find (data_t &data) noexcept
+	{
+		PWX_LOCK_GUARD (list_t, this)
+		return const_cast<elem_t* > (privFindData(static_cast<const data_t> (data)));
+	}
+
+
+	/** @brief find the element with the given @a data content
+	  *
+	  * This method searches through the set and returns a const pointer
+	  * to the element with the given @a data or nullptr if @a data is not
+	  * stored in this set.
+	  *
+	  * This is a search for the data and not a pointer. Stored objects must
+	  * therefore support operator== and operator> in a suitable way.
+	  *
+	  * @param data reference of the data to find
+	  * @return return a const pointer to the element storing @a data
+	**/
+	virtual const elem_t* find (const data_t &data) const noexcept
+	{
+		PWX_LOCK_GUARD (list_t, const_cast<list_t*>(this))
+		return privFindData(data);
+	}
+
+
+	/** @brief insert a new data pointer after the specified data
+	  *
+	  * This method inserts a new element in the list after the element
+	  * holding @a prev.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the data the element that should precede the new element holds
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insNext (data_t* prev, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (data && (nullptr == privFindData(*data)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insNext(prev, data))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert an element copy after the specified data
+	  *
+	  * This method inserts a new element in the list after the element
+	  * holding @a prev that is a copy from element @a src.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the data the element that should precede the new element holds.
+	  * @param[in] src a reference of the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	virtual uint32_t insNext (data_t* prev, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (src.data.get() && (nullptr == privFindData(*src)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insNext(prev, src))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert a new data pointer after the specified element
+	  *
+	  * This method inserts a new element in the list after the element
+	  * @a prev.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If @a prev is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the element that should precede the new element
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (data && (nullptr == privFindData(*data)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(prev, data))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert an element copy after the specified element
+	  *
+	  * This method inserts a new element in the list after the element
+	  * @a prev that is a copy of @a src.
+	  *
+	  * If @a prev is set to nullptr, the new element will become the new
+	  * head of the list.
+	  *
+	  * If @a prev is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] prev the element that should precede the new element.
+	  * @param[in] src reference of the lement to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (src.data.get() && (nullptr == privFindData(*src)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(prev, src))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert a new data pointer before the specified data
+	  *
+	  * This method inserts a new element in the list before the element
+	  * holding @a next.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the data the element that should succeed the new element
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insPrev (data_t* next, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (data && (nullptr == privFindData(*data)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insPrev(next, data))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert an element copy before the specified data
+	  *
+	  * This method inserts a new element in the list before the element
+	  * holding @a next as a copy of @a src.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the data the element that should succeed the new element.
+	  * @param[in] src reference to the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	virtual uint32_t insPrev (data_t* next, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (src.data.get() && (nullptr == privFindData(*src)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insPrev(next, src))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert a new data pointer before the specified element
+	  *
+	  * This method inserts a new element in the list before the element
+	  * @a next.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If @a next is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the element that should succeed the new element
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insPrevElem (elem_t* next, data_t* data)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (data && nullptr == privFindData(*data)) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insPrevElem(next, data))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief insert an element copy before the specified element
+	  *
+	  * This method inserts a new element in the list before the element
+	  * @a next as a copy of @a src.
+	  *
+	  * If @a next is set to nullptr, the new element will become the new
+	  * tail of the list.
+	  *
+	  * If @a next is no element of this list, the wrong list is updated
+	  * and both element counts will be wrong then. So please make sure to
+	  * use the correct element on the correct list!
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] next the element that should succeed the new element.
+	  * @param[in] src reference to the element to copy.
+	  * @return the number of elements in this list after the insertion.
+	**/
+	virtual uint32_t insPrevElem (elem_t* next, const elem_t &src)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (src.data.get() && (nullptr == privFindData(*src)) ) {
+			if (isSorted) {
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+			} else {
+				PWX_TRY_PWX_FURTHER(return base_t::insPrevElem(next, src))
+			}
+		} // End of having an element to insert that is not present in the set
+
+		return eCount;
+	}
+
+
+	/** @brief pop the first element from the set
+	  *
+	  * This is the regular set operation to get the first element.
+	  * Being a set this element comes from the front.
+	  *
+	  * To get an element from the back, use pop_back() or shift().
+	  *
+	  * The element is removed from the set so you have to take
+	  * care of its deletion once you are finished with it.
+	  *
+	  * If there is no element in the set a pwx::CException with the
+	  * name "OutOfRange" is thrown.
+	  *
+	  * @return the last element on the set.
+	**/
+	virtual elem_t* pop()
+	{
+		PWX_TRY_PWX_FURTHER (return pop_front())
+	}
+
+
+	using base_t::pop_back;
+	using base_t::pop_front;
+
+
+	/** @brief push a new data pointer onto the set
+	  *
+	  * This is the regular set operation to add a new element.
+	  * Being a set this new element is added to the end.
+	  *
+	  * To add a new data pointer to the front, use push_front() or
+	  * unshift().
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push (data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER (return push_back (data))
+	}
+
+
+	using base_t::push_back;
+	using base_t::push_front;
+	using base_t::remData;
+	using base_t::remElem;
+	using base_t::remNext;
+	using base_t::remNextElem;
+	using base_t::remPrev;
+	using base_t::remPrevElem;
+
+
+	/** @brief shift an element from the set
+	  *
+	  * This is the irregular set operation shifting an element
+	  * from the end of the set.
+	  *
+	  * To get an element from the start, use pop() or pop_front().
+	  *
+	  * The element is removed from the set so you have to take
+	  * care of its deletion once you are finished with it.
+	  *
+	  * If there is no element in the set a pwx::CException with the
+	  * name "OutOfRange" is thrown.
+	  *
+	  * @return the top element on the set.
+	**/
+	virtual elem_t* shift()
+	{
+		PWX_TRY_PWX_FURTHER(return pop_back())
+	}
+
+
+	using base_t::size;
+
+
+	/** @brief unshift an element onto the set
+	  *
+	  * This is the irregular set operation unshifting an element
+	  * onto the start of the set.
+	  *
+	  * To add an element to the end, use push() or push_back().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t unshift(data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER(return push_front(data))
+	}
+
+
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
+
+	/** @brief assignment operator
+	  *
+	  * Clears this set and copies all elements from @a rhs
+	  * onto this set.
+	  *
+	  * @param[in] rhs reference of the set to copy.
+	  * @return reference to this.
+	**/
+	virtual list_t &operator= (const list_t &rhs)
+	{
+		if (&rhs != this) {
+			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			clear();
+			destroy = rhs.destroy;
+			PWX_TRY_PWX_FURTHER (*this += rhs)
+		}
+		return *this;
+	}
+
+
+	using base_t::operator+=;
+	using base_t::operator-=;
+	using base_t::operator[];
+
 
 protected:
-  /* ===============================================
-   * === Protected Constructors and destructors  ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Protected methods                       ===
+	 * ===============================================
+	*/
+	using base_t::destroy;
 
-  /* ===============================================
-   * === Protected methods                       ===
-   * ===============================================
-  */
 
-  /* ===============================================
-   * === Protected operators                     ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Protected members                       ===
-   * ===============================================
-  */
+	using base_t::eCount;
+	using base_t::eNr;
+	using base_t::curr;
+	using base_t::head;
+	using base_t::tail;
+
+	const bool isSorted; //!< determines whether the set is sorted or not.
+
 
 private:
-  /* ===============================================
-   * === Private Constructors and destructors    ===
-   * ===============================================
-  */
+	/* ===============================================
+	 * === Private methods                         ===
+	 * ===============================================
+	*/
 
-  /* ===============================================
-   * === Private methods                         ===
-   * ===============================================
-  */
-  void (*destroy)(data_t* data);
+	/// IMPORTANT: private methods do not lock, callers must have locked!
 
-  // Note: Lock before calling!
-  // Important: If the set is sorted last will point to the next smaller element
-  //            or nullptr if the searched data can not be found. If the set
-  //            is not sorted, it will be set to nullptr.
-  elem_t* privFind(data_t &data) noexcept
-    {
-      uint32_t listSize = sList.size();
-      if (0 == listSize)
-        return nullptr;
+	/** @brief find an element holding the specified @a data
+	  *
+	  * The privFind() method of the containers search for pointers, while
+	  * this special method searches for the data behind the pointers.
+	  *
+	  * If the set is sorted and @a data can not be found, then curr points
+	  * to the element which would precede an element holding @a data if
+	  * it where present. With this special outcome the inserting methods
+	  * can simply use insNextElem() with curr to add data in a sorted way.
+	  * The only detail to look at is the situation when the new element
+	  * must become the new head. In this special case, <B>curr is set to
+	  * nullptr</B> and <B>eNr is set to -1</B>.
+	  *
+	  * @param[in] data reference of the data to search.
+	  * @return pointer to the element or nullptr if @a data is not present in the set.
+	**/
+	const elem_t* privFindData (const data_t &data) const noexcept
+	{
+		/* Note:
+		 * When the set is sorted, we can make some quick exit assumptions:
+		 * 1: If head is larger, data can not be in the set
+		 * 2: If tail is smaller, data can not be in the set
+		*/
+		if (eCount) {
+			// Quick exit if sorted set assumption 1 is correct:
+			if (isSorted && (**head > data)) {
+				eNr  = -1;
+				curr = nullptr;
+				return nullptr;
+			}
 
-      // Allow a quick out if "last" has been set and a neighbor (or "last") is wanted:
-      if (last)
-        {
-          if (**last == data)
-            return last;
-          else if (last->next && (**last->next == data))
-            {
-              last = last->next;
-              return last;
-            }
-          else if (last->prev && (**last->prev == data))
-            {
-              last = last->prev;
-              return last;
-            }
-        }
+			// Quick exit if curr is correct:
+			if (**curr == data)
+				return curr;
 
-      /* another quick exit if head or tail are wanted: */
-      elem_t* head = sList[0];
-      elem_t* tail = sList[-1];
-      if (**head == data)
-        {
-          last = head;
-          return head;
-        }
-      if (listSize > 1)
-        {
-          if (**tail == data)
-            {
-              last = tail;
-              return tail;
-            }
-        }
-      else if (!isSorted)
-        return nullptr; // head is alone and not the searched one.
+			// Quick exit if head is wanted:
+			if (**head == data) {
+				eNr = 0;
+				curr = head;
+				return curr;
+			}
+			// End of having at least one element
+		} else
+			// return immediately if there are no elements
+			return nullptr;
 
-      /* There are two completely different situations here:
-       * A) The set is sorted.
-       *    In this case we do not only search for the data but maintain this->prev
-       *    to point to the prev of the next larger element if data can not be found.
-       *    push()/unshift() then use this->prev for an sList.insNextElem()
-       * B) The set is unsorted.
-       *    Here we have to walk all the way through the whole sList until the
-       *    element is found or tail is reached.
-       *    However, prev stores the last accessed element for a speedier access to
-       *    its neighbors
-      */
+		// Checking tail does only make sense if we have at least 2 element
+		if (eCount > 1) {
+			// Quick exit if sorted set assumption 2 is correct:
+			if (isSorted && (data > **tail)) {
+				eNr  = eCount -1;
+				curr = tail;
+				return nullptr;
+			}
 
-      /// Situation A)
-      if (isSorted)
-        {
-          if (nullptr == last)
-            // Oh no, start from scratch
-            last = head;
+			// Quick exit if tail is wanted:
+			if (**head == data) {
+				eNr = eCount - 1;
+				curr = tail;
+				return curr;
+			}
+		} // End of having at least two elements
 
-          /* Go upwards: */
-          while ((tail != last) && (data > **last))
-            last = last->next;
-          /* Go downwards: */
-          while ((head != last) && (**last > data))
-            last = last->prev;
+		// The complete search is useless unless there are at least three elements:
+		if (eCount > 2) {
+			/* The searching differs between sorted and unsorted sets:
+			 * A)   sorted : We can determine a direction to go to make
+			 *               the search as quick as possible
+			 * B) unsorted : We have to wander through the whole set
+			*/
+			if (isSorted) {
+				/* Here we know that data is definitely in the range of the set.
+				 * It is larger than head an smaller than tail. The good thing
+				 * about this is the absence of any need to check curr against
+				 * head or tail.
+				*/
+				// Step 1: Move up until curr is larger
+				while (data > **curr) {
+					curr = curr->next;
+					++eNr;
+				}
+				// Step 2: Move down until curr is smaller
+				while (**curr > data) {
+					curr = curr->prev;
+					--eNr;
+				}
+				/* Due to this order curr is now either pointing to an element
+				 * holding data, or the next smaller element. The latter detail
+				 * is important for the sorted insertion. If data is not found,
+				 * all inserting methods can now insert a new element holding
+				 * the searched data using insNextElem() on curr.
+				*/
+				return (**curr == data ? curr : nullptr);
+			} else {
+				curr = head->next;
+				eNr  = 1;
+				// Note: head and tail are already checked.
+				while ((curr != tail) && (**curr != data)) {
+					curr = curr->next;
+					++eNr;
+				}
+				// Because tail is already checked, a pointer comparison will do:
+				return (curr != tail ? curr : nullptr);
+			}
+		} // End of having at least 3 elements
 
-          // If last is larger than data now, it must be set to nullptr
-          // for privInsert to work properly:
-          if (**last > data)
-            last = nullptr;
 
-          /* Return either last or nullptr now */
-          return (**last == data ? last : nullptr);
-          // Note: due to the order above, if data is not found,
-          // last points to the next smaller element if any.
-        } // End of find in a sorted set
+		return nullptr;
+	}
 
-      /// Situation B)
-      last = head->next;
-      while ((tail != last) && !(data == **last))
-        last = last->next;
-
-      /* Return either last or nullptr now */
-      if (**last != data)
-        last = nullptr;
-      return last;
-    }
-
-  // Note: elem must be valid, and its data not present in the current set.
-  // And : Lock before calling!
-  uint32_t privInsert(elem_t* elem)
-    {
-      if (isSorted && sList.size())
-        {
-          /// Case A: The new element is the new smallest element:
-          elem_t* head = sList[0];
-          if (**head > **elem)
-            {
-              PWX_TRY_PWX_FURTHER(return sList.push_front(*elem))
-            }
-
-          /// Case B: The new element is the new largest element:
-          elem_t* tail = sList[-1];
-          if (**elem > **tail)
-            {
-              PWX_TRY_PWX_FURTHER(return sList.push_back(*elem))
-            }
-
-          /// Case C: We have to search for the right location:
-          if (nullptr == last)
-            last = head->next;
-
-          /* downwards: */
-          if (**last > **elem)
-            {
-              while (**last > **elem)
-                last = last->prev;
-              // Now "last" is the first smaller element
-              PWX_TRY_PWX_FURTHER(return sList.insNextElem(last, *elem))
-            }
-
-          /* upwards : */
-          while (**elem > **last)
-            last = last->next;
-          // Now "last" is the first larger element
-          PWX_TRY_PWX_FURTHER(return sList.insPrevElem(last, *elem))
-        }
-      else
-        {
-          PWX_TRY_PWX_FURTHER(return sList.push_front(elem))
-        }
-    }
-
-  /* ===============================================
-   * === Private operators                       ===
-   * ===============================================
-  */
-
-  /* ===============================================
-   * === Private members                         ===
-   * ===============================================
-  */
-  const bool isSorted = true;    //!< Whether to sort elements on insertion or not.
-  store_t    sList;              //!< Data is held by a doubly linked list.
-  mutable
-  elem_t*    last     = nullptr; //!< The last element in the list seen by this sets methods.
 
 }; // class TSet
+
 
 /** @brief default destructor
   *
   * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the set.
 **/
-template<typename data_t, typename store_t, typename elem_t>
-TSet<data_t, store_t, elem_t>::~TSet() noexcept
-  {
-    sList.clear();
-  }
+template<typename data_t>
+TSet<data_t>::~TSet() noexcept
+{ /* deletion is done in base_t ctor */ }
+
 
 } // namespace pwx
 #endif // PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
