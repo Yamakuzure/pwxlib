@@ -556,6 +556,29 @@ public:
 	}
 
 
+	/** @brief push an element copy onto the set
+	  *
+	  * This is the regular set operation to add an element copy.
+	  * Being a set this new element is added to the end.
+	  *
+	  * If the set is sorted, the element will be inserted at the correct
+	  * sorted position.
+	  *
+	  * If the set already holds an element containing the same data,
+	  * nothing is inserted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference of the element to copy.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push (elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER (return insNextElem(tail, src))
+	}
+
+
 	using base_t::push_back;
 	using base_t::push_front;
 	using base_t::remData;
