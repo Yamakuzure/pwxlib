@@ -30,6 +30,7 @@
 #include <pwx/types/CLockable.h>
 #include <pwx/general/macros.h>
 #include <pwx/container/TDoubleList.h>
+#include <pwx/functions/set_fwd.h>
 
 namespace pwx
 {
@@ -554,6 +555,29 @@ public:
 	using base_t::remPrevElem;
 
 
+	/** @brief reset a set to a predefined sate of a different set
+	  *
+	  * This method can be used to clear a set and copy both the
+	  * sorted switch and the destroy method from another set.
+	  * Basically this is meant to build a working set without
+	  * having to use the copy constructor, which would copy all
+	  * members as well.
+	  *
+	  * If a set is reseted using itself, it is cleared of all elements
+	  * nevertheless.
+	  *
+	  * @param[in] src reference of the set to take the base values from
+	**/
+	virtual void reset(const list_t &src) noexcept
+	{
+		clear();
+		if (&rhs != this) {
+			destroy = src.destroy;
+			const_cast<bool>(isSorted) = src.isSorted;
+		}
+	}
+
+
 	/** @brief shift an element from the set
 	  *
 	  * This is the irregular set operation shifting an element
@@ -782,5 +806,8 @@ TSet<data_t>::~TSet() noexcept
 
 
 } // namespace pwx
+
+#include <pwx/functions/set_func.h>
+
 #endif // PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 
