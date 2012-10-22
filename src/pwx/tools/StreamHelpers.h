@@ -45,7 +45,7 @@ PWX_INLINE ::std::ostream PWX_API &operator<< (::std::ostream &os, const adjRigh
 PWX_INLINE bool           PWX_API cropShell (const char *key, ::std::string &data)  noexcept;
 PWX_INLINE void           PWX_API forwardTo (::std::ifstream &is, char value)       noexcept;
 PWX_INLINE void           PWX_API ltrim (::std::string &text, char extra = 0x0) noexcept;
-PWX_INLINE const char*            makeTemp (const char *aPath, const char *aTemplate,
+PWX_INLINE const char     PWX_API *makeTemp (const char *aPath, const char *aTemplate,
 											const char *aSuffix, ::std::ofstream &ofs,
 											::std::ios_base::openmode mode = ::std::ios_base::out |::std::ios_base::trunc)
 											noexcept PWX_WARNUNUSED;
