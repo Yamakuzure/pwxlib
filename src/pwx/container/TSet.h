@@ -182,6 +182,17 @@ public:
 	}
 
 
+	/** @brief return true if @a elem is an element of this set
+	  *
+	  * @param[in] elem reference to the element to test
+	  * @return true if the element is a member of this set, false otherwise
+	**/
+	virtual bool hasMember(const elem_t &elem) noexcept
+	{
+		return (find(*elem) ? true : false);
+	}
+
+
 	/** @brief insert a new data pointer after the specified data
 	  *
 	  * This method inserts a new element in the list after the element
@@ -571,9 +582,9 @@ public:
 	virtual void reset(const list_t &src) noexcept
 	{
 		clear();
-		if (&rhs != this) {
-			destroy = src.destroy;
-			const_cast<bool>(isSorted) = src.isSorted;
+		if (&src != this) {
+			destroy  = src.destroy;
+			isSorted = src.isSorted;
 		}
 	}
 
@@ -670,8 +681,7 @@ protected:
 	using base_t::head;
 	using base_t::tail;
 
-	const bool isSorted; //!< determines whether the set is sorted or not.
-
+	bool isSorted; //!< determines whether the set is sorted or not.
 
 private:
 	/* ===============================================
