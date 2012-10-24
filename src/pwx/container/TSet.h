@@ -182,14 +182,29 @@ public:
 	}
 
 
+	using base_t::get;
+	using base_t::getData;
+
+
 	/** @brief return true if @a elem is an element of this set
 	  *
 	  * @param[in] elem reference to the element to test
 	  * @return true if the element is a member of this set, false otherwise
 	**/
-	virtual bool hasMember(const elem_t &elem) noexcept
+	virtual bool hasMember(const elem_t &elem) const noexcept
 	{
 		return (find(*elem) ? true : false);
+	}
+
+
+	/** @brief return true if @a data is an element of this set
+	  *
+	  * @param[in] data reference to the data to test
+	  * @return true if the data is a member of this set, false otherwise
+	**/
+	virtual bool hasMember(const data_t &data) const noexcept
+	{
+		return (find(data) ? true : false);
 	}
 
 
@@ -505,6 +520,40 @@ public:
 	}
 
 
+	/** @brief return true if this set is a subset of @a src
+	  *
+	  * A set A is a subset of set B, if set B has all elements
+	  * of set A.
+	  *
+	  * @param[in] src reference of the set to test against
+	  * return true if this set is a subset of @a src
+	**/
+	virtual bool isSubsetOf(const list_t &src) noexcept
+	{
+		bool result = true;
+
+		// The empty set is always a subset of everything.
+		if (eCount && (this != &src)) {
+			if (src.size()) {
+				curr = head;
+				eNr = 0;
+
+				// A simple loop will do, because we can use privFindData directly.
+				do {
+					if (src.privFindData(**curr)) {
+						curr = curr->next;
+						++eNr;
+					} else
+						result = true;
+				} while (result && (curr != head));
+			} else
+				result = false;
+		}
+
+		return result;
+	}
+
+
 	/** @brief pop the first element from the set
 	  *
 	  * This is the regular set operation to get the first element.
@@ -573,7 +622,7 @@ public:
 	  * @param[in] src reference of the element to copy.
 	  * @return number of elements stored after the operation.
 	**/
-	virtual uint32_t push (elem_t &src)
+	virtual uint32_t push (const elem_t &src)
 	{
 		PWX_TRY_PWX_FURTHER (return insNextElem(tail, src))
 	}
@@ -743,6 +792,12 @@ private:
 				eNr  = -1;
 				curr = nullptr;
 				return nullptr;
+			}
+
+			// Reset curr if a previous search has invalidated it:
+			if (nullptr == curr) {
+				curr = head;
+				eNr  = 0;
 			}
 
 			// Quick exit if curr is correct:
