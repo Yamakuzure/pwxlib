@@ -17,8 +17,9 @@ typedef pwx::TSet<data_t> set_t;
   ** D) Try to add another "2", must not be possible.                       **
   ** E) Shift two integers, must be 5, 4                                    **
   ** F) Build sets (1, 3, 5) and (2, 3, 4) - Build intersection, must be (3)**
-  ** G) Build difference A-B, must be (1, 5)                                **
-  ** H) Build union A+B, must be (1, 2, 3, 4, 5)                            **
+  **    Build difference A-B, must be (1, 5)                                **
+  **    Build union A+B, must be (1, 2, 3, 4, 5)                            **
+  ** G) Build sets (1, 3) and (1, 2, 3) - test ==/!=/isSubsetOf             **
   ****************************************************************************
 **/
 template<typename list_t>
@@ -142,7 +143,7 @@ int32_t testSet (sEnv& env)
 	** F) Build sets (1, 3, 5) and (2, 3, 4) - Build intersection, must be (3)**
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
-		cout << adjRight (4, 0) << ++env.testCount << " F) Build an intersection : " << endl;
+		cout  << "     F) Test set operations : " << endl;
 
 		// A: (1, 3, 5)
 		testContA.push(&numbers[0]);
@@ -161,46 +162,40 @@ int32_t testSet (sEnv& env)
 		// C: (3)
 		// Note: Using the (costly) reference version tests the pointer version as well!
 		testContC = set_intersection(testContA, testContB);
-		cout << "        Intersection: ";
+		cout << adjRight (4, 0) << ++env.testCount << "    Intersection (3)             : ";
 		cout << **testContC[0];
 
 		if ((3 == testContA.size()) && (3 == testContB.size()) && (1 == testContC.size()) && (3 == **testContC[0])) {
-			cout << " - Success" << endl;
+			cout << "             - Success" << endl;
 			++env.testSuccess;
 		} else {
-			cout << " - FAIL" << endl;
+			cout << "             - FAIL" << endl;
 			++env.testFail;
 			result = EXIT_FAILURE;
 		}
 
-	} // End of test F
-
-	/***************************************************************************
-	** G) Build difference A-B, must be (1, 5)                                **
-	***************************************************************************/
-	if (EXIT_SUCCESS == result) {
-		cout << adjRight (4, 0) << ++env.testCount << " F) Build a difference : ";
+		/***************************************************************************
+		**   Build difference A-B, must be (1, 5)                                **
+		***************************************************************************/
+		cout << adjRight (4, 0) << ++env.testCount << "    Difference   (1, 5)          : ";
 		// Note: The (very costly) operator- uses the reference version of set_difference(),
 		//       which uses the pointer version of set_difference(). Three tests in one.
 		testContC = testContA - testContB;
 		cout << **testContC[0] << ", " << **testContC[1];
 
 		if ((2 == testContC.size()) && (1 == **testContC[0]) && (5 == **testContC[1])) {
-			cout << " - Success" << endl;
+			cout << "          - Success" << endl;
 			++env.testSuccess;
 		} else {
-			cout << " - FAIL" << endl;
+			cout << "          - FAIL" << endl;
 			++env.testFail;
 			result = EXIT_FAILURE;
 		}
 
-	} // End of test G
-
-	/***************************************************************************
-	** H) Build union A+B, must be (1, 2, 3, 4, 5)                            **
-	***************************************************************************/
-	if (EXIT_SUCCESS == result) {
-		cout << adjRight (4, 0) << ++env.testCount << " F) Build a union : ";
+		/***************************************************************************
+		**    Build union A+B, must be (1, 2, 3, 4, 5)                            **
+		***************************************************************************/
+		cout << adjRight (4, 0) << ++env.testCount << "    Union        (1, 2, 3, 4, 5) : ";
 		// Note: The (very costly) operator+ uses the reference version of set_union(),
 		//       which uses the pointer version of set_union(). Three tests in one.
 		testContC = testContA + testContB;
@@ -218,8 +213,59 @@ int32_t testSet (sEnv& env)
 			result = EXIT_FAILURE;
 		}
 
-	} // End of test G
+	} // End of test F
 
+	/***************************************************************************
+	** G) Build sets (1, 3) and (1, 2, 3) - test ==/!=/isSubsetOf             **
+	***************************************************************************/
+	if (EXIT_SUCCESS == result) {
+		cout << "     G) Test comparisons : " << endl;
+
+		// A: (1, 3)
+		testContA.clear();
+		testContA.push(&numbers[0]);
+		testContA.push(&numbers[2]);
+		cout << "         Container 1: ";
+		cout << **testContA[0] << ", " << **testContA[1] << endl;
+
+		// B: (1, 2, 3)
+		testContB.clear();
+		testContB.push(&numbers[0]);
+		testContB.push(&numbers[1]);
+		testContB.push(&numbers[2]);
+		cout << "         Container 2: ";
+		cout << **testContB[0] << ", " << **testContB[1] << ", " << **testContB[2] << endl;
+
+		cout << adjRight (4, 0) << ++env.testCount << "    Container 1 == Container 2 ? (false)  : ";
+		if (!(testContA == testContB)) {
+			cout << " false - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " true  - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << "    Container 1 != Container 2 ? (true)   : ";
+		if (testContA != testContB) {
+			cout << " true  - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " false - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << "    Container 1 is a subset of 2 ? (true) : ";
+		if (testContA.isSubsetOf(testContB)) {
+			cout << " true  - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " false - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
+	} // End of test I
 
 
 /// @todo : Put into unified speed test once RNG is available for random access
