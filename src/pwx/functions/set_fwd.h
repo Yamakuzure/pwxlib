@@ -40,12 +40,27 @@ template<typename data_t> class TSet;
 
 // --- Function Prototypes ---
 template<typename data_t>
-TSet<data_t> PWX_API *set_difference(const TSet<data_t> &lhs, const TSet<data_t> &rhs);
+TSet<data_t> PWX_API *set_difference  (const TSet<data_t>* const lhs, const TSet<data_t>* const rhs);
 template<typename data_t>
-TSet<data_t> PWX_API *set_intersection(const TSet<data_t> &lhs, const TSet<data_t> &rhs);
+TSet<data_t> PWX_API  set_difference  (const TSet<data_t> &lhs, const TSet<data_t> &rhs);
 template<typename data_t>
-TSet<data_t> PWX_API *set_union(const TSet<data_t> &lhs, const TSet<data_t> &rhs);
+TSet<data_t> PWX_API *set_intersection(const TSet<data_t>* const lhs, const TSet<data_t>* const rhs);
+template<typename data_t>
+TSet<data_t> PWX_API  set_intersection(const TSet<data_t> &lhs, const TSet<data_t> &rhs);
+template<typename data_t>
+TSet<data_t> PWX_API *set_union       (const TSet<data_t>* const lhs, const TSet<data_t>* const rhs);
+template<typename data_t>
+TSet<data_t> PWX_API  set_union       (const TSet<data_t> &lhs, const TSet<data_t> &rhs);
 
+// --- operator prototypes ---
+template<typename data_t>
+bool         PWX_API &operator==(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept;
+template<typename data_t>
+bool         PWX_API &operator!=(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept;
+template<typename data_t>
+TSet<data_t> PWX_API  operator+ (const TSet<data_t> &lhs, const TSet<data_t> &rhs);
+template<typename data_t>
+TSet<data_t> PWX_API  operator- (const TSet<data_t> &lhs, const TSet<data_t> &rhs);
 
 } // namespace pwx
 #endif // PWX_PWXLIB_PWX_FUNCTIONS_SET_FWD_H_INCLUDED
