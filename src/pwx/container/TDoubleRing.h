@@ -264,6 +264,8 @@ public:
 
 	using base_t::empty;
 	using base_t::find;
+	using base_t::get;
+	using base_t::getData;
 
 
 	/** @brief insert a new data pointer after the specified data
@@ -546,7 +548,7 @@ public:
 	  * @param[in] src reference to the element to copy
 	  * @return the number of elements in this ring after the insertion
 	**/
-	virtual uint32_t push_back (elem_t &src)
+	virtual uint32_t push_back (const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, src))
@@ -580,7 +582,7 @@ public:
 	  * @param[in] src reference to the element to copy
 	  * @return the number of elements in this ring after the insertion
 	**/
-	virtual uint32_t push_front (elem_t &src)
+	virtual uint32_t push_front (const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, src))

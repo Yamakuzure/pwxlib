@@ -120,6 +120,8 @@ public:
 	using base_t::delNextElem;
 	using base_t::empty;
 	using base_t::find;
+	using base_t::get;
+	using base_t::getData;
 	using base_t::insNext;
 	using base_t::insNextElem;
 
