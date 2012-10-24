@@ -107,6 +107,8 @@ public:
 		while (eNr < (eCount - 1)) {
 			if (curr && curr->next)
 				curr->next->prev = curr;
+			curr = curr->next;
+			++eNr;
 		}
 	}
 
@@ -315,7 +317,8 @@ public:
 		return nullptr;
 	}
 
-
+	using base_t::get;
+	using base_t::getData;
 	using base_t::insNext;
 	using base_t::insNextElem;
 
@@ -619,55 +622,7 @@ public:
 
 	using base_t::operator+=;
 	using base_t::operator-=;
-
-
-	/** @brief return a read-only pointer to the element with the given @a index
-	  *
-	  * This operator retrieves an element by index like an array. The pointer given
-	  * back is read-only.
-	  *
-	  * There will be no exception if the index is out of range, it will be wrapped
-	  * to press it into the valid range. This means that an index of -1 can be used
-	  * to retrieve the last element (tail) for instance.
-	  *
-	  * If the list is empty, the operator returns nullptr.
-	  *
-	  * If you use this operator to quickly access head or tail, neither the currently
-	  * used internal pointer nor number are changed. Head and tail are given back
-	  * directly.
-	  *
-	  * @param[in] index the index of the element to find.
-	  * @return read-only pointer to the element, or nullptr if the list is empty.
-	**/
-	virtual const elem_t* operator[] (const int32_t index) const noexcept
-	{
-		return privGetElementByIndex (index);
-	}
-
-
-	/** @brief return a read/write pointer to the element with the given @a index
-	  *
-	  * This operator retrieves an element by index like an array. The pointer given
-	  * back is write enabled, so use with care.
-	  *
-	  * There will be no exception if the index is out of range, it will be wrapped
-	  * to press it into the valid range. This means that an index of -1 can be used
-	  * to retrieve the last element (tail) for instance.
-	  *
-	  * If the list is empty, the operator returns nullptr.
-	  *
-	  * If you use this operator to quickly access head or tail, neither the currently
-	  * used internal pointer nor number are changed. Head and tail are given back
-	  * directly.
-	  *
-	  * @param[in] index the index of the element to find.
-	  * @return read/write pointer to the element, or nullptr if the list is empty.
-	**/
-	virtual elem_t* operator[] (int32_t index) noexcept
-	{
-		return const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
-	}
-
+	using base_t::operator[];
 
 protected:
 	/* ===============================================
