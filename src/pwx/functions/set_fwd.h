@@ -54,9 +54,9 @@ TSet<data_t> PWX_API  set_union       (const TSet<data_t> &lhs, const TSet<data_
 
 // --- operator prototypes ---
 template<typename data_t>
-bool         PWX_API &operator==(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept;
+bool         PWX_API  operator==(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept;
 template<typename data_t>
-bool         PWX_API &operator!=(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept;
+bool         PWX_API  operator!=(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept;
 template<typename data_t>
 TSet<data_t> PWX_API  operator+ (const TSet<data_t> &lhs, const TSet<data_t> &rhs);
 template<typename data_t>

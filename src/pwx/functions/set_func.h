@@ -317,7 +317,7 @@ TSet<data_t> set_union(const TSet<data_t> &lhs, const TSet<data_t> &rhs)
   * @return true if both sets are equal
 **/
 template<typename data_t>
-bool &operator==(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept
+bool operator==(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept
 {
 	bool result = true;
 
@@ -342,7 +342,7 @@ bool &operator==(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept
   * @return true if both sets are different
 **/
 template<typename data_t>
-bool &operator!=(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept
+bool operator!=(const TSet<data_t> &lhs, const TSet<data_t> &rhs) noexcept
 {
 	return !operator==(lhs, rhs);
 }

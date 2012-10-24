@@ -528,7 +528,7 @@ public:
 	  * @param[in] src reference of the set to test against
 	  * return true if this set is a subset of @a src
 	**/
-	virtual bool isSubsetOf(const list_t &src) noexcept
+	virtual bool isSubsetOf(const list_t &src) const noexcept
 	{
 		bool result = true;
 
@@ -545,7 +545,7 @@ public:
 						++eNr;
 					} else
 						result = false;
-				} while (result && (curr != head));
+				} while (result && (curr != tail));
 			} else
 				result = false;
 		}
