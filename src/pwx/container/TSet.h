@@ -544,7 +544,7 @@ public:
 						curr = curr->next;
 						++eNr;
 					} else
-						result = true;
+						result = false;
 				} while (result && (curr != head));
 			} else
 				result = false;
