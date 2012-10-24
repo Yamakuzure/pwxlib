@@ -102,9 +102,9 @@ public:
 		base_t (src)
 	{
 		// lock the source list, it must not be changed now.
-		PWX_LOCK_GUARD (list_t, const_cast<list_t> (src))
+		PWX_LOCK_GUARD (list_t, const_cast<list_t*> (&src))
 		uint32_t rSize = src.size();
-		for (int32_t i = 0; i < rSize; ++i) {
+		for (uint32_t i = 0; i < rSize; ++i) {
 			PWX_TRY_PWX_FURTHER (insNextElem (tail, *src[i]))
 		}
 	}
@@ -263,6 +263,112 @@ public:
 		} // End of handling a search with more than one element
 
 		return nullptr;
+	}
+
+
+	/** @brief return a read-only pointer to the element with the given @a index
+	  *
+	  * This method retrieves an element by index like an array. The pointer given
+	  * back is read-only.
+	  *
+	  * There will be no exception if the index is out of range, it will be wrapped
+	  * to press it into the valid range. This means that an index of -1 can be used
+	  * to retrieve the last element (tail) for instance.
+	  *
+	  * If the list is empty, the method returns nullptr.
+	  *
+	  * If you use this method to quickly access head or tail, neither the currently
+	  * used internal pointer nor number are changed. Head and tail are given back
+	  * directly.
+	  *
+	  * @param[in] index the index of the element to find.
+	  * @return read-only pointer to the element, or nullptr if the list is empty.
+	**/
+	virtual const elem_t* get (const int32_t index) const noexcept
+	{
+		return privGetElementByIndex (index);
+	}
+
+
+	/** @brief return a read/write pointer to the element with the given @a index
+	  *
+	  * This method retrieves an element by index like an array. The pointer given
+	  * back is write enabled, so use with care.
+	  *
+	  * There will be no exception if the index is out of range, it will be wrapped
+	  * to press it into the valid range. This means that an index of -1 can be used
+	  * to retrieve the last element (tail) for instance.
+	  *
+	  * If the list is empty, the method returns nullptr.
+	  *
+	  * If you use this method to quickly access head or tail, neither the currently
+	  * used internal pointer nor number are changed. Head and tail are given back
+	  * directly.
+	  *
+	  * @param[in] index the index of the element to find.
+	  * @return read/write pointer to the element, or nullptr if the list is empty.
+	**/
+	virtual elem_t* get (int32_t index) noexcept
+	{
+		return const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
+	}
+
+
+	/** @brief return a read-only reference to the data of the element with the given @a index
+	  *
+	  * This method retrieves an element by index like an array and returns a reference
+	  * to the stored data. The reference given back is read-only.
+	  *
+	  * There will be no exception if the index is out of range, it will be wrapped
+	  * to press it into the valid range. This means that an index of -1 can be used
+	  * to retrieve the last element (tail) for instance.
+	  *
+	  * If the list is empty, the function throws a pwx::CException with the name
+	  * "OutOfRange".
+	  *
+	  * If you use this method to quickly access head or tail, neither the currently
+	  * used internal pointer nor number are changed. Head and tail are given back
+	  * directly.
+	  *
+	  * @param[in] index the index of the element to find.
+	  * @return read-only reference to the elements data.
+	**/
+	virtual const data_t &getData (const int32_t index) const
+	{
+		const elem_t *elem = privGetElementByIndex (index);
+		if (nullptr == elem) {
+			PWX_THROW("OutOfRange", "The list is empty", "getData() used on an empty list.")
+		}
+		return **elem;
+	}
+
+
+	/** @brief return a read/write reference to the data of the element with the given @a index
+	  *
+	  * This method retrieves an element by index like an array and returns a reference
+	  * to the stored data. The reference given back is write enabled, so use with care.
+	  *
+	  * There will be no exception if the index is out of range, it will be wrapped
+	  * to press it into the valid range. This means that an index of -1 can be used
+	  * to retrieve the last element (tail) for instance.
+	  *
+	  * If the list is empty, the function throws a pwx::CException with the name
+	  * "OutOfRange".
+	  *
+	  * If you use this method to quickly access head or tail, neither the currently
+	  * used internal pointer nor number are changed. Head and tail are given back
+	  * directly.
+	  *
+	  * @param[in] index the index of the element to find.
+	  * @return read/write reference to the elements data.
+	**/
+	virtual data_t &getData (int32_t index)
+	{
+		elem_t *elem = const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
+		if (nullptr == elem) {
+			PWX_THROW("OutOfRange", "The list is empty", "getData() used on an empty list.")
+		}
+		return **elem;
 	}
 
 
@@ -467,7 +573,7 @@ public:
 	  * @param[in] src reference to the element to copy
 	  * @return the number of elements in this list after the insertion
 	**/
-	virtual uint32_t push_back (elem_t &src)
+	virtual uint32_t push_back (const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (return insNextElem (tail, src))
@@ -497,7 +603,7 @@ public:
 	  * @param[in] src reference to the element to copy
 	  * @return the number of elements in this list after the insertion
 	**/
-	virtual uint32_t push_front (elem_t &src)
+	virtual uint32_t push_front (const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (return insNext (nullptr, src))
