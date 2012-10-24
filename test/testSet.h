@@ -136,17 +136,90 @@ int32_t testSet (sEnv& env)
 		delete elemB;
 	} // end of sub test B
 
+	list_t testContA(do_not_destroy), testContB(do_not_destroy), testContC(do_not_destroy);
+
 	/***************************************************************************
 	** F) Build sets (1, 3, 5) and (2, 3, 4) - Build intersection, must be (3)**
 	***************************************************************************/
+	if (EXIT_SUCCESS == result) {
+		cout << adjRight (4, 0) << ++env.testCount << " F) Build an intersection : " << endl;
+
+		// A: (1, 3, 5)
+		testContA.push(&numbers[0]);
+		testContA.push(&numbers[2]);
+		testContA.push(&numbers[4]);
+		cout << "         Container 1: ";
+		cout << **testContA[0] << ", " << **testContA[1] << ", " << **testContA[2] << endl;
+
+		// B: (2, 3, 4)
+		testContB.push(&numbers[1]);
+		testContB.push(&numbers[2]);
+		testContB.push(&numbers[3]);
+		cout << "         Container 2: ";
+		cout << **testContB[0] << ", " << **testContB[1] << ", " << **testContB[2] << endl;
+
+		// C: (3)
+		// Note: Using the (costly) reference version tests the pointer version as well!
+		testContC = set_intersection(testContA, testContB);
+		cout << "        Intersection: ";
+		cout << **testContC[0];
+
+		if ((3 == testContA.size()) && (3 == testContB.size()) && (1 == testContC.size()) && (3 == **testContC[0])) {
+			cout << " - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
+
+	} // End of test F
 
 	/***************************************************************************
 	** G) Build difference A-B, must be (1, 5)                                **
 	***************************************************************************/
+	if (EXIT_SUCCESS == result) {
+		cout << adjRight (4, 0) << ++env.testCount << " F) Build a difference : ";
+		// Note: The (very costly) operator- uses the reference version of set_difference(),
+		//       which uses the pointer version of set_difference(). Three tests in one.
+		testContC = testContA - testContB;
+		cout << **testContC[0] << ", " << **testContC[1];
+
+		if ((2 == testContC.size()) && (1 == **testContC[0]) && (5 == **testContC[1])) {
+			cout << " - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
+
+	} // End of test G
 
 	/***************************************************************************
 	** H) Build union A+B, must be (1, 2, 3, 4, 5)                            **
 	***************************************************************************/
+	if (EXIT_SUCCESS == result) {
+		cout << adjRight (4, 0) << ++env.testCount << " F) Build a union : ";
+		// Note: The (very costly) operator+ uses the reference version of set_union(),
+		//       which uses the pointer version of set_union(). Three tests in one.
+		testContC = testContA + testContB;
+		cout << **testContC[0] << ", " << **testContC[1] << ", ";
+		cout << **testContC[2] << ", " << **testContC[3] << ", ";
+		cout << **testContC[4];
+
+		if (	(5 == testContC.size()) && (1 == **testContC[0]) && (2 == **testContC[1])
+			&&	(3 == **testContC[2])   && (4 == **testContC[3]) && (5 == **testContC[4])) {
+			cout << " - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
+
+	} // End of test G
+
 
 
 /// @todo : Put into unified speed test once RNG is available for random access
