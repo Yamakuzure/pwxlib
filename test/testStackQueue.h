@@ -18,7 +18,7 @@ typedef pwx::TQueue<data_t> queue_t;
   ** D) Shift two integers, must be 5, 4 (Queue) or 1, 2 (Stack)            **
   ** E) Build two containers (1, 3, 5), (2, 4) and 2 x operator+ on third   **
   ** F) Check third container values (2, 4, 1, 3, 5)                        **
-  ** G) Substract first from the union (4, 2)                               **
+  ** G) Substract first from the union (2, 4)                               **
   ****************************************************************************
 **/
 template<typename list_t>
@@ -175,7 +175,7 @@ int32_t testStackQueue (sEnv &env)
 	** F) Check third container values (2, 4, 1, 3, 5)                        **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
-		cout << adjRight (4, 0) << ++env.testCount << " E) Check third container" << endl;
+		cout << adjRight (4, 0) << ++env.testCount << " F) Check third container" << endl;
 		cout << "         (2, 4, 1, 3, 5) - ";
 		int32_t check[5] = { **testContC[0], **testContC[1], **testContC[2], **testContC[3], **testContC[4] };
 		cout << check[0] << ", " << check[1] << ", " << check[2] << ", " << check[3] << ", " << check[4];
@@ -191,9 +191,21 @@ int32_t testStackQueue (sEnv &env)
 
 
 	/***************************************************************************
-	** G) Substract first from the union (4, 2)                               **
+	** G) Substract first from the union (2, 4)                               **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
+		cout << adjRight (4, 0) << ++env.testCount << " G) Substract first container (2, 4) - ";
+		testContC -= testContA;
+		int32_t check[2] = { **testContC[0], **testContC[1] };
+		cout << check[0] << ", " << check[1];
+		if ( (2 == check[0]) && (4 == check[1])) {
+			cout << " - Success" << endl;
+			++env.testSuccess;
+		} else {
+			cout << " - FAIL" << endl;
+			++env.testFail;
+			result = EXIT_FAILURE;
+		}
 	} // End of test G
 
 /// @todo : Put into unified speed test once RNG is available for random access

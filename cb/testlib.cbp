@@ -37,8 +37,6 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../Makefile" />
-		<Unit filename="../src/pwx/functions/set_func.h" />
-		<Unit filename="../src/pwx/functions/set_fwd.h" />
 		<Unit filename="../test/Makefile" />
 		<Unit filename="../test/destroy.cpp" />
 		<Unit filename="../test/destroy.h" />
