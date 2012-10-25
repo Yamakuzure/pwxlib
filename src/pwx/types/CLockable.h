@@ -42,7 +42,7 @@ namespace pwx
   * @brief Base class to make objects lockable via mutexes
   *
   * First things first: You need to compile both the library and your
-  * application withe the macro PWX_THREADS being defined, or there will
+  * application with the macro PWX_THREADS being defined, or there will
   * be no locking functionality.
   *
   * Any class that is derived from this class gains three methods
