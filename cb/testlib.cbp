@@ -45,6 +45,7 @@
 		<Unit filename="../test/main.h" />
 		<Unit filename="../test/testListRing.h" />
 		<Unit filename="../test/testSet.h" />
+		<Unit filename="../test/testSpeed.h" />
 		<Unit filename="../test/testStackQueue.h" />
 		<Extensions>
 			<envvars set="libpwx" />

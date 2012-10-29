@@ -58,6 +58,8 @@
 		<Unit filename="../src/pwx/general/compiler.h" />
 		<Unit filename="../src/pwx/general/macros.h" />
 		<Unit filename="../src/pwx/general/templates.h" />
+		<Unit filename="../src/pwx/internal/CRandomConstants.h" />
+		<Unit filename="../src/pwx/internal/CRandomWordConstants.h" />
 		<Unit filename="../src/pwx/tools.h" />
 		<Unit filename="../src/pwx/tools/StreamHelpers.cpp" />
 		<Unit filename="../src/pwx/tools/StreamHelpers.h" />
@@ -70,6 +72,8 @@
 		<Unit filename="../src/pwx/types/TSingleElement.h" />
 		<Unit filename="../src/pwx/types/TVarDeleter.h" />
 		<Unit filename="../src/pwx/worker.h" />
+		<Unit filename="../src/pwx/worker/CRandom.cpp" />
+		<Unit filename="../src/pwx/worker/CRandom.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

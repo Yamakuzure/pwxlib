@@ -8,6 +8,7 @@ int32_t main()
 	// Wrap a giant try/catch around just everything to trace immediately
 	try {
 
+		// --- General container tests ---
 		if (EXIT_SUCCESS == result) {
 			PWX_TRY_PWX_FURTHER (result = testListRing<single_list_t> (env))
 		}
@@ -30,6 +31,30 @@ int32_t main()
 			PWX_TRY_PWX_FURTHER (result = testSet<set_t> (env))
 		}
 
+		// --- test the speed of the containers ---
+		if (EXIT_SUCCESS == result) {
+			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
+			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
+			PWX_TRY_PWX_FURTHER (result = testSpeed<single_list_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeed<double_list_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeed<single_ring_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeed<double_ring_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeed<stack_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeed<queue_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeed<set_t> (env))
+		}
 
 		// End of giant try
 	} catch (pwx::CException &e) {

@@ -11,10 +11,14 @@ using std::endl;
 #include <pwx.h>
 using pwx::adjRight;
 
+/// Type for the data to test with containers
+typedef int32_t data_t;
+
 #include "env.h"
 #include "destroy.h"
 #include "testListRing.h"
 #include "testStackQueue.h"
 #include "testSet.h"
+#include "testSpeed.h"
 
 #endif // PWX_LIBPWX_TEST_MAIN_H_INCLUDED
