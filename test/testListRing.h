@@ -4,9 +4,6 @@
 
 #include "main.h" // This is here for IDE Parsers to find the other stuff
 
-/// Type for the data to test with lists
-typedef int32_t data_t;
-
 /// Typedefs for the specific lists:
 typedef pwx::TSingleList<data_t> single_list_t;
 typedef pwx::TSingleRing<data_t> single_ring_t;
