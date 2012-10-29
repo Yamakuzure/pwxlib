@@ -63,7 +63,11 @@ PWX_INLINE float          PWX_API to_float (const T val) noexcept;
 template <typename T>
 PWX_INLINE int32_t        PWX_API to_int32 (const T val) noexcept;
 template <typename T>
+PWX_INLINE uint32_t       PWX_API to_uint32 (const T val) noexcept;
+template <typename T>
 PWX_INLINE int64_t        PWX_API to_int64 (const T val) noexcept;
+template <typename T>
+PWX_INLINE uint64_t       PWX_API to_uint64 (const T val) noexcept;
 template <typename T>
 PWX_INLINE ::std::string  PWX_API to_string (const T val) noexcept;
 PWX_INLINE void           PWX_API trim (::std::string &text, char extra = 0x0) noexcept;
@@ -283,6 +287,26 @@ int32_t to_int32 (const T val) noexcept {
 }
 
 
+/** @brief convert a value to uint32_t
+  *
+  * This function uses a stringstream to convert @a val to a uint32_t.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting uint32_t
+**/
+template <typename T>
+uint32_t to_uint32 (const T val) noexcept {
+	uint32_t result = 0;
+	::std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
 /** @brief convert a value to int64_t
   *
   * This function uses a stringstream to convert @a val to a int64_t.
@@ -296,6 +320,26 @@ int32_t to_int32 (const T val) noexcept {
 template <typename T>
 int64_t to_int64 (const T val) noexcept {
 	int64_t result = 0;
+	::std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
+/** @brief convert a value to uint64_t
+  *
+  * This function uses a stringstream to convert @a val to a int64_t.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting uint64_t
+**/
+template <typename T>
+uint64_t to_uint64 (const T val) noexcept {
+	uint64_t result = 0;
 	::std::stringstream ss;
 	ss << val;
 	ss >> result;

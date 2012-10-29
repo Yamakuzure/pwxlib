@@ -28,6 +28,15 @@
 **/
 
 
+/** @brief Return the sign as -1 or +1 of an expression
+  *
+  * <I>Prerequisites</I>: none
+  * @param[in] expr any expression that can be compared against 0 (zero)
+  * @return -1 if @a expr < 0, 1 otherwise
+**/
+#define SIGN(expr) (((expr) < 0) ? -1 : 1)
+
+
 /** @brief Simple try{} wrapper
   *
   * This macro can be used for single try { ONE_FUNC_CALL } - entries.

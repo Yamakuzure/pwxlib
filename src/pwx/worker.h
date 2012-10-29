@@ -27,7 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-
+#include <pwx/worker/CRandom.h>
 
 #endif // PWX_LIBPWX_PWX_WORKER_H_INCLUDED
 
