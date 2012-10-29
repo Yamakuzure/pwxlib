@@ -2,11 +2,9 @@
 #  define PWX_EXPORTS 1
 #endif
 
-#define CALL_FROM_CRANDOM_CPP 1
-#include <pwx/worker/CRandom.h>
-#undef CALL_FROM_CRANDOM_CPP
 #include <pwx/general/macros.h>
 #include <pwx/tools/StreamHelpers.h>
+#include <pwx/worker/CRandom.h>
 #include <pwx/internal/CRandomConstants.h>
 #include <pwx/internal/CRandomWordConstants.h>
 
@@ -16,6 +14,8 @@
 #include <cmath>
 
 namespace pwx {
+
+CRandom RNG;
 
 /** @brief default ctor
 *

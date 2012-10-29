@@ -224,9 +224,7 @@ private:
 	int32_t spxTab[512];   //!< A permutation table for simplex noise
 };
 
-#ifndef CALL_FROM_CRANDOM_CPP
-extern CRandom RNG; //!< Static instance of Random to be used
-#endif
+extern CRandom RNG; //!< External instance of Random to be used
 
 } // namespace pwx
 
