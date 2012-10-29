@@ -4,8 +4,6 @@
 
 #include "main.h" // This is here for IDE Parsers to find the other stuff
 
-const uint32_t maxElements = 1000000;
-
 /** @brief Unified container speed test
   *
   * The test is simple: Add maxElements random elements,
