@@ -554,80 +554,10 @@ public:
 	}
 
 
-	/** @brief pop the first element from the set
-	  *
-	  * This is the regular set operation to get the first element.
-	  * Being a set this element comes from the front.
-	  *
-	  * To get an element from the back, use pop_back() or shift().
-	  *
-	  * The element is removed from the set so you have to take
-	  * care of its deletion once you are finished with it.
-	  *
-	  * If there is no element in the set a pwx::CException with the
-	  * name "OutOfRange" is thrown.
-	  *
-	  * @return the last element on the set.
-	**/
-	virtual elem_t* pop()
-	{
-		PWX_TRY_PWX_FURTHER (return pop_front())
-	}
-
-
+	using base_t::pop;
 	using base_t::pop_back;
 	using base_t::pop_front;
-
-
-	/** @brief push a new data pointer onto the set
-	  *
-	  * This is the regular set operation to add a new element.
-	  * Being a set this new element is added to the end.
-	  *
-	  * To add a new data pointer to the front, use push_front() or
-	  * unshift().
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] data data pointer to store.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push (data_t* data)
-	{
-		PWX_TRY_PWX_FURTHER (return push_back (data))
-	}
-
-
-	/** @brief push an element copy onto the set
-	  *
-	  * This is the regular set operation to add an element copy.
-	  * Being a set this new element is added to the end.
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] src reference of the element to copy.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push (const elem_t &src)
-	{
-		PWX_TRY_PWX_FURTHER (return insNextElem(tail, src))
-	}
-
-
+	using base_t::push;
 	using base_t::push_back;
 	using base_t::push_front;
 	using base_t::remData;

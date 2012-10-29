@@ -506,6 +506,21 @@ public:
 	}
 
 
+	/** @briefshort alias for pop_front()
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the list is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the list is empty
+	**/
+	virtual elem_t* pop() noexcept
+	{
+		return pop_front();
+	}
+
+
 	/** @brief alias to remove the last element (tail)
 	  *
 	  * You have to delete the removed element by yourself. If you do not intent
@@ -547,6 +562,34 @@ public:
 			PWX_CATCH_AND_FORGET (CException)
 		}
 		return nullptr;
+	}
+
+
+	/** @brief short alias for push_back(data_t *data)
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push (data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER (return push_back (data))
+	}
+
+
+	/** @brief short alias for push_back(const elem_t &src)
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER (return push_back (src))
 	}
 
 

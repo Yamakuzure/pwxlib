@@ -124,29 +124,7 @@ public:
 	using base_t::getData;
 	using base_t::insNext;
 	using base_t::insNextElem;
-
-
-	/** @brief pop the first element from the stack
-	  *
-	  * This is the regular stack operation to get the newest element.
-	  * Being a stack this element comes from the top.
-	  *
-	  * To get an element from the bottom, use pop_back() or shift().
-	  *
-	  * The element is removed from the stack so you have to take
-	  * care of its deletion once you are finished with it.
-	  *
-	  * If there is no element in the stack a pwx::CException with the
-	  * name "OutOfRange" is thrown.
-	  *
-	  * @return the top element on the stack.
-	**/
-	virtual elem_t* pop()
-	{
-		PWX_TRY_PWX_FURTHER (return pop_front())
-	}
-
-
+	using base_t::pop;
 	using base_t::pop_back;
 	using base_t::pop_front;
 

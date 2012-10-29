@@ -451,8 +451,10 @@ public:
 	}
 
 
+	using base_t::pop;
 	using base_t::pop_back;
 	using base_t::pop_front;
+	using base_t::push;
 	using base_t::push_back;
 	using base_t::push_front;
 

@@ -147,7 +147,7 @@ public:
 	  *
 	  * @return the last element on the queue.
 	**/
-	virtual elem_t* pop()
+	virtual elem_t* pop() noexcept
 	{
 		PWX_TRY_PWX_FURTHER (return pop_back())
 	}
