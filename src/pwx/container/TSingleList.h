@@ -133,11 +133,10 @@ public:
 #ifdef PWX_THREADS
 				PWX_LOCK_GUARD(list_t, this)
 				if (eCount)
-#else
-				privDelete(remNext(nullptr))
+#endif // PWX_THREADS
+				privDelete(remNext(nullptr));
 			}
 			PWX_CATCH_AND_FORGET(CException)
-#endif // PWX_THREADS
 		}
 	}
 
@@ -190,7 +189,7 @@ public:
 	}
 
 
-	using base_t::empty;
+	// empty() provided by base_t
 
 
 	/** @brief find the element with the given @a data
@@ -519,7 +518,7 @@ public:
 	virtual uint32_t push_back (data_t *data)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-		PWX_TRY_PWX_FURTHER (return insNextElem (tail, data))
+		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (tail, data))
 	}
 
 
@@ -534,7 +533,7 @@ public:
 	virtual uint32_t push_back (const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-		PWX_TRY_PWX_FURTHER (return insNextElem (tail, src))
+		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (tail, src))
 	}
 
 
@@ -549,7 +548,7 @@ public:
 	virtual uint32_t push_front (data_t *data)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-		PWX_TRY_PWX_FURTHER (return insNext (nullptr, data))
+		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (nullptr, data))
 	}
 
 
@@ -564,7 +563,7 @@ public:
 	virtual uint32_t push_front (const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-		PWX_TRY_PWX_FURTHER (return insNext (nullptr, src))
+		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (nullptr, src))
 	}
 
 
