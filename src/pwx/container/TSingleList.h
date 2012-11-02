@@ -128,9 +128,18 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		while (eCount)
-			delNext (nullptr);
+		while (eCount) {
+#ifdef PWX_THREADS
+			PWX_LOCK_GUARD(list_t, this)
+			if (eCount) {
+				PWX_TRY(delNext (nullptr))
+				PWX_CATCH_AND_FORGET(CException)
+			}
+#else
+			PWX_TRY(delNext (nullptr))
+			PWX_CATCH_AND_FORGET(CException)
+#endif // PWX_THREADS
+		}
 	}
 
 
@@ -152,14 +161,7 @@ public:
 	**/
 	virtual uint32_t delNext (data_t* prev)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		try {
-			elem_t* removed = remNext (prev);
-			if (removed)
-				delete removed;
-			return eCount;
-		}
-		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TSingleList::delNext() failed.")
+		PWX_TRY_PWX_FURTHER(return privDelete(remNext(prev)))
 	}
 
 
@@ -185,22 +187,11 @@ public:
 	**/
 	virtual uint32_t delNextElem (elem_t* prev)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		try {
-			elem_t* removed = remNextElem (prev);
-			if (removed)
-				delete removed;
-			return eCount;
-		}
-		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TSingleList::delNextElem() failed.")
+		PWX_TRY_PWX_FURTHER(return privDelete(remNextElem(prev)))
 	}
 
 
-	/// @brief return true if the list is empty
-	virtual bool empty() const noexcept
-	{
-		return !eCount;
-	}
+	using base_t::empty;
 
 
 	/** @brief find the element with the given @a data
@@ -214,7 +205,7 @@ public:
 	**/
 	virtual elem_t* find (data_t* data) noexcept
 	{
-		return const_cast<elem_t* > (find (static_cast<const data_t* > (data)));
+		return const_cast<elem_t* > (privFind (static_cast<const data_t* > (data)));
 	}
 
 
@@ -229,40 +220,7 @@ public:
 	**/
 	virtual const elem_t* find (const data_t* data) const noexcept
 	{
-		if (nullptr == curr)
-			return nullptr;
-
-		// From here on, curr is valid and the list needs to be guarded:
-		PWX_LOCK_GUARD (list_t, const_cast<list_t* > (this))
-
-		// Quick exit if curr is already what we want:
-		if (curr->data.get() == data)
-			return curr;
-
-		// The next does only make sense if we have more than one element
-		if (eCount > 1) {
-			// Exit if head is wanted...
-			if (head->data.get() == data) {
-				curr = head;
-				eNr  = 0;
-				return head;
-			}
-
-			// ...or tail
-			if (tail->data.get() == data) {
-				curr = tail;
-				eNr  = eCount - 1;
-				return tail;
-			}
-
-			// Otherwise search for the previous item, it's the next, then
-			elem_t* prev = privFindPrev (data);
-			// Note: privFindPrev returns the wanted element and sets curr to the next element.
-			if (prev)
-				return curr;
-		} // End of handling a search with more than one element
-
-		return nullptr;
+		return privFind(data);
 	}
 
 
@@ -364,11 +322,7 @@ public:
 	**/
 	virtual data_t &getData (int32_t index)
 	{
-		elem_t *elem = const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
-		if (nullptr == elem) {
-			PWX_THROW("OutOfRange", "The list is empty", "getData() used on an empty list.")
-		}
-		return **elem;
+		PWX_TRY_PWX_FURTHER(return const_cast<data_t&>(getData(static_cast<const int32_t>(index))))
 	}
 
 
@@ -390,18 +344,7 @@ public:
 	virtual uint32_t insNext (data_t* prev, data_t* data)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-
-		if (prev && (nullptr == find (prev)))
-			// find sets curr to the correct value.
-			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
-
-		// First create a new element for data
-		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-
-		return privInsert (prev ? curr : nullptr, newElement);
+		PWX_TRY_PWX_FURTHER(return privInsDataBehindData(prev, data))
 	}
 
 
@@ -423,20 +366,7 @@ public:
 	virtual uint32_t insNext (data_t* prev, const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-
-		if (prev && (nullptr == find (prev)))
-			// find sets curr to the correct value.
-			PWX_THROW ("ElementNotFound",
-					   "Element not found",
-					   "The searched element can not be found in this singly linked list")
-
-		// First create a new element for data
-		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-
-		return privInsert (prev ? curr : nullptr, newElement);
+		PWX_TRY_PWX_FURTHER(return privInsElemBehindData(prev, src))
 	}
 
 
@@ -462,14 +392,7 @@ public:
 	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-
-		// First create a new element for data
-		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-
-		return privInsert (prev, newElement);
+		PWX_TRY_PWX_FURTHER(return privInsDataBehindElem(prev, data))
 	}
 
 
@@ -495,14 +418,7 @@ public:
 	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
 	{
 		PWX_LOCK_GUARD (list_t, this)
-
-		// First create a new element for data
-		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-
-		return privInsert (prev, newElement);
+		PWX_TRY_PWX_FURTHER(return privInsElemBehindElem(prev, src))
 	}
 
 
@@ -873,7 +789,66 @@ private:
 	 * ===============================================
 	*/
 
-	/// IMPORTANT: private methods do not lock, callers must have locked!
+	/* Important: Public methods should not lock unless it is crucial.
+	 *            All necessary checks are done by the public methods,
+	 *            work is done by the private methods which will lock
+	 *            where appropriate.
+	*/
+
+	/// @brief Delete the element behind @a prev
+	virtual uint32_t privDelete(elem_t* removed)
+	{
+		try {
+			if (removed) {
+				PWX_DOUBLE_LOCK(list_t, this, elem_t, removed)
+				if (!removed->destroyed())
+					delete removed;
+			}
+			return eCount;
+		}
+		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TSingleList::delNext() failed.")
+	}
+
+
+	/// @brief Search until the current element contains the searched data
+	virtual const elem_t* privFind (const data_t* data) const noexcept
+	{
+		if (nullptr == curr)
+			return nullptr;
+
+		// From here on, curr is valid and the list needs to be guarded:
+		PWX_LOCK_GUARD (list_t, const_cast<list_t* > (this))
+
+		// Quick exit if curr is already what we want:
+		if (curr->data.get() == data)
+			return curr;
+
+		// The next does only make sense if we have more than one element
+		if (eCount > 1) {
+			// Exit if head is wanted...
+			if (head->data.get() == data) {
+				curr = head;
+				eNr  = 0;
+				return head;
+			}
+
+			// ...or tail
+			if (tail->data.get() == data) {
+				curr = tail;
+				eNr  = eCount - 1;
+				return tail;
+			}
+
+			// Otherwise search for the previous item, it's the next, then
+			elem_t* prev = privFindPrev (data);
+			// Note: privFindPrev returns the wanted element and sets curr to the next element.
+			if (prev)
+				return curr;
+		} // End of handling a search with more than one element
+
+		return nullptr;
+	}
+
 
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
@@ -893,6 +868,7 @@ private:
 		--eNr;
 		return nullptr;
 	}
+
 
 	/// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
@@ -953,34 +929,190 @@ private:
 	}
 
 
-	/// @brief simple method to insert an element into the list
-	virtual uint32_t privInsert (elem_t* prev, elem_t* elem)
+	/// @brief preparation method to insert data behind data
+	/// Note: The list must be locked beforehand!
+	uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		if (elem) {
-			if (prev) {
-				if (tail == prev)
-					tail = elem;
-				elem->next = prev->next;
-				prev->next = elem;
-				// curr is only maintainable if it is prev
-				if (curr != prev) {
-					// In which case it wouldn't have needed any change.
-					curr = head;
-					eNr  = 0;
+		// 1: Prepare the previous element
+		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
+		if (prev && (nullptr == prevElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this singly linked list")
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert data behind an element
+	/// Note: The list must be locked beforehand!
+	uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
+	{
+		// 1: Prepare the previous element
+		elem_t* prevElement = prev;
+
+#ifdef PWX_THREADDEBUG
+		if (prev) {
+			prevElement->lock();
+			while (prevElement->destroyed()) {
+				// This is bad. It means that someone manually deleted the element.
+				// If the element still has a next, or if it is the last element,
+				// we can, however, continue.
+				if ((eCount > 1) && prev->next) {
+					PWX_LOCK_GUARD(elem_t, prevElement)
+					prevElement->unlock();
+					prevElement = prevElement->next;
+					prevElement->lock();
 				}
-			} else if (eCount) {
-				elem->next = head;
-				head = elem;
-				++eNr; // No matter what happened, curr has another element before it now.
-			} else {
-				// If we had no elements yet, head and tail need to be set:
-				head = elem;
-				tail = elem;
+				else if (eCount < 2) {
+					prevElement->unlock();
+					prevElement = nullptr; // New head about
+				}
+				else {
+					prevElement->unlock();
+					// my bad...
+					PWX_THROW("Illegal Condition", "Previous element destroyed",
+							  "An element used as prev for insertion is destroyed.")
+				}
+			} // End of ensuring a valid prevElement
+		}
+		// We need a RAII aware lock guard now and reduce the previous manual lock:
+		PWX_LOCK_GUARD(elem_t, prevElement)
+		prevElement->unlock(); // (Now you know why I am using recursive mutexes. ;) )
+#endif // PWX_THREADDEBUG
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy behind data
+	/// Note: The list must be locked beforehand!
+	uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
+	{
+		// 1: Check source:
+		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		// 2: Prepare the previous element
+		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
+		if (prev && (nullptr == prevElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this singly linked list")
+
+		// 3: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 4: Do the real insert
+		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy behind an element
+	/// Note: The list must be locked beforehand!
+	uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
+	{
+		// 1: Check source:
+		PWX_NAMED_LOCK_GUARD(src, elem_t, const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		// 2: Prepare the previous element
+		elem_t* prevElement = prev;
+
+#ifdef PWX_THREADDEBUG
+		if (prev) {
+			prevElement->lock();
+			while (prevElement->destroyed()) {
+				if ((eCount > 1) && prev->next) {
+					PWX_LOCK_GUARD(elem_t, prevElement)
+					prevElement->unlock();
+					prevElement = prevElement->next;
+					prevElement->lock();
+				}
+				else if (eCount < 2) {
+					prevElement->unlock();
+					prevElement = nullptr; // New head about
+				}
+				else {
+					prevElement->unlock();
+					PWX_THROW("Illegal Condition", "Previous element destroyed",
+							  "An element used as prev for insertion is destroyed.")
+				}
+			} // End of ensuring a valid prevElement
+		}
+		PWX_NAMED_LOCK_GUARD(prev, elem_t, prevElement)
+		prevElement->unlock();
+#endif // PWX_THREADDEBUG
+
+		// 3: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 4: Do the real insert
+		PWX_TRY_PWX_FURTHER(return privInsert(prev, newElement))
+	}
+
+
+	/// @brief Simple inserter, all locks must be in place!
+	uint32_t privInsert (elem_t* insPrev, elem_t* insElem)
+	{
+		// Now the real insertion can be done:
+		if (insPrev) {
+			if (tail == insPrev)
+				tail = insElem;
+			insElem->next = insPrev->next;
+			insPrev->next = insElem;
+			// curr is only maintainable if it is insPrev
+			if (curr != insPrev) {
+				// In which case it wouldn't have needed any change.
 				curr = head;
+				eNr  = 0;
 			}
-			++eCount;
-		} // End of having an element to insert
-		return eCount;
+		} else if (eCount) {
+			insElem->next = head;
+			head = insElem;
+			++eNr; // No matter what happened, curr has another element before it now.
+		} else {
+			// If we had no elements yet, head and tail need to be set:
+			head = insElem;
+			tail = insElem;
+			curr = head;
+		}
+
+		return ++eCount;
 	}
 
 
