@@ -232,12 +232,28 @@
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
+  * @param name a string to add to the local variable name to be able to use more than one guard
+  * @param T the type of the object to lock
+  * @param object pointer to the object to lock
+**/
+#if defined(PWX_THREADS)
+#  define PWX_NAMED_LOCK_GUARD(Name, T, object) \
+	::std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object);
+#else
+#  define PWX_LOCK_GUARD(Name, T, object)
+#endif
+
+
+/** @brief Impose a lock guard on the given object, that is unlocked when leaving the current scope
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
+  *
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
 #if defined(PWX_THREADS)
 #  define PWX_LOCK_GUARD(T, object) \
-	::std::lock_guard<T> pwx_libpwx_lock_guard_(*object);
+	PWX_NAMED_LOCK_GUARD(Default, T, object)
 #else
 #  define PWX_LOCK_GUARD(T, object)
 #endif
