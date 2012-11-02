@@ -215,7 +215,7 @@ private:
 	 * ===============================================
 	*/
 
-	bool isDestroyed = false; //!< Set to false by the dtor to let other threads react if they ask destroyed().
+	bool isDestroyed = false; //!< Set to true by the dtor to let other threads react if they ask destroyed().
 }; // struct TSingleElement
 
 
