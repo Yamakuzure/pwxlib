@@ -105,7 +105,7 @@ public:
 		PWX_LOCK_GUARD (list_t, const_cast<list_t*> (&src))
 		uint32_t rSize = src.size();
 		for (uint32_t i = 0; i < rSize; ++i) {
-			PWX_TRY_PWX_FURTHER (insNextElem (tail, *src[i]))
+			PWX_TRY_PWX_FURTHER (privInsElemBehindElem(tail, *src[i]))
 		}
 	}
 
@@ -129,14 +129,13 @@ public:
 	virtual void clear() noexcept
 	{
 		while (eCount) {
+			try {
 #ifdef PWX_THREADS
-			PWX_LOCK_GUARD(list_t, this)
-			if (eCount) {
-				PWX_TRY(delNext (nullptr))
-				PWX_CATCH_AND_FORGET(CException)
-			}
+				PWX_LOCK_GUARD(list_t, this)
+				if (eCount)
 #else
-			PWX_TRY(delNext (nullptr))
+				privDelete(remNext(nullptr))
+			}
 			PWX_CATCH_AND_FORGET(CException)
 #endif // PWX_THREADS
 		}
