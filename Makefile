@@ -7,6 +7,11 @@ THREADSAFE := YES
 # Set to YES to include debugging info
 DEBUG := YES
 
+# Note: If both THREADSAFE and DEBUG are set to "YES", special code
+#       blocks are activated doing a lot of checks in thread relevant
+#       sections. These checks are costly, so be sure to disable
+#       DEBUG for production.
+
 # Set to YES to include profiling info
 PROFILE := NO
 
@@ -81,10 +86,6 @@ INCDIR   = -Isrc
 
 # ===================================================================
 # Set flags according to settings:
-ifeq (YES, ${THREADSAFE})
-  CXXFLAGS := ${CXXFLAGS} -DPWX_THREADS
-endif
-
 ifeq (YES, ${DEBUG})
   CXXFLAGS := ${CXXFLAGS} ${DBG_CXXFLAGS}
   LDFLAGS  := ${LDFLAGS} ${DBG_LDFLAGS}
@@ -95,12 +96,21 @@ endif
 
 ifeq (YES, ${PROFILE})
   CXXFLAGS := ${CXXFLAGS} -pg -O2
-	LDFLAGS  := ${LDFLAGS} -pg
+  LDFLAGS  := ${LDFLAGS} -pg
 endif
 
 ifeq (YES, ${GRAPHITE})
   CXXFLAGS := ${CXXFLAGS} ${GRP_CXXFLAGS}
 endif
+
+ifeq (YES, ${THREADSAFE})
+  ifeq (YES, ${DEBUG})
+    CXXFLAGS := ${CXXFLAGS} -DPWX_THREADDEBUG
+  endif
+  CXXFLAGS := ${CXXFLAGS} -DPWX_THREADS -pthread
+  LDFLAGS  := ${LDFLAGS} -lpthread
+endif
+
 
 # ------------------------------------
 # Rules
