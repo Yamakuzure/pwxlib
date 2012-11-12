@@ -809,7 +809,7 @@ private:
 
 
 	/// @brief simple method to remove an element from the list
-	virtual uint32_t privRemove (elem_t* prev, elem_t* elem)
+	virtual void privRemove (elem_t* prev, elem_t* elem)
 	{
 		if (elem) {
 			// maintain tail and head first
@@ -851,7 +851,6 @@ private:
 			elem->prev = nullptr;
 			--eCount;
 		} // end of having an element to remove
-		return eCount;
 	}
 }; // class TDoubleList
 
