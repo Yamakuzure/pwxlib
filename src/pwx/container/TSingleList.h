@@ -768,9 +768,12 @@ private:
 	{
 		try {
 			if (removed) {
-				PWX_LOCK_GUARD(elem_t, removed)
-				if (!removed->destroyed())
+				removed->lock();
+				if (!removed->destroyed()) {
+					removed->unlock();
 					delete removed;
+				} else
+					removed->lock();
 			}
 			return eCount;
 		}
