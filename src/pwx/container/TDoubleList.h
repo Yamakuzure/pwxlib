@@ -135,14 +135,7 @@ public:
 	**/
 	virtual uint32_t delData (data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		try {
-			elem_t* removed = remData (data);
-			if (removed)
-				delete removed;
-			return eCount;
-		}
-		PWX_THROW_STD_FURTHER ("delete", "Deleting an element in TDoubleList::delData() failed.")
+		PWX_TRY_PWX_FURTHER(return privDelete(remData(data)))
 	}
 
 
@@ -161,14 +154,7 @@ public:
 	**/
 	virtual uint32_t delElem (elem_t* elem)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		try {
-			elem_t* removed = remElem (elem);
-			if (removed)
-				delete removed;
-			return eCount;
-		}
-		PWX_THROW_STD_FURTHER ("delete", "Deleting an element in TDoubleList::delElem() failed.")
+		PWX_TRY_PWX_FURTHER(return privDelete(remElem(elem)))
 	}
 
 
@@ -194,14 +180,7 @@ public:
 	**/
 	virtual uint32_t delPrev (data_t* next)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		try {
-			elem_t* removed = remPrev (next);
-			if (removed)
-				delete removed;
-			return eCount;
-		}
-		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TDoubleList::delPrev() failed.")
+		PWX_TRY_PWX_FURTHER(return privDelete(remPrev(next)))
 	}
 
 
@@ -227,14 +206,7 @@ public:
 	**/
 	virtual uint32_t delPrevElem (elem_t* next)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		try {
-			elem_t* removed = remPrevElem (next);
-			if (removed)
-				delete removed;
-			return eCount;
-		}
-		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TDoubleList::delPrevElem() failed.")
+		PWX_TRY_PWX_FURTHER(return privDelete(remPrevElem(next)))
 	}
 
 
@@ -652,7 +624,29 @@ private:
 	 * ===============================================
 	*/
 
-	/// IMPORTANT: private methods do not lock, callers must have locked!
+	/* Important: Public methods should not lock unless it is crucial.
+	 *            All necessary checks are done by the public methods,
+	 *            work is done by the private methods which will lock
+	 *            where appropriate.
+	*/
+
+	/// @brief Delete the element behind @a prev
+	virtual uint32_t privDelete(elem_t* removed)
+	{
+		try {
+			if (removed) {
+				removed->lock();
+				if (!removed->destroyed()) {
+					removed->unlock();
+					delete removed;
+				} else
+					removed->lock();
+			}
+			return eCount;
+		}
+		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TDoubleList::privDelete() failed.")
+	}
+
 
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
