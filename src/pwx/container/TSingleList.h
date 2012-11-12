@@ -586,19 +586,7 @@ public:
 	**/
 	virtual elem_t* remNext (data_t* prev)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
-		if (prev && (nullptr == find (prev)))
-			// find sets curr to the correct value.
-			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
-
-		if (prev && (nullptr == curr->next))
-			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind element holding the given prev pointer")
-
-		elem_t* toRemove = prev ? curr->next : head;
-		privRemove (prev ? curr : nullptr, toRemove);
-
-		return toRemove;
+		PWX_TRY_PWX_FURTHER(return privRemoveAfterData(prev))
 	}
 
 
@@ -622,18 +610,7 @@ public:
 	**/
 	virtual elem_t* remNextElem (elem_t* prev)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
-		if (prev && (nullptr == prev->next))
-			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind the given prev element")
-
-		if (0 == eCount)
-			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
-
-		elem_t* toRemove = prev ? prev->next : head;
-		privRemove (prev, toRemove);
-
-		return toRemove;
+		PWX_TRY_PWX_FURTHER(return privRemoveAfterElement(prev))
 	}
 
 
@@ -950,17 +927,16 @@ private:
 		elem_t* prevElement = prev;
 
 #ifdef PWX_THREADDEBUG
-		if (prev) {
+		if (prevElement) {
 			prevElement->lock();
 			while (prevElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a next, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && prev->next) {
-					PWX_LOCK_GUARD(elem_t, prevElement)
+				if ((eCount > 1) && prevElement->next) {
+					prevElement->next->lock();
 					prevElement->unlock();
 					prevElement = prevElement->next;
-					prevElement->lock();
 				}
 				else if (eCount < 2) {
 					prevElement->unlock();
@@ -974,9 +950,9 @@ private:
 				}
 			} // End of ensuring a valid prevElement
 		}
-		// We need a RAII aware lock guard now and reduce the previous manual lock:
+		// We need a new and now absolute lock:
 		PWX_LOCK_GUARD(elem_t, prevElement)
-		prevElement->unlock(); // (Now you know why I am using recursive mutexes. ;) )
+		if (prevElement) prevElement->unlock();
 #endif // PWX_THREADDEBUG
 
 		// 2: Create a new element
@@ -1042,14 +1018,13 @@ private:
 		elem_t* prevElement = prev;
 
 #ifdef PWX_THREADDEBUG
-		if (prev) {
+		if (prevElement) {
 			prevElement->lock();
 			while (prevElement->destroyed()) {
 				if ((eCount > 1) && prev->next) {
-					PWX_LOCK_GUARD(elem_t, prevElement)
+					prevElement->next->lock();
 					prevElement->unlock();
 					prevElement = prevElement->next;
-					prevElement->lock();
 				}
 				else if (eCount < 2) {
 					prevElement->unlock();
@@ -1063,7 +1038,7 @@ private:
 			} // End of ensuring a valid prevElement
 		}
 		PWX_NAMED_LOCK_GUARD(prev, elem_t, prevElement)
-		prevElement->unlock();
+		if (prevElement) prevElement->unlock();
 #endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
@@ -1107,10 +1082,9 @@ private:
 	}
 
 
-	/// @brief simple method to remove an element from the list
-	virtual uint32_t privRemove (elem_t* prev, elem_t* elem)
+	/// @brief simple method to remove an element from the list, all locks must be in place!
+	virtual void privRemove (elem_t* prev, elem_t* elem)
 	{
-		PWX_LOCK_GUARD(list_t, this)
 		if (elem) {
 			// maintain tail and head first
 			if (tail == elem)
@@ -1148,7 +1122,43 @@ private:
 			elem->next = nullptr;
 			--eCount;
 		} // end of having an element to remove
-		return eCount;
+	}
+
+
+	/// @brief remove the element after the specified data
+	virtual elem_t* privRemoveAfterData(data_t* prev)
+	{
+		PWX_TRY_PWX_FURTHER(return privRemoveAfterData(prev))
+
+		if (prev && (nullptr == find (prev)))
+			// find sets curr to the correct value.
+			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
+
+		if (prev && (nullptr == curr->next))
+			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind element holding the given prev pointer")
+
+		elem_t* toRemove = prev ? curr->next : head;
+		privRemove (prev ? curr : nullptr, toRemove);
+
+		return toRemove;
+	}
+
+
+	/// @brief remove the element after the specified element
+	virtual elem_t* privRemoveAfterElement(elem_t* prev)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if (prev && (nullptr == prev->next))
+			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind the given prev element")
+
+		if (0 == eCount)
+			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
+
+		elem_t* toRemove = prev ? prev->next : head;
+		privRemove (prev, toRemove);
+
+		return toRemove;
 	}
 }; // class TSingleList
 
