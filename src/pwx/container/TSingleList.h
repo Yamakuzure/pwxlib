@@ -768,13 +768,13 @@ private:
 	{
 		try {
 			if (removed) {
-				PWX_DOUBLE_LOCK(list_t, this, elem_t, removed)
+				PWX_LOCK_GUARD(elem_t, removed)
 				if (!removed->destroyed())
 					delete removed;
 			}
 			return eCount;
 		}
-		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TSingleList::delNext() failed.")
+		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TSingleList::privDelete() failed.")
 	}
 
 
