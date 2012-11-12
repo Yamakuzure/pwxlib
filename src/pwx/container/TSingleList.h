@@ -1149,6 +1149,14 @@ private:
 	{
 		PWX_LOCK_GUARD (list_t, this)
 
+#ifdef PWX_THREADDEBUG
+		if (prev->destroyed()) {
+			// If it is deleted, there is no "next" to get on with
+			PWX_THROW("Illegal Condition", "prev element destroyed",
+					  "The previous element for a removal is already destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
 		if (prev && (nullptr == prev->next))
 			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind the given prev element")
 
