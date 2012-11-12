@@ -596,9 +596,6 @@ public:
 			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind element holding the given prev pointer")
 
 		elem_t* toRemove = prev ? curr->next : head;
-
-		// Lock both curr and the element to remove, then get it out
-		PWX_DOUBLE_LOCK (elem_t, curr, elem_t, toRemove);
 		privRemove (prev ? curr : nullptr, toRemove);
 
 		return toRemove;
@@ -634,11 +631,7 @@ public:
 			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
 
 		elem_t* toRemove = prev ? prev->next : head;
-
-		// Lock and remove the element
-		toRemove->lock();
 		privRemove (prev, toRemove);
-		toRemove->unlock();
 
 		return toRemove;
 	}
@@ -1117,6 +1110,7 @@ private:
 	/// @brief simple method to remove an element from the list
 	virtual uint32_t privRemove (elem_t* prev, elem_t* elem)
 	{
+		PWX_LOCK_GUARD(list_t, this)
 		if (elem) {
 			// maintain tail and head first
 			if (tail == elem)
