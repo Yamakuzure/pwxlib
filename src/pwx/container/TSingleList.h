@@ -953,8 +953,6 @@ private:
 				}
 			} // End of ensuring a valid prevElement
 		}
-		// We need a new and now absolute lock:
-		PWX_LOCK_GUARD(elem_t, prevElement)
 		if (prevElement) prevElement->unlock();
 #endif // PWX_THREADDEBUG
 
@@ -1040,7 +1038,6 @@ private:
 				}
 			} // End of ensuring a valid prevElement
 		}
-		PWX_NAMED_LOCK_GUARD(prev, elem_t, prevElement)
 		if (prevElement) prevElement->unlock();
 #endif // PWX_THREADDEBUG
 
@@ -1051,7 +1048,7 @@ private:
 							 "The Creation of a new list element failed.")
 
 		// 4: Do the real insert
-		PWX_TRY_PWX_FURTHER(return privInsert(prev, newElement))
+		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
 	}
 
 
