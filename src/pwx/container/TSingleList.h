@@ -1128,7 +1128,7 @@ private:
 	/// @brief remove the element after the specified data
 	virtual elem_t* privRemoveAfterData(data_t* prev)
 	{
-		PWX_TRY_PWX_FURTHER(return privRemoveAfterData(prev))
+		PWX_LOCK_GUARD(list_t, this)
 
 		if (prev && (nullptr == find (prev)))
 			// find sets curr to the correct value.
