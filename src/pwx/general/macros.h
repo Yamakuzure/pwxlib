@@ -190,8 +190,7 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_LOCK(object) { \
-		PWX_TRY(object->lock()) \
-		PWX_THROW_FURTHER \
+		PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
 	}
 #else
 #  define PWX_LOCK(object)
@@ -220,8 +219,7 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_UNLOCK(object) { \
-		PWX_TRY(object->unlock()) \
-		PWX_THROW_FURTHER \
+		PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
 	}
 #else
 #  define PWX_UNLOCK(object)
