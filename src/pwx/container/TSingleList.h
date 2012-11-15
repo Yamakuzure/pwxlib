@@ -1083,7 +1083,7 @@ private:
 
 
 	/// @brief simple method to remove an element from the list, all locks must be in place!
-	virtual void privRemove (elem_t* prev, elem_t* elem)
+	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
 			// maintain tail and head first
@@ -1130,7 +1130,7 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 
-		if (prev && (nullptr == find (prev)))
+		if (prev && (nullptr == privFind (prev)))
 			// find sets curr to the correct value.
 			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
 
