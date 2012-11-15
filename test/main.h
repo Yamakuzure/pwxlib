@@ -2,15 +2,15 @@
 #ifndef PWX_LIBPWX_TEST_MAIN_H_INCLUDED
 #define PWX_LIBPWX_TEST_MAIN_H_INCLUDED 1
 
+#ifdef PWX_THREADS
+# include <thread>
+#endif
 #include <ctime>
 #include <iostream>
 using std::cout;
 using std::cerr;
 using std::endl;
 
-#ifndef PWX_THREADS
-# define PWX_THREADS 1
-#endif
 #include <pwx.h>
 using pwx::adjRight;
 
@@ -19,6 +19,8 @@ typedef int32_t data_t;
 
 /// Number of elements to use with all mass and speed tests
 const uint32_t maxElements = 1000000;
+/// Number of threads to launch for parallel testing
+const uint32_t maxThreads  = 8;
 
 #include "env.h"
 #include "destroy.h"

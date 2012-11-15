@@ -35,25 +35,46 @@ int32_t main()
 		if (EXIT_SUCCESS == result) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
 			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
-			PWX_TRY_PWX_FURTHER (result = testSpeed<single_list_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeed<double_list_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeed<single_ring_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<double_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeed<double_ring_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeed<stack_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_ring_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeed<queue_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_ring_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeed<set_t> (env))
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<double_ring_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_ring_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<stack_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<stack_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<queue_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<queue_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedST<set_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testSpeedMT<set_t> (env))
 		}
 
 		// End of giant try
