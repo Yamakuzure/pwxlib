@@ -337,17 +337,7 @@ public:
 	**/
 	virtual elem_t* remData (data_t* data) noexcept
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		elem_t* toRemove = nullptr;
-
-		if (data)
-			toRemove = find (data);
-
-		// If we were successful, we have to detach toRemove first:
-		if (toRemove)
-			privRemove (toRemove->prev, toRemove);
-
-		return toRemove;
+		return privRemoveData(data);
 	}
 
 
@@ -368,10 +358,7 @@ public:
 	**/
 	virtual elem_t* remElem (elem_t* elem) noexcept
 	{
-		PWX_LOCK_GUARD (list_t, this)
-		if (elem)
-			privRemove (elem->prev, elem);
-		return elem;
+		return privRemoveElem(elem);
 	}
 
 
@@ -398,24 +385,7 @@ public:
 	**/
 	virtual elem_t* remPrev (data_t* next)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
-		if (next && (nullptr == find (next)))
-			// find sets curr to the correct value.
-			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this doubly linked list")
-
-		if (next && (nullptr == curr->prev))
-			PWX_THROW ("OutOfRange", "Element out of range", "There is no element before the element holding the given next pointer")
-
-		elem_t* toRemove = next ? curr->prev : tail;
-
-		// Lock both curr and the element to remove:
-		PWX_DOUBLE_LOCK (elem_t, curr, elem_t, toRemove);
-
-		// Now detach toRemove
-		privRemove (toRemove->prev, toRemove);
-
-		return toRemove;
+		PWX_TRY_PWX_FURTHER(return privRemoveBeforeData(next))
 	}
 
 
@@ -442,23 +412,7 @@ public:
 	**/
 	virtual elem_t* remPrevElem (elem_t* next)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
-		if (next && (nullptr == next->prev))
-			PWX_THROW ("OutOfRange", "Element out of range", "There is no element before the given prev element")
-
-		if (0 == eCount)
-			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
-
-		elem_t* toRemove = next ? next->prev : tail;
-
-		// Lock the element to remove and then detach it out of the list
-		toRemove->lock();
-		privRemove (toRemove->prev, toRemove);
-
-		toRemove->unlock();
-
-		return toRemove;
+		PWX_TRY_PWX_FURTHER(return privRemoveBeforeElem(next))
 	}
 
 
@@ -853,7 +807,7 @@ private:
 
 
 	/// @brief simple method to remove an element from the list
-	virtual void privRemove (elem_t* prev, elem_t* elem)
+	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
 			// maintain tail and head first
@@ -895,6 +849,82 @@ private:
 			elem->prev = nullptr;
 			--eCount;
 		} // end of having an element to remove
+	}
+
+
+	/// @brief simple wrapper to prepare the direct removal of data
+	virtual elem_t* privRemoveData(data_t* data) noexcept
+	{
+		PWX_LOCK_GUARD(list_t, this)
+
+		if ( (nullptr == data) || (nullptr == find (data) ) )
+			return nullptr;
+
+		elem_t* toRemove = curr;
+		privRemove (curr->prev, curr);
+
+		return toRemove;
+	}
+
+
+	/// @brief simple wrapper to prepare the direct removal of an element
+	virtual elem_t* privRemoveElem(elem_t* elem) noexcept
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+		if ((nullptr == elem) || elem->destroyed() || (0 == eCount))
+			return nullptr;
+
+		privRemove (elem->prev, elem);
+
+		return elem;
+	}
+
+
+	/// @brief simple wrapper to prepare the removal of an element before data
+	virtual elem_t* privRemoveBeforeData(data_t* next)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+
+		if (next && (nullptr == find (next)))
+			// find sets curr to the correct value.
+			PWX_THROW ("ElementNotFound", "Element not found",
+						"The searched element can not be found in this double linked list")
+
+		if (next && (nullptr == curr->prev))
+			PWX_THROW ("OutOfRange", "Element out of range",
+						"There is no element before element holding the given prev pointer")
+
+		elem_t* toRemove = next ? curr->prev : tail;
+		privRemove (toRemove ? toRemove->prev : nullptr, toRemove);
+
+		return toRemove;
+	}
+
+
+	/// @brief simple wrapper to prepare the removal of an element before another element
+	virtual elem_t* privRemoveBeforeElem(elem_t* elem)
+	{
+		PWX_LOCK_GUARD (list_t, this)
+
+#ifdef PWX_THREADDEBUG
+		if (elem->destroyed()) {
+			// If it is deleted, there is no "prev" to get on with
+			PWX_THROW("Illegal Condition", "next element destroyed",
+					  "The next element for a removal is already destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		if (elem && (nullptr == elem->prev))
+			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind the given prev element")
+
+		if (0 == eCount)
+			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
+
+		elem_t* toRemove = elem ? elem->prev : tail;
+		privRemove (toRemove ? toRemove->prev : nullptr, toRemove);
+
+		return toRemove;
 	}
 }; // class TDoubleList
 
