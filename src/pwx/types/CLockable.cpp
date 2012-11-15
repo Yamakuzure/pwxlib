@@ -24,10 +24,17 @@ CLockable::CLockable (const CLockable&) noexcept
 
 /** @brief ~CLockable
   *
-  * @todo: document this function
+  * The default dtor will try to unlock a held mutex until it succeeds.
   */
 CLockable::~CLockable() noexcept
-{ /* --- nothing to do here. ---*/ }
+{
+#if defined(PWX_THREADS)
+	while (lock_cnt) {
+		PWX_TRY(this->unlock())
+		PWX_CATCH_AND_FORGET(CException)
+	}
+#endif
+}
 
 
 /** @brief lock
@@ -48,7 +55,7 @@ CLockable::~CLockable() noexcept
 void CLockable::lock()
 {
 #if defined(PWX_THREADS)
-	PWX_TRY (mutex.lock())
+	PWX_TRY (mutex.lock(); ++lock_cnt;)
 	catch (int &e) {
 		if      (EINVAL  == e) PWX_THROW ("LockFailed", "EINVAL",  "Invalid argument")
 		else if (EAGAIN  == e) PWX_THROW ("LockFailed", "EAGAIN",  "Try again")
@@ -72,7 +79,11 @@ void CLockable::lock()
 bool CLockable::try_lock() noexcept
 {
 #if defined(PWX_THREADS)
-	PWX_TRY (return mutex.try_lock())
+	try {
+		bool gotLock = mutex.try_lock();
+		if (gotLock) ++lock_cnt;
+		return gotLock;
+	}
 	PWX_CATCH_AND_FORGET (int)
 	return false; // A system error occurred.
 #else
@@ -98,9 +109,15 @@ bool CLockable::try_lock() noexcept
   */
 void CLockable::unlock()
 {
-#if defined(PWC_THREADS)
-	PWX_TRY (mutex.unlock())
+#if defined(PWX_THREADS)
+	try {
+		if (lock_cnt) {
+			--lock_cnt;
+			mutex.unlock();
+		}
+	}
 	catch (int &e) {
+		++lock_cnt; // unlocking didn't work out.
 		if      (EINVAL  == e) PWX_THROW ("UnlockFailed", "EINVAL",  "Invalid argument")
 		else if (EAGAIN  == e) PWX_THROW ("UnlockFailed", "EAGAIN",  "Try again")
 		else if (EBUSY   == e) PWX_THROW ("UnlockFailed", "EBUSY",   "Device or resource busy")
