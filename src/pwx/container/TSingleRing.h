@@ -531,10 +531,8 @@ private:
 	 * ===============================================
 	*/
 
-	/// IMPORTANT: private methods do not lock, callers must have locked!
-
 	/// @brief simple private method to make sure the ring is closed
-	void privConnectEnds() noexcept
+	virtual void privConnectEnds() noexcept
 	{
 		if (tail && (tail->next != head))
 			tail->next = head;
