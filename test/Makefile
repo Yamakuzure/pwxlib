@@ -21,9 +21,9 @@ INCDIR   = -I../src
 	@echo "Compiling $@"
 	@$(CXX) $(INCDIR) $(CXXFLAGS) -o $@ -c $<
 
-all: $(TARGET)
+all: depend $(TARGET)
 
-$(TARGET): depend $(MODULES)
+$(TARGET): $(MODULES)
 	@echo "Linking $(TARGET) ..."
 	@$(CXX) -o $(TARGET) $(LDFLAGS) -L../lib -lpwx $(MODULES)
 
