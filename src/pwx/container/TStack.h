@@ -203,24 +203,7 @@ public:
 	 * ===============================================
 	*/
 
-	/** @brief assignment operator
-	  *
-	  * Clears this stack and copies all elements from @a rhs
-	  * onto this stack.
-	  *
-	  * @param[in] rhs reference of the stack to copy.
-	  * @return reference to this.
-	**/
-	virtual list_t &operator= (const list_t &rhs)
-	{
-		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			clear();
-			destroy = rhs.destroy;
-			PWX_TRY_PWX_FURTHER (*this += rhs)
-		}
-		return *this;
-	}
+	using base_t::operator=;
 
 
 	/** @brief addition assignment operator
@@ -239,7 +222,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			int32_t rSize = rhs.size();
 			for (int32_t i = 1; i <= rSize; ++i) {
-				PWX_TRY_PWX_FURTHER (insNext(nullptr, *rhs[0 - i]))
+				PWX_TRY_PWX_FURTHER (insNextElem(nullptr, *rhs[0 - i]))
 			}
 		}
 		return *this;
