@@ -902,7 +902,7 @@ private:
 
 	/// @brief preparation method to insert data behind data
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsDataBehindData(data_t* prev, data_t* data)
+	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
 		// 1: Prepare the previous element
 		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
@@ -924,7 +924,7 @@ private:
 
 	/// @brief preparation method to insert data behind an element
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
+	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
 		// 1: Prepare the previous element
 		elem_t* prevElement = prev;
@@ -969,7 +969,7 @@ private:
 
 	/// @brief preparation method to insert an element copy behind data
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
+	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
 		// 1: Check source:
 		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(&src))
@@ -1002,7 +1002,7 @@ private:
 
 	/// @brief preparation method to insert an element copy behind an element
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
+	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
 		// 1: Check source:
 		PWX_NAMED_LOCK_GUARD(src, elem_t, const_cast<elem_t*>(&src))
@@ -1053,7 +1053,7 @@ private:
 
 
 	/// @brief Simple inserter, all locks must be in place!
-	uint32_t privInsert (elem_t* insPrev, elem_t* insElem)
+	virtual uint32_t privInsert (elem_t* insPrev, elem_t* insElem)
 	{
 		// Now the real insertion can be done:
 		if (insPrev) {

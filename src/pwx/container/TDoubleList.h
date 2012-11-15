@@ -598,7 +598,7 @@ private:
 
 	/// @brief preparation method to insert data before data
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsDataBeforeData(data_t* next, data_t* data)
+	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
 	{
 		// 1: Prepare the next element
 		elem_t* nextElement = next ? const_cast<elem_t*>(find(next)) : nullptr;
@@ -620,7 +620,7 @@ private:
 
 	/// @brief preparation method to insert data before an element
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
+	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
 		// 1: Prepare the previous element
 		elem_t* nextElement = next;
@@ -665,7 +665,7 @@ private:
 
 	/// @brief preparation method to insert an element copy before data
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
+	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
 	{
 		// 1: Check source:
 		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(&src))
@@ -698,7 +698,7 @@ private:
 
 	/// @brief preparation method to insert an element copy before an element
 	/// Note: The list must be locked beforehand!
-	uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
+	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
 		// 1: Check source:
 		PWX_NAMED_LOCK_GUARD(src, elem_t, const_cast<elem_t*>(&src))
