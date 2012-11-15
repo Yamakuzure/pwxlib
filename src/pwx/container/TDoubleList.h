@@ -421,29 +421,11 @@ public:
 	 * ===============================================
 	*/
 
-	/** @brief assignment operator
-	  *
-	  * Clears this list and copies all elements from @a rhs
-	  * into this list.
-	  *
-	  * @param[in] rhs reference of the list to copy.
-	  * @return reference to this.
-	**/
-	virtual list_t &operator= (const list_t &rhs)
-	{
-		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			clear();
-			destroy = rhs.destroy;
-			PWX_TRY_PWX_FURTHER (*this += rhs)
-		}
-		return *this;
-	}
-
-
+	using base_t::operator=;
 	using base_t::operator+=;
 	using base_t::operator-=;
 	using base_t::operator[];
+
 
 protected:
 	/* ===============================================
