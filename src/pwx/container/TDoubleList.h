@@ -469,7 +469,7 @@ private:
 					removed->unlock();
 					delete removed;
 				} else
-					removed->lock();
+					removed->unlock();
 			}
 			return eCount;
 		}
