@@ -913,7 +913,7 @@ private:
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data),
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
 
@@ -958,7 +958,7 @@ private:
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data),
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
 
