@@ -102,7 +102,6 @@ private:
 
 #if defined(PWX_THREADS)
 	::std::recursive_mutex mutex;
-	size_t lock_cnt = 0;
 #endif
 }; // class CLockable
 

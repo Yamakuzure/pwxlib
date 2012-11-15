@@ -29,9 +29,11 @@ CLockable::CLockable (const CLockable&) noexcept
 CLockable::~CLockable() noexcept
 {
 #if defined(PWX_THREADS)
-	while (lock_cnt) {
+	if (mutex.native_handle()->__data.__lock && try_lock()){
+		while (mutex.native_handle()->__data.__count) {
 		PWX_TRY(this->unlock())
 		PWX_CATCH_AND_FORGET(CException)
+		}
 	}
 #endif
 }
@@ -55,7 +57,7 @@ CLockable::~CLockable() noexcept
 void CLockable::lock()
 {
 #if defined(PWX_THREADS)
-	PWX_TRY (mutex.lock(); ++lock_cnt;)
+	PWX_TRY (mutex.lock())
 	catch (int &e) {
 		if      (EINVAL  == e) PWX_THROW ("LockFailed", "EINVAL",  "Invalid argument")
 		else if (EAGAIN  == e) PWX_THROW ("LockFailed", "EAGAIN",  "Try again")
@@ -79,11 +81,7 @@ void CLockable::lock()
 bool CLockable::try_lock() noexcept
 {
 #if defined(PWX_THREADS)
-	try {
-		bool gotLock = mutex.try_lock();
-		if (gotLock) ++lock_cnt;
-		return gotLock;
-	}
+	PWX_TRY(return mutex.try_lock())
 	PWX_CATCH_AND_FORGET (int)
 	return false; // A system error occurred.
 #else
@@ -110,14 +108,8 @@ bool CLockable::try_lock() noexcept
 void CLockable::unlock()
 {
 #if defined(PWX_THREADS)
-	try {
-		if (lock_cnt) {
-			--lock_cnt;
-			mutex.unlock();
-		}
-	}
+	PWX_TRY(mutex.unlock())
 	catch (int &e) {
-		++lock_cnt; // unlocking didn't work out.
 		if      (EINVAL  == e) PWX_THROW ("UnlockFailed", "EINVAL",  "Invalid argument")
 		else if (EAGAIN  == e) PWX_THROW ("UnlockFailed", "EAGAIN",  "Try again")
 		else if (EBUSY   == e) PWX_THROW ("UnlockFailed", "EBUSY",   "Device or resource busy")
