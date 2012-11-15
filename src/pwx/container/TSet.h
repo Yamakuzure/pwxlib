@@ -557,9 +557,110 @@ public:
 	using base_t::pop;
 	using base_t::pop_back;
 	using base_t::pop_front;
-	using base_t::push;
-	using base_t::push_back;
-	using base_t::push_front;
+
+
+	/** @brief push an element onto the set
+	  *
+	  * This is the regular set operation pushing an element
+	  * onto the end of the set.
+	  *
+	  * To add an element to the front, use unshift() or push_front().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push(data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER(return insNextElem(tail, data))
+	}
+
+
+	/** @brief push an element copy onto the set
+	  *
+	  * This is the regular set operation pushing an element
+	  * copy onto the end of the set.
+	  *
+	  * To add an element to the front, use unshift() or push_front().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src element to copy.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push(const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return insNextElem(tail, src))
+	}
+
+
+	/** @brief push an element onto the end of set
+	  *
+	  * To add an element to the front, use unshift() or push_front().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push_back(data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER(return insNextElem(tail, data))
+	}
+
+
+	/** @brief push an element copy onto the end of set
+	  *
+	  * To add an element to the front, use unshift() or push_front().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src element to copy.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push_back(const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return insNextElem(tail, src))
+	}
+
+
+	/** @brief push an element to the front the set
+	  *
+	  * To add an element to the back, use push() or push_back().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data data pointer to store.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push_front(data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER(return insNext(nullptr, data))
+	}
+
+
+	/** @brief push an element copy to the front the set
+	  *
+	  * To add an element to the back, use push() or push_back().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src element to copy.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t push_front(const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return insNext(nullptr, src))
+	}
+
+
 	using base_t::remData;
 	using base_t::remElem;
 	using base_t::remNext;
@@ -630,7 +731,26 @@ public:
 	**/
 	virtual uint32_t unshift(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return push_front(data))
+		PWX_TRY_PWX_FURTHER(return insNext(nullptr, data))
+	}
+
+
+	/** @brief unshift an element copy onto the set
+	  *
+	  * This is the irregular set operation unshifting an element
+	  * copy onto the start of the set.
+	  *
+	  * To add an element to the end, use push() or push_back().
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src element to copy.
+	  * @return number of elements stored after the operation.
+	**/
+	virtual uint32_t unshift(const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return insNext(nullptr, src))
 	}
 
 
