@@ -29,13 +29,46 @@ CLockable::CLockable (const CLockable&) noexcept
 CLockable::~CLockable() noexcept
 {
 #if defined(PWX_THREADS)
+	clear_locks();
+	// the return value is unimportant, we can't do
+	// anything about it in the middle of a dtor anyway.
+#endif
+}
+
+
+/** @brief clear all locks from this thread.
+  *
+  * If this thread is the current owner of the mutex' lock,
+  * and if there are locks in place, they are all cleared.
+  *
+  * Warning: This method throws away all exceptions. Use
+  * it only if a normal unlocking is, for whatever reason,
+  * not an option. Regular unlock() calls are always to be
+  * preferred.
+  *
+  * If the macro PWX_THREADS is not defined, this method
+  * always returns true.
+  *
+  * @return true if this thread is the owner and all locks could be cleared.
+**/
+bool CLockable::clear_locks() noexcept
+{
+#if defined(PWX_THREADS)
 	if (mutex.native_handle()->__data.__lock && try_lock()){
+		/** @todo : There must be an easier way, or more direct way,
+		  * to find out whether this thread is the owner or not.
+		**/
 		while (mutex.native_handle()->__data.__count) {
-		PWX_TRY(this->unlock())
-		PWX_CATCH_AND_FORGET(CException)
+			PWX_TRY(this->unlock())
+			PWX_CATCH_AND_FORGET(CException)
 		}
 	}
+
+	// Return false if the mutex is still locked:
+	if (mutex.native_handle()->__data.__lock)
+		return false;
 #endif
+	return true;
 }
 
 
@@ -72,7 +105,10 @@ void CLockable::lock()
   *
   * Try to lock the recursive mutex of this object.
   *
-  * If the locking was successful, the method returns true, false otherwise
+  * If the locking was successful, the method returns true, false otherwise.
+  * Although this method can be used to determine whether a thread is the
+  * current owner of a lock, please remember that a return value of
+  * "true" means that you have to unlock this extra lock.
   *
   * If the macro PWX_THREADS is not defined, this method does nothing.
   *

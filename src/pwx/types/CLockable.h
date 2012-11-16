@@ -45,10 +45,16 @@ namespace pwx
   * application with the macro PWX_THREADS being defined, or there will
   * be no locking functionality.
   *
-  * Any class that is derived from this class gains three methods
-  * lock(), try_lock() and unlock() to use a recursive mutex for locking.
+  * Any class that is derived from this class gains four methods
+  * lock(), try_lock(), clear_locks() and unlock() to use a recursive mutex
+  * for locking.
   * Recursive mutex means, that the class can be locked several times
   * by the locking thread, but needs the same amount of unlocking calls.
+  *
+  * If the owning thread destroys the lockable mutex, the destructor will
+  * try to unlock completely before going away. If another thread waits
+  * for a lock in the meantime, or if the destroying thread is not the
+  * lock owner, the behavior is undefined.
   *
   * Although very unlikely, the three mutex methods can throw system errors.
   * These are caught and translated into pwx::CException with proper names,
@@ -80,6 +86,7 @@ public:
 	 * ===============================================
 	*/
 
+	bool clear_locks() noexcept;
 	void lock();
 	bool try_lock() noexcept;
 	void unlock();
