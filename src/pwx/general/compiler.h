@@ -61,10 +61,14 @@
  * --- no inlining unless this is an internal compile without debug mode ---
  * -------------------------------------------------------------------------
 */
-#if !defined(LIBPWX_DEBUG) && defined(PWX_EXPORTS)
-#  define PWX_INLINE inline
-#else
+#if defined(LIBPWX_DEBUG)
 #  define PWX_INLINE
+#else
+#  if defined(PWX_EXPORTS)
+#    define PWX_INLINE inline
+#  else
+#    define PWX_INLINE extern
+#  endif
 #endif
 
 
