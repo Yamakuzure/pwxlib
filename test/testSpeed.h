@@ -11,6 +11,29 @@
 /// === REMOVE AFTER TESTING
 
 
+#ifdef PWX_THREADS
+// Little thread method to clear a container
+template<typename list_t>
+void thClr(list_t* cont)
+{
+	if (cont)
+		cont->clear();
+}
+#endif
+
+// little thread method to add elements to a container
+// used by the single threaded tests, too
+template<typename list_t>
+void thAdd(list_t* cont, data_t start, data_t toAdd, data_t maxAdd)
+{
+	if (cont) {
+		for (data_t nr = 0; nr < toAdd; ++nr) {
+			PWX_TRY_PWX_FURTHER(cont->push(new data_t(start)))
+			start += pwx::RNG.random(1, maxAdd);
+		}
+	}
+}
+
 
 /** @brief Unified container speed test - single threaded
   *
@@ -45,6 +68,7 @@ int32_t testSpeedST (sEnv &env)
 		cout << "nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
 	}
+	cout.flush();
 
 	list_t intCont; // The list
 
@@ -61,11 +85,7 @@ int32_t testSpeedST (sEnv &env)
 
 	// Now add localMaxElem integers and start the counting.
     clock_t startTime = clock();
-	int32_t value = lowest;
-	for (uint32_t pos = 0; pos < localMaxElem; ++pos) {
-		PWX_TRY_PWX_FURTHER(intCont.push(new data_t(value)))
-		value += pwx::RNG.random(1, maxAdd);
-	}
+	thAdd<list_t>(&intCont, lowest, localMaxElem, maxAdd);
 
 	// Now clear them up again:
 	uint32_t contSize = intCont.size();
@@ -86,30 +106,6 @@ int32_t testSpeedST (sEnv &env)
 
 	return result;
 }
-
-
-#ifdef PWX_THREADS
-// Little thread method to clear a container
-template<typename list_t>
-void thClr(list_t* cont)
-{
-	if (cont)
-		cont->clear();
-}
-
-// little thread method to add elements to a container
-template<typename list_t>
-void thAdd(list_t* cont, data_t start, data_t toAdd, data_t maxAdd)
-{
-	if (cont) {
-		for (data_t nr = 0; nr < toAdd; ++nr) {
-			PWX_TRY(cont->push(new data_t(start)))
-			PWX_CATCH_AND_FORGET(std::exception)
-			start += pwx::RNG.random(1, maxAdd);
-		}
-	}
-}
-#endif
 
 
 /** @brief Unified container speed test - multi threaded
