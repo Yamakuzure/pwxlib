@@ -865,14 +865,14 @@ private:
 			uint32_t xNr   = eNr;
 			PWX_UNLOCK(const_cast<list_t*>(this))
 
-			// Is curr already correct?
+			// Is xCurr already correct?
 			if (xIdx == xNr)
 				return xCurr;
 
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
-				PWX_LOCK(const_cast<list_t*>(this))
 				xCurr = xCurr->next;
+				PWX_LOCK(const_cast<list_t*>(this))
 				curr  = xCurr;
 				eNr   = xNr + 1;
 				PWX_UNLOCK(const_cast<list_t*>(this))
@@ -985,8 +985,15 @@ private:
 	/// Note: The list must be locked beforehand!
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		// 1: Check source:
-		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(&src))
+		// 1: Prepare the previous element
+		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
+		if (prev && (nullptr == prevElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this singly linked list")
+
+		// 2: Check source:
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 #ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
@@ -996,18 +1003,12 @@ private:
 		}
 #endif // PWX_THREADDEBUG
 
-		// 2: Prepare the previous element
-		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
-		if (prev && (nullptr == prevElement))
-			PWX_THROW ("ElementNotFound",
-					   "Element not found",
-					   "The searched element can not be found in this singly linked list")
-
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
@@ -1018,18 +1019,7 @@ private:
 	/// Note: The list must be locked beforehand!
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		// 1: Check source:
-		PWX_NAMED_LOCK_GUARD(src, elem_t, const_cast<elem_t*>(&src))
-
-#ifdef PWX_THREADDEBUG
-		if (src.destroyed()) {
-			// What on earth did the caller think?
-			PWX_THROW("Illegal Condition", "Source element destroyed",
-					  "An element used as source for insertion is destroyed.")
-		}
-#endif // PWX_THREADDEBUG
-
-		// 2: Prepare the previous element
+		// 1: Prepare the previous element
 		elem_t* prevElement = prev;
 
 #ifdef PWX_THREADDEBUG
@@ -1055,11 +1045,23 @@ private:
 		if (prevElement) PWX_UNLOCK(prevElement)
 #endif // PWX_THREADDEBUG
 
+		// 2: Check source:
+		PWX_LOCK(const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
@@ -1150,15 +1152,17 @@ private:
 	/// @brief remove the element after the specified data
 	virtual elem_t* privRemoveAfterData(data_t* prev)
 	{
-		if (prev && (nullptr == privFind (prev)))
-			// find sets curr to the correct value.
+		elem_t* xPrev = nullptr;
+
+		if (prev && (nullptr == (xPrev = const_cast<elem_t*>(privFind (prev))) ) )
 			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
 
-		if (prev && (nullptr == curr->next))
+		if (xPrev && (nullptr == xPrev->next))
 			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind element holding the given prev pointer")
 
-		elem_t* toRemove = prev ? curr->next : head;
-		privRemove (prev ? curr : nullptr, toRemove);
+		elem_t* toRemove = xPrev ? xPrev->next : head;
+
+		privRemove (xPrev, toRemove);
 
 		return toRemove;
 	}
