@@ -121,7 +121,27 @@ public:
 	 * ===============================================
 	*/
 
-	using base_t::clear;
+	/** @brief delete all elements
+	  *
+	  * This is a quick way to get rid of all elements
+	  * at once. If a destroy() function was set, it is
+	  * used for the data deletion. Otherwise it is
+	  * assumed that data_t responds to the delete
+	  * operator.
+	**/
+	virtual void clear() noexcept
+	{
+		while (eCount) {
+			try {
+#ifdef PWX_THREADS
+				PWX_LOCK_GUARD(list_t, this)
+				if (eCount)
+#endif // PWX_THREADS
+				privDelete(remElem(tail));
+			}
+			PWX_CATCH_AND_FORGET(CException)
+		}
+	}
 
 
 	/** @brief delete the element holding the specified data
@@ -814,7 +834,7 @@ private:
 	/// @brief simple method to insert an element into the list
 	virtual uint32_t privInsert (elem_t* prev, elem_t* elem) noexcept
 	{
-		PWX_UNLOCK(this)
+		PWX_LOCK(this)
 		if (prev) {
 			if (tail == prev)
 				tail = elem;
