@@ -34,7 +34,8 @@ int32_t main()
 		// --- test the speed of the containers ---
 		if (EXIT_SUCCESS == result) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
-			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
+			cout << " (Inserting " << maxElements << " random elements and clear up)";
+			cout << "                Add / Clear" << endl;
 			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_list_t> (env))
 		}
 		if (EXIT_SUCCESS == result) {
