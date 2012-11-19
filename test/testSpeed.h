@@ -50,20 +50,20 @@ int32_t testSpeedST (sEnv &env)
 
 	cout << adjRight (4, 0) << ++env.testCount << " Test the speed of ";
 	if (isSameType (list_t, single_list_t))
-		cout << "singly linked lists ( 1 thread ) : ";
+		cout << "singly linked lists   ( 1 thread ) : ";
 	else if (isSameType (list_t, double_list_t))
-		cout << "doubly linked lists ( 1 thread ) : ";
+		cout << "doubly linked lists   ( 1 thread ) : ";
 	else if (isSameType (list_t, single_ring_t))
-		cout << "singly linked rings ( 1 thread ) : ";
+		cout << "singly linked rings   ( 1 thread ) : ";
 	else if (isSameType (list_t, double_ring_t))
-		cout << "doubly linked rings ( 1 thread ) : ";
+		cout << "doubly linked rings   ( 1 thread ) : ";
 	else if (isSameType (list_t, stack_t))
-		cout << "stacks              ( 1 thread ) : ";
+		cout << "stacks                ( 1 thread ) : ";
 	else if (isSameType (list_t, queue_t))
-		cout << "queues              ( 1 thread ) : ";
+		cout << "queues                ( 1 thread ) : ";
 	else if (isSameType (list_t, set_t)) {
-		cout << "sets                ( 1 thread ) : ";
 		localMaxElem /= 10;
+		cout << "sets " << adjRight(7,0) << localMaxElem << " elements ( 1 thread ) : ";
 	} else {
 		cout << "nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
@@ -84,17 +84,20 @@ int32_t testSpeedST (sEnv &env)
 	} while ((maxAdd < 2) || (static_cast<uint32_t>((highest - lowest) / maxAdd) < localMaxElem));
 
 	// Now add localMaxElem integers and start the counting.
-    clock_t startTime = clock();
+    clock_t startTimeAdd = clock();
 	thAdd<list_t>(&intCont, lowest, localMaxElem, maxAdd);
 
 	// Now clear them up again:
 	uint32_t contSize = intCont.size();
+	clock_t endTimeAdd = clock();
 	intCont.clear();
 
 	// Bring out the needed time in ms:
-	clock_t endTime = clock();
-	double msNeeded = 1000.0 * (static_cast<double>(endTime - startTime) / static_cast<double>(CLOCKS_PER_SEC));
-	cout << adjRight(5,0) << msNeeded << " ms" << endl;
+	clock_t endTimeClr = clock();
+	double msNeededAdd = 1000.0 * (static_cast<double>(endTimeAdd - startTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
+	double msNeededClr = 1000.0 * (static_cast<double>(endTimeClr - endTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
+	cout << adjRight(5,0) << msNeededAdd << " ms /";
+	cout << adjRight(5,0) << msNeededClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
@@ -125,20 +128,20 @@ int32_t testSpeedMT (sEnv &env)
 
 	cout << adjRight (4, 0) << ++env.testCount << " Test the speed of ";
 	if (isSameType (list_t, single_list_t))
-		cout << "singly linked lists (" << adjRight (2,0) << maxThreads << " threads)  : ";
+		cout << "singly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, double_list_t))
-		cout << "doubly linked lists (" << adjRight (2,0) << maxThreads << " threads)  : ";
+		cout << "doubly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, single_ring_t))
-		cout << "singly linked rings (" << adjRight (2,0) << maxThreads << " threads)  : ";
+		cout << "singly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, double_ring_t))
-		cout << "doubly linked rings (" << adjRight (2,0) << maxThreads << " threads)  : ";
+		cout << "doubly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, stack_t))
-		cout << "stacks              (" << adjRight (2,0) << maxThreads << " threads)  : ";
+		cout << "stacks                (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, queue_t))
-		cout << "queues              (" << adjRight (2,0) << maxThreads << " threads)  : ";
+		cout << "queues                (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, set_t)) {
-		cout << "sets                (" << adjRight (2,0) << maxThreads << " threads)  : ";
 		localMaxElem /= 10;
+		cout << "sets " << adjRight(7,0) << localMaxElem << " elements (" << adjRight (2,0) << maxThreads << " threads) : ";
 	} else {
 		cout << "nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
@@ -168,7 +171,7 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Create the thread array:
     std::thread* threads[maxThreads];
-    clock_t startTime = clock();
+    clock_t startTimeAdd = clock();
 
 	// Starting in a loop ...
     for (size_t nr = 0; nr < maxThreads; ++nr) {
@@ -187,6 +190,7 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Now clear the container up again:
 	uint32_t contSize = intCont.size();
+	clock_t endTimeAdd = clock();
 
 	// Starting in a loop ...
     for (size_t nr = 0; nr < maxThreads; ++nr) {
@@ -202,9 +206,11 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	// Bring out the needed time in ms:
-	clock_t endTime = clock();
-	double msNeeded = 1000.0 * (static_cast<double>(endTime - startTime) / static_cast<double>(CLOCKS_PER_SEC));
-	cout << adjRight(5,0) << msNeeded << " ms" << endl;
+	clock_t endTimeClr = clock();
+	double msNeededAdd = 1000.0 * (static_cast<double>(endTimeAdd - startTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
+	double msNeededClr = 1000.0 * (static_cast<double>(endTimeClr - endTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
+	cout << adjRight(5,0) << msNeededAdd << " ms /";
+	cout << adjRight(5,0) << msNeededClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
