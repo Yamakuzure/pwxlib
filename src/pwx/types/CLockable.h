@@ -105,7 +105,7 @@ public:
 	bool clear_locks() noexcept
 	{
 #if defined(PWX_THREADS)
-		if (mutex.native_handle()->__data.__lock && try_lock()){
+		if (mutex.native_handle()->__data.__lock && try_lock()) {
 			/** @todo : There must be an easier way, or more direct way,
 			  * to find out whether this thread is the owner or not.
 			**/
