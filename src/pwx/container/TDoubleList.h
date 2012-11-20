@@ -134,10 +134,17 @@ public:
 		while (eCount) {
 			try {
 #ifdef PWX_THREADS
-				PWX_LOCK_GUARD(list_t, this)
-				if (eCount)
-#endif // PWX_THREADS
+				PWX_LOCK(this)
+				elem_t* toDelete = tail;
+				if (eCount && toDelete && !toDelete->destroyed()) {
+					privRemove(toDelete->prev, toDelete);
+					PWX_FORCE_UNLOCK(this)
+					privDelete(toDelete);
+				} else
+					PWX_FORCE_UNLOCK(this)
+#else
 				privDelete(remElem(tail));
+#endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
 		}
