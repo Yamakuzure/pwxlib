@@ -291,7 +291,7 @@
 	::std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, ::std::defer_lock); \
 	::std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B);
 #else
-#  define PWX_LOCK_DEFER(Ta, objA, Tb, objB)
+#  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB)
 #endif
 
 
