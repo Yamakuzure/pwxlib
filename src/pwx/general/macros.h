@@ -228,6 +228,23 @@
 #endif
 
 
+/** @brief Use object->unlock if PWX_THREADS is defined, and throw possible exceptions away
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to unlock.
+**/
+#if defined(PWX_THREADS)
+#  define PWX_FORCE_UNLOCK(object) { \
+		if (object) { \
+			PWX_TRY(object->unlock()) \
+			PWX_CATCH_AND_FORGET(CException) \
+	} }
+#else
+#  define PWX_UNLOCK(object)
+#endif
+
+
 /** @brief Impose a lock guard on the given object, that is unlocked when leaving the current scope
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
