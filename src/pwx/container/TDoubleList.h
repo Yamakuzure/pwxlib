@@ -1035,11 +1035,10 @@ template<typename data_t, typename elem_t>
 TDoubleList<data_t, elem_t> operator+ (const TDoubleList<data_t, elem_t> &lhs, const TDoubleList<data_t, elem_t> &rhs)
 {
 	typedef TDoubleList<data_t, elem_t> list_t;
-	lhs.lock();
+	PWX_LOCK(&lhs)
 	list_t result (lhs);
-	lhs.unlock();
+	PWX_UNLOCK(&lhs)
 	if (&lhs != &rhs) {
-		PWX_LOCK_GUARD (list_t, const_cast<list_t*> (&rhs))
 		PWX_TRY_PWX_FURTHER (result += rhs)
 	}
 
@@ -1064,12 +1063,11 @@ template<typename data_t, typename elem_t>
 TDoubleList<data_t, elem_t> operator- (const TDoubleList<data_t, elem_t> &lhs, const TDoubleList<data_t, elem_t> &rhs)
 {
 	typedef TDoubleList<data_t, elem_t> list_t;
-	lhs.lock();
+	PWX_LOCK(&lhs)
 	list_t result (lhs);
-	lhs.unlock();
+	PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
-		PWX_LOCK_GUARD (list_t, const_cast<list_t*> (&rhs))
 		PWX_TRY_PWX_FURTHER (result -= rhs)
 	} else
 		result.clear();
