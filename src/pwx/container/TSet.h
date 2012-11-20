@@ -158,7 +158,6 @@ public:
 	**/
 	virtual elem_t* find (data_t &data) noexcept
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		return const_cast<elem_t* > (privFindData(static_cast<const data_t> (data)));
 	}
 
@@ -177,7 +176,6 @@ public:
 	**/
 	virtual const elem_t* find (const data_t &data) const noexcept
 	{
-		PWX_LOCK_GUARD (list_t, const_cast<list_t*>(this))
 		return privFindData(data);
 	}
 
@@ -231,8 +229,6 @@ public:
 	**/
 	virtual uint32_t insNext (data_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (data && (nullptr == privFindData(*data)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
@@ -268,8 +264,6 @@ public:
 	**/
 	virtual uint32_t insNext (data_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
@@ -309,8 +303,6 @@ public:
 	**/
 	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (data && (nullptr == privFindData(*data)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
@@ -350,8 +342,6 @@ public:
 	**/
 	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
@@ -387,8 +377,6 @@ public:
 	**/
 	virtual uint32_t insPrev (data_t* next, data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (data && (nullptr == privFindData(*data)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
@@ -424,8 +412,6 @@ public:
 	**/
 	virtual uint32_t insPrev (data_t* next, const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
@@ -465,8 +451,6 @@ public:
 	**/
 	virtual uint32_t insPrevElem (elem_t* next, data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (data && nullptr == privFindData(*data)) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
@@ -506,8 +490,6 @@ public:
 	**/
 	virtual uint32_t insPrevElem (elem_t* next, const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
-
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
@@ -535,17 +517,16 @@ public:
 		// The empty set is always a subset of everything.
 		if (eCount && (this != &src)) {
 			if (src.size()) {
-				curr = head;
-				eNr = 0;
+				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
+				elem_t* xCurr = head;
 
 				// A simple loop will do, because we can use privFindData directly.
 				do {
-					if (src.privFindData(**curr)) {
-						curr = curr->next;
-						++eNr;
-					} else
+					if (src.privFindData(**xCurr))
+						xCurr = xCurr->next;
+					else
 						result = false;
-				} while (result && (curr != tail));
+				} while (result && (xCurr != tail));
 			} else
 				result = false;
 		}
@@ -669,7 +650,7 @@ public:
 	using base_t::remPrevElem;
 
 
-	/** @brief reset a set to a predefined sate of a different set
+	/** @brief reset a set to a predefined state of a different set
 	  *
 	  * This method can be used to clear a set and copy both the
 	  * sorted switch and the destroy method from another set.
@@ -684,6 +665,7 @@ public:
 	**/
 	virtual void reset(const list_t &src) noexcept
 	{
+		PWX_LOCK_GUARD(list_t, this)
 		clear();
 		if (&src != this) {
 			destroy  = src.destroy;
@@ -811,8 +793,6 @@ private:
 	 * ===============================================
 	*/
 
-	/// IMPORTANT: private methods do not lock, callers must have locked!
-
 	/** @brief find an element holding the specified @a data
 	  *
 	  * The privFind() method of the containers search for pointers, while
@@ -831,6 +811,10 @@ private:
 	**/
 	const elem_t* privFindData (const data_t &data) const noexcept
 	{
+		// Note: As the consistency of the content of a set is more important
+		//       than anything, a big lock is a must-have here!
+		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
 		 * 1: If head is larger, data can not be in the set
