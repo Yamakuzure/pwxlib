@@ -11,28 +11,62 @@
 /// === REMOVE AFTER TESTING
 
 
-#ifdef PWX_THREADS
-// Little thread method to clear a container
+/// @brief struct doing synchronized start/stop for additions of items into containers
+/// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
 template<typename list_t>
-void thClr(list_t* cont)
+struct thAdder
 {
-	if (cont)
-		cont->clear();
-}
-#endif
+	bool    isRunning = false;
+	list_t* cont      = nullptr;
 
-// little thread method to add elements to a container
-// used by the single threaded tests, too
-template<typename list_t>
-void thAdd(list_t* cont, data_t start, data_t toAdd, data_t maxAdd)
-{
-	if (cont) {
-		for (data_t nr = 0; nr < toAdd; ++nr) {
-			PWX_TRY_PWX_FURTHER(cont->push(new data_t(start)))
-			start += pwx::RNG.random(1, maxAdd);
+	explicit thAdder(bool autostart) : isRunning(autostart) { }
+	thAdder() { thAdder(false); }
+
+	/// @brief the working functions, called manually or by std::thread
+	void operator()(list_t* cont_, data_t start, data_t toAdd, data_t maxAdd)
+	{
+		cont = cont_;
+#ifdef PWX_THREADS
+		std::chrono::milliseconds sleepTime( 1 );
+		while (!isRunning)
+			std::this_thread::sleep_for( sleepTime );
+#endif
+		if (cont) {
+			for (data_t nr = 0; nr < toAdd; ++nr) {
+				PWX_TRY_PWX_FURTHER(cont->push(new data_t(start)))
+				start += pwx::RNG.random(1, maxAdd);
+			}
 		}
+
+		isRunning = false;
 	}
-}
+};
+
+/// @brief struct doing synchronized start/stop for clearing containers
+/// IMPORTANT: Single threaded calls _MUST_ set autostart on creation !
+template<typename list_t>
+struct thClearer
+{
+	bool    isRunning = false;
+	list_t* cont      = nullptr;
+
+	explicit thClearer(bool autostart) : isRunning(autostart) { }
+	thClearer() { thClearer(false); }
+
+	/// @brief the working functions, called manually or by std::thread
+	void operator()(list_t* cont_)
+	{
+		cont = cont_;
+#ifdef PWX_THREADS
+		std::chrono::milliseconds sleepTime( 1 );
+		while (!isRunning)
+			std::this_thread::sleep_for( sleepTime );
+#endif
+		if (cont) cont->clear();
+
+		isRunning = false;
+	}
+};
 
 
 /** @brief Unified container speed test - single threaded
@@ -48,24 +82,24 @@ int32_t testSpeedST (sEnv &env)
 	int32_t  result       = EXIT_SUCCESS;
 	uint32_t localMaxElem = maxElements;
 
-	cout << adjRight (4, 0) << ++env.testCount << " Test the speed of ";
+	cout << adjRight (4, 0) << ++env.testCount;
 	if (isSameType (list_t, single_list_t))
-		cout << "singly linked lists   ( 1 thread ) : ";
+		cout << " Singly linked lists   ( 1 thread ) : ";
 	else if (isSameType (list_t, double_list_t))
-		cout << "doubly linked lists   ( 1 thread ) : ";
+		cout << " Doubly linked lists   ( 1 thread ) : ";
 	else if (isSameType (list_t, single_ring_t))
-		cout << "singly linked rings   ( 1 thread ) : ";
+		cout << " Singly linked rings   ( 1 thread ) : ";
 	else if (isSameType (list_t, double_ring_t))
-		cout << "doubly linked rings   ( 1 thread ) : ";
+		cout << " Doubly linked rings   ( 1 thread ) : ";
 	else if (isSameType (list_t, stack_t))
-		cout << "stacks                ( 1 thread ) : ";
+		cout << " Stacks                ( 1 thread ) : ";
 	else if (isSameType (list_t, queue_t))
-		cout << "queues                ( 1 thread ) : ";
+		cout << " Queues                ( 1 thread ) : ";
 	else if (isSameType (list_t, set_t)) {
 		localMaxElem /= 10;
-		cout << "sets " << adjRight(7,0) << localMaxElem << " elements ( 1 thread ) : ";
+		cout << " Sets " << adjRight(7,0) << localMaxElem << " elements ( 1 thread ) : ";
 	} else {
-		cout << "nothing - the type is unknown!" << endl;
+		cout << " Nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
 	}
 	cout.flush();
@@ -84,20 +118,21 @@ int32_t testSpeedST (sEnv &env)
 	} while ((maxAdd < 2) || (static_cast<uint32_t>((highest - lowest) / maxAdd) < localMaxElem));
 
 	// Now add localMaxElem integers and start the counting.
-    clock_t startTimeAdd = clock();
-	thAdd<list_t>(&intCont, lowest, localMaxElem, maxAdd);
+	thAdder<list_t> adder(true);
+	auto startTimeAdd = std::chrono::high_resolution_clock::now();
+    adder(&intCont, lowest, localMaxElem, maxAdd);
 
 	// Now clear them up again:
 	uint32_t contSize = intCont.size();
-	clock_t endTimeAdd = clock();
+	auto endTimeAdd = std::chrono::high_resolution_clock::now();
 	intCont.clear();
 
 	// Bring out the needed time in ms:
-	clock_t endTimeClr = clock();
-	double msNeededAdd = 1000.0 * (static_cast<double>(endTimeAdd - startTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
-	double msNeededClr = 1000.0 * (static_cast<double>(endTimeClr - endTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
-	cout << adjRight(5,0) << msNeededAdd << " ms /";
-	cout << adjRight(5,0) << msNeededClr << " ms" << endl;
+	auto endTimeClr = std::chrono::high_resolution_clock::now();
+	auto elapsedAdd = std::chrono::duration_cast<std::chrono::microseconds>(endTimeAdd - startTimeAdd).count() / 1000.0;
+	auto elapsedClr = std::chrono::duration_cast<std::chrono::microseconds>(endTimeClr - endTimeAdd  ).count() / 1000.0;
+	cout << adjRight(5,2) << elapsedAdd << " ms /";
+	cout << adjRight(5,2) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
@@ -126,24 +161,24 @@ int32_t testSpeedMT (sEnv &env)
 #ifdef PWX_THREADS
 	uint32_t localMaxElem = maxElements;
 
-	cout << adjRight (4, 0) << ++env.testCount << " Test the speed of ";
+	cout << adjRight (4, 0) << ++env.testCount;
 	if (isSameType (list_t, single_list_t))
-		cout << "singly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Singly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, double_list_t))
-		cout << "doubly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Doubly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, single_ring_t))
-		cout << "singly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Singly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, double_ring_t))
-		cout << "doubly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Doubly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, stack_t))
-		cout << "stacks                (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Stacks                (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, queue_t))
-		cout << "queues                (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Queues                (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, set_t)) {
 		localMaxElem /= 10;
-		cout << "sets " << adjRight(7,0) << localMaxElem << " elements (" << adjRight (2,0) << maxThreads << " threads) : ";
+		cout << " Sets " << adjRight(7,0) << localMaxElem << " elements (" << adjRight (2,0) << maxThreads << " threads) : ";
 	} else {
-		cout << "nothing - the type is unknown!" << endl;
+		cout << " Nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
 	}
 	cout.flush();
@@ -169,48 +204,80 @@ int32_t testSpeedMT (sEnv &env)
 	// to achieve the total number of localMaxElem
 	rest     = localMaxElem - (part * maxThreads);
 
-	// Create the thread array:
-    std::thread* threads[maxThreads];
-    clock_t startTimeAdd = clock();
+	// Create the thread and the worker arrays:
+    std::thread*      threads [maxThreads];
+    thAdder<list_t>   adders  [maxThreads];
+    thClearer<list_t> clearers[maxThreads];
 
-	// Starting in a loop ...
+	// Creation in a loop ...
     for (size_t nr = 0; nr < maxThreads; ++nr) {
-		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(thAdd<list_t>, &intCont, lowest,
+		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(adders[nr]), &intCont, lowest,
 														part + (nr == (maxThreads - 1) ? rest : 0),
 														maxAdd),
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
 		lowest += interval;
     }
+
+	// Starting in a loop
+	auto startTimeAdd = std::chrono::high_resolution_clock::now();
+    for (size_t nr = 0; nr < maxThreads; ++nr)
+		adders[nr].isRunning = true;
+
     // ... joining in a loop.
-	for (size_t nr = 0; nr < maxThreads; ++nr) {
-		threads[nr]->join();
-		delete threads[nr];
-		threads[nr] = nullptr;
+    bool isFinished = false;
+    while (!isFinished) {
+		isFinished = true;
+		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
+			if (adders[nr].isRunning)
+				isFinished = false;
+		}
+		if (isFinished) {
+			for (size_t nr = 0; nr < maxThreads; ++nr) {
+				threads[nr]->join();
+				delete threads[nr];
+				threads[nr] = nullptr;
+			}
+		} else
+			std::this_thread::yield();
     }
+
+	uint32_t contSize = intCont.size();
+	auto endTimeAdd = std::chrono::high_resolution_clock::now();
 
 	// Now clear the container up again:
-	uint32_t contSize = intCont.size();
-	clock_t endTimeAdd = clock();
-
-	// Starting in a loop ...
-    for (size_t nr = 0; nr < maxThreads; ++nr) {
-		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(thClr<list_t>, &intCont),
+    for (size_t nr = 0; nr < maxThreads; ++nr)
+		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(clearers[nr]), &intCont),
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
-		lowest += interval;
-    }
+
+	// Starting in a loop
+	auto startTimeClr = std::chrono::high_resolution_clock::now();
+    for (size_t nr = 0; nr < maxThreads; ++nr)
+		clearers[nr].isRunning = true;
+
     // ... joining in a loop.
-	for (size_t nr = 0; nr < maxThreads; ++nr) {
-		threads[nr]->join();
-		delete threads[nr];
-		threads[nr] = nullptr;
+    isFinished = false;
+    while (!isFinished) {
+		isFinished = true;
+		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
+			if (clearers[nr].isRunning)
+				isFinished = false;
+		}
+		if (isFinished) {
+			for (size_t nr = 0; nr < maxThreads; ++nr) {
+				threads[nr]->join();
+				delete threads[nr];
+				threads[nr] = nullptr;
+			}
+		} else
+			std::this_thread::yield();
     }
 
 	// Bring out the needed time in ms:
-	clock_t endTimeClr = clock();
-	double msNeededAdd = 1000.0 * (static_cast<double>(endTimeAdd - startTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
-	double msNeededClr = 1000.0 * (static_cast<double>(endTimeClr - endTimeAdd) / static_cast<double>(CLOCKS_PER_SEC));
-	cout << adjRight(5,0) << msNeededAdd << " ms /";
-	cout << adjRight(5,0) << msNeededClr << " ms" << endl;
+	auto endTimeClr = std::chrono::high_resolution_clock::now();
+	auto elapsedAdd = std::chrono::duration_cast<std::chrono::microseconds>(endTimeAdd - startTimeAdd).count() / 1000.0;
+	auto elapsedClr = std::chrono::duration_cast<std::chrono::microseconds>(endTimeClr - startTimeClr).count() / 1000.0;
+	cout << adjRight(5,2) << elapsedAdd << " ms /";
+	cout << adjRight(5,2) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
