@@ -133,7 +133,6 @@ public:
 	**/
 	virtual uint32_t delNext (data_t* prev)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::delNext (prev))
 		privConnectEnds();
 		return eCount;
@@ -162,7 +161,6 @@ public:
 	**/
 	virtual uint32_t delNextElem (elem_t* prev)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::delNextElem (prev))
 		privConnectEnds();
 		return eCount;
@@ -192,7 +190,6 @@ public:
 	**/
 	virtual uint32_t insNext (data_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNext (prev, data))
 		privConnectEnds();
 		return eCount;
@@ -216,7 +213,6 @@ public:
 	**/
 	virtual uint32_t insNext (data_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNext (prev, src))
 		privConnectEnds();
 		return eCount;
@@ -244,7 +240,6 @@ public:
 	**/
 	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (prev, data))
 		privConnectEnds();
 		return eCount;
@@ -272,7 +267,6 @@ public:
 	**/
 	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (prev, src))
 		privConnectEnds();
 		return eCount;
@@ -290,16 +284,18 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		elem_t* toRemove = nullptr;
-		if (eCount > 1) {
-			PWX_TRY (toRemove = base_t::remNextElem (base_t::operator[] (-2)))
-			PWX_CATCH_AND_FORGET (CException)
-		} else if (eCount) {
-			PWX_TRY (toRemove = remNext (nullptr))
-			PWX_CATCH_AND_FORGET (CException)
+		try {
+			PWX_LOCK(this)
+			if (eCount > 1)
+				toRemove = base_t::remNextElem (base_t::operator[] (-2));
+			else if (eCount)
+				toRemove = remNext (nullptr);
+			PWX_FORCE_UNLOCK(this)
+			if (toRemove)
+				privConnectEnds();
 		}
-		privConnectEnds();
+		PWX_CATCH_AND_FORGET(CException)
 		return toRemove;
 	}
 
@@ -315,13 +311,16 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		elem_t* toRemove = nullptr;
-		if (eCount) {
-			PWX_TRY (toRemove = base_t::remNext (nullptr))
-			PWX_CATCH_AND_FORGET (CException)
+		try {
+			PWX_LOCK(this)
+			if (eCount)
+				toRemove = base_t::remNext(nullptr);
+			PWX_FORCE_UNLOCK(this)
+			if (toRemove)
+				privConnectEnds();
 		}
-		privConnectEnds();
+		PWX_CATCH_AND_FORGET(CException)
 		return toRemove;
 	}
 
@@ -336,7 +335,6 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, data))
 		privConnectEnds();
 		return eCount;
@@ -353,7 +351,6 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, src))
 		privConnectEnds();
 		return eCount;
@@ -370,7 +367,6 @@ public:
 	**/
 	virtual uint32_t push_front (data_t *data)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, data))
 		privConnectEnds();
 		return eCount;
@@ -387,7 +383,6 @@ public:
 	**/
 	virtual uint32_t push_front (const elem_t &src)
 	{
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, src))
 		privConnectEnds();
 		return eCount;
@@ -415,9 +410,9 @@ public:
 	virtual elem_t* remNext (data_t* prev)
 	{
 		elem_t* toRemove = nullptr;
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (toRemove = base_t::remNext (prev))
-		privConnectEnds();
+		if (toRemove)
+			privConnectEnds();
 		return toRemove;
 	}
 
@@ -443,9 +438,9 @@ public:
 	virtual elem_t* remNextElem (elem_t* prev)
 	{
 		elem_t* toRemove = nullptr;
-		PWX_LOCK_GUARD (list_t, this)
 		PWX_TRY_PWX_FURTHER (toRemove = base_t::remNextElem (prev))
-		privConnectEnds();
+		if (toRemove)
+			privConnectEnds();
 		return toRemove;
 	}
 
@@ -459,7 +454,6 @@ public:
 	*/
 
 	/** @brief assignment operator
-	  *
 	  *
 	  * Clears this list and copies all elements from @a rhs
 	  * into this list.
@@ -534,8 +528,13 @@ private:
 	/// @brief simple private method to make sure the ring is closed
 	virtual void privConnectEnds() noexcept
 	{
-		if (tail && (tail->next != head))
-			tail->next = head;
+		try {
+			PWX_LOCK(this)
+			if (tail && !tail->destroyed() && (tail->next != head))
+				tail->next = head;
+			PWX_FORCE_UNLOCK(this)
+		}
+		PWX_CATCH_AND_FORGET(CException)
 	}
 }; // class TSingleRing
 
@@ -568,11 +567,10 @@ template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
 	typedef TSingleRing<data_t, elem_t> ring_t;
-	lhs.lock();
+	PWX_LOCK(&lhs);
 	ring_t result (lhs);
-	lhs.unlock();
+	PWX_UNLOCK(&lhs);
 	if (&lhs != &rhs) {
-		PWX_LOCK_GUARD (ring_t, const_cast<ring_t*> (&rhs))
 		PWX_TRY_PWX_FURTHER (result += rhs)
 	}
 
@@ -597,12 +595,11 @@ template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator- (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
 	typedef TSingleRing<data_t, elem_t> ring_t;
-	lhs.lock();
+	PWX_LOCK(&lhs)
 	ring_t result (lhs);
-	lhs.unlock();
+	PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
-		PWX_LOCK_GUARD (ring_t, const_cast<ring_t*> (&rhs))
 		PWX_TRY_PWX_FURTHER (result -= rhs)
 	} else
 		result.clear();
