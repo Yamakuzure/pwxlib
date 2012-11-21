@@ -90,10 +90,10 @@ public:
 	 * ===============================================
 	 */
 
-	elem_t* curr    = nullptr;
-	int32_t eNr     = -1;
-	thId_t  thId;
-	bool    reseted = true;
+	elem_t*  curr    = nullptr;
+	uint32_t eNr     = 0;
+	thId_t   thId;
+	bool     reseted = true;
 }; // class TContState
 
 
