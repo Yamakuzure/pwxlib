@@ -475,12 +475,12 @@ public:
 	{
 		elem_t* toRemove = nullptr;
 		try {
-			PWX_LOCK(this)
+			PWX_LOCK_NOEXCEPT(this)
 			if (eCount > 1)
 				toRemove = base_t::remNextElem (base_t::operator[] (-2));
 			else if (eCount)
 				toRemove = remNext (nullptr);
-			PWX_FORCE_UNLOCK(this)
+			PWX_UNLOCK_NOEXCEPT(this)
 			if (toRemove)
 				privConnectEnds();
 		}
@@ -502,10 +502,10 @@ public:
 	{
 		elem_t* toRemove = nullptr;
 		try {
-			PWX_LOCK(this)
+			PWX_LOCK_NOEXCEPT(this)
 			if (eCount)
 				toRemove = base_t::remNext(nullptr);
-			PWX_FORCE_UNLOCK(this)
+			PWX_UNLOCK_NOEXCEPT(this)
 			if (toRemove)
 				privConnectEnds();
 		}
@@ -821,14 +821,14 @@ private:
 	virtual void privConnectEnds() noexcept
 	{
 		try {
-			PWX_LOCK(this)
+			PWX_LOCK_NOEXCEPT(this)
 			if (head && tail) {
 				if (head && !head->destroyed() && (head->prev != tail))
 					head->prev = tail;
 				if (tail && !head->destroyed() && (tail->next != head))
 					tail->next = head;
 			}
-			PWX_FORCE_UNLOCK(this)
+			PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)
 	}
