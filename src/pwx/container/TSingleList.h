@@ -747,20 +747,18 @@ protected:
 	*/
 
 	/// @brief internal wrapper that takes care of state data if it is reseted
-	state_t* getState() noexcept
+	state_t* getState() const noexcept
 	{
 		state_t* state = state_list.getState();
 
 		if (state->reseted) {
-			PWX_LOCK_NOEXCEPT(this)
-			if (eCount) {
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+			state->eNr  = 0;
+			if (eCount)
 				state->curr = head;
-				state->eNr  = 0;
-			} else {
+			else
 				state->curr = nullptr;
-				state->eNr  = -1;
-			}
-			PWX_UNLOCK_NOEXCEPT(this)
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			state->reseted = false;
 		}
 
@@ -922,7 +920,7 @@ private:
 
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (state->eNr + 1)) {
-				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 				// It is important to make sure that the last item is
 				// still around and not deleted, yet.
@@ -933,7 +931,6 @@ private:
 					// Otherwise state is suspicious.
 					// Now that we hold a lock, do a (one-time) recursive call
 					return privGetElementByIndex(index);
-				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return state->curr;
 			}
 
@@ -966,9 +963,8 @@ private:
 				return state->curr;
 			// ... or someone freaked the list
 			else {
-				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 				return privGetElementByIndex(index);
-				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			}
 		}
 
