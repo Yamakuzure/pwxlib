@@ -64,7 +64,6 @@ public:
 	explicit TContStateList()
 	{
 		try {
-			data_t* first = new data_t();
 			head = new elem_t(new data_t());
 			curr = head;
 			tail = head;
@@ -76,7 +75,7 @@ public:
 	~TContStateList() noexcept
 	{
 		while (eCount)
-			clear;
+			clear();
 	}
 
 
@@ -117,11 +116,11 @@ public:
 
 			if (eCount) {
 				curr = head;
-				while (curr && (**curr.thId != wanted))
+				while (curr && ((**curr).thId != wanted))
 					curr = curr->next;
 			}
 
-			if (curr && (**curr.thId == wanted))
+			if (curr && ((**curr).thId == wanted))
 				result = curr->data.get();
 			else {
 				result = new data_t();
@@ -153,7 +152,7 @@ public:
 		PWX_LOCK_NOEXCEPT(this)
 		curr = head;
 		while (curr) {
-			**curr.reseted = true;
+			(**curr).reseted = true;
 			curr = curr->next;
 		}
 		PWX_UNLOCK_NOEXCEPT(this)
