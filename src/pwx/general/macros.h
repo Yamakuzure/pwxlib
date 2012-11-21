@@ -198,6 +198,23 @@
 #endif
 
 
+/** @brief Use object->lock if PWX_THREADS is defined, and throw possible exceptions away
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to lock.
+**/
+#if defined(PWX_THREADS)
+#  define PWX_LOCK_NOEXCEPT(object) { \
+		if (object) { \
+			PWX_TRY(object->lock()) \
+			PWX_CATCH_AND_FORGET(CException) \
+	} }
+#else
+#  define PWX_LOCK(object)
+#endif
+
+
 /** @brief Use object->try_lock if PWX_THREADS is defined
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
@@ -235,7 +252,7 @@
   * @param object pointer to the object to unlock.
 **/
 #if defined(PWX_THREADS)
-#  define PWX_FORCE_UNLOCK(object) { \
+#  define PWX_UNLOCK_NOEXCEPT(object) { \
 		if (object) { \
 			PWX_TRY(object->unlock()) \
 			PWX_CATCH_AND_FORGET(CException) \
