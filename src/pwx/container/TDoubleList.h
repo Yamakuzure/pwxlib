@@ -63,6 +63,8 @@ public:
 
 	typedef TSingleList<data_t, elem_t> base_t;
 	typedef TDoubleList<data_t, elem_t> list_t;
+	typedef TContState<elem_t>          state_t;
+	typedef TContStateList<elem_t>      state_list_t;
 
 
 	/* ===============================================
@@ -102,13 +104,14 @@ public:
 	{
 		// The copy ctor of base_t has already copied all elements.
 		// But they do not have a valid prev pointer, yet.
-		curr = head;
-		eNr  = 0;
-		while (eNr < (eCount - 1)) {
-			if (curr && curr->next)
-				curr->next->prev = curr;
-			curr = curr->next;
-			++eNr;
+		state_t* state = getState();
+		state->curr = head;
+		state->eNr  = 0;
+		while (state->eNr < (eCount - 1)) {
+			if (state->curr && state->curr->next)
+				state->curr->next->prev = state->curr;
+			state->curr = state->curr->next;
+			++state->eNr;
 		}
 	}
 
@@ -134,14 +137,14 @@ public:
 		while (eCount) {
 			try {
 #ifdef PWX_THREADS
-				PWX_LOCK(this)
+				PWX_LOCK_NOEXCEPT(this)
 				elem_t* toDelete = tail;
 				if (eCount && toDelete && !toDelete->destroyed()) {
 					privRemove(toDelete->prev, toDelete);
-					PWX_FORCE_UNLOCK(this)
+					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
 				} else
-					PWX_FORCE_UNLOCK(this)
+					PWX_UNLOCK_NOEXCEPT(this)
 #else
 				privDelete(remElem(tail));
 #endif // PWX_THREADS
@@ -455,6 +458,8 @@ protected:
 	 * === Protected methods                       ===
 	 * ===============================================
 	*/
+
+	using base_t::getState;
 	using base_t::destroy;
 
 
@@ -464,10 +469,9 @@ protected:
 	*/
 
 	using base_t::eCount;
-	using base_t::eNr;
-	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
+	using base_t::state_list;
 
 
 private:
@@ -502,44 +506,33 @@ private:
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		PWX_LOCK(const_cast<list_t*>(this))
-		elem_t*  oldCurr = curr;
-		elem_t*  xCurr   = oldCurr->next; // Go upwards first
-		uint32_t oldNr   = eNr;
-		uint32_t xNr     = oldNr + 1;
-		PWX_UNLOCK(const_cast<list_t*>(this))
+		state_t* state   = getState();
+		elem_t*  oldCurr = state->curr;
+		uint32_t oldNr   = state->eNr;
 
-		while (xCurr && (xCurr != tail) ) {
-			if (xCurr->data.get() == data) {
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr = xCurr;
-				eNr  = xNr;
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return xCurr->prev;
+		// Go upwards first
+		state->curr = state->curr->next;
+		++state->eNr;
+
+		while (state->curr && (state->curr != tail) ) {
+			if (state->curr->data.get() == data) {
+				return state->curr->prev;
 			}
-			++xNr;
-			xCurr = xCurr->next;
+			++state->eNr;
+			state->curr = state->curr->next;
 		} // End of moving upwards
 
-		// If no result has been found, move downwards oldCurr is not head
+		// If no result has been found, move downwards if oldCurr is not head
 		if (oldNr) {
-			xCurr = oldCurr->prev;
-			xNr   = oldNr - 1;
+			state->curr = oldCurr->prev;
+			state->eNr  = oldNr - 1;
 
-			while (xCurr) {
-				if (xCurr->data.get() == data) {
-					PWX_LOCK(const_cast<list_t*>(this))
-					curr = xCurr;
-					eNr  = xNr;
-					PWX_UNLOCK(const_cast<list_t*>(this))
-					return xCurr->prev;
+			while (state->eNr) {
+				if (state->curr->data.get() == data) {
+					return state->curr->prev;
 				}
-				if (xCurr == head)
-					xCurr = nullptr; // done, not found
-				else {
-					--xNr;
-					xCurr = xCurr->prev;
-				}
+				state->curr = state->curr->prev;
+				--state->eNr;
 			} // End of moving downwards
 		} // End of having started beyond head
 
@@ -552,11 +545,8 @@ private:
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
 		if (eCount) {
-			PWX_LOCK(const_cast<list_t*>(this))
-			elem_t*  xCurr  = curr;
-			uint32_t xNr    = eNr;
+			state_t* state  = getState();
 			uint32_t xCount = eCount;
-			PWX_UNLOCK(const_cast<list_t*>(this))
 
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
@@ -568,28 +558,35 @@ private:
 			if (xIdx >= xCount)
 				xIdx = xIdx % xCount;
 
-			// Is xCurr already correct?
-			if (xIdx == xNr)
-				return xCurr;
+			// Is curr already correct?
+			if (xIdx == state->eNr)
+				return state->curr;
 
-			// Is xIdx the next member, like in an upward for loop?
-			if (xIdx == (eNr + 1)) {
-				xCurr = xCurr->next;
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr  = xCurr;
-				eNr   = xNr + 1;
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return xCurr;
+			// Is xIdx the next member, like in a for loop?
+			if (xIdx == (state->eNr + 1)) {
+				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+
+				if (state->curr->next && !state->curr->next->destroyed()) {
+					state->curr = state->curr->next;
+					++state->eNr;
+				} else
+					// recurse with suspicious state
+					return privGetElementByIndex(index);
+				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				return state->curr;
 			}
 
 			// Is xIdx the prev member, like in a downward for loop?
-			if (xIdx == (eNr - 1)) {
-				xCurr = xCurr->prev;
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr  = xCurr;
-				eNr   = xNr - 1;
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return xCurr;
+			if (state->eNr && (xIdx == (state->eNr - 1)) ) {
+				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+
+				if (state->curr->prev && !state->curr->prev->destroyed()) {
+					state->curr = state->curr->prev;
+					--state->eNr;
+				} else
+					// recurse with suspicious state
+					return privGetElementByIndex(index);
+				return state->curr;
 			}
 
 			// Is it the head we want?
@@ -601,79 +598,56 @@ private:
 				return tail;
 
 			/* Manual search with four possibilities:
-			 * A) xIdx is between xNr and eCount
-			 *   1: xIdx is nearer to xNr    -> move upwards from xCurr
+			 * A) xIdx is between eNr and eCount
+			 *   1: xIdx is nearer to eNr    -> move upwards from xCurr
 			 *   2: xIdx is nearer to eCount -> move downwards from tail
-			 * B) xIdx is between 0 and xNr
+			 * B) xIdx is between 0 and eNr
 			 *   1: xIdx is nearer to 0      -> move upwards from head
-			 *   2: xIdx is nearer to xNr    -> move downwards from xCurr
+			 *   2: xIdx is nearer to eNr    -> move downwards from xCurr
 			*/
 			bool goUp = true;
-			if (xIdx > xNr) {
-				// A) xIdx is between xNr and eCount
-				if ( (xIdx - xNr) <= ( (eCount - xNr) / 2)) {
+			if (xIdx > state->eNr) {
+				// A) xIdx is between state->eNr and eCount
+				if ( (xIdx - state->eNr) <= ( (eCount - state->eNr) / 2)) {
 					// 1: xIdx is nearer to eNr -> move upwards from curr
-					xCurr = xCurr->next;
-					++eNr;
+					state->curr = state->curr->next;
+					++state->eNr;
 				} else {
 					// 2: xIdx is nearer to eCount -> move downwards from tail
 					goUp  = false;
-					PWX_LOCK(const_cast<list_t*>(this))
-					xCurr = tail->prev;
-					xNr   = eCount - 2;
-					PWX_UNLOCK(const_cast<list_t*>(this))
+					state->curr  = tail->prev;
+					state->eNr   = eCount - 2;
 				}
 			} // end of group A
 			else {
-				// B) xIdx is between 0 and xNr
-				if (xIdx <= (xNr / 2)) {
+				// B) xIdx is between 0 and state->eNr
+				if (xIdx <= (state->eNr / 2)) {
 					// 1: xIdx is nearer to 0 -> move upwards from head
-					PWX_LOCK(const_cast<list_t*>(this))
-					xCurr = head->next;
-					xNr  = 1;
-					PWX_UNLOCK(const_cast<list_t*>(this))
+					state->curr = head->next;
+					state->eNr  = 1;
 				} else {
 					// 2: xIdx is nearer to eNr -> move downwards from curr
 					goUp = false;
-					xCurr = xCurr->prev;
-					--xNr;
+					state->curr = state->curr->prev;
+					--state->eNr;
 				}
 			} // end of group B
 
 			// Now solve the move by a simple while loop:
-			while (xCurr && (xIdx != xNr)) {
-				xCurr = goUp ? xCurr->next : xCurr->prev;
-				xNr += goUp ? 1 : -1;
+			while (state->curr && (xIdx != state->eNr)) {
+				state->curr = goUp ? state->curr->next : state->curr->prev;
+				state->eNr += goUp ? 1 : -1;
 
 				// if Another thread deletes any element during this search,
 				// another "flip" is necessary to stay valid:
-				PWX_LOCK(const_cast<list_t*>(this))
-				if ( (tail == xCurr) || (head == xCurr) ) {
-					xCount = eCount;
-					if (xCount) {
-						// We need to re-mod xIdx:
-						xIdx = static_cast<uint32_t> (index < 0
-													? eCount - (::std::abs (index) % eCount)
-													: index % eCount);
-						if (xIdx >= eCount)
-							xIdx = xIdx % eCount;
-						xCurr = goUp ? head : tail;
-						xNr   = goUp ? 0 : (eCount - 1);
-					} else
-						xCurr = nullptr; // List has been emptied?
-				}
-				PWX_UNLOCK(const_cast<list_t*>(this))
+				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+				if ( (tail == state->curr) || (head == state->curr) )
+					// Easiest way is to call this method recursively *once*
+					return privGetElementByIndex(index);
 			}
 
-			// If xCurr is still set, it points to where it should now:
-			if (xCurr) {
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr = xCurr;
-				eNr  = xNr;
-				PWX_UNLOCK(const_cast<list_t*>(this))
-			}
-
-			return xCurr;
+			// state->curr is now either nullptr or the result.
+			return state->curr;
 		}
 
 		return nullptr;
@@ -841,7 +815,9 @@ private:
 	/// @brief simple method to insert an element into the list
 	virtual uint32_t privInsert (elem_t* prev, elem_t* elem) noexcept
 	{
-		PWX_LOCK(this)
+		state_t* state = getState();
+
+		PWX_LOCK_NOEXCEPT(this)
 		if (prev) {
 			if (tail == prev)
 				tail = elem;
@@ -851,27 +827,30 @@ private:
 			prev->next = elem;
 			elem->prev = prev;
 			// curr is only maintainable if it is prev
-			if (curr != prev) {
+			if (state->curr != prev) {
 				// In which case it wouldn't have needed any change.
-				curr = head;
-				eNr  = 0;
+				state->curr = head;
+				state->eNr  = 0;
 			}
 		} else if (eCount) {
 			elem->next = head;
 			if (head)
 				head->prev = elem;
 			head = elem;
-			++eNr; // No matter what happened, curr has another element before it now.
+			++state->eNr; // No matter what happened, curr has another element before it now.
 		} else {
 			// If we had no elements yet, head and tail need to be set:
 			head = elem;
 			tail = elem;
-			curr = head;
+			state->curr = head;
 		}
 
 		uint32_t xCount = ++eCount;
 
-		PWX_UNLOCK(this)
+		// Reset the states, they are no longer reliable!
+		state_list.resetStates();
+
+		PWX_UNLOCK_NOEXCEPT(this)
 
 		return xCount;
 	}
@@ -881,7 +860,8 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
-			PWX_LOCK(this)
+			state_t* state = getState();
+			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem)
@@ -897,31 +877,35 @@ private:
 				elem->prev->next = elem->next;
 
 			// curr needs to be valid
-			if (curr == elem) {
+			if (state->curr == elem) {
 				if (elem->next)
-					curr = elem->next;
+					state->curr = elem->next;
 				else if (prev) {
-					curr = prev;
-					--eNr;
+					state->curr = prev;
+					--state->eNr;
 				}
 			} else {
-				curr = head;
-				eNr  = 0;
+				state->curr = head;
+				state->eNr  = 0;
 			} // End of maintaining curr
 
 			// if this was the last element, sanitize the list:
 			if (1 == eCount) {
 				head = nullptr;
-				curr = nullptr;
+				state->curr = nullptr;
 				tail = nullptr;
-				eNr  = 0;
+				state->eNr  = 0;
 			}
 
 			// Finally elem does not need pointers to its neighbors any more
 			elem->next = nullptr;
 			elem->prev = nullptr;
 			--eCount;
-			PWX_UNLOCK(this)
+
+			// Reset the states, they are no longer reliable!
+			state_list.resetStates();
+
+			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
 
