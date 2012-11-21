@@ -80,8 +80,6 @@ protected:
 	*/
 
 	uint32_t eCount = 0; //!< Element count
-	mutable
-	uint32_t eNr    = 0; //!< Number of the element curr points to
 }; // class VContainer
 
 /// @brief ~VContainer default destructor.
