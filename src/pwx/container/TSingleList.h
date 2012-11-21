@@ -28,7 +28,8 @@
 **/
 
 #include <pwx/base/VContainer.h>
-#include <pwx/types/TSingleElement.h>
+#include <pwx/container/TContStateList.h>
+
 
 namespace pwx
 {
@@ -61,6 +62,8 @@ public:
 
 	typedef VContainer                  base_t;
 	typedef TSingleList<data_t, elem_t> list_t;
+	typedef TContState<elem_t>          state_t;
+	typedef TContStateList<elem_t>      state_list_t;
 
 
 	/* ===============================================
@@ -131,14 +134,14 @@ public:
 		while (eCount) {
 			try {
 #ifdef PWX_THREADS
-				PWX_LOCK(this)
+				PWX_LOCK_NOEXCEPT(this)
 				elem_t* toDelete = head;
 				if (eCount && toDelete && !toDelete->destroyed()) {
 					privRemove(nullptr, toDelete);
-					PWX_FORCE_UNLOCK(this)
+					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
 				} else
-					PWX_FORCE_UNLOCK(this)
+					PWX_UNLOCK_NOEXCEPT(this)
 #else
 				privDelete(remNext(nullptr));
 #endif // PWX_THREADS
@@ -743,6 +746,28 @@ protected:
 	 * ===============================================
 	*/
 
+	/// @brief internal wrapper that takes care of state data if it is reseted
+	state_t* getState() noexcept
+	{
+		state_t* state = state_list.getState();
+
+		if (state->reseted) {
+			PWX_LOCK_NOEXCEPT(this)
+			if (eCount) {
+				state->curr = head;
+				state->eNr  = 0;
+			} else {
+				state->curr = nullptr;
+				state->eNr  = -1;
+			}
+			PWX_UNLOCK_NOEXCEPT(this)
+			state->reseted = false;
+		}
+
+		return state;
+	}
+
+
 	void (*destroy) (data_t* data_);
 
 
@@ -751,11 +776,10 @@ protected:
 	 * ===============================================
 	*/
 
+	elem_t* head = nullptr;   //!< pointer to the first element
+	elem_t* tail = nullptr;   //!< pointer to the last element
 	mutable
-	elem_t*  curr   = nullptr;   //!< pointer to the currently handled element
-	elem_t*  head   = nullptr;   //!< pointer to the first element
-	elem_t*  tail   = nullptr;   //!< pointer to the last element
-
+	state_list_t state_list;
 
 private:
 	/* ===============================================
@@ -791,34 +815,41 @@ private:
 	/// @brief Search until the current element contains the searched data
 	virtual const elem_t* privFind (const data_t* data) const noexcept
 	{
-		elem_t* xCurr = curr; // Local pointer, a big lock is no longer needed.
+		state_t* state = getState();
 
-		if (nullptr == xCurr)
+		if (nullptr == state->curr)
 			return nullptr;
 
-		// Quick exit if xCurr is already what we want:
-		if (xCurr->data.get() == data)
-			return xCurr;
+		// Quick exit if curr is already what we want:
+		if (state->curr->data.get() == data)
+			return state->curr;
+
+		// For subsequent searches curr->next is to be checked as well:
+		if (state->curr->next && (state->curr->next->data.get() == data)) {
+			state->curr = state->curr->next;
+			++state->eNr;
+			return state->curr;
+		}
 
 		// The next does only make sense if we have more than one element
 		if (eCount > 1) {
 			// Exit if head is wanted...
-			PWX_LOCK(const_cast<list_t*>(this))
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			if (head->data.get() == data) {
-				curr = head;
-				eNr  = 0;
+				state->curr = head;
+				state->eNr  = 0;
 				return head;
 			}
 
 			// ...or tail
 			if (tail->data.get() == data) {
-				curr = tail;
-				eNr  = eCount - 1;
+				state->curr = tail;
+				state->eNr  = eCount - 1;
 				return tail;
 			}
 
 			// Otherwise search for the previous item, it's the next, then
-			PWX_UNLOCK(const_cast<list_t*>(this))
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			elem_t* prev = privFindPrev (data);
 			if (prev)
 				return prev->next;
@@ -831,24 +862,33 @@ private:
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
+		state_t* state = getState();
+		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 		elem_t*  prev  = head;
-		elem_t*  xCurr = prev->next;
-		uint32_t xNr   = 1;
 
-		while (prev != tail) {
-			if (xCurr->data.get() == data) {
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr = xCurr;
-				eNr  = xNr;
-				PWX_UNLOCK(const_cast<list_t*>(this))
+		if (prev && prev != tail) {
+			state->curr    = prev->next;
+			state->eNr     = 1;
+			if (state->reseted)
+				state->reseted = false;
+		}
+		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+
+		while (prev && (prev != tail) && state->curr) {
+			if (state->curr->data.get() == data)
 				return prev;
-			}
-			++xNr;
-			prev  = xCurr;
-			xCurr = xCurr->next;
+			++state->eNr;
+			prev  = state->curr;
+			state->curr = state->curr->next;
 		}
 
 		// If we are here, prev points to tail. No match found.
+		if (nullptr == state->curr) {
+			state->curr    = head;
+			state->eNr     = 0;
+			state->reseted = false;
+		}
+
 		return nullptr;
 	}
 
@@ -857,7 +897,10 @@ private:
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
 		if (eCount) {
+			state_t* state = state_list.getState();
+
 			// Mod index into range
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
 												   ? eCount - (::std::abs (index) % eCount)
 												   : index % eCount);
@@ -867,23 +910,31 @@ private:
 			if (xIdx >= eCount)
 				xIdx = xIdx % eCount;
 
-			PWX_LOCK(const_cast<list_t*>(this))
-			elem_t*  xCurr = curr;
-			uint32_t xNr   = eNr;
-			PWX_UNLOCK(const_cast<list_t*>(this))
+			if (nullptr == state->curr) {
+				state->curr = head;
+				state->eNr  = 0;
+			}
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
-			// Is xCurr already correct?
-			if (xIdx == xNr)
-				return xCurr;
+			// Is curr already correct?
+			if (xIdx == state->eNr)
+				return state->curr;
 
 			// Is xIdx the next member, like in a for loop?
-			if (xIdx == (xNr + 1)) {
-				xCurr = xCurr->next;
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr  = xCurr;
-				eNr   = xNr + 1;
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return xCurr;
+			if (xIdx == (state->eNr + 1)) {
+				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+
+				// It is important to make sure that the last item is
+				// still around and not deleted, yet.
+				if (state->curr->next && !state->curr->next->destroyed()) {
+					state->curr = state->curr->next;
+					++state->eNr;
+				} else
+					// Otherwise state is suspicious.
+					// Now that we hold a lock, do a (one-time) recursive call
+					return privGetElementByIndex(index);
+				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				return state->curr;
 			}
 
 			// Is it the head we want?
@@ -895,26 +946,30 @@ private:
 				return tail;
 
 			// Ok, let's go. But only start from head if we currently are beyond.
-			if (xIdx < eNr) {
-				xCurr = head->next;
-				xNr  = 1;
+			if (xIdx < state->eNr) {
+				state->curr = head->next;
+				state->eNr  = 1;
 			}
-			// Otherwise the next of xCurr is already checked, so skip it
+			// Otherwise the next of curr is already checked, so skip it
 			else {
-				xCurr = xCurr->next;
-				++xNr;
+				state->curr = state->curr->next;
+				++state->eNr;
 			}
 			// Now look into the rest
-			while ( (xNr < xIdx) && (xNr < (eCount - 1))) {
-				xCurr = xCurr->next;
-				++xNr;
+			while ( (state->eNr < xIdx) && (state->eNr < (eCount - 1)) && state->curr) {
+				state->curr = state->curr->next;
+				++state->eNr;
 			}
-			// xCurr is sure to be pointing where it should now.
-			PWX_LOCK(const_cast<list_t*>(this))
-			curr = xCurr;
-			eNr  = xNr;
-			PWX_UNLOCK(const_cast<list_t*>(this))
-			return xCurr;
+
+			// Now curr is either the wanted element ...
+			if (state->curr)
+				return state->curr;
+			// ... or someone freaked the list
+			else {
+				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				return privGetElementByIndex(index);
+				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+			}
 		}
 
 		return nullptr;
@@ -1080,26 +1135,22 @@ private:
 	{
 		// Now the real insertion can be done:
 		PWX_LOCK(this)
+
+		// Reset all states, the list will change
+		state_list.resetStates();
+
 		if (insPrev) {
 			if (tail == insPrev)
 				tail = insElem;
 			insElem->next = insPrev->next;
 			insPrev->next = insElem;
-			// curr is only maintainable if it is insPrev
-			if (curr != insPrev) {
-				// In which case it wouldn't have needed any change.
-				curr = head;
-				eNr  = 0;
-			}
 		} else if (eCount) {
 			insElem->next = head;
 			head = insElem;
-			++eNr; // No matter what happened, curr has another element before it now.
 		} else {
 			// If we had no elements yet, head and tail need to be set:
 			head = insElem;
 			tail = insElem;
-			curr = head;
 		}
 
 		uint32_t xCount = ++eCount;
@@ -1116,6 +1167,9 @@ private:
 		if (elem) {
 			PWX_LOCK(this)
 
+			// Reset all states, the list will change
+			state_list.resetStates();
+
 			// maintain tail and head first
 			if (tail == elem)
 				tail = prev;
@@ -1127,25 +1181,10 @@ private:
 			if (prev)
 				prev->next = elem->next;
 
-			// curr needs to be valid
-			if (curr == elem) {
-				if (elem->next)
-					curr = elem->next;
-				else if (prev) {
-					curr = prev;
-					--eNr;
-				}
-			} else {
-				curr = head;
-				eNr  = 0;
-			} // End of maintaining curr
-
 			// if this was the last element, sanitize the list:
 			if (1 == eCount) {
 				head = nullptr;
-				curr = nullptr;
 				tail = nullptr;
-				eNr  = 0;
 			}
 
 			// Finally elem does not need pointers to its neighbors any more
