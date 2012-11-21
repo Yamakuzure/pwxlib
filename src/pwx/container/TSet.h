@@ -81,6 +81,8 @@ public:
 	typedef TDoubleElement<data_t>      elem_t;
 	typedef TDoubleList<data_t, elem_t> base_t;
 	typedef TSet<data_t>                list_t;
+	typedef TContState<elem_t>          state_t;
+	typedef TContStateList<elem_t>      state_list_t;
 
 
 	/* ===============================================
@@ -229,9 +231,12 @@ public:
 	**/
 	virtual uint32_t insNext (data_t* prev, data_t* data)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (data && (nullptr == privFindData(*data)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insNext(prev, data))
 			}
@@ -264,9 +269,12 @@ public:
 	**/
 	virtual uint32_t insNext (data_t* prev, const elem_t &src)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insNext(prev, src))
 			}
@@ -303,9 +311,12 @@ public:
 	**/
 	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (data && (nullptr == privFindData(*data)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(prev, data))
 			}
@@ -342,9 +353,12 @@ public:
 	**/
 	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(prev, src))
 			}
@@ -377,9 +391,12 @@ public:
 	**/
 	virtual uint32_t insPrev (data_t* next, data_t* data)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (data && (nullptr == privFindData(*data)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insPrev(next, data))
 			}
@@ -412,9 +429,12 @@ public:
 	**/
 	virtual uint32_t insPrev (data_t* next, const elem_t &src)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insPrev(next, src))
 			}
@@ -451,9 +471,12 @@ public:
 	**/
 	virtual uint32_t insPrevElem (elem_t* next, data_t* data)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (data && nullptr == privFindData(*data)) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, data))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insPrevElem(next, data))
 			}
@@ -490,9 +513,12 @@ public:
 	**/
 	virtual uint32_t insPrevElem (elem_t* next, const elem_t &src)
 	{
+		// During this operation no manipulation of the set is allowed!
+		PWX_LOCK_GUARD(list_t, this)
+		state_t* state = getState();
 		if (src.data.get() && (nullptr == privFindData(*src)) ) {
 			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(curr, src))
+				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
 			} else {
 				PWX_TRY_PWX_FURTHER(return base_t::insPrevElem(next, src))
 			}
@@ -771,6 +797,8 @@ protected:
 	 * === Protected methods                       ===
 	 * ===============================================
 	*/
+
+	using base_t::getState;
 	using base_t::destroy;
 
 
@@ -780,10 +808,9 @@ protected:
 	*/
 
 	using base_t::eCount;
-	using base_t::eNr;
-	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
+	using base_t::state_list;
 
 	bool isSorted; //!< determines whether the set is sorted or not.
 
@@ -798,10 +825,10 @@ private:
 	  * The privFind() method of the containers search for pointers, while
 	  * this special method searches for the data behind the pointers.
 	  *
-	  * If the set is sorted and @a data can not be found, then curr points
+	  * If the set is sorted and @a data can not be found, then state->curr points
 	  * to the element which would precede an element holding @a data if
 	  * it where present. With this special outcome the inserting methods
-	  * can simply use insNextElem() with curr to add data in a sorted way.
+	  * can simply use insNextElem() with state->curr to add data in a sorted way.
 	  * The only detail to look at is the situation when the new element
 	  * must become the new head. In this special case, <B>curr is set to
 	  * nullptr</B> and <B>eNr is set to -1</B>.
@@ -811,6 +838,8 @@ private:
 	**/
 	const elem_t* privFindData (const data_t &data) const noexcept
 	{
+		state_t* state = getState();
+
 		// Note: As the consistency of the content of a set is more important
 		//       than anything, a big lock is a must-have here!
 		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
@@ -823,26 +852,26 @@ private:
 		if (eCount) {
 			// Quick exit if sorted set assumption 1 is correct:
 			if (isSorted && (**head > data)) {
-				eNr  = -1;
-				curr = nullptr;
+				state->eNr  = 0;
+				state->curr = nullptr;
 				return nullptr;
 			}
 
-			// Reset curr if a previous search has invalidated it:
-			if (nullptr == curr) {
-				curr = head;
-				eNr  = 0;
+			// Reset state->curr if a previous search has invalidated it:
+			if (nullptr == state->curr) {
+				state->curr = head;
+				state->eNr  = 0;
 			}
 
-			// Quick exit if curr is correct:
-			if (**curr == data)
-				return curr;
+			// Quick exit if state->curr is correct:
+			if (**state->curr == data)
+				return state->curr;
 
 			// Quick exit if head is wanted:
 			if (**head == data) {
-				eNr = 0;
-				curr = head;
-				return curr;
+				state->eNr  = 0;
+				state->curr = head;
+				return state->curr;
 			}
 			// End of having at least one element
 		} else
@@ -853,16 +882,16 @@ private:
 		if (eCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
 			if (isSorted && (data > **tail)) {
-				eNr  = eCount -1;
-				curr = tail;
+				state->eNr  = eCount -1;
+				state->curr = tail;
 				return nullptr;
 			}
 
 			// Quick exit if tail is wanted:
-			if (**head == data) {
-				eNr = eCount - 1;
-				curr = tail;
-				return curr;
+			if (**tail == data) {
+				state->eNr  = eCount - 1;
+				state->curr = tail;
+				return state->curr;
 			}
 		} // End of having at least two elements
 
@@ -876,36 +905,36 @@ private:
 			if (isSorted) {
 				/* Here we know that data is definitely in the range of the set.
 				 * It is larger than head an smaller than tail. The good thing
-				 * about this is the absence of any need to check curr against
+				 * about this is the absence of any need to check state->curr against
 				 * head or tail.
 				*/
-				// Step 1: Move up until curr is larger
-				while (data > **curr) {
-					curr = curr->next;
-					++eNr;
+				// Step 1: Move up until state->curr is larger
+				while (data > **state->curr) {
+					state->curr = state->curr->next;
+					++state->eNr;
 				}
-				// Step 2: Move down until curr is smaller
-				while (**curr > data) {
-					curr = curr->prev;
-					--eNr;
+				// Step 2: Move down until state->curr is smaller
+				while (**state->curr > data) {
+					state->curr = state->curr->prev;
+					--state->eNr;
 				}
-				/* Due to this order curr is now either pointing to an element
+				/* Due to this order state->curr is now either pointing to an element
 				 * holding data, or the next smaller element. The latter detail
 				 * is important for the sorted insertion. If data is not found,
 				 * all inserting methods can now insert a new element holding
-				 * the searched data using insNextElem() on curr.
+				 * the searched data using insNextElem() on state->curr.
 				*/
-				return (**curr == data ? curr : nullptr);
+				return (**state->curr == data ? state->curr : nullptr);
 			} else {
-				curr = head->next;
-				eNr  = 1;
+				state->curr  = head->next;
+				state->eNr   = 1;
 				// Note: head and tail are already checked.
-				while ((curr != tail) && (**curr != data)) {
-					curr = curr->next;
-					++eNr;
+				while ((state->curr != tail) && (**state->curr != data)) {
+					state->curr = state->curr->next;
+					++state->eNr;
 				}
 				// Because tail is already checked, a pointer comparison will do:
-				return (curr != tail ? curr : nullptr);
+				return (state->curr != tail ? state->curr : nullptr);
 			}
 		} // End of having at least 3 elements
 
@@ -919,7 +948,7 @@ private:
 
 /** @brief default destructor
   *
-  * This destructor will delete all elements currently stored. There is no
+  * This destructor will delete all elements state->currently stored. There is no
   * need to clean up manually before deleting the set.
 **/
 template<typename data_t>
