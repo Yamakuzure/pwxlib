@@ -58,6 +58,18 @@
 
 
 /* ---------------------------------------------------------------------
+ * --- Private methods of the worker classes can be inlined, unless  ---
+ * --- this is a debugging build                                     ---
+ * ---------------------------------------------------------------------
+*/
+#if defined(LIBPWX_DEBUG)
+# define PWX_PRIVATE_INLINE
+#else
+# define PWX_PRIVATE_INLINE inline
+#endif
+
+
+/* ---------------------------------------------------------------------
  * --- Some modifiers to methods, structs, classes and functions are ---
  * --- defined centrally to be able to apply changes quickly on a    ---
  * --- global scope.                                                 ---
