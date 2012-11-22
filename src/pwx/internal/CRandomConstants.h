@@ -28,6 +28,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <limits>
+
 namespace pwx {
 
 /** @namespace pwx::constants

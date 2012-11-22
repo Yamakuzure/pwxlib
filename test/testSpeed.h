@@ -133,8 +133,8 @@ int32_t testSpeedST (sEnv &env)
 	auto endTimeClr = hrClock::now();
 	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
 	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - endTimeAdd  ).count();
-	cout << adjRight(5,2) << elapsedAdd << " ms /";
-	cout << adjRight(5,2) << elapsedClr << " ms" << endl;
+	cout << adjRight(5,0) << elapsedAdd << " ms /";
+	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
@@ -160,7 +160,6 @@ int32_t testSpeedMT (sEnv &env)
 {
 	int32_t  result       = EXIT_SUCCESS;
 
-#ifdef PWX_THREADS
 	uint32_t localMaxElem = maxElements;
 
 	cout << adjRight (4, 0) << ++env.testCount;
@@ -185,6 +184,7 @@ int32_t testSpeedMT (sEnv &env)
 	}
 	cout.flush();
 
+#ifdef PWX_THREADS
 	list_t intCont; // The list
 
 	// To make the testing of the sets easier, we use a counting loop, so no doublets
@@ -278,8 +278,8 @@ int32_t testSpeedMT (sEnv &env)
 	auto endTimeClr = hrClock::now();
 	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
 	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr).count();
-	cout << adjRight(5,2) << elapsedAdd << " ms /";
-	cout << adjRight(5,2) << elapsedClr << " ms" << endl;
+	cout << adjRight(5,0) << elapsedAdd << " ms /";
+	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
@@ -288,6 +288,10 @@ int32_t testSpeedMT (sEnv &env)
 		result = EXIT_FAILURE;
 	} else
 		++env.testSuccess;
+#else
+	cout << adjRight(5,0) << "n/a" << "    /";
+	cout << adjRight(5,0) << "n/a" << endl;
+	++env.testSuccess;
 #endif // PWX_THREADS
 
 	return result;

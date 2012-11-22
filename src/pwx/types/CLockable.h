@@ -28,12 +28,12 @@
 **/
 
 #include <pwx/general/compiler.h>
+#include <pwx/types/CException.h>
+#include <pwx/general/macros.h>
 #if defined(PWX_THREADS)
-#  include <pwx/types/CException.h>
-#  include <pwx/general/macros.h>
 #  include <mutex>
-#  include <cstring>
 #endif
+#include <cstring>
 
 namespace pwx
 {
