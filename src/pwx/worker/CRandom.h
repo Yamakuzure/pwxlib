@@ -29,11 +29,6 @@
 
 #include <pwx/general/compiler.h>
 #include <pwx/types/CLockable.h>
-//#include <cstdlib>
-//#include <cmath>
-//#include <cstring>
-//#include <ctime>
-//#include <limits>
 
 namespace pwx {
 
@@ -105,46 +100,46 @@ public:
 	* === Public methods						  ===
 	* ===============================================
 	*/
-	PWX_INLINE int32_t     getSeed  () const noexcept;
-	PWX_INLINE uint32_t    hash     (int32_t        key) const noexcept;
-	PWX_INLINE uint32_t    hash     (uint32_t       key) const noexcept;
-	PWX_INLINE uint32_t    hash     (int64_t        key) const noexcept;
-	PWX_INLINE uint32_t    hash     (uint64_t       key) const noexcept;
-	PWX_INLINE uint32_t    hash     (float          key) const noexcept;
-	PWX_INLINE uint32_t    hash     (double         key) const noexcept;
-	PWX_INLINE uint32_t    hash     (const char*    key) const noexcept;
-	PWX_INLINE uint32_t    hash     (::std::string &key) const noexcept;
-	PWX_INLINE double      noise    (int32_t x) const noexcept;
-	PWX_INLINE double      noise    (int32_t x, int32_t y) const noexcept;
-	PWX_INLINE double      noise    (int32_t x, int32_t y, int32_t z) const noexcept;
-	PWX_INLINE double      noise    (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept;
-	PWX_INLINE int32_t     random   (int32_t max = RAND_MAX) noexcept;
-	PWX_INLINE int32_t     random   (int32_t min, int32_t max) noexcept;
-	PWX_INLINE int64_t     random   (int64_t max) noexcept;
-	PWX_INLINE int64_t     random   (int64_t min, int64_t max) noexcept;
-	PWX_INLINE float       random   (float max) noexcept;
-	PWX_INLINE float       random   (float min, float max) noexcept;
-	PWX_INLINE double      random   (double max) noexcept;
-	PWX_INLINE double      random   (double min, double max) noexcept;
-	PWX_INLINE long double random   (long double max) noexcept;
-	PWX_INLINE long double random   (long double min, long double max) noexcept;
-	PWX_INLINE char*       rndName  (double x,                               bool lN = false, bool mW = false) noexcept;
-	PWX_INLINE char*       rndName  (double x, double y,                     bool lN = false, bool mW = false) noexcept;
-	PWX_INLINE char*       rndName  (double x, double y, double z,           bool lN = false, bool mW = false) noexcept;
-	PWX_INLINE char*       rndName  (double x, double y, double z, double w, bool lN = false, bool mW = false) noexcept;
-	PWX_INLINE char*       rndName  (double x,                               int32_t chars, int32_t sylls, int32_t parts) noexcept;
-	PWX_INLINE char*       rndName  (double x, double y,                     int32_t chars, int32_t sylls, int32_t parts) noexcept;
-	PWX_INLINE char*       rndName  (double x, double y, double z,           int32_t chars, int32_t sylls, int32_t parts) noexcept;
-	PWX_INLINE char*       rndName  (double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts) noexcept;
-	PWX_INLINE void        setSeed  (int32_t newSeed) noexcept;
-	PWX_INLINE double      simplex1D(double x,                               double zoom = 1.0, double smooth = 1.0) noexcept;
-	PWX_INLINE double      simplex1D(double x,                               double zoom, double smooth, double reduction, int32_t waves) noexcept;
-	PWX_INLINE double      simplex2D(double x, double y,                     double zoom = 1.0, double smooth = 1.0) noexcept;
-	PWX_INLINE double      simplex2D(double x, double y,                     double zoom, double smooth, double reduction, int32_t waves) noexcept;
-	PWX_INLINE double      simplex3D(double x, double y, double z,           double zoom = 1.0, double smooth = 1.0) noexcept;
-	PWX_INLINE double      simplex3D(double x, double y, double z,           double zoom, double smooth, double reduction, int32_t waves) noexcept;
-	PWX_INLINE double      simplex4D(double x, double y, double z, double w, double zoom = 1.0, double smooth = 1.0) noexcept;
-	PWX_INLINE double      simplex4D(double x, double y, double z, double w, double zoom, double smooth, double reduction, int32_t waves) noexcept;
+	int32_t     getSeed  () const noexcept;
+	uint32_t    hash     (int32_t        key) const noexcept;
+	uint32_t    hash     (uint32_t       key) const noexcept;
+	uint32_t    hash     (int64_t        key) const noexcept;
+	uint32_t    hash     (uint64_t       key) const noexcept;
+	uint32_t    hash     (float          key) const noexcept;
+	uint32_t    hash     (double         key) const noexcept;
+	uint32_t    hash     (const char*    key) const noexcept;
+	uint32_t    hash     (::std::string &key) const noexcept;
+	double      noise    (int32_t x) const noexcept;
+	double      noise    (int32_t x, int32_t y) const noexcept;
+	double      noise    (int32_t x, int32_t y, int32_t z) const noexcept;
+	double      noise    (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept;
+	int32_t     random   (int32_t max = RAND_MAX) noexcept;
+	int32_t     random   (int32_t min, int32_t max) noexcept;
+	int64_t     random   (int64_t max) noexcept;
+	int64_t     random   (int64_t min, int64_t max) noexcept;
+	float       random   (float max) noexcept;
+	float       random   (float min, float max) noexcept;
+	double      random   (double max) noexcept;
+	double      random   (double min, double max) noexcept;
+	long double random   (long double max) noexcept;
+	long double random   (long double min, long double max) noexcept;
+	char*       rndName  (double x,                               bool lN = false, bool mW = false) noexcept;
+	char*       rndName  (double x, double y,                     bool lN = false, bool mW = false) noexcept;
+	char*       rndName  (double x, double y, double z,           bool lN = false, bool mW = false) noexcept;
+	char*       rndName  (double x, double y, double z, double w, bool lN = false, bool mW = false) noexcept;
+	char*       rndName  (double x,                               int32_t chars, int32_t sylls, int32_t parts) noexcept;
+	char*       rndName  (double x, double y,                     int32_t chars, int32_t sylls, int32_t parts) noexcept;
+	char*       rndName  (double x, double y, double z,           int32_t chars, int32_t sylls, int32_t parts) noexcept;
+	char*       rndName  (double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts) noexcept;
+	void        setSeed  (int32_t newSeed) noexcept;
+	double      simplex1D(double x,                               double zoom = 1.0, double smooth = 1.0) noexcept;
+	double      simplex1D(double x,                               double zoom, double smooth, double reduction, int32_t waves) noexcept;
+	double      simplex2D(double x, double y,                     double zoom = 1.0, double smooth = 1.0) noexcept;
+	double      simplex2D(double x, double y,                     double zoom, double smooth, double reduction, int32_t waves) noexcept;
+	double      simplex3D(double x, double y, double z,           double zoom = 1.0, double smooth = 1.0) noexcept;
+	double      simplex3D(double x, double y, double z,           double zoom, double smooth, double reduction, int32_t waves) noexcept;
+	double      simplex4D(double x, double y, double z, double w, double zoom = 1.0, double smooth = 1.0) noexcept;
+	double      simplex4D(double x, double y, double z, double w, double zoom, double smooth, double reduction, int32_t waves) noexcept;
 
 
 	/* ===============================================
@@ -178,29 +173,29 @@ private:
 	 * ===============================================
 	*/
 
-	PWX_INLINE void    checkRule  (int32_t &state, const char first, const char second, const char third) noexcept;
-	PWX_INLINE int32_t genSyllable(double &idx, double step, char*  syll, int32_t &state, char*  lastChrs) noexcept PWX_WARNUNUSED;
-	PWX_INLINE double  getStepping(double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl) noexcept PWX_WARNUNUSED;
+	void    checkRule  (int32_t &state, const char first, const char second, const char third) noexcept;
+	int32_t genSyllable(double &idx, double step, char*  syll, int32_t &state, char*  lastChrs) noexcept PWX_WARNUNUSED;
+	double  getStepping(double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl) noexcept PWX_WARNUNUSED;
 
 	/* === Helper methods for Simplex Noise === */
-	PWX_INLINE double  getSimpDot(int32_t index, double x) noexcept;
-	PWX_INLINE double  getSimpDot(int32_t index, double x, double y) noexcept;
-	PWX_INLINE double  getSimpDot(int32_t index, double x, double y, double z) noexcept;
-	PWX_INLINE double  getSimpDot(int32_t index, double x, double y, double z, double w) noexcept;
+	double  getSimpDot(int32_t index, double x) noexcept;
+	double  getSimpDot(int32_t index, double x, double y) noexcept;
+	double  getSimpDot(int32_t index, double x, double y, double z) noexcept;
+	double  getSimpDot(int32_t index, double x, double y, double z, double w) noexcept;
 	/* Note: These are four functions, because using 1 with default values would cause alot of overhead with 0
 		   multiplication. Testing 10M Iterations with 2 dimensions was 500ms slower with such an "universal"
 		   getSimpDot() method. */
-	PWX_INLINE double  getSpx1D (double x) noexcept;
-	PWX_INLINE double  getSpx2D (double x, double y) noexcept;
-	PWX_INLINE double  getSpx3D (double x, double y, double z) noexcept;
-	PWX_INLINE double  getSpx4D (double x, double y, double z, double w) noexcept;
+	double  getSpx1D (double x) noexcept;
+	double  getSpx2D (double x, double y) noexcept;
+	double  getSpx3D (double x, double y, double z) noexcept;
+	double  getSpx4D (double x, double y, double z, double w) noexcept;
 
 	// These are helpers to make the functions using raw noise more powerful when calculating with doubles
-	PWX_INLINE double  noiseD   (double x) const noexcept;
-	PWX_INLINE double  noiseD   (double x, double y) const noexcept;
-	PWX_INLINE double  noiseD   (double x, double y, double z) const noexcept;
-	PWX_INLINE double  noiseD   (double x, double y, double z, double w) const noexcept;
-	PWX_INLINE int32_t doubToInt(double val) const noexcept;
+	double  noiseD   (double x) const noexcept;
+	double  noiseD   (double x, double y) const noexcept;
+	double  noiseD   (double x, double y, double z) const noexcept;
+	double  noiseD   (double x, double y, double z, double w) const noexcept;
+	int32_t doubToInt(double val) const noexcept;
 
 
 	/* ===============================================

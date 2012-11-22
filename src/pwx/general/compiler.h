@@ -57,21 +57,6 @@
 #endif
 
 
-/* -------------------------------------------------------------------------
- * --- no inlining unless this is an internal compile without debug mode ---
- * -------------------------------------------------------------------------
-*/
-#if defined(LIBPWX_DEBUG)
-#  define PWX_INLINE
-#else
-#  if defined(PWX_EXPORTS)
-#    define PWX_INLINE inline
-#  else
-#    define PWX_INLINE extern
-#  endif
-#endif
-
-
 /* ---------------------------------------------------------------------
  * --- Some modifiers to methods, structs, classes and functions are ---
  * --- defined centrally to be able to apply changes quickly on a    ---

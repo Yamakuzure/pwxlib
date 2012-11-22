@@ -194,7 +194,7 @@
 			PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
 	} }
 #else
-#  define PWX_LOCK(object)
+#  define PWX_LOCK(object) { }
 #endif
 
 
@@ -211,7 +211,7 @@
 			PWX_CATCH_AND_FORGET(CException) \
 	} }
 #else
-#  define PWX_LOCK(object)
+#  define PWX_LOCK_NOEXCEPT(object) { }
 #endif
 
 
@@ -225,7 +225,7 @@
 #if defined(PWX_THREADS)
 #  define PWX_TRY_LOCK(object) ((object) ? (object)->try_lock() : false)
 #else
-#  define PWX_TRY_LOCK(object)
+#  define PWX_TRY_LOCK(object) (true)
 #endif
 
 
@@ -241,7 +241,7 @@
 			PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
 	} }
 #else
-#  define PWX_UNLOCK(object)
+#  define PWX_UNLOCK(object) { }
 #endif
 
 
@@ -258,7 +258,7 @@
 			PWX_CATCH_AND_FORGET(CException) \
 	} }
 #else
-#  define PWX_UNLOCK(object)
+#  define PWX_UNLOCK_NOEXCEPT(object) { }
 #endif
 
 
@@ -274,7 +274,7 @@
 #  define PWX_NAMED_LOCK_GUARD(Name, T, object) \
 	::std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object);
 #else
-#  define PWX_LOCK_GUARD(Name, T, object)
+#  define PWX_NAMED_LOCK_GUARD(Name, T, object) { }
 #endif
 
 
@@ -289,7 +289,7 @@
 #  define PWX_LOCK_GUARD(T, object) \
 	PWX_NAMED_LOCK_GUARD(Default, T, object)
 #else
-#  define PWX_LOCK_GUARD(T, object)
+#  define PWX_LOCK_GUARD(T, object) { }
 #endif
 
 
@@ -308,7 +308,7 @@
 	::std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, ::std::defer_lock); \
 	::std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B);
 #else
-#  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB)
+#  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) { }
 #endif
 
 

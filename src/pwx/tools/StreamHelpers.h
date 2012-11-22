@@ -40,37 +40,37 @@ namespace pwx
 class adjLeft;
 class adjRight;
 
-PWX_INLINE ::std::ostream PWX_API &operator<< (::std::ostream &os, const adjLeft& l)  noexcept;
-PWX_INLINE ::std::ostream PWX_API &operator<< (::std::ostream &os, const adjRight& r) noexcept;
-PWX_INLINE bool           PWX_API cropShell (const char *key, ::std::string &data)  noexcept;
-PWX_INLINE void           PWX_API forwardTo (::std::ifstream &is, char value)       noexcept;
-PWX_INLINE void           PWX_API ltrim (::std::string &text, char extra = 0x0) noexcept;
-PWX_INLINE const char     PWX_API *makeTemp (const char *aPath, const char *aTemplate,
+::std::ostream PWX_API &operator<< (::std::ostream &os, const adjLeft& l)  noexcept;
+::std::ostream PWX_API &operator<< (::std::ostream &os, const adjRight& r) noexcept;
+bool           PWX_API cropShell (const char *key, ::std::string &data)  noexcept;
+void           PWX_API forwardTo (::std::ifstream &is, char value)       noexcept;
+void           PWX_API ltrim (::std::string &text, char extra = 0x0) noexcept;
+const char     PWX_API *makeTemp (const char *aPath, const char *aTemplate,
 											const char *aSuffix, ::std::ofstream &ofs,
 											::std::ios_base::openmode mode = ::std::ios_base::out |::std::ios_base::trunc)
 											noexcept PWX_WARNUNUSED;
 template <typename Tval>
-PWX_INLINE bool           PWX_API readNextValue (Tval &value, ::std::ifstream &is, char separator,
+bool           PWX_API readNextValue (Tval &value, ::std::ifstream &is, char separator,
 												bool search = false, bool emptyAllowed = true)
 												noexcept PWX_WARNUNUSED;
-PWX_INLINE void           PWX_API rtrim (::std::string &text, char extra = 0x0)	noexcept;
-PWX_INLINE bool           PWX_API skipLineBreak (::std::ifstream &is) noexcept PWX_WARNUNUSED;
-PWX_INLINE void           PWX_API tabToSpace (::std::string &text, size_t spacePerTab = 1) noexcept;
+void           PWX_API rtrim (::std::string &text, char extra = 0x0)	noexcept;
+bool           PWX_API skipLineBreak (::std::ifstream &is) noexcept PWX_WARNUNUSED;
+void           PWX_API tabToSpace (::std::string &text, size_t spacePerTab = 1) noexcept;
 template <typename T>
-PWX_INLINE double         PWX_API to_double (const T val) noexcept;
+double         PWX_API to_double (const T val) noexcept;
 template <typename T>
-PWX_INLINE float          PWX_API to_float (const T val) noexcept;
+float          PWX_API to_float (const T val) noexcept;
 template <typename T>
-PWX_INLINE int32_t        PWX_API to_int32 (const T val) noexcept;
+int32_t        PWX_API to_int32 (const T val) noexcept;
 template <typename T>
-PWX_INLINE uint32_t       PWX_API to_uint32 (const T val) noexcept;
+uint32_t       PWX_API to_uint32 (const T val) noexcept;
 template <typename T>
-PWX_INLINE int64_t        PWX_API to_int64 (const T val) noexcept;
+int64_t        PWX_API to_int64 (const T val) noexcept;
 template <typename T>
-PWX_INLINE uint64_t       PWX_API to_uint64 (const T val) noexcept;
+uint64_t       PWX_API to_uint64 (const T val) noexcept;
 template <typename T>
-PWX_INLINE ::std::string  PWX_API to_string (const T val) noexcept;
-PWX_INLINE void           PWX_API trim (::std::string &text, char extra = 0x0) noexcept;
+::std::string  PWX_API to_string (const T val) noexcept;
+void           PWX_API trim (::std::string &text, char extra = 0x0) noexcept;
 
 // --- Classes for stream manipulation ---
 
