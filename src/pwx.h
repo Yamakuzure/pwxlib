@@ -55,6 +55,9 @@
   * 0.8.6.10  2012-10-08  sed, PrydeWorX  Added operator=/+/-/+=/-= to all containers and finished TSet implementation.
   * 0.8.6.11  2012-10-24  sed, PrydeWorX  Many fixes, completed TSet and and set functions.
   * 0.8.6.12  2012-10-29  sed, PrydeWorX  Imported pwxLib RNG (CRandom)
+  * 0.8.6.13  2012-11-21  sed, PrydeWorX  Changed all containers to a new scheme: public methods do no real work, private
+  *                                       and protected methods do the work and are overwritten where necessary.
+  * 0.8.6.14  2012-11-22  sed, PrydeWorX  Removed PWX_INLINE macro, it is of no use any more in a real library!
   @endverbatim
 **/
 
