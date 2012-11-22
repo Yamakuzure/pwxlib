@@ -4,10 +4,6 @@
 
 #include "main.h" // This is here for IDE Parsers to find the other stuff
 
-// The names are long, make them shorter:
-typedef std::chrono::high_resolution_clock hrClock;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
 
 /// @brief struct doing synchronized start/stop for additions of items into containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !

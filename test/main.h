@@ -11,6 +11,11 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+// The names are long, make them shorter:
+typedef std::chrono::high_resolution_clock hrClock;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+
 #include <pwx.h>
 using pwx::adjRight;
 
