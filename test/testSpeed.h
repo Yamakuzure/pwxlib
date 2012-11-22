@@ -4,6 +4,11 @@
 
 #include "main.h" // This is here for IDE Parsers to find the other stuff
 
+// The names are long, make them shorter:
+typedef std::chrono::high_resolution_clock hrClock;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+
 /// @brief struct doing synchronized start/stop for additions of items into containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
 template<typename list_t>
@@ -20,7 +25,7 @@ struct thAdder
 	{
 		cont = cont_;
 #ifdef PWX_THREADS
-		std::chrono::milliseconds sleepTime( 1 );
+		milliseconds sleepTime( 1 );
 		while (!isRunning) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
@@ -53,7 +58,7 @@ struct thClearer
 	{
 		cont = cont_;
 #ifdef PWX_THREADS
-		std::chrono::milliseconds sleepTime( 1 );
+		milliseconds sleepTime( 1 );
 		while (!isRunning) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
@@ -116,18 +121,18 @@ int32_t testSpeedST (sEnv &env)
 
 	// Now add localMaxElem integers and start the counting.
 	thAdder<list_t> adder(true);
-	auto startTimeAdd = std::chrono::high_resolution_clock::now();
+	auto startTimeAdd = hrClock::now();
     adder(&intCont, lowest, localMaxElem, maxAdd);
 
 	// Now clear them up again:
 	uint32_t contSize = intCont.size();
-	auto endTimeAdd = std::chrono::high_resolution_clock::now();
+	auto endTimeAdd = hrClock::now();
 	intCont.clear();
 
 	// Bring out the needed time in ms:
-	auto endTimeClr = std::chrono::high_resolution_clock::now();
-	auto elapsedAdd = std::chrono::duration_cast<std::chrono::microseconds>(endTimeAdd - startTimeAdd).count() / 1000.0;
-	auto elapsedClr = std::chrono::duration_cast<std::chrono::microseconds>(endTimeClr - endTimeAdd  ).count() / 1000.0;
+	auto endTimeClr = hrClock::now();
+	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
+	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - endTimeAdd  ).count();
 	cout << adjRight(5,2) << elapsedAdd << " ms /";
 	cout << adjRight(5,2) << elapsedClr << " ms" << endl;
 
@@ -216,7 +221,7 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	// Starting in a loop
-	auto startTimeAdd = std::chrono::high_resolution_clock::now();
+	auto startTimeAdd = hrClock::now();
     for (size_t nr = 0; nr < maxThreads; ++nr)
 		adders[nr].isRunning = true;
 
@@ -239,7 +244,7 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	uint32_t contSize = intCont.size();
-	auto endTimeAdd = std::chrono::high_resolution_clock::now();
+	auto endTimeAdd = hrClock::now();
 
 	// Now clear the container up again:
     for (size_t nr = 0; nr < maxThreads; ++nr)
@@ -247,7 +252,7 @@ int32_t testSpeedMT (sEnv &env)
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
 
 	// Starting in a loop
-	auto startTimeClr = std::chrono::high_resolution_clock::now();
+	auto startTimeClr = hrClock::now();
     for (size_t nr = 0; nr < maxThreads; ++nr)
 		clearers[nr].isRunning = true;
 
@@ -270,9 +275,9 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	// Bring out the needed time in ms:
-	auto endTimeClr = std::chrono::high_resolution_clock::now();
-	auto elapsedAdd = std::chrono::duration_cast<std::chrono::microseconds>(endTimeAdd - startTimeAdd).count() / 1000.0;
-	auto elapsedClr = std::chrono::duration_cast<std::chrono::microseconds>(endTimeClr - startTimeClr).count() / 1000.0;
+	auto endTimeClr = hrClock::now();
+	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
+	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr).count();
 	cout << adjRight(5,2) << elapsedAdd << " ms /";
 	cout << adjRight(5,2) << elapsedClr << " ms" << endl;
 
