@@ -81,8 +81,6 @@ public:
 	typedef TDoubleElement<data_t>      elem_t;
 	typedef TDoubleList<data_t, elem_t> base_t;
 	typedef TSet<data_t>                list_t;
-	typedef TContState<elem_t>          state_t;
-	typedef TContStateList<elem_t>      state_list_t;
 
 
 	/* ===============================================
@@ -208,324 +206,10 @@ public:
 	}
 
 
-	/** @brief insert a new data pointer after the specified data
-	  *
-	  * This method inserts a new element in the list after the element
-	  * holding @a prev.
-	  *
-	  * If @a prev is set to nullptr, the new element will become the new
-	  * head of the list.
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] prev the data the element that should precede the new element holds
-	  * @param[in] data the pointer that is to be added.
-	  * @return the number of elements in this list after the insertion
-	**/
-	virtual uint32_t insNext (data_t* prev, data_t* data)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (data && (nullptr == privFindData(*data)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insNext(prev, data))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert an element copy after the specified data
-	  *
-	  * This method inserts a new element in the list after the element
-	  * holding @a prev that is a copy from element @a src.
-	  *
-	  * If @a prev is set to nullptr, the new element will become the new
-	  * head of the list.
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] prev the data the element that should precede the new element holds.
-	  * @param[in] src a reference of the element to copy.
-	  * @return the number of elements in this list after the insertion.
-	**/
-	virtual uint32_t insNext (data_t* prev, const elem_t &src)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (src.data.get() && (nullptr == privFindData(*src)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insNext(prev, src))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert a new data pointer after the specified element
-	  *
-	  * This method inserts a new element in the list after the element
-	  * @a prev.
-	  *
-	  * If @a prev is set to nullptr, the new element will become the new
-	  * head of the list.
-	  *
-	  * If @a prev is no element of this list, the wrong list is updated
-	  * and both element counts will be wrong then. So please make sure to
-	  * use the correct element on the correct list!
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] prev the element that should precede the new element
-	  * @param[in] data the pointer that is to be added.
-	  * @return the number of elements in this list after the insertion
-	**/
-	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (data && (nullptr == privFindData(*data)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(prev, data))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert an element copy after the specified element
-	  *
-	  * This method inserts a new element in the list after the element
-	  * @a prev that is a copy of @a src.
-	  *
-	  * If @a prev is set to nullptr, the new element will become the new
-	  * head of the list.
-	  *
-	  * If @a prev is no element of this list, the wrong list is updated
-	  * and both element counts will be wrong then. So please make sure to
-	  * use the correct element on the correct list!
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] prev the element that should precede the new element.
-	  * @param[in] src reference of the lement to copy.
-	  * @return the number of elements in this list after the insertion.
-	**/
-	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (src.data.get() && (nullptr == privFindData(*src)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(prev, src))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert a new data pointer before the specified data
-	  *
-	  * This method inserts a new element in the list before the element
-	  * holding @a next.
-	  *
-	  * If @a next is set to nullptr, the new element will become the new
-	  * tail of the list.
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] next the data the element that should succeed the new element
-	  * @param[in] data the pointer that is to be added.
-	  * @return the number of elements in this list after the insertion
-	**/
-	virtual uint32_t insPrev (data_t* next, data_t* data)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (data && (nullptr == privFindData(*data)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insPrev(next, data))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert an element copy before the specified data
-	  *
-	  * This method inserts a new element in the list before the element
-	  * holding @a next as a copy of @a src.
-	  *
-	  * If @a next is set to nullptr, the new element will become the new
-	  * tail of the list.
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] next the data the element that should succeed the new element.
-	  * @param[in] src reference to the element to copy.
-	  * @return the number of elements in this list after the insertion.
-	**/
-	virtual uint32_t insPrev (data_t* next, const elem_t &src)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (src.data.get() && (nullptr == privFindData(*src)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insPrev(next, src))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert a new data pointer before the specified element
-	  *
-	  * This method inserts a new element in the list before the element
-	  * @a next.
-	  *
-	  * If @a next is set to nullptr, the new element will become the new
-	  * tail of the list.
-	  *
-	  * If @a next is no element of this list, the wrong list is updated
-	  * and both element counts will be wrong then. So please make sure to
-	  * use the correct element on the correct list!
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] next the element that should succeed the new element
-	  * @param[in] data the pointer that is to be added.
-	  * @return the number of elements in this list after the insertion
-	**/
-	virtual uint32_t insPrevElem (elem_t* next, data_t* data)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (data && nullptr == privFindData(*data)) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, data))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insPrevElem(next, data))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
-
-
-	/** @brief insert an element copy before the specified element
-	  *
-	  * This method inserts a new element in the list before the element
-	  * @a next as a copy of @a src.
-	  *
-	  * If @a next is set to nullptr, the new element will become the new
-	  * tail of the list.
-	  *
-	  * If @a next is no element of this list, the wrong list is updated
-	  * and both element counts will be wrong then. So please make sure to
-	  * use the correct element on the correct list!
-	  *
-	  * If the set is sorted, the element will be inserted at the correct
-	  * sorted position.
-	  *
-	  * If the set already holds an element containing the same data,
-	  * nothing is inserted.
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] next the element that should succeed the new element.
-	  * @param[in] src reference to the element to copy.
-	  * @return the number of elements in this list after the insertion.
-	**/
-	virtual uint32_t insPrevElem (elem_t* next, const elem_t &src)
-	{
-		// During this operation no manipulation of the set is allowed!
-		PWX_LOCK_GUARD(list_t, this)
-		state_t* state = getState();
-		if (src.data.get() && (nullptr == privFindData(*src)) ) {
-			if (isSorted) {
-				PWX_TRY_PWX_FURTHER(return base_t::insNextElem(state->curr, src))
-			} else {
-				PWX_TRY_PWX_FURTHER(return base_t::insPrevElem(next, src))
-			}
-		} // End of having an element to insert that is not present in the set
-
-		return eCount;
-	}
+	using base_t::insNext;
+	using base_t::insNextElem;
+	using base_t::insPrev;
+	using base_t::insPrevElem;
 
 
 	/** @brief return true if this set is a subset of @a src
@@ -581,7 +265,7 @@ public:
 	**/
 	virtual uint32_t push(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return insNextElem(tail, data))
+		PWX_TRY_PWX_FURTHER(return push_back(data))
 	}
 
 
@@ -600,74 +284,12 @@ public:
 	**/
 	virtual uint32_t push(const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER(return insNextElem(tail, src))
+		PWX_TRY_PWX_FURTHER(return push_back(src))
 	}
 
 
-	/** @brief push an element onto the end of set
-	  *
-	  * To add an element to the front, use unshift() or push_front().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] data data pointer to store.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push_back(data_t* data)
-	{
-		PWX_TRY_PWX_FURTHER(return insNextElem(tail, data))
-	}
-
-
-	/** @brief push an element copy onto the end of set
-	  *
-	  * To add an element to the front, use unshift() or push_front().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] src element to copy.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push_back(const elem_t &src)
-	{
-		PWX_TRY_PWX_FURTHER(return insNextElem(tail, src))
-	}
-
-
-	/** @brief push an element to the front the set
-	  *
-	  * To add an element to the back, use push() or push_back().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] data data pointer to store.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push_front(data_t* data)
-	{
-		PWX_TRY_PWX_FURTHER(return insNext(nullptr, data))
-	}
-
-
-	/** @brief push an element copy to the front the set
-	  *
-	  * To add an element to the back, use push() or push_back().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] src element to copy.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push_front(const elem_t &src)
-	{
-		PWX_TRY_PWX_FURTHER(return insNext(nullptr, src))
-	}
-
-
+	using base_t::push_back;
+	using base_t::push_front;
 	using base_t::remData;
 	using base_t::remElem;
 	using base_t::remNext;
@@ -739,7 +361,7 @@ public:
 	**/
 	virtual uint32_t unshift(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return insNext(nullptr, data))
+		PWX_TRY_PWX_FURTHER(return push_front(data))
 	}
 
 
@@ -758,7 +380,7 @@ public:
 	**/
 	virtual uint32_t unshift(const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER(return insNext(nullptr, src))
+		PWX_TRY_PWX_FURTHER(return push_front(src))
 	}
 
 
@@ -797,9 +419,9 @@ protected:
 	 * === Protected methods                       ===
 	 * ===============================================
 	*/
-
-	using base_t::getState;
 	using base_t::destroy;
+	using base_t::protFind;
+	using base_t::protInsert;
 
 
 	/* ===============================================
@@ -808,9 +430,10 @@ protected:
 	*/
 
 	using base_t::eCount;
+	using base_t::eNr;
+	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
-	using base_t::state_list;
 
 	bool isSorted; //!< determines whether the set is sorted or not.
 
@@ -822,13 +445,13 @@ private:
 
 	/** @brief find an element holding the specified @a data
 	  *
-	  * The privFind() method of the containers search for pointers, while
+	  * The protFind() method of the containers search for pointers, while
 	  * this special method searches for the data behind the pointers.
 	  *
-	  * If the set is sorted and @a data can not be found, then state->curr points
+	  * If the set is sorted and @a data can not be found, then curr points
 	  * to the element which would precede an element holding @a data if
 	  * it where present. With this special outcome the inserting methods
-	  * can simply use insNextElem() with state->curr to add data in a sorted way.
+	  * can simply use insNextElem() with curr to add data in a sorted way.
 	  * The only detail to look at is the situation when the new element
 	  * must become the new head. In this special case, <B>curr is set to
 	  * nullptr</B> and <B>eNr is set to -1</B>.
@@ -838,8 +461,6 @@ private:
 	**/
 	const elem_t* privFindData (const data_t &data) const noexcept
 	{
-		state_t* state = getState();
-
 		// Note: As the consistency of the content of a set is more important
 		//       than anything, a big lock is a must-have here!
 		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
@@ -852,26 +473,26 @@ private:
 		if (eCount) {
 			// Quick exit if sorted set assumption 1 is correct:
 			if (isSorted && (**head > data)) {
-				state->eNr  = 0;
-				state->curr = nullptr;
+				eNr  = -1;
+				curr = nullptr;
 				return nullptr;
 			}
 
-			// Reset state->curr if a previous search has invalidated it:
-			if (nullptr == state->curr) {
-				state->curr = head;
-				state->eNr  = 0;
+			// Reset curr if a previous search has invalidated it:
+			if (nullptr == curr) {
+				curr = head;
+				eNr  = 0;
 			}
 
-			// Quick exit if state->curr is correct:
-			if (**state->curr == data)
-				return state->curr;
+			// Quick exit if curr is correct:
+			if (**curr == data)
+				return curr;
 
 			// Quick exit if head is wanted:
 			if (**head == data) {
-				state->eNr  = 0;
-				state->curr = head;
-				return state->curr;
+				eNr = 0;
+				curr = head;
+				return curr;
 			}
 			// End of having at least one element
 		} else
@@ -882,16 +503,16 @@ private:
 		if (eCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
 			if (isSorted && (data > **tail)) {
-				state->eNr  = eCount -1;
-				state->curr = tail;
+				eNr  = eCount -1;
+				curr = tail;
 				return nullptr;
 			}
 
 			// Quick exit if tail is wanted:
-			if (**tail == data) {
-				state->eNr  = eCount - 1;
-				state->curr = tail;
-				return state->curr;
+			if (**head == data) {
+				eNr = eCount - 1;
+				curr = tail;
+				return curr;
 			}
 		} // End of having at least two elements
 
@@ -905,36 +526,36 @@ private:
 			if (isSorted) {
 				/* Here we know that data is definitely in the range of the set.
 				 * It is larger than head an smaller than tail. The good thing
-				 * about this is the absence of any need to check state->curr against
+				 * about this is the absence of any need to check curr against
 				 * head or tail.
 				*/
-				// Step 1: Move up until state->curr is larger
-				while (data > **state->curr) {
-					state->curr = state->curr->next;
-					++state->eNr;
+				// Step 1: Move up until curr is larger
+				while (data > **curr) {
+					curr = curr->next;
+					++eNr;
 				}
-				// Step 2: Move down until state->curr is smaller
-				while (**state->curr > data) {
-					state->curr = state->curr->prev;
-					--state->eNr;
+				// Step 2: Move down until curr is smaller
+				while (**curr > data) {
+					curr = curr->prev;
+					--eNr;
 				}
-				/* Due to this order state->curr is now either pointing to an element
+				/* Due to this order curr is now either pointing to an element
 				 * holding data, or the next smaller element. The latter detail
 				 * is important for the sorted insertion. If data is not found,
 				 * all inserting methods can now insert a new element holding
-				 * the searched data using insNextElem() on state->curr.
+				 * the searched data using insNextElem() on curr.
 				*/
-				return (**state->curr == data ? state->curr : nullptr);
+				return (**curr == data ? curr : nullptr);
 			} else {
-				state->curr  = head->next;
-				state->eNr   = 1;
+				curr = head->next;
+				eNr  = 1;
 				// Note: head and tail are already checked.
-				while ((state->curr != tail) && (**state->curr != data)) {
-					state->curr = state->curr->next;
-					++state->eNr;
+				while ((curr != tail) && (**curr != data)) {
+					curr = curr->next;
+					++eNr;
 				}
 				// Because tail is already checked, a pointer comparison will do:
-				return (state->curr != tail ? state->curr : nullptr);
+				return (curr != tail ? curr : nullptr);
 			}
 		} // End of having at least 3 elements
 
@@ -943,12 +564,356 @@ private:
 	}
 
 
+	/// @brief preparation method to insert data behind data
+	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*data))
+			return eCount;
+
+		// 1: Prepare the previous element
+		elem_t* prevElement = isSorted ? curr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
+		if (!isSorted && prev && (nullptr == prevElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this singly linked list")
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert data behind an element
+	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*data))
+			return eCount;
+
+		// 1: Prepare the previous element
+		elem_t* prevElement = isSorted ? curr : prev;
+
+#ifdef PWX_THREADDEBUG
+		if (prevElement) {
+			PWX_LOCK(prevElement)
+			while (prevElement->destroyed()) {
+				// This is bad. It means that someone manually deleted the element.
+				// If the element still has a next, or if it is the last element,
+				// we can, however, continue.
+				if ((eCount > 1) && prevElement->next) {
+					PWX_LOCK(prevElement->next)
+					PWX_UNLOCK(prevElement)
+					prevElement = prevElement->next;
+				}
+				else if (eCount < 2) {
+					PWX_UNLOCK(prevElement)
+					prevElement = nullptr; // New head about
+				}
+				else {
+					PWX_UNLOCK(prevElement)
+					// my bad...
+					PWX_THROW("Illegal Condition", "Previous element destroyed",
+							  "An element used as prev for insertion is destroyed.")
+				}
+			} // End of ensuring a valid prevElement
+		}
+		if (prevElement) PWX_UNLOCK(prevElement)
+#endif // PWX_THREADDEBUG
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy behind data
+	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*src))
+			return eCount;
+
+		// 1: Prepare the previous element
+		elem_t* prevElement = isSorted ? curr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
+		if (!isSorted && prev && (nullptr == prevElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this singly linked list")
+
+		// 2: Check source:
+		PWX_LOCK(const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		// 3: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+
+		// 4: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy behind an element
+	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*src))
+			return eCount;
+
+		// 1: Prepare the previous element
+		elem_t* prevElement = isSorted ? curr : prev;
+
+#ifdef PWX_THREADDEBUG
+		if (prevElement) {
+			PWX_LOCK(prevElement)
+			while (prevElement->destroyed()) {
+				if ((eCount > 1) && prev->next) {
+					PWX_LOCK(prevElement->next)
+					PWX_UNLOCK(prevElement)
+					prevElement = prevElement->next;
+				}
+				else if (eCount < 2) {
+					PWX_UNLOCK(prevElement)
+					prevElement = nullptr; // New head about
+				}
+				else {
+					PWX_UNLOCK(prevElement)
+					PWX_THROW("Illegal Condition", "Previous element destroyed",
+							  "An element used as prev for insertion is destroyed.")
+				}
+			} // End of ensuring a valid prevElement
+		}
+		if (prevElement) PWX_UNLOCK(prevElement)
+#endif // PWX_THREADDEBUG
+
+		// 2: Check source:
+		PWX_LOCK(const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		// 3: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+
+		// 4: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert data before data
+	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*data))
+			return eCount;
+
+		// 1: Prepare the next element
+		elem_t* nextElement = isSorted ? curr : next ? const_cast<elem_t*>(find(next)) : nullptr;
+		if (!isSorted && next && (nullptr == nextElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this doubly linked list")
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 3: Do the real insert
+		if (isSorted)
+			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
+		else
+			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+	}
+
+
+	/// @brief preparation method to insert data before an element
+	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*data))
+			return eCount;
+
+		// 1: Prepare the next element
+		elem_t* nextElement = isSorted ? curr : next;
+
+#ifdef PWX_THREADDEBUG
+		if (nextElement) {
+			PWX_LOCK(nextElement)
+			while (nextElement->destroyed()) {
+				// This is bad. It means that someone manually deleted the element.
+				// If the element still has a prev, or if it is the last element,
+				// we can, however, continue.
+				if ((eCount > 1) && nextElement->prev) {
+					PWX_LOCK(nextElement->prev)
+					PWX_UNLOCK(nextElement)
+					nextElement = nextElement->prev;
+				}
+				else if (eCount < 2) {
+					PWX_UNLOCK(nextElement)
+					nextElement = nullptr; // New head about
+				}
+				else {
+					PWX_UNLOCK(nextElement)
+					// my bad...
+					PWX_THROW("Illegal Condition", "Next element destroyed",
+							  "An element used as next for insertion is destroyed.")
+				}
+			} // End of ensuring a valid nextElement
+		}
+		if (nextElement) PWX_UNLOCK(nextElement)
+#endif // PWX_THREADDEBUG
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy before data
+	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*src))
+			return eCount;
+
+		// 1: Prepare the next element
+		elem_t* nextElement = isSorted ? curr : next ? const_cast<elem_t*>(find(next)) : nullptr;
+		if (!isSorted && next && (nullptr == nextElement))
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this doubly linked list")
+
+		// 2: Check source:
+		PWX_LOCK(const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		// 3: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+
+		// 4: Do the real insert
+		if (isSorted)
+			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
+		else
+			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy before an element
+	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
+	{
+		PWX_LOCK_GUARD(list_t, this)
+		if (privFindData(*src))
+			return eCount;
+
+		// 1: Prepare the previous element
+		elem_t* nextElement = isSorted ? curr : next;
+
+#ifdef PWX_THREADDEBUG
+		if (nextElement) {
+			PWX_LOCK(nextElement)
+			while (nextElement->destroyed()) {
+				// This is bad. It means that someone manually deleted the element.
+				// If the element still has a prev, or if it is the last element,
+				// we can, however, continue.
+				if ((eCount > 1) && nextElement->prev) {
+					PWX_LOCK(nextElement->prev)
+					PWX_UNLOCK(nextElement)
+					nextElement = nextElement->prev;
+				}
+				else if (eCount < 2) {
+					PWX_UNLOCK(nextElement)
+					nextElement = nullptr; // New head about
+				}
+				else {
+					PWX_UNLOCK(nextElement)
+					// my bad...
+					PWX_THROW("Illegal Condition", "Next element destroyed",
+							  "An element used as next for insertion is destroyed.")
+				}
+			} // End of ensuring a valid nextElement
+		}
+		if (nextElement) PWX_UNLOCK(nextElement)
+#endif // PWX_THREADDEBUG
+
+		// 2: Check source:
+		PWX_LOCK(const_cast<elem_t*>(&src))
+
+#ifdef PWX_THREADDEBUG
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+#endif // PWX_THREADDEBUG
+
+		// 3: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
+							 "ElementCreationFailed",
+							 "The Creation of a new list element failed.")
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+
+		// 4: Do the real insert
+		if (isSorted)
+			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
+		else
+			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+	}
+
 }; // class TSet
 
 
 /** @brief default destructor
   *
-  * This destructor will delete all elements state->currently stored. There is no
+  * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the set.
 **/
 template<typename data_t>
