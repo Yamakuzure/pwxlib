@@ -173,29 +173,29 @@ private:
 	 * ===============================================
 	*/
 
-	void    checkRule  (int32_t &state, const char first, const char second, const char third) noexcept;
-	int32_t genSyllable(double &idx, double step, char*  syll, int32_t &state, char*  lastChrs) noexcept PWX_WARNUNUSED;
-	double  getStepping(double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl) noexcept PWX_WARNUNUSED;
+	PWX_PRIVATE_INLINE void    checkRule  (int32_t &state, const char first, const char second, const char third) noexcept;
+	PWX_PRIVATE_INLINE int32_t genSyllable(double &idx, double step, char*  syll, int32_t &state, char*  lastChrs) noexcept PWX_WARNUNUSED;
+	PWX_PRIVATE_INLINE double  getStepping(double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl) noexcept PWX_WARNUNUSED;
 
 	/* === Helper methods for Simplex Noise === */
-	double  getSimpDot(int32_t index, double x) noexcept;
-	double  getSimpDot(int32_t index, double x, double y) noexcept;
-	double  getSimpDot(int32_t index, double x, double y, double z) noexcept;
-	double  getSimpDot(int32_t index, double x, double y, double z, double w) noexcept;
+	PWX_PRIVATE_INLINE double  getSimpDot(int32_t index, double x) noexcept;
+	PWX_PRIVATE_INLINE double  getSimpDot(int32_t index, double x, double y) noexcept;
+	PWX_PRIVATE_INLINE double  getSimpDot(int32_t index, double x, double y, double z) noexcept;
+	PWX_PRIVATE_INLINE double  getSimpDot(int32_t index, double x, double y, double z, double w) noexcept;
 	/* Note: These are four functions, because using 1 with default values would cause alot of overhead with 0
 		   multiplication. Testing 10M Iterations with 2 dimensions was 500ms slower with such an "universal"
 		   getSimpDot() method. */
-	double  getSpx1D (double x) noexcept;
-	double  getSpx2D (double x, double y) noexcept;
-	double  getSpx3D (double x, double y, double z) noexcept;
-	double  getSpx4D (double x, double y, double z, double w) noexcept;
+	PWX_PRIVATE_INLINE double  getSpx1D (double x) noexcept;
+	PWX_PRIVATE_INLINE double  getSpx2D (double x, double y) noexcept;
+	PWX_PRIVATE_INLINE double  getSpx3D (double x, double y, double z) noexcept;
+	PWX_PRIVATE_INLINE double  getSpx4D (double x, double y, double z, double w) noexcept;
 
 	// These are helpers to make the functions using raw noise more powerful when calculating with doubles
-	double  noiseD   (double x) const noexcept;
-	double  noiseD   (double x, double y) const noexcept;
-	double  noiseD   (double x, double y, double z) const noexcept;
-	double  noiseD   (double x, double y, double z, double w) const noexcept;
-	int32_t doubToInt(double val) const noexcept;
+	PWX_PRIVATE_INLINE double  noiseD   (double x) const noexcept;
+	PWX_PRIVATE_INLINE double  noiseD   (double x, double y) const noexcept;
+	PWX_PRIVATE_INLINE double  noiseD   (double x, double y, double z) const noexcept;
+	PWX_PRIVATE_INLINE double  noiseD   (double x, double y, double z, double w) const noexcept;
+	PWX_PRIVATE_INLINE int32_t doubToInt(double val) const noexcept;
 
 
 	/* ===============================================
