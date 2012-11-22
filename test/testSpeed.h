@@ -4,13 +4,6 @@
 
 #include "main.h" // This is here for IDE Parsers to find the other stuff
 
-/// === ALPHA STAGE TESTING REQUIREMENTS ===
-#ifndef PWX_THREADS
-#define PWX_THREADS 1
-#endif
-/// === REMOVE AFTER TESTING
-
-
 /// @brief struct doing synchronized start/stop for additions of items into containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
 template<typename list_t>
@@ -28,8 +21,10 @@ struct thAdder
 		cont = cont_;
 #ifdef PWX_THREADS
 		std::chrono::milliseconds sleepTime( 1 );
-		while (!isRunning)
+		while (!isRunning) {
 			std::this_thread::sleep_for( sleepTime );
+			std::this_thread::yield();
+		}
 #endif
 		if (cont) {
 			for (data_t nr = 0; nr < toAdd; ++nr) {
@@ -59,8 +54,10 @@ struct thClearer
 		cont = cont_;
 #ifdef PWX_THREADS
 		std::chrono::milliseconds sleepTime( 1 );
-		while (!isRunning)
+		while (!isRunning) {
 			std::this_thread::sleep_for( sleepTime );
+			std::this_thread::yield();
+		}
 #endif
 		if (cont) cont->clear();
 
