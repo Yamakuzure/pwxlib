@@ -28,8 +28,7 @@
 **/
 
 #include <pwx/base/VContainer.h>
-#include <pwx/container/TContStateList.h>
-
+#include <pwx/types/TSingleElement.h>
 
 namespace pwx
 {
@@ -62,8 +61,6 @@ public:
 
 	typedef VContainer                  base_t;
 	typedef TSingleList<data_t, elem_t> list_t;
-	typedef TContState<elem_t>          state_t;
-	typedef TContStateList<elem_t>      state_list_t;
 
 
 	/* ===============================================
@@ -213,7 +210,7 @@ public:
 	**/
 	virtual elem_t* find (data_t* data) noexcept
 	{
-		return const_cast<elem_t* > (privFind (static_cast<const data_t* > (data)));
+		return const_cast<elem_t* > (protFind (static_cast<const data_t* > (data)));
 	}
 
 
@@ -228,7 +225,7 @@ public:
 	**/
 	virtual const elem_t* find (const data_t* data) const noexcept
 	{
-		return privFind(data);
+		return protFind(data);
 	}
 
 
@@ -681,7 +678,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			int32_t rSize = rhs.size();
 			for (int32_t i = 0; i < rSize; ++i) {
-				elem_t* prev = privFindPrev (rhs[i]->data.get());
+				elem_t* prev = protFindPrev (rhs[i]->data.get());
 				if (prev) {
 					PWX_TRY_PWX_FURTHER (delNextElem (prev))
 				}
@@ -746,27 +743,82 @@ protected:
 	 * ===============================================
 	*/
 
-	/// @brief internal wrapper that takes care of state data if it is reseted
-	state_t* getState() const noexcept
+	void (*destroy) (data_t* data_);
+
+
+	/// @brief Search until the current element contains the searched data
+	virtual const elem_t* protFind (const data_t* data) const noexcept
 	{
-		state_t* state = state_list.getState();
+		elem_t* xCurr = curr; // Local pointer, a big lock is no longer needed.
 
-		if (state->reseted) {
-			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-			state->eNr  = 0;
-			if (eCount)
-				state->curr = head;
-			else
-				state->curr = nullptr;
-			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
-			state->reseted = false;
-		}
+		if (nullptr == xCurr)
+			return nullptr;
 
-		return state;
+		// Quick exit if xCurr is already what we want:
+		if (xCurr->data.get() == data)
+			return xCurr;
+
+		// The next does only make sense if we have more than one element
+		if (eCount > 1) {
+			// Exit if head is wanted...
+			PWX_LOCK(const_cast<list_t*>(this))
+			if (head->data.get() == data) {
+				curr = head;
+				eNr  = 0;
+				return head;
+			}
+
+			// ...or tail
+			if (tail->data.get() == data) {
+				curr = tail;
+				eNr  = eCount - 1;
+				return tail;
+			}
+
+			// Otherwise search for the previous item, it's the next, then
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			elem_t* prev = protFindPrev (data);
+			if (prev)
+				return prev->next;
+		} // End of handling a search with more than one element
+
+		return nullptr;
 	}
 
 
-	void (*destroy) (data_t* data_);
+	/// @brief simple method to insert an element into the list
+	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem) noexcept
+	{
+		// Now the real insertion can be done:
+		PWX_LOCK(this)
+		if (insPrev) {
+			if (tail == insPrev)
+				tail = insElem;
+			insElem->next = insPrev->next;
+			insPrev->next = insElem;
+			// curr is only maintainable if it is insPrev
+			if (curr != insPrev) {
+				// In which case it wouldn't have needed any change.
+				curr = head;
+				eNr  = 0;
+			}
+		} else if (eCount) {
+			insElem->next = head;
+			head = insElem;
+			++eNr; // No matter what happened, curr has another element before it now.
+		} else {
+			// If we had no elements yet, head and tail need to be set:
+			head = insElem;
+			tail = insElem;
+			curr = head;
+		}
+
+		uint32_t xCount = ++eCount;
+
+		PWX_UNLOCK(this)
+
+		return xCount;
+	}
 
 
 	/* ===============================================
@@ -774,10 +826,11 @@ protected:
 	 * ===============================================
 	*/
 
-	elem_t* head = nullptr;   //!< pointer to the first element
-	elem_t* tail = nullptr;   //!< pointer to the last element
 	mutable
-	state_list_t state_list;
+	elem_t*  curr   = nullptr;   //!< pointer to the currently handled element
+	elem_t*  head   = nullptr;   //!< pointer to the first element
+	elem_t*  tail   = nullptr;   //!< pointer to the last element
+
 
 private:
 	/* ===============================================
@@ -810,83 +863,27 @@ private:
 	}
 
 
-	/// @brief Search until the current element contains the searched data
-	virtual const elem_t* privFind (const data_t* data) const noexcept
-	{
-		state_t* state = getState();
-
-		if (nullptr == state->curr)
-			return nullptr;
-
-		// Quick exit if curr is already what we want:
-		if (state->curr->data.get() == data)
-			return state->curr;
-
-		// For subsequent searches curr->next is to be checked as well:
-		if (state->curr->next && (state->curr->next->data.get() == data)) {
-			state->curr = state->curr->next;
-			++state->eNr;
-			return state->curr;
-		}
-
-		// The next does only make sense if we have more than one element
-		if (eCount > 1) {
-			// Exit if head is wanted...
-			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-			if (head->data.get() == data) {
-				state->curr = head;
-				state->eNr  = 0;
-				return head;
-			}
-
-			// ...or tail
-			if (tail->data.get() == data) {
-				state->curr = tail;
-				state->eNr  = eCount - 1;
-				return tail;
-			}
-
-			// Otherwise search for the previous item, it's the next, then
-			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
-			elem_t* prev = privFindPrev (data);
-			if (prev)
-				return prev->next;
-		} // End of handling a search with more than one element
-
-		return nullptr;
-	}
-
-
 	/// @brief Search until the next element contains the searched data
-	virtual elem_t* privFindPrev (const data_t* data) const noexcept
+	virtual elem_t* protFindPrev (const data_t* data) const noexcept
 	{
-		state_t* state = getState();
-		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 		elem_t*  prev  = head;
+		elem_t*  xCurr = prev->next;
+		uint32_t xNr   = 1;
 
-		if (prev && prev != tail) {
-			state->curr    = prev->next;
-			state->eNr     = 1;
-			if (state->reseted)
-				state->reseted = false;
-		}
-		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
-
-		while (prev && (prev != tail) && state->curr) {
-			if (state->curr->data.get() == data)
+		while (prev != tail) {
+			if (xCurr->data.get() == data) {
+				PWX_LOCK(const_cast<list_t*>(this))
+				curr = xCurr;
+				eNr  = xNr;
+				PWX_UNLOCK(const_cast<list_t*>(this))
 				return prev;
-			++state->eNr;
-			prev  = state->curr;
-			state->curr = state->curr->next;
+			}
+			++xNr;
+			prev  = xCurr;
+			xCurr = xCurr->next;
 		}
 
 		// If we are here, prev points to tail. No match found.
-		if (nullptr == state->curr) {
-			state->curr    = head;
-			state->eNr     = 0;
-			state->reseted = false;
-		}
-
 		return nullptr;
 	}
 
@@ -895,10 +892,7 @@ private:
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
 		if (eCount) {
-			state_t* state = state_list.getState();
-
 			// Mod index into range
-			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
 												   ? eCount - (::std::abs (index) % eCount)
 												   : index % eCount);
@@ -908,30 +902,23 @@ private:
 			if (xIdx >= eCount)
 				xIdx = xIdx % eCount;
 
-			if (nullptr == state->curr) {
-				state->curr = head;
-				state->eNr  = 0;
-			}
-			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+			PWX_LOCK(const_cast<list_t*>(this))
+			elem_t*  xCurr = curr;
+			uint32_t xNr   = eNr;
+			PWX_UNLOCK(const_cast<list_t*>(this))
 
-			// Is curr already correct?
-			if (xIdx == state->eNr)
-				return state->curr;
+			// Is xCurr already correct?
+			if (xIdx == xNr)
+				return xCurr;
 
 			// Is xIdx the next member, like in a for loop?
-			if (xIdx == (state->eNr + 1)) {
-				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-
-				// It is important to make sure that the last item is
-				// still around and not deleted, yet.
-				if (state->curr->next && !state->curr->next->destroyed()) {
-					state->curr = state->curr->next;
-					++state->eNr;
-				} else
-					// Otherwise state is suspicious.
-					// Now that we hold a lock, do a (one-time) recursive call
-					return privGetElementByIndex(index);
-				return state->curr;
+			if (xIdx == (xNr + 1)) {
+				xCurr = xCurr->next;
+				PWX_LOCK(const_cast<list_t*>(this))
+				curr  = xCurr;
+				eNr   = xNr + 1;
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return xCurr;
 			}
 
 			// Is it the head we want?
@@ -943,29 +930,26 @@ private:
 				return tail;
 
 			// Ok, let's go. But only start from head if we currently are beyond.
-			if (xIdx < state->eNr) {
-				state->curr = head->next;
-				state->eNr  = 1;
+			if (xIdx < eNr) {
+				xCurr = head->next;
+				xNr  = 1;
 			}
-			// Otherwise the next of curr is already checked, so skip it
+			// Otherwise the next of xCurr is already checked, so skip it
 			else {
-				state->curr = state->curr->next;
-				++state->eNr;
+				xCurr = xCurr->next;
+				++xNr;
 			}
 			// Now look into the rest
-			while ( (state->eNr < xIdx) && (state->eNr < (eCount - 1)) && state->curr) {
-				state->curr = state->curr->next;
-				++state->eNr;
+			while ( (xNr < xIdx) && (xNr < (eCount - 1))) {
+				xCurr = xCurr->next;
+				++xNr;
 			}
-
-			// Now curr is either the wanted element ...
-			if (state->curr)
-				return state->curr;
-			// ... or someone freaked the list
-			else {
-				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-				return privGetElementByIndex(index);
-			}
+			// xCurr is sure to be pointing where it should now.
+			PWX_LOCK(const_cast<list_t*>(this))
+			curr = xCurr;
+			eNr  = xNr;
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return xCurr;
 		}
 
 		return nullptr;
@@ -973,11 +957,10 @@ private:
 
 
 	/// @brief preparation method to insert data behind data
-	/// Note: The list must be locked beforehand!
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
 		// 1: Prepare the previous element
-		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
+		elem_t* prevElement = prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
 		if (prev && (nullptr == prevElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
@@ -990,12 +973,11 @@ private:
 							 "The Creation of a new list element failed.")
 
 		// 3: Do the real insert
-		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
 
 	/// @brief preparation method to insert data behind an element
-	/// Note: The list must be locked beforehand!
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
 		// 1: Prepare the previous element
@@ -1035,16 +1017,15 @@ private:
 							 "The Creation of a new list element failed.")
 
 		// 3: Do the real insert
-		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy behind data
-	/// Note: The list must be locked beforehand!
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
 		// 1: Prepare the previous element
-		elem_t* prevElement = prev ? const_cast<elem_t*>(privFind(prev)) : nullptr;
+		elem_t* prevElement = prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
 		if (prev && (nullptr == prevElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
@@ -1069,12 +1050,11 @@ private:
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
-		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy behind an element
-	/// Note: The list must be locked beforehand!
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
 		// 1: Prepare the previous element
@@ -1122,38 +1102,7 @@ private:
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
-		PWX_TRY_PWX_FURTHER(return privInsert(prevElement, newElement))
-	}
-
-
-	/// @brief Simple inserter, all locks must be in place!
-	virtual uint32_t privInsert (elem_t* insPrev, elem_t* insElem) noexcept
-	{
-		// Now the real insertion can be done:
-		PWX_LOCK(this)
-
-		// Reset all states, the list will change
-		state_list.resetStates();
-
-		if (insPrev) {
-			if (tail == insPrev)
-				tail = insElem;
-			insElem->next = insPrev->next;
-			insPrev->next = insElem;
-		} else if (eCount) {
-			insElem->next = head;
-			head = insElem;
-		} else {
-			// If we had no elements yet, head and tail need to be set:
-			head = insElem;
-			tail = insElem;
-		}
-
-		uint32_t xCount = ++eCount;
-
-		PWX_UNLOCK(this)
-
-		return xCount;
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
 
@@ -1162,9 +1111,6 @@ private:
 	{
 		if (elem) {
 			PWX_LOCK(this)
-
-			// Reset all states, the list will change
-			state_list.resetStates();
 
 			// maintain tail and head first
 			if (tail == elem)
@@ -1177,10 +1123,25 @@ private:
 			if (prev)
 				prev->next = elem->next;
 
+			// curr needs to be valid
+			if (curr == elem) {
+				if (elem->next)
+					curr = elem->next;
+				else if (prev) {
+					curr = prev;
+					--eNr;
+				}
+			} else {
+				curr = head;
+				eNr  = 0;
+			} // End of maintaining curr
+
 			// if this was the last element, sanitize the list:
 			if (1 == eCount) {
 				head = nullptr;
+				curr = nullptr;
 				tail = nullptr;
+				eNr  = 0;
 			}
 
 			// Finally elem does not need pointers to its neighbors any more
@@ -1196,7 +1157,7 @@ private:
 	{
 		elem_t* xPrev = nullptr;
 
-		if (prev && (nullptr == (xPrev = const_cast<elem_t*>(privFind (prev))) ) )
+		if (prev && (nullptr == (xPrev = const_cast<elem_t*>(protFind (prev))) ) )
 			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
 
 		if (xPrev && (nullptr == xPrev->next))
