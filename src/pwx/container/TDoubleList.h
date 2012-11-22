@@ -540,7 +540,7 @@ private:
 
 
 	/// @brief Search until the next element contains the searched data
-	virtual elem_t* protFindPrev (const data_t* data) const noexcept
+	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
 		PWX_LOCK(const_cast<list_t*>(this))
 		elem_t*  oldCurr = curr;

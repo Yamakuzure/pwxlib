@@ -678,7 +678,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			int32_t rSize = rhs.size();
 			for (int32_t i = 0; i < rSize; ++i) {
-				elem_t* prev = protFindPrev (rhs[i]->data.get());
+				elem_t* prev = privFindPrev (rhs[i]->data.get());
 				if (prev) {
 					PWX_TRY_PWX_FURTHER (delNextElem (prev))
 				}
@@ -777,7 +777,7 @@ protected:
 
 			// Otherwise search for the previous item, it's the next, then
 			PWX_UNLOCK(const_cast<list_t*>(this))
-			elem_t* prev = protFindPrev (data);
+			elem_t* prev = privFindPrev (data);
 			if (prev)
 				return prev->next;
 		} // End of handling a search with more than one element
@@ -864,7 +864,7 @@ private:
 
 
 	/// @brief Search until the next element contains the searched data
-	virtual elem_t* protFindPrev (const data_t* data) const noexcept
+	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
 		elem_t*  prev  = head;
 		elem_t*  xCurr = prev->next;
