@@ -101,22 +101,33 @@ public:
 	* ===============================================
 	*/
 	int32_t     getSeed  () const noexcept;
-	uint32_t    hash     (int32_t        key) const noexcept;
-	uint32_t    hash     (uint32_t       key) const noexcept;
-	uint32_t    hash     (int64_t        key) const noexcept;
-	uint32_t    hash     (uint64_t       key) const noexcept;
-	uint32_t    hash     (float          key) const noexcept;
-	uint32_t    hash     (double         key) const noexcept;
-	uint32_t    hash     (const char*    key) const noexcept;
-	uint32_t    hash     (::std::string &key) const noexcept;
+	uint32_t    hash     (int16_t     key) const noexcept;
+	uint32_t    hash     (uint16_t    key) const noexcept;
+	uint32_t    hash     (int32_t     key) const noexcept;
+	uint32_t    hash     (uint32_t    key) const noexcept;
+	uint32_t    hash     (int64_t     key) const noexcept;
+	uint32_t    hash     (uint64_t    key) const noexcept;
+	uint32_t    hash     (float       key) const noexcept;
+	uint32_t    hash     (double      key) const noexcept;
+	uint32_t    hash     (long double key) const noexcept;
+	uint32_t    hash     (const char* key, size_t keyLen = 0) const noexcept;
+	uint32_t    hash     (std::string &key) const noexcept;
 	double      noise    (int32_t x) const noexcept;
 	double      noise    (int32_t x, int32_t y) const noexcept;
 	double      noise    (int32_t x, int32_t y, int32_t z) const noexcept;
 	double      noise    (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept;
+	int16_t     random   (int16_t max) noexcept;
+	int16_t     random   (int16_t min, int16_t max) noexcept;
+	uint16_t    random   (uint16_t max) noexcept;
+	uint16_t    random   (uint16_t min, uint16_t max) noexcept;
 	int32_t     random   (int32_t max = RAND_MAX) noexcept;
 	int32_t     random   (int32_t min, int32_t max) noexcept;
+	uint32_t    random   (uint32_t max = RAND_MAX) noexcept;
+	uint32_t    random   (uint32_t min, uint32_t max) noexcept;
 	int64_t     random   (int64_t max) noexcept;
 	int64_t     random   (int64_t min, int64_t max) noexcept;
+	uint64_t    random   (uint64_t max) noexcept;
+	uint64_t    random   (uint64_t min, uint64_t max) noexcept;
 	float       random   (float max) noexcept;
 	float       random   (float min, float max) noexcept;
 	double      random   (double max) noexcept;
@@ -208,15 +219,15 @@ private:
 	 * ===============================================
 	*/
 
-	int32_t lastRndValue;  //!< The last by rand() generated value
-	int32_t seed;          //!< General seed, can be changed with setSeed(new_value)
-	double  spxCorn[5];    //!< The Corners contributing to a simplex noise. (1D: 2, 4D: 5 corners)
-	double  spxDist[5][4]; //!< Simplex distance of a point to the simplex' corners
-	int32_t spxGrads[5];   //!< Gradient table index for the simplex corners
-	int32_t spxNorms[4];   //!< Normalized Coordinates for x, y, z, w
-	int32_t spxOffs[3][4]; //!< Offsets for determining which vertice a dot is in
-	int32_t spxPerms[4];   //!< Permutation table indices for x, y, z, w
-	int32_t spxTab[512];   //!< A permutation table for simplex noise
+	uint32_t lastRndValue;  //!< The last by rand() generated value
+	int32_t  seed;          //!< General seed, can be changed with setSeed(new_value)
+	double   spxCorn[5];    //!< The Corners contributing to a simplex noise. (1D: 2, 4D: 5 corners)
+	double   spxDist[5][4]; //!< Simplex distance of a point to the simplex' corners
+	int32_t  spxGrads[5];   //!< Gradient table index for the simplex corners
+	int32_t  spxNorms[4];   //!< Normalized Coordinates for x, y, z, w
+	int32_t  spxOffs[3][4]; //!< Offsets for determining which vertice a dot is in
+	int32_t  spxPerms[4];   //!< Permutation table indices for x, y, z, w
+	int32_t  spxTab[512];   //!< A permutation table for simplex noise
 };
 
 extern CRandom RNG; //!< External instance of Random to be used

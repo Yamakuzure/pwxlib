@@ -2,11 +2,12 @@
 #  define PWX_EXPORTS 1
 #endif
 
-#include <pwx/general/macros.h>
-#include <pwx/tools/StreamHelpers.h>
-#include <pwx/worker/CRandom.h>
-#include <pwx/internal/CRandomConstants.h>
-#include <pwx/internal/CRandomWordConstants.h>
+#include "pwx/general/macros.h"
+#include "pwx/tools/StreamHelpers.h"
+#include "pwx/worker/CRandom.h"
+#include "pwx/internal/CRandomTRandom.h"
+#include "pwx/internal/CRandomTHash.h"
+#include "pwx/internal/CRandomWordConstants.h"
 
 #include <string>
 #include <cstring>
@@ -16,1227 +17,6 @@
 namespace pwx {
 
 CRandom RNG;
-
-/** @brief default ctor
-*
-* Initializes the random number generator and assigns a first random value
-* to lastRndValue. The seed and Simplex data are initialized as well.
-**/
-CRandom::CRandom() noexcept
-: lastRndValue (0), seed (0)
-{
-	uint32_t currTime = static_cast<uint32_t> (time (NULL));
-	srand (currTime);
-	lastRndValue  =  rand();
-	setSeed (currTime);
-
-	// Initialize Simplex values:
-	for (int32_t i = 0; i < 5; i++) {
-		spxCorn[i]    = 0.0;
-		spxGrads[i]   = 0;
-		for (int32_t j = 0; j < 4; j++)
-			spxDist[i][j] = 0.0;
-
-		if (i < 4) {
-			spxNorms[i] = 0;
-			spxPerms[i] = 0;
-		}
-
-		if (i < 3) {
-			for (int32_t j = 0; j < 4; j++)
-				spxOffs[i][j] = 0;
-		}
-	}
-}
-
-
-/** @brief default dtor
-*
-* Empty default dtor, nothing to be done.
-*
-**/
-CRandom::~CRandom() noexcept
-{ }
-
-
-/** @brief return current seed
-  *
-  * This method simply returns the current Seed used to manipulate values
-  * to calculate Simplex Noise and random names.
-  *
-  * @return Current Seed
-**/
-int32_t CRandom::getSeed() const noexcept
-{
-	return (seed);
-}
-
-
-/** @brief hash32shift with signed key
-  *
-  * This is hash32shift() like described by Thomas Wang, 01/2007
-  *
-  * @param[in] key the value that is hashed
-  * @return uint32_t with the resulting hash
-**/
-uint32_t CRandom::hash (int32_t key) const noexcept
-{
-	key = (~key) + (key << 15);
-	key ^= (key & constants::fullMaxInt) >> 12; // key >>> 12
-	key += key << 2;
-	key ^= (key & constants::fullMaxInt) >> 4; // key >>> 4
-	key *= 2057;
-	key ^= (key & constants::fullMaxInt) >> 16; // key >>> 16
-	return static_cast<uint32_t> (key);
-}
-
-
-/** @brief hash32shift with unsigned key
-  *
-  * This is hash() like described by Robert Jenkins, 6-shift version
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-**/
-uint32_t CRandom::hash (uint32_t key) const noexcept
-{
-	key = (key  + 0x7ed55d16) + (key << 12);
-	key = (key  ^ 0xc761c23c) ^ (key >> 19);
-	key = (key  + 0x165667b1) + (key << 5);
-	key = (key  + 0xd3a2646c) ^ (key << 9);
-	key = (key  + 0xfd7046c5) + (key << 3);
-	return (key ^ 0xb55a4f09) ^ (key >> 16);
-}
-
-
-/** @brief hash64shift with signed key
-  *
-  * This is hash64shift() like described by Thomas Wang, 01/2007.
-  * Modified to result in a unified uint32_t hash.
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-**/
-uint32_t CRandom::hash (int64_t key) const noexcept
-{
-	key  = (~key) + (key << 21);
-	key ^= (key & constants::fullMaxLong) >> 24; // key >>> 24
-	key += (key << 3) + (key << 8);
-	key ^= (key & constants::fullMaxLong) >> 14; // key >>> 14
-	key += (key << 2) + (key << 4);
-	key ^= (key & constants::fullMaxLong) >> 28; // key >>> 28
-	return static_cast<uint32_t> (0x00000000ffffffff & (key + (key >> 31)));
-}
-
-
-/** @brief hash64 to 32 bit shift with unsigned key
-  *
-  * This is a 64 (or 2 x 32) to 32 bit shift hash function
-  * like described by Thomas Wang, 01/2007
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-**/
-uint32_t CRandom::hash (uint64_t key) const noexcept
-{
-	key  = (~key) + (key << 18);
-	key ^= (key & constants::fullMaxLong) >> 31; // key >>> 31
-	key *= 21;
-	key ^= (key & constants::fullMaxLong) >> 11; // key >>> 11
-	key += key << 6;
-	key ^= (key & constants::fullMaxLong) >> 22; // key >>> 22
-	return static_cast<uint32_t> (key);
-}
-
-
-/** @brief hash float to 32 bit with dual mix
-  *
-  * This is a mixing hash for type float that mixes 32 bit hashes
-  * for the part left and right of the floating point using XOR.
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-  */
-uint32_t CRandom::hash (float key) const noexcept
-{
-	return hash(static_cast<double>(key));
-}
-
-
-/** @brief hash double to 32 bit with dual mix
-  *
-  * This is a mixing hash for type double that mixes 32 bit hashes
-  * for the part left and right of the floating point using XOR.
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-  */
-uint32_t CRandom::hash (double key) const noexcept
-{
-	::std::string number = to_string(key);
-
-	if (number.size() > 2) {
-		size_t pos = number.find('.');
-		if (number.npos == pos)
-			pos = number.find(',');
-
-		uint64_t lhs = hash(to_uint64(number.substr(0, pos)));
-		uint64_t rhs = hash(to_uint64(number.substr(pos + 1)));
-
-		return (hash(lhs) ^ hash(rhs));
-	} else if (number.size()) {
-		return hash(to_uint32(number));
-	}
-
-	return hash(static_cast<uint32_t>(0));
-}
-
-
-/** @brief hash a C-String to 32bit unsigned integer
-  *
-  * This is a rather simple hash method that combines quadruples
-  * of characters to uint32_t values intermixing their results.
-  * The final number then is used as a key for a regular hash
-  * function.
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-  */
-uint32_t CRandom::hash (const char* key) const noexcept
-{
-	uint32_t part = 0, sum = 0;
-	size_t   len = strlen(key), phase = 0, level = 0;
-
-	for (size_t pos = 0; pos < len; ++pos) {
-		phase = pos % 4;
-		part |= static_cast<uint32_t>(key[pos] << (phase * 8));
-		if (3 == phase) {
-			level = pos % 3;
-			if (1 == level)
-				sum |= part >> 1;
-			else if (2 == level)
-				sum ^= part << 4;
-			else
-				sum += part >> 2;
-			part = 0;
-		} // End of adding result
-	} // end of going through the string
-
-	// If there is something in part left, it has to be added:
-	if (part)
-		sum += part;
-
-	return hash(sum);
-}
-
-
-/** @brief hash an std::string to 32bit unsigned integer
-  *
-  * This is a rather simple hash method that combines quadruples
-  * of characters to uint32_t values intermixing their results.
-  * The final number then is used as a key for a regular hash
-  * function.
-  *
-  * @param[in] key the value that is seeded
-  * @return uint32_t with the resulting hash
-  */
-uint32_t CRandom::hash (::std::string& key) const noexcept
-{
-	return hash(key.c_str());
-}
-
-
-/** @brief noise with one dimension
-  *
-  * This method calculates a noise value between -1.0 and 1.0 out of one integer
-  *
-  * @param[in] x paramter to transform
-  * @return double noise value between -1.0 and +1.0
-**/
-double CRandom::noise (int32_t x) const noexcept
-{
-	return (1.0 - (static_cast<double> (hash (x) & constants::fullMaxInt) / constants::noiseMod));
-}
-
-
-/** @brief noise with two dimensions
-  *
-  * This method calculates a noise value between -1.0 and 1.0 out of two integers
-  *
-  * @param[in] x paramter to transform
-  * @param[in] y paramter to transform
-  * @return double noise value between -1.0 and +1.0
-**/
-double CRandom::noise (int32_t x, int32_t y) const noexcept
-{
-	return (1.0 - (static_cast<double> (
-					(hash (x) & constants::halfMaxInt)
-					+	(hash (y) & constants::halfMaxInt)
-				   ) / constants::noiseMod));
-}
-
-
-/** @brief noise with three dimensions
-  *
-  * This method calculates a noise value between -1.0 and 1.0 out of three integers
-  *
-  * @param[in] x paramter to transform
-  * @param[in] y paramter to transform
-  * @param[in] z paramter to transform
-  * @return double noise value between -1.0 and +1.0
-**/
-double CRandom::noise (int32_t x, int32_t y, int32_t z) const noexcept
-{
-	return (1.0 - (static_cast<double> (
-						(hash (x) & constants::halfMaxInt)
-					+	(hash (y) & constants::fourthMaxInt)
-					+	(hash (z) & constants::fourthMaxInt)
-				   ) / constants::noiseMod));
-}
-
-
-/** @brief noise with four dimensions
-  *
-  * This method calculates a noise value between -1.0 and 1.0 out of four integers
-  *
-  * @param[in] x paramter to transform
-  * @param[in] y paramter to transform
-  * @param[in] z paramter to transform
-  * @param[in] w paramter to transform
-  * @return double noise value between -1.0 and +1.0
-**/
-double CRandom::noise (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept
-{
-	return (1.0 - (static_cast<double> (
-						(hash (x) & constants::fourthMaxInt)
-					+	(hash (y) & constants::fourthMaxInt)
-					+	(hash (z) & constants::fourthMaxInt)
-					+	(hash (w) & constants::fourthMaxInt)
-				   ) / constants::noiseMod));
-}
-
-
-/** @brief Generate a random value of int32_t between 0 and @a max.
-  *
-  * This is the simplest method, which, when used without an argument,
-  * behaves exactly like rand() would, but ensures, that the return
-  * value is different than the one returned the last time any of
-  * the random methods was used.
-  *
-  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
-  *
-  * @param[in] max Specifies the desired maximum value (default is RAND_MAX).
-  * @return A random value between 0 and @a max.
-**/
-int32_t CRandom::random (int32_t max) noexcept
-{
-	if (max == 0)
-		return (0);
-	else {
-		int32_t result = rand();
-		int32_t xMax   = abs (max); // To ensure that xMax is positive
-
-		while (result == lastRndValue)
-			result = rand();
-		lastRndValue  =  result;  // Last rand() result saved!
-
-		if (xMax < RAND_MAX)
-			// Now the result has to be recalculated into 0<=result<=max
-			result  %= xMax + 1; // + 1 to include xMax
-
-		return (result * SIGN (max));
-	}
-}
-
-
-/** @brief Generate a random value of int32_t between @a min and @a max.
-  *
-  * This method returns a value between @a min and @a max if either
-  * @a min < @a max, or @a max is negative and @a max < @a min.
-  *
-  * if a negative @a max is submitted, the result will be @a max <= result <= @a min.
-  * This might be looking odd, but @a min <= result <= @a max with negative @a min and
-  * @a max is possible, too. It is just a convenience.
-  *
-  * @param[in] min Specifies the desired minimum value.
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between 0 and max.
-**/
-int32_t CRandom::random (int32_t min, int32_t max) noexcept
-{
-	if (max == min)
-		return (max);
-	else {
-		int32_t xMin = ::std::min (min, max);
-
-		// As the result is an int32_t, we can use random()
-		return (random (::std::max (min, max) - xMin) + xMin);
-	}
-}
-
-
-/** @brief Generate a random value of int64_t between 0 and @a max.
-  *
-  * @see CRandom::random(int32_t max) for documentation
-  *
-  * This one should be used with care! As rand() returns values between
-  * 0 and the maximum number an int32_t can hold, recalculating the result
-  * into a int64_t with a maximum higher than INT_MAX *will* eliminate
-  * various numbers which can not be returned
-  *
-  * Example:<BR>
-  * If you get a random number between 0 and 10, and then recalculate it
-  * to be between 0 and 20, all odd numbers will be eliminated. So your
-  * result *will* be even, no matter what you try!
-  *
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between 0 and max.
-**/
-int64_t CRandom::random (int64_t max) noexcept
-{
-	if (max == 0)
-		return (0);
-	else {
-		/* There are two possibilities:
-		 * 1.: max <=  RAND_MAX
-		 *     Then just return the result of the integer version.
-		 * 2.: max >  RAND_MAX
-		 *     Return the result of the integer version, multiplied by
-		 *     the difference factor between max and RAND_MAX
-		 */
-		if (::std::abs (max) <= RAND_MAX)
-			// First Situation:
-			return (static_cast<int64_t> (random (static_cast<int32_t> (max))));
-		else {
-			// Second Situation:
-			int64_t     result  =  static_cast<int64_t> (random());
-			long double factor  =  abs (static_cast<long double> (max) / static_cast<long double> (RAND_MAX));
-			return (static_cast<int64_t> (round (result * factor * SIGN (max))));
-		}
-	}
-}
-
-
-/** @brief Generate a random value of int64_t between @a min and @a max.
-  *
-  * @see CRandom::random(int32_t min, int32_t max) for documentation
-  *
-  * Use this method if you need a random value between @a min and @a max,
-  * but have a @a max that is larger than INT_MAX.
-  *
-  * @param[in] min Specifies the desired minimum value.
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between min and max.
-**/
-int64_t CRandom::random (int64_t min, int64_t max) noexcept
-{
-	if (max == min)
-		return (max);
-	else {
-		int64_t xMin = ::std::min (min, max);
-		int64_t xMax = ::std::max (min, max);
-
-		// Can we use random(max) ?
-		if (xMin == 0L)
-			return (random (xMax));
-		// Can we use random(min) ?
-		else if (xMax == 0L)
-			return (random (xMin));
-		else
-			return (random (xMax - xMin) + xMin);
-	}
-}
-
-
-/** @brief Generate a random value of float between 0 and @a max.
-  *
-  * @see CRandom::random(int32_t max) for documentation
-  *
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between 0 and max.
-**/
-float CRandom::random (float max) noexcept
-{
-	if (max == 0.0)
-		return (0.0);
-	else {
-		int32_t iRand = random();
-		return (max * (static_cast<float> (iRand) / static_cast<float> (RAND_MAX)));
-	}
-}
-
-
-/** @brief Generate a random value of float between @a min and @a max.
-  *
-  * @see CRandom::random(int32_t min, int32_t max) for documentation
-  *
-  * @param[in] min Specifies the desired minimum value.
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between min and max.
-**/
-float CRandom::random (float min, float max) noexcept
-{
-	if (max == min)
-		return (max);
-	else {
-		float xMin = ::std::min (min, max);
-		float xMax = ::std::max (min, max);
-
-		// Can we use random(float max) ?
-		if (xMin == 0.0)
-			return (random (xMax));
-		// Can we use random(float min ?
-		else if (xMax == 0.0)
-			return (random (xMin));
-		else
-			return (random (xMax - xMin) + xMin);
-	}
-}
-
-
-/** @brief Generate a random value of double between 0 and @a max.
-  *
-  * @see CRandom::random(int32_t max) for documentation
-  *
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between 0 and max.
-**/
-double CRandom::random (double max) noexcept
-{
-	if (max == 0.0)
-		return (0.0);
-	else {
-		int32_t iRand = random();
-		return (max * (static_cast<double> (iRand) / static_cast<double> (RAND_MAX)));
-	}
-}
-
-
-/** @brief Generate a random value of double between @a min and @a max.
-  *
-  * @see CRandom::random(int32_t min, int32_t max) for documentation
-  *
-  * @param[in] min Specifies the desired minimum value.
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between min and max.
-**/
-double CRandom::random (double min, double max) noexcept
-{
-	if (max == min)
-		return (max);
-	else {
-		double xMin = ::std::min (min, max);
-		double xMax = ::std::max (min, max);
-
-		// Can we use random(double max) ?
-		if (xMin == 0.0)
-			return (random (xMax));
-		// Can we use random(double min ?
-		else if (xMax == 0.0)
-			return (random (xMin));
-		else
-			return (random (xMax - xMin) + xMin);
-	}
-}
-
-
-/** @brief Generate a random value of long double between 0 and @a max.
-  *
-  * @see CRandom::random(int32_t max) for documentation
-  *
-  * @param[in] max Specifies the desired maximum value.
-  * @return A random value between 0 and max.
-**/
-long double CRandom::random (long double max) noexcept
-{
-	if (max == 0.0)
-		return (max);
-	else {
-		int32_t iRand = random();
-		return (max * (static_cast<long double> (iRand) / static_cast<long double> (RAND_MAX)));
-	}
-}
-
-
-/** @brief Generate a random value of long double between @a min and @a max.
-  *
-  * @see CRandom::random(int32_t min, int32_t max) for documentation.
-  *
-  * @param[in] min Specifies the desired minimum value.
-  * @param[in] max Specifies the desired maximum value.
-  * @return A randomvalue between min and max.
-**/
-long double CRandom::random (long double min, long double max) noexcept
-{
-	if (max == min)
-		return (max);
-	else {
-		long double xMin = ::std::min (min, max);
-		long double xMax = ::std::max (min, max);
-
-		// Can we use random(long double max) ?
-		if (xMin == 0.0)
-			return (random (xMax));
-		// Can we use random(long double min ?
-		else if (xMax == 0.0)
-			return (random (xMin));
-		else
-			return (random (xMax - xMin) + xMin);
-	}
-}
-
-
-/** @brief get random name (1D)
-  *
-  * This is a convenient wrapper for getting a random name out of one dimension and switches
-  * for long name and multi part.
-  *
-  * @a lN decides upon the maximum number of chars and syllables generated. A value of
-  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
-  * argument to true results in a maximum of 20 chars in up to six syllables.
-  *
-  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
-  * a name out of one part. A value of true results in a name that can be generated out
-  * of up to three parts.
-  *
-  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
-  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, bool lN, bool mW) noexcept
-{
-	return (rndName (x, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
-}
-
-
-/** @brief get random name (1D)
-  *
-  * This is a convenient wrapper for getting a random name out of one dimension.
-  *
-  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] chars set the maximum number of characters to be generated
-  * @param[in] sylls set the maximum number of syllables to be generated
-  * @param[in] parts set the maximum number of parts the resulting name consists of
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, int32_t chars, int32_t sylls, int32_t parts) noexcept
-{
-	double newY = x * noiseD (x) * (abs (x) < 1.0 ? 1000.0 : abs (x) < 10.0 ? 100.0 : abs (x) < 100 ? 10.0 : 1.0);
-	return (rndName (x, newY, chars, sylls, parts));
-}
-
-
-/** @brief get random name (2D)
-  *
-  * This is a convenient wrapper for getting a random name out of two dimensions and switches
-  * for long name and multi part.
-  *
-  * @a lN decides upon the maximum number of chars and syllables generated. A value of
-  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
-  * argument to true results in a maximum of 20 chars in up to six syllables.
-  *
-  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
-  * a name out of one part. A value of true results in a name that can be generated out
-  * of up to three parts.
-  *
-  * @see CRandom::rndName(double x, double y, double z, double w, bool lN, bool mW)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] y simple number to influence the result.
-  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
-  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, double y, bool lN, bool mW) noexcept
-{
-	return (rndName (x, y, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
-}
-
-
-/** @brief get random name (2D)
-  *
-  * This is a convenient wrapper for getting a random name out of two dimensions.
-  *
-  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] y simple number to influence the result.
-  * @param[in] chars set the maximum number of characters to be generated
-  * @param[in] sylls set the maximum number of syllables to be generated
-  * @param[in] parts set the maximum number of parts the resulting name consists of
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, double y, int32_t chars, int32_t sylls, int32_t parts) noexcept
-{
-	double newZ = (x * noiseD (y)) + (y * noiseD (x));
-	newZ *= abs (newZ) < 1 ? 1000.0 : abs (newZ) < 10.0 ? 100.0 : abs (newZ) < 100 ? 10.0 : 1.0;
-	return (rndName (x, y, newZ, chars, sylls, parts));
-}
-
-
-/** @brief get random name (3D)
-  *
-  * This is a convenient wrapper for getting a random name out of three dimensions and switches
-  * for long name and multi part.
-  *
-  * @a lN decides upon the maximum number of chars and syllables generated. A value of
-  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
-  * argument to true results in a maximum of 20 chars in up to six syllables.
-  *
-  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
-  * a name out of one part. A value of true results in a name that can be generated out
-  * of up to three parts.
-  *
-  * @see CRandom::rndName(double x, double y, double z, double w, bool lN, bool mW)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] y simple number to influence the result.
-  * @param[in] z simple number to influence the result.
-  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
-  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, double y, double z, bool lN, bool mW) noexcept
-{
-	return (rndName (x, y, z,  lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
-}
-
-
-/** @brief get random name (3D)
-  *
-  * This is a convenient wrapper for getting a random name out of three dimensions.
-  *
-  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] y simple number to influence the result.
-  * @param[in] z simple number to influence the result.
-  * @param[in] chars set the maximum number of characters to be generated
-  * @param[in] sylls set the maximum number of syllables to be generated
-  * @param[in] parts set the maximum number of parts the resulting name consists of
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, double y, double z, int32_t chars, int32_t sylls, int32_t parts) noexcept
-{
-	double newW = (x * noiseD (y + z)) + (y * noiseD (x + z)) + (z * noiseD (x + y));
-	newW *= abs (newW) < 1 ? 1000.0 : abs (newW) < 10.0 ? 100.0 : abs (newW) < 100 ? 10.0 : 1.0;
-	return (rndName (x, y, z, newW, chars, sylls, parts));
-}
-
-
-/** @brief get random name (4D)
-  *
-  * This is a convenient wrapper for getting a random name out of four dimensions and switches
-  * for long name and multi part.
-  *
-  * @a lN decides upon the maximum number of chars and syllables generated. A value of
-  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
-  * argument to true results in a maximum of 20 chars in up to six syllables.
-  *
-  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
-  * a name out of one part. A value of true results in a name that can be generated out
-  * of up to three parts.
-  *
-  * @see CRandom::rndName(double x, double y, double z, double w, bool lN, bool mW)
-  * for documentation
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] y simple number to influence the result.
-  * @param[in] z simple number to influence the result.
-  * @param[in] w simple number to influence the result.
-  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
-  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, double y, double z, double w, bool lN, bool mW) noexcept
-{
-	return (rndName (x, y, z, w, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
-}
-
-
-/** @brief get random name
-  *
-  * This method produces random names by combining letters into syllables
-  * and syllables into words. This strictly depends on pseudo random
-  * generators, utilizing noise() and simplex() methods. Therefore
-  * you get the same result if called twice with the same seed set and
-  * arguments set.
-  *
-  * The main switch for the name generation is @a parts, which must be
-  * at least one. Each parts consits of at least two syllables. Therefore,
-  * if you set @a sylls to a lower value than @a parts + 1, sylls will be
-  * raised automatically. Furthermore each syllable consist of two to four
-  * chars. Thus if you set chars to a lower value than (@a sylls * 3) + 2,
-  * it will be raised, too. In the end @a chars will be at least:
-  * 3 * (1 + @a parts) + 2.
-  *
-  * You can use one of the convenient wrapper which let you decide whether
-  * you want long or short names, consisting of one or up to three parts.
-  *
-  * @param[in] x simple number to influence the result.
-  * @param[in] y simple number to influence the result.
-  * @param[in] z simple number to influence the result.
-  * @param[in] w simple number to influence the result.
-  * @param[in] chars set the maximum number of characters to be generated
-  * @param[in] sylls set the maximum number of syllables to be generated
-  * @param[in] parts set the maximum number of parts the resulting name consists of
-  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
-**/
-char * CRandom::rndName (double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts) noexcept
-{
-	::std::string name = "";
-	char    syll[5]    = { 0x0, 0x0, 0x0, 0x0, 0x0 };
-	int32_t partsLeft  = ::std::max (1                  , parts);
-	int32_t syllsLeft  = ::std::max (1 +      partsLeft , sylls);
-	int32_t charsLeft  = ::std::max (2 + (3 * syllsLeft), chars);
-	int32_t genState   = NameConstants::genPartStart;
-	char    lastChrs[2] = { 0x0, 0x0 }; // This is an explicit array, no C-String, so no \0 ending
-	int32_t syllsDone  = 0;
-	double  index      = (x * simplex3D (y, z, w))
-						 + (y * simplex3D (x,    z, w))
-						 + (z * simplex3D (x, y,    w))
-						 + (w * simplex3D (x, y, z))
-						 + seed;
-	double stepping    = getStepping (index, x, y, z, w, charsLeft, syllsLeft, partsLeft);
-	double endChance   = 0.0;
-
-	// Do - while genState doesn't equal NameConstants::genFinished
-	do {
-		/// 1) Determine whether the next syllable ends a part, genSyllable() needs to know.
-		endChance = static_cast<double> ( (syllsLeft * 2) - (partsLeft * 2)) / 10.0;
-		/* maximum : 12 - 2 = 10 => / 10 = 1.0 (after first syll, !mW &&  lN) =>  0%
-		 * minimum :  8 - 6 =  2 => / 10 = 0.2 (after first syll,  mW && !lN) => 40%
-		 */
-
-		// Nevertheless we reduce the endchance if this is the first syllable and no multiword selected:
-		if (!syllsDone && (1 == partsLeft))
-			endChance += static_cast<double> (syllsLeft) / 20.0;
-		/* The initial chance is (8-2)/10 = 0.6 = 20%.
-		 * After this modification it is 0.6 + 0.2 = 10%
-		 * This, however, does not cover weird arguments set by the user!
-		 */
-		// However, we need to raise the chance if we have too few sylls left:
-		if (syllsLeft < (partsLeft * 2))
-			endChance -= static_cast<double> (syllsLeft) / static_cast<double> (partsLeft * 2);
-		/* So if we have three sylls left and two parts, the chance is raised by 0.75
-		 * If we have 5 sylls left and 3 parts, it would be 0,83
-		 */
-
-		// If this is the very first syllable, the chance is halved:
-		if (0 == syllsDone)
-			endChance += (endChance + 1.0) / 2.0;
-
-		// Now test the chance:
-		if (simplex3D (index, charsLeft, partsLeft) > endChance)
-			genState |= NameConstants::genPartEnd;
-
-		/// 2) generate syllable:
-		charsLeft -= genSyllable (index, stepping, syll, genState, lastChrs);
-
-		/// 3) if we have a syllable (genSyllable produces an empty string on error) it can be added:
-		if (strlen (syll) > 1) {
-			name += syll;
-			syllsDone++;
-			syllsLeft--;
-
-			// If this is a partEnd, react
-			if (genState & NameConstants::genPartEnd) {
-				genState = NameConstants::genPartStart;
-				if ( (charsLeft >= 4) && --partsLeft && syllsLeft)
-					name += " "; // add a space, as we will start a new part
-				memset (lastChrs, 0, sizeof (char)); // Needs to be resetted...
-			}
-		}
-		// 4) If we have work to do, generate a new stepping and index
-		if ( (charsLeft >= 4) && partsLeft && syllsLeft) {
-			stepping = getStepping (index, x, y, z, w, charsLeft, syllsLeft, partsLeft);
-			index   += stepping;
-		} else
-			genState = NameConstants::genFinished;
-	} while (genState != NameConstants::genFinished);
-
-	return (strdup (name.c_str()));
-}
-
-
-/** @brief set Simplex Seed
-  *
-  * Set the seed to @a newSeed which will cause the simplex table to be
-  * reinitialized.
-**/
-void CRandom::setSeed (int32_t newSeed) noexcept
-{
-	newSeed &= constants::fourthMaxInt;
-	if (newSeed != seed) {
-		seed = newSeed;
-		for (int32_t i = 0; i < 256; i++) {
-			spxTab[i]       = hash (seed + i) % 256;
-			spxTab[i + 256] = spxTab[i];
-		}
-	}
-}
-
-
-/** @brief calculate a one dimensional simplex noise value
-  *
-  * This method returns a simplex noise value of one dimension.
-  *
-  * - zoom and smooth have a default value of 1.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-**/
-double CRandom::simplex1D (double x, double zoom, double smooth) noexcept
-{
-	if (zoom      < 0.001) zoom = 0.001;
-	if (smooth    < 1.0)   smooth = 1.0;
-
-	x += seed;
-
-	return (getSpx1D (x / zoom) / smooth);
-}
-
-
-/** @brief calculate a one dimensional simplex wave
-  *
-  * This method returns a simplex wave of one dimension. The number of waves specified will overlay
-  * each others with multiplied smoothing, specified by 'reduction'. The default value of 1 wave
-  * just returns the simplex noise value in an intervall of [-1, 1]. While having more than one waves
-  * makes it _possible_ to stay in this intervall, the results will most probably be nearer to zero.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
-  *
-  * - waves has a minimum value of 1.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-  * @param[in] reduction Multiplier for the smoothing factor in each round.
-  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
-**/
-double CRandom::simplex1D (double x, double zoom, double smooth, double reduction, int32_t waves) noexcept
-{
-	if (zoom      < 0.001) zoom = 0.001;
-	if (smooth    < 1.0)   smooth = 1.0;
-	if (reduction < 1.0)   reduction = 1.0;
-	if (waves     < 1)     waves = 1;
-
-	x += seed;
-
-	double result = getSpx1D (x / zoom) / smooth;
-
-	if (waves > 1) {
-		double currWave   = 1.0;
-		double currSmooth = smooth;
-		double factor     = 1.0;
-		double currZoom, dX;
-
-		while (currWave < waves) {
-			currWave   += 1.0;
-			currSmooth *= reduction;
-			currZoom    = zoom / ::std::pow (currWave, 2);
-			dX          = x / currZoom;
-			result     += getSpx1D (dX) / currSmooth;
-			factor     += 1.0 / currSmooth;
-		}
-		result /= factor;
-	}
-
-	return (result);
-}
-
-
-/** @brief calculate a two dimensional simplex noise value
-  *
-  * This method returns a simplex noise value of two dimensions.
-  *
-  * - zoom and smooth have a default value of 1.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-**/
-double CRandom::simplex2D (double x, double y, double zoom, double smooth) noexcept
-{
-	if (zoom   < 0.001) zoom = 0.001;
-	if (smooth < 1.0)   smooth = 1.0;
-
-	x += seed;
-	y += seed;
-
-	return (getSpx2D (x / zoom, y / zoom) / smooth);
-}
-
-
-/** @brief calculate a two dimensional simplex wave
-  *
-  * This method returns a simplex wave of two dimensions. The number of waves specified will overlay
-  * each others with multiplied smoothing, specified by 'reduction'. The default value of 1 wave just
-  * returns the simplex noise value in an intervall of [-1, 1]. While having more than one waves makes
-  * it _possible_ to stay in this intervall, the results will most probably be nearer to zero.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
-  *
-  * - waves has a minimum value of 1.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-  * @param[in] reduction Multiplier for the smoothing factor in each round.
-  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
-**/
-double CRandom::simplex2D (double x, double y, double zoom, double smooth, double reduction, int32_t waves) noexcept
-{
-	if (zoom      < 0.001) zoom = 0.001;
-	if (smooth    < 1.0)   smooth = 1.0;
-	if (reduction < 1.0)   reduction = 1.0;
-	if (waves     < 1)     waves = 1;
-
-	x += seed;
-	y += seed;
-
-	double result = getSpx2D (x / zoom, y / zoom) / smooth;
-
-	if (waves > 1) {
-		double currWave   = 1.0;
-		double currSmooth = smooth;
-		double factor     = 1.0;
-		double currZoom, dX, dY;
-
-		while (currWave < waves) {
-			currWave   += 1.0;
-			currSmooth *= reduction;
-			currZoom    = zoom / ::std::pow (currWave, 2);
-			dX          = x / currZoom;
-			dY          = y / currZoom;
-			result     += getSpx2D (dX, dY) / currSmooth;
-			factor     += 1.0 / currSmooth;
-		}
-		result /= factor;
-	}
-
-	return (result);
-}
-
-
-/** @brief calculate a three dimensional simplex noise value
-  *
-  * This method returns a simplex wave of three dimensions.
-  *
-  * - zoom and smooth have a default value of 1.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-**/
-double CRandom::simplex3D (double x, double y, double z, double zoom, double smooth) noexcept
-{
-	if (zoom   < 0.001) zoom = 0.001;
-	if (smooth < 1.0)   smooth = 1.0;
-
-	x += seed;
-	y += seed;
-	z += seed;
-
-	return (getSpx3D (x / zoom, y / zoom, z / zoom) / smooth);
-}
-
-
-/** @brief calculate a three dimensional simplex wave
-  *
-  * This method returns a simplex wave of three dimensions. The number of waves specified will overlay
-  * each others with reduced zoom, specified by 'reduction'. The default value of 1 wave just returns
-  * the simplex noise value in an intervall of [-1, 1]. While having more than one waves makes it
-  * _possible_ to stay in this intervall, the results will most probably be nearer to zero.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
-  *
-  * - waves has a minimum value of 1.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-  * @param[in] reduction Multiplier for the smoothing factor in each round.
-  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
-**/
-double CRandom::simplex3D (double x, double y, double z, double zoom, double smooth, double reduction, int32_t waves) noexcept
-{
-	if (zoom      < 0.001) zoom = 0.001;
-	if (smooth    < 1.0)   smooth = 1.0;
-	if (reduction < 1.0)   reduction = 1.0;
-	if (waves     < 1)     waves = 1;
-
-	x += seed;
-	y += seed;
-	z += seed;
-
-	double result = getSpx3D (x / zoom, y / zoom, z / zoom) / smooth;
-
-	if (waves > 1) {
-		double currWave   = 1.0;
-		double currSmooth = smooth;
-		double factor     = 1.0;
-		double currZoom, dX, dY, dZ;
-
-		while (currWave < waves) {
-			currWave   += 1.0;
-			currSmooth *= reduction;
-			currZoom    = zoom / ::std::pow (currWave, 2);
-			dX          = x / currZoom;
-			dY          = y / currZoom;
-			dZ          = z / currZoom;
-			result     += getSpx3D (dX, dY, dZ) / currSmooth;
-			factor     += 1.0 / currSmooth;
-		}
-		result /= factor;
-	}
-
-	return (result);
-}
-
-
-/** @brief calculate a four dimensional simplex noise value
-  *
-  * This method returns a simplex noise value of four dimension.
-  *
-  * - zoom and smooth have a default value of 1.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] w W-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-**/
-double CRandom::simplex4D (double x, double y, double z, double w, double zoom, double smooth) noexcept
-{
-	if (zoom   < 0.001) zoom = 0.001;
-	if (smooth < 1.0)   smooth = 1.0;
-
-	x += seed;
-	y += seed;
-	z += seed;
-	w += seed;
-
-	return (getSpx4D (x / zoom, y / zoom, z / zoom, w / zoom) / smooth);
-}
-
-
-/** @brief calculate a four dimensional simplex wave
-  *
-  * This method returns a simplex wave of four dimension. The number of waves specified will overlay
-  * each others with reduced zoom, specified by 'reduction'. The default value of 1 wave just returns
-  * the simplex noise value in an intervall of [-1, 1]. While having more than one waves makes it
-  * _possible_ to stay in this intervall, the results will most probably be nearer to zero.
-  *
-  * - zoom, smooth, reduction and waves all have a default value of 1.
-  *
-  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
-  *   be zero.
-  *
-  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
-  *
-  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
-  *
-  * - waves has a minimum value of 1.
-  *
-  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] w W-Coordinate of the Simplex Point, modified by the simplex seed.
-  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
-  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
-  * @param[in] reduction Multiplier for the smoothing factor in each round.
-  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
-**/
-double CRandom::simplex4D (double x, double y, double z, double w, double zoom, double smooth, double reduction, int32_t waves) noexcept
-{
-	if (zoom      < 0.001) zoom = 0.001;
-	if (smooth    < 1.0)   smooth = 1.0;
-	if (reduction < 1.0)   reduction = 1.0;
-	if (waves     < 1)     waves = 1;
-
-	x += seed;
-	y += seed;
-	z += seed;
-	w += seed;
-
-	double result = getSpx4D (x / zoom, y / zoom, z / zoom, w / zoom) / smooth;
-
-	if (waves > 1) {
-		double currWave   = 1.0;
-		double currSmooth = smooth;
-		double factor     = 1.0;
-		double currZoom, dX, dY, dZ, dW;
-
-		while (currWave < waves) {
-			currWave   += 1.0;
-			currSmooth *= reduction;
-			currZoom    = zoom / ::std::pow (currWave, 2);
-			dX          = x / currZoom;
-			dY          = y / currZoom;
-			dZ          = z / currZoom;
-			dW          = w / currZoom;
-			result     += getSpx4D (dX, dY, dZ, dW) / currSmooth;
-			factor     += 1.0 / currSmooth;
-		}
-		result /= factor;
-	}
-
-	return (result);
-}
 
 
 /* --------------------------------------- *
@@ -1255,7 +35,7 @@ void CRandom::checkRule (int32_t &state, const char first, const char second, co
 
 	if ( ( (one == two) && (two == three)) // eleminate tripple threats
 	|| (0 == (NameConstants::nameFUM[one][two]
-	& static_cast<int32_t> (::std::pow (2, three)))
+	& static_cast<int32_t> (std::pow (2, three)))
 	   )) {
 		// The desired character is not allowed to follow the set two chars
 		if (state & NameConstants::genNextIsCon)
@@ -1610,7 +390,7 @@ double CRandom::getSpx1D (double x) noexcept
 {
 	double contrib = 0.0;
 
-	spxNorms[0] = static_cast<int32_t> (::std::floor (x)); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> (std::floor (x)); // Normalized X-Coordinate
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 
 	// Distances from left and right edge
@@ -1622,10 +402,10 @@ double CRandom::getSpx1D (double x) noexcept
 	spxGrads[1] = spxTab[spxPerms[0] + 1] % 4;
 
 	// Calculate the contribution from the two edges
-	contrib = 0.75 - ::std::pow (spxDist[0][0], 2);
-	spxCorn[0] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[0], noiseD (x)) : 0.0;
-	contrib = 0.75 - ::std::pow (spxDist[1][0], 2);
-	spxCorn[1] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[1], noiseD (x + 1)) : 0.0;
+	contrib = 0.75 - std::pow (spxDist[0][0], 2);
+	spxCorn[0] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[0], noiseD (x)) : 0.0;
+	contrib = 0.75 - std::pow (spxDist[1][0], 2);
+	spxCorn[1] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[1], noiseD (x + 1)) : 0.0;
 
 
 	// Add contributions from each corner to get the final noise value.
@@ -1650,9 +430,9 @@ double CRandom::getSpx1D (double x) noexcept
 double CRandom::getSpx2D (double x, double y) noexcept
 {
 	double contrib = x + ( (x + y) * constants::spxSkew[0][0]);
-	spxNorms[0] = static_cast<int32_t> (::std::floor (contrib)); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> (std::floor (contrib)); // Normalized X-Coordinate
 	contrib = y + ( (x + y) * constants::spxSkew[0][0]);
-	spxNorms[1] = static_cast<int32_t> (::std::floor (contrib)); // Normalized Y-Coordinate
+	spxNorms[1] = static_cast<int32_t> (std::floor (contrib)); // Normalized Y-Coordinate
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 	spxPerms[1] = spxNorms[1] & 0x000000ff; // Y-Coordinate factor for Permutation Table
 
@@ -1677,12 +457,12 @@ double CRandom::getSpx2D (double x, double y) noexcept
 	spxGrads[2] = spxTab[spxPerms[0] + 1 + spxTab[spxPerms[1] + 1]] % 8;
 
 	// Calculate the contribution from the three corners
-	contrib = 0.5 - ::std::pow (spxDist[0][0], 2) - ::std::pow (spxDist[0][1], 2);
-	spxCorn[0] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[0], spxDist[0][0], spxDist[0][1]) : 0.0;
-	contrib = 0.5 - ::std::pow (spxDist[1][0], 2) - ::std::pow (spxDist[1][1], 2);
-	spxCorn[1] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[1], spxDist[1][0], spxDist[1][1]) : 0.0;
-	contrib = 0.5 - ::std::pow (spxDist[2][0], 2) - ::std::pow (spxDist[2][1], 2);
-	spxCorn[2] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[2], spxDist[2][0], spxDist[2][1]) : 0.0;
+	contrib = 0.5 - std::pow (spxDist[0][0], 2) - std::pow (spxDist[0][1], 2);
+	spxCorn[0] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[0], spxDist[0][0], spxDist[0][1]) : 0.0;
+	contrib = 0.5 - std::pow (spxDist[1][0], 2) - std::pow (spxDist[1][1], 2);
+	spxCorn[1] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[1], spxDist[1][0], spxDist[1][1]) : 0.0;
+	contrib = 0.5 - std::pow (spxDist[2][0], 2) - std::pow (spxDist[2][1], 2);
+	spxCorn[2] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[2], spxDist[2][0], spxDist[2][1]) : 0.0;
 	// Note: This is not looped, because the loop would produce more overhead than it is worth to just have 3 less lines.
 
 	// Add contributions from each corner to get the final noise value.
@@ -1708,11 +488,11 @@ double CRandom::getSpx2D (double x, double y) noexcept
 double CRandom::getSpx3D (double x, double y, double z) noexcept
 {
 	double contrib = x + ( (x + y + z) * constants::spxSkew[1][0]);
-	spxNorms[0] = static_cast<int32_t> (::std::floor (contrib)); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> (std::floor (contrib)); // Normalized X-Coordinate
 	contrib = y + ( (x + y + z) * constants::spxSkew[1][0]);
-	spxNorms[1] = static_cast<int32_t> (::std::floor (contrib)); // Normalized Y-Coordinate
+	spxNorms[1] = static_cast<int32_t> (std::floor (contrib)); // Normalized Y-Coordinate
 	contrib = z + ( (x + y + z) * constants::spxSkew[1][0]);
-	spxNorms[2] = static_cast<int32_t> (::std::floor (contrib)); // Normalized Z-Coordinate
+	spxNorms[2] = static_cast<int32_t> (std::floor (contrib)); // Normalized Z-Coordinate
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 	spxPerms[1] = spxNorms[1] & 0x000000ff; // Y-Coordinate factor for Permutation Table
 	spxPerms[2] = spxNorms[2] & 0x000000ff; // Z-Coordinate factor for Permutation Table
@@ -1802,14 +582,14 @@ double CRandom::getSpx3D (double x, double y, double z) noexcept
 	spxGrads[3] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + 1] + 1] + 1] % 12;
 
 	// Calculate the contribution from the four corners
-	contrib = 0.6 - ::std::pow (spxDist[0][0], 2) - ::std::pow (spxDist[0][1], 2) - ::std::pow (spxDist[0][2], 2);
-	spxCorn[0] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2]) : 0.0;
-	contrib = 0.6 - ::std::pow (spxDist[1][0], 2) - ::std::pow (spxDist[1][1], 2) - ::std::pow (spxDist[1][2], 2);
-	spxCorn[1] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2]) : 0.0;
-	contrib = 0.6 - ::std::pow (spxDist[2][0], 2) - ::std::pow (spxDist[2][1], 2) - ::std::pow (spxDist[2][2], 2);
-	spxCorn[2] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2]) : 0.0;
-	contrib = 0.6 - ::std::pow (spxDist[3][0], 2) - ::std::pow (spxDist[3][1], 2) - ::std::pow (spxDist[3][2], 2);
-	spxCorn[3] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[0][0], 2) - std::pow (spxDist[0][1], 2) - std::pow (spxDist[0][2], 2);
+	spxCorn[0] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[1][0], 2) - std::pow (spxDist[1][1], 2) - std::pow (spxDist[1][2], 2);
+	spxCorn[1] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[2][0], 2) - std::pow (spxDist[2][1], 2) - std::pow (spxDist[2][2], 2);
+	spxCorn[2] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[3][0], 2) - std::pow (spxDist[3][1], 2) - std::pow (spxDist[3][2], 2);
+	spxCorn[3] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2]) : 0.0;
 
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
@@ -1836,13 +616,13 @@ double CRandom::getSpx4D (double x, double y, double z, double w) noexcept
 {
 	int32_t    traverse;
 	double contrib = x + ( (x + y + z + w) * constants::spxSkew[2][0]);
-	spxNorms[0] = static_cast<int32_t> (::std::floor (contrib)); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> (std::floor (contrib)); // Normalized X-Coordinate
 	contrib = y + ( (x + y + z + w) * constants::spxSkew[2][0]);
-	spxNorms[1] = static_cast<int32_t> (::std::floor (contrib)); // Normalized X-Coordinate
+	spxNorms[1] = static_cast<int32_t> (std::floor (contrib)); // Normalized X-Coordinate
 	contrib = z + ( (x + y + z + w) * constants::spxSkew[2][0]);
-	spxNorms[2] = static_cast<int32_t> (::std::floor (contrib)); // Normalized X-Coordinate
+	spxNorms[2] = static_cast<int32_t> (std::floor (contrib)); // Normalized X-Coordinate
 	contrib = w + ( (x + y + z + w) * constants::spxSkew[2][0]);
-	spxNorms[3] = static_cast<int32_t> (::std::floor (contrib)); // Normalized X-Coordinate
+	spxNorms[3] = static_cast<int32_t> (std::floor (contrib)); // Normalized X-Coordinate
 
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 	spxPerms[1] = spxNorms[1] & 0x000000ff; // Y-Coordinate factor for Permutation Table
@@ -1918,14 +698,14 @@ double CRandom::getSpx4D (double x, double y, double z, double w) noexcept
 	spxGrads[4] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + 1] + 1] + 1] + 1] % 32;
 
 	// Calculate the contribution from the four corners
-	contrib = 0.6 - ::std::pow (spxDist[0][0], 2) - ::std::pow (spxDist[0][1], 2) - ::std::pow (spxDist[0][2], 2) - ::std::pow (spxDist[0][3], 2);
-	spxCorn[0] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2], spxDist[0][3]) : 0.0;
-	contrib = 0.6 - ::std::pow (spxDist[1][0], 2) - ::std::pow (spxDist[1][1], 2) - ::std::pow (spxDist[1][2], 2) - ::std::pow (spxDist[1][3], 2);
-	spxCorn[1] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2], spxDist[1][3]) : 0.0;
-	contrib = 0.6 - ::std::pow (spxDist[2][0], 2) - ::std::pow (spxDist[2][1], 2) - ::std::pow (spxDist[2][2], 2) - ::std::pow (spxDist[2][3], 2);
-	spxCorn[2] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2], spxDist[2][3]) : 0.0;
-	contrib = 0.6 - ::std::pow (spxDist[3][0], 2) - ::std::pow (spxDist[3][1], 2) - ::std::pow (spxDist[3][2], 2) - ::std::pow (spxDist[3][3], 2);
-	spxCorn[3] = (contrib > 0.0) ? ::std::pow (contrib, 4) * getSimpDot (spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2], spxDist[3][3]) : 0.0;
+	contrib = 0.6 - ::std::pow (spxDist[0][0], 2) - std::pow (spxDist[0][1], 2) - std::pow (spxDist[0][2], 2) - std::pow (spxDist[0][3], 2);
+	spxCorn[0] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2], spxDist[0][3]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[1][0], 2) - std::pow (spxDist[1][1], 2) - std::pow (spxDist[1][2], 2) - std::pow (spxDist[1][3], 2);
+	spxCorn[1] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2], spxDist[1][3]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[2][0], 2) - std::pow (spxDist[2][1], 2) - std::pow (spxDist[2][2], 2) - std::pow (spxDist[2][3], 2);
+	spxCorn[2] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2], spxDist[2][3]) : 0.0;
+	contrib = 0.6 - std::pow (spxDist[3][0], 2) - std::pow (spxDist[3][1], 2) - std::pow (spxDist[3][2], 2) - std::pow (spxDist[3][3], 2);
+	spxCorn[3] = (contrib > 0.0) ? std::pow (contrib, 4) * getSimpDot (spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2], spxDist[3][3]) : 0.0;
 
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
@@ -1972,5 +752,1174 @@ int32_t CRandom::doubToInt (double val) const noexcept
 
 	return static_cast<int32_t> (round (val));
 }
+
+/* -------------------------------------- *
+ * --- Public Methods Implementations --- *
+ * -------------------------------------- */
+
+/** @brief default ctor
+*
+* Initializes the random number generator and assigns a first random value
+* to lastRndValue. The seed and Simplex data are initialized as well.
+**/
+CRandom::CRandom() noexcept
+: lastRndValue (0), seed (0)
+{
+	uint32_t currTime = static_cast<uint32_t> (time (NULL));
+	srand (currTime);
+	lastRndValue  =  rand();
+	setSeed (currTime);
+
+	// Initialize Simplex values:
+	for (int32_t i = 0; i < 5; i++) {
+		spxCorn[i]    = 0.0;
+		spxGrads[i]   = 0;
+		for (int32_t j = 0; j < 4; j++)
+			spxDist[i][j] = 0.0;
+
+		if (i < 4) {
+			spxNorms[i] = 0;
+			spxPerms[i] = 0;
+		}
+
+		if (i < 3) {
+			for (int32_t j = 0; j < 4; j++)
+				spxOffs[i][j] = 0;
+		}
+	}
+}
+
+
+/** @brief default dtor
+*
+* Empty default dtor, nothing to be done.
+*
+**/
+CRandom::~CRandom() noexcept
+{ }
+
+
+/** @brief return current seed
+  *
+  * This method simply returns the current Seed used to manipulate values
+  * to calculate Simplex Noise and random names.
+  *
+  * @return Current Seed
+**/
+int32_t CRandom::getSeed() const noexcept
+{
+	return (seed);
+}
+
+
+/** @brief hash an unsigned 16 bit integer to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (int16_t key) const noexcept
+{
+	return private_::private_hash_int<int16_t>(key);
+}
+
+
+/** @brief hash a signed 16 bit integer to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (uint16_t key) const noexcept
+{
+	return private_::private_hash_int<uint16_t>(key);
+}
+
+
+/** @brief hash a signed 32 bit integer to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (int32_t key) const noexcept
+{
+	return private_::private_hash_int<int32_t>(key);
+}
+
+
+/** @brief hash an unsigned 32 bit integer to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (uint32_t key) const noexcept
+{
+	return private_::private_hash_int<uint32_t>(key);
+}
+
+
+/** @brief hash a signed 64 bit integer to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (int64_t key) const noexcept
+{
+	return private_::private_hash_int<int64_t>(key);
+}
+
+
+/** @brief hash an unsigned 64 bit integer to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (uint64_t key) const noexcept
+{
+	return private_::private_hash_int<uint64_t>(key);
+}
+
+
+/** @brief hash float to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (float key) const noexcept
+{
+	return private_::private_hash_flt<float>(key);
+}
+
+
+/** @brief hash double to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (double key) const noexcept
+{
+	return private_::private_hash_flt<double>(key);
+}
+
+
+/** @brief hash long double to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (long double key) const noexcept
+{
+	return private_::private_hash_flt<long double>(key);
+}
+
+
+/** @brief hash C-String to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @param[in] keyLen if omitted, a 0-terminated C-String is assumed
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (const char* key, size_t keyLen) const noexcept
+{
+	return private_::private_hash_str(key, keyLen);
+}
+
+
+/** @brief hash an std::string to an unsigned 32 bit integer
+  *
+  * @param[in] key The key to hash
+  * @return unsigned 32 bit integer hash
+**/
+uint32_t CRandom::hash (std::string &key) const noexcept
+{
+	return private_::private_hash_str(key.c_str(), key.size());
+}
+
+
+/** @brief noise with one dimension
+  *
+  * This method calculates a noise value between -1.0 and 1.0 out of one integer
+  *
+  * @param[in] x paramter to transform
+  * @return double noise value between -1.0 and +1.0
+**/
+double CRandom::noise (int32_t x) const noexcept
+{
+	return (1.0 - (static_cast<double> (hash (x) & constants::fullMaxInt) / constants::noiseMod));
+}
+
+
+/** @brief noise with two dimensions
+  *
+  * This method calculates a noise value between -1.0 and 1.0 out of two integers
+  *
+  * @param[in] x paramter to transform
+  * @param[in] y paramter to transform
+  * @return double noise value between -1.0 and +1.0
+**/
+double CRandom::noise (int32_t x, int32_t y) const noexcept
+{
+	return (1.0 - (static_cast<double> (
+					(hash (x) & constants::halfMaxInt)
+					+	(hash (y) & constants::halfMaxInt)
+				   ) / constants::noiseMod));
+}
+
+
+/** @brief noise with three dimensions
+  *
+  * This method calculates a noise value between -1.0 and 1.0 out of three integers
+  *
+  * @param[in] x paramter to transform
+  * @param[in] y paramter to transform
+  * @param[in] z paramter to transform
+  * @return double noise value between -1.0 and +1.0
+**/
+double CRandom::noise (int32_t x, int32_t y, int32_t z) const noexcept
+{
+	return (1.0 - (static_cast<double> (
+						(hash (x) & constants::halfMaxInt)
+					+	(hash (y) & constants::fourthMaxInt)
+					+	(hash (z) & constants::fourthMaxInt)
+				   ) / constants::noiseMod));
+}
+
+
+/** @brief noise with four dimensions
+  *
+  * This method calculates a noise value between -1.0 and 1.0 out of four integers
+  *
+  * @param[in] x paramter to transform
+  * @param[in] y paramter to transform
+  * @param[in] z paramter to transform
+  * @param[in] w paramter to transform
+  * @return double noise value between -1.0 and +1.0
+**/
+double CRandom::noise (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept
+{
+	return (1.0 - (static_cast<double> (
+						(hash (x) & constants::fourthMaxInt)
+					+	(hash (y) & constants::fourthMaxInt)
+					+	(hash (z) & constants::fourthMaxInt)
+					+	(hash (w) & constants::fourthMaxInt)
+				   ) / constants::noiseMod));
+}
+
+
+/** @brief Generate a random value of int16_t between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+int16_t CRandom::random (int16_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<int16_t>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of int16_t between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+int16_t CRandom::random (int16_t min, int16_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<int16_t>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of uint16_t between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+uint16_t CRandom::random (uint16_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<uint16_t>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of uint16_t between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+uint16_t CRandom::random (uint16_t min, uint16_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<uint16_t>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of int32_t between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+int32_t CRandom::random (int32_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<int32_t>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of int32_t between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * This method has a default value of RAND_MAX for @a max.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+int32_t CRandom::random (int32_t min, int32_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<int32_t>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of uint32_t between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * This method has a default value of RAND_MAX for @a max.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+uint32_t CRandom::random (uint32_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<uint32_t>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of uint32_t between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+uint32_t CRandom::random (uint32_t min, uint32_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<uint32_t>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of int64_t between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+int64_t CRandom::random (int64_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<int64_t>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of int64_t between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+int64_t CRandom::random (int64_t min, int64_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<int64_t>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of uint64_t between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+uint64_t CRandom::random (uint64_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<uint64_t>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of uint64_t between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+uint64_t CRandom::random (uint64_t min, uint64_t max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<uint64_t>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of float between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+float CRandom::random (float max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<float>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of float between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+float CRandom::random (float min, float max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<float>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of double between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+double CRandom::random (double max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<double>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of double between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+double CRandom::random (double min, double max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<double>(min, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of long double between 0 and @a max.
+  *
+  * if a negative @a max is submitted, the result will be @a max <= result <= 0.
+  *
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+long double CRandom::random (long double max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<long double>(0, max, lastRndValue);
+}
+
+
+/** @brief Generate a random value of long double between @a min and @a max.
+  *
+  * if @a max is lower than @a min, the result will be @a max <= result <= @a min.
+  *
+  * @param[in] min Minimum result.
+  * @param[in] max Maximum result.
+  * @return A random value between 0 and @a max.
+**/
+long double CRandom::random (long double min, long double max) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random<long double>(min, max, lastRndValue);
+}
+
+
+/** @brief get random name (1D)
+  *
+  * This is a convenient wrapper for getting a random name out of one dimension and switches
+  * for long name and multi part.
+  *
+  * @a lN decides upon the maximum number of chars and syllables generated. A value of
+  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
+  * argument to true results in a maximum of 20 chars in up to six syllables.
+  *
+  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
+  * a name out of one part. A value of true results in a name that can be generated out
+  * of up to three parts.
+  *
+  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
+  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, bool lN, bool mW) noexcept
+{
+	return (rndName (x, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
+}
+
+
+/** @brief get random name (1D)
+  *
+  * This is a convenient wrapper for getting a random name out of one dimension.
+  *
+  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] chars set the maximum number of characters to be generated
+  * @param[in] sylls set the maximum number of syllables to be generated
+  * @param[in] parts set the maximum number of parts the resulting name consists of
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, int32_t chars, int32_t sylls, int32_t parts) noexcept
+{
+	double newY = x * noiseD (x) * (abs (x) < 1.0 ? 1000.0 : abs (x) < 10.0 ? 100.0 : abs (x) < 100 ? 10.0 : 1.0);
+	return (rndName (x, newY, chars, sylls, parts));
+}
+
+
+/** @brief get random name (2D)
+  *
+  * This is a convenient wrapper for getting a random name out of two dimensions and switches
+  * for long name and multi part.
+  *
+  * @a lN decides upon the maximum number of chars and syllables generated. A value of
+  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
+  * argument to true results in a maximum of 20 chars in up to six syllables.
+  *
+  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
+  * a name out of one part. A value of true results in a name that can be generated out
+  * of up to three parts.
+  *
+  * @see CRandom::rndName(double x, double y, double z, double w, bool lN, bool mW)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] y simple number to influence the result.
+  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
+  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, double y, bool lN, bool mW) noexcept
+{
+	return (rndName (x, y, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
+}
+
+
+/** @brief get random name (2D)
+  *
+  * This is a convenient wrapper for getting a random name out of two dimensions.
+  *
+  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] y simple number to influence the result.
+  * @param[in] chars set the maximum number of characters to be generated
+  * @param[in] sylls set the maximum number of syllables to be generated
+  * @param[in] parts set the maximum number of parts the resulting name consists of
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, double y, int32_t chars, int32_t sylls, int32_t parts) noexcept
+{
+	double newZ = (x * noiseD (y)) + (y * noiseD (x));
+	newZ *= abs (newZ) < 1 ? 1000.0 : abs (newZ) < 10.0 ? 100.0 : abs (newZ) < 100 ? 10.0 : 1.0;
+	return (rndName (x, y, newZ, chars, sylls, parts));
+}
+
+
+/** @brief get random name (3D)
+  *
+  * This is a convenient wrapper for getting a random name out of three dimensions and switches
+  * for long name and multi part.
+  *
+  * @a lN decides upon the maximum number of chars and syllables generated. A value of
+  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
+  * argument to true results in a maximum of 20 chars in up to six syllables.
+  *
+  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
+  * a name out of one part. A value of true results in a name that can be generated out
+  * of up to three parts.
+  *
+  * @see CRandom::rndName(double x, double y, double z, double w, bool lN, bool mW)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] y simple number to influence the result.
+  * @param[in] z simple number to influence the result.
+  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
+  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, double y, double z, bool lN, bool mW) noexcept
+{
+	return (rndName (x, y, z,  lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
+}
+
+
+/** @brief get random name (3D)
+  *
+  * This is a convenient wrapper for getting a random name out of three dimensions.
+  *
+  * @see char * CRandom::rndName(double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] y simple number to influence the result.
+  * @param[in] z simple number to influence the result.
+  * @param[in] chars set the maximum number of characters to be generated
+  * @param[in] sylls set the maximum number of syllables to be generated
+  * @param[in] parts set the maximum number of parts the resulting name consists of
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, double y, double z, int32_t chars, int32_t sylls, int32_t parts) noexcept
+{
+	double newW = (x * noiseD (y + z)) + (y * noiseD (x + z)) + (z * noiseD (x + y));
+	newW *= abs (newW) < 1 ? 1000.0 : abs (newW) < 10.0 ? 100.0 : abs (newW) < 100 ? 10.0 : 1.0;
+	return (rndName (x, y, z, newW, chars, sylls, parts));
+}
+
+
+/** @brief get random name (4D)
+  *
+  * This is a convenient wrapper for getting a random name out of four dimensions and switches
+  * for long name and multi part.
+  *
+  * @a lN decides upon the maximum number of chars and syllables generated. A value of
+  * false (the default) results in a maximum of 12 chars in four syllables. Setting this
+  * argument to true results in a maximum of 20 chars in up to six syllables.
+  *
+  * @a mW decides upon the maximum number of parts. A value of false (the default) produces
+  * a name out of one part. A value of true results in a name that can be generated out
+  * of up to three parts.
+  *
+  * @see CRandom::rndName(double x, double y, double z, double w, bool lN, bool mW)
+  * for documentation
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] y simple number to influence the result.
+  * @param[in] z simple number to influence the result.
+  * @param[in] w simple number to influence the result.
+  * @param[in] lN longName  - sets syllables to 3-8 and max chars to 28
+  * @param[in] mW multiWord - allows the name to contain spaces (0-2)
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, double y, double z, double w, bool lN, bool mW) noexcept
+{
+	return (rndName (x, y, z, w, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1));
+}
+
+
+/** @brief get random name
+  *
+  * This method produces random names by combining letters into syllables
+  * and syllables into words. This strictly depends on pseudo random
+  * generators, utilizing noise() and simplex() methods. Therefore
+  * you get the same result if called twice with the same seed set and
+  * arguments set.
+  *
+  * The main switch for the name generation is @a parts, which must be
+  * at least one. Each parts consits of at least two syllables. Therefore,
+  * if you set @a sylls to a lower value than @a parts + 1, sylls will be
+  * raised automatically. Furthermore each syllable consist of two to four
+  * chars. Thus if you set chars to a lower value than (@a sylls * 3) + 2,
+  * it will be raised, too. In the end @a chars will be at least:
+  * 3 * (1 + @a parts) + 2.
+  *
+  * You can use one of the convenient wrapper which let you decide whether
+  * you want long or short names, consisting of one or up to three parts.
+  *
+  * @param[in] x simple number to influence the result.
+  * @param[in] y simple number to influence the result.
+  * @param[in] z simple number to influence the result.
+  * @param[in] w simple number to influence the result.
+  * @param[in] chars set the maximum number of characters to be generated
+  * @param[in] sylls set the maximum number of syllables to be generated
+  * @param[in] parts set the maximum number of parts the resulting name consists of
+  * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
+**/
+char * CRandom::rndName (double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts) noexcept
+{
+	std::string name = "";
+	char    syll[5]    = { 0x0, 0x0, 0x0, 0x0, 0x0 };
+	int32_t partsLeft  = std::max (1                  , parts);
+	int32_t syllsLeft  = std::max (1 +      partsLeft , sylls);
+	int32_t charsLeft  = std::max (2 + (3 * syllsLeft), chars);
+	int32_t genState   = NameConstants::genPartStart;
+	char    lastChrs[2] = { 0x0, 0x0 }; // This is an explicit array, no C-String, so no \0 ending
+	int32_t syllsDone  = 0;
+	double  index      = (x * simplex3D (y, z, w))
+						 + (y * simplex3D (x,    z, w))
+						 + (z * simplex3D (x, y,    w))
+						 + (w * simplex3D (x, y, z))
+						 + seed;
+	double stepping    = getStepping (index, x, y, z, w, charsLeft, syllsLeft, partsLeft);
+	double endChance   = 0.0;
+
+	// Do - while genState doesn't equal NameConstants::genFinished
+	do {
+		/// 1) Determine whether the next syllable ends a part, genSyllable() needs to know.
+		endChance = static_cast<double> ( (syllsLeft * 2) - (partsLeft * 2)) / 10.0;
+		/* maximum : 12 - 2 = 10 => / 10 = 1.0 (after first syll, !mW &&  lN) =>  0%
+		 * minimum :  8 - 6 =  2 => / 10 = 0.2 (after first syll,  mW && !lN) => 40%
+		 */
+
+		// Nevertheless we reduce the endchance if this is the first syllable and no multiword selected:
+		if (!syllsDone && (1 == partsLeft))
+			endChance += static_cast<double> (syllsLeft) / 20.0;
+		/* The initial chance is (8-2)/10 = 0.6 = 20%.
+		 * After this modification it is 0.6 + 0.2 = 10%
+		 * This, however, does not cover weird arguments set by the user!
+		 */
+		// However, we need to raise the chance if we have too few sylls left:
+		if (syllsLeft < (partsLeft * 2))
+			endChance -= static_cast<double> (syllsLeft) / static_cast<double> (partsLeft * 2);
+		/* So if we have three sylls left and two parts, the chance is raised by 0.75
+		 * If we have 5 sylls left and 3 parts, it would be 0,83
+		 */
+
+		// If this is the very first syllable, the chance is halved:
+		if (0 == syllsDone)
+			endChance += (endChance + 1.0) / 2.0;
+
+		// Now test the chance:
+		if (simplex3D (index, charsLeft, partsLeft) > endChance)
+			genState |= NameConstants::genPartEnd;
+
+		/// 2) generate syllable:
+		charsLeft -= genSyllable (index, stepping, syll, genState, lastChrs);
+
+		/// 3) if we have a syllable (genSyllable produces an empty string on error) it can be added:
+		if (strlen (syll) > 1) {
+			name += syll;
+			syllsDone++;
+			syllsLeft--;
+
+			// If this is a partEnd, react
+			if (genState & NameConstants::genPartEnd) {
+				genState = NameConstants::genPartStart;
+				if ( (charsLeft >= 4) && --partsLeft && syllsLeft)
+					name += " "; // add a space, as we will start a new part
+				memset (lastChrs, 0, sizeof (char)); // Needs to be resetted...
+			}
+		}
+		// 4) If we have work to do, generate a new stepping and index
+		if ( (charsLeft >= 4) && partsLeft && syllsLeft) {
+			stepping = getStepping (index, x, y, z, w, charsLeft, syllsLeft, partsLeft);
+			index   += stepping;
+		} else
+			genState = NameConstants::genFinished;
+	} while (genState != NameConstants::genFinished);
+
+	return (strdup (name.c_str()));
+}
+
+
+/** @brief set Simplex Seed
+  *
+  * Set the seed to @a newSeed which will cause the simplex table to be
+  * reinitialized.
+**/
+void CRandom::setSeed (int32_t newSeed) noexcept
+{
+	newSeed &= constants::fourthMaxInt;
+	if (newSeed != seed) {
+		seed = newSeed;
+		for (int32_t i = 0; i < 256; i++) {
+			spxTab[i]       = hash (seed + i) % 256;
+			spxTab[i + 256] = spxTab[i];
+		}
+	}
+}
+
+
+/** @brief calculate a one dimensional simplex noise value
+  *
+  * This method returns a simplex noise value of one dimension.
+  *
+  * - zoom and smooth have a default value of 1.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+**/
+double CRandom::simplex1D (double x, double zoom, double smooth) noexcept
+{
+	if (zoom      < 0.001) zoom = 0.001;
+	if (smooth    < 1.0)   smooth = 1.0;
+
+	x += seed;
+
+	return (getSpx1D (x / zoom) / smooth);
+}
+
+
+/** @brief calculate a one dimensional simplex wave
+  *
+  * This method returns a simplex wave of one dimension. The number of waves specified will overlay
+  * each others with multiplied smoothing, specified by 'reduction'. The default value of 1 wave
+  * just returns the simplex noise value in an intervall of [-1, 1]. While having more than one waves
+  * makes it _possible_ to stay in this intervall, the results will most probably be nearer to zero.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
+  *
+  * - waves has a minimum value of 1.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+  * @param[in] reduction Multiplier for the smoothing factor in each round.
+  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
+**/
+double CRandom::simplex1D (double x, double zoom, double smooth, double reduction, int32_t waves) noexcept
+{
+	if (zoom      < 0.001) zoom = 0.001;
+	if (smooth    < 1.0)   smooth = 1.0;
+	if (reduction < 1.0)   reduction = 1.0;
+	if (waves     < 1)     waves = 1;
+
+	x += seed;
+
+	double result = getSpx1D (x / zoom) / smooth;
+
+	if (waves > 1) {
+		double currWave   = 1.0;
+		double currSmooth = smooth;
+		double factor     = 1.0;
+		double currZoom, dX;
+
+		while (currWave < waves) {
+			currWave   += 1.0;
+			currSmooth *= reduction;
+			currZoom    = zoom / std::pow (currWave, 2);
+			dX          = x / currZoom;
+			result     += getSpx1D (dX) / currSmooth;
+			factor     += 1.0 / currSmooth;
+		}
+		result /= factor;
+	}
+
+	return (result);
+}
+
+
+/** @brief calculate a two dimensional simplex noise value
+  *
+  * This method returns a simplex noise value of two dimensions.
+  *
+  * - zoom and smooth have a default value of 1.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+**/
+double CRandom::simplex2D (double x, double y, double zoom, double smooth) noexcept
+{
+	if (zoom   < 0.001) zoom = 0.001;
+	if (smooth < 1.0)   smooth = 1.0;
+
+	x += seed;
+	y += seed;
+
+	return (getSpx2D (x / zoom, y / zoom) / smooth);
+}
+
+
+/** @brief calculate a two dimensional simplex wave
+  *
+  * This method returns a simplex wave of two dimensions. The number of waves specified will overlay
+  * each others with multiplied smoothing, specified by 'reduction'. The default value of 1 wave just
+  * returns the simplex noise value in an intervall of [-1, 1]. While having more than one waves makes
+  * it _possible_ to stay in this intervall, the results will most probably be nearer to zero.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
+  *
+  * - waves has a minimum value of 1.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+  * @param[in] reduction Multiplier for the smoothing factor in each round.
+  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
+**/
+double CRandom::simplex2D (double x, double y, double zoom, double smooth, double reduction, int32_t waves) noexcept
+{
+	if (zoom      < 0.001) zoom = 0.001;
+	if (smooth    < 1.0)   smooth = 1.0;
+	if (reduction < 1.0)   reduction = 1.0;
+	if (waves     < 1)     waves = 1;
+
+	x += seed;
+	y += seed;
+
+	double result = getSpx2D (x / zoom, y / zoom) / smooth;
+
+	if (waves > 1) {
+		double currWave   = 1.0;
+		double currSmooth = smooth;
+		double factor     = 1.0;
+		double currZoom, dX, dY;
+
+		while (currWave < waves) {
+			currWave   += 1.0;
+			currSmooth *= reduction;
+			currZoom    = zoom / std::pow (currWave, 2);
+			dX          = x / currZoom;
+			dY          = y / currZoom;
+			result     += getSpx2D (dX, dY) / currSmooth;
+			factor     += 1.0 / currSmooth;
+		}
+		result /= factor;
+	}
+
+	return (result);
+}
+
+
+/** @brief calculate a three dimensional simplex noise value
+  *
+  * This method returns a simplex wave of three dimensions.
+  *
+  * - zoom and smooth have a default value of 1.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+**/
+double CRandom::simplex3D (double x, double y, double z, double zoom, double smooth) noexcept
+{
+	if (zoom   < 0.001) zoom = 0.001;
+	if (smooth < 1.0)   smooth = 1.0;
+
+	x += seed;
+	y += seed;
+	z += seed;
+
+	return (getSpx3D (x / zoom, y / zoom, z / zoom) / smooth);
+}
+
+
+/** @brief calculate a three dimensional simplex wave
+  *
+  * This method returns a simplex wave of three dimensions. The number of waves specified will overlay
+  * each others with reduced zoom, specified by 'reduction'. The default value of 1 wave just returns
+  * the simplex noise value in an intervall of [-1, 1]. While having more than one waves makes it
+  * _possible_ to stay in this intervall, the results will most probably be nearer to zero.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
+  *
+  * - waves has a minimum value of 1.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+  * @param[in] reduction Multiplier for the smoothing factor in each round.
+  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
+**/
+double CRandom::simplex3D (double x, double y, double z, double zoom, double smooth, double reduction, int32_t waves) noexcept
+{
+	if (zoom      < 0.001) zoom = 0.001;
+	if (smooth    < 1.0)   smooth = 1.0;
+	if (reduction < 1.0)   reduction = 1.0;
+	if (waves     < 1)     waves = 1;
+
+	x += seed;
+	y += seed;
+	z += seed;
+
+	double result = getSpx3D (x / zoom, y / zoom, z / zoom) / smooth;
+
+	if (waves > 1) {
+		double currWave   = 1.0;
+		double currSmooth = smooth;
+		double factor     = 1.0;
+		double currZoom, dX, dY, dZ;
+
+		while (currWave < waves) {
+			currWave   += 1.0;
+			currSmooth *= reduction;
+			currZoom    = zoom / std::pow (currWave, 2);
+			dX          = x / currZoom;
+			dY          = y / currZoom;
+			dZ          = z / currZoom;
+			result     += getSpx3D (dX, dY, dZ) / currSmooth;
+			factor     += 1.0 / currSmooth;
+		}
+		result /= factor;
+	}
+
+	return (result);
+}
+
+
+/** @brief calculate a four dimensional simplex noise value
+  *
+  * This method returns a simplex noise value of four dimension.
+  *
+  * - zoom and smooth have a default value of 1.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] w W-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+**/
+double CRandom::simplex4D (double x, double y, double z, double w, double zoom, double smooth) noexcept
+{
+	if (zoom   < 0.001) zoom = 0.001;
+	if (smooth < 1.0)   smooth = 1.0;
+
+	x += seed;
+	y += seed;
+	z += seed;
+	w += seed;
+
+	return (getSpx4D (x / zoom, y / zoom, z / zoom, w / zoom) / smooth);
+}
+
+
+/** @brief calculate a four dimensional simplex wave
+  *
+  * This method returns a simplex wave of four dimension. The number of waves specified will overlay
+  * each others with reduced zoom, specified by 'reduction'. The default value of 1 wave just returns
+  * the simplex noise value in an intervall of [-1, 1]. While having more than one waves makes it
+  * _possible_ to stay in this intervall, the results will most probably be nearer to zero.
+  *
+  * - zoom, smooth, reduction and waves all have a default value of 1.
+  *
+  * - zoom has a minimum of 0.001, as a thounsandth produces very high values already and zoom must not
+  *   be zero.
+  *
+  * - smooth has a minimum value of 1.0 to make sure the [-1, 1] intervall isn't broken.
+  *
+  * - reduction has a minimum value of 1.0 to ensure the savety of the resulting intervall.
+  *
+  * - waves has a minimum value of 1.
+  *
+  * @param[in] x X-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] y Y-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] z Z-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] w W-Coordinate of the Simplex Point, modified by the simplex seed.
+  * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
+  * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
+  * @param[in] reduction Multiplier for the smoothing factor in each round.
+  * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
+**/
+double CRandom::simplex4D (double x, double y, double z, double w, double zoom, double smooth, double reduction, int32_t waves) noexcept
+{
+	if (zoom      < 0.001) zoom = 0.001;
+	if (smooth    < 1.0)   smooth = 1.0;
+	if (reduction < 1.0)   reduction = 1.0;
+	if (waves     < 1)     waves = 1;
+
+	x += seed;
+	y += seed;
+	z += seed;
+	w += seed;
+
+	double result = getSpx4D (x / zoom, y / zoom, z / zoom, w / zoom) / smooth;
+
+	if (waves > 1) {
+		double currWave   = 1.0;
+		double currSmooth = smooth;
+		double factor     = 1.0;
+		double currZoom, dX, dY, dZ, dW;
+
+		while (currWave < waves) {
+			currWave   += 1.0;
+			currSmooth *= reduction;
+			currZoom    = zoom / std::pow (currWave, 2);
+			dX          = x / currZoom;
+			dY          = y / currZoom;
+			dZ          = z / currZoom;
+			dW          = w / currZoom;
+			result     += getSpx4D (dX, dY, dZ, dW) / currSmooth;
+			factor     += 1.0 / currSmooth;
+		}
+		result /= factor;
+	}
+
+	return (result);
+}
+
 
 } // namespace pwx
