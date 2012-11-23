@@ -7,7 +7,7 @@
 #include <cstring>
 #include <unistd.h>
 
-#include <pwx/tools/StreamHelpers.h>
+#include "pwx/tools/StreamHelpers.h"
 
 namespace pwx
 {
@@ -19,10 +19,10 @@ namespace pwx
   * @return the stream object
   *
 **/
-::std::ostream &operator<< (::std::ostream& os, const adjLeft& l) noexcept
+std::ostream &operator<< (std::ostream& os, const adjLeft& l) noexcept
 {
 	if (os.good()) {
-		os.setf (::std::ios_base::left, ::std::ios_base::adjustfield | ::std::ios_base::floatfield);
+		os.setf (std::ios_base::left, std::ios_base::adjustfield | std::ios_base::floatfield);
 		l.setFields (os);
 	}
 	return (os);
@@ -36,10 +36,10 @@ namespace pwx
   * @return the stream object
   *
 **/
-::std::ostream &operator<< (::std::ostream& os, const adjRight& r) noexcept
+std::ostream &operator<< (std::ostream& os, const adjRight& r) noexcept
 {
 	if (os.good()) {
-		os.setf (::std::ios_base::right, ::std::ios_base::adjustfield | ::std::ios_base::floatfield);
+		os.setf (std::ios_base::right, std::ios_base::adjustfield | std::ios_base::floatfield);
 		r.setFields (os);
 	}
 	return (os);
@@ -55,9 +55,9 @@ namespace pwx
   * @param[in,out] data The data string to search
   * @return true if a representation was found.
 **/
-bool cropShell (const char* key, ::std::string& data) noexcept
+bool cropShell (const char* key, std::string& data) noexcept
 {
-	::std::string shLike = "$";
+	std::string shLike = "$";
 	shLike += key;
 	size_t pos = data.find (shLike);
 	bool hasRep = (pos != data.npos) ? true : false;
@@ -94,7 +94,7 @@ bool cropShell (const char* key, ::std::string& data) noexcept
   * @param[in] is the ifstream to manipulate
   * @param[in] value the value to look for and jump after
 **/
-void forwardTo (::std::ifstream& is, char value) noexcept
+void forwardTo (std::ifstream& is, char value) noexcept
 {
 	while (is.good() && (is.peek() != value))
 		is.ignore (1);
@@ -107,7 +107,7 @@ void forwardTo (::std::ifstream& is, char value) noexcept
   * @param[in,out] text a string reference that will be trimmed
   * @param[in] extra optional extra character to be trimmed as well, defaults to 0
 **/
-void ltrim (::std::string& text, char extra) noexcept
+void ltrim (std::string& text, char extra) noexcept
 {
 	if ( (extra == '\r') || (extra == '\n') || (extra == ' ') || (extra == '\t'))
 		extra = 0x0;
@@ -135,10 +135,10 @@ void ltrim (::std::string& text, char extra) noexcept
   * @return the file name on success, so you can get rid of the file, or NULL if something went wrong
 **/
 const char* makeTemp (const char* aPath, const char* aTemplate, const char* aSuffix,
-					  ::std::ofstream& ofs, ::std::ios_base::openmode mode) noexcept
+					  std::ofstream& ofs, std::ios_base::openmode mode) noexcept
 {
 	try {
-		::std::string fileName (aPath);
+		std::string fileName (aPath);
 		int32_t suffLen = aSuffix ? strlen (aSuffix) : 0;
 
 		// If a template is given, use it
@@ -163,7 +163,7 @@ const char* makeTemp (const char* aPath, const char* aTemplate, const char* aSuf
 		}
 
 		// Unfortunately mkstemp() can't use a const_char, so c_str() isn't our method
-		::std::vector<char> destination (fileName.begin(), fileName.end());
+		std::vector<char> destination (fileName.begin(), fileName.end());
 		destination.push_back ('\0');
 
 		int32_t fd = -1;
@@ -181,7 +181,7 @@ const char* makeTemp (const char* aPath, const char* aTemplate, const char* aSuf
 			return (strdup (fileName.c_str()));
 		}
 	}
-	PWX_CATCH_AND_FORGET (::std::exception)
+	PWX_CATCH_AND_FORGET (std::exception)
 	// This simple catch'all should ensure that nothing leaves this.
 	return (NULL);
 }
@@ -191,7 +191,7 @@ const char* makeTemp (const char* aPath, const char* aTemplate, const char* aSuf
   * @param[in,out] text a string reference that will be trimmed
   * @param[in] extra optional extra character to be trimmed as well, defaults to 0
 **/
-void rtrim (::std::string& text, char extra) noexcept
+void rtrim (std::string& text, char extra) noexcept
 {
 	if ( (extra == '\r') || (extra == '\n') || (extra == ' ') || (extra == '\t'))
 		extra = 0x0;
@@ -215,7 +215,7 @@ void rtrim (::std::string& text, char extra) noexcept
   * @param[in] is an open ifstream
   * @return false if something fails, true if a different char or eof is met
 **/
-bool skipLineBreak (::std::ifstream &is) noexcept
+bool skipLineBreak (std::ifstream &is) noexcept
 {
 	bool    result = false;
 	int32_t peek   = 0;
@@ -228,7 +228,7 @@ bool skipLineBreak (::std::ifstream &is) noexcept
 		}
 	}
 	// If >>is<< is still good (or eof), we have finished:
-	if (is.good() || (0 == (is.rdstate() ^ ::std::ios_base::eofbit)))
+	if (is.good() || (0 == (is.rdstate() ^ std::ios_base::eofbit)))
 		// Note: we use XOR, because this leaves all other failbits untouched,
 		// resulting in !0 if something else is set as well
 		result = true;
@@ -248,7 +248,7 @@ bool skipLineBreak (::std::ifstream &is) noexcept
   * @param[in,out] text reference on the string to search
   * @param[in] spacePerTab number of spaces per tab.
 **/
-void tabToSpace (::std::string &text, size_t spacePerTab) noexcept
+void tabToSpace (std::string &text, size_t spacePerTab) noexcept
 {
 	if (text.size()) {
 		size_t pos = text.find_first_of ('\t');
@@ -268,7 +268,7 @@ void tabToSpace (::std::string &text, size_t spacePerTab) noexcept
   * @param[in,out] text a string reference that will be trimmed
   * @param[in] extra optional extra character to be trimmed as well, defaults to 0
 **/
-void trim (::std::string &text, char extra) noexcept
+void trim (std::string &text, char extra) noexcept
 {
 	ltrim (text, extra);
 	rtrim (text, extra);
@@ -305,13 +305,13 @@ format::format() noexcept
   *
   * @param[in,out] os an open and valid output stream to format
 **/
-void format::setFields (::std::ostream& os) const noexcept
+void format::setFields (std::ostream& os) const noexcept
 {
 	if (os.good() && (left || right)) {
 		if (left)
 			os.width (left + (right ? 1 + right : 0));
 		if (right) {
-			os.setf (::std::ios_base::fixed);
+			os.setf (std::ios_base::fixed);
 			os.precision (right);
 		}
 	}

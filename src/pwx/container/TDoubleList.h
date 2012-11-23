@@ -600,7 +600,7 @@ private:
 
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
-												   ? xCount - (::std::abs (index) % xCount)
+												   ? xCount - (std::abs (index) % xCount)
 												   : index % xCount);
 			// Unfortunately this results in xIdx equaling xCount
 			// (which is wrong) if index is a negative multiple of
@@ -693,7 +693,7 @@ private:
 					if (xCount) {
 						// We need to re-mod xIdx:
 						xIdx = static_cast<uint32_t> (index < 0
-													? eCount - (::std::abs (index) % eCount)
+													? eCount - (std::abs (index) % eCount)
 													: index % eCount);
 						if (xIdx >= eCount)
 							xIdx = xIdx % eCount;

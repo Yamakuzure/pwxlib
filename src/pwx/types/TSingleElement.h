@@ -71,7 +71,7 @@ struct PWX_API TSingleElement : public CLockable
 
 	typedef CLockable                 base_t;
 	typedef TSingleElement<data_t>    elem_t;
-	typedef ::std::shared_ptr<data_t> share_t;
+	typedef std::shared_ptr<data_t> share_t;
 
 
 	/* ===============================================

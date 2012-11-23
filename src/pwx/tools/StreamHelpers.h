@@ -36,17 +36,17 @@
 namespace pwx
 {
 
-bool           PWX_API cropShell (const char *key, ::std::string &data)  noexcept;
-void           PWX_API forwardTo (::std::ifstream &is, char value)       noexcept;
-void           PWX_API ltrim (::std::string &text, char extra = 0x0) noexcept;
+bool           PWX_API cropShell (const char *key, std::string &data)  noexcept;
+void           PWX_API forwardTo (std::ifstream &is, char value)       noexcept;
+void           PWX_API ltrim (std::string &text, char extra = 0x0) noexcept;
 const char     PWX_API *makeTemp (const char *aPath, const char *aTemplate,
-											const char *aSuffix, ::std::ofstream &ofs,
-											::std::ios_base::openmode mode = ::std::ios_base::out |::std::ios_base::trunc)
+											const char *aSuffix, std::ofstream &ofs,
+											std::ios_base::openmode mode = std::ios_base::out |std::ios_base::trunc)
 											noexcept PWX_WARNUNUSED;
-void           PWX_API rtrim (::std::string &text, char extra = 0x0)	noexcept;
-bool           PWX_API skipLineBreak (::std::ifstream &is) noexcept PWX_WARNUNUSED;
-void           PWX_API tabToSpace (::std::string &text, size_t spacePerTab = 1) noexcept;
-void           PWX_API trim (::std::string &text, char extra = 0x0) noexcept;
+void           PWX_API rtrim (std::string &text, char extra = 0x0)	noexcept;
+bool           PWX_API skipLineBreak (std::ifstream &is) noexcept PWX_WARNUNUSED;
+void           PWX_API tabToSpace (std::string &text, size_t spacePerTab = 1) noexcept;
+void           PWX_API trim (std::string &text, char extra = 0x0) noexcept;
 
 // --- Classes for stream manipulation ---
 
@@ -79,7 +79,7 @@ public:
 	 * === Public methods                          ===
 	 * ===============================================
 	*/
-	void setFields (::std::ostream &os) const noexcept;
+	void setFields (std::ostream &os) const noexcept;
 protected:
 	/* ===============================================
 	 * === Protected members                       ===
@@ -131,8 +131,8 @@ public:
 };
 
 
-::std::ostream PWX_API &operator<< (::std::ostream& os, const adjLeft& l) noexcept;
-::std::ostream PWX_API &operator<< (::std::ostream& os, const adjRight& r) noexcept;
+std::ostream PWX_API &operator<< (std::ostream& os, const adjLeft& l) noexcept;
+std::ostream PWX_API &operator<< (std::ostream& os, const adjRight& r) noexcept;
 
 
 /** @brief get the next seperated value
@@ -162,8 +162,9 @@ public:
   *
 **/
 template <typename Tval>
-bool PWX_API readNextValue (Tval &value, ::std::ifstream &is, char separator,
-							bool search, bool emptyAllowed) noexcept {
+bool PWX_API readNextValue (Tval &value, std::ifstream &is, char separator,
+							bool search, bool emptyAllowed) noexcept
+{
 	bool result   = false;
 	bool sepFound = true;
 
@@ -218,9 +219,10 @@ bool PWX_API readNextValue (Tval &value, ::std::ifstream &is, char separator,
   * @return the resulting float
 **/
 template <typename T>
-float PWX_API to_float (const T val) noexcept {
+float PWX_API to_float (const T val) noexcept
+{
 	float result = 0.;
-	::std::stringstream ss;
+	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
@@ -238,9 +240,31 @@ float PWX_API to_float (const T val) noexcept {
   * @return the resulting double
 **/
 template <typename T>
-double PWX_API to_double (const T val) noexcept {
+double PWX_API to_double (const T val) noexcept
+{
 	double result = 0.;
-	::std::stringstream ss;
+	std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
+/** @brief convert a value to long double
+  *
+  * This function uses a stringstream to convert @a val to a long
+  * double. The value will not be type-checked, so it is the users
+  * responsibility to use a type that is compatible with stringstream.
+  * Of course the compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting long double
+**/
+template <typename T>
+long double PWX_API to_long_double (const T val) noexcept
+{
+	long double result = 0.;
+	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
@@ -258,9 +282,10 @@ double PWX_API to_double (const T val) noexcept {
   * @return the resulting int32_t
 **/
 template <typename T>
-int32_t PWX_API to_int32 (const T val) noexcept {
+int32_t PWX_API to_int32 (const T val) noexcept
+{
 	int32_t result = 0;
-	::std::stringstream ss;
+	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
@@ -278,9 +303,10 @@ int32_t PWX_API to_int32 (const T val) noexcept {
   * @return the resulting uint32_t
 **/
 template <typename T>
-uint32_t PWX_API to_uint32 (const T val) noexcept {
+uint32_t PWX_API to_uint32 (const T val) noexcept
+{
 	uint32_t result = 0;
-	::std::stringstream ss;
+	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
@@ -298,9 +324,10 @@ uint32_t PWX_API to_uint32 (const T val) noexcept {
   * @return the resulting int64_t
 **/
 template <typename T>
-int64_t PWX_API to_int64 (const T val) noexcept {
+int64_t PWX_API to_int64 (const T val) noexcept
+{
 	int64_t result = 0;
-	::std::stringstream ss;
+	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
@@ -318,9 +345,10 @@ int64_t PWX_API to_int64 (const T val) noexcept {
   * @return the resulting uint64_t
 **/
 template <typename T>
-uint64_t PWX_API to_uint64 (const T val) noexcept {
+uint64_t PWX_API to_uint64 (const T val) noexcept
+{
 	uint64_t result = 0;
-	::std::stringstream ss;
+	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
@@ -338,8 +366,9 @@ uint64_t PWX_API to_uint64 (const T val) noexcept {
   * @return the resulting int64_t
 **/
 template <typename T>
-::std::string PWX_API to_string (const T val) noexcept {
-	::std::stringstream ss;
+std::string PWX_API to_string (const T val) noexcept
+{
+	std::stringstream ss;
 	ss << val;
 	return ss.str();
 }

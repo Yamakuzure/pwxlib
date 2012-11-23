@@ -894,7 +894,7 @@ private:
 		if (eCount) {
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
-												   ? eCount - (::std::abs (index) % eCount)
+												   ? eCount - (std::abs (index) % eCount)
 												   : index % eCount);
 			// Unfortunately this results in xIdx equaling eCount
 			// (which is wrong) if index is a negative multiple of

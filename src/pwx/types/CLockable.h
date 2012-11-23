@@ -221,7 +221,7 @@ private:
 	*/
 
 #if defined(PWX_THREADS)
-	::std::recursive_mutex mutex;
+	std::recursive_mutex mutex;
 #endif
 }; // class CLockable
 

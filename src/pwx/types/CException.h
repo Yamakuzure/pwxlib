@@ -62,7 +62,7 @@ namespace pwx
   * trace(): Return a trace of all methods this exceptions passed through. If it didn't pass through anywhere,
   *          the trace is empty.
 **/
-class PWX_API CException : public ::std::exception
+class PWX_API CException : public std::exception
 {
 
 public:
@@ -116,7 +116,7 @@ private:
 	const char *const txtWhere; //!< A malloc'd C-String with "file:line - method"
 	const char *const txtFunc;  //!< The result of __PRETTY_FUNC__
 	const char *const txtDesc;  //!< Optional description
-	::std::string txtTrace;     //!< A trace, that can hopefully be added together
+	std::string txtTrace;     //!< A trace, that can hopefully be added together
 };
 
 

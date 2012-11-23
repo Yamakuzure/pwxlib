@@ -70,7 +70,7 @@ struct PWX_API TDoubleElement : public CLockable
 	*/
 	typedef CLockable                 base_t;
 	typedef TDoubleElement<data_t>    elem_t;
-	typedef ::std::shared_ptr<data_t> share_t;
+	typedef std::shared_ptr<data_t> share_t;
 
 
 	/* ===============================================

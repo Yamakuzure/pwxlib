@@ -1,8 +1,8 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include <pwx/types/CException.h>
-#include <pwx/general/macros.h>
+#include "pwx/types/CException.h"
+#include "pwx/general/macros.h"
 #include <cstring>
 
 namespace pwx {
@@ -27,7 +27,7 @@ namespace pwx {
   */
 CException::CException (const char* const name_, const char* const what_, const char* const where_,
 						const char* const func_, const char* const desc_) noexcept
-	: ::std::exception(),
+	: std::exception(),
 	  txtName  (strdup (name_)),
 	  txtWhat  (strdup (what_)),
 	  txtWhere (strdup (where_)),
@@ -36,7 +36,7 @@ CException::CException (const char* const name_, const char* const what_, const 
 	  txtTrace ("Thrown from : ")
 {
 	PWX_TRY (txtTrace += where_)
-	PWX_CATCH_AND_FORGET (::std::exception)
+	PWX_CATCH_AND_FORGET (std::exception)
 }
 
 
@@ -45,7 +45,7 @@ CException::CException (const char* const name_, const char* const what_, const 
   * @param[in] src the exception to copy
   */
 CException::CException (const CException& src) noexcept
-	: ::std::exception (src),
+	: std::exception (src),
 	  txtName  (strdup (src.txtName)),
 	  txtWhat  (strdup (src.txtWhat)),
 	  txtWhere (strdup (src.txtWhere)),
@@ -68,10 +68,10 @@ void CException::addToTrace (const char* trace_) noexcept
 {
 	if (txtTrace.empty()) {
 		PWX_TRY (txtTrace  = "Thrown from : "; txtTrace += txtWhere)
-		PWX_CATCH_AND_FORGET (::std::exception)
+		PWX_CATCH_AND_FORGET (std::exception)
 	}
 	PWX_TRY (txtTrace += "\n"; txtTrace += trace_;)
-	PWX_CATCH_AND_FORGET (::std::exception)
+	PWX_CATCH_AND_FORGET (std::exception)
 }
 
 

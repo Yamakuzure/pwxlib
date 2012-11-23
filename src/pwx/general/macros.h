@@ -98,7 +98,7 @@
   * @param[in] name const char name of the exception
   * @param[in] desc const char message to be returned by the exceptions desc() method
 **/
-#define PWX_THROW_STD_FURTHER(name, desc) catch(::std::exception &e) { \
+#define PWX_THROW_STD_FURTHER(name, desc) catch(std::exception &e) { \
 		PWX_THROW(name, e.what(), desc) \
 	}
 
@@ -272,7 +272,7 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_NAMED_LOCK_GUARD(Name, T, object) \
-	::std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object);
+	std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object);
 #else
 #  define PWX_NAMED_LOCK_GUARD(Name, T, object) { }
 #endif
@@ -304,9 +304,9 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) \
-	::std::unique_lock<Ta> pwx_libpwx_double_lock_A(*objA, ::std::defer_lock); \
-	::std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, ::std::defer_lock); \
-	::std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B);
+	std::unique_lock<Ta> pwx_libpwx_double_lock_A(*objA, std::defer_lock); \
+	std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, std::defer_lock); \
+	std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B);
 #else
 #  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) { }
 #endif
@@ -364,7 +364,7 @@
   * @param b right hand C-String
   * @return true if both C-Strings are equal
 **/
-#define STREQ(a,b) (::std::strcmp(a,b) == 0)
+#define STREQ(a,b) (std::strcmp(a,b) == 0)
 
 
 /** @brief return true if two C-Strings are not equal
@@ -375,7 +375,7 @@
   * @param b right hand C-String
   * @return true if both C-Strings are not equal
 **/
-#define STRNE(a,b) (::std::strcmp(a,b) != 0)
+#define STRNE(a,b) (std::strcmp(a,b) != 0)
 
 
 /** @brief true if @a a is "lower" than @a b
@@ -386,7 +386,7 @@
   * @param b right hand C-String
   * @return true if @a a is "lower" than @a b
 **/
-#define STRLT(a,b) (::std::strcmp(a,b) < 0)
+#define STRLT(a,b) (std::strcmp(a,b) < 0)
 
 
 /** @brief true if @a a is "greater" than @a b
@@ -397,7 +397,7 @@
   * @param b right hand C-String
   * @return true if @a a is "greater" than @a b
 **/
-#define STRGT(a,b) (::std::strcmp(a,b) > 0)
+#define STRGT(a,b) (std::strcmp(a,b) > 0)
 
 
 /** @brief true if @a a is of the same type as @a b
@@ -408,7 +408,7 @@
   * @param b right type
   * @return true if @a and @a b are of the same type
 **/
-#define isSameType(a, b) (::std::is_same<a, b>::value)
+#define isSameType(a, b) (std::is_same<a, b>::value)
 
 
 /** @brief true if @a a is a pointer
@@ -418,7 +418,7 @@
   * @param a type to check
   * @return true if @a is a pointer
 **/
-#define isPointer(a) (::std::is_pointer<a>::value)
+#define isPointer(a) (std::is_pointer<a>::value)
 
 
 /** @brief true if @a a is an integral type
@@ -428,7 +428,7 @@
   * @param a type to check
   * @return true if @a is an integral type
 **/
-#define isIntType(a) (::std::is_integral<a>::value)
+#define isIntType(a) (std::is_integral<a>::value)
 
 
 /** @brief true if @a a is a floating point type
@@ -438,7 +438,7 @@
   * @param a type to check
   * @return true if @a is a floating point type
 **/
-#define isFloatType(a) (::std::is_floating_point<a>::value)
+#define isFloatType(a) (std::is_floating_point<a>::value)
 
 
 /** @brief true if @a a is an array
@@ -448,7 +448,7 @@
   * @param a type to check
   * @return true if @a is an array
 **/
-#define isArrayType(a) (::std::is_array<a>::value)
+#define isArrayType(a) (std::is_array<a>::value)
 
 
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED
