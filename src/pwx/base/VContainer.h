@@ -82,9 +82,11 @@ protected:
 	uint32_t eCount = 0; //!< Element count
 }; // class VContainer
 
+#if defined(PWX_EXPORTS)
 /// @brief ~VContainer default destructor.
 VContainer::~VContainer() noexcept
 { }
+#endif
 
 } // namespace pwx
 #endif // PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED
