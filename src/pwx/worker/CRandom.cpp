@@ -1269,6 +1269,29 @@ long double CRandom::random (long double min, long double max) noexcept
 }
 
 
+/** @brief Generates a random C-String with @a minLen to @a maxLen characters
+  *
+  * The characters are in the range of a-z and A-Z. No whitespace or special
+  * characters are used.
+  *
+  * Note: @a dest is not checked. It must have a size of at least
+  * @a maxLen + 1 zero-byte.
+  * This means, that if both values are 0, nothing is done with @a dest,
+  * and if the larger value is 1, @a dest will simply made to start with
+  * a zero-byte.
+  *
+  * @param[out] dest the char buffer the random character sequence is written into.
+  * @param[in] minLen minimum length of the random character sequence.
+  * @param[out] maxLen maximum length of the random character sequence.
+  * @return number of characters actually written including the final zero-byte.
+**/
+size_t CRandom::random (char* dest, size_t minLen, size_t maxLen) noexcept
+{
+	PWX_LOCK_GUARD(CRandom, this)
+	return private_::private_random_str(dest, minLen, maxLen, lastRndValue);
+}
+
+
 /** @brief get random name (1D)
   *
   * This is a convenient wrapper for getting a random name out of one dimension and switches

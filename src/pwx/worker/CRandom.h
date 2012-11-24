@@ -134,6 +134,7 @@ public:
 	double      random   (double min, double max) noexcept;
 	long double random   (long double max) noexcept;
 	long double random   (long double min, long double max) noexcept;
+	size_t      random   (char* dest, size_t minLen, size_t maxLen) noexcept;
 	char*       rndName  (double x,                               bool lN = false, bool mW = false) noexcept;
 	char*       rndName  (double x, double y,                     bool lN = false, bool mW = false) noexcept;
 	char*       rndName  (double x, double y, double z,           bool lN = false, bool mW = false) noexcept;

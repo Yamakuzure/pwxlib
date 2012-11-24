@@ -82,6 +82,53 @@ Tval private_random(Tval min_, Tval max_, uint32_t &lastRndValue) noexcept
 
 }
 
+/// @internal random character handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+/// Important: RNG has to be _LOCKED_ before using this function!
+size_t private_random_str(char* dest, size_t min_, size_t max_, uint32_t &lastRndValue) noexcept
+{
+	const uint8_t lowA = 'a';
+	const uint8_t uppA = 'A';
+
+	size_t pos = 0;
+
+	if (min_ || max_ ) {
+		size_t xMin    = std::min(min_, max_);
+		size_t xMax    = std::max(min_, max_);
+		uint32_t base  = 0; // Determines whether to use lower or upper case
+		uint32_t pool  = 0; // A pool of 4 bytes to build the string of
+		size_t   left  = 0; // How many bytes are left to use
+		size_t   range = xMax - xMin;
+		size_t   over  = range;
+
+		while ((pos < (xMax - 1)) && (private_random(static_cast<size_t>(0), range, lastRndValue) <= over)) {
+
+			// Get new values if there are none left
+			if (0 == left) {
+				left = 4;
+				base = private_random<uint32_t>(0x01010101, 0xffffffff, lastRndValue);
+				pool = private_random<uint32_t>(0x01010101, 0xffffffff, lastRndValue);
+			}
+
+			// set left as it is our shift indicator
+			--left;
+
+			// Set up next character
+			dest[pos] = (static_cast<uint8_t>(0x000000ff & (pool >> (8 * left))) % 26)
+			          + (static_cast<uint8_t>(0x000000ff & (base >> (8 * left))) % 2 ? lowA : uppA);
+
+			// Advance pos and reduce over if xMin is already met
+			++pos;
+			if (pos >= xMin)
+				--over;
+		} // end of building string
+
+		// Set the final zero byte as well:
+		dest[pos++] = 0x0;
+	}
+
+	return pos;
+}
+
 } // namespace private_
 } // namespace pwx
 #endif // PWX_LIBPWX_PWX_INTERNAL_CRANDOMTRANDOM_H_INCLUDED
