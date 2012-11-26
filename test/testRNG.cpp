@@ -119,7 +119,7 @@ int32_t testRNG (sEnv &env)
 /// @internal test the C-String hash function
 void testRNG_hash_char(sEnv &env)
 {
-	char buf[18];
+	char     buf[18];
 	uint32_t curHash  = 0;
 	uint32_t minHash  = maxUInt32;
 	uint32_t maxHash  = 0;
@@ -149,11 +149,40 @@ void testRNG_hash_char(sEnv &env)
 		cout << "FAILED!" << endl;
 		++env.testFail;
 	}
-
 }
 
 /// @internal test the std::string hash function
 void testRNG_hash_str(sEnv &env)
 {
+	char        buf[18];
+	std::string str;
+	uint32_t    curHash  = 0;
+	uint32_t    minHash  = maxUInt32;
+	uint32_t    maxHash  = 0;
+	memset(buf, 0, 18 * sizeof(char));
 
+	hrTime_t tStart, tUsed;
+	hrTime_t tFull = hrClock::now();
+	for (size_t i = 0; i < hashMaxElements; ++i) {
+		RNG.random(buf, 8, 17);
+		str.assign(buf);
+		tStart = hrClock::now();
+		curHash = RNG.hash(str);
+		tUsed += hrClock::now() - tStart;
+		if (curHash > maxHash) maxHash = curHash;
+		if (curHash < minHash) minHash = curHash;
+	}
+
+	hrTime_t tEnd = hrClock::now();
+	auto tHashTime = duration_cast<milliseconds>(tUsed - hrTime_t()).count();
+	auto tFullTime = duration_cast<milliseconds>(tEnd - tFull).count();
+	cout << adjRight(10,0) << minHash << " / " << adjRight(10,0) << maxHash;
+	cout << " (" << tHashTime << " / " << tFullTime << " ms) ";
+	if (maxHash > minHash) {
+		cout << "SUCCESS" << endl;
+		++env.testSuccess;
+	} else {
+		cout << "FAILED!" << endl;
+		++env.testFail;
+	}
 }
