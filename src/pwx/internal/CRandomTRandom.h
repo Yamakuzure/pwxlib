@@ -38,33 +38,45 @@ namespace pwx {
 **/
 namespace private_ {
 
+typedef std::random_device::result_type rand_t;
+
 const long double maxRandomValue   = static_cast<long double>(std::random_device::max());
 const long double minRandomValue   = static_cast<long double>(std::random_device::min());
 const long double randomValueRange = maxRandomValue - minRandomValue;
 
 static std::random_device privRandDev_;
+static rand_t lastRndValue = 0;  //!< The last generated random value
+
+
+/// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+/// Important: RNG has to be _LOCKED_ before using this function!
+rand_t private_get_random() noexcept
+{
+	rand_t randVal = privRandDev_();
+	while (randVal == lastRndValue)
+		randVal = privRandDev_();
+	lastRndValue = randVal;
+	return randVal;
+}
+
 
 /// @internal random number handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 /// Important: RNG has to be _LOCKED_ before using this function!
 template<typename Tval>
-Tval private_random(Tval min_, Tval max_, uint32_t &lastRndValue) noexcept
+Tval private_random(Tval min_, Tval max_) noexcept
 {
-	typedef std::random_device::result_type rand_t;
 	// Type borders:
-	const Tval realMaxVal = std::numeric_limits<Tval>::max();
-	const Tval realMinVal = std::numeric_limits<Tval>::min();
-	const long double xMaxVal = static_cast<long double>(realMaxVal);
-	const long double xMinVal = static_cast<long double>(realMinVal);
+	static const Tval realMaxVal = std::numeric_limits<Tval>::max();
+	static const Tval realMinVal = std::numeric_limits<Tval>::min();
+	static const long double xMaxVal = static_cast<long double>(realMaxVal);
+	static const long double xMinVal = static_cast<long double>(realMinVal);
 
 	// Quick exit when no calculation can be done
 	if (max_ == min_)
 		return (max_);
 	else {
 		// Step 1: Get a new random value
-		rand_t randVal = privRandDev_();
-		while (randVal == static_cast<rand_t>(lastRndValue))
-			randVal = privRandDev_();
-		lastRndValue = static_cast<uint32_t>(randVal);
+		rand_t randVal = private_get_random();
 
 		// Step 2: Reorder min_ and max_ and bring everything to long double and in range
 		long double xMin = static_cast<long double>(std::min(min_, max_));
@@ -84,7 +96,7 @@ Tval private_random(Tval min_, Tval max_, uint32_t &lastRndValue) noexcept
 
 /// @internal random character handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 /// Important: RNG has to be _LOCKED_ before using this function!
-size_t private_random_str(char* dest, size_t min_, size_t max_, uint32_t &lastRndValue) noexcept
+size_t private_random_str(char* dest, size_t min_, size_t max_) noexcept
 {
 	const uint8_t lowA = 'a';
 	const uint8_t uppA = 'A';
@@ -100,13 +112,13 @@ size_t private_random_str(char* dest, size_t min_, size_t max_, uint32_t &lastRn
 		size_t   range = xMax - xMin;
 		size_t   over  = range;
 
-		while ((pos < (xMax - 1)) && (private_random(static_cast<size_t>(0), range, lastRndValue) <= over)) {
+		while ((pos < (xMax - 1)) && (private_random(static_cast<size_t>(0), range) <= over)) {
 
 			// Get new values if there are none left
 			if (0 == left) {
 				left = 4;
-				base = private_random<uint32_t>(0x01010101, 0xffffffff, lastRndValue);
-				pool = private_random<uint32_t>(0x01010101, 0xffffffff, lastRndValue);
+				base = private_random<uint32_t>(0x01010101, 0xffffffff);
+				pool = private_random<uint32_t>(0x01010101, 0xffffffff);
 			}
 
 			// set left as it is our shift indicator

@@ -220,7 +220,6 @@ private:
 	 * ===============================================
 	*/
 
-	uint32_t lastRndValue;  //!< The last by rand() generated value
 	int32_t  seed;          //!< General seed, can be changed with setSeed(new_value)
 	double   spxCorn[5];    //!< The Corners contributing to a simplex noise. (1D: 2, 4D: 5 corners)
 	double   spxDist[5][4]; //!< Simplex distance of a point to the simplex' corners
