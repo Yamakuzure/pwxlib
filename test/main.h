@@ -13,8 +13,11 @@ using std::endl;
 
 // The names are long, make them shorter:
 typedef std::chrono::high_resolution_clock hrClock;
+typedef std::chrono::high_resolution_clock::time_point hrTime_t;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
+
+
 
 #include <pwx.h>
 using pwx::adjRight;

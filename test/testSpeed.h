@@ -117,16 +117,16 @@ int32_t testSpeedST (sEnv &env)
 
 	// Now add localMaxElem integers and start the counting.
 	thAdder<list_t> adder(true);
-	auto startTimeAdd = hrClock::now();
+	hrTime_t startTimeAdd = hrClock::now();
     adder(&intCont, lowest, localMaxElem, maxAdd);
 
 	// Now clear them up again:
 	uint32_t contSize = intCont.size();
-	auto endTimeAdd = hrClock::now();
+	hrTime_t endTimeAdd = hrClock::now();
 	intCont.clear();
 
 	// Bring out the needed time in ms:
-	auto endTimeClr = hrClock::now();
+	hrTime_t endTimeClr = hrClock::now();
 	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
 	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - endTimeAdd  ).count();
 	cout << adjRight(5,0) << elapsedAdd << " ms /";
@@ -217,7 +217,7 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	// Starting in a loop
-	auto startTimeAdd = hrClock::now();
+	hrTime_t startTimeAdd = hrClock::now();
     for (size_t nr = 0; nr < maxThreads; ++nr)
 		adders[nr].isRunning = true;
 
@@ -240,7 +240,7 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	uint32_t contSize = intCont.size();
-	auto endTimeAdd = hrClock::now();
+	hrTime_t endTimeAdd = hrClock::now();
 
 	// Now clear the container up again:
     for (size_t nr = 0; nr < maxThreads; ++nr)
@@ -248,7 +248,7 @@ int32_t testSpeedMT (sEnv &env)
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
 
 	// Starting in a loop
-	auto startTimeClr = hrClock::now();
+	hrTime_t startTimeClr = hrClock::now();
     for (size_t nr = 0; nr < maxThreads; ++nr)
 		clearers[nr].isRunning = true;
 
@@ -271,7 +271,7 @@ int32_t testSpeedMT (sEnv &env)
     }
 
 	// Bring out the needed time in ms:
-	auto endTimeClr = hrClock::now();
+	hrTime_t endTimeClr = hrClock::now();
 	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
 	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr).count();
 	cout << adjRight(5,0) << elapsedAdd << " ms /";
