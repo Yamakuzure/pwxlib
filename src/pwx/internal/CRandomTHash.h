@@ -149,38 +149,10 @@ uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
 }
 
 
-/* Old method:
-  48 float      :      10087 / 4294957025 (179 / 231 ms) SUCCESS
-  49 double     :      18544 / 4294965291 (319 / 375 ms) SUCCESS
-  50 long double:       9375 / 4294965842 (310 / 367 ms) SUCCESS
-   New method:
-  48 float      :        266 / 4294966563 (76 / 135 ms) SUCCESS
-  49 double     :      92042 / 4294787590 (101 / 159 ms) SUCCESS
-  50 long double:      75638 / 4294897163 (140 / 199 ms) SUCCESS
- *WOHOOOO* !!!
-*/
-
 /// @internal hash handler for floats. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 template<typename Tval>
 uint32_t private_hash_flt(Tval key) noexcept
 {
-//	long double oldInt, oldFrac;
-//	int64_t     newInt, newFrac;
-//
-//	oldFrac = std::modf(static_cast<long double>(key), &oldInt);
-//	newInt  = static_cast<int64_t>(std::trunc(oldInt));
-//
-//	// Bring the old fractional value in a integer range
-//	while ( (oldFrac != std::trunc(oldFrac))
-//		  &&( ((oldFrac > 0.) && ((oldFrac * 1000.) < maxInt64inLD))
-//			||((oldFrac < 0.) && ((oldFrac * 1000.) > minInt64inLD)) ) )
-//		oldFrac *= 1000.;
-//
-//	// Use trunc, too, to make sure int64_t is not overflown.
-//	newFrac = static_cast<int64_t>(std::trunc(oldFrac));
-//
-//	// now xor the parts to have a nice and shiny int64_t key
-//	return private_hash_int<int64_t>(newInt ^ newFrac);
 	static       char   buf[sizeof(Tval)];
 	static const size_t vSize = sizeof(Tval);
 	memcpy(buf, reinterpret_cast<char*>(&key), vSize);
