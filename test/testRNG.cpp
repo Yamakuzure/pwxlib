@@ -1,65 +1,12 @@
-#include <limits>
-#include "testRNG.h"
-
-using pwx::RNG;
-
-const uint32_t hashMaxElements = maxElements;
-const int16_t maxInt16  = std::numeric_limits<int16_t>::max();
-const int16_t minInt16  = std::numeric_limits<int16_t>::min();
-const int32_t maxUInt32 = std::numeric_limits<uint32_t>::max();
-
-/// @internal the test method for hash functions
-template<typename T>
-void testRNG_hash(sEnv &env)
-{
-	const T maxTval = std::numeric_limits<T>::max();
-	const T minTval = std::numeric_limits<T>::min();
-	uint32_t curHash  = 0;
-	uint32_t minHash  = maxUInt32;
-	uint32_t maxHash  = 0;
-	T start    = static_cast<T>(RNG.random(minInt16, maxInt16));
-	T interval = RNG.random((T)3, (T)9);
-
-	hrTime_t tStart, tUsed;
-	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < hashMaxElements; ++i) {
-		tStart = hrClock::now();
-		curHash = RNG.hash(start);
-		tUsed += hrClock::now() - tStart;
-		if (curHash > maxHash) maxHash = curHash;
-		if (curHash < minHash) minHash = curHash;
-		if (start < (maxTval - interval))
-			start += interval;
-		else
-			start = minTval + (maxTval - start); // flip
-	}
-
-	hrTime_t tEnd = hrClock::now();
-	auto tHashTime = duration_cast<milliseconds>(tUsed - hrTime_t()).count();
-	auto tFullTime = duration_cast<milliseconds>(tEnd - tFull).count();
-	cout << adjRight(10,0) << minHash << " / " << adjRight(10,0) << maxHash;
-	cout << " (" << tHashTime << " / " << tFullTime << " ms) ";
-	if (maxHash > minHash) {
-		cout << "SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << "FAILED!" << endl;
-		++env.testFail;
-	}
-}
-
-// The following two can not be templated and are defined below:
-void testRNG_hash_char(sEnv &env);
-void testRNG_hash_str(sEnv &env);
-
+#include "testRNG_func.h"
 
 /** @brief central function to test pwx::RNG
   *
   *************************************************************************
   ** === All tests include time measurement with maxThreads threads  === **
-  ** A) Hash functions                                                   **
-  ** B) Noise functions                                                  **
-  ** C) Random number functions                                          **
+  ** A) Random number functions                                          **
+  ** B) Hash functions                                                   **
+  ** C) Noise functions                                                  **
   ** D) Random name functions                                            **
   ** E) Simplex Noise functions                                          **
   *************************************************************************
@@ -71,9 +18,70 @@ int32_t testRNG (sEnv &env)
 	cout << "Test CRandom instance pwx::RNG\n------------------------------" << endl;
 
 	/************************************************************************
-	** A) Hash functions                                                   **
+	** C) Random number functions                                          **
 	************************************************************************/
-	cout << " A) Hash functions with " << hashMaxElements << " keys (min/max (hash / loop ms))" << endl;
+	cout << " A) Random functions (max) / (min, max)" << endl;
+
+		cout << adjRight (4, 0) << ++env.testCount << " (u)int16_t  (-999, 999) / (500)" << endl;
+		for (size_t i = 1; i < 11; ++i) {
+			cout << adjRight(8,0) << i << ": ";
+			cout << adjRight(5,0) << RNG.random((int16_t)-999, (int16_t)999) << " / ";
+			cout << adjRight(3,0) << RNG.random((uint16_t)500) << endl;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << " (u)int32_t  (-1.0e6, 1.0e6) / (1.0e9)" << endl;
+		for (size_t i = 1; i < 11; ++i) {
+			cout << adjRight( 8,0) << i << ": ";
+			cout << adjRight( 8,0) << RNG.random((int32_t)-1e6, (int32_t)1e6) << " / ";
+			cout << adjRight(10,0) << RNG.random((uint32_t)1e9) << endl;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << " (u)int64_t  (-1.0e12, 1.0e12) / (1.0e15)" << endl;
+		for (size_t i = 1; i < 11; ++i) {
+			cout << adjRight( 8,0) << i << ": ";
+			cout << adjRight(14,0) << RNG.random((int64_t)-1e12, (int64_t)1e12) << " / ";
+			cout << adjRight(16,0) << RNG.random((uint64_t)1e15) << endl;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << " float       (-1.0, 1.0) / (1.0e-4)" << endl;
+		for (size_t i = 1; i < 11; ++i) {
+			cout << adjRight(8,0) << i << ": ";
+			cout << adjRight(2,8) << RNG.random((float)-1.0, (float)1.0) << " / ";
+			cout << adjRight(2,8) << RNG.random((float)1e-4) << endl;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << " double      (-9.999, 9.999) / (1.0e-8)" << endl;
+		for (size_t i = 1; i < 11; ++i) {
+			cout << adjRight(8,0) << i << ": ";
+			cout << adjRight(2,12) << RNG.random((double)-9.999, (double)9.999) << " / ";
+			cout << adjRight(2,12) << RNG.random((double)1e-8) << endl;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << " long double (-1.0e-4, 1.0e-4) / (1.0e-12)" << endl;
+		for (size_t i = 1; i < 11; ++i) {
+			cout << adjRight(8,0) << i << ": ";
+			cout << adjRight(2,16) << RNG.random((long double)-1.0e-4, (long double)1.0e-4) << " / ";
+			cout << adjRight(2,16) << RNG.random((long double)1e-12) << endl;
+		}
+
+		cout << adjRight (4, 0) << ++env.testCount << " char        ( 8, 12) / (12)" << endl;
+		{
+			char   bufA[13]; // Left side
+			char   bufB[13]; // Right side
+
+			for (size_t i = 1; i < 11; ++i) {
+				RNG.random(bufA, 8, 12);
+				RNG.random(bufB, 0, 12);
+				cout << adjRight(8,0) << i << ": \"" << adjLeft(12,0) << bufA;
+				cout << "\" / \"" << adjLeft(12,0) << bufB << "\"" << endl;
+			}
+		}
+
+
+	/************************************************************************
+	** B) Hash functions                                                   **
+	************************************************************************/
+	cout << " B) Hash functions with " << hashMaxElements << " keys (min/max (hash / loop ms))" << endl;
 	cout << adjRight (4, 0) << ++env.testCount << " int16_t    : "; cout.flush();
 	testRNG_hash<int16_t>(env);
 	cout << adjRight (4, 0) << ++env.testCount << " uint16_t   : "; cout.flush();
@@ -98,11 +106,7 @@ int32_t testRNG (sEnv &env)
 	testRNG_hash_str(env);
 
 	/************************************************************************
-	** B) Noise functions                                                  **
-	************************************************************************/
-
-	/************************************************************************
-	** C) Random number functions                                          **
+	** C) Noise functions                                                  **
 	************************************************************************/
 
 	/************************************************************************
@@ -116,73 +120,3 @@ int32_t testRNG (sEnv &env)
 	return result;
 }
 
-/// @internal test the C-String hash function
-void testRNG_hash_char(sEnv &env)
-{
-	char     buf[18];
-	uint32_t curHash  = 0;
-	uint32_t minHash  = maxUInt32;
-	uint32_t maxHash  = 0;
-	size_t   strLen   = 0;
-	memset(buf, 0, 18 * sizeof(char));
-
-	hrTime_t tStart, tUsed;
-	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < hashMaxElements; ++i) {
-		strLen = RNG.random(buf, 8, 17);
-		tStart = hrClock::now();
-		curHash = RNG.hash(buf, strLen);
-		tUsed += hrClock::now() - tStart;
-		if (curHash > maxHash) maxHash = curHash;
-		if (curHash < minHash) minHash = curHash;
-	}
-
-	hrTime_t tEnd = hrClock::now();
-	auto tHashTime = duration_cast<milliseconds>(tUsed - hrTime_t()).count();
-	auto tFullTime = duration_cast<milliseconds>(tEnd - tFull).count();
-	cout << adjRight(10,0) << minHash << " / " << adjRight(10,0) << maxHash;
-	cout << " (" << tHashTime << " / " << tFullTime << " ms) ";
-	if (maxHash > minHash) {
-		cout << "SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << "FAILED!" << endl;
-		++env.testFail;
-	}
-}
-
-/// @internal test the std::string hash function
-void testRNG_hash_str(sEnv &env)
-{
-	char        buf[18];
-	std::string str;
-	uint32_t    curHash  = 0;
-	uint32_t    minHash  = maxUInt32;
-	uint32_t    maxHash  = 0;
-	memset(buf, 0, 18 * sizeof(char));
-
-	hrTime_t tStart, tUsed;
-	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < hashMaxElements; ++i) {
-		RNG.random(buf, 8, 17);
-		str.assign(buf);
-		tStart = hrClock::now();
-		curHash = RNG.hash(str);
-		tUsed += hrClock::now() - tStart;
-		if (curHash > maxHash) maxHash = curHash;
-		if (curHash < minHash) minHash = curHash;
-	}
-
-	hrTime_t tEnd = hrClock::now();
-	auto tHashTime = duration_cast<milliseconds>(tUsed - hrTime_t()).count();
-	auto tFullTime = duration_cast<milliseconds>(tEnd - tFull).count();
-	cout << adjRight(10,0) << minHash << " / " << adjRight(10,0) << maxHash;
-	cout << " (" << tHashTime << " / " << tFullTime << " ms) ";
-	if (maxHash > minHash) {
-		cout << "SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << "FAILED!" << endl;
-		++env.testFail;
-	}
-}

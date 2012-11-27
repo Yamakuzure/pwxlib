@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TEST_TESTSET_H_INCLUDED
 #define PWX_LIBPWX_TEST_TESTSET_H_INCLUDED 1
 
-#include "main.h" // This is here for IDE Parsers to find the other stuff
+#include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific set:
 typedef pwx::TSet<data_t> set_t;

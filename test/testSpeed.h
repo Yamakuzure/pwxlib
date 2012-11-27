@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TESTLIB_TESTSPEED_H_INCLUDED
 #define PWX_LIBPWX_TESTLIB_TESTSPEED_H_INCLUDED 1
 
-#include "main.h" // This is here for IDE Parsers to find the other stuff
+#include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 
 /// @brief struct doing synchronized start/stop for additions of items into containers

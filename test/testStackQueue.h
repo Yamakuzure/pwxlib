@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TEST_TESTSTACKQUEUE_H_INCLUDED
 #define PWX_LIBPWX_TEST_TESTSTACKQUEUE_H_INCLUDED 1
 
-#include "main.h" // This is here for IDE Parsers to find the other stuff
+#include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific stack/queue:
 typedef pwx::TStack<data_t> stack_t;
