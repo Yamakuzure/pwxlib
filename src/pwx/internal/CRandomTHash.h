@@ -43,7 +43,7 @@ using constants::fullMaxLong;
 
 // These are needed for the float hashes conversion using modf/trunc
 const long double maxInt64inLD = static_cast<long double>(std::numeric_limits<int64_t>::max());
-const long double minInt64inLD = static_cast<long double>(std::numeric_limits<int64_t>::min());
+const long double minInt64inLD = static_cast<long double>(std::numeric_limits<int64_t>::lowest());
 
 /// @internal hash handler for integers. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 template<typename Tval>

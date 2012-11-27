@@ -67,7 +67,7 @@ Tval private_random(Tval min_, Tval max_) noexcept
 {
 	// Type borders:
 	static const Tval realMaxVal = std::numeric_limits<Tval>::max();
-	static const Tval realMinVal = std::numeric_limits<Tval>::min();
+	static const Tval realMinVal = std::numeric_limits<Tval>::lowest();
 	static const long double xMaxVal = static_cast<long double>(realMaxVal);
 	static const long double xMinVal = static_cast<long double>(realMinVal);
 

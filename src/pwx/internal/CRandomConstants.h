@@ -44,7 +44,7 @@ namespace constants
 
 /** The following are shortcuts for various limits used by CRandom: **/
 const int32_t fullMaxInt    = std::numeric_limits<int32_t>::max();
-const int32_t fullMinInt    = std::numeric_limits<int32_t>::min();
+const int32_t fullMinInt    = std::numeric_limits<int32_t>::lowest();
 const int32_t halfMaxInt    = fullMaxInt >> 1;
 const int32_t fourthMaxInt  = halfMaxInt >> 1;
 const int64_t fullMaxLong   = std::numeric_limits<int64_t>::max();
