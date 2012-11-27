@@ -115,7 +115,7 @@ endif
 # ------------------------------------
 # Rules
 # ------------------------------------
-.PHONY: clean test documentation docinstall install userinstall tools all library help
+.PHONY: clean testlib documentation docinstall hashbuilder install userinstall tools all library help
 .SUFFIXES: .cpp
 
 %.o: %.cpp
@@ -136,10 +136,11 @@ help: Makefile
 	@echo "  docinstall    - install documentation into $(DOCDIR)"
 	@echo "  clean         - remove object files, test programs and tools"
 	@echo "  help          - this help"
+	@echo "  hashbuilder   - build hash_builder test program in $(TESTDIR) (*)"
 	@echo "  install       - install pwxLib in $(INSTDIR)"
 	@echo "  library       - compile pwxLib (*)"
 	@echo "  userinstall   - install pwxLib in $(USRINST)"
-	@echo "  test          - build test programs in ./$(TESTDIR) (*)"
+	@echo "  testlib       - build test_lib test program in ./$(TESTDIR) (*)"
 	@echo "  tools         - build tools in ./$(TOOLDIR) (*)"
 	@echo ""
 	@echo "(*): You can turn on debugging and profiling information or the use"
@@ -156,6 +157,10 @@ docinstall: documentation
 	@$(INSTALL) doc/html/* $(DOCDIR)/html
 	@echo "Installing information files into $(DOCDIR)"
 	@$(INSTALL) $(DOCFILES) $(DOCDIR)
+
+hashbuilder: depend library
+	@echo "Making hash_builder in $(TESTDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) hashbuilder)
 
 install: Makefile $(TARGET)
 	@echo "Installing pwxLib into $(INSTDIR)"
@@ -187,9 +192,9 @@ userinstall: Makefile $(TARGET)
 	@$(INSTALL) pwx/types/*.h $(USRINST)/pwx/types
 	@$(INSTALL) pwx/worker/*.h $(USRINST)/pwx/worker
 
-test: depend library
-	@echo "Making all in $(TESTDIR)"
-	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR))
+testlib: depend library
+	@echo "Making testlib in $(TESTDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) testlib)
 
 tools: depend library
 	@echo "Making all in $(TOOLDIR)"

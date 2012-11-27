@@ -43,6 +43,7 @@
 		<Unit filename="../README" />
 		<Unit filename="../TODO" />
 		<Unit filename="../src/pwx.h" />
+		<Unit filename="../src/pwx/base/VContainer.cpp" />
 		<Unit filename="../src/pwx/base/VContainer.h" />
 		<Unit filename="../src/pwx/container.h" />
 		<Unit filename="../src/pwx/container/TDoubleList.h" />
@@ -59,6 +60,8 @@
 		<Unit filename="../src/pwx/general/macros.h" />
 		<Unit filename="../src/pwx/general/templates.h" />
 		<Unit filename="../src/pwx/internal/CRandomConstants.h" />
+		<Unit filename="../src/pwx/internal/CRandomTHash.h" />
+		<Unit filename="../src/pwx/internal/CRandomTRandom.h" />
 		<Unit filename="../src/pwx/internal/CRandomWordConstants.h" />
 		<Unit filename="../src/pwx/tools.h" />
 		<Unit filename="../src/pwx/tools/StreamHelpers.cpp" />
