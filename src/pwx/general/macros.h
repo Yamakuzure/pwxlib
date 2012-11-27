@@ -451,4 +451,53 @@
 #define isArrayType(a) (std::is_array<a>::value)
 
 
+/** @brief Check whether file @a f exists
+  *
+  * <I>Prerequisites</I>: <unistd.h>
+  *
+  * @param f A file or directory to check
+  * @return true if @a exists
+**/
+#define pwx_file_exists(f) (0 == access(f, F_OK))
+
+
+/** @brief Check whether file @a f is executable
+  *
+  * <I>Prerequisites</I>: <unistd.h>
+  *
+  * @param f A file or directory to check
+  * @return true if @a is executable
+**/
+#define pwx_file_isX(f) (0 == access(f, X_OK))
+
+
+/** @brief Check whether file @a f is writable
+  *
+  * <I>Prerequisites</I>: <unistd.h>
+  *
+  * @param f A file or directory to check
+  * @return true if @a is writable
+**/
+#define pwx_file_isW(f) (0 == access(f, W_OK))
+
+
+/** @brief Check whether file @a f is readable
+  *
+  * <I>Prerequisites</I>: <unistd.h>
+  *
+  * @param f A file or directory to check
+  * @return true if @a is readable
+**/
+#define pwx_file_isR(f) (0 == access(f, R_OK))
+
+
+/** @brief Check whether file @a f is readable and writable
+  *
+  * <I>Prerequisites</I>: <unistd.h>
+  *
+  * @param f A file or directory to check
+  * @return true if @a is readable and writable
+**/
+#define pwx_file_isRW(f) (0 == access(f, W_OK | W_OK))
+
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED
