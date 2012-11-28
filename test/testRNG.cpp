@@ -28,6 +28,7 @@ int32_t testRNG (sEnv &env)
 			cout << adjRight(5,0) << RNG.random((int16_t)-999, (int16_t)999) << " / ";
 			cout << adjRight(3,0) << RNG.random((uint16_t)500) << endl;
 		}
+		++env.testSuccess;
 
 		cout << adjRight (4, 0) << ++env.testCount << " (u)int32_t  (-1.0e6, 1.0e6) / (1.0e9)" << endl;
 		for (size_t i = 1; i < 11; ++i) {
@@ -35,6 +36,7 @@ int32_t testRNG (sEnv &env)
 			cout << adjRight( 8,0) << RNG.random((int32_t)-1e6, (int32_t)1e6) << " / ";
 			cout << adjRight(10,0) << RNG.random((uint32_t)1e9) << endl;
 		}
+		++env.testSuccess;
 
 		cout << adjRight (4, 0) << ++env.testCount << " (u)int64_t  (-1.0e12, 1.0e12) / (1.0e15)" << endl;
 		for (size_t i = 1; i < 11; ++i) {
@@ -42,6 +44,7 @@ int32_t testRNG (sEnv &env)
 			cout << adjRight(14,0) << RNG.random((int64_t)-1e12, (int64_t)1e12) << " / ";
 			cout << adjRight(16,0) << RNG.random((uint64_t)1e15) << endl;
 		}
+		++env.testSuccess;
 
 		cout << adjRight (4, 0) << ++env.testCount << " float       (-1.0, 1.0) / (1.0e-4)" << endl;
 		for (size_t i = 1; i < 11; ++i) {
@@ -49,6 +52,7 @@ int32_t testRNG (sEnv &env)
 			cout << adjRight(2,8) << RNG.random((float)-1.0, (float)1.0) << " / ";
 			cout << adjRight(2,8) << RNG.random((float)1e-4) << endl;
 		}
+		++env.testSuccess;
 
 		cout << adjRight (4, 0) << ++env.testCount << " double      (-9.999, 9.999) / (1.0e-8)" << endl;
 		for (size_t i = 1; i < 11; ++i) {
@@ -56,6 +60,7 @@ int32_t testRNG (sEnv &env)
 			cout << adjRight(2,12) << RNG.random((double)-9.999, (double)9.999) << " / ";
 			cout << adjRight(2,12) << RNG.random((double)1e-8) << endl;
 		}
+		++env.testSuccess;
 
 		cout << adjRight (4, 0) << ++env.testCount << " long double (-1.0e-4, 1.0e-4) / (1.0e-12)" << endl;
 		for (size_t i = 1; i < 11; ++i) {
@@ -63,6 +68,7 @@ int32_t testRNG (sEnv &env)
 			cout << adjRight(2,16) << RNG.random((long double)-1.0e-4, (long double)1.0e-4) << " / ";
 			cout << adjRight(2,16) << RNG.random((long double)1e-12) << endl;
 		}
+		++env.testSuccess;
 
 		cout << adjRight (4, 0) << ++env.testCount << " char        ( 8, 12) / (12)" << endl;
 		{
@@ -76,6 +82,7 @@ int32_t testRNG (sEnv &env)
 				cout << "\" / \"" << adjLeft(12,0) << bufB << "\"" << endl;
 			}
 		}
+		++env.testSuccess;
 
 
 	/************************************************************************
