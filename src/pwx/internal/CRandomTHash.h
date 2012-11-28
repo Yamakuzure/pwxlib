@@ -68,6 +68,8 @@ const long double minInt64inLD = static_cast<long double>(std::numeric_limits<in
 template<typename Tval>
 uint32_t private_hash_int(Tval key) noexcept
 {
+	uint32_t xHash = 0;
+
 	// --- int16_t and int32_t can use the same algorithm
 	if (isSameType(int16_t, Tval) || isSameType(int32_t, Tval)) {
 		/* ====================================================================
@@ -82,7 +84,7 @@ uint32_t private_hash_int(Tval key) noexcept
 		xKey ^= (xKey & fullMaxInt) >> 4; // xKey >>> 4
 		xKey *= 2057;
 		xKey ^= (xKey & fullMaxInt) >> 16; // xKey >>> 16
-		return static_cast<uint32_t> (xKey);
+		xHash = static_cast<uint32_t> (xKey);
 	}
 	// --- uint16_t and uint32_t can use the same algorithm, too
 	else if (isSameType(uint16_t, Tval) || isSameType(uint32_t, Tval)) {
@@ -97,7 +99,7 @@ uint32_t private_hash_int(Tval key) noexcept
 		xKey = (xKey  + 0x165667b1) + (xKey << 5);
 		xKey = (xKey  + 0xd3a2646c) ^ (xKey << 9);
 		xKey = (xKey  + 0xfd7046c5) + (xKey << 3);
-		return (xKey  ^ 0xb55a4f09) ^ (xKey >> 16);
+		xHash = (xKey  ^ 0xb55a4f09) ^ (xKey >> 16);
 	}
 	// --- int64_t needs its own algorithm
 	else if (isSameType(int64_t, Tval)) {
@@ -111,7 +113,7 @@ uint32_t private_hash_int(Tval key) noexcept
 		key ^= (key & fullMaxLong) >> 14; // key >>> 14
 		key += (key << 2) + (key << 4);
 		key ^= (key & fullMaxLong) >> 28; // key >>> 28
-		return static_cast<uint32_t> (0x00000000ffffffff & (key + (key >> 31)));
+		xHash = static_cast<uint32_t> (0x00000000ffffffff & (key + (key >> 31)));
 	}
 	// --- int64_t needs its own algorithm
 	else if (isSameType(uint64_t, Tval)) {
@@ -125,9 +127,10 @@ uint32_t private_hash_int(Tval key) noexcept
 		key ^= (key & fullMaxLong) >> 11; // key >>> 11
 		key += key << 6;
 		key ^= (key & fullMaxLong) >> 22; // key >>> 22
-		return static_cast<uint32_t> (key);
-	} else
-		return 0; // FAIL
+		xHash = static_cast<uint32_t> (key);
+	}
+
+	return xHash;
 }
 
 
@@ -142,11 +145,14 @@ uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
 	if (0 == len)
 		return 0;
 
-	// Otherwise loop through the string and combine
+	// We need unsigned values to not overflow anything:
+	const uint8_t* keyBuf = reinterpret_cast<const uint8_t*>(key);
+
+	// loop through the string and combine
 	// groups of four to the sum
 	for (size_t pos = 0; pos < len; ++pos) {
 		phase = pos % 4;
-		part |= static_cast<uint32_t>(key[pos] << (phase * 8));
+		part |= static_cast<uint32_t>(keyBuf[pos] << (phase * 8));
 		if (3 == phase) {
 			level = pos % 3;
 			if (1 == level)
@@ -172,8 +178,9 @@ uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
 template<typename Tval>
 uint32_t private_hash_flt(Tval key) noexcept
 {
-	static       char   buf[sizeof(Tval)];
 	static const size_t vSize = sizeof(Tval);
+	static       char   buf[vSize + 1];
+	memset(buf, 0, vSize + 1);
 	memcpy(buf, reinterpret_cast<char*>(&key), vSize);
 	return private_hash_str(buf, vSize);
 }
