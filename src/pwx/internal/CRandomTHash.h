@@ -37,7 +37,26 @@ namespace pwx {
 
 namespace private_ {
 
+/* ================================================================================================
+Statistics with 10M Hashes (65535 for (u)int16_t) :
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Type        | Unique rand|    Quota | Unique Hash|    Quota | Result
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Long Double |  8,309,222 |  83.09 % |    397,556 |   4.78 % | Random is good, Hash is abysmal!
+   Double      |  3,615,883 |  36.16 % |    115,769 |   3.20 % | Random is bad, Hash is a nightmare!
+   Float       |  7,012,670 |  70.13 % |  1,366,255 |  19.48 % | Random is OK, Hash is a disaster!
+   int16_t     |     41,296 |  63.01 % |     41,296 | 100.00 % | Random is OK, Hash is perfect!
+   uint16_t    |     41,537 |  63.38 % |     41,537 | 100.00 % | Random is OK, Hash is perfect!
+   int32_t     |  9,988,334 |  99.88 % |  9,988,334 | 100.00 % | Random is great, Hash is is perfect!
+   uint32_t    |  9,988,339 |  99.88 % |  9,988,339 | 100.00 % | Random is great, Hash is is perfect!
+   int64_t     |  9,988,393 |  99.88 % |  9,976,858 |  99.88 % | Random is great, Hash is is great!
+   uint64_t    |  9,988,332 |  99.88 % |  9,976,620 |  99.88 % | Random is great, Hash is is great!
+   C-String    | 10,000,000 | 100.00 % |  9,987,160 |  99.87 % | Random is perfect, Hash is is great!
+   ------------+------------+----------+------------+----------+--------------------------------------
+  Result: The floating point random number generation must be improved, and the hash building has
+          some serious problem or is a serious problem in itself.
 
+   ================================================================================================ */
 using constants::fullMaxInt;
 using constants::fullMaxLong;
 
