@@ -56,6 +56,27 @@ Statistics with 10M Hashes (65535 for (u)int16_t) :
   Result: The floating point random number generation must be improved, and the hash building has
           some serious problem or is a serious problem in itself.
 
+Statistics with 10M Hashes (65535 for (uint16_t)) after the following changes:
+	1) Changed the random range for the floats to -5000.0 to +5000.0
+	2) private_hash_str now converts the char* string into an uint8_t* buffer
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Type        | Unique rand|    Quota | Unique Hash|    Quota | Result
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Long Double |  9,961,939 |  99.62 % |  5,988,634 |  60.12 % | Random is great, Hash is OK!
+   Double      |  9,981,779 |  99.81 % |  6,569,158 |  65.81 % | Random is great, Hash is OK!
+   Float       |  7,017,313 |  70.17 % |  6,920,215 |  98.62 % | Random is OK, Hash is great!
+   int16_t     |     41,379 |  63.14 % |     41,379 | 100.00 % | Random is OK, Hash is perfect!
+   uint16_t    |     41,505 |  63.33 % |     41,505 | 100.00 % | Random is OK, Hash is perfect!
+   int32_t     |  9,988,413 |  99.88 % |  9,988,413 | 100.00 % | Random is great, Hash is is perfect!
+   uint32_t    |  9,988,459 |  99.88 % |  9,988,459 | 100.00 % | Random is great, Hash is is perfect!
+   int64_t     |  9,988,454 |  99.88 % |  9,976,745 |  99.88 % | Random is great, Hash is is great!
+   uint64_t    |  9,988,427 |  99.88 % |  9,976,682 |  99.88 % | Random is great, Hash is is great!
+   C-String    | 10,000,000 | 100.00 % |  9,987,110 |  99.87 % | Random is perfect, Hash is is great!
+  Result: The floating point hashing has improved greatly. But the random result for float suggests,
+          that a higher integer range is needed. And the hash result for double and long double is
+          far from being really good. Maybe it would be better tp mix the floating point bytes directly
+          into an uint32_t hash.
+          And for (u)int16_t a specialized hash loop is needed that simply goes from lowest to max.
    ================================================================================================ */
 using constants::fullMaxInt;
 using constants::fullMaxLong;

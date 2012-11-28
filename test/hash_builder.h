@@ -40,15 +40,11 @@ int32_t build_hash_list_num(string &outfile, int32_t cnt_)
 	}
 
 	// Correct maxTval/minTval if this is no integer
-	if (isSameType(T, float)) {
-		maxTval = (T)5.0;
-		minTval = (T)-5.0;
-	} else if (isSameType(T, double)) {
-		maxTval = (T).5;
-		minTval = (T)-.5;
-	} else if (isSameType(T, long double)) {
-		maxTval = (T).05;
-		minTval = (T)-.05;
+	if (isSameType(T, float)
+		|| isSameType(T, double)
+		|| isSameType(T, long double)) {
+		maxTval = (T)5000.0;
+		minTval = (T)-5000.0;
 	}
 
 	T randVal;
