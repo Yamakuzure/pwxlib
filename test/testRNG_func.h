@@ -16,8 +16,8 @@ const int32_t maxUInt32 = std::numeric_limits<uint32_t>::max();
 template<typename T>
 void testRNG_hash(sEnv &env)
 {
-	const T maxTval = std::numeric_limits<T>::max();
-	const T minTval = std::numeric_limits<T>::min();
+	static const T maxTval = std::numeric_limits<T>::max();
+	static const T minTval = std::numeric_limits<T>::lowest();
 	uint32_t curHash  = 0;
 	uint32_t minHash  = maxUInt32;
 	uint32_t maxHash  = 0;
