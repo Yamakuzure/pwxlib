@@ -6,5 +6,6 @@
 		<Project filename="cb/testlib.cbp">
 			<Depends filename="cb/libpwx.cbp" />
 		</Project>
+		<Project filename="cb/hash_builder.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
