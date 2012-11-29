@@ -78,6 +78,47 @@ int32_t build_hash_list_num(string &outfile, int32_t cnt_)
 }
 
 
+/// @internal specialized variant to build an [u]int16_t hash list
+template<typename T>
+int32_t build_hash_list_int16(string &outfile)
+{
+	int32_t result = EXIT_SUCCESS;
+	T maxTval = std::numeric_limits<T>::max();
+	T minTval = std::numeric_limits<T>::lowest();
+	ofstream out(outfile.c_str());
+
+	if (!out.is_open() || !out.good()) {
+		cerr << "Error opening \"" << outfile << "\"" << endl;
+		return EXIT_FAILURE;
+	}
+
+	cout << "Writing " << static_cast<int32_t>(maxTval - minTval) << " values into \"" << outfile << "\" ...";
+	cout.flush();
+
+	hrTime_t tStart = hrClock::now();
+
+	for (T cnt = minTval ; out.good() && (cnt < maxTval); ++cnt)
+		out << cnt << ";" << RNG.hash(cnt) << endl;
+
+	hrTime_t tEnd = hrClock::now();
+	auto tTimeNeeded = duration_cast<milliseconds>(tEnd - tStart).count();
+	cout << "(" << tTimeNeeded << " ms)";
+
+	if (!out.good())
+		result = EXIT_FAILURE;
+
+	if (out.is_open())
+		out.close();
+
+	if (EXIT_SUCCESS == result)
+		cout << " done" << endl;
+	else
+		cout << " ERROR!" << endl;
+
+	return result;
+}
+
+
 /// @internal build a C-String based hash list
 int32_t build_hash_list_char(string &outfile, int32_t cnt_)
 {
