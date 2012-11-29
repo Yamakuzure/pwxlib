@@ -75,7 +75,7 @@ Statistics with 10M Hashes (65535 for (uint16_t)) after the following changes:
    ------------+------------+----------+------------+----------+--------------------------------------
   Result: The floating point hashing has improved greatly. But the random result for float suggests,
           that a higher integer range is needed. And the hash result for double and long double is
-          far from being really good. Maybe it would be better tp mix the floating point bytes directly
+          far from being really good. Maybe it would be better t0 mix the floating point bytes directly
           into an uint32_t hash.
           And for (u)int16_t a specialized hash loop is needed that simply goes from lowest to max.
 
@@ -89,6 +89,19 @@ Statistics with 65535 hashes for (u)int16_t after the following changes:
    uint16_t    |        n/a |      n/a |     65,535 | 100.00 % | Hash is perfect!
    ------------+------------+----------+------------+----------+--------------------------------------
   Result: Every single value for (u)int16_t results in a unique hash value. fine!
+
+Statistics with 10M hashes for float, double, long double after changing to a direct mix:
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Type        | Unique rand|    Quota | Unique Hash|    Quota | Result
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Long Double |  9,986,139 |  99.86 % |  1,472,965 |  14.75 % | Random is great, Hash is a disaster.
+   Double      |  9,986,162 |  99.86 % |  9,216,337 |  92.29 % | Random is great, Hash is very good!
+   Float       |  9,001,882 |  90.02 % |  9,001,882 | 100.00 % | Random is very good, Hash is perfect!
+   ------------+------------+----------+------------+----------+--------------------------------------
+  Result: The range for float should be enlarged again, I doubt it is the random algorithm. Further
+          the new direct mixing seems to be sufficient on double and float, but does not work well
+		  with long double. XORing 8/16 bytes into four with 4/2 bit shift seems to destroy certain
+		  hash values. The solution tried next will be to do some more inter-mixing of the bytes.
 
    ================================================================================================ */
 using constants::fullMaxInt;
@@ -212,11 +225,22 @@ uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
 template<typename Tval>
 uint32_t private_hash_flt(Tval key) noexcept
 {
-	static const size_t vSize = sizeof(Tval);
-	static       char   buf[vSize + 1];
+	static const size_t  vSize  = sizeof(Tval);
+	static const size_t  vShift = std::trunc((4. / (float)vSize) * 8.);
+	static       uint8_t buf[vSize + 1];
+	uint32_t xHash = 0;
+
+	// reset buffer and copy key binary:
 	memset(buf, 0, vSize + 1);
-	memcpy(buf, reinterpret_cast<char*>(&key), vSize);
-	return private_hash_str(buf, vSize);
+	memcpy(buf, reinterpret_cast<uint8_t*>(&key), vSize);
+
+//	return private_hash_str(buf, vSize);
+
+	// Now mix the bytes into our hash key
+	for (size_t pos = 0; pos < vSize; ++pos)
+		xHash ^= static_cast<uint32_t>(buf[pos]) << (pos * vShift);
+
+	return xHash;
 }
 
 } // namespace private_
