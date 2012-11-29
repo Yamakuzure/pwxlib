@@ -72,11 +72,24 @@ Statistics with 10M Hashes (65535 for (uint16_t)) after the following changes:
    int64_t     |  9,988,454 |  99.88 % |  9,976,745 |  99.88 % | Random is great, Hash is is great!
    uint64_t    |  9,988,427 |  99.88 % |  9,976,682 |  99.88 % | Random is great, Hash is is great!
    C-String    | 10,000,000 | 100.00 % |  9,987,110 |  99.87 % | Random is perfect, Hash is is great!
+   ------------+------------+----------+------------+----------+--------------------------------------
   Result: The floating point hashing has improved greatly. But the random result for float suggests,
           that a higher integer range is needed. And the hash result for double and long double is
           far from being really good. Maybe it would be better tp mix the floating point bytes directly
           into an uint32_t hash.
           And for (u)int16_t a specialized hash loop is needed that simply goes from lowest to max.
+
+Statistics with 65535 hashes for (u)int16_t after the following changes:
+	1) Added a specialized builder that does no longer use random values but simply loops through the
+	   range of int16_t.
+   ------------+------------+----------+------------+----------+--------------------------------------
+   Type        | Unique rand|    Quota | Unique Hash|    Quota | Result
+   ------------+------------+----------+------------+----------+--------------------------------------
+   int16_t     |        n/a |      n/a |     65,535 | 100.00 % | Hash is perfect!
+   uint16_t    |        n/a |      n/a |     65,535 | 100.00 % | Hash is perfect!
+   ------------+------------+----------+------------+----------+--------------------------------------
+  Result: Every single value for (u)int16_t results in a unique hash value. fine!
+
    ================================================================================================ */
 using constants::fullMaxInt;
 using constants::fullMaxLong;
