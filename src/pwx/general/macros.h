@@ -208,7 +208,7 @@
 #  define PWX_LOCK_NOEXCEPT(object) { \
 		if (object) { \
 			PWX_TRY(object->lock()) \
-			PWX_CATCH_AND_FORGET(CException) \
+			PWX_CATCH_AND_FORGET(pwx::CException) \
 	} }
 #else
 #  define PWX_LOCK_NOEXCEPT(object) { }
@@ -255,7 +255,7 @@
 #  define PWX_UNLOCK_NOEXCEPT(object) { \
 		if (object) { \
 			PWX_TRY(object->unlock()) \
-			PWX_CATCH_AND_FORGET(CException) \
+			PWX_CATCH_AND_FORGET(pwx::CException) \
 	} }
 #else
 #  define PWX_UNLOCK_NOEXCEPT(object) { }
