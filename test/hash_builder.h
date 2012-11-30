@@ -24,6 +24,7 @@ using std::chrono::milliseconds;
 
 #include <pwx.h>
 using pwx::RNG;
+using pwx::adjRight;
 
 /// @internal build a numerical hash list
 template<typename T>
@@ -41,14 +42,14 @@ int32_t build_hash_list_num(string &outfile, int32_t cnt_)
 
 	// Correct maxTval/minTval if this is no integer
 	if (isSameType(T, float)) {
+		maxTval = (T)500000.0;
+		minTval = (T)-500000.0;
+	} else if (isSameType(T, double)) {
 		maxTval = (T)50000.0;
 		minTval = (T)-50000.0;
-	} else if (isSameType(T, double)) {
+	} else if (isSameType(T, long double)) {
 		maxTval = (T)5000.0;
 		minTval = (T)-5000.0;
-	} else if (isSameType(T, long double)) {
-		maxTval = (T)500.0;
-		minTval = (T)-500.0;
 	}
 
 	T randVal;
@@ -60,7 +61,14 @@ int32_t build_hash_list_num(string &outfile, int32_t cnt_)
 
 	for (int32_t cnt = 0 ; out.good() && (cnt < cnt_); ++cnt) {
 		randVal = RNG.random(minTval, maxTval);
-		out << randVal << ";" << RNG.hash(randVal) << endl;
+		if (isSameType(T,float))
+			out << adjRight(7,4) << randVal << ";" << RNG.hash(randVal) << endl;
+		else if (isSameType(T,double))
+			out << adjRight(6,8) << randVal << ";" << RNG.hash(randVal) << endl;
+		else if (isSameType(T,long double))
+			out << adjRight(5,12) << randVal << ";" << RNG.hash(randVal) << endl;
+		else
+			out << randVal << ";" << RNG.hash(randVal) << endl;
 	}
 
 	hrTime_t tEnd = hrClock::now();
