@@ -60,6 +60,7 @@
 		<Unit filename="../src/pwx/general/macros.h" />
 		<Unit filename="../src/pwx/general/templates.h" />
 		<Unit filename="../src/pwx/internal/CRandomConstants.h" />
+		<Unit filename="../src/pwx/internal/CRandomTHash.cpp" />
 		<Unit filename="../src/pwx/internal/CRandomTHash.h" />
 		<Unit filename="../src/pwx/internal/CRandomTRandom.h" />
 		<Unit filename="../src/pwx/internal/CRandomWordConstants.h" />

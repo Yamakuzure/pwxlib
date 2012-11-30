@@ -27,7 +27,9 @@ using pwx::adjRight;
 typedef int32_t data_t;
 
 /// Number of elements to use with all mass and speed tests
-const uint32_t maxElements = 500000;
+//const uint32_t maxElements = 500000;
+// Low number of valgrind testing:
+const uint32_t maxElements = 10000;
 /// Number of threads to launch for parallel testing
 const uint32_t maxThreads  = 8;
 
