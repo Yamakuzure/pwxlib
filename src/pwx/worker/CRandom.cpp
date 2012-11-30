@@ -880,7 +880,7 @@ uint32_t CRandom::hash (uint64_t key) const noexcept
 **/
 uint32_t CRandom::hash (float key) const noexcept
 {
-	return private_::private_hash_flt<float>(key);
+	return private_::private_hash_flt<float>(&key);
 }
 
 
@@ -891,7 +891,7 @@ uint32_t CRandom::hash (float key) const noexcept
 **/
 uint32_t CRandom::hash (double key) const noexcept
 {
-	return private_::private_hash_flt<double>(key);
+	return private_::private_hash_flt<double>(&key);
 }
 
 
@@ -902,7 +902,7 @@ uint32_t CRandom::hash (double key) const noexcept
 **/
 uint32_t CRandom::hash (long double key) const noexcept
 {
-	return private_::private_hash_flt<long double>(key);
+	return private_::private_hash_flt<long double>(&key);
 }
 
 

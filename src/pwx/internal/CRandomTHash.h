@@ -28,8 +28,10 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include "pwx/general/compiler.h"
 #include "pwx/general/macros.h"
 #include "pwx/internal/CRandomConstants.h"
+#include <cstdlib>
 #include <type_traits>
 #include <cmath>
 
@@ -103,7 +105,28 @@ Statistics with 10M hashes for float, double, long double after changing to a di
 		  with long double. XORing 8/16 bytes into four with 4/2 bit shift seems to destroy certain
 		  hash values. The solution tried next will be to do some more inter-mixing of the bytes.
 
+Statistics with 100M (!) hashes for everything after rewriting the float hash function:
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+   Type        | Unique rand |    Quota | Unique Hash |    Quota | Result
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+   Long Double |  98,841,301 |  98.84 % |  96,714,170 |  97.85 % | Random is great, Hash is great!
+   Double      |  98,845,336 |  98.85 % |  97,611,543 |  98.75 % | Random is great, Hash is great!
+   Float       |  48,479,805 |  48.48 % |  45,315,059 |  93.47 % | Random is bad, Hash is very good!
+   int32_t     |  98,845,792 |  98.85 % |  98,845,792 | 100.00 % | Random is great, Hash is is perfect!
+   uint32_t    |  98,843,940 |  98.84 % |  98,843,940 | 100.00 % | Random is great, Hash is is perfect!
+   int64_t     |  98,843,912 |  98.84 % |  97,715,073 |  98.86 % | Random is great, Hash is is great!
+   uint64_t    |  98,845,554 |  98.85 % |  97,719,178 |  98.86 % | Random is great, Hash is is great!
+   C-String    | 100,000,000 | 100.00 % |  98,723,200 |  99.87 % | Random is perfect, Hash is is great!
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+  Result: I think this is the final version for now. The low number of unique random floats is mainly
+          the result of not finding a good range for testing. But everything else looks splendid now.
+
    ================================================================================================ */
+
+// Prototype for "inline = outline" methods
+PWX_PRIVATE_INLINE uint32_t private_hash_str(const char* key, size_t keyLen) noexcept;
+PWX_PRIVATE_INLINE uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept;
+
 using constants::fullMaxInt;
 using constants::fullMaxLong;
 
@@ -181,67 +204,15 @@ uint32_t private_hash_int(Tval key) noexcept
 }
 
 
-/// @internal hash handler for strings. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
-{
-	uint32_t part  = 0, sum = 0;
-	size_t   len   = keyLen ? keyLen : strlen(key);
-	size_t   phase = 0, level = 0;
-
-	// Quick exit if there is no string:
-	if (0 == len)
-		return 0;
-
-	// We need unsigned values to not overflow anything:
-	const uint8_t* keyBuf = reinterpret_cast<const uint8_t*>(key);
-
-	// loop through the string and combine
-	// groups of four to the sum
-	for (size_t pos = 0; pos < len; ++pos) {
-		phase = pos % 4;
-		part |= static_cast<uint32_t>(keyBuf[pos] << (phase * 8));
-		if (3 == phase) {
-			level = pos % 3;
-			if (1 == level)
-				sum |= part >> 1;
-			else if (2 == level)
-				sum ^= part << 4;
-			else
-				sum += part >> 2;
-			part = 0;
-		} // End of adding result
-	} // end of going through the string
-
-	// If there is something in part left, it has to be added:
-	if (part)
-		sum += part >> 4;
-
-	// The sum is then a nice uint32_t key:
-	return private_hash_int<uint32_t>(sum);
-}
-
-
-/// @internal hash handler for floats. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+/// @internal hash handler for float and (long) double. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 template<typename Tval>
-uint32_t private_hash_flt(Tval key) noexcept
+uint32_t private_hash_flt(const Tval* key) noexcept
 {
 	static const size_t  vSize  = sizeof(Tval);
-	static const size_t  vShift = std::trunc((4. / (float)vSize) * 8.);
-	static       uint8_t buf[vSize + 1];
-	uint32_t xHash = 0;
-
-	// reset buffer and copy key binary:
-	memset(buf, 0, vSize + 1);
-	memcpy(buf, reinterpret_cast<uint8_t*>(&key), vSize);
-
-//	return private_hash_str(buf, vSize);
-
-	// Now mix the bytes into our hash key
-	for (size_t pos = 0; pos < vSize; ++pos)
-		xHash ^= static_cast<uint32_t>(buf[pos]) << (pos * vShift);
-
-	return xHash;
+	const uint8_t* buf_ptr = reinterpret_cast<const uint8_t*>(key);
+	return private_hash_buf(buf_ptr, vSize);
 }
+
 
 } // namespace private_
 
