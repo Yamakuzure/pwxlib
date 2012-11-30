@@ -878,7 +878,7 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
-			PWX_LOCK(this)
+			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem)
@@ -918,7 +918,7 @@ private:
 			elem->next = nullptr;
 			elem->prev = nullptr;
 			--eCount;
-			PWX_UNLOCK(this)
+			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
 
@@ -977,7 +977,7 @@ private:
 	/// @brief simple wrapper to prepare the removal of an element before another element
 	virtual elem_t* privRemoveBeforeElem(elem_t* next)
 	{
-		PWX_LOCK(next)
+		PWX_LOCK_GUARD(list_t, this)
 
 #ifdef PWX_THREADDEBUG
 		if (next->destroyed()) {
@@ -996,8 +996,6 @@ private:
 		elem_t* toRemove = next ? next->prev : tail;
 
 		privRemove (toRemove->prev, toRemove);
-
-		PWX_UNLOCK(next)
 
 		return toRemove;
 	}

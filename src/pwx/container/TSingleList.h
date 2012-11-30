@@ -1110,7 +1110,7 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
-			PWX_LOCK(this)
+			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem)
@@ -1147,7 +1147,7 @@ private:
 			// Finally elem does not need pointers to its neighbors any more
 			elem->next = nullptr;
 			--eCount;
-			PWX_UNLOCK(this)
+			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
 
@@ -1174,7 +1174,7 @@ private:
 	/// @brief remove the element after the specified element
 	virtual elem_t* privRemoveAfterElement(elem_t* prev)
 	{
-		PWX_LOCK(prev)
+		PWX_LOCK_GUARD(list_t, this)
 
 #ifdef PWX_THREADDEBUG
 		if (prev->destroyed()) {
@@ -1192,8 +1192,6 @@ private:
 
 		elem_t* toRemove = prev ? prev->next : head;
 		privRemove (prev, toRemove);
-
-		PWX_UNLOCK(prev)
 
 		return toRemove;
 	}

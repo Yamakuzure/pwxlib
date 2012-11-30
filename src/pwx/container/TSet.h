@@ -601,29 +601,20 @@ private:
 
 #ifdef PWX_THREADDEBUG
 		if (prevElement) {
-			PWX_LOCK(prevElement)
 			while (prevElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a next, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && prevElement->next) {
-					PWX_LOCK(prevElement->next)
-					PWX_UNLOCK(prevElement)
+				if ((eCount > 1) && prevElement->next)
 					prevElement = prevElement->next;
-				}
-				else if (eCount < 2) {
-					PWX_UNLOCK(prevElement)
+				else if (eCount < 2)
 					prevElement = nullptr; // New head about
-				}
-				else {
-					PWX_UNLOCK(prevElement)
+				else
 					// my bad...
 					PWX_THROW("Illegal Condition", "Previous element destroyed",
 							  "An element used as prev for insertion is destroyed.")
-				}
 			} // End of ensuring a valid prevElement
 		}
-		if (prevElement) PWX_UNLOCK(prevElement)
 #endif // PWX_THREADDEBUG
 
 		// 2: Create a new element
@@ -686,25 +677,16 @@ private:
 
 #ifdef PWX_THREADDEBUG
 		if (prevElement) {
-			PWX_LOCK(prevElement)
 			while (prevElement->destroyed()) {
-				if ((eCount > 1) && prev->next) {
-					PWX_LOCK(prevElement->next)
-					PWX_UNLOCK(prevElement)
+				if ((eCount > 1) && prev->next)
 					prevElement = prevElement->next;
-				}
-				else if (eCount < 2) {
-					PWX_UNLOCK(prevElement)
+				else if (eCount < 2)
 					prevElement = nullptr; // New head about
-				}
-				else {
-					PWX_UNLOCK(prevElement)
+				else
 					PWX_THROW("Illegal Condition", "Previous element destroyed",
 							  "An element used as prev for insertion is destroyed.")
-				}
 			} // End of ensuring a valid prevElement
 		}
-		if (prevElement) PWX_UNLOCK(prevElement)
 #endif // PWX_THREADDEBUG
 
 		// 2: Check source:
@@ -770,29 +752,20 @@ private:
 
 #ifdef PWX_THREADDEBUG
 		if (nextElement) {
-			PWX_LOCK(nextElement)
 			while (nextElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && nextElement->prev) {
-					PWX_LOCK(nextElement->prev)
-					PWX_UNLOCK(nextElement)
+				if ((eCount > 1) && nextElement->prev)
 					nextElement = nextElement->prev;
-				}
-				else if (eCount < 2) {
-					PWX_UNLOCK(nextElement)
+				else if (eCount < 2)
 					nextElement = nullptr; // New head about
-				}
-				else {
-					PWX_UNLOCK(nextElement)
+				else
 					// my bad...
 					PWX_THROW("Illegal Condition", "Next element destroyed",
 							  "An element used as next for insertion is destroyed.")
-				}
 			} // End of ensuring a valid nextElement
 		}
-		if (nextElement) PWX_UNLOCK(nextElement)
 #endif // PWX_THREADDEBUG
 
 		// 2: Create a new element
@@ -858,29 +831,20 @@ private:
 
 #ifdef PWX_THREADDEBUG
 		if (nextElement) {
-			PWX_LOCK(nextElement)
 			while (nextElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && nextElement->prev) {
-					PWX_LOCK(nextElement->prev)
-					PWX_UNLOCK(nextElement)
+				if ((eCount > 1) && nextElement->prev)
 					nextElement = nextElement->prev;
-				}
-				else if (eCount < 2) {
-					PWX_UNLOCK(nextElement)
+				else if (eCount < 2)
 					nextElement = nullptr; // New head about
-				}
-				else {
-					PWX_UNLOCK(nextElement)
+				else
 					// my bad...
 					PWX_THROW("Illegal Condition", "Next element destroyed",
 							  "An element used as next for insertion is destroyed.")
-				}
 			} // End of ensuring a valid nextElement
 		}
-		if (nextElement) PWX_UNLOCK(nextElement)
 #endif // PWX_THREADDEBUG
 
 		// 2: Check source:
