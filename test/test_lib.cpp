@@ -31,7 +31,6 @@ int32_t main()
 			PWX_TRY_PWX_FURTHER (result = testSet<set_t> (env))
 		}
 
-/* Put away for debugging testRNG
 		// --- test the speed of the containers ---
 		if (EXIT_SUCCESS == result) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
@@ -78,7 +77,6 @@ int32_t main()
 		if (EXIT_SUCCESS == result) {
 			PWX_TRY_PWX_FURTHER (result = testSpeedMT<set_t> (env))
 		}
--------- */
 
 		// --- Test RNG worker ---
 		if (EXIT_SUCCESS == result ) {
