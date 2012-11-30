@@ -53,22 +53,14 @@ uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
 /// IMPORTANT: max keyLen is 32!
 uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept
 {
-	uint8_t buf[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0 };
 	uint32_t xHash = 0, part = 0;
 	size_t   phase = 0, tgtPos = 24;
 	bool     isMixed = false;
 
-	memcpy(buf, key, keyLen > 32 ? 32 : keyLen);
-
 	// Now mix the bytes into our hash key
 	for (size_t pos = 0; pos < keyLen; ++pos) {
-		phase = pos % 3;
-		if (buf[pos]) {
-			// Only add present bits!
-			part |= static_cast<uint32_t>(buf[pos]) << tgtPos;
+		if (key[pos]) {
+			part |= static_cast<uint32_t>(key[pos]) << tgtPos;
 
 			// If all positions are filled, add the part to xHash
 			if (0 == tgtPos) {
@@ -79,6 +71,7 @@ uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept
 					isMixed = true;
 
 				// Now add our part to xHash
+				phase = pos % 4;
 				if (2 == phase)
 					xHash |= part >> 1;
 				else if (1 == phase)
@@ -88,7 +81,7 @@ uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept
 				part = 0;
 			} else
 				tgtPos -= 8;
-		} // End of having a byte to add
+		} // End of having non-zero byte
 	} // End of looping through the source
 
 	// If there is something in part left, it has to be added:

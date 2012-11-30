@@ -121,6 +121,17 @@ Statistics with 100M (!) hashes for everything after rewriting the float hash fu
   Result: I think this is the final version for now. The low number of unique random floats is mainly
           the result of not finding a good range for testing. But everything else looks splendid now.
 
+Statistics with 10M hashes for float and (long) double after a slight change (phase shift) to the
+hash algorithm, and a better production of random values:
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+   Type        | Unique rand |    Quota | Unique Hash |    Quota | Result
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+   Long Double |  9988379 |  98.88 % |  9947530 |  99.59% | Random is great, Hash is great!
+   Double      |  9988475 |  98.88 % |  9952956 |  99.64 % | Random is great, Hash is great!
+   Float       |  9067506 |  90.68 % |  9011867 |  99.39 % | Random is very good, Hash is great!
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+  Result: I think we can leave it now as is.
+
    ================================================================================================ */
 
 // Prototype for "inline = outline" methods
