@@ -3,28 +3,33 @@
 #define PWX_LIBPWX_TESTLIB_TESTSPEED_H_INCLUDED 1
 
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
-
+#include <pwx/types/CLockable.h>
+#include <pwx/types/CException.h>
+#include <pwx/general/macros.h>
 
 /// @brief struct doing synchronized start/stop for additions of items into containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
 template<typename list_t>
-struct thAdder
+struct thAdder : public pwx::CLockable
 {
 	bool    isRunning = false;
 	list_t* cont      = nullptr;
 
 	explicit thAdder(bool autostart) : isRunning(autostart) { }
-	thAdder() { thAdder(false); }
+	thAdder():thAdder(false) { }
 
 	/// @brief the working functions, called manually or by std::thread
 	void operator()(list_t* cont_, data_t start, data_t toAdd, data_t maxAdd)
 	{
+		PWX_LOCK_NOEXCEPT(this)
 		cont = cont_;
 #ifdef PWX_THREADS
 		milliseconds sleepTime( 1 );
 		while (!isRunning) {
+			PWX_UNLOCK_NOEXCEPT(this)
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
+			PWX_LOCK_NOEXCEPT(this)
 		}
 #endif
 		if (cont) {
@@ -35,13 +40,14 @@ struct thAdder
 		}
 
 		isRunning = false;
+		PWX_UNLOCK_NOEXCEPT(this)
 	}
 };
 
 /// @brief struct doing synchronized start/stop for clearing containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart on creation !
 template<typename list_t>
-struct thClearer
+struct thClearer : public pwx::CLockable
 {
 	bool    isRunning = false;
 	list_t* cont      = nullptr;
@@ -52,17 +58,21 @@ struct thClearer
 	/// @brief the working functions, called manually or by std::thread
 	void operator()(list_t* cont_)
 	{
+		PWX_LOCK(this)
 		cont = cont_;
 #ifdef PWX_THREADS
 		milliseconds sleepTime( 1 );
 		while (!isRunning) {
+			PWX_UNLOCK(this)
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
+			PWX_LOCK(this)
 		}
 #endif
 		if (cont) cont->clear();
 
 		isRunning = false;
+		PWX_UNLOCK(this)
 	}
 };
 
@@ -218,16 +228,21 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Starting in a loop
 	hrTime_t startTimeAdd = hrClock::now();
-    for (size_t nr = 0; nr < maxThreads; ++nr)
+    for (size_t nr = 0; nr < maxThreads; ++nr) {
+		PWX_LOCK_NOEXCEPT( (&adders[nr]) )
 		adders[nr].isRunning = true;
+		PWX_UNLOCK_NOEXCEPT( (&adders[nr]) )
+    }
 
     // ... joining in a loop.
     bool isFinished = false;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
+			PWX_LOCK_NOEXCEPT( (&adders[nr]) )
 			if (adders[nr].isRunning)
 				isFinished = false;
+			PWX_UNLOCK_NOEXCEPT( (&adders[nr]) )
 		}
 		if (isFinished) {
 			for (size_t nr = 0; nr < maxThreads; ++nr) {
@@ -249,16 +264,21 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Starting in a loop
 	hrTime_t startTimeClr = hrClock::now();
-    for (size_t nr = 0; nr < maxThreads; ++nr)
+    for (size_t nr = 0; nr < maxThreads; ++nr) {
+		PWX_LOCK_NOEXCEPT( (&clearers[nr]) )
 		clearers[nr].isRunning = true;
+		PWX_UNLOCK_NOEXCEPT( (&clearers[nr]) )
+    }
 
     // ... joining in a loop.
     isFinished = false;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
+			PWX_LOCK_NOEXCEPT( (&clearers[nr]) )
 			if (clearers[nr].isRunning)
 				isFinished = false;
+			PWX_UNLOCK_NOEXCEPT( (&clearers[nr]) )
 		}
 		if (isFinished) {
 			for (size_t nr = 0; nr < maxThreads; ++nr) {
