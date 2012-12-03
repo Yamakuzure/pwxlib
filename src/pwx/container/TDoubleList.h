@@ -131,23 +131,27 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
+		PWX_LOCK_NOEXCEPT(this)
 		while (eCount) {
 			try {
 #ifdef PWX_THREADS
-				PWX_LOCK_NOEXCEPT(this)
 				elem_t* toDelete = tail;
 				if (eCount && toDelete && !toDelete->destroyed()) {
 					privRemove(toDelete->prev, toDelete);
 					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
-				} else
+				} else {
 					PWX_UNLOCK_NOEXCEPT(this)
+					std::this_thread::yield();
+				}
+				PWX_LOCK_NOEXCEPT(this)
 #else
 				privDelete(remElem(tail));
 #endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
 		}
+		PWX_UNLOCK_NOEXCEPT(this)
 	}
 
 

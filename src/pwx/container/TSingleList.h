@@ -128,23 +128,27 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
+		PWX_LOCK_NOEXCEPT(this)
 		while (eCount) {
 			try {
 #ifdef PWX_THREADS
-				PWX_LOCK_NOEXCEPT(this)
 				elem_t* toDelete = head;
 				if (eCount && toDelete && !toDelete->destroyed()) {
 					privRemove(nullptr, toDelete);
 					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
-				} else
+				} else {
 					PWX_UNLOCK_NOEXCEPT(this)
+					std::this_thread::yield();
+				}
+				PWX_LOCK_NOEXCEPT(this)
 #else
 				privDelete(remNext(nullptr));
 #endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
 		}
+		PWX_UNLOCK_NOEXCEPT(this)
 	}
 
 
@@ -518,7 +522,10 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (tail, data))
+		PWX_LOCK(this)
+		elem_t* xTail = tail;
+		PWX_UNLOCK(this)
+		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (xTail, data))
 	}
 
 
@@ -532,7 +539,10 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (tail, src))
+		PWX_LOCK(this)
+		elem_t* xTail = tail;
+		PWX_UNLOCK(this)
+		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (xTail, src))
 	}
 
 
