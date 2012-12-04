@@ -141,12 +141,12 @@ public:
 					PWX_UNLOCK_NOEXCEPT(this)
 					std::this_thread::yield();
 				}
-				PWX_LOCK_NOEXCEPT(this)
 #else
 				privDelete(remNext(nullptr));
 #endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
+			PWX_LOCK_NOEXCEPT(this)
 		}
 		PWX_UNLOCK_NOEXCEPT(this)
 	}
@@ -453,11 +453,14 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		if (eCount > 1) {
+		PWX_LOCK_NOEXCEPT(this)
+		uint32_t localCount = eCount;
+		PWX_UNLOCK_NOEXCEPT(this)
+		if (localCount > 1) {
 			PWX_TRY (return remNextElem (const_cast<elem_t* > (privGetElementByIndex (-2))))
 			PWX_CATCH_AND_FORGET (CException)
 		}
-		else if (eCount) {
+		else if (localCount) {
 			PWX_TRY (return remNext (nullptr))
 			PWX_CATCH_AND_FORGET (CException)
 		}
@@ -476,7 +479,10 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		if (eCount) {
+		PWX_LOCK_NOEXCEPT(this)
+		uint32_t localCount = eCount;
+		PWX_UNLOCK_NOEXCEPT(this)
+		if (localCount) {
 			PWX_TRY (return remNext (nullptr))
 			PWX_CATCH_AND_FORGET (CException)
 		}
@@ -759,7 +765,11 @@ protected:
 	/// @brief Search until the current element contains the searched data
 	virtual const elem_t* protFind (const data_t* data) const noexcept
 	{
-		elem_t* xCurr = curr; // Local pointer, a big lock is no longer needed.
+		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+		// Use local values of *now*, no big lock needed, then.
+		elem_t*  xCurr      = curr;
+		uint32_t localCount = eCount;
+		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 		if (nullptr == xCurr)
 			return nullptr;
@@ -769,9 +779,9 @@ protected:
 			return xCurr;
 
 		// The next does only make sense if we have more than one element
-		if (eCount > 1) {
+		if (localCount > 1) {
 			// Exit if head is wanted...
-			PWX_LOCK(const_cast<list_t*>(this))
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			if (head->data.get() == data) {
 				curr = head;
 				eNr  = 0;
@@ -786,7 +796,7 @@ protected:
 			}
 
 			// Otherwise search for the previous item, it's the next, then
-			PWX_UNLOCK(const_cast<list_t*>(this))
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			elem_t* prev = privFindPrev (data);
 			if (prev)
 				return prev->next;
@@ -854,10 +864,13 @@ private:
 	 *            where appropriate.
 	*/
 
-	/// @brief Delete the element behind @a prev
+	/// @brief Delete the element @a removed
 	virtual uint32_t privDelete(elem_t* removed)
 	{
 		try {
+			PWX_LOCK_NOEXCEPT(this)
+			uint32_t localCount = eCount;
+			PWX_UNLOCK_NOEXCEPT(this)
 			if (removed) {
 				PWX_LOCK(removed)
 				if (!removed->destroyed())
@@ -867,7 +880,7 @@ private:
 				else
 					PWX_UNLOCK(removed)
 			}
-			return eCount;
+			return localCount;
 		}
 		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TSingleList::privDelete() failed.")
 	}
@@ -876,20 +889,24 @@ private:
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		elem_t*  prev  = head;
-		elem_t*  xCurr = prev->next;
+		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+		elem_t*  xPrev = head;
+		elem_t*  xTail = tail;
+		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+
+		elem_t*  xCurr = xPrev->next;
 		uint32_t xNr   = 1;
 
-		while (prev != tail) {
+		while (xPrev && (xPrev != xTail)) {
 			if (xCurr->data.get() == data) {
-				PWX_LOCK(const_cast<list_t*>(this))
+				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr = xCurr;
 				eNr  = xNr;
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return prev;
+				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				return xPrev;
 			}
 			++xNr;
-			prev  = xCurr;
+			xPrev = xCurr;
 			xCurr = xCurr->next;
 		}
 
@@ -901,21 +918,27 @@ private:
 	/// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
-		if (eCount) {
+		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+		uint32_t localCount = eCount;
+		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+
+		if (localCount) {
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
-												   ? eCount - (std::abs (index) % eCount)
-												   : index % eCount);
+												   ? localCount - (std::abs (index) % localCount)
+												   : index % localCount);
 			// Unfortunately this results in xIdx equaling eCount
 			// (which is wrong) if index is a negative multiple of
 			// eCount:
-			if (xIdx >= eCount)
-				xIdx = xIdx % eCount;
+			if (xIdx >= localCount)
+				xIdx = xIdx % localCount;
 
-			PWX_LOCK(const_cast<list_t*>(this))
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+			elem_t*  xHead = head;
+			elem_t*  xTail = tail;
 			elem_t*  xCurr = curr;
 			uint32_t xNr   = eNr;
-			PWX_UNLOCK(const_cast<list_t*>(this))
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 			// Is xCurr already correct?
 			if (xIdx == xNr)
@@ -924,41 +947,62 @@ private:
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
 				xCurr = xCurr->next;
-				PWX_LOCK(const_cast<list_t*>(this))
+				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr  = xCurr;
-				eNr   = xNr + 1;
-				PWX_UNLOCK(const_cast<list_t*>(this))
+				eNr   = xNr;
+				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
 			// Is it the head we want?
 			if (0 == xIdx)
-				return head;
+				return xHead;
 
 			// Or tail ?
-			if ( (eCount - 1) == xIdx)
-				return tail;
+			if ( (localCount - 1) == xIdx)
+				return xTail;
 
 			// Ok, let's go. But only start from head if we currently are beyond.
-			if (xIdx < eNr) {
-				xCurr = head->next;
+			if (xIdx < xNr) {
+				xCurr = xHead->next;
 				xNr  = 1;
 			}
+
 			// Otherwise the next of xCurr is already checked, so skip it
 			else {
 				xCurr = xCurr->next;
 				++xNr;
 			}
+
 			// Now look into the rest
-			while ( (xNr < xIdx) && (xNr < (eCount - 1))) {
+			while ( xCurr && (xNr < xIdx) && (xNr < (localCount - 1))) {
 				xCurr = xCurr->next;
 				++xNr;
+
+				// if Another thread deletes any element during this search,
+				// and if this element was in our path, we reach the already
+				// checked xHead and xTail.
+				// To solve this bad situation a big lock is imposed and a
+				// recursive call will eventually find the correct location.
+				if (xTail == xCurr) {
+					try {
+						PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+						// Note: We do not set curr and eNr to tail, because
+						// We actually reached xTail. This could be somewhere
+						// else right now.
+						curr = xCurr;
+						eNr  = xNr;
+						return privGetElementByIndex(index);
+					}
+					PWX_CATCH_AND_FORGET(std::exception)
+				}
 			}
+
 			// xCurr is sure to be pointing where it should now.
-			PWX_LOCK(const_cast<list_t*>(this))
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			curr = xCurr;
 			eNr  = xNr;
-			PWX_UNLOCK(const_cast<list_t*>(this))
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			return xCurr;
 		}
 

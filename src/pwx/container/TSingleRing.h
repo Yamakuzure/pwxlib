@@ -273,6 +273,9 @@ public:
 	}
 
 
+	using base_t::pop;
+
+
 	/** @brief alias to remove the last element (tail)
 	  *
 	  * You have to delete the removed element by yourself. If you do not intent
@@ -286,12 +289,10 @@ public:
 	{
 		elem_t* toRemove = nullptr;
 		try {
-			PWX_LOCK_NOEXCEPT(this)
 			if (eCount > 1)
 				toRemove = base_t::remNextElem (base_t::operator[] (-2));
 			else if (eCount)
 				toRemove = remNext (nullptr);
-			PWX_UNLOCK_NOEXCEPT(this)
 			if (toRemove)
 				privConnectEnds();
 		}
@@ -313,16 +314,17 @@ public:
 	{
 		elem_t* toRemove = nullptr;
 		try {
-			PWX_LOCK_NOEXCEPT(this)
 			if (eCount)
 				toRemove = base_t::remNext(nullptr);
-			PWX_UNLOCK_NOEXCEPT(this)
 			if (toRemove)
 				privConnectEnds();
 		}
 		PWX_CATCH_AND_FORGET(CException)
 		return toRemove;
 	}
+
+
+	using base_t::push;
 
 
 	/** @brief alias to add a data pointer to the end of the ring.
@@ -335,7 +337,10 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, data))
+		PWX_LOCK(this)
+		elem_t* xTail = tail;
+		PWX_UNLOCK(this)
+		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, data))
 		privConnectEnds();
 		return eCount;
 	}
@@ -351,6 +356,9 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
+		PWX_LOCK(this)
+		elem_t* xTail = xTail;
+		PWX_UNLOCK(this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, src))
 		privConnectEnds();
 		return eCount;
