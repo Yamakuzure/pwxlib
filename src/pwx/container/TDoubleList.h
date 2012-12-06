@@ -27,8 +27,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/container/TSingleList.h>
-#include <pwx/types/TDoubleElement.h>
+#include "pwx/container/TSingleList.h"
+#include "pwx/types/TDoubleElement.h"
 
 namespace pwx
 {
@@ -103,12 +103,10 @@ public:
 		// The copy ctor of base_t has already copied all elements.
 		// But they do not have a valid prev pointer, yet.
 		curr = head;
-		eNr  = 0;
-		while (eNr < (eCount - 1)) {
+		while (curr != tail) {
 			if (curr && curr->next)
 				curr->next->prev = curr;
 			curr = curr->next;
-			++eNr;
 		}
 	}
 
@@ -131,12 +129,13 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
+		uint32_t localCount = size();
 		PWX_LOCK_NOEXCEPT(this)
-		while (eCount) {
+		while (localCount) {
 			try {
 #ifdef PWX_THREADS
 				elem_t* toDelete = tail;
-				if (eCount && toDelete && !toDelete->destroyed()) {
+				if (localCount && toDelete && !toDelete->destroyed()) {
 					privRemove(toDelete->prev, toDelete);
 					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
@@ -149,6 +148,7 @@ public:
 #endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
+			localCount = size();
 			PWX_LOCK_NOEXCEPT(this)
 		}
 		PWX_UNLOCK_NOEXCEPT(this)
@@ -241,9 +241,7 @@ public:
 	}
 
 
-	// empty() provided by base_t
-
-
+	using base_t::empty;
 	using base_t::find;
 	using base_t::get;
 	using base_t::getData;
@@ -344,7 +342,32 @@ public:
 
 
 	using base_t::pop;
-	using base_t::pop_back;
+
+
+	/** @brief alias to remove the last element (tail)
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the list is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the list is empty
+	**/
+	virtual elem_t* pop_back() noexcept
+	{
+		uint32_t localCount = size();
+		if (localCount > 1) {
+			PWX_TRY (return remNextElem (tail->prev))
+			PWX_CATCH_AND_FORGET (CException)
+		}
+		else if (localCount) {
+			PWX_TRY (return remNext (nullptr))
+			PWX_CATCH_AND_FORGET (CException)
+		}
+		return nullptr;
+	}
+
+
 	using base_t::pop_front;
 	using base_t::push;
 	using base_t::push_back;
@@ -443,6 +466,9 @@ public:
 	}
 
 
+	using base_t::size;
+
+
 	/* ===============================================
 	 * === Public operators                        ===
 	 * ===============================================
@@ -464,41 +490,40 @@ protected:
 	using base_t::protFind;
 
 	/// @brief simple method to insert an element into the list
-	virtual uint32_t protInsert (elem_t* prev, elem_t* elem) noexcept
+	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem) noexcept
 	{
-		PWX_LOCK(this)
-		if (prev) {
-			if (tail == prev)
-				tail = elem;
-			elem->next = prev->next;
-			if (elem->next)
-				elem->next->prev = elem;
-			prev->next = elem;
-			elem->prev = prev;
-			// curr is only maintainable if it is prev
-			if (curr != prev) {
-				// In which case it wouldn't have needed any change.
-				curr = head;
-				eNr  = 0;
-			}
-		} else if (eCount) {
-			elem->next = head;
+		uint32_t localCount = size();
+
+		PWX_LOCK_NOEXCEPT(this)
+		if (insPrev) {
+			// Maintain tail first
+			if (tail == insPrev)
+				tail = insElem;
+			// Then take care of a possible next neighbor
+			insElem->next = insPrev->next;
+			if (insElem->next)
+				insElem->next->prev = insElem;
+			// And the previous, of course
+			insPrev->next = insElem;
+			insElem->prev = insPrev;
+		} else if (localCount) {
+			insElem->next = head;
 			if (head)
-				head->prev = elem;
-			head = elem;
-			++eNr; // No matter what happened, curr has another element before it now.
+				head->prev = insElem;
+			head = insElem;
 		} else {
-			// If we had no elements yet, head and tail need to be set:
-			head = elem;
-			tail = elem;
-			curr = head;
+			// If we had no insElements yet, head and tail need to be set:
+			head = insElem;
+			tail = insElem;
 		}
 
-		uint32_t xCount = ++eCount;
+		// Set curr and renumber the list
+		curr = insElem;
+		curr->setNr(insPrev ? insPrev->getNr() + 1 : 0, head, tail);
 
-		PWX_UNLOCK(this)
+		PWX_UNLOCK_NOEXCEPT(this)
 
-		return xCount;
+		return (localCount + 1);
 	}
 
 
@@ -507,8 +532,6 @@ protected:
 	 * ===============================================
 	*/
 
-	using base_t::eCount;
-	using base_t::eNr;
 	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
@@ -530,9 +553,9 @@ private:
 	virtual uint32_t privDelete(elem_t* removed)
 	{
 		try {
-			PWX_LOCK_NOEXCEPT(this)
-			uint32_t localCount = eCount;
-			PWX_UNLOCK_NOEXCEPT(this)
+			PWX_LOCK(this)
+			uint32_t localCount = size();
+			PWX_UNLOCK(this)
 			if (removed) {
 				PWX_LOCK(removed)
 				if (!removed->destroyed())
@@ -549,47 +572,39 @@ private:
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 		elem_t*  oldCurr = curr;
 		elem_t*  xHead   = head;
 		elem_t*  xTail   = tail;
-		uint32_t oldNr   = eNr;
-		PWX_UNLOCK(const_cast<list_t*>(this))
+		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 		elem_t*  xCurr   = oldCurr->next; // Go upwards first
-		uint32_t xNr     = oldNr + 1;
 
 		while (xCurr && (xCurr != xTail) ) {
 			if (xCurr->data.get() == data) {
-				PWX_LOCK(const_cast<list_t*>(this))
+				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr = xCurr;
-				eNr  = xNr;
-				PWX_UNLOCK(const_cast<list_t*>(this))
+				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return xCurr->prev;
 			}
-			++xNr;
 			xCurr = xCurr->next;
 		} // End of moving upwards
 
 		// If no result has been found, move downwards if oldCurr is not head
-		if (oldNr) {
+		if (oldCurr != xHead) {
 			xCurr = oldCurr->prev;
-			xNr   = oldNr - 1;
 
 			while (xCurr) {
 				if (xCurr->data.get() == data) {
-					PWX_LOCK(const_cast<list_t*>(this))
+					PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 					curr = xCurr;
-					eNr  = xNr;
-					PWX_UNLOCK(const_cast<list_t*>(this))
+					PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 					return xCurr->prev;
 				}
 				if (xCurr == xHead)
 					xCurr = nullptr; // done, not found
-				else {
-					--xNr;
+				else
 					xCurr = xCurr->prev;
-				}
 			} // End of moving downwards
 		} // End of having started beyond head
 
@@ -601,9 +616,7 @@ private:
 	/// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
-		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-		uint32_t localCount = eCount;
-		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+		uint32_t localCount = size();
 
 		if (localCount) {
 			// Mod index into range
@@ -620,7 +633,8 @@ private:
 			elem_t*  xCurr = curr;
 			elem_t*  xHead = head;
 			elem_t*  xTail = tail;
-			uint32_t xNr   = eNr;
+			// See note in TSingleList about why a local number is used.
+			uint32_t xNr   = xCurr->getNr();
 			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 			// Is xCurr already correct?
@@ -632,17 +646,15 @@ private:
 				xCurr = xCurr->next;
 				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr  = xCurr;
-				eNr   = xNr + 1;
 				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
 			// Is xIdx the prev member, like in a downward for loop?
-			if (xIdx == (xNr - 1)) {
+			if (xNr && (xIdx == (xNr - 1)) ) {
 				xCurr = xCurr->prev;
 				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr  = xCurr;
-				eNr   = xNr - 1;
 				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return xCurr;
 			}
@@ -665,28 +677,24 @@ private:
 			*/
 			bool goUp = true;
 			if (xIdx > xNr) {
-				// A) xIdx is between xNr and eCount
+				// A) xIdx is between xNr and localCount
 				if ( (xIdx - xNr) <= ( (localCount - xNr) / 2)) {
-					// 1: xIdx is nearer to eNr -> move upwards from curr
+					// 1: xIdx is nearer to xNr -> move upwards from curr
 					xCurr = xCurr->next;
 					++xNr;
 				} else {
-					// 2: xIdx is nearer to eCount -> move downwards from tail
+					// 2: xIdx is nearer to localCount -> move downwards from tail
 					goUp  = false;
-					PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 					xCurr = xTail->prev;
 					xNr   = localCount - 2;
-					PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				}
 			} // end of group A
 			else {
 				// B) xIdx is between 0 and xNr
 				if (xIdx <= (xNr / 2)) {
 					// 1: xIdx is nearer to 0 -> move upwards from head
-					PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 					xCurr = xHead->next;
 					xNr  = 1;
-					PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				} else {
 					// 2: xIdx is nearer to eNr -> move downwards from curr
 					goUp = false;
@@ -704,8 +712,7 @@ private:
 				if ( (xTail == xCurr) || (xHead == xCurr) ) {
 					try {
 						PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-						eNr  = (xTail == xCurr) ? eCount - 1 : 0;
-						curr = (xTail == xCurr) ? tail : head;
+						curr = xCurr;
 						return privGetElementByIndex(index);
 					}
 					PWX_CATCH_AND_FORGET(std::exception)
@@ -716,7 +723,6 @@ private:
 			if (xCurr) {
 				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr = xCurr;
-				eNr  = xNr;
 				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			}
 
@@ -761,12 +767,13 @@ private:
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && nextElement->prev) {
+				uint32_t localCount = size();
+				if ((localCount > 1) && nextElement->prev) {
 					PWX_LOCK(nextElement->prev)
 					PWX_UNLOCK(nextElement)
 					nextElement = nextElement->prev;
 				}
-				else if (eCount < 2) {
+				else if (localCount < 2) {
 					PWX_UNLOCK(nextElement)
 					nextElement = nullptr; // New head about
 				}
@@ -805,13 +812,12 @@ private:
 		// 2: Check source:
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
-#ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			// What on earth did the caller think?
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
-#endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
@@ -838,12 +844,13 @@ private:
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && nextElement->prev) {
+				uint32_t localCount = size();
+				if ((localCount > 1) && nextElement->prev) {
 					PWX_LOCK(nextElement->prev)
 					PWX_UNLOCK(nextElement)
 					nextElement = nextElement->prev;
 				}
-				else if (eCount < 2) {
+				else if (localCount < 2) {
 					PWX_UNLOCK(nextElement)
 					nextElement = nullptr; // New head about
 				}
@@ -861,13 +868,12 @@ private:
 		// 2: Check source:
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
-#ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
 			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
-#endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
@@ -885,46 +891,45 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
+			uint32_t localCount = size();
 			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem)
 				tail = elem->prev;
 
-			if (elem == head)
+			if (elem == head) {
 				head = elem->next;
+				// With only one element tail would result in nullptr:
+				if (nullptr == tail)
+					tail = head;
+			}
 
 			// now maintain the neighbors
-			if (elem->next)
-				elem->next->prev = elem->prev;
-			if (elem->prev)
-				elem->prev->next = elem->next;
-
-			// curr needs to be valid
-			if (curr == elem) {
-				if (elem->next)
-					curr = elem->next;
-				else if (prev) {
-					curr = prev;
-					--eNr;
-				}
-			} else {
+			if (prev) {
+				prev->next = elem->next;
+				curr = prev;
+			} else
 				curr = head;
-				eNr  = 0;
-			} // End of maintaining curr
 
 			// if this was the last element, sanitize the list:
-			if (1 == eCount) {
+			if (1 == localCount) {
 				head = nullptr;
 				curr = nullptr;
 				tail = nullptr;
-				eNr  = 0;
-			}
+			} else if (curr && curr->next)
+				curr->next->prev = curr;
 
 			// Finally elem does not need pointers to its neighbors any more
+			// and the list needs to be renumbered
 			elem->next = nullptr;
 			elem->prev = nullptr;
-			--eCount;
+			if (curr) {
+				if (curr == head)
+					curr->setNr(0, head, tail);
+				else if ((curr != tail) && curr->next)
+					curr->next->setNr(curr->getNr() + 1, head, tail);
+			}
 			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
@@ -997,7 +1002,7 @@ private:
 		if (next && (nullptr == next->prev))
 			PWX_THROW ("OutOfRange", "Element out of range", "There is no element before the given next element")
 
-		if (0 == eCount)
+		if (empty())
 			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
 
 		elem_t* toRemove = next ? next->prev : tail;
@@ -1028,6 +1033,8 @@ TDoubleList<data_t, elem_t>::~TDoubleList() noexcept
   * Warning: For this to work a local list is created on the stack. Giving it back
   * means that it will be copied onto your result. In other words: All elements
   * will be copied twice!
+  * Only use this operator if you really think you need a construct like
+  * 'listC = listA + listB'.
   *
   * @param[in] lhs left hand side reference
   * @param[in] rhs right hand side reference
@@ -1036,10 +1043,8 @@ TDoubleList<data_t, elem_t>::~TDoubleList() noexcept
 template<typename data_t, typename elem_t>
 TDoubleList<data_t, elem_t> operator+ (const TDoubleList<data_t, elem_t> &lhs, const TDoubleList<data_t, elem_t> &rhs)
 {
-	typedef TDoubleList<data_t, elem_t> list_t;
-	PWX_LOCK(&lhs)
-	list_t result (lhs);
-	PWX_UNLOCK(&lhs)
+	TDoubleList<data_t, elem_t> result (lhs);
+
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result += rhs)
 	}
@@ -1064,10 +1069,7 @@ TDoubleList<data_t, elem_t> operator+ (const TDoubleList<data_t, elem_t> &lhs, c
 template<typename data_t, typename elem_t>
 TDoubleList<data_t, elem_t> operator- (const TDoubleList<data_t, elem_t> &lhs, const TDoubleList<data_t, elem_t> &rhs)
 {
-	typedef TDoubleList<data_t, elem_t> list_t;
-	PWX_LOCK(&lhs)
-	list_t result (lhs);
-	PWX_UNLOCK(&lhs)
+	TDoubleList<data_t, elem_t> result (lhs);
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result -= rhs)

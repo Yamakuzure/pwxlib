@@ -27,9 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <memory>
-#include <pwx/types/CLockable.h>
-#include <pwx/types/TVarDeleter.h>
+#include "pwx/base/VElement.h"
 
 namespace pwx
 {
@@ -61,15 +59,15 @@ namespace pwx
   * If PWX_THREADS is defined, changes to the element are done in a locked state.
 **/
 template<typename data_t>
-struct PWX_API TDoubleElement : public CLockable
+struct PWX_API TDoubleElement : public VElement
 {
 
 	/* ===============================================
 	 * === Public types                            ===
 	 * ===============================================
 	*/
-	typedef CLockable                 base_t;
-	typedef TDoubleElement<data_t>    elem_t;
+	typedef VElement                base_t;
+	typedef TDoubleElement<data_t>  elem_t;
 	typedef std::shared_ptr<data_t> share_t;
 
 
@@ -142,6 +140,71 @@ struct PWX_API TDoubleElement : public CLockable
 	bool destroyed() const noexcept { return isDestroyed; }
 
 
+	// getNr() is provided by the VElement base class
+
+
+	/** @brief set a new number and renumber all neighbors
+	  *
+	  * The caller is responsible for a consistent numbering.
+	  * This method will set not only the new number of this
+	  * element, but will renumber all prev and next neighbors
+	  * which do not have a number fitting.
+	  * The renumbering will be done until either an element
+	  * already has a correct number or the inspected element
+	  * equals @a head when inspecting prev neighbors or @a tail
+	  * when inspecting next neighbors.
+	  *
+	  * @param[in] newNr the new number this element should get
+	  * @param[in] head pointer to the head of the list
+	  * @param[in] tail pointer to the tail of the list
+	**/
+	virtual void setNr(const uint32_t newNr, const base_t* head, const base_t* tail) const noexcept
+	{
+		// Check head first, maybe the whole list needs renumbering:
+		if (head && (this != head) && (head->getNr() > 0))
+			head->setNr(0, head, tail);
+		else {
+			PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+			if (newNr != eNr)
+				eNr = newNr;
+
+			// Step 1: Go downwards
+			if (head && (this != head) && prev) {
+				uint32_t xNr   = newNr - 1;
+				elem_t*  xPrev = prev;
+				while (xPrev && (xPrev != head) && (xPrev->eNr != xNr)) {
+					PWX_NAMED_LOCK_GUARD(xPrev, elem_t, const_cast<elem_t*>(xPrev))
+					xPrev->eNr = xNr--;
+					xPrev = xPrev->prev;
+				}
+
+				// If head is reached, its number needs to be checked:
+				if ((xPrev == head) && (xNr != xPrev->eNr)) {
+					PWX_NAMED_LOCK_GUARD(head, elem_t, const_cast<elem_t*>(xPrev))
+					xPrev->eNr = xNr;
+				}
+			} // End of having a next neighbor
+
+			// Step 2: Go upwards
+			if (tail && (this != tail) && next) {
+				uint32_t xNr   = newNr + 1;
+				elem_t*  xNext = next;
+				while (xNext && (xNext != tail) && (xNext->eNr != xNr)) {
+					PWX_NAMED_LOCK_GUARD(xNext, elem_t, const_cast<elem_t*>(xNext))
+					xNext->eNr = xNr++;
+					xNext = xNext->next;
+				}
+
+				// If tail is reached, its number needs to be checked:
+				if ((xNext == tail) && (xNr != xNext->eNr)) {
+					PWX_NAMED_LOCK_GUARD(tail, elem_t, const_cast<elem_t*>(xNext))
+					xNext->eNr = xNr;
+				}
+			} // End of having a next neighbor
+		} // End of having consistent head or being head
+	}
+
+
 	/* ===============================================
 	 * === Public operators                        ===
 	 * ===============================================
@@ -210,6 +273,18 @@ struct PWX_API TDoubleElement : public CLockable
 
 
 private:
+
+	/* ===============================================
+	 * === Private methods                         ===
+	 * ===============================================
+	*/
+
+	/// @brief internal method to directly set the number
+	void setNr(const uint32_t newNr) const noexcept
+	{
+		eNr = newNr;
+	}
+
 
 	/* ===============================================
 	 * === Private members                         ===

@@ -116,8 +116,8 @@
   * @param[in] desc const char message to be returned by the exceptions desc() method if an std::exception is caught.
 **/
 #define PWX_THROW_PWXSTD_FURTHER(name, desc) \
-	PWX_THROW_PWX_FURTHER \
-	PWX_THROW_STD_FURTHER(name, desc)
+		PWX_THROW_PWX_FURTHER \
+		PWX_THROW_STD_FURTHER(name, desc)
 
 
 /** @brief try and throw pwx::CExceptions further
@@ -130,10 +130,10 @@
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
 **/
-#define PWX_TRY_PWX_FURTHER(func) \
-	PWX_TRY(func) \
-	PWX_THROW_PWX_FURTHER
-
+#define PWX_TRY_PWX_FURTHER(func) { \
+		PWX_TRY(func) \
+		PWX_THROW_PWX_FURTHER \
+	}
 
 /** @brief try and throw std::exception as pwx::CExceptions further
   *
@@ -147,10 +147,10 @@
   * @param[in] name const char name of the exception.
   * @param[in] desc const char message to be returned by the exceptions desc() method.
 **/
-#define PWX_TRY_STD_FURTHER(func, name, desc) \
-	PWX_TRY(func) \
-	PWX_THROW_STD_FURTHER(name, desc)
-
+#define PWX_TRY_STD_FURTHER(func, name, desc) { \
+		PWX_TRY(func) \
+		PWX_THROW_STD_FURTHER(name, desc) \
+	}
 
 /** @brief try and throw both std::exception or pwx::CExceptions further
   *
@@ -164,10 +164,11 @@
   * @param[in] name const char name of the exception for std::exception
   * @param[in] desc const char message to be returned by the exceptions desc() method if an std::exception is caught.
 **/
-#define PWX_TRY_STDPWX_FURTHER(func, name, desc) \
-	PWX_TRY(func) \
-	PWX_THROW_PWX_FURTHER \
-	PWX_THROW_STD_FURTHER(name, desc)
+#define PWX_TRY_STDPWX_FURTHER(func, name, desc) { \
+		PWX_TRY(func) \
+		PWX_THROW_PWX_FURTHER \
+		PWX_THROW_STD_FURTHER(name, desc) \
+	}
 
 
 /** @brief This catches and ignores an exception.
@@ -190,9 +191,9 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_LOCK(object) { \
-		if (object) { \
+		if (object) \
 			PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
-	} }
+	}
 #else
 #  define PWX_LOCK(object) { }
 #endif
@@ -237,9 +238,9 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_UNLOCK(object) { \
-		if (object) { \
+		if (object) \
 			PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
-	} }
+	}
 #else
 #  define PWX_UNLOCK(object) { }
 #endif
@@ -262,7 +263,7 @@
 #endif
 
 
-/** @brief Impose a lock guard on the given object, that is unlocked when leaving the current scope
+/** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
@@ -278,7 +279,7 @@
 #endif
 
 
-/** @brief Impose a lock guard on the given object, that is unlocked when leaving the current scope
+/** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *

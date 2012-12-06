@@ -1,10 +1,10 @@
 #pragma once
-#ifndef PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED
-#define PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED 1
+#ifndef PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED
+#define PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED 1
 
-/** @file VContainer.h
+/** @file VElement.h
   *
-  * @brief Virtual base class for all containers.
+  * @brief Virtual base class for all container elements.
   *
   * (c) 2007 - 2012 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -27,20 +27,22 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <memory>
 #include "pwx/types/CLockable.h"
+#include "pwx/types/TVarDeleter.h"
 #include "pwx/general/macros.h"
 
 namespace pwx
 {
 
-/** @class VContainer
+/** @class VElement
   *
-  * @brief Virtual base class for all containers.
+  * @brief Virtual base class for all container elements.
   *
-  * This class is strictly virtual. ALl container templates have
+  * This class is strictly virtual. ALl element templates have
   * to inherit public from this base class.
 **/
-class VContainer : public CLockable
+class VElement : public CLockable
 {
 public:
 	/* ===============================================
@@ -49,7 +51,7 @@ public:
 	*/
 
 	typedef CLockable  base_t;
-	typedef VContainer list_t;
+	typedef VElement   elem_t;
 
 
 	/* ===============================================
@@ -57,9 +59,9 @@ public:
 	 * ===============================================
 	*/
 
-	explicit VContainer() noexcept;
-	VContainer (const VContainer &src) noexcept;
-	virtual ~VContainer() noexcept;
+	explicit VElement() noexcept;
+	VElement (const VElement &src) noexcept;
+	virtual ~VElement() noexcept;
 
 
 	/* ===============================================
@@ -67,17 +69,30 @@ public:
 	 * ===============================================
 	*/
 
-	virtual void     clear()       noexcept PWX_VIRTUAL_PURE;
-	virtual bool     empty() const noexcept PWX_VIRTUAL_PURE;
-	virtual uint32_t size()  const noexcept PWX_VIRTUAL_PURE;
+	/// @brief return the current number of this element
+	virtual uint32_t getNr() const noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		return eNr;
+	}
+	virtual void setNr(const uint32_t newNr, const elem_t* head, const elem_t* tail) const noexcept PWX_VIRTUAL_PURE;
+
+
+protected:
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
+
+	mutable uint32_t eNr = 0; //!< Number of the element
 }; // class VContainer
 
 #if defined(PWX_EXPORTS)
-/// @brief ~VContainer default destructor.
-VContainer::~VContainer() noexcept
+/// @brief ~VElement default destructor.
+VElement::~VElement() noexcept
 { }
 #endif
 
 } // namespace pwx
-#endif // PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED
+#endif // PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED
 

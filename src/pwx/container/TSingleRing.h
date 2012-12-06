@@ -28,7 +28,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/container/TSingleList.h>
+#include "pwx/container/TSingleList.h"
 
 namespace pwx
 {
@@ -134,8 +134,7 @@ public:
 	virtual uint32_t delNext (data_t* prev)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::delNext (prev))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -162,8 +161,7 @@ public:
 	virtual uint32_t delNextElem (elem_t* prev)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::delNextElem (prev))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -191,8 +189,7 @@ public:
 	virtual uint32_t insNext (data_t* prev, data_t* data)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::insNext (prev, data))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -214,8 +211,7 @@ public:
 	virtual uint32_t insNext (data_t* prev, const elem_t &src)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::insNext (prev, src))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -241,8 +237,7 @@ public:
 	virtual uint32_t insNextElem (elem_t* prev, data_t* data)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (prev, data))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -268,8 +263,7 @@ public:
 	virtual uint32_t insNextElem (elem_t* prev, const elem_t &src)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (prev, src))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -288,10 +282,11 @@ public:
 	virtual elem_t* pop_back() noexcept
 	{
 		elem_t* toRemove = nullptr;
+		uint32_t localCount = size();
 		try {
-			if (eCount > 1)
+			if (localCount > 1)
 				toRemove = base_t::remNextElem (base_t::operator[] (-2));
-			else if (eCount)
+			else if (localCount)
 				toRemove = remNext (nullptr);
 			if (toRemove)
 				privConnectEnds();
@@ -314,7 +309,7 @@ public:
 	{
 		elem_t* toRemove = nullptr;
 		try {
-			if (eCount)
+			if (size())
 				toRemove = base_t::remNext(nullptr);
 			if (toRemove)
 				privConnectEnds();
@@ -341,8 +336,7 @@ public:
 		elem_t* xTail = tail;
 		PWX_UNLOCK(this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, data))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -360,8 +354,7 @@ public:
 		elem_t* xTail = xTail;
 		PWX_UNLOCK(this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, src))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -376,8 +369,7 @@ public:
 	virtual uint32_t push_front (data_t *data)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, data))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -392,8 +384,7 @@ public:
 	virtual uint32_t push_front (const elem_t &src)
 	{
 		PWX_TRY_PWX_FURTHER (base_t::insNext (nullptr, src))
-		privConnectEnds();
-		return eCount;
+		return privConnectEnds();
 	}
 
 
@@ -522,7 +513,6 @@ protected:
 	 * ===============================================
 	*/
 
-	using base_t::eCount;
 	using base_t::head;
 	using base_t::tail;
 
@@ -534,15 +524,30 @@ private:
 	*/
 
 	/// @brief simple private method to make sure the ring is closed
-	virtual void privConnectEnds() noexcept
+	virtual uint32_t privConnectEnds() noexcept
 	{
+		uint32_t localCount = 0;
+
 		try {
 			PWX_LOCK_NOEXCEPT(this)
-			if (tail && !tail->destroyed() && (tail->next != head))
-				tail->next = head;
+
+#if defined(PWX_THREADS)
+			while (tail && tail->destroyed()) {
+				PWX_UNLOCK_NOEXCEPT(this)
+				std::this_thread::yield();
+				PWX_LOCK_NOEXCEPT(this)
+			}
+#endif // PWX_THREADS
+
+			if (tail) {
+				localCount = tail->getNr() + 1;
+				if (!tail->destroyed() && (tail->next != head))
+					tail->next = head;
+			}
 			PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)
+		return localCount;
 	}
 }; // class TSingleRing
 

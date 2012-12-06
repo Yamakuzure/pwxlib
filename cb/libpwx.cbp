@@ -45,6 +45,8 @@
 		<Unit filename="../src/pwx.h" />
 		<Unit filename="../src/pwx/base/VContainer.cpp" />
 		<Unit filename="../src/pwx/base/VContainer.h" />
+		<Unit filename="../src/pwx/base/VElement.cpp" />
+		<Unit filename="../src/pwx/base/VElement.h" />
 		<Unit filename="../src/pwx/container.h" />
 		<Unit filename="../src/pwx/container/TDoubleList.h" />
 		<Unit filename="../src/pwx/container/TDoubleRing.h" />

@@ -27,10 +27,10 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/types/CLockable.h>
-#include <pwx/general/macros.h>
-#include <pwx/container/TDoubleList.h>
-#include <pwx/functions/set_fwd.h>
+#include "pwx/types/CLockable.h"
+#include "pwx/general/macros.h"
+#include "pwx/container/TDoubleList.h"
+#include "pwx/functions/set_fwd.h"
 
 namespace pwx
 {
@@ -222,10 +222,11 @@ public:
 	**/
 	virtual bool isSubsetOf(const list_t &src) const noexcept
 	{
-		bool result = true;
+		bool     result     = true;
+		uint32_t localCount = size();
 
 		// The empty set is always a subset of everything.
-		if (eCount && (this != &src)) {
+		if (localCount && (this != &src)) {
 			if (src.size()) {
 				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
 				elem_t* xCurr = head;
@@ -429,8 +430,6 @@ protected:
 	 * ===============================================
 	*/
 
-	using base_t::eCount;
-	using base_t::eNr;
 	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
@@ -464,25 +463,22 @@ private:
 		// Note: As the consistency of the content of a set is more important
 		//       than anything, a big lock is a must-have here!
 		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-
+		uint32_t localCount = size();
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
 		 * 1: If head is larger, data can not be in the set
 		 * 2: If tail is smaller, data can not be in the set
 		*/
-		if (eCount) {
+		if (localCount) {
 			// Quick exit if sorted set assumption 1 is correct:
 			if (isSorted && (**head > data)) {
-				eNr  = -1;
 				curr = nullptr;
 				return nullptr;
 			}
 
 			// Reset curr if a previous search has invalidated it:
-			if (nullptr == curr) {
+			if (nullptr == curr)
 				curr = head;
-				eNr  = 0;
-			}
 
 			// Quick exit if curr is correct:
 			if (**curr == data)
@@ -490,7 +486,6 @@ private:
 
 			// Quick exit if head is wanted:
 			if (**head == data) {
-				eNr = 0;
 				curr = head;
 				return curr;
 			}
@@ -500,24 +495,22 @@ private:
 			return nullptr;
 
 		// Checking tail does only make sense if we have at least 2 element
-		if (eCount > 1) {
+		if (localCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
 			if (isSorted && (data > **tail)) {
-				eNr  = eCount -1;
 				curr = tail;
 				return nullptr;
 			}
 
 			// Quick exit if tail is wanted:
 			if (**head == data) {
-				eNr = eCount - 1;
 				curr = tail;
 				return curr;
 			}
 		} // End of having at least two elements
 
 		// The complete search is useless unless there are at least three elements:
-		if (eCount > 2) {
+		if (localCount > 2) {
 			/* The searching differs between sorted and unsorted sets:
 			 * A)   sorted : We can determine a direction to go to make
 			 *               the search as quick as possible
@@ -529,16 +522,15 @@ private:
 				 * about this is the absence of any need to check curr against
 				 * head or tail.
 				*/
+
 				// Step 1: Move up until curr is larger
-				while (data > **curr) {
+				while (data > **curr)
 					curr = curr->next;
-					++eNr;
-				}
+
 				// Step 2: Move down until curr is smaller
-				while (**curr > data) {
+				while (**curr > data)
 					curr = curr->prev;
-					--eNr;
-				}
+
 				/* Due to this order curr is now either pointing to an element
 				 * holding data, or the next smaller element. The latter detail
 				 * is important for the sorted insertion. If data is not found,
@@ -548,12 +540,11 @@ private:
 				return (**curr == data ? curr : nullptr);
 			} else {
 				curr = head->next;
-				eNr  = 1;
+
 				// Note: head and tail are already checked.
-				while ((curr != tail) && (**curr != data)) {
+				while ((curr != tail) && (**curr != data))
 					curr = curr->next;
-					++eNr;
-				}
+
 				// Because tail is already checked, a pointer comparison will do:
 				return (curr != tail ? curr : nullptr);
 			}
@@ -569,7 +560,7 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
-			return eCount;
+			return size();
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = isSorted ? curr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
@@ -594,20 +585,21 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
-			return eCount;
+			return size();
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = isSorted ? curr : prev;
 
 #ifdef PWX_THREADDEBUG
 		if (prevElement) {
+			uint32_t localCount = size();
 			while (prevElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a next, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && prevElement->next)
+				if ((localCount > 1) && prevElement->next)
 					prevElement = prevElement->next;
-				else if (eCount < 2)
+				else if (localCount < 2)
 					prevElement = nullptr; // New head about
 				else
 					// my bad...
@@ -633,7 +625,7 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
-			return eCount;
+			return size();
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = isSorted ? curr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
@@ -645,13 +637,12 @@ private:
 		// 2: Check source:
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
-#ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
 			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
-#endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
@@ -670,17 +661,18 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
-			return eCount;
+			return size();
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = isSorted ? curr : prev;
 
 #ifdef PWX_THREADDEBUG
 		if (prevElement) {
+			uint32_t localCount = size();
 			while (prevElement->destroyed()) {
-				if ((eCount > 1) && prev->next)
+				if ((localCount > 1) && prev->next)
 					prevElement = prevElement->next;
-				else if (eCount < 2)
+				else if (localCount < 2)
 					prevElement = nullptr; // New head about
 				else
 					PWX_THROW("Illegal Condition", "Previous element destroyed",
@@ -692,13 +684,12 @@ private:
 		// 2: Check source:
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
-#ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
 			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
-#endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
@@ -717,7 +708,7 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
-			return eCount;
+			return size();
 
 		// 1: Prepare the next element
 		elem_t* nextElement = isSorted ? curr : next ? const_cast<elem_t*>(find(next)) : nullptr;
@@ -745,20 +736,21 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
-			return eCount;
+			return size();
 
 		// 1: Prepare the next element
 		elem_t* nextElement = isSorted ? curr : next;
 
 #ifdef PWX_THREADDEBUG
 		if (nextElement) {
+			uint32_t localCount = size();
 			while (nextElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && nextElement->prev)
+				if ((localCount > 1) && nextElement->prev)
 					nextElement = nextElement->prev;
-				else if (eCount < 2)
+				else if (localCount < 2)
 					nextElement = nullptr; // New head about
 				else
 					// my bad...
@@ -784,7 +776,7 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
-			return eCount;
+			return size();
 
 		// 1: Prepare the next element
 		elem_t* nextElement = isSorted ? curr : next ? const_cast<elem_t*>(find(next)) : nullptr;
@@ -796,13 +788,12 @@ private:
 		// 2: Check source:
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
-#ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
 			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
-#endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
@@ -824,20 +815,21 @@ private:
 	{
 		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
-			return eCount;
+			return size();
 
 		// 1: Prepare the previous element
 		elem_t* nextElement = isSorted ? curr : next;
 
 #ifdef PWX_THREADDEBUG
 		if (nextElement) {
+			uint32_t localCount = size();
 			while (nextElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((eCount > 1) && nextElement->prev)
+				if ((localCount > 1) && nextElement->prev)
 					nextElement = nextElement->prev;
-				else if (eCount < 2)
+				else if (localCount < 2)
 					nextElement = nullptr; // New head about
 				else
 					// my bad...
@@ -850,13 +842,12 @@ private:
 		// 2: Check source:
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
-#ifdef PWX_THREADDEBUG
 		if (src.destroyed()) {
 			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
-#endif // PWX_THREADDEBUG
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
@@ -887,7 +878,7 @@ TSet<data_t>::~TSet() noexcept
 
 } // namespace pwx
 
-#include <pwx/functions/set_func.h>
+#include "pwx/functions/set_func.h"
 
 #endif // PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 
