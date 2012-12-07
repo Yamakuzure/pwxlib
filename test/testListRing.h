@@ -91,11 +91,11 @@ int32_t testListRing (sEnv &env)
 		intCont.delNext (&numbers[3]); // remove 5 via direct pointer to "4"
 		intCount = intCont.size();
 		if (2 != intCount) {
-			cout << "FAIL" << endl;
+			cout << "(" << intCount << "/2) FAIL" << endl;
 			++env.testFail;
 			result = EXIT_FAILURE;
 		} else {
-			cout << "Success" << endl;
+			cout << "(2/2) Success" << endl;
 			++env.testSuccess;
 		}
 	} // end of sub test C
@@ -116,71 +116,6 @@ int32_t testListRing (sEnv &env)
 			++env.testSuccess;
 		}
 	} // End of sub test D
-
-/// @todo : Put into unified speed test once RNG is available for random access
-//  /** E) Speed test inserting, checking and removing MAXINTCOUNT integers **/
-//  if (EXIT_SUCCESS == result)
-//    {
-//      clock_t startTime = 0;
-//      clock_t endTime   = 0;
-//
-//      cout << adjRight(4,0) << ++env.testCount << " E) Speed test (" << MAXINTCOUNT << " elements) : "; cout.flush();
-//
-//      // for this test we need a container that does delete data:
-//      list_t spdCont; // The list without the do-not-destroy-destroy()-method
-//
-//      cout << "ins"; cout.flush();
-//
-//      startTime = clock();
-//
-//      for (int32_t i = 1; i < (MAXINTCOUNT + 1); ++i)
-//        {
-//          // Note: As main() does a catch-all, no try{} needed here.
-//          int32_t* newInt = new int32_t(i);
-//          spdCont.insNextElem(spdCont[-1], newInt);
-//        }
-//
-//      cout << ", chk"; cout.flush();
-//
-//      for (int32_t i = 1; i < (MAXINTCOUNT + 1); ++i)
-//        {
-//          if (**spdCont[i-1] != i)
-//            {
-//              cout << " FAILED: " << **spdCont[i] << " != " << i << endl;
-//              result = EXIT_FAILURE;
-//              i = MAXINTCOUNT + 1;
-//            }
-//        }
-//
-//      if ((EXIT_SUCCESS == result) && (MAXINTCOUNT != static_cast<int32_t>(spdCont.size())))
-//        {
-//          cout << " FAILED: spdCont has " << spdCont.size() << " elements" << endl;
-//          result = EXIT_FAILURE;
-//        }
-//
-//      if (EXIT_SUCCESS == result)
-//        {
-//          cout << ", clr"; cout.flush();
-//          spdCont.clear();
-//          if (spdCont.size())
-//            {
-//              cout << " FAILED: " << spdCont.size() << " items remain" << endl;
-//              result = EXIT_FAILURE;
-//            }
-//          else
-//            {
-//              endTime = clock();
-//              double msNeeded = 1000.0 * (static_cast<double>(endTime - startTime) / static_cast<double>(CLOCKS_PER_SEC));
-//              cout << adjRight(5,0) << msNeeded << " ms - Success" << endl;
-//            }
-//        }
-//
-//      if (EXIT_SUCCESS == result)
-//        ++env.testSuccess;
-//      else
-//        ++env.testFail;
-//
-//    } // End of sub test E
 
 	cout << endl;
 
