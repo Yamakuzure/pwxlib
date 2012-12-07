@@ -128,13 +128,13 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		uint32_t localCount = size();
 		PWX_LOCK_NOEXCEPT(this)
-		while (localCount) {
+		while (head) {
+			doRenumber = false;
 			try {
 #ifdef PWX_THREADS
 				elem_t* toDelete = head;
-				if (localCount && toDelete && !toDelete->destroyed()) {
+				if (toDelete && !toDelete->destroyed()) {
 					privRemove(nullptr, toDelete);
 					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
@@ -147,9 +147,9 @@ public:
 #endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
-			localCount = size();
 			PWX_LOCK_NOEXCEPT(this)
 		}
+		doRenumber = true;
 		PWX_UNLOCK_NOEXCEPT(this)
 	}
 
@@ -434,7 +434,7 @@ public:
 	}
 
 
-	/** @briefshort alias for pop_front()
+	/** @brief short alias for pop_front()
 	  *
 	  * You have to delete the removed element by yourself. If you do not intent
 	  * to work with the removed element, use delNext instead.
@@ -634,7 +634,8 @@ public:
 	uint32_t size() const noexcept
 	{
 		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-		return (tail ? tail->getNr() + 1 : 0);
+		protRenumber();
+		return (tail ? tail->eNr + 1 : 0);
 	}
 
 
@@ -680,9 +681,15 @@ public:
 	{
 		if (&rhs != this) {
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			int32_t rSize = rhs.size();
-			for (int32_t i = 0; i < rSize; ++i) {
-				PWX_TRY_PWX_FURTHER (insNextElem (tail, *rhs[i]))
+			elem_t* rhsCurr = rhs.head;
+			bool    isDone  = false;
+
+			while (rhsCurr && !isDone) {
+				PWX_TRY_PWX_FURTHER (insNextElem (tail, *rhsCurr))
+				if (rhsCurr == rhs.tail)
+					isDone = true;
+				else
+					rhsCurr = rhsCurr->next;
 			}
 		}
 		return *this;
@@ -703,13 +710,29 @@ public:
 	{
 		if (&rhs != this) {
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			int32_t rSize = rhs.size();
-			for (int32_t i = 0; i < rSize; ++i) {
-				elem_t* prev = privFindPrev (rhs[i]->data.get());
-				if (prev) {
-					PWX_TRY_PWX_FURTHER (delNextElem (prev))
+			elem_t* rhsCurr = rhs.head;
+			elem_t* lhsPrev = nullptr;
+			data_t* rhsData = nullptr;
+			bool    isDone  = false;
+
+			while (rhsCurr && !isDone) {
+				rhsData = rhsCurr->data.get();
+
+				// Head must be treated first, privFindPrev won't help.
+				if (rhsData == head->data.get())
+					PWX_TRY_PWX_FURTHER(delNextElem(nullptr))
+				else {
+					lhsPrev = privFindPrev(rhsData);
+					if (lhsPrev)
+						PWX_TRY_PWX_FURTHER(delNextElem(lhsPrev))
 				}
+
+				if (rhsCurr == rhs.tail)
+					isDone = true;
+				else
+					rhsCurr = rhsCurr->next;
 			}
+
 		} else
 			clear();
 		return *this;
@@ -842,14 +865,35 @@ protected:
 		}
 
 		// Set curr and renumber the list
-		curr = insElem;
-		curr->setNr(insPrev ? insPrev->getNr() + 1 : 0, head, tail);
-
+		curr       = insElem;
+		doRenumber = true;
 		PWX_UNLOCK_NOEXCEPT(this)
 
 		return (localCount + 1);
 	}
 
+
+	/// @brief renumber all elements
+	virtual void protRenumber() const noexcept
+	{
+		if (doRenumber) {
+			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+			elem_t*  xCurr  = head;
+			uint32_t xNr    = 0;
+			bool     isDone = false;
+
+			while (xCurr && !isDone) {
+				xCurr->eNr = xNr++;
+				if (xCurr == tail)
+					isDone = true;
+				else
+					xCurr = xCurr->next;
+			}
+
+			doRenumber = false;
+			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+		}
+	}
 
 	/* ===============================================
 	 * === Protected members                       ===
@@ -923,6 +967,7 @@ private:
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
 		uint32_t localCount = size();
+		// Note: size() will ensure consistent numbering if needed.
 
 		if (localCount) {
 			// Mod index into range
@@ -946,7 +991,7 @@ private:
 			 * Further the question is which element has the given index at
 			 * the moment this method begins, not when it ends.
 			*/
-			uint32_t xNr   = xCurr->getNr();
+			uint32_t xNr   = xCurr->eNr;
 			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 			// Is xCurr already correct?
@@ -1167,43 +1212,33 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
-			uint32_t localCount = size();
 			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem)
 				tail = prev;
 
-			if (elem == head) {
+			if (elem == head)
 				head = elem->next;
-				// With only one element tail would result in nullptr:
-				if (nullptr == tail)
-					tail = head;
-			}
 
 			// now maintain the neighbors
 			if (prev) {
 				prev->next = elem->next;
 				curr = prev;
-			} else
+			} else {
+				// If this was the last element, tail is nullptr now.
+				if (nullptr == tail)
+					// Note: Although head is already nullptr if this is
+					// a TSingleList, its next points to itself in a
+					// TSingleRing.
+					head = nullptr;
 				curr = head;
-
-			// if this was the last element, sanitize the list:
-			if (1 == localCount) {
-				head = nullptr;
-				curr = nullptr;
-				tail = nullptr;
 			}
 
 			// Finally elem does not need pointers to its neighbors any more
 			// and the list needs to be renumbered
 			elem->next = nullptr;
-			if (curr) {
-				if (curr == head)
-					curr->setNr(0, head, tail);
-				else if ((curr != tail) && curr->next)
-					curr->next->setNr(curr->getNr() + 1, head, tail);
-			}
+			doRenumber = true;
 			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}

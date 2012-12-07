@@ -129,13 +129,13 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		uint32_t localCount = size();
 		PWX_LOCK_NOEXCEPT(this)
-		while (localCount) {
+		while (tail) {
+			doRenumber = false;
 			try {
 #ifdef PWX_THREADS
 				elem_t* toDelete = tail;
-				if (localCount && toDelete && !toDelete->destroyed()) {
+				if (toDelete && !toDelete->destroyed()) {
 					privRemove(toDelete->prev, toDelete);
 					PWX_UNLOCK_NOEXCEPT(this)
 					privDelete(toDelete);
@@ -148,9 +148,9 @@ public:
 #endif // PWX_THREADS
 			}
 			PWX_CATCH_AND_FORGET(CException)
-			localCount = size();
 			PWX_LOCK_NOEXCEPT(this)
 		}
+		doRenumber = true;
 		PWX_UNLOCK_NOEXCEPT(this)
 	}
 
@@ -518,8 +518,8 @@ protected:
 		}
 
 		// Set curr and renumber the list
-		curr = insElem;
-		curr->setNr(insPrev ? insPrev->getNr() + 1 : 0, head, tail);
+		curr       = insElem;
+		doRenumber = true;
 
 		PWX_UNLOCK_NOEXCEPT(this)
 
@@ -532,6 +532,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::doRenumber;
 	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
@@ -634,7 +635,7 @@ private:
 			elem_t*  xHead = head;
 			elem_t*  xTail = tail;
 			// See note in TSingleList about why a local number is used.
-			uint32_t xNr   = xCurr->getNr();
+			uint32_t xNr   = xCurr->eNr;
 			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 			// Is xCurr already correct?
@@ -891,45 +892,34 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
-			uint32_t localCount = size();
 			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem)
-				tail = elem->prev;
+				tail = prev;
 
-			if (elem == head) {
+			if (elem == head)
 				head = elem->next;
-				// With only one element tail would result in nullptr:
-				if (nullptr == tail)
-					tail = head;
-			}
 
 			// now maintain the neighbors
 			if (prev) {
 				prev->next = elem->next;
 				curr = prev;
-			} else
+			} else {
 				curr = head;
+				// If this was the last element, tail is nullptr now.
+				if (nullptr == tail)
+					head = nullptr;
+			}
 
-			// if this was the last element, sanitize the list:
-			if (1 == localCount) {
-				head = nullptr;
-				curr = nullptr;
-				tail = nullptr;
-			} else if (curr && curr->next)
+			if (curr && curr->next)
 				curr->next->prev = curr;
 
 			// Finally elem does not need pointers to its neighbors any more
 			// and the list needs to be renumbered
 			elem->next = nullptr;
 			elem->prev = nullptr;
-			if (curr) {
-				if (curr == head)
-					curr->setNr(0, head, tail);
-				else if ((curr != tail) && curr->next)
-					curr->next->setNr(curr->getNr() + 1, head, tail);
-			}
+			doRenumber = true;
 			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}

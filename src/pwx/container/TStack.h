@@ -42,12 +42,18 @@ namespace pwx
   *
   * The stack is a basic container deriving TSingleList to manage its data
   * pointers. The stack is deriving from (isA) instead of using (hasA) a
-  * a TSingleList to enable it to be used like a list if necessary without
+  * TSingleList to enable it to be used like a list if necessary without
   * having to copy a lot of code.
   *
   * The constructor takes an optional destroy(T*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
   * the standard delete operator is used instead.
+  *
+  * Being a stack, the meanings of head, tail, front and back are reversed compared
+  * to the singly linked list. The first added element will always be "head", and
+  * meant by "back". "front" is where the next new item is pushed and where "tail"
+  * resides. Please keep that in mind. However, push() and pop() will always do
+  * the right thing for you.
   *
   * It is recommended that you use the much more advanced std::stack unless you
   * need to store a very large number of elements and can not live with the
@@ -124,33 +130,142 @@ public:
 	using base_t::getData;
 	using base_t::insNext;
 	using base_t::insNextElem;
-	using base_t::pop;
-	using base_t::pop_back;
-	using base_t::pop_front;
 
 
-	/** @brief push a new data pointer onto the stack
+	/** @brief pop the top element from the stack
 	  *
-	  * This is the regular stack operation to add a new element.
-	  * Being a stack this new element is put on top of it.
+	  * This is the regular stack operation to get the top element.
 	  *
-	  * To add a new data pointer to the bottom, use push_back() or
-	  * unshift().
+	  * To get an element from the bottom, use pop_back() or shift().
+	  *
+	  * The element is removed from the stack so you have to take
+	  * care of its deletion once you are finished with it.
+	  *
+	  * If there is no element in the stack a pwx::CException with the
+	  * name "OutOfRange" is thrown.
+	  *
+	  * @return the top element on the stack.
+	**/
+	virtual elem_t* pop() noexcept
+	{
+		PWX_TRY_PWX_FURTHER (return base_t::pop_back())
+	}
+
+
+	/** @brief alias to remove the bottom element (head)
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the list is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the list is empty
+	**/
+	virtual elem_t* pop_back() noexcept
+	{
+		return base_t::pop_front();
+	}
+
+
+	/** @brief alias to remove the top element (tail)
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the list is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the list is empty
+	**/
+	virtual elem_t* pop_front() noexcept
+	{
+		return base_t::pop_back();
+	}
+
+
+	/** @brief short alias for push_back(data_t *data)
 	  *
 	  * If the new element can not be created, a pwx::CException with
 	  * the name "ElementCreationFailed" is thrown.
 	  *
-	  * @param[in] data data pointer to store.
-	  * @return number of elements stored after the operation.
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
 	**/
-	virtual uint32_t push (data_t* data)
+	virtual uint32_t push (data_t *data)
 	{
-		PWX_TRY_PWX_FURTHER (return push_front (data))
+		PWX_TRY_PWX_FURTHER (return base_t::push_back (data))
 	}
 
 
-	using base_t::push_back;
-	using base_t::push_front;
+	/** @brief short alias for push_back(const elem_t &src)
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER (return base_t::push_back (src))
+	}
+
+
+	/** @brief alias to add a data pointer to the bottom of the stack.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push_back (data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER (return base_t::push_front (data))
+	}
+
+
+	/** @brief alias to add an element copy to the bottom of the stack.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push_back (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER (return base_t::push_front (src))
+	}
+
+
+	/** @brief alias to add a data pointer to the top of the stack.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push_front (data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER (return base_t::push_back (data))
+	}
+
+
+	/** @brief alias to add an element copy to the top of the stack.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t push_front (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER (return base_t::push_back (src))
+	}
+
+
 	using base_t::remNext;
 	using base_t::remNextElem;
 
@@ -172,7 +287,7 @@ public:
 	**/
 	virtual elem_t* shift()
 	{
-		PWX_TRY_PWX_FURTHER(return pop_back())
+		PWX_TRY_PWX_FURTHER(return base_t::pop_front())
 	}
 
 
@@ -194,7 +309,7 @@ public:
 	**/
 	virtual uint32_t unshift(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return push_back(data))
+		PWX_TRY_PWX_FURTHER(return base_t::push_front(data))
 	}
 
 
@@ -204,31 +319,7 @@ public:
 	*/
 
 	using base_t::operator=;
-
-
-	/** @brief addition assignment operator
-	  *
-	  * Add all elements from @a rhs to this list. Being a
-	  * stack the elements must be retrieved in reverse order
-	  * and pushed on the stack. Otherwise the ordering is
-	  * reversed and the FiLo structure damaged.
-	  *
-	  * @param[in] rhs reference of the list to add.
-	  * @return reference to this.
-	**/
-	virtual list_t &operator+= (const list_t & rhs)
-	{
-		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			int32_t rSize = rhs.size();
-			for (int32_t i = 1; i <= rSize; ++i) {
-				PWX_TRY_PWX_FURTHER (insNextElem(nullptr, *rhs[0 - i]))
-			}
-		}
-		return *this;
-	}
-
-
+	using base_t::operator+=;
 	using base_t::operator-=;
 	using base_t::operator[];
 

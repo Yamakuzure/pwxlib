@@ -526,8 +526,6 @@ private:
 	/// @brief simple private method to make sure the ring is closed
 	virtual uint32_t privConnectEnds() noexcept
 	{
-		uint32_t localCount = 0;
-
 		try {
 			PWX_LOCK_NOEXCEPT(this)
 
@@ -539,15 +537,12 @@ private:
 			}
 #endif // PWX_THREADS
 
-			if (tail) {
-				localCount = tail->getNr() + 1;
-				if (!tail->destroyed() && (tail->next != head))
-					tail->next = head;
-			}
+			if (tail && !tail->destroyed() && (tail->next != head))
+				tail->next = head;
 			PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)
-		return localCount;
+		return size();
 	}
 }; // class TSingleRing
 

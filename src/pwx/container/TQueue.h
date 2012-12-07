@@ -132,12 +132,12 @@ public:
 	using base_t::insPrevElem;
 
 
-	/** @brief pop the last element from the queue
+	/** @brief pop the first element from the queue
 	  *
-	  * This is the regular queue operation to get the last element.
-	  * Being a queue this element comes from the end.
+	  * This is the regular queue operation to get the first element.
+	  * Being a queue this element comes from the start.
 	  *
-	  * To get an element from the front, use pop_front() or shift().
+	  * To get an element from the back, use pop_back() or shift().
 	  *
 	  * The element is removed from the queue so you have to take
 	  * care of its deletion once you are finished with it.
@@ -145,38 +145,17 @@ public:
 	  * If there is no element in the queue a pwx::CException with the
 	  * name "OutOfRange" is thrown.
 	  *
-	  * @return the last element on the queue.
+	  * @return the first element on the queue.
 	**/
 	virtual elem_t* pop() noexcept
 	{
-		PWX_TRY_PWX_FURTHER (return pop_back())
+		PWX_TRY_PWX_FURTHER (return base_t::pop_front())
 	}
 
 
 	using base_t::pop_back;
 	using base_t::pop_front;
-
-
-	/** @brief push a new data pointer onto the queue
-	  *
-	  * This is the regular queue operation to add a new element.
-	  * Being a queue this new element is put on top of it.
-	  *
-	  * To add a new data pointer to the bottom, use push_back() or
-	  * unshift().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] data data pointer to store.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push (data_t* data)
-	{
-		PWX_TRY_PWX_FURTHER (return push_front (data))
-	}
-
-
+	using base_t::push;
 	using base_t::push_back;
 	using base_t::push_front;
 	using base_t::remData;
@@ -190,9 +169,9 @@ public:
 	/** @brief shift an element from the queue
 	  *
 	  * This is the irregular queue operation shifting an element
-	  * from the head.
+	  * from the end.
 	  *
-	  * To get an element from the tail, use pop() or pop_back().
+	  * To get an element from the start, use pop() or pop_front().
 	  *
 	  * The element is removed from the queue so you have to take
 	  * care of its deletion once you are finished with it.
@@ -200,11 +179,11 @@ public:
 	  * If there is no element in the queue a pwx::CException with the
 	  * name "OutOfRange" is thrown.
 	  *
-	  * @return the top element on the queue.
+	  * @return the last element on the queue.
 	**/
 	virtual elem_t* shift()
 	{
-		PWX_TRY_PWX_FURTHER(return pop_front())
+		PWX_TRY_PWX_FURTHER(return pop_back())
 	}
 
 
@@ -236,31 +215,7 @@ public:
 	*/
 
 	using base_t::operator=;
-
-
-	/** @brief addition assignment operator
-	  *
-	  * Add all elements from @a rhs to this list. Being a
-	  * queue the elements must be retrieved in reverse order
-	  * and pushed on the queue. Otherwise the ordering is
-	  * reversed and the FiFo structure damaged.
-	  *
-	  * @param[in] rhs reference of the list to add.
-	  * @return reference to this.
-	**/
-	virtual list_t &operator+= (const list_t & rhs)
-	{
-		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			int32_t rSize = rhs.size();
-			for (int32_t i = 1; i <= rSize; ++i) {
-				PWX_TRY_PWX_FURTHER (insNextElem (nullptr, *rhs[0 - i]))
-			}
-		}
-		return *this;
-	}
-
-
+	using base_t::operator+=;
 	using base_t::operator-=;
 	using base_t::operator[];
 
