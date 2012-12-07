@@ -465,8 +465,12 @@ public:
 		elem_t*  toRemove   = nullptr;
 		uint32_t localCount = size();
 		try {
-			if (localCount > 1)
-				toRemove = base_t::remNextElem (base_t::operator[] (-2));
+			if (localCount > 1) {
+				PWX_LOCK(this)
+				elem_t* xTail = tail;
+				PWX_UNLOCK(this)
+				toRemove = base_t::remNextElem (xTail->prev);
+			}
 			else if (localCount)
 				toRemove = remNext (nullptr);
 			if (toRemove)
@@ -869,9 +873,8 @@ TDoubleRing<data_t, elem_t>::~TDoubleRing() noexcept
 template<typename data_t, typename elem_t>
 TDoubleRing<data_t, elem_t> operator+ (const TDoubleRing<data_t, elem_t> &lhs, const TDoubleRing<data_t, elem_t> &rhs)
 {
-	typedef TDoubleRing<data_t, elem_t> ring_t;
 	PWX_LOCK(&lhs)
-	ring_t result (lhs);
+	TDoubleRing<data_t, elem_t> result (lhs);
 	PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
@@ -898,9 +901,8 @@ TDoubleRing<data_t, elem_t> operator+ (const TDoubleRing<data_t, elem_t> &lhs, c
 template<typename data_t, typename elem_t>
 TDoubleRing<data_t, elem_t> operator- (const TDoubleRing<data_t, elem_t> &lhs, const TDoubleRing<data_t, elem_t> &rhs)
 {
-	typedef TDoubleRing<data_t, elem_t> ring_t;
 	PWX_LOCK(&lhs)
-	ring_t result (lhs);
+	TDoubleRing<data_t, elem_t> result (lhs);
 	PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {

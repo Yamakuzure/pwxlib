@@ -81,7 +81,9 @@ protected:
 	*/
 
 	mutable
-	std::atomic_bool doRenumber;
+	std::atomic_bool doRenumber; //!< If set to true, a renumbering is done before retrieving elements by index
+	mutable
+	uint32_t eCount = 0; //!< Current number of elements
 
 
 }; // class VContainer

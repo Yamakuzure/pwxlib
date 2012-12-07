@@ -574,10 +574,10 @@ TSingleRing<data_t, elem_t>::~TSingleRing() noexcept
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	typedef TSingleRing<data_t, elem_t> ring_t;
 	PWX_LOCK(&lhs);
-	ring_t result (lhs);
+	TSingleRing<data_t, elem_t> result (lhs);
 	PWX_UNLOCK(&lhs);
+
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result += rhs)
 	}
@@ -602,9 +602,8 @@ TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, c
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator- (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	typedef TSingleRing<data_t, elem_t> ring_t;
 	PWX_LOCK(&lhs)
-	ring_t result (lhs);
+	TSingleRing<data_t, elem_t> result (lhs);
 	PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {

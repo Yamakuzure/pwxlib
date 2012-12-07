@@ -101,12 +101,7 @@ public:
 	TSingleList (const list_t &src) :
 		base_t (src)
 	{
-		// lock the source list, it must not be changed now.
-		PWX_LOCK_GUARD (list_t, const_cast<list_t*> (&src))
-		uint32_t rSize = src.size();
-		for (uint32_t i = 0; i < rSize; ++i) {
-			PWX_TRY_PWX_FURTHER (privInsElemBehindElem(tail, *src[i]))
-		}
+		operator+=(src);
 	}
 
 
@@ -130,7 +125,6 @@ public:
 	{
 		PWX_LOCK_NOEXCEPT(this)
 		while (head) {
-			doRenumber = false;
 			try {
 #ifdef PWX_THREADS
 				elem_t* toDelete = head;
@@ -149,7 +143,6 @@ public:
 			PWX_CATCH_AND_FORGET(CException)
 			PWX_LOCK_NOEXCEPT(this)
 		}
-		doRenumber = true;
 		PWX_UNLOCK_NOEXCEPT(this)
 	}
 
@@ -633,9 +626,10 @@ public:
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept
 	{
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-		protRenumber();
-		return (tail ? tail->eNr + 1 : 0);
+		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this));
+		uint32_t currSize = eCount;
+		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this));
+		return currSize;
 	}
 
 
@@ -867,9 +861,10 @@ protected:
 		// Set curr and renumber the list
 		curr       = insElem;
 		doRenumber = true;
+		localCount = ++eCount;
 		PWX_UNLOCK_NOEXCEPT(this)
 
-		return (localCount + 1);
+		return localCount;
 	}
 
 
@@ -966,8 +961,8 @@ private:
 	/// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
+		protRenumber();
 		uint32_t localCount = size();
-		// Note: size() will ensure consistent numbering if needed.
 
 		if (localCount) {
 			// Mod index into range
@@ -1239,6 +1234,7 @@ private:
 			// and the list needs to be renumbered
 			elem->next = nullptr;
 			doRenumber = true;
+			--eCount;
 			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
@@ -1269,7 +1265,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 #ifdef PWX_THREADDEBUG
-		if (prev->destroyed()) {
+		if (prev && prev->destroyed()) {
 			// If it is deleted, there is no "next" to get on with
 			PWX_THROW("Illegal Condition", "prev element destroyed",
 					  "The previous element for a removal is already destroyed.")

@@ -229,15 +229,19 @@ public:
 		if (localCount && (this != &src)) {
 			if (src.size()) {
 				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
-				elem_t* xCurr = head;
+				elem_t* xCurr  = head;
+				bool    isDone = false;
 
 				// A simple loop will do, because we can use privFindData directly.
-				do {
-					if (src.privFindData(**xCurr))
-						xCurr = xCurr->next;
-					else
+				while (result && xCurr && !isDone) {
+					if (src.privFindData(**xCurr)) {
+						if (xCurr == head)
+							isDone = true;
+						else
+							xCurr = xCurr->next;
+					} else
 						result = false;
-				} while (result && (xCurr != tail));
+				}
 			} else
 				result = false;
 		}

@@ -131,7 +131,6 @@ public:
 	{
 		PWX_LOCK_NOEXCEPT(this)
 		while (tail) {
-			doRenumber = false;
 			try {
 #ifdef PWX_THREADS
 				elem_t* toDelete = tail;
@@ -150,7 +149,6 @@ public:
 			PWX_CATCH_AND_FORGET(CException)
 			PWX_LOCK_NOEXCEPT(this)
 		}
-		doRenumber = true;
 		PWX_UNLOCK_NOEXCEPT(this)
 	}
 
@@ -356,9 +354,14 @@ public:
 	virtual elem_t* pop_back() noexcept
 	{
 		uint32_t localCount = size();
-		if (localCount > 1) {
-			PWX_TRY (return remNextElem (tail->prev))
-			PWX_CATCH_AND_FORGET (CException)
+		try
+			if (localCount > 1) {
+				PWX_LOCK(this)
+				elem_t* xTail = tail;
+				PWX_UNLOCK(this)
+				PWX_TRY (return remNextElem (xTail->prev))
+				PWX_CATCH_AND_FORGET (CException)
+			}
 		}
 		else if (localCount) {
 			PWX_TRY (return remNext (nullptr))
@@ -520,11 +523,14 @@ protected:
 		// Set curr and renumber the list
 		curr       = insElem;
 		doRenumber = true;
-
+		localCount = ++eCount;
 		PWX_UNLOCK_NOEXCEPT(this)
 
-		return (localCount + 1);
+		return localCount;
 	}
+
+
+	using base_t::protRenumber;
 
 
 	/* ===============================================
@@ -532,6 +538,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::eCount;
 	using base_t::doRenumber;
 	using base_t::curr;
 	using base_t::head;
@@ -617,6 +624,7 @@ private:
 	/// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
+		protRenumber();
 		uint32_t localCount = size();
 
 		if (localCount) {
@@ -920,6 +928,7 @@ private:
 			elem->next = nullptr;
 			elem->prev = nullptr;
 			doRenumber = true;
+			--eCount;
 			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
@@ -982,7 +991,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 #ifdef PWX_THREADDEBUG
-		if (next->destroyed()) {
+		if (next && next->destroyed()) {
 			// If it is deleted, there is no "prev" to get on with
 			PWX_THROW("Illegal Condition", "next element destroyed",
 					  "The next element for a removal is already destroyed.")
