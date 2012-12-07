@@ -7,7 +7,6 @@ int32_t main()
 
 	// Wrap a giant try/catch around just everything to trace immediately
 	try {
-
 		// --- General container tests ---
 		if (EXIT_SUCCESS == result) {
 			PWX_TRY_PWX_FURTHER (result = testListRing<single_list_t> (env))
