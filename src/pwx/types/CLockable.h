@@ -32,6 +32,7 @@
 #include <pwx/general/macros.h>
 #if defined(PWX_THREADS)
 #  include <mutex>
+#  include <thread>
 #endif
 #include <cstring>
 
