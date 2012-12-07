@@ -139,56 +139,6 @@ struct PWX_API TSingleElement : public VElement
 	bool destroyed() const noexcept { return isDestroyed; }
 
 
-	// getNr() is provided by the VElement base class
-
-
-	/** @brief set a new number and renumber the next neighbors
-	  *
-	  * The caller is responsible for a consistent numbering.
-	  * This method will set not only the new number of this
-	  * element, but will renumber all next neighbors which
-	  * do not have a number fitting.
-	  * The renumbering will be done until either an element
-	  * already has a correct number or the inspected element
-	  * equals @a tail.
-	  *
-	  * @param[in] newNr the new number this element should get
-	  * @param[in] head pointer to the head of the list
-	  * @param[in] tail pointer to the tail of the list
-	**/
-	virtual void setNr(const uint32_t newNr, const base_t* head, const base_t* tail) const noexcept
-	{
-		// Check head first, maybe the whole list needs renumbering:
-		if (head && (this != head) && (head->getNr() > 0))
-			head->setNr(0, head, tail);
-		else {
-			PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
-			if (newNr != eNr)
-				eNr = newNr;
-
-			if (tail && (this != tail) && next) {
-				uint32_t xNr   = newNr + 1;
-				elem_t*  xNext = next;
-				while (xNext && (xNext != tail) && (xNext->eNr != xNr)) {
-					PWX_NAMED_LOCK_GUARD(xNext, elem_t, const_cast<elem_t*>(xNext))
-					xNext->eNr = xNr++;
-					xNext = xNext->next;
-				}
-
-				// If tail is reached, its number needs to be checked:
-				if ((xNext == tail) && (xNr != xNext->eNr)) {
-					PWX_NAMED_LOCK_GUARD(tail, elem_t, const_cast<elem_t*>(xNext))
-					xNext->eNr = xNr;
-				}
-
-				// Note: The renumbering is done from inside the first called element
-				//       only, because a calling of setNr on other elements would create
-				//       a recursion bomb with large containers.
-			} // End of having a next neighbor
-		} // End of having consistent head or being head
-	}
-
-
 	/* ===============================================
 	 * === Public operators                        ===
 	 * ===============================================
