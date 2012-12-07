@@ -840,13 +840,18 @@ protected:
 	/// @brief simple method to insert an element into the list
 	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem) noexcept
 	{
-		uint32_t localCount = size();
+		uint32_t localCount   = size();
+		bool     needRenumber = true;
 
 		// Now the real insertion can be done:
 		PWX_LOCK_NOEXCEPT(this)
 		if (insPrev) {
-			if (tail == insPrev)
+			if (tail == insPrev) {
+				// In this case we do not need a full renumbering
+				needRenumber = false;
+				insElem->eNr = tail->eNr + 1;
 				tail = insElem;
+			}
 			insElem->next = insPrev->next;
 			insPrev->next = insElem;
 		} else if (localCount) {
@@ -860,8 +865,9 @@ protected:
 
 		// Set curr and renumber the list
 		curr       = insElem;
-		doRenumber = true;
 		localCount = ++eCount;
+		if (needRenumber)
+			doRenumber = true;
 		PWX_UNLOCK_NOEXCEPT(this)
 
 		return localCount;
@@ -1207,34 +1213,41 @@ private:
 	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
 	{
 		if (elem) {
+			bool needRenumber = true;
 			PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
-			if (tail == elem)
-				tail = prev;
+			if (tail == elem) {
+				// In this case no full renumbering is
+				// required, only the last number off.
+				needRenumber = false;
+				if (head == elem)
+					// The last item is going bye bye, now!
+					tail = nullptr;
+				else
+					tail = prev;
+			}
 
-			if (elem == head)
-				head = elem->next;
+			if (elem == head) {
+				if (tail)
+					head = elem->next;
+				else
+					head = nullptr;
+			}
 
 			// now maintain the neighbors
-			if (prev) {
+			if (prev && (prev != elem)) {
 				prev->next = elem->next;
 				curr = prev;
-			} else {
-				// If this was the last element, tail is nullptr now.
-				if (nullptr == tail)
-					// Note: Although head is already nullptr if this is
-					// a TSingleList, its next points to itself in a
-					// TSingleRing.
-					head = nullptr;
+			} else
 				curr = head;
-			}
 
 			// Finally elem does not need pointers to its neighbors any more
 			// and the list needs to be renumbered
 			elem->next = nullptr;
-			doRenumber = true;
 			--eCount;
+			if (needRenumber)
+				doRenumber = true;
 			PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
