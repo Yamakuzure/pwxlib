@@ -65,22 +65,7 @@ public:
 
 
 	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	*/
-
-	/// @brief return the current number of this element
-	virtual uint32_t getNr() const noexcept
-	{
-		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
-		return eNr;
-	}
-	virtual void setNr(const uint32_t newNr, const elem_t* head, const elem_t* tail) const noexcept PWX_VIRTUAL_PURE;
-
-
-protected:
-	/* ===============================================
-	 * === Protected members                       ===
+	 * === Public members                          ===
 	 * ===============================================
 	*/
 
