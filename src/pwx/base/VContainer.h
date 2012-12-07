@@ -27,6 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <atomic>
 #include "pwx/types/CLockable.h"
 #include "pwx/general/macros.h"
 
@@ -70,6 +71,19 @@ public:
 	virtual void     clear()       noexcept PWX_VIRTUAL_PURE;
 	virtual bool     empty() const noexcept PWX_VIRTUAL_PURE;
 	virtual uint32_t size()  const noexcept PWX_VIRTUAL_PURE;
+
+
+protected:
+
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
+
+	mutable
+	std::atomic_bool doRenumber;
+
+
 }; // class VContainer
 
 #if defined(PWX_EXPORTS)
