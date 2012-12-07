@@ -115,7 +115,7 @@ endif
 # ------------------------------------
 # Rules
 # ------------------------------------
-.PHONY: clean testlib documentation docinstall hashbuilder install userinstall tools all library help
+.PHONY: clean testlib documentation docinstall hashbuilder install userinstall tools torture all library help
 .SUFFIXES: .cpp
 
 %.o: %.cpp
@@ -136,12 +136,13 @@ help: Makefile
 	@echo "  docinstall    - install documentation into $(DOCDIR)"
 	@echo "  clean         - remove object files, test programs and tools"
 	@echo "  help          - this help"
-	@echo "  hashbuilder   - build hash_builder test program in $(TESTDIR) (*)"
+	@echo "  hashbuilder   - build hashbuilder test program (*)"
 	@echo "  install       - install pwxLib in $(INSTDIR)"
 	@echo "  library       - compile pwxLib (*)"
 	@echo "  userinstall   - install pwxLib in $(USRINST)"
-	@echo "  testlib       - build test_lib test program in ./$(TESTDIR) (*)"
+	@echo "  testlib       - build testlib test program (*)"
 	@echo "  tools         - build tools in ./$(TOOLDIR) (*)"
+	@echo "  torture       - build torture test program (*)"
 	@echo ""
 	@echo "(*): You can turn on debugging and profiling information or the use"
 	@echo "     of the gcc graphite extension by editing this Makefile."
@@ -195,6 +196,10 @@ userinstall: Makefile $(TARGET)
 testlib: depend library
 	@echo "Making testlib in $(TESTDIR)"
 	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) testlib)
+
+torture: depend library
+	@echo "Making torture in $(TESTDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) torture)
 
 tools: depend library
 	@echo "Making all in $(TOOLDIR)"
