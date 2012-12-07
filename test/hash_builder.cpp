@@ -5,8 +5,8 @@ int32_t main(int32_t argc, char** argv)
 	int32_t result = EXIT_SUCCESS;
 
 	if ((argc < 3) || (argc > 4)) {
-		cerr << "Usage:\n  " << argv[0] << " <destination directory> <number of lines> [type]\n";
-		cerr << " type is one of:";
+		cerr << "Usage:\n  " << basename(argv[0]) << " <destination directory> <number of lines> [type]\n";
+		cerr << " type is one of:\n";
 		cerr << "   all   : build hash lists for all types (default)\n";
 		cerr << "   char  : build the hash list for char* strings\n";
 		cerr << "   float : build hash lists for float, double and long double\n";
