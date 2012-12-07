@@ -7,5 +7,6 @@
 			<Depends filename="cb/libpwx.cbp" />
 		</Project>
 		<Project filename="cb/hash_builder.cbp" />
+		<Project filename="cb/torture.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
