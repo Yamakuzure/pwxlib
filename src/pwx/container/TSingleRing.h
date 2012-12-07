@@ -351,9 +351,9 @@ public:
 	virtual uint32_t push_back (const elem_t &src)
 	{
 		PWX_LOCK(this)
-		elem_t* xTail = xTail;
+		elem_t* xTail = tail;
 		PWX_UNLOCK(this)
-		PWX_TRY_PWX_FURTHER (base_t::insNextElem (tail, src))
+		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, src))
 		return privConnectEnds();
 	}
 
@@ -574,9 +574,9 @@ TSingleRing<data_t, elem_t>::~TSingleRing() noexcept
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	PWX_LOCK(&lhs);
+	PWX_LOCK(&lhs)
 	TSingleRing<data_t, elem_t> result (lhs);
-	PWX_UNLOCK(&lhs);
+	PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result += rhs)
