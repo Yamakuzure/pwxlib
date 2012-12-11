@@ -4,11 +4,13 @@
 	<Project>
 		<Option title="torture" />
 		<Option makefile_is_custom="1" />
+		<Option execution_dir="/home/sed/pryde/PrydeWorX/pwxLib" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="clean">
-				<Option output="./torture" prefix_auto="1" extension_auto="1" />
+				<Option output="../torture" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -16,8 +18,9 @@
 					<Add option="-g" />
 				</Compiler>
 			</Target>
-			<Target title="hash_builder">
-				<Option output="./torture" prefix_auto="1" extension_auto="1" />
+			<Target title="torture">
+				<Option output="../torture" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -29,22 +32,26 @@
 				</Linker>
 			</Target>
 			<Target title="library">
-                                <Option output="../lib/pwx" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
-                                <Option working_dir="../" />
-                                <Option object_output="./" />
-                                <Option type="3" />
-                                <Option compiler="gcc" />
-                                <Compiler>
-                                        <Add option="-O2" />
-                                </Compiler>
-                                <Linker>
-                                        <Add option="-s" />
-                                </Linker>
-                        </Target>
+				<Option output="../lib/pwx" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
+				<Option object_output="./" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../Makefile" />
+		<Unit filename="../test/Makefile" />
+		<Unit filename="../test/torture.cpp" />
+		<Unit filename="../test/torture.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
