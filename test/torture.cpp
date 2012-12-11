@@ -44,8 +44,25 @@ int32_t main(int32_t argc, char** argv)
 	} // Finished checking arguments
 
 
-	if (EXIT_SUCCESS == result)
-		result = startTest(numThreads, testType);
+	if (EXIT_SUCCESS == result) {
+		PWX_TRY(result = startTest(numThreads, testType))
+		catch (pwx::CException &e) {
+			cerr << "== Thread " << std::this_thread::get_id();
+			cerr << " ==\n-----\npwx exception \"" << e.name() << "\" caught!" << endl;
+			cerr << "What : \"" << e.what() << "\"" << endl;
+			cerr << "What : \"" << e.desc() << "\"" << endl;
+			cerr << "Where: \"" << e.where() << "\"" << endl;
+			cerr << "pFunc: \"" << e.pfunc() << "\"" << endl;
+			cerr << "\nTrace:\n" << e.trace() << "\n-----" << endl;
+		} catch (...) {
+			cerr << "== Thread " << std::this_thread::get_id();
+			cerr << " ==\n-----\nSomething completely unknown was caught!" << endl;
+		}
+	}
+
+	// Is the output lock helper still there?
+	if (outLock)
+		delete outLock;
 
 	return result;
 }
@@ -58,9 +75,9 @@ int32_t setNumThreads(const char* chNum, uint32_t &numThreads)
 
 	numThreads = pwx::to_uint32(chNum);
 
-	if (numThreads < 2) {
+	if (numThreads < 4) {
 		cerr << "\"" << chNum << "\" is invalid as a number of threads to start.\n";
-		cerr << "Anything not even or greater than 2 is absolutely pointless." << endl;
+		cerr << "Anything not even or greater than 4 is absolutely pointless." << endl;
 		result = EXIT_FAILURE;
 	}
 
@@ -102,57 +119,85 @@ int32_t setTestType(const char* chType, eTestType &testType)
 }
 
 
-/// @brief the template that produces the test results
-template<typename list_t>
-int32_t do_test(uint32_t numThreads)
-{
-	int32_t result = EXIT_SUCCESS;
-
-
-
-	return result;
-}
-
-
 /// @brief main test starting function
 int32_t startTest(uint32_t numThreads, eTestType testType)
 {
 	int32_t result = EXIT_SUCCESS;
 
+	// The outLock Helper is needed now:
+	PWX_TRY_STD_FURTHER(outLock = new pwx::CLockable, "new_failed", "Couldn't create output lock helper")
+
 	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
 		|| (testType == E_TEST_LIST)
-		|| (testType == E_TEST_LIST_S)))
-		result = do_test<pwx::TSingleList<int32_t> >(numThreads);
-	if ((EXIT_SUCCESS)
+		|| (testType == E_TEST_LIST_S))) {
+		cout << " === Testing TSingleList === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TSingleList<data_t> >(numThreads))
+	}
+	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
 		|| (testType == E_TEST_LIST)
-		|| (testType == E_TEST_LIST_D)))
-		result = do_test<pwx::TDoubleList<int32_t>>(numThreads);
-	if ((EXIT_SUCCESS)
+		|| (testType == E_TEST_LIST_D))) {
+		cout << " === Testing TDoubleList === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TDoubleList<data_t>>(numThreads))
+	}
+	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
-		|| (testType == E_TEST_QUEUE)))
-		result = do_test<pwx::TQueue<int32_t>>(numThreads);
+		|| (testType == E_TEST_QUEUE))) {
+		cout << " === Testing TQueue === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TQueue<data_t>>(numThreads))
+	}
 	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
 		|| (testType == E_TEST_RING)
-		|| (testType == E_TEST_RING_S)))
-		result = do_test<pwx::TSingleRing<int32_t>>(numThreads);
-	if ((EXIT_SUCCESS)
+		|| (testType == E_TEST_RING_S))) {
+		cout << " === Testing TSingleRing === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TSingleRing<data_t>>(numThreads))
+	}
+	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
 		|| (testType == E_TEST_RING)
-		|| (testType == E_TEST_RING_D)))
-		result = do_test<pwx::TDoubleRing<int32_t>>(numThreads);
-	if ((EXIT_SUCCESS)
+		|| (testType == E_TEST_RING_D))) {
+		cout << " === Testing TDoubleRing === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TDoubleRing<data_t>>(numThreads))
+	}
+	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
-		|| (testType == E_TEST_SET)))
-		result = do_test<pwx::TSet<int32_t>>(numThreads);
-	if ((EXIT_SUCCESS)
+		|| (testType == E_TEST_SET))) {
+		cout << " === Testing TSet === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TSet<data_t>>(numThreads))
+	}
+	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)
-		|| (testType == E_TEST_STACK)))
-		result = do_test<pwx::TStack<int32_t>>(numThreads);
+		|| (testType == E_TEST_STACK))) {
+		cout << " === Testing TStack === " << endl;
+		PWX_TRY_PWX_FURTHER(result = do_test<pwx::TStack<data_t>>(numThreads))
+	}
 
 	return result;
 }
 
 
+// --- thread classes method implementations ---
+
+/// @brief dtor waiting for the thread to finish
+thrdBase::~thrdBase() noexcept
+{
+	// No thread must be deleted while it is still running!
+	if (isRunning) {
+		isKilled = true;
+		while (isRunning)
+			std::this_thread::yield();
+	}
+}
+
+/// @brief simple sleeper to wait for the thread to start.
+void thrdBase::waitForStart() noexcept
+{
+	std::chrono::milliseconds sleepTime( 1 );
+	while (!isRunning && !isKilled) {
+		std::this_thread::sleep_for( sleepTime );
+		if (!isRunning && !isKilled)
+			std::this_thread::yield();
+	}
+}
