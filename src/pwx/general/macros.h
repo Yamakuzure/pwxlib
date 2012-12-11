@@ -164,7 +164,7 @@
   * @param[in] name const char name of the exception for std::exception
   * @param[in] desc const char message to be returned by the exceptions desc() method if an std::exception is caught.
 **/
-#define PWX_TRY_STDPWX_FURTHER(func, name, desc) { \
+#define PWX_TRY_PWXSTD_FURTHER(func, name, desc) { \
 		PWX_TRY(func) \
 		PWX_THROW_PWX_FURTHER \
 		PWX_THROW_STD_FURTHER(name, desc) \
