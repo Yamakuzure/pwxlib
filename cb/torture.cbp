@@ -24,6 +24,7 @@
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-c list_s -t 16" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>

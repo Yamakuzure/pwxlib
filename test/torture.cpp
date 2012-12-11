@@ -17,6 +17,16 @@ int32_t main(int32_t argc, char** argv)
 				result = EXIT_FAILURE;
 			}
 		} else if (STREQ("--help", argv[i]) || STREQ("-h", argv[i])) {
+			cout << "================================================================\n";
+			cout << " WARNING: This program does a lot of very stupid stuff you\n";
+			cout << "          must NOT copy! It is a very bad idea to hammer this\n";
+			cout << "          many different tasks onto any data container using\n";
+			cout << "          simultaneous access. The only reason this program\n";
+			cout << "          does that is to enable thread analyzers like Helgrind\n";
+			cout << "          or DRD to give as many opportunities to detect locking\n";
+			cout << "          order problems and/or possible race conditions as\n";
+			cout << "          possible. Again: DO NOT DO THIS IN YOUR PROGRAMS!\n";
+			cout << "================================================================\n";
 			cout << "Usage:\n  " << basename(argv[0]) << " [[-h|--help] | [-c type] [-t num]]\n";
 			cout << "  -c type     : set the type of container to check\n";
 			cout << "       all    : Test all containers (default)\n";
