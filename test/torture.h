@@ -47,6 +47,8 @@ pwx::CLockable* outLock; //!< Just lock before c[out|err]ing anything and unlock
 	cout << "Thread " << thId << " \"" << thrdName << "\" created" << endl; \
 	PWX_UNLOCK_NOEXCEPT(outLock) \
 	waitForStart(); \
+	std::chrono::milliseconds threadStartWaitTime( 1 ); \
+	std::this_thread::sleep_for(threadStartWaitTime); \
 	PWX_LOCK_NOEXCEPT(outLock) \
 	cout << "Thread " << thId << " \"" << thrdName << "\" started" << endl; \
 	PWX_UNLOCK_NOEXCEPT(outLock)
@@ -279,6 +281,9 @@ struct thrdPop : public thrdBase
 	{
 		THRD_STARTER("Pop")
 
+		// Removing threads start with a yield:
+		std::this_thread::yield();
+
 		if (cont) {
 			data_t minValFound = maxValue;
 			data_t maxValFound = minValue;
@@ -329,6 +334,9 @@ struct thrdPopFront : public thrdBase
 	{
 		THRD_STARTER("PopFront")
 
+		// Removing threads start with a yield:
+		std::this_thread::yield();
+
 		if (cont) {
 			data_t minValFound = maxValue;
 			data_t maxValFound = minValue;
@@ -378,6 +386,9 @@ struct thrdPopBack : public thrdBase
 	void operator()(pwx::VContainer* cont_)
 	{
 		THRD_STARTER("PopBack")
+
+		// Removing threads start with a yield:
+		std::this_thread::yield();
 
 		if (cont) {
 			data_t minValFound = maxValue;
@@ -464,6 +475,9 @@ struct thrdRemove : public thrdBase
 	{
 		THRD_STARTER("Remove")
 
+		// Removing threads start with a yield:
+		std::this_thread::yield();
+
 		if (cont) {
 			uint32_t idx       = 0;
 			uint32_t cnt       = 0;
@@ -519,6 +533,9 @@ struct thrdDelete : public thrdBase
 	void operator()(pwx::VContainer* cont_)
 	{
 		THRD_STARTER("Delete")
+
+		// Removing threads start with a yield:
+		std::this_thread::yield();
 
 		if (cont) {
 			uint32_t idx      = 0;
@@ -786,9 +803,10 @@ int32_t do_test(uint32_t numThreads)
 	PWX_TRY_STD_FURTHER(worker[numThreads - 1] = new thrdOpSub<list_t>,   "new_failed", "Couldn't create thrdOpSub")
 
 	// Before we can fire away, the container needs to be filled with the
-	// first x random values, with x equaling maxIterations. Otherwise we
-	// run into problems if more threads pull something out than putting in.
-	for (size_t i = 0; i < maxIterations; ++i) {
+	// first x random values, with x equaling ten times the maximum iterations.
+	// Otherwise we run into problems if more threads pull something out than
+	// putting in.
+	for (size_t i = 0; i < (10 * maxIterations); ++i) {
 		PWX_TRY_PWXSTD_FURTHER(cont.push(new data_t(pwx::RNG.random(minValue, maxValue))),
 								"init_failed",
 								"Failed to add a random data_t to the container")
