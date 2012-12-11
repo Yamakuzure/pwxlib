@@ -877,6 +877,7 @@ protected:
 	/// @brief renumber all elements
 	virtual void protRenumber() const noexcept
 	{
+		// Now do the renumbering if it is necessary:
 		if (doRenumber) {
 			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			elem_t*  xCurr  = head;
@@ -971,20 +972,20 @@ private:
 		uint32_t localCount = size();
 
 		if (localCount) {
-			// Mod index into range
-			uint32_t xIdx = static_cast<uint32_t> (index < 0
-												   ? localCount - (std::abs (index) % localCount)
-												   : index % localCount);
-			// Unfortunately this results in xIdx equaling localCount
-			// (which is wrong) if index is a negative multiple of
-			// localCount:
-			if (xIdx >= localCount)
-				xIdx %= localCount;
-
 			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			elem_t*  xHead = head;
 			elem_t*  xTail = tail;
-			elem_t*  xCurr = curr;
+			elem_t*  xCurr = curr ? curr : head;
+
+#ifdef PWX_THREADDEBUG
+			if (nullptr == xHead)
+				PWX_THROW("Illegal Condition", "head is nullptr",
+						  "The container has elements, but head is nullptr")
+			if (nullptr == xTail)
+				PWX_THROW("Illegal Condition", "tail is nullptr",
+						  "The container has elements, but tail is nullptr")
+#endif // PWX_THREADDEBUG
+
 			/* Note: It is important to use a local number. If the current
 			 * number of xCurr is used, wandering the list might _jump_ the
 			 * asked for index if another thread deletes an element that
@@ -994,6 +995,16 @@ private:
 			*/
 			uint32_t xNr   = xCurr->eNr;
 			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+
+			// Mod index into range
+			uint32_t xIdx = static_cast<uint32_t> (index < 0
+												   ? localCount - (std::abs (index) % localCount)
+												   : index % localCount);
+			// Unfortunately this results in xIdx equaling localCount
+			// (which is wrong) if index is a negative multiple of
+			// localCount:
+			if (xIdx >= localCount)
+				xIdx %= localCount;
 
 			// Is xCurr already correct?
 			if (xIdx == xNr)
