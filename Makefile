@@ -54,11 +54,11 @@ endif
 # Compiler and linker flags for release, debugging and profiling
 
 # DEBUG
-DBG_CXXFLAGS = -pedantic -g -ggdb -O0 -DLIBPWX_DEBUG
+DBG_CXXFLAGS = -ggdb -DLIBPWX_DEBUG
 DBG_LDFLAGS  =
 
 # RELEASE
-RLS_CXXFLAGS = -march=native -O2 -pipe -DNDEBUG
+RLS_CXXFLAGS = -march=native -pipe -DNDEBUG
 RLS_LDFLAGS  = -Wl,--sort-common -Wl,--hash-style=gnu -Wl,-O1 -s
 # Note: -Wl,--as-needed does _not_ work!
 
@@ -71,7 +71,7 @@ USRINST   = /usr/local/include
 AR        = $(shell which ar)
 ARFLAGS   = rcs
 CXX       = $(shell which g++)
-CXXFLAGS += -std=c++11 -Wall -Wextra -fexceptions
+CXXFLAGS += -std=c++11 -Wall -Wextra -fexceptions -pedantic -O2
 INSTALL   = $(shell which install)
 DOXYGEN   = $(shell which doxygen)
 LIBDIR    = lib
