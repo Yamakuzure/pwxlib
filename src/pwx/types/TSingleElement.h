@@ -44,13 +44,18 @@ namespace pwx
   * the standard delete operator is used instead.
   *
   * The data pointer itself is wrapped into an std::shared_ptr. It is therefore
-  * completely safe to copy TsingleElement instances.
+  * completely safe to copy TSingleElement instances.
   *
   * The data pointer itself is public. You can use foo->data.get() to access it.
   * Further the operator* is overloaded and **foo will result in a reference to the
   * data.
   *
-  * The next element in the list can be retrieved using the public foo->next pointer.
+  * The next element in the list can be retrieved using the public GET_NEXT_PTR(foo) pointer.
+  *
+  * <B>Important</B>: If you plan to use this type in a multi-threaded environment,
+  * it is strongly recommended to use the getNext() and setNext() functions to
+  * manipulate the next pointer. These methods will lock the element prior any
+  * read/write access.
   *
   * It is recommended that you use the much more advanced std::list unless you
   * need to store a very large number of elements and can not live with the
@@ -137,6 +142,34 @@ struct PWX_API TSingleElement : public VElement
 	  * @return true if the element is within its destruction process.
 	**/
 	bool destroyed() const noexcept { return isDestroyed; }
+
+
+	/** @brief returns a pointer to the next element or nullptr if there is none.
+	  *
+	  * This method will lock this element and is therefore safe to use
+	  * in a multi-threaded environment.
+	  *
+	  * @return the next pointer or nullptr if there is none.
+	**/
+	elem_t* getNext() const noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		return next;
+	}
+
+
+	/** @brief set the next pointer to another element.
+	  *
+	  * This method will lock this element and is therefore safe to use
+	  * in a multi-threaded environment.
+	  *
+	  * @param[in] next target where the next pointer should point at.
+	**/
+	void setNext(elem_t* new_next) noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, this)
+		next = new_next;
+	}
 
 
 	/* ===============================================
