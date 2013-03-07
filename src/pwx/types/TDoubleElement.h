@@ -50,7 +50,13 @@ namespace pwx
   * Further the operator* is overloaded and **foo will result in a reference to the
   * data.
   *
-  * The next element in the list can be retrieved using the public foo->next pointer.
+  * The next element in the list can be retrieved using the public GET_NEXT_PTR(foo) pointer.
+  * The previous element in the list can be retrieved using the public GET_PREV_PTR(foo) pointer.
+  *
+  * <B>Important</B>: If you plan to use this type in a multi-threaded environment,
+  * it is strongly recommended to use the getNext(), setNext(), getPrev() and setPrev()
+  * functions to manipulate the next and prev pointers. These methods will lock the
+  * element prior any read/write access.
   *
   * It is recommended that you use the much more advanced std::list unless you
   * need to store a very large number of elements and can not live with the
@@ -138,6 +144,62 @@ struct PWX_API TDoubleElement : public VElement
 	  * @return true if the element is within its destruction process.
 	**/
 	bool destroyed() const noexcept { return isDestroyed; }
+
+
+	/** @brief returns a pointer to the next element or nullptr if there is none.
+	  *
+	  * This method will lock this element and is therefore safe to use
+	  * in a multi-threaded environment.
+	  *
+	  * @return the next pointer or nullptr if there is none.
+	**/
+	elem_t* getNext() const noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		return next;
+	}
+
+
+	/** @brief returns a pointer to the prev element or nullptr if there is none.
+	  *
+	  * This method will lock this element and is therefore safe to use
+	  * in a multi-threaded environment.
+	  *
+	  * @return the prev pointer or nullptr if there is none.
+	**/
+	elem_t* getPrev() const noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		return prev;
+	}
+
+
+	/** @brief set the next pointer to another element.
+	  *
+	  * This method will lock this element and is therefore safe to use
+	  * in a multi-threaded environment.
+	  *
+	  * @param[in] next target where the next pointer should point at.
+	**/
+	void setNext(elem_t* new_next) noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, this)
+		next = new_next;
+	}
+
+
+	/** @brief set the prev pointer to another element.
+	  *
+	  * This method will lock this element and is therefore safe to use
+	  * in a multi-threaded environment.
+	  *
+	  * @param[in] prev target where the prev pointer should point at.
+	**/
+	void setPrev(elem_t* new_prev) noexcept
+	{
+		PWX_LOCK_GUARD(elem_t, this)
+		prev = new_prev;
+	}
 
 
 	/* ===============================================
