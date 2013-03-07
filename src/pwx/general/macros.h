@@ -313,6 +313,62 @@
 #endif
 
 
+/** @brief Macro to use ->next member directly or use a getNext() function
+  *
+  * <I>Prerequisites</I>: "pwx/types/TSingleElement.h" or "pwx/types/TDoubleElement.h"
+  *
+  * @param obj pointer of the object whose next pointer is to be retrieved
+  * @return the next pointer of obj or nullptr if there is none.
+**/
+#if defined(PWX_THREADS)
+#  define GET_NEXT_PTR(obj) ((obj)->getNext())
+#else
+#  define GET_NEXT_PTR(obj) ((obj)->next)
+#endif // defined(PWX_THREADS)
+
+
+/** @brief Macro to use ->prev member directly or use a getPrev() function
+  *
+  * <I>Prerequisites</I>: "pwx/types/TDoubleElement.h"
+  *
+  * @param obj pointer of the object whose prev pointer is to be retrieved
+  * @return the prev pointer of obj or nullptr if there is none.
+**/
+#if defined(PWX_THREADS)
+#  define GET_PREV_PTR(obj) ((obj)->getPrev())
+#else
+#  define GET_PREV_PTR(obj) ((obj)->prev)
+#endif // defined(PWX_THREADS)
+
+
+/** @brief Macro to set ->next member directly or use a setNext function
+  *
+  * <I>Prerequisites</I>: "pwx/types/TSingleElement.h" or "pwx/types/TDoubleElement.h"
+  *
+  * @param obj pointer of the object whose next pointer is to be retrieved
+  * @param new_next pointer to where the next pointer should be directed
+**/
+#if defined(PWX_THREADS)
+#  define SET_NEXT_PTR(obj, new_next) { (obj)->setNext(new_next); }
+#else
+#  define SET_NEXT_PTR(obj) { (obj)->next = (new_next); }
+#endif // defined(PWX_THREADS)
+
+
+/** @brief Macro to set ->prev member directly or use a setPrev function
+  *
+  * <I>Prerequisites</I>: "pwx/types/TDoubleElement.h"
+  *
+  * @param obj pointer of the object whose prev pointer is to be retrieved
+  * @param new_prev pointer to where the prev pointer should be directed
+**/
+#if defined(PWX_THREADS)
+#  define SET_PREV_PTR(obj, new_prev) { (obj)->setPrev(new_prev); }
+#else
+#  define SET_PREV_PTR(obj) { (obj)->prev = (new_prev); }
+#endif // defined(PWX_THREADS)
+
+
 /** @brief return true if two C-Strings are equal ignoring case
   *
   * <I>Prerequisites</I>: <cstring>
