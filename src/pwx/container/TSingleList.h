@@ -123,27 +123,22 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		PWX_LOCK_NOEXCEPT(this)
-		while (head) {
-			try {
-#ifdef PWX_THREADS
-				elem_t* toDelete = head;
-				if (toDelete && !toDelete->destroyed()) {
-					privRemove(nullptr, toDelete);
-					PWX_UNLOCK_NOEXCEPT(this)
-					privDelete(toDelete);
-				} else {
-					PWX_UNLOCK_NOEXCEPT(this)
-					std::this_thread::yield();
-				}
-#else
-				privDelete(remNext(nullptr));
-#endif // PWX_THREADS
-			}
-			PWX_CATCH_AND_FORGET(CException)
+		while (size()) {
 			PWX_LOCK_NOEXCEPT(this)
-		}
-		PWX_UNLOCK_NOEXCEPT(this)
+			elem_t* toDelete = head;
+			if (toDelete) {
+				privRemove(nullptr, toDelete);
+				PWX_UNLOCK_NOEXCEPT(this)
+				PWX_TRY(privDelete(toDelete))
+				catch(...) {
+#ifdef PWX_THREADS
+					std::this_thread::yield();
+#endif // PWX_THREADS
+				}
+			} // End of having an element do delete
+			else
+				PWX_UNLOCK_NOEXCEPT(this)
+		} // end of while size()
 	}
 
 
@@ -453,16 +448,9 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		uint32_t localCount = size();
-		if (localCount > 1) {
-			PWX_TRY (return remNextElem (const_cast<elem_t* > (privGetElementByIndex (-2))))
-			PWX_CATCH_AND_FORGET (CException)
-		}
-		else if (localCount) {
-			PWX_TRY (return remNext (nullptr))
-			PWX_CATCH_AND_FORGET (CException)
-		}
-		return nullptr;
+		if (size() > 1)
+			return remNextElem (const_cast<elem_t* > (privGetElementByIndex (-2)));
+		return remNext (nullptr);
 	}
 
 
@@ -477,12 +465,7 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		uint32_t localCount = size();
-		if (localCount) {
-			PWX_TRY (return remNext (nullptr))
-			PWX_CATCH_AND_FORGET (CException)
-		}
-		return nullptr;
+		return remNext (nullptr);
 	}
 
 
@@ -587,15 +570,15 @@ public:
 	  * You have to delete the removed element by yourself. If you do not intent
 	  * to work with the removed element, use delNext instead.
 	  *
-	  * If there is no element behind the element @a prev a
-	  * pwx::CException with the name "OutOfRange" is thrown.
+	  * If there is no element behind the element @a prev or if the list is
+	  * empty, nullptr is returned.
 	  *
 	  * @param[in] prev the data the element that precedes the element to remove holds
-	  * @return a pointer to the removed element
+	  * @return a pointer to the removed element or nullptr if @a prev is held by the last element or the list is empty
 	**/
-	virtual elem_t* remNext (data_t* prev)
+	virtual elem_t* remNext (data_t* prev) noexcept
 	{
-		PWX_TRY_PWX_FURTHER(return privRemoveAfterData(prev))
+		return privRemoveAfterData(prev);
 	}
 
 
@@ -612,14 +595,14 @@ public:
 	  * use the correct element on the correct list!
 	  *
 	  * If there is no element behind the element @a prev or if the list is
-	  * empty, a pwx::CException with the name "OutOfRange" is thrown.
+	  * empty, nullptr is returned.
 	  *
 	  * @param[in] prev the element that precedes the element to remove
-	  * @return a pointer to the removed element
+	  * @return a pointer to the removed element or nullptr if the list is empty or @a prev is the last element.
 	**/
-	virtual elem_t* remNextElem (elem_t* prev)
+	virtual elem_t* remNextElem (elem_t* prev) noexcept
 	{
-		PWX_TRY_PWX_FURTHER(return privRemoveAfterElement(prev))
+		return privRemoveAfterElement(prev);
 	}
 
 
@@ -683,7 +666,7 @@ public:
 				if (rhsCurr == rhs.tail)
 					isDone = true;
 				else
-					rhsCurr = rhsCurr->next;
+					rhsCurr = GET_NEXT_PTR(rhsCurr);
 			}
 		}
 		return *this;
@@ -724,7 +707,7 @@ public:
 				if (rhsCurr == rhs.tail)
 					isDone = true;
 				else
-					rhsCurr = rhsCurr->next;
+					rhsCurr = GET_NEXT_PTR(rhsCurr);
 			}
 
 		} else
@@ -830,7 +813,7 @@ protected:
 			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			elem_t* prev = privFindPrev (data);
 			if (prev)
-				return prev->next;
+				return GET_NEXT_PTR(prev);
 		} // End of handling a search with more than one element
 
 		return nullptr;
@@ -852,10 +835,10 @@ protected:
 				insElem->eNr = tail->eNr + 1;
 				tail = insElem;
 			}
-			insElem->next = insPrev->next;
-			insPrev->next = insElem;
+			SET_NEXT_PTR(insElem, GET_NEXT_PTR(insPrev))
+			SET_NEXT_PTR(insPrev, insElem)
 		} else if (localCount) {
-			insElem->next = head;
+			SET_NEXT_PTR(insElem, head)
 			head = insElem;
 		} else {
 			// If we had no elements yet, head and tail need to be set:
@@ -889,7 +872,7 @@ protected:
 				if (xCurr == tail)
 					isDone = true;
 				else
-					xCurr = xCurr->next;
+					xCurr = GET_NEXT_PTR(xCurr);
 			}
 
 			doRenumber = false;
@@ -947,7 +930,7 @@ private:
 		elem_t*  xTail = tail;
 		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
-		elem_t*  xCurr = xPrev->next;
+		elem_t*  xCurr = GET_NEXT_PTR(xPrev);
 
 		while (xPrev && (xPrev != xTail)) {
 			if (xCurr->data.get() == data) {
@@ -957,7 +940,7 @@ private:
 				return xPrev;
 			}
 			xPrev = xCurr;
-			xCurr = xCurr->next;
+			xCurr = GET_NEXT_PTR(xCurr);
 		}
 
 		// If we are here, prev points to tail. No match found.
@@ -976,15 +959,6 @@ private:
 			elem_t*  xHead = head;
 			elem_t*  xTail = tail;
 			elem_t*  xCurr = curr ? curr : head;
-
-#ifdef PWX_THREADDEBUG
-			if (nullptr == xHead)
-				PWX_THROW("Illegal Condition", "head is nullptr",
-						  "The container has elements, but head is nullptr")
-			if (nullptr == xTail)
-				PWX_THROW("Illegal Condition", "tail is nullptr",
-						  "The container has elements, but tail is nullptr")
-#endif // PWX_THREADDEBUG
 
 			/* Note: It is important to use a local number. If the current
 			 * number of xCurr is used, wandering the list might _jump_ the
@@ -1012,7 +986,7 @@ private:
 
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
-				xCurr = xCurr->next;
+				xCurr = GET_NEXT_PTR(xCurr);
 				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr  = xCurr;
 				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
@@ -1029,19 +1003,19 @@ private:
 
 			// Ok, let's go. But only start from head if we currently are beyond.
 			if (xIdx < xNr) {
-				xCurr = xHead->next;
+				xCurr = GET_NEXT_PTR(xHead);
 				xNr  = 1;
 			}
 
 			// Otherwise the next of xCurr is already checked, so skip it
 			else {
-				xCurr = xCurr->next;
+				xCurr = GET_NEXT_PTR(xCurr);
 				++xNr;
 			}
 
 			// Now look into the rest
 			while ( xCurr && (xNr < xIdx) && (xNr < (localCount - 1))) {
-				xCurr = xCurr->next;
+				xCurr = GET_NEXT_PTR(xCurr);
 				++xNr;
 
 				// if Another thread deletes any element during this search,
@@ -1107,10 +1081,10 @@ private:
 				// If the element still has a next, or if it is the last element,
 				// we can, however, continue.
 				uint32_t localCount = size();
-				if ((localCount > 1) && prevElement->next) {
-					PWX_LOCK(prevElement->next)
+				if ((localCount > 1) && GET_NEXT_PTR(prevElement)) {
+					PWX_LOCK(GET_NEXT_PTR(prevElement))
 					PWX_UNLOCK(prevElement)
-					prevElement = prevElement->next;
+					prevElement = GET_NEXT_PTR(prevElement);
 				} else if (localCount < 2) {
 					PWX_UNLOCK(prevElement)
 					prevElement = nullptr; // New head about
@@ -1179,10 +1153,10 @@ private:
 			PWX_LOCK(prevElement)
 			while (prevElement->destroyed()) {
 				uint32_t localCount = size();
-				if ((localCount > 1) && prev->next) {
-					PWX_LOCK(prevElement->next)
+				if ((localCount > 1) && GET_NEXT_PTR(prev)) {
+					PWX_LOCK(GET_NEXT_PTR(prevElement))
 					PWX_UNLOCK(prevElement)
-					prevElement = prevElement->next;
+					prevElement = GET_NEXT_PTR(prevElement);
 				}
 				else if (localCount < 2) {
 					PWX_UNLOCK(prevElement)
@@ -1241,21 +1215,21 @@ private:
 
 			if (elem == head) {
 				if (tail)
-					head = elem->next;
+					head = GET_NEXT_PTR(elem);
 				else
 					head = nullptr;
 			}
 
 			// now maintain the neighbors
 			if (prev && (prev != elem)) {
-				prev->next = elem->next;
+				SET_NEXT_PTR(prev, GET_NEXT_PTR(elem))
 				curr = prev;
 			} else
 				curr = head;
 
 			// Finally elem does not need pointers to its neighbors any more
 			// and the list needs to be renumbered
-			elem->next = nullptr;
+			SET_NEXT_PTR(elem, nullptr)
 			--eCount;
 			if (needRenumber)
 				doRenumber = true;
@@ -1264,46 +1238,31 @@ private:
 	}
 
 
-	/// @brief remove the element after the specified data
-	virtual elem_t* privRemoveAfterData(data_t* prev)
+	/** @brief remove the element after the specified data
+	  * @return nullptr if the element holding @a prev is the last element or the list is empty.
+	**/
+	virtual elem_t* privRemoveAfterData(data_t* prev) noexcept
 	{
-		elem_t* xPrev = nullptr;
+		elem_t* xPrev    = prev ? const_cast<elem_t*>(protFind (prev)) : nullptr;
+		elem_t* toRemove = xPrev ? GET_NEXT_PTR(xPrev) : head;
 
-		if (prev && (nullptr == (xPrev = const_cast<elem_t*>(protFind (prev))) ) )
-			PWX_THROW ("ElementNotFound", "Element not found", "The searched element can not be found in this singly linked list")
-
-		if (xPrev && (nullptr == xPrev->next))
-			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind element holding the given prev pointer")
-
-		elem_t* toRemove = xPrev ? xPrev->next : head;
-
-		privRemove (xPrev, toRemove);
+		if (toRemove)
+			privRemove (xPrev, toRemove);
 
 		return toRemove;
 	}
 
 
-	/// @brief remove the element after the specified element
-	virtual elem_t* privRemoveAfterElement(elem_t* prev)
+	/** @brief remove the element after the specified element
+	  * @return nullptr if GET_NEXT_PTR(prev) is nullptr or the list is empty
+	**/
+	virtual elem_t* privRemoveAfterElement(elem_t* prev) noexcept
 	{
 		PWX_LOCK_GUARD(list_t, this)
 
-#ifdef PWX_THREADDEBUG
-		if (prev && prev->destroyed()) {
-			// If it is deleted, there is no "next" to get on with
-			PWX_THROW("Illegal Condition", "prev element destroyed",
-					  "The previous element for a removal is already destroyed.")
-		}
-#endif // PWX_THREADDEBUG
-
-		if (prev && (nullptr == prev->next))
-			PWX_THROW ("OutOfRange", "Element out of range", "There is no element behind the given prev element")
-
-		if (empty())
-			PWX_THROW ("OutOfRange", "Element out of range", "The list is empty")
-
-		elem_t* toRemove = prev ? prev->next : head;
-		privRemove (prev, toRemove);
+		elem_t* toRemove = prev ? GET_NEXT_PTR(prev) : head;
+		if (toRemove)
+			privRemove (prev, toRemove);
 
 		return toRemove;
 	}

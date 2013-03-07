@@ -400,16 +400,15 @@ public:
 	  * You have to delete the removed element by yourself. If you do not intent
 	  * to work with the removed element, use delNext instead.
 	  *
-	  * If there is no element behind the element @a prev a
-	  * pwx::CException with the name "OutOfRange" is thrown.
+	  * If there is no element behind the element @a prev a nullptr is returned.
 	  *
 	  * @param[in] prev the data the element that precedes the element to remove holds
-	  * @return a pointer to the removed element
+	  * @return a pointer to the removed element or nullptr if there is none
 	**/
-	virtual elem_t* remNext (data_t* prev)
+	virtual elem_t* remNext (data_t* prev) noexcept
 	{
 		elem_t* toRemove = nullptr;
-		PWX_TRY_PWX_FURTHER (toRemove = base_t::remNext (prev))
+		toRemove = base_t::remNext (prev);
 		if (toRemove)
 			privConnectEnds();
 		return toRemove;
@@ -429,15 +428,15 @@ public:
 	  * use the correct element on the correct list!
 	  *
 	  * If there is no element behind the element @a prev or if the ring is
-	  * empty, a pwx::CException with the name "OutOfRange" is thrown.
+	  * empty, nullptr is returned.
 	  *
 	  * @param[in] prev the element that precedes the element to remove
-	  * @return a pointer to the removed element
+	  * @return a pointer to the removed element or nullptr if there is none
 	**/
-	virtual elem_t* remNextElem (elem_t* prev)
+	virtual elem_t* remNextElem (elem_t* prev) noexcept
 	{
 		elem_t* toRemove = nullptr;
-		PWX_TRY_PWX_FURTHER (toRemove = base_t::remNextElem (prev))
+		toRemove = base_t::remNextElem (prev);
 		if (toRemove)
 			privConnectEnds();
 		return toRemove;
@@ -537,8 +536,8 @@ private:
 			}
 #endif // PWX_THREADS
 
-			if (tail && !tail->destroyed() && (tail->next != head))
-				tail->next = head;
+			if (tail && !tail->destroyed() && (GET_NEXT_PTR(tail) != head))
+				SET_NEXT_PTR(tail, head)
 			PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)

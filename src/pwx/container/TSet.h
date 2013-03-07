@@ -238,7 +238,7 @@ public:
 						if (xCurr == head)
 							isDone = true;
 						else
-							xCurr = xCurr->next;
+							xCurr = GET_NEXT_PTR(xCurr);
 					} else
 						result = false;
 				}
@@ -529,11 +529,11 @@ private:
 
 				// Step 1: Move up until curr is larger
 				while (data > **curr)
-					curr = curr->next;
+					curr = GET_NEXT_PTR(curr);
 
 				// Step 2: Move down until curr is smaller
 				while (**curr > data)
-					curr = curr->prev;
+					curr = GET_PREV_PTR(curr);
 
 				/* Due to this order curr is now either pointing to an element
 				 * holding data, or the next smaller element. The latter detail
@@ -543,11 +543,11 @@ private:
 				*/
 				return (**curr == data ? curr : nullptr);
 			} else {
-				curr = head->next;
+				curr = GET_NEXT_PTR(head);
 
 				// Note: head and tail are already checked.
 				while ((curr != tail) && (**curr != data))
-					curr = curr->next;
+					curr = GET_NEXT_PTR(curr);
 
 				// Because tail is already checked, a pointer comparison will do:
 				return (curr != tail ? curr : nullptr);
@@ -601,8 +601,8 @@ private:
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a next, or if it is the last element,
 				// we can, however, continue.
-				if ((localCount > 1) && prevElement->next)
-					prevElement = prevElement->next;
+				if ((localCount > 1) && GET_NEXT_PTR(prevElement))
+					prevElement = GET_NEXT_PTR(prevElement);
 				else if (localCount < 2)
 					prevElement = nullptr; // New head about
 				else
@@ -674,8 +674,8 @@ private:
 		if (prevElement) {
 			uint32_t localCount = size();
 			while (prevElement->destroyed()) {
-				if ((localCount > 1) && prev->next)
-					prevElement = prevElement->next;
+				if ((localCount > 1) && GET_NEXT_PTR(prev))
+					prevElement = GET_NEXT_PTR(prevElement);
 				else if (localCount < 2)
 					prevElement = nullptr; // New head about
 				else
@@ -731,7 +731,7 @@ private:
 		if (isSorted)
 			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
 		else
-			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? GET_PREV_PTR(nextElement) : nullptr, newElement))
 	}
 
 
@@ -752,8 +752,8 @@ private:
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((localCount > 1) && nextElement->prev)
-					nextElement = nextElement->prev;
+				if ((localCount > 1) && GET_PREV_PTR(nextElement))
+					nextElement = GET_PREV_PTR(nextElement);
 				else if (localCount < 2)
 					nextElement = nullptr; // New head about
 				else
@@ -771,7 +771,7 @@ private:
 							 "The Creation of a new list element failed.")
 
 		// 3: Do the real insert
-		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? GET_PREV_PTR(nextElement) : nullptr, newElement))
 	}
 
 
@@ -810,7 +810,7 @@ private:
 		if (isSorted)
 			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
 		else
-			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? GET_PREV_PTR(nextElement) : nullptr, newElement))
 	}
 
 
@@ -831,8 +831,8 @@ private:
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
-				if ((localCount > 1) && nextElement->prev)
-					nextElement = nextElement->prev;
+				if ((localCount > 1) && GET_PREV_PTR(nextElement))
+					nextElement = GET_PREV_PTR(nextElement);
 				else if (localCount < 2)
 					nextElement = nullptr; // New head about
 				else
@@ -864,7 +864,7 @@ private:
 		if (isSorted)
 			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
 		else
-			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->prev : nullptr, newElement))
+			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? GET_PREV_PTR(nextElement) : nullptr, newElement))
 	}
 
 }; // class TSet
