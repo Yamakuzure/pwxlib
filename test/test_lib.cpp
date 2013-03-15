@@ -1,9 +1,13 @@
 #include "test_lib.h"
 
-int32_t main()
+int32_t main(int argc, char* argv[])
 {
-	int32_t result = EXIT_SUCCESS;
+	int32_t result  = EXIT_SUCCESS;
 	sEnv env;
+
+	// Disable speed test?
+	if ((argc > 1) && (STREQ(argv[1], "--no-speed-test")))
+		env.doSpeed = false;
 
 	// Wrap a giant try/catch around just everything to trace immediately
 	try {
@@ -31,56 +35,57 @@ int32_t main()
 		}
 
 		// --- test the speed of the containers ---
-		if (EXIT_SUCCESS == result) {
+		if ((EXIT_SUCCESS == result) && env.doSpeed) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
 			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
 			cout << "                                               Add /      Clear" << endl;
 			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_list_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_list_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<double_list_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_list_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_ring_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_ring_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<double_ring_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_ring_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<stack_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<stack_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<queue_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<queue_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<set_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSpeedMT<set_t> (env))
-		}
 
-		// --- Test RNG worker ---
-		if (EXIT_SUCCESS == result ) {
-			PWX_TRY_PWX_FURTHER (result = testRNG (env))
-		}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_list_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedST<double_list_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_list_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedST<single_ring_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_ring_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedST<double_ring_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_ring_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedST<stack_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<stack_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedST<queue_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<queue_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedST<set_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSpeedMT<set_t> (env))
+			}
+		} // End of speed tests
+
+	// --- Test RNG worker ---
+	if (EXIT_SUCCESS == result ) {
+		PWX_TRY_PWX_FURTHER (result = testRNG (env))
+	}
 
 		// End of giant try
 	} catch (pwx::CException &e) {
