@@ -6,7 +6,7 @@
   *
   * @brief Declaration of a general base class to add locking mechanisms to classes derived from CLockable.
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
@@ -121,6 +121,15 @@ public:
 			return false;
 #endif
 		return true;
+	}
+
+
+	/** @brief return the number of locks on this object
+	  * @return the number of current locks
+	**/
+	uint32_t count() noexcept
+	{
+		return mutex.native_handle()->__data.__count;
 	}
 
 
