@@ -18,15 +18,16 @@ void testRNG_hash(sEnv &env)
 {
 	static const T maxTval = std::numeric_limits<T>::max();
 	static const T minTval = std::numeric_limits<T>::lowest();
-	uint32_t curHash  = 0;
-	uint32_t minHash  = maxUInt32;
-	uint32_t maxHash  = 0;
+	uint32_t numOfElem = env.doSpeed ? hashMaxElements : 10;
+	uint32_t curHash   = 0;
+	uint32_t minHash   = maxUInt32;
+	uint32_t maxHash   = 0;
 	T start    = static_cast<T>(RNG.random(minInt16, maxInt16));
 	T interval = RNG.random((T)3, (T)9);
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < hashMaxElements; ++i) {
+	for (size_t i = 0; i < numOfElem; ++i) {
 		tStart = hrClock::now();
 		curHash = RNG.hash(start);
 		tUsed += hrClock::now() - tStart;
@@ -56,15 +57,16 @@ void testRNG_hash(sEnv &env)
 void testRNG_hash_char(sEnv &env)
 {
 	char     buf[18];
-	uint32_t curHash  = 0;
-	uint32_t minHash  = maxUInt32;
-	uint32_t maxHash  = 0;
-	size_t   strLen   = 0;
+	uint32_t numOfElem = env.doSpeed ? hashMaxElements : 10;
+	uint32_t curHash   = 0;
+	uint32_t minHash   = maxUInt32;
+	uint32_t maxHash   = 0;
+	size_t   strLen    = 0;
 	memset(buf, 0, 18 * sizeof(char));
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < hashMaxElements; ++i) {
+	for (size_t i = 0; i < numOfElem; ++i) {
 		strLen = RNG.random(buf, 8, 17);
 		tStart = hrClock::now();
 		curHash = RNG.hash(buf, strLen);
@@ -92,14 +94,15 @@ void testRNG_hash_str(sEnv &env)
 {
 	char        buf[18];
 	std::string str;
-	uint32_t    curHash  = 0;
-	uint32_t    minHash  = maxUInt32;
-	uint32_t    maxHash  = 0;
+	uint32_t    numOfElem = env.doSpeed ? hashMaxElements : 10;
+	uint32_t    curHash   = 0;
+	uint32_t    minHash   = maxUInt32;
+	uint32_t    maxHash   = 0;
 	memset(buf, 0, 18 * sizeof(char));
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < hashMaxElements; ++i) {
+	for (size_t i = 0; i < numOfElem; ++i) {
 		RNG.random(buf, 8, 17);
 		str.assign(buf);
 		tStart = hrClock::now();
