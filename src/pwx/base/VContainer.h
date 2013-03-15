@@ -6,7 +6,7 @@
   *
   * @brief Virtual base class for all containers.
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
@@ -40,6 +40,11 @@ namespace pwx
   *
   * This class is strictly virtual. ALl container templates have
   * to inherit public from this base class.
+  *
+  * Notes: <UL>
+  * <LI>Both doRenumber and eCount are atomic and need no lock</LI>
+  * <LI>Both doRenumber and eCount are mutable and need no const_cast</LI>
+  * </UL>
 **/
 class VContainer : public CLockable
 {
@@ -83,7 +88,7 @@ protected:
 	mutable
 	std::atomic_bool doRenumber; //!< If set to true, a renumbering is done before retrieving elements by index
 	mutable
-	uint32_t eCount = 0; //!< Current number of elements
+	std::atomic_uint eCount; //!< Current number of elements
 
 
 }; // class VContainer
