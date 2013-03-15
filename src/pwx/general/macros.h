@@ -6,7 +6,7 @@
   *
   * @brief preprocessor macros for general usage.
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
@@ -27,6 +27,10 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+// Debug? (Ensure it is loaded if compiler.h isn't needed)
+#ifdef LIBPWX_DEBUG
+# include "pwx/functions/debug.h"
+#endif // LIBPWX_DEBUG
 
 /** @brief Return the sign as -1 or +1 of an expression
   *
@@ -191,8 +195,10 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_LOCK(object) { \
-		if (object) \
+		if (object) {\
 			PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
+			LOG_LOCK(object) \
+		} \
 	}
 #else
 #  define PWX_LOCK(object) { }
@@ -210,6 +216,7 @@
 		if (object) { \
 			PWX_TRY(object->lock()) \
 			PWX_CATCH_AND_FORGET(pwx::CException) \
+			LOG_LOCK(object) \
 	} }
 #else
 #  define PWX_LOCK_NOEXCEPT(object) { }
@@ -238,8 +245,10 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_UNLOCK(object) { \
-		if (object) \
+		if (object) { \
 			PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
+			LOG_UNLOCK(object) \
+		} \
 	}
 #else
 #  define PWX_UNLOCK(object) { }
@@ -257,6 +266,7 @@
 		if (object) { \
 			PWX_TRY(object->unlock()) \
 			PWX_CATCH_AND_FORGET(pwx::CException) \
+			LOG_UNLOCK(object) \
 	} }
 #else
 #  define PWX_UNLOCK_NOEXCEPT(object) { }
@@ -273,7 +283,8 @@
 **/
 #if defined(PWX_THREADS)
 #  define PWX_NAMED_LOCK_GUARD(Name, T, object) \
-	std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object);
+	std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object); \
+	LOG_LOCK_GUARD(object)
 #else
 #  define PWX_NAMED_LOCK_GUARD(Name, T, object) { }
 #endif
@@ -307,7 +318,9 @@
 #  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) \
 	std::unique_lock<Ta> pwx_libpwx_double_lock_A(*objA, std::defer_lock); \
 	std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, std::defer_lock); \
-	std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B);
+	std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B); \
+	LOG_LOCK_GUARD(objA) \
+	LOG_LOCK_GUARD(objB)
 #else
 #  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) { }
 #endif
@@ -320,11 +333,15 @@
   * @param obj pointer of the object whose next pointer is to be retrieved
   * @return the next pointer of obj or nullptr if there is none.
 **/
-#if defined(PWX_THREADS)
-#  define GET_NEXT_PTR(obj) ((obj)->getNext())
+#if defined(LIBPWX_DEBUG)
+#  define GET_NEXT_PTR(obj) _debug_get_next(obj)
 #else
-#  define GET_NEXT_PTR(obj) ((obj)->next)
-#endif // defined(PWX_THREADS)
+#  if defined(PWX_THREADS)
+#    define GET_NEXT_PTR(obj) ((obj)->getNext())
+#  else
+#    define GET_NEXT_PTR(obj) ((obj)->next)
+#  endif // defined(PWX_THREADS)
+#endif // defined(LIBPWX_DEBUG)
 
 
 /** @brief Macro to use ->prev member directly or use a getPrev() function
@@ -334,11 +351,15 @@
   * @param obj pointer of the object whose prev pointer is to be retrieved
   * @return the prev pointer of obj or nullptr if there is none.
 **/
-#if defined(PWX_THREADS)
-#  define GET_PREV_PTR(obj) ((obj)->getPrev())
+#if defined(LIBPWX_DEBUG)
+#  define GET_PREV_PTR(obj) _debug_get_prev(obj)
 #else
-#  define GET_PREV_PTR(obj) ((obj)->prev)
-#endif // defined(PWX_THREADS)
+#  if defined(PWX_THREADS)
+#    define GET_PREV_PTR(obj) ((obj)->getPrev())
+#  else
+#    define GET_PREV_PTR(obj) ((obj)->prev)
+#  endif // defined(PWX_THREADS)
+#endif // defined(LIBPWX_DEBUG)
 
 
 /** @brief Macro to set ->next member directly or use a setNext function
@@ -348,11 +369,15 @@
   * @param obj pointer of the object whose next pointer is to be retrieved
   * @param new_next pointer to where the next pointer should be directed
 **/
-#if defined(PWX_THREADS)
-#  define SET_NEXT_PTR(obj, new_next) { (obj)->setNext(new_next); }
+#if defined(LIBPWX_DEBUG)
+#  define SET_NEXT_PTR(obj, new_next) _debug_set_next(obj, new_next);
 #else
-#  define SET_NEXT_PTR(obj) { (obj)->next = (new_next); }
-#endif // defined(PWX_THREADS)
+#  if defined(PWX_THREADS)
+#    define SET_NEXT_PTR(obj, new_next) (obj)->setNext(new_next);
+#  else
+#    define SET_NEXT_PTR(obj, new_next) (obj)->next = new_next;
+#  endif // defined(PWX_THREADS)
+#endif // defined(LIBPWX_DEBUG)
 
 
 /** @brief Macro to set ->prev member directly or use a setPrev function
@@ -362,11 +387,15 @@
   * @param obj pointer of the object whose prev pointer is to be retrieved
   * @param new_prev pointer to where the prev pointer should be directed
 **/
-#if defined(PWX_THREADS)
-#  define SET_PREV_PTR(obj, new_prev) { (obj)->setPrev(new_prev); }
+#if defined(LIBPWX_DEBUG)
+#  define SET_PREV_PTR(obj, new_prev) _debug_set_prev(obj, new_prev);
 #else
-#  define SET_PREV_PTR(obj) { (obj)->prev = (new_prev); }
-#endif // defined(PWX_THREADS)
+#  if defined(PWX_THREADS)
+#    define SET_PREV_PTR(obj, new_prev) (obj)->setPrev(new_prev);
+#  else
+#    define SET_PREV_PTR(obj, new_prev) (obj)->prev = new_prev;
+#  endif // defined(PWX_THREADS)
+#endif // defined(LIBPWX_DEBUG)
 
 
 /** @brief return true if two C-Strings are equal ignoring case
