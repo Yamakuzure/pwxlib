@@ -6,7 +6,7 @@
   *
   * @brief Definitions of functions for pwx/container/TSet.h
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net
@@ -162,14 +162,14 @@ TSet<data_t>* set_intersection(const TSet<data_t>* const lhs, const TSet<data_t>
 	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_difference() could not create the difference set!")
 	newSet->reset(*lhs);
 
-	// Actions is only needed if neither is the empty
+	// Action is only needed if neither is the empty set
 	if (lhs->size() && rhs->size()) {
 		PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(lhs), list_t, const_cast<list_t*>(rhs))
 
 		/* Two possibilities:
 		 * 1.: rhs and lhs are equal, then we simply copy lhs
 		 * 2.: Otherwise we have to traverse lhs and add
-		 *     all elements that are a member of rhs, too.
+		 *     all elements that are a member of rhs.
 		*/
 		if (lhs == rhs)
 			// This is possibility 1
@@ -253,7 +253,7 @@ TSet<data_t>* set_union(const TSet<data_t>* const lhs, const TSet<data_t>* const
 	PWX_TRY(newSet = new list_t())
 	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_difference() could not create the difference set!")
 
-	// If lhs has elements, we can begin with addingits elements
+	// If lhs has elements, we can begin with adding them.
 	if (lhs->size()) {
 		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(lhs))
 		newSet->reset(*lhs);

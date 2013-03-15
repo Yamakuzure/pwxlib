@@ -7,7 +7,7 @@
   *
   * @brief definition of a little template that does all the random() handling
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net

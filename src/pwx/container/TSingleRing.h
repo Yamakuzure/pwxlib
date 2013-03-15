@@ -6,7 +6,7 @@
   *
   * @brief Declaration of a basic template for singly linked rings
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
@@ -536,7 +536,7 @@ private:
 			}
 #endif // PWX_THREADS
 
-			if (tail && !tail->destroyed() && (GET_NEXT_PTR(tail) != head))
+			if (tail && !tail->destroyed() && (tail->next != head))
 				SET_NEXT_PTR(tail, head)
 			PWX_UNLOCK_NOEXCEPT(this)
 		}

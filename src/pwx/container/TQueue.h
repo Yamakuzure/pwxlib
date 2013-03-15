@@ -8,7 +8,7 @@
   *
   * @brief Declaration of a basic template for queues based on doubly linked lists
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net

@@ -6,7 +6,7 @@
   *
   * @brief Main include file to add everything from folder "types"
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net

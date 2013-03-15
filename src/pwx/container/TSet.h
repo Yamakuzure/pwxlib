@@ -6,7 +6,7 @@
   *
   * @brief Declaration of the TSet template to store unique elements
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net

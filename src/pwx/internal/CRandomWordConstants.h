@@ -10,7 +10,7 @@
   * <B>Automatically generated Header! Do NOT modify! See bottom
   * of this file for more information!</B>
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net
