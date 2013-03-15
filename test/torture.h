@@ -160,7 +160,7 @@ struct thrdClear : public thrdBase
 		std::this_thread::sleep_for(waitTime);
 
 		// Now fire away if this thread hasn't been killed and is still allowed to work:
-		if (cont && isRunning && !isKilled) {
+		while (cont && isRunning && !isKilled && cont->size()) {
 			PWX_TRY(cont->clear())
 			THRD_CATCHER("Clear")
 		}
