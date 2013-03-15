@@ -7,11 +7,12 @@ namespace pwx {
 
 /// @brief VElement default constructor.
 VElement::VElement() noexcept
+	: eNr(0)
 { }
 
 /// @brief VElement copy constructor.
-VElement::VElement(const VElement& src) noexcept :
-	base_t(src)
+VElement::VElement(const VElement& src) noexcept
+	: base_t(src), eNr(0)
 { }
 
 } // namespace pwx

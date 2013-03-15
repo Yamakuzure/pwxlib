@@ -6,7 +6,7 @@
   *
   * @brief Virtual base class for all container elements.
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
@@ -27,6 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <atomic>
 #include <memory>
 #include "pwx/types/CLockable.h"
 #include "pwx/types/TVarDeleter.h"
@@ -41,6 +42,11 @@ namespace pwx
   *
   * This class is strictly virtual. ALl element templates have
   * to inherit public from this base class.
+  *
+  * Notes: <UL>
+  * <LI>eNr does not need a lock, it is atomic.</LI>
+  * <LI>eNr needs no const_cast, it is mutable.</LI>
+  * </UL>
 **/
 class VElement : public CLockable
 {
@@ -69,7 +75,10 @@ public:
 	 * ===============================================
 	*/
 
-	mutable uint32_t eNr = 0; //!< Number of the element
+	mutable
+	std::atomic_uint_fast32_t
+	eNr; //!< Number of the element
+
 }; // class VContainer
 
 #if defined(PWX_EXPORTS)
