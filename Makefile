@@ -104,9 +104,6 @@ ifeq (YES, ${GRAPHITE})
 endif
 
 ifeq (YES, ${THREADSAFE})
-  ifeq (YES, ${DEBUG})
-    CXXFLAGS := ${CXXFLAGS} -DPWX_THREADDEBUG
-  endif
   CXXFLAGS := ${CXXFLAGS} -DPWX_THREADS -pthread
   LDFLAGS  := ${LDFLAGS} -lpthread
 endif
