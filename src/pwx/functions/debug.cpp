@@ -3,6 +3,8 @@
 
 namespace pwx {
 
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
+
 void debug_log(const char* fmt, ...)
 {
     va_list ap;
@@ -10,5 +12,7 @@ void debug_log(const char* fmt, ...)
     vfprintf (stderr, fmt, ap);
 	va_end(ap);
 }
+
+#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 } // namespace pwx

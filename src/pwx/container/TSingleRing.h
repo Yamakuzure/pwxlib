@@ -48,7 +48,12 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * If PWX_THREADS is defined, changes to the element are done in a locked state.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
+  * === : EMXIF ===
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
 class PWX_API TSingleRing : public TSingleList<data_t, elem_t>
@@ -332,9 +337,9 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		PWX_LOCK(this)
+		{} /// FIXME: PWX_LOCK(this)
 		elem_t* xTail = tail;
-		PWX_UNLOCK(this)
+		{} /// FIXME: PWX_UNLOCK(this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, data))
 		return privConnectEnds();
 	}
@@ -350,9 +355,9 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		PWX_LOCK(this)
+		{} /// FIXME: PWX_LOCK(this)
 		elem_t* xTail = tail;
-		PWX_UNLOCK(this)
+		{} /// FIXME: PWX_UNLOCK(this)
 		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, src))
 		return privConnectEnds();
 	}
@@ -526,19 +531,17 @@ private:
 	virtual uint32_t privConnectEnds() noexcept
 	{
 		try {
-			PWX_LOCK_NOEXCEPT(this)
+			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
 
-#if defined(PWX_THREADS)
 			while (tail && tail->destroyed()) {
-				PWX_UNLOCK_NOEXCEPT(this)
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 				std::this_thread::yield();
-				PWX_LOCK_NOEXCEPT(this)
+				{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
 			}
-#endif // PWX_THREADS
 
 			if (tail && !tail->destroyed() && (tail->next != head))
 				SET_NEXT_PTR(tail, head)
-			PWX_UNLOCK_NOEXCEPT(this)
+			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)
 		return size();
@@ -573,9 +576,9 @@ TSingleRing<data_t, elem_t>::~TSingleRing() noexcept
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	PWX_LOCK(&lhs)
+	{} /// FIXME: PWX_LOCK(&lhs)
 	TSingleRing<data_t, elem_t> result (lhs);
-	PWX_UNLOCK(&lhs)
+	{} /// FIXME: PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result += rhs)
@@ -601,9 +604,9 @@ TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, c
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator- (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	PWX_LOCK(&lhs)
+	{} /// FIXME: PWX_LOCK(&lhs)
 	TSingleRing<data_t, elem_t> result (lhs);
-	PWX_UNLOCK(&lhs)
+	{} /// FIXME: PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result -= rhs)

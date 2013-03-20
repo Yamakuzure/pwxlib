@@ -67,7 +67,12 @@ namespace pwx
   * to store a very large number of elements and can not live with the downside of
   * every element having to be copied into the std container.
   *
-  * If PWX_THREADS is defined, changes to the element are done in a locked state.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
+  * === : EMXIF ===
 **/
 template<typename data_t>
 class PWX_API TSet : public TDoubleList<data_t>
@@ -228,7 +233,7 @@ public:
 		// The empty set is always a subset of everything.
 		if (localCount && (this != &src)) {
 			if (src.size()) {
-				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
+				{} /// FIXME: PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
 				elem_t* xCurr  = head;
 				bool    isDone = false;
 
@@ -318,7 +323,7 @@ public:
 	**/
 	virtual void reset(const list_t &src) noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		clear();
 		if (&src != this) {
 			destroy  = src.destroy;
@@ -405,7 +410,7 @@ public:
 	virtual list_t &operator= (const list_t &rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			{} /// FIXME: PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy = rhs.destroy;
 			PWX_TRY_PWX_FURTHER (*this += rhs)
@@ -466,7 +471,7 @@ private:
 	{
 		// Note: As the consistency of the content of a set is more important
 		//       than anything, a big lock is a must-have here!
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 		uint32_t localCount = size();
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
@@ -562,7 +567,7 @@ private:
 	/// @brief preparation method to insert data behind data
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
@@ -587,7 +592,7 @@ private:
 	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
@@ -627,7 +632,7 @@ private:
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
@@ -639,11 +644,11 @@ private:
 					   "The searched element can not be found in this singly linked list")
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
@@ -653,7 +658,7 @@ private:
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
@@ -663,7 +668,7 @@ private:
 	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
@@ -686,11 +691,11 @@ private:
 #endif // PWX_THREADDEBUG
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
@@ -700,7 +705,7 @@ private:
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
@@ -710,7 +715,7 @@ private:
 	/// @brief preparation method to insert data before data
 	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
@@ -738,7 +743,7 @@ private:
 	/// @brief preparation method to insert data before an element
 	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
@@ -778,7 +783,7 @@ private:
 	/// @brief preparation method to insert an element copy before data
 	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
@@ -790,11 +795,11 @@ private:
 					   "The searched element can not be found in this doubly linked list")
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
@@ -804,7 +809,7 @@ private:
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		if (isSorted)
@@ -817,7 +822,7 @@ private:
 	/// @brief preparation method to insert an element copy before an element
 	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
@@ -844,11 +849,11 @@ private:
 #endif // PWX_THREADDEBUG
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
@@ -858,7 +863,7 @@ private:
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		if (isSorted)

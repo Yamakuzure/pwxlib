@@ -2,9 +2,7 @@
 #ifndef PWX_LIBPWX_TEST_MAIN_H_INCLUDED
 #define PWX_LIBPWX_TEST_MAIN_H_INCLUDED 1
 
-#ifdef PWX_THREADS
-# include <thread>
-#endif
+#include <thread>
 #include <chrono>
 #include <iostream>
 using std::cout;

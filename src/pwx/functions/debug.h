@@ -31,25 +31,25 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+// Handle includes and defines
 #ifdef LIBPWX_DEBUG
 # include <cstdio>
 # include <cstring>
-# ifdef PWX_THREADS
+# ifdef PWX_THREADDEBUG
 #   include <mutex>
-#   define PWX_THREADDEBUG 1
-# endif // PWX_THREADSS
+# endif
 #endif // LIBPWX_DEBUG
 
 namespace pwx {
 
 // If any debugging mode is activated, a central logging functions is needed:
-#ifdef LIBPWX_DEBUG
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
 // The central log needs a log mutex if multi threading is used:
 # ifdef PWX_THREADDEBUG
 	static std::recursive_mutex _pwx_internal_LOG_mutex;
-#   define _LOCK_LOG_MUTEX   { pwx::_pwx_internal_LOG_mutex.lock();   }
-#   define _UNLOCK_LOG_MUTEX { pwx::_pwx_internal_LOG_mutex.unlock(); }
+#   define _LOCK_LOG_MUTEX   { try { pwx::_pwx_internal_LOG_mutex.lock(); } catch (...) {}   }
+#   define _UNLOCK_LOG_MUTEX { try { pwx::_pwx_internal_LOG_mutex.unlock(); } catch (...) {} }
 # else
 #   define _LOCK_LOG_MUTEX   { }
 #   define _UNLOCK_LOG_MUTEX { }
@@ -69,15 +69,14 @@ void debug_log(const char* fmt, ...);
 #else
 # define DEBUG_LOG(...) {}
 # define debug_log(...) {} // Just in case someone uses it directly...
-#endif // LIBPWX_DEBUG
+#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 // Specialized logging macros for mutex locking/unlocking
 #ifdef PWX_THREADDEBUG
-# define LOG_LOCK(obj)       DEBUG_LOG("LOCK", "%s has %d locks", #obj, obj->count())
-# define LOG_UNLOCK(obj)     DEBUG_LOG("ÚNLOCK", "%s has %d locks", #obj, obj->count())
-# define LOG_LOCK_GUARD(obj) DEBUG_LOG("GUARD", "%s has %d locks", #obj, obj->count())
+# define LOG_LOCK(obj)       DEBUG_LOG("LOCK", "%s has %d locks", #obj, obj->count_locks())
+# define LOG_UNLOCK(obj)     DEBUG_LOG("UNLOCK", "%s has %d locks", #obj, obj->count_locks())
+# define LOG_LOCK_GUARD(obj) DEBUG_LOG("GUARD", "%s has %d locks", #obj, obj->count_locks())
 #else
-# define DEBUG_LOG(...) {}
 # define LOG_LOCK(...) {}
 # define LOG_UNLOCK(...) {}
 # define LOG_LOCK_GUARD(...) {}
@@ -87,43 +86,27 @@ void debug_log(const char* fmt, ...);
 #ifdef LIBPWX_DEBUG
 template<typename T> T* _debug_get_next(T* obj)
 {
-#ifdef PWX_THREADS
 	if (obj) return (obj)->getNext();
-#else
-	if (obj) return (obj)->next;
-#endif // PWX_THREADS
 	DEBUG_LOG("GET NEXT", "%s is nullptr!", "obj")
 	return nullptr;
 }
 
 template<typename T> T* _debug_get_prev(T* obj)
 {
-#ifdef PWX_THREADS
 	if (obj) return (obj)->getPrev();
-#else
-	if (obj) return (obj)->prev;
-#endif // PWX_THREADS
 	DEBUG_LOG("GET PREV", "%s is nullptr!", "obj")
 	return nullptr;
 }
 
 template<typename T> void _debug_set_next(T* obj, void* new_next)
 {
-#ifdef PWX_THREADS
 	if (obj) (obj)->setNext(static_cast<T*>(new_next));
-#else
-	if (obj) (obj)->next = static_cast<T*>(new_next);
-#endif // PWX_THREADS
 	else DEBUG_LOG("SET NEXT", "%s is nullptr!", "obj")
 }
 
 template<typename T> void _debug_set_prev(T* obj, void* new_prev)
 {
-#ifdef PWX_THREADS
 	if (obj) (obj)->setPrev(static_cast<T*>(new_prev));
-#else
-	if (obj) (obj)->prev = static_cast<T*>(new_prev);
-#endif // PWX_THREADS
 	else DEBUG_LOG("SET PREV", "%s is nullptr!", "obj")
 }
 #endif // LIBPWX_DEBUG

@@ -35,9 +35,10 @@ int32_t main(int argc, char* argv[])
 		}
 
 		// --- test the speed of the containers ---
-		if ((EXIT_SUCCESS == result) && env.doSpeed) {
+		if (EXIT_SUCCESS == result) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
-			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
+			cout << " (Inserting " << (env.doSpeed ? maxElements : maxThreads * 100);
+			cout << " random elements and clear up)" << endl;
 			cout << "                                               Add /      Clear" << endl;
 			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_list_t> (env))
 

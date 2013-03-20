@@ -61,7 +61,12 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * If PWX_THREADS is defined, changes to the element are done in a locked state.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, changes to the element are done in a locked state."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling elements via VElement whether they are used concurrently or not?
+  * === : EMXIF ===
 **/
 template<typename data_t>
 struct PWX_API TSingleElement : public VElement
@@ -153,7 +158,7 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		{} /// FIXME: PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
 		return next;
 	}
 
@@ -167,7 +172,7 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		PWX_LOCK_GUARD(elem_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(elem_t, this)
 		next = new_next;
 	}
 
@@ -189,7 +194,7 @@ struct PWX_API TSingleElement : public VElement
 	elem_t& operator= (const elem_t &src) noexcept
 	{
 		if (this != &src) {
-			PWX_LOCK_GUARD (elem_t, this)
+			{} /// FIXME: PWX_LOCK_GUARD (elem_t, this)
 			data    = src.data;
 		}
 		return *this;
@@ -265,13 +270,13 @@ TSingleElement<data_t>::~TSingleElement() noexcept
 	isDestroyed = true;
 
 	if (1 == data.use_count()) {
-		PWX_LOCK_GUARD (elem_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD (elem_t, this)
 		PWX_TRY(data.reset()) // the shared_ptr will delete the data now
 		catch(...) { }
 	}
 	// Do another locking, so that threads having had to wait while the data
 	// was destroyed have a chance now to react before the object is gone.
-	PWX_LOCK_GUARD (elem_t, this)
+	{} /// FIXME: PWX_LOCK_GUARD (elem_t, this)
 }
 
 } // namespace pwx

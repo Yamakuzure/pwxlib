@@ -55,6 +55,8 @@
 		<Unit filename="../src/pwx/container/TSingleList.h" />
 		<Unit filename="../src/pwx/container/TSingleRing.h" />
 		<Unit filename="../src/pwx/container/TStack.h" />
+		<Unit filename="../src/pwx/functions/debug.cpp" />
+		<Unit filename="../src/pwx/functions/debug.h" />
 		<Unit filename="../src/pwx/functions/set_func.h" />
 		<Unit filename="../src/pwx/functions/set_fwd.h" />
 		<Unit filename="../src/pwx/general.h" />

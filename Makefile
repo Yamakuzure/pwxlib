@@ -1,16 +1,15 @@
 VERSION = 0.8.99
 
 # ===================================================================
-# Set to NO to disable Thread-safety components and functions
-THREADSAFE := YES
-
 # Set to YES to include debugging info
 DEBUG := YES
 
-# Note: If both THREADSAFE and DEBUG are set to "YES", special code
-#       blocks are activated doing a lot of checks in thread relevant
-#       sections. These checks are costly, so be sure to disable
-#       DEBUG for production.
+# The following switch produces massive output and should
+# not be enabled lightly. Make sure to disable it before
+# running tools like helgrind or DRD on any pwxLib program!
+THREADDEBUG := YES
+
+# Note: You can add additional debugging options in pwx/functions/debug.h
 
 # Set to YES to include profiling info
 PROFILE := NO
@@ -71,7 +70,8 @@ USRINST   = /usr/local/include
 AR        = $(shell which ar)
 ARFLAGS   = rcs
 CXX       = $(shell which g++)
-CXXFLAGS += -std=c++11 -Wall -Wextra -fexceptions -pedantic -O2
+CXXFLAGS += -std=c++11 -Wall -Wextra -fexceptions -pedantic -O2 -pthread
+LDFLAGS  += -lpthread
 INSTALL   = $(shell which install)
 DOXYGEN   = $(shell which doxygen)
 LIBDIR    = lib
@@ -103,9 +103,8 @@ ifeq (YES, ${GRAPHITE})
   CXXFLAGS := ${CXXFLAGS} ${GRP_CXXFLAGS}
 endif
 
-ifeq (YES, ${THREADSAFE})
-  CXXFLAGS := ${CXXFLAGS} -DPWX_THREADS -pthread
-  LDFLAGS  := ${LDFLAGS} -lpthread
+ifeq (YES, ${THREADDEBUG})
+  CXXFLAGS := ${CXXFLAGS} -DPWX_THREADDEBUG
 endif
 
 

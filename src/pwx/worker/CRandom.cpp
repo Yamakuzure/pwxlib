@@ -1008,7 +1008,7 @@ double CRandom::noise (int32_t x, int32_t y, int32_t z, int32_t w) const noexcep
 **/
 int16_t CRandom::random (int16_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<int16_t>(0, max);
 }
 
@@ -1023,7 +1023,7 @@ int16_t CRandom::random (int16_t max) noexcept
 **/
 int16_t CRandom::random (int16_t min, int16_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<int16_t>(min, max);
 }
 
@@ -1037,7 +1037,7 @@ int16_t CRandom::random (int16_t min, int16_t max) noexcept
 **/
 uint16_t CRandom::random (uint16_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<uint16_t>(0, max);
 }
 
@@ -1052,7 +1052,7 @@ uint16_t CRandom::random (uint16_t max) noexcept
 **/
 uint16_t CRandom::random (uint16_t min, uint16_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<uint16_t>(min, max);
 }
 
@@ -1066,7 +1066,7 @@ uint16_t CRandom::random (uint16_t min, uint16_t max) noexcept
 **/
 int32_t CRandom::random (int32_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<int32_t>(0, max);
 }
 
@@ -1083,7 +1083,7 @@ int32_t CRandom::random (int32_t max) noexcept
 **/
 int32_t CRandom::random (int32_t min, int32_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<int32_t>(min, max);
 }
 
@@ -1099,7 +1099,7 @@ int32_t CRandom::random (int32_t min, int32_t max) noexcept
 **/
 uint32_t CRandom::random (uint32_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<uint32_t>(0, max);
 }
 
@@ -1114,7 +1114,7 @@ uint32_t CRandom::random (uint32_t max) noexcept
 **/
 uint32_t CRandom::random (uint32_t min, uint32_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<uint32_t>(min, max);
 }
 
@@ -1128,7 +1128,7 @@ uint32_t CRandom::random (uint32_t min, uint32_t max) noexcept
 **/
 int64_t CRandom::random (int64_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<int64_t>(0, max);
 }
 
@@ -1143,7 +1143,7 @@ int64_t CRandom::random (int64_t max) noexcept
 **/
 int64_t CRandom::random (int64_t min, int64_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<int64_t>(min, max);
 }
 
@@ -1157,7 +1157,7 @@ int64_t CRandom::random (int64_t min, int64_t max) noexcept
 **/
 uint64_t CRandom::random (uint64_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<uint64_t>(0, max);
 }
 
@@ -1172,7 +1172,7 @@ uint64_t CRandom::random (uint64_t max) noexcept
 **/
 uint64_t CRandom::random (uint64_t min, uint64_t max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<uint64_t>(min, max);
 }
 
@@ -1186,7 +1186,7 @@ uint64_t CRandom::random (uint64_t min, uint64_t max) noexcept
 **/
 float CRandom::random (float max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<float>(0, max);
 }
 
@@ -1201,7 +1201,7 @@ float CRandom::random (float max) noexcept
 **/
 float CRandom::random (float min, float max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<float>(min, max);
 }
 
@@ -1215,7 +1215,7 @@ float CRandom::random (float min, float max) noexcept
 **/
 double CRandom::random (double max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<double>(0, max);
 }
 
@@ -1230,7 +1230,7 @@ double CRandom::random (double max) noexcept
 **/
 double CRandom::random (double min, double max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<double>(min, max);
 }
 
@@ -1244,7 +1244,7 @@ double CRandom::random (double min, double max) noexcept
 **/
 long double CRandom::random (long double max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<long double>(0, max);
 }
 
@@ -1259,7 +1259,7 @@ long double CRandom::random (long double max) noexcept
 **/
 long double CRandom::random (long double min, long double max) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random<long double>(min, max);
 }
 
@@ -1282,7 +1282,7 @@ long double CRandom::random (long double min, long double max) noexcept
 **/
 size_t CRandom::random (char* dest, size_t minLen, size_t maxLen) noexcept
 {
-	PWX_LOCK_GUARD(CRandom, this)
+	{} /// FIXME: PWX_LOCK_GUARD(CRandom, this)
 	return private_::private_random_str(dest, minLen, maxLen);
 }
 

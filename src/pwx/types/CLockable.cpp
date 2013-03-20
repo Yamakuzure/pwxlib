@@ -9,6 +9,7 @@ namespace pwx
 /** @brief Default ctor
   */
 CLockable::CLockable() noexcept
+	: lockCount(0), threadId(std::thread::id())
 { /* --- nothing to do here. ---*/ }
 
 
@@ -27,11 +28,9 @@ CLockable::CLockable (const CLockable&) noexcept
   */
 CLockable::~CLockable() noexcept
 {
-#if defined(PWX_THREADS)
 	clear_locks();
 	// the return value is unimportant, we can't do
 	// anything about it in the middle of a dtor anyway.
-#endif
 }
 
 

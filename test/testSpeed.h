@@ -7,13 +7,17 @@
 #include <pwx/types/CException.h>
 #include <pwx/general/macros.h>
 
+// Shortcut - I'm lazy. ;)
+typedef std::atomic_bool aBool;
+
+
 /// @brief struct doing synchronized start/stop for additions of items into containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
 template<typename list_t>
 struct thAdder : public pwx::CLockable
 {
-	bool    isRunning = false;
-	list_t* cont      = nullptr;
+	aBool   isRunning;
+	list_t* cont  = nullptr;
 
 	explicit thAdder(bool autostart) : isRunning(autostart) { }
 	thAdder():thAdder(false) { }
@@ -21,17 +25,12 @@ struct thAdder : public pwx::CLockable
 	/// @brief the working functions, called manually or by std::thread
 	void operator()(list_t* cont_, data_t start, data_t toAdd, data_t maxAdd)
 	{
-		PWX_LOCK_NOEXCEPT(this)
 		cont = cont_;
-#ifdef PWX_THREADS
 		milliseconds sleepTime( 1 );
-		while (!isRunning) {
-			PWX_UNLOCK_NOEXCEPT(this)
+		while (!isRunning.load()) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
-			PWX_LOCK_NOEXCEPT(this)
 		}
-#endif
 		if (cont) {
 			for (data_t nr = 0; nr < toAdd; ++nr) {
 				PWX_TRY_PWX_FURTHER(cont->push(new data_t(start)))
@@ -39,8 +38,7 @@ struct thAdder : public pwx::CLockable
 			}
 		}
 
-		isRunning = false;
-		PWX_UNLOCK_NOEXCEPT(this)
+		isRunning.store(false);
 	}
 };
 
@@ -49,8 +47,8 @@ struct thAdder : public pwx::CLockable
 template<typename list_t>
 struct thClearer : public pwx::CLockable
 {
-	bool    isRunning = false;
-	list_t* cont      = nullptr;
+	aBool   isRunning;
+	list_t* cont = nullptr;
 
 	explicit thClearer(bool autostart) : isRunning(autostart) { }
 	thClearer() { thClearer(false); }
@@ -58,21 +56,15 @@ struct thClearer : public pwx::CLockable
 	/// @brief the working functions, called manually or by std::thread
 	void operator()(list_t* cont_)
 	{
-		PWX_LOCK(this)
 		cont = cont_;
-#ifdef PWX_THREADS
 		milliseconds sleepTime( 1 );
-		while (!isRunning) {
-			PWX_UNLOCK(this)
+		while (!isRunning.load()) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
-			PWX_LOCK(this)
 		}
-#endif
 		if (cont) cont->clear();
 
-		isRunning = false;
-		PWX_UNLOCK(this)
+		isRunning.store(false);
 	}
 };
 
@@ -88,7 +80,7 @@ template<typename list_t>
 int32_t testSpeedST (sEnv &env)
 {
 	int32_t  result       = EXIT_SUCCESS;
-	uint32_t localMaxElem = maxElements;
+	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
 
 	cout << adjRight (4, 0) << ++env.testCount;
 	if (isSameType (list_t, single_list_t))
@@ -165,8 +157,7 @@ template<typename list_t>
 int32_t testSpeedMT (sEnv &env)
 {
 	int32_t  result       = EXIT_SUCCESS;
-
-	uint32_t localMaxElem = maxElements;
+	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
 
 	cout << adjRight (4, 0) << ++env.testCount;
 	if (isSameType (list_t, single_list_t))
@@ -190,7 +181,7 @@ int32_t testSpeedMT (sEnv &env)
 	}
 	cout.flush();
 
-#ifdef PWX_THREADS
+	// Now the threaded part:
 	list_t intCont; // The list
 
 	// To make the testing of the sets easier, we use a counting loop, so no doublets
@@ -228,21 +219,16 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Starting in a loop
 	hrTime_t startTimeAdd = hrClock::now();
-    for (size_t nr = 0; nr < maxThreads; ++nr) {
-		PWX_LOCK_NOEXCEPT( (&adders[nr]) )
-		adders[nr].isRunning = true;
-		PWX_UNLOCK_NOEXCEPT( (&adders[nr]) )
-    }
+    for (size_t nr = 0; nr < maxThreads; ++nr)
+		adders[nr].isRunning.store(true);
 
     // ... joining in a loop.
     bool isFinished = false;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
-			PWX_LOCK_NOEXCEPT( (&adders[nr]) )
-			if (adders[nr].isRunning)
+			if (adders[nr].isRunning.load())
 				isFinished = false;
-			PWX_UNLOCK_NOEXCEPT( (&adders[nr]) )
 		}
 		if (isFinished) {
 			for (size_t nr = 0; nr < maxThreads; ++nr) {
@@ -264,21 +250,16 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Starting in a loop
 	hrTime_t startTimeClr = hrClock::now();
-    for (size_t nr = 0; nr < maxThreads; ++nr) {
-		PWX_LOCK_NOEXCEPT( (&clearers[nr]) )
-		clearers[nr].isRunning = true;
-		PWX_UNLOCK_NOEXCEPT( (&clearers[nr]) )
-    }
+    for (size_t nr = 0; nr < maxThreads; ++nr)
+		clearers[nr].isRunning.store(true);
 
     // ... joining in a loop.
     isFinished = false;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
-			PWX_LOCK_NOEXCEPT( (&clearers[nr]) )
-			if (clearers[nr].isRunning)
+			if (clearers[nr].isRunning.load())
 				isFinished = false;
-			PWX_UNLOCK_NOEXCEPT( (&clearers[nr]) )
 		}
 		if (isFinished) {
 			for (size_t nr = 0; nr < maxThreads; ++nr) {
@@ -304,11 +285,6 @@ int32_t testSpeedMT (sEnv &env)
 		result = EXIT_FAILURE;
 	} else
 		++env.testSuccess;
-#else
-	cout << adjRight(5,0) << "n/a" << "    /";
-	cout << adjRight(5,0) << "n/a" << endl;
-	++env.testSuccess;
-#endif // PWX_THREADS
 
 	return result;
 }

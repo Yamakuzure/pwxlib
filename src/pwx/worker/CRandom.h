@@ -39,7 +39,12 @@ namespace pwx {
   * This class produces a static instance called pwx::RNG, meaning
   * "Random Name/Noise/Number Generator".
   *
-  * If PWX_THREADS is defined, all operations will be thread save.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, all operations will be thread save."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling RNG with a function whether it is used concurrently or not?
+  * === : EMXIF ===
   *
   * The following sets of functions are available:
   *

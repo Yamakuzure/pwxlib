@@ -48,7 +48,12 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * If PWX_THREADS is defined, changes to the element are done in a locked state.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
+  * === : EMXIF ===
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
 class PWX_API TSingleList : public VContainer
@@ -129,11 +134,8 @@ public:
 			if (toDelete) {
 				PWX_TRY(privDelete(toDelete))
 				catch(...) { } // We can't do anything about that
-			}
-#ifdef PWX_THREADS
-			else
+			} else
 				std::this_thread::yield();
-#endif // PWX_THREADS
 		} // end of while head
 	}
 
@@ -294,7 +296,7 @@ public:
 	**/
 	virtual const data_t &getData (const int32_t index) const
 	{
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 		// Note: The guard is needed or another thread can
 		// delete the retrieved element between the retrieval
 		// and the delivery. A segfault would be the result.
@@ -449,7 +451,7 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		// Note: The guard is needed to ensure that no thread changes the
 		// the number of elements beyond the border of eCount > 1
 		return (eCount > 1
@@ -511,7 +513,7 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		// Note: The guard is needed to ensure that tail is not
 		// manipulated between function calls.
 		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (tail, data))
@@ -528,7 +530,7 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		// Note: The guard is needed to ensure that tail is not
 		// manipulated between function calls.
 		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (tail, src))
@@ -627,8 +629,7 @@ public:
 	  * Clears this list and copies all elements from @a rhs
 	  * into this list.
 	  *
-	  * If PWX_THREADS is defined, an exclusive lock for [b]both[/b]
-	  * lists is required!
+	  * FIXME: An exclusive lock for [b]both[/b] lists is required?
 	  *
 	  * @param[in] rhs reference of the list to copy.
 	  * @return reference to this.
@@ -636,7 +637,7 @@ public:
 	virtual list_t &operator= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			{} /// FIXME: PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy = rhs.destroy;
 			PWX_TRY_PWX_FURTHER (*this += rhs)
@@ -649,8 +650,7 @@ public:
 	  *
 	  * Add all elements from @a rhs to this list.
 	  *
-	  * If PWX_THREADS is defined, an exclusive lock for [b]both[/b]
-	  * lists is required!
+	  * FIXME: An exclusive lock for [b]both[/b] lists is required?
 	  *
 	  * @param[in] rhs reference of the list to add.
 	  * @return reference to this.
@@ -658,7 +658,7 @@ public:
 	virtual list_t &operator+= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			{} /// FIXME: PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			elem_t* rhsCurr = rhs.head;
 			bool    isDone  = false;
 
@@ -678,8 +678,7 @@ public:
 	  *
 	  * Remove all elements from @a rhs from this list.
 	  *
-	  * If PWX_THREADS is defined, an exclusive lock for [b]both[/b]
-	  * lists is required!
+	  * FIXME: An exclusive lock for [b]both[/b] lists is required?
 	  *
 	  * @param[in] rhs reference of the list to substract.
 	  * @return reference to this.
@@ -687,7 +686,7 @@ public:
 	virtual list_t &operator-= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			{} /// FIXME: PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			elem_t* rhsCurr = rhs.head;
 			elem_t* lhsPrev = nullptr;
 			data_t* rhsData = nullptr;
@@ -712,7 +711,7 @@ public:
 			}
 
 		} else {
-			PWX_LOCK_GUARD(list_t, this)
+			{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 			clear();
 		}
 
@@ -784,7 +783,7 @@ protected:
 		if (!eCount)
 			return nullptr;
 
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 		// Exit if curr is nullptr (list emptied while we waited for the lock)
 		if (nullptr == curr)
@@ -822,7 +821,7 @@ protected:
 	/// @brief simple method to insert an element into the list
 	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem) noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		bool needRenumber = true;
 
 		// Now the real insertion can be done:
@@ -859,7 +858,7 @@ protected:
 	{
 		// Do a big lock, so multiple threads calling this function
 		// won't renumber multiple times when once is enough.
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 		// Now do the renumbering if it is necessary:
 		if (doRenumber) {
@@ -910,13 +909,13 @@ private:
 
 		try {
 			if (removed) {
-				PWX_LOCK(removed)
+				{} /// FIXME: PWX_LOCK(removed)
 				if (!removed->destroyed())
 					// Note: The dtor of CLockable will remove all
 					// locks imposed by this thread.
 					delete removed;
 				else
-					PWX_UNLOCK(removed)
+					{} /// FIXME: PWX_UNLOCK(removed)
 			}
 			return eCount;
 		}
@@ -951,7 +950,7 @@ private:
 		protRenumber();
 
 		// Do a big lock, no thread is allowed to change the list for consistencies sake!
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 		if (eCount) {
 			elem_t*  xCurr = curr ? curr : head;
@@ -1016,128 +1015,156 @@ private:
 	/// @brief preparation method to insert data behind data
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		PWX_LOCK_NOEXCEPT(this)
+		{} /// FIXME: PWX_LOCK(this)
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
-		if (prev && (nullptr == prevElement))
+		if (prev && (nullptr == prevElement)) {
+			{} /// FIXME: PWX_UNLOCK(this)
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this singly linked list")
+		}
 
 		// Now prevElement must not change any more
-		PWX_LOCK_NOEXCEPT(prevElement)
-		PWX_UNLOCK_NOEXCEPT(this)
+		if (prevElement)
+			{} /// FIXME: PWX_LOCK(prevElement)
+		{} /// FIXME: PWX_UNLOCK(this)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (prevElement)
+				{} /// FIXME: PWX_UNLOCK(prevElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
 
 		// 3: Do the real insert
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		if (prevElement)
+			{} /// FIXME: PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
-		PWX_UNLOCK_NOEXCEPT(prevElement)
 	}
 
 
 	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
-		PWX_LOCK_NOEXCEPT(this)
+		{} /// FIXME: PWX_LOCK(this)
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = prev;
 
 		// Now prevElement must not change any more
-		PWX_LOCK_NOEXCEPT(prevElement)
-		PWX_UNLOCK_NOEXCEPT(this)
+		if (prevElement)
+			{} /// FIXME: PWX_LOCK(prevElement)
+		{} /// FIXME: PWX_UNLOCK(this)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (prevElement)
+				{} /// FIXME: PWX_UNLOCK(prevElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
 
 		// 3: Do the real insert
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		if (prevElement)
+			{} /// FIXME: PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
-		PWX_UNLOCK_NOEXCEPT(prevElement)
 	}
 
 
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_NOEXCEPT(this)
+		{} /// FIXME: PWX_LOCK(this)
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
-		if (prev && (nullptr == prevElement))
+		if (prev && (nullptr == prevElement)) {
+			{} /// FIXME: PWX_UNLOCK(this)
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this singly linked list")
+		}
 
 		// Now prevElement must not change any more
-		PWX_LOCK_NOEXCEPT(prevElement)
-		PWX_UNLOCK_NOEXCEPT(this)
+		if (prevElement)
+			{} /// FIXME: PWX_LOCK(prevElement)
+		{} /// FIXME: PWX_UNLOCK(this)
 
 		// 2: Check source:
-		PWX_LOCK_NOEXCEPT(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_NOEXCEPT(const_cast<elem_t*>(&src))
-			PWX_UNLOCK_NOEXCEPT(prevElement)
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			if (prevElement)
+				{} /// FIXME: PWX_UNLOCK(prevElement)
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		if (prevElement)
+			{} /// FIXME: PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
-		PWX_UNLOCK_NOEXCEPT(prevElement)
 	}
 
 
 	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_NOEXCEPT(this)
+		{} /// FIXME: PWX_LOCK(this)
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = prev;
 
 		// Now prevElement must not change any more
-		PWX_LOCK_NOEXCEPT(prevElement)
-		PWX_UNLOCK_NOEXCEPT(this)
+		if (prevElement)
+			{} /// FIXME: PWX_LOCK(prevElement)
+		{} /// FIXME: PWX_UNLOCK(this)
 
 		// 2: Check source:
-		PWX_LOCK_NOEXCEPT(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_NOEXCEPT(const_cast<elem_t*>(&src))
-			PWX_UNLOCK_NOEXCEPT(prevElement)
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		PWX_UNLOCK_NOEXCEPT(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			if (prevElement)
+				{} /// FIXME: PWX_UNLOCK(prevElement)
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		if (prevElement)
+			{} /// FIXME: PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
-		PWX_UNLOCK_NOEXCEPT(prevElement)
 	}
 
 
@@ -1189,7 +1216,7 @@ private:
 	**/
 	virtual elem_t* privRemoveAfterData(data_t* prev) noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		// Need a big lock, the list must not be modified, now!
 		elem_t* xPrev    = prev ? const_cast<elem_t*>(protFind (prev)) : nullptr;
 		elem_t* toRemove = xPrev ? xPrev->next : head;
@@ -1206,7 +1233,7 @@ private:
 	**/
 	virtual elem_t* privRemoveAfterElement(elem_t* prev) noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* toRemove = prev ? prev->next : head;
 		if (toRemove)

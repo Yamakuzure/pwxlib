@@ -53,7 +53,12 @@ namespace pwx
   * unless you need to store a very large number of elements and can not live with
   * the downside of every element having to be copied into the std container.
   *
-  * If PWX_THREADS is defined, changes to the element are done in a locked state.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
+  * === : EMXIF ===
 **/
 template<typename data_t>
 class PWX_API TQueue : public TDoubleList<data_t>

@@ -30,10 +30,8 @@
 #include <pwx/general/compiler.h>
 #include <pwx/types/CException.h>
 #include <pwx/general/macros.h>
-#if defined(PWX_THREADS)
-#  include <mutex>
-#  include <thread>
-#endif
+#include <mutex>
+#include <thread>
 #include <cstring>
 
 namespace pwx
@@ -42,10 +40,6 @@ namespace pwx
 /** @class CLockable
   *
   * @brief Base class to make objects lockable via mutexes
-  *
-  * First things first: You need to compile both the library and your
-  * application with the macro PWX_THREADS being defined, or there will
-  * be no locking functionality.
   *
   * Any class that is derived from this class gains four methods
   * lock(), try_lock(), clear_locks() and unlock() to use a recursive mutex
@@ -98,38 +92,31 @@ public:
 	  * not an option. Regular unlock() calls are always to be
 	  * preferred.
 	  *
-	  * If the macro PWX_THREADS is not defined, this method
-	  * always returns true.
-	  *
 	  * @return true if this thread is the owner and all locks could be cleared.
 	**/
 	bool clear_locks() noexcept
 	{
-#if defined(PWX_THREADS)
-		if (mutex.native_handle()->__data.__lock && try_lock()) {
-			/** @todo : There must be an easier way, or more direct way,
-			  * to find out whether this thread is the owner or not.
-			**/
-			while (mutex.native_handle()->__data.__count) {
+		if (std::this_thread::get_id() == threadId) {
+			while (std::this_thread::get_id() == threadId) {
 				PWX_TRY(this->unlock())
 				PWX_CATCH_AND_FORGET(CException)
 			}
+			return true;
 		}
 
-		// Return false if the mutex is still locked:
-		if (mutex.native_handle()->__data.__lock)
-			return false;
-#endif
-		return true;
+		// Return false we can not unlock it from this thread
+		return false;
 	}
 
 
-	/** @brief return the number of locks on this object
-	  * @return the number of current locks
+	/** @brief return the number of locks on this object *this* thread has
+	  * @return the number of current locks held by the calling thread
 	**/
-	uint32_t count() noexcept
+	uint32_t count_locks() noexcept
 	{
-		return mutex.native_handle()->__data.__count;
+		if (std::this_thread::get_id() == threadId)
+			return lockCount;
+		return 0;
 	}
 
 
@@ -145,12 +132,9 @@ public:
 	  *   -# EAGAIN  - Try again
 	  *   -# EBUSY   - Device or resource busy
 	  *   -# EDEADLK - Resource deadlock would occur
-	  *
-	  * If the macro PWX_THREADS is not defined, this method does nothing.
 	  */
 	void lock()
 	{
-#if defined(PWX_THREADS)
 		PWX_TRY (mutex.lock())
 		catch (int &e) {
 			if      (EINVAL  == e) PWX_THROW ("LockFailed", "EINVAL",  "Invalid argument")
@@ -158,7 +142,10 @@ public:
 			else if (EBUSY   == e) PWX_THROW ("LockFailed", "EBUSY",   "Device or resource busy")
 			else if (EDEADLK == e) PWX_THROW ("LockFailed", "EDEADLK", "Resource deadlock would occur")
 		}
-#endif
+		// Got it, so note it:
+		if (std::this_thread::get_id() != threadId)
+			threadId  = std::this_thread::get_id();
+		lockCount = mutex.native_handle()->__data.__count;
 	}
 
 
@@ -171,19 +158,20 @@ public:
 	  * current owner of a lock, please remember that a return value of
 	  * "true" means that you have to unlock this extra lock.
 	  *
-	  * If the macro PWX_THREADS is not defined, this method does nothing.
-	  *
 	  * @return true if the object could be locked, false otherwise.
 	  */
 	bool try_lock() noexcept
 	{
-#if defined(PWX_THREADS)
-		PWX_TRY(return mutex.try_lock())
+		try {
+			if (mutex.try_lock()) {
+				if (std::this_thread::get_id() != threadId)
+					threadId  = std::this_thread::get_id();
+				lockCount = mutex.native_handle()->__data.__count;
+				return true;
+			}
+		}
 		PWX_CATCH_AND_FORGET (int)
-		return false; // A system error occurred.
-#else
-		return true;
-#endif
+		return false; // A system error occurred or the try_lock was unsuccessful
 	}
 
 
@@ -199,19 +187,26 @@ public:
 	  *   -# EINVAL  - Invalid Argument
 	  *   -# EAGAIN  - Try again
 	  *   -# EBUSY   - Device or resource busy
-	  *
-	  * If the macro PWX_THREADS is not defined, this method does nothing.
 	  */
 	void unlock()
 	{
-#if defined(PWX_THREADS)
-		PWX_TRY(mutex.unlock())
-		catch (int &e) {
-			if      (EINVAL  == e) PWX_THROW ("UnlockFailed", "EINVAL",  "Invalid argument")
-			else if (EAGAIN  == e) PWX_THROW ("UnlockFailed", "EAGAIN",  "Try again")
-			else if (EBUSY   == e) PWX_THROW ("UnlockFailed", "EBUSY",   "Device or resource busy")
+		if (std::this_thread::get_id() == threadId) {
+			try {
+				if (1 == lockCount)
+					threadId = std::thread::id();
+				lockCount = 0;
+				mutex.unlock();
+			}
+			catch (int &e) {
+				// First reinstate the tracking data
+				lockCount = mutex.native_handle()->__data.__count;
+				if (lockCount)
+					threadId  = std::this_thread::get_id();
+				if      (EINVAL  == e) PWX_THROW ("UnlockFailed", "EINVAL",  "Invalid argument")
+				else if (EAGAIN  == e) PWX_THROW ("UnlockFailed", "EAGAIN",  "Try again")
+				else if (EBUSY   == e) PWX_THROW ("UnlockFailed", "EBUSY",   "Device or resource busy")
+			}
 		}
-#endif
 	}
 
 
@@ -230,9 +225,11 @@ private:
 	 * ===============================================
 	*/
 
-#if defined(PWX_THREADS)
-	std::recursive_mutex mutex;
-#endif
+	uint32_t             lockCount; //!< How many times the current thread has locked.
+	// Note: lockCount is not atomic, because it is only read/written when the current
+	//       Thread has the lock. Therefore there can not be any concurrency.
+	std::recursive_mutex mutex;     //!< Recursive mutex, let's us lock fast without time consuming checks.
+	std::thread::id      threadId;  //!< The owning thread of a lock
 }; // class CLockable
 
 } // namespace pwx

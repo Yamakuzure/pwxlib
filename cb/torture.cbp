@@ -24,7 +24,7 @@
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-c list_s -t 16" />
+				<Option parameters="-c list_s -t 8" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -54,7 +54,7 @@
 		<Unit filename="../test/torture.cpp" />
 		<Unit filename="../test/torture.h" />
 		<Extensions>
-			<envvars />
+			<envvars set="libpwx" />
 			<code_completion />
 			<lib_finder disable_auto="1" />
 			<debugger />

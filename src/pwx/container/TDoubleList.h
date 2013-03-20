@@ -6,7 +6,7 @@
   *
   * @brief Declaration of a basic template for doubly linked lists
   *
-  * (c) 2007 - 2012 PrydeWorX
+  * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net
@@ -50,7 +50,12 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * If PWX_THREADS is defined, changes to the element are done in a locked state.
+  * === FIXME : ===
+  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
+  * -> This must be changed. No automatic locking all the time, but run time
+  *     variable handling of thread safety.
+  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
+  * === : EMXIF ===
 **/
 template<typename data_t, typename elem_t = TDoubleElement<data_t> >
 class PWX_API TDoubleList : public TSingleList<data_t, elem_t>
@@ -129,22 +134,23 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		while (size()) {
-			PWX_LOCK_NOEXCEPT(this)
-			elem_t* toDelete = tail;
+		while (head || curr || tail) {
+			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
+			elem_t* toDelete = tail ? tail : head ? head : curr;
 			if (toDelete) {
-				privRemove(GET_PREV_PTR(toDelete), toDelete);
-				PWX_UNLOCK_NOEXCEPT(this)
+				if (head == toDelete)
+					privRemove(nullptr, toDelete);
+				else
+					privRemove(GET_PREV_PTR(toDelete), toDelete);
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 				PWX_TRY(privDelete(toDelete))
 				catch(...) {
-#ifdef PWX_THREADS
 					std::this_thread::yield();
-#endif // PWX_THREADS
 				}
 			} // End of deleting element
 			else
-				PWX_UNLOCK_NOEXCEPT(this)
-		} // end of while size()
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
+		} // end of while tail, head, curr
 	}
 
 
@@ -349,7 +355,7 @@ public:
 	virtual elem_t* pop_back() noexcept
 	{
 		if (size() > 1) {
-			PWX_LOCK_GUARD(list_t, this)
+			{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 			return remNextElem (GET_PREV_PTR(tail));
 		}
 		return remNext (nullptr);
@@ -480,10 +486,10 @@ protected:
 	/// @brief simple method to insert an element into the list
 	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem) noexcept
 	{
+		{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
 		uint32_t localCount   = size();
 		bool     needRenumber = true;
 
-		PWX_LOCK_NOEXCEPT(this)
 		if (insPrev) {
 			// Maintain tail first
 			if (tail == insPrev) {
@@ -515,7 +521,7 @@ protected:
 		localCount = ++eCount;
 		if (needRenumber)
 			doRenumber = true;
-		PWX_UNLOCK_NOEXCEPT(this)
+		{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 
 		return localCount;
 	}
@@ -552,15 +558,15 @@ private:
 	virtual uint32_t privDelete(elem_t* removed)
 	{
 		try {
-			PWX_LOCK(this)
+			{} /// FIXME: PWX_LOCK(this)
 			uint32_t localCount = size();
-			PWX_UNLOCK(this)
+			{} /// FIXME: PWX_UNLOCK(this)
 			if (removed) {
-				PWX_LOCK(removed)
+				{} /// FIXME: PWX_LOCK(removed)
 				if (!removed->destroyed())
 					delete removed;
 				else
-					PWX_UNLOCK(removed)
+					{} /// FIXME: PWX_UNLOCK(removed)
 			}
 			return localCount;
 		}
@@ -571,19 +577,19 @@ private:
 	/// @brief Search until the next element contains the searched data
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+		{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 		elem_t*  oldCurr = curr;
 		elem_t*  xHead   = head;
 		elem_t*  xTail   = tail;
-		PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+		{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 		elem_t*  xCurr   = GET_NEXT_PTR(oldCurr); // Go upwards first
 
 		while (xCurr && (xCurr != xTail) ) {
 			if (xCurr->data.get() == data) {
-				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr = xCurr;
-				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return GET_PREV_PTR(xCurr);
 			}
 			xCurr = GET_NEXT_PTR(xCurr);
@@ -595,9 +601,9 @@ private:
 
 			while (xCurr) {
 				if (xCurr->data.get() == data) {
-					PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+					{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 					curr = xCurr;
-					PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+					{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 					return GET_PREV_PTR(xCurr);
 				}
 				if (xCurr == xHead)
@@ -619,14 +625,14 @@ private:
 		uint32_t localCount = size();
 
 		if (localCount) {
-			PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+			{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 			elem_t*  xHead = head;
 			elem_t*  xTail = tail;
 			elem_t*  xCurr = curr ? curr : head;
 
 			// See note in TSingleList about why a local number is used.
 			uint32_t xNr   = xCurr->eNr;
-			PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
@@ -645,18 +651,18 @@ private:
 			// Is xIdx the next member, like in an upward for loop?
 			if (xIdx == (xNr + 1)) {
 				xCurr = GET_NEXT_PTR(xCurr);
-				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr  = xCurr;
-				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
 			// Is xIdx the prev member, like in a downward for loop?
 			if (xNr && (xIdx == (xNr - 1)) ) {
 				xCurr = GET_PREV_PTR(xCurr);
-				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr  = xCurr;
-				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
@@ -712,7 +718,7 @@ private:
 				// Same solution to a "dead-end" like in the single list
 				if ( (xTail == xCurr) || (xHead == xCurr) ) {
 					try {
-						PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+						{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 						curr = xCurr;
 						return privGetElementByIndex(index);
 					}
@@ -722,9 +728,9 @@ private:
 
 			// If xCurr is still set, it points to where it should now:
 			if (xCurr) {
-				PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr = xCurr;
-				PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
 			}
 
 			return xCurr;
@@ -763,30 +769,30 @@ private:
 
 #ifdef PWX_THREADDEBUG
 		if (nextElement) {
-			PWX_LOCK(nextElement)
+			{} /// FIXME: PWX_LOCK(nextElement)
 			while (nextElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
 				uint32_t localCount = size();
 				if ((localCount > 1) && GET_PREV_PTR(nextElement)) {
-					PWX_LOCK(GET_PREV_PTR(nextElement))
-					PWX_UNLOCK(nextElement)
+					{} /// FIXME: PWX_LOCK(GET_PREV_PTR(nextElement))
+					{} /// FIXME: PWX_UNLOCK(nextElement)
 					nextElement = GET_PREV_PTR(nextElement);
 				}
 				else if (localCount < 2) {
-					PWX_UNLOCK(nextElement)
+					{} /// FIXME: PWX_UNLOCK(nextElement)
 					nextElement = nullptr; // New head about
 				}
 				else {
-					PWX_UNLOCK(nextElement)
+					{} /// FIXME: PWX_UNLOCK(nextElement)
 					// my bad...
 					PWX_THROW("Illegal Condition", "Next element destroyed",
 							  "An element used as next for insertion is destroyed.")
 				}
 			} // End of ensuring a valid nextElement
 		}
-		if (nextElement) PWX_UNLOCK(nextElement)
+		if (nextElement) {} /// FIXME: PWX_UNLOCK(nextElement)
 #endif // PWX_THREADDEBUG
 
 		// 2: Create a new element
@@ -811,10 +817,10 @@ private:
 					   "The searched element can not be found in this doubly linked list")
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			// What on earth did the caller think?
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
@@ -825,7 +831,7 @@ private:
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? GET_PREV_PTR(nextElement) : nullptr, newElement))
@@ -840,38 +846,38 @@ private:
 
 #ifdef PWX_THREADDEBUG
 		if (nextElement) {
-			PWX_LOCK(nextElement)
+			{} /// FIXME: PWX_LOCK(nextElement)
 			while (nextElement->destroyed()) {
 				// This is bad. It means that someone manually deleted the element.
 				// If the element still has a prev, or if it is the last element,
 				// we can, however, continue.
 				uint32_t localCount = size();
 				if ((localCount > 1) && GET_PREV_PTR(nextElement)) {
-					PWX_LOCK(GET_PREV_PTR(nextElement))
-					PWX_UNLOCK(nextElement)
+					{} /// FIXME: PWX_LOCK(GET_PREV_PTR(nextElement))
+					{} /// FIXME: PWX_UNLOCK(nextElement)
 					nextElement = GET_PREV_PTR(nextElement);
 				}
 				else if (localCount < 2) {
-					PWX_UNLOCK(nextElement)
+					{} /// FIXME: PWX_UNLOCK(nextElement)
 					nextElement = nullptr; // New head about
 				}
 				else {
-					PWX_UNLOCK(nextElement)
+					{} /// FIXME: PWX_UNLOCK(nextElement)
 					// my bad...
 					PWX_THROW("Illegal Condition", "Next element destroyed",
 							  "An element used as next for insertion is destroyed.")
 				}
 			} // End of ensuring a valid nextElement
 		}
-		if (nextElement) PWX_UNLOCK(nextElement)
+		if (nextElement) {} /// FIXME: PWX_UNLOCK(nextElement)
 #endif // PWX_THREADDEBUG
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
@@ -881,7 +887,7 @@ private:
 		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
 							 "ElementCreationFailed",
 							 "The Creation of a new list element failed.")
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 
 		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? GET_PREV_PTR(nextElement) : nullptr, newElement))
@@ -893,7 +899,7 @@ private:
 	{
 		if (elem) {
 			bool needRenumber = true;
-			PWX_LOCK_NOEXCEPT(this)
+			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
 
 			// maintain tail and head first
 			if (tail == elem) {
@@ -933,7 +939,7 @@ private:
 			--eCount;
 			if (needRenumber)
 				doRenumber = true;
-			PWX_UNLOCK_NOEXCEPT(this)
+			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 		} // end of having an element to remove
 	}
 
@@ -955,7 +961,7 @@ private:
 	/// @brief simple wrapper to prepare the direct removal of an element
 	virtual elem_t* privRemoveElem(elem_t* elem) noexcept
 	{
-		PWX_LOCK_GUARD(elem_t, elem)
+		{} /// FIXME: PWX_LOCK_GUARD(elem_t, elem)
 
 		if (elem->destroyed())
 			// If it is deleted, it can not be removed as it is already detached.
@@ -988,7 +994,7 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeElem(elem_t* next) noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* toRemove = next ? GET_PREV_PTR(next) : tail;
 		if (toRemove)

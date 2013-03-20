@@ -187,90 +187,70 @@
 #define PWX_CATCH_AND_FORGET(except) catch(except&) { }
 
 
-/** @brief Use object->lock if PWX_THREADS is defined, and trace possible exceptions
+/** @brief Use object->lock and trace possible exceptions
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
-#if defined(PWX_THREADS)
-#  define PWX_LOCK(object) { \
-		if (object) {\
-			PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
-			LOG_LOCK(object) \
-		} \
-	}
-#else
-#  define PWX_LOCK(object) { }
-#endif
+#define PWX_LOCK(object) { \
+	if (object) {\
+		PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
+		LOG_LOCK(object) \
+	} \
+}
 
 
-/** @brief Use object->lock if PWX_THREADS is defined, and throw possible exceptions away
+/** @brief Use object->lock and throw possible exceptions away
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
-#if defined(PWX_THREADS)
-#  define PWX_LOCK_NOEXCEPT(object) { \
-		if (object) { \
-			PWX_TRY(object->lock()) \
-			PWX_CATCH_AND_FORGET(pwx::CException) \
-			LOG_LOCK(object) \
-	} }
-#else
-#  define PWX_LOCK_NOEXCEPT(object) { }
-#endif
+#define PWX_LOCK_NOEXCEPT(object) { \
+	if (object) { \
+		PWX_TRY(object->lock()) \
+		PWX_CATCH_AND_FORGET(pwx::CException) \
+		LOG_LOCK(object) \
+} }
 
 
-/** @brief Use object->try_lock if PWX_THREADS is defined
+/** @brief Use object->try_lock
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to try_lock.
   * @return true if the lock could be acquired, false otherwise
 **/
-#if defined(PWX_THREADS)
-#  define PWX_TRY_LOCK(object) ((object) ? (object)->try_lock() : false)
-#else
-#  define PWX_TRY_LOCK(object) (true)
-#endif
+#define PWX_TRY_LOCK(object) ((object) ? (object)->try_lock() : false)
 
 
-/** @brief Use object->unlock if PWX_THREADS is defined, and trace possible exceptions
+/** @brief Use object->unlock and trace possible exceptions
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to unlock.
 **/
-#if defined(PWX_THREADS)
-#  define PWX_UNLOCK(object) { \
-		if (object) { \
-			PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
-			LOG_UNLOCK(object) \
-		} \
-	}
-#else
-#  define PWX_UNLOCK(object) { }
-#endif
+#define PWX_UNLOCK(object) { \
+	if (object) { \
+		PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
+		LOG_UNLOCK(object) \
+	} \
+}
 
 
-/** @brief Use object->unlock if PWX_THREADS is defined, and throw possible exceptions away
+/** @brief Use object->unlock and throw possible exceptions away
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to unlock.
 **/
-#if defined(PWX_THREADS)
-#  define PWX_UNLOCK_NOEXCEPT(object) { \
-		if (object) { \
-			PWX_TRY(object->unlock()) \
-			PWX_CATCH_AND_FORGET(pwx::CException) \
-			LOG_UNLOCK(object) \
-	} }
-#else
-#  define PWX_UNLOCK_NOEXCEPT(object) { }
-#endif
+#define PWX_UNLOCK_NOEXCEPT(object) { \
+	if (object) { \
+		PWX_TRY(object->unlock()) \
+		PWX_CATCH_AND_FORGET(pwx::CException) \
+		LOG_UNLOCK(object) \
+} }
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
@@ -281,13 +261,9 @@
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
-#if defined(PWX_THREADS)
-#  define PWX_NAMED_LOCK_GUARD(Name, T, object) \
+#define PWX_NAMED_LOCK_GUARD(Name, T, object) \
 	std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object); \
 	LOG_LOCK_GUARD(object)
-#else
-#  define PWX_NAMED_LOCK_GUARD(Name, T, object) { }
-#endif
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
@@ -297,12 +273,7 @@
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
-#if defined(PWX_THREADS)
-#  define PWX_LOCK_GUARD(T, object) \
-	PWX_NAMED_LOCK_GUARD(Default, T, object)
-#else
-#  define PWX_LOCK_GUARD(T, object) { }
-#endif
+#define PWX_LOCK_GUARD(T, object) PWX_NAMED_LOCK_GUARD(Default, T, object)
 
 
 /** @brief Lock two elements simultaneously
@@ -314,16 +285,12 @@
   * @param Tb the type of the second object to lock
   * @param objB pointer to the second object to lock
 **/
-#if defined(PWX_THREADS)
-#  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) \
+#define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) \
 	std::unique_lock<Ta> pwx_libpwx_double_lock_A(*objA, std::defer_lock); \
 	std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, std::defer_lock); \
 	std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B); \
 	LOG_LOCK_GUARD(objA) \
 	LOG_LOCK_GUARD(objB)
-#else
-#  define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) { }
-#endif
 
 
 /** @brief Macro to use ->next member directly or use a getNext() function
@@ -336,11 +303,7 @@
 #if defined(LIBPWX_DEBUG)
 #  define GET_NEXT_PTR(obj) _debug_get_next(obj)
 #else
-#  if defined(PWX_THREADS)
-#    define GET_NEXT_PTR(obj) ((obj)->getNext())
-#  else
-#    define GET_NEXT_PTR(obj) ((obj)->next)
-#  endif // defined(PWX_THREADS)
+#  define GET_NEXT_PTR(obj) ((obj)->getNext())
 #endif // defined(LIBPWX_DEBUG)
 
 
@@ -354,11 +317,7 @@
 #if defined(LIBPWX_DEBUG)
 #  define GET_PREV_PTR(obj) _debug_get_prev(obj)
 #else
-#  if defined(PWX_THREADS)
-#    define GET_PREV_PTR(obj) ((obj)->getPrev())
-#  else
-#    define GET_PREV_PTR(obj) ((obj)->prev)
-#  endif // defined(PWX_THREADS)
+#  define GET_PREV_PTR(obj) ((obj)->getPrev())
 #endif // defined(LIBPWX_DEBUG)
 
 
@@ -372,11 +331,7 @@
 #if defined(LIBPWX_DEBUG)
 #  define SET_NEXT_PTR(obj, new_next) _debug_set_next(obj, new_next);
 #else
-#  if defined(PWX_THREADS)
-#    define SET_NEXT_PTR(obj, new_next) (obj)->setNext(new_next);
-#  else
-#    define SET_NEXT_PTR(obj, new_next) (obj)->next = new_next;
-#  endif // defined(PWX_THREADS)
+#  define SET_NEXT_PTR(obj, new_next) (obj)->setNext(new_next);
 #endif // defined(LIBPWX_DEBUG)
 
 
@@ -390,11 +345,7 @@
 #if defined(LIBPWX_DEBUG)
 #  define SET_PREV_PTR(obj, new_prev) _debug_set_prev(obj, new_prev);
 #else
-#  if defined(PWX_THREADS)
-#    define SET_PREV_PTR(obj, new_prev) (obj)->setPrev(new_prev);
-#  else
-#    define SET_PREV_PTR(obj, new_prev) (obj)->prev = new_prev;
-#  endif // defined(PWX_THREADS)
+#  define SET_PREV_PTR(obj, new_prev) (obj)->setPrev(new_prev);
 #endif // defined(LIBPWX_DEBUG)
 
 
