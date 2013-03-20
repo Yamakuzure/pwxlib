@@ -832,7 +832,7 @@ protected:
 				insElem->eNr = tail->eNr + 1;
 				tail = insElem;
 			}
-			insElem->next = insPrev->next;
+			insElem->next = insPrev->getNext();
 			insPrev->next = insElem;
 		} else if (eCount) {
 			insElem->next = head;
@@ -1196,7 +1196,7 @@ private:
 
 			// now maintain the neighbors
 			if (prev && (prev != elem)) {
-				prev->next = elem->next;
+				prev->next = elem->getNext();
 				curr = prev;
 			} else
 				curr = head;
@@ -1219,7 +1219,7 @@ private:
 		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 		// Need a big lock, the list must not be modified, now!
 		elem_t* xPrev    = prev ? const_cast<elem_t*>(protFind (prev)) : nullptr;
-		elem_t* toRemove = xPrev ? xPrev->next : head;
+		elem_t* toRemove = xPrev ? xPrev->getNext() : head;
 
 		if (toRemove)
 			privRemove (xPrev, toRemove);
@@ -1235,7 +1235,7 @@ private:
 	{
 		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
 
-		elem_t* toRemove = prev ? prev->next : head;
+		elem_t* toRemove = prev ? prev->getNext() : head;
 		if (toRemove)
 			privRemove (prev, toRemove);
 
