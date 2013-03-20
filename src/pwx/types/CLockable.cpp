@@ -9,13 +9,16 @@ namespace pwx
 /** @brief Default ctor
   */
 CLockable::CLockable() noexcept
-	: lockCount(0), threadId(std::thread::id())
+ :	CL_Lock_Count(0),
+	CL_Do_Locking(true),
+	CL_Lock(ATOMIC_FLAG_INIT),
+	CL_Thread_ID(std::thread::id())
 { /* --- nothing to do here. ---*/ }
 
 
 /** @brief Copy ctor
   *
-  * Nothing to do, all objects have their private mutex.
+  * Nothing to do, all objects have their private locking.
   */
 CLockable::CLockable (const CLockable&) noexcept
 { /* --- nothing to do here. ---*/ }

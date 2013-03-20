@@ -39,22 +39,24 @@ namespace pwx
 
 /** @class CLockable
   *
-  * @brief Base class to make objects lockable via mutexes
+  * @brief Base class to make objects lockable via atomic_flag and lock counting.
   *
-  * Any class that is derived from this class gains four methods
-  * lock(), try_lock(), clear_locks() and unlock() to use a recursive mutex
-  * for locking.
-  * Recursive mutex means, that the class can be locked several times
-  * by the locking thread, but needs the same amount of unlocking calls.
+  * Any class that is derived from this class gains the following methods:
+  * <UL>
+  * <LI>clear_locks() - remove all locks for the current thread.</LI>
+  * <LI>do_locking(bool) - if set to false, no real locking is done.
+  * This is useful if you use anything derived from CLOckable in a single
+  * threaded environment. The default is to do locking.</LI>
+  * <LI>lock() - acquire lock for the current thread.</LI>
+  * <LI>lock_count() - return the number of locks the current thread has.</LI>
+  * <LI>try_lock() - try to acquire lock for the current thread and return true on success.</LI>
+  * <LI>unlock() - release lock for the current thread if it holds one.</LI>
+  * </UL>
   *
-  * If the owning thread destroys the lockable mutex, the destructor will
+  * If the owning thread destroys the CLockable instance, the destructor will
   * try to unlock completely before going away. If another thread waits
   * for a lock in the meantime, or if the destroying thread is not the
   * lock owner, the behavior is undefined.
-  *
-  * Although very unlikely, the three mutex methods can throw system errors.
-  * These are caught and translated into pwx::CException with proper names,
-  * the system errno as message and a proper description.
   *
   * <B>Important</B>: It is strongly recommended that you use std::lock_guard
   * or std::unique_lock to do the locking of any object derived from
@@ -84,23 +86,16 @@ public:
 
 	/** @brief clear all locks from this thread.
 	  *
-	  * If this thread is the current owner of the mutex' lock,
+	  * If this thread is the current owner of the lock,
 	  * and if there are locks in place, they are all cleared.
-	  *
-	  * Warning: This method throws away all exceptions. Use
-	  * it only if a normal unlocking is, for whatever reason,
-	  * not an option. Regular unlock() calls are always to be
-	  * preferred.
 	  *
 	  * @return true if this thread is the owner and all locks could be cleared.
 	**/
 	bool clear_locks() noexcept
 	{
-		if (std::this_thread::get_id() == threadId) {
-			while (std::this_thread::get_id() == threadId) {
-				PWX_TRY(this->unlock())
-				PWX_CATCH_AND_FORGET(CException)
-			}
+		if (CURRENT_THREAD_ID == CL_Thread_ID) {
+			CL_Lock_Count = 1;
+			this->unlock();
 			return true;
 		}
 
@@ -109,102 +104,100 @@ public:
 	}
 
 
-	/** @brief return the number of locks on this object *this* thread has
-	  * @return the number of current locks held by the calling thread
+	/** @brief switch whether to really use locking or not.
+	  *
+	  * With this method you can switch the locking mechanics on/off
+	  * for objects to be used in concurrency or strictly single threaded.
+	  * The default is to turn locking on.
+	  *
+	  * Note: If a thread holds a lock while you turn locking off, this
+	  * method waits until a lock is acquired before turning locking off.
+	  *
+	  * @param[in] doLock true to turn locking on, false to turn it off.
 	**/
-	uint32_t count_locks() noexcept
+	void do_locking(bool doLock) noexcept
 	{
-		if (std::this_thread::get_id() == threadId)
-			return lockCount;
-		return 0;
+        if (doLock != CL_Do_Locking.load(std::memory_order_acquire)) {
+			if (!doLock)
+				this->lock(); // Need this to ensure nobody relies on a lock now.
+			CL_Do_Locking.store(doLock, std::memory_order_release);
+			if (!doLock) {
+				// Nuke the lock acquired above:
+				CL_Lock_Count = 0;
+				CL_Thread_ID  = std::thread::id();
+				CL_Lock.clear(std::memory_order_release);
+			}
+        }
 	}
 
 
 	/** @brief lock
 	  *
-	  * Lock the recursive mutex of this object. If a system error occurs a
-	  * pwx::CException with the name "LockFailed" will be thrown. The system
-	  * error name can be retrieved by the exceptions what() method, a short
-	  * explanation by the desc() method.
-	  *
-	  * Caught system errors are:
-	  *   -# EINVAL  - Invalid Argument
-	  *   -# EAGAIN  - Try again
-	  *   -# EBUSY   - Device or resource busy
-	  *   -# EDEADLK - Resource deadlock would occur
+	  * Lock this object for the current thread if locking is enabled.
 	  */
-	void lock()
+	void lock() noexcept
 	{
-		PWX_TRY (mutex.lock())
-		catch (int &e) {
-			if      (EINVAL  == e) PWX_THROW ("LockFailed", "EINVAL",  "Invalid argument")
-			else if (EAGAIN  == e) PWX_THROW ("LockFailed", "EAGAIN",  "Try again")
-			else if (EBUSY   == e) PWX_THROW ("LockFailed", "EBUSY",   "Device or resource busy")
-			else if (EDEADLK == e) PWX_THROW ("LockFailed", "EDEADLK", "Resource deadlock would occur")
+		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
+			if (CURRENT_THREAD_ID != CL_Thread_ID) {
+				while (CL_Lock.test_and_set(std::memory_order_acquire))
+					std::this_thread::yield();
+				// Got it now, so note it:
+				CL_Thread_ID  = CURRENT_THREAD_ID;
+				CL_Lock_Count = 1;
+			} else
+				++CL_Lock_Count;
 		}
-		// Got it, so note it:
-		if (std::this_thread::get_id() != threadId)
-			threadId  = std::this_thread::get_id();
-		lockCount = mutex.native_handle()->__data.__count;
+	}
+
+
+	/** @brief return the number of locks on this object *this* thread has
+	  * @return the number of current locks held by the calling thread
+	**/
+	uint32_t lock_count() noexcept
+	{
+		if (CURRENT_THREAD_ID == CL_Thread_ID)
+			return CL_Lock_Count;
+		return 0;
 	}
 
 
 	/** @brief try_lock
 	  *
-	  * Try to lock the recursive mutex of this object.
-	  *
-	  * If the locking was successful, the method returns true, false otherwise.
-	  * Although this method can be used to determine whether a thread is the
-	  * current owner of a lock, please remember that a return value of
-	  * "true" means that you have to unlock this extra lock.
+	  * Try to lock this object.
 	  *
 	  * @return true if the object could be locked, false otherwise.
 	  */
 	bool try_lock() noexcept
 	{
-		try {
-			if (mutex.try_lock()) {
-				if (std::this_thread::get_id() != threadId)
-					threadId  = std::this_thread::get_id();
-				lockCount = mutex.native_handle()->__data.__count;
-				return true;
+		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
+			if (CURRENT_THREAD_ID != CL_Thread_ID) {
+				if (CL_Lock.test_and_set(std::memory_order_acquire)) {
+					// Got it now, so note it:
+					CL_Thread_ID  = CURRENT_THREAD_ID;
+					CL_Lock_Count = 1;
+					return true;
+				}
+				return false; // Nope, and only condition for a no-no.
 			}
 		}
-		PWX_CATCH_AND_FORGET (int)
-		return false; // A system error occurred or the try_lock was unsuccessful
+
+		// return true otherwise, we are fine.
+		return true;
 	}
 
 
 	/** @brief unlock
 	  *
-	  *
-	  * Unlock the recursive mutex of this object. If a system error occurs a
-	  * pwx::CException with the name "LockFailed" will be thrown. The system
-	  * error name can be retrieved by the exceptions what() method, a short
-	  * explanation by the desc() method.
-	  *
-	  * Caught system errors are:
-	  *   -# EINVAL  - Invalid Argument
-	  *   -# EAGAIN  - Try again
-	  *   -# EBUSY   - Device or resource busy
+	  * If locking is disabled or if the current thread does not hold
+	  * the lock, nothing happens. Otherwise the last lock is released.
 	  */
-	void unlock()
+	void unlock() noexcept
 	{
-		if (std::this_thread::get_id() == threadId) {
-			try {
-				if (1 == lockCount)
-					threadId = std::thread::id();
-				lockCount = 0;
-				mutex.unlock();
-			}
-			catch (int &e) {
-				// First reinstate the tracking data
-				lockCount = mutex.native_handle()->__data.__count;
-				if (lockCount)
-					threadId  = std::this_thread::get_id();
-				if      (EINVAL  == e) PWX_THROW ("UnlockFailed", "EINVAL",  "Invalid argument")
-				else if (EAGAIN  == e) PWX_THROW ("UnlockFailed", "EAGAIN",  "Try again")
-				else if (EBUSY   == e) PWX_THROW ("UnlockFailed", "EBUSY",   "Device or resource busy")
+        if ( CL_Do_Locking.load(std::memory_order_acquire)
+		  && (CURRENT_THREAD_ID == CL_Thread_ID) ) {
+			if (0 == --CL_Lock_Count) {
+				CL_Thread_ID  = std::thread::id();
+				CL_Lock.clear(std::memory_order_release);
 			}
 		}
 	}
@@ -225,11 +218,10 @@ private:
 	 * ===============================================
 	*/
 
-	uint32_t             lockCount; //!< How many times the current thread has locked.
-	// Note: lockCount is not atomic, because it is only read/written when the current
-	//       Thread has the lock. Therefore there can not be any concurrency.
-	std::recursive_mutex mutex;     //!< Recursive mutex, let's us lock fast without time consuming checks.
-	std::thread::id      threadId;  //!< The owning thread of a lock
+	uint32_t         CL_Lock_Count; //!< How many times the current thread has locked.
+	std::atomic_bool CL_Do_Locking; //!< If set to false with do_locking(false), no real locking is done.
+	std::atomic_flag CL_Lock;       //!< Instead of a costly mutex atomic_flag spinlocks are used.
+	std::thread::id  CL_Thread_ID;  //!< The owning thread of a lock
 }; // class CLockable
 
 } // namespace pwx
