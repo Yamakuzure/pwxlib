@@ -65,9 +65,9 @@ void debug_log(const char* fmt, ...);
 
 // Specialized logging macros for mutex locking/unlocking
 #ifdef PWX_THREADDEBUG
-# define LOG_LOCK(obj)       DEBUG_LOG("LOCK", "%s has %d locks", #obj, obj->count_locks())
-# define LOG_UNLOCK(obj)     DEBUG_LOG("UNLOCK", "%s has %d locks", #obj, obj->count_locks())
-# define LOG_LOCK_GUARD(obj) DEBUG_LOG("GUARD", "%s has %d locks", #obj, obj->count_locks())
+# define LOG_LOCK(obj)       DEBUG_LOG("LOCK", "%s has %d locks", #obj, obj->lock_count())
+# define LOG_UNLOCK(obj)     DEBUG_LOG("UNLOCK", "%s has %d locks", #obj, obj->lock_count())
+# define LOG_LOCK_GUARD(obj) DEBUG_LOG("GUARD", "%s has %d locks", #obj, obj->lock_count())
 #else
 # define LOG_LOCK(...) {}
 # define LOG_UNLOCK(...) {}
