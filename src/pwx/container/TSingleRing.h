@@ -540,7 +540,7 @@ private:
 			}
 
 			if (tail && !tail->destroyed() && (tail->next != head))
-				SET_NEXT_PTR(tail, head)
+				tail->setNext(head);
 			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)

@@ -50,8 +50,8 @@ namespace pwx
   * Further the operator* is overloaded and **foo will result in a reference to the
   * data.
   *
-  * The next element in the list can be retrieved using the public GET_NEXT_PTR(foo) pointer.
-  * The previous element in the list can be retrieved using the public GET_PREV_PTR(foo) pointer.
+  * The next element in the list can be retrieved using the public foo->getNext() pointer.
+  * The previous element in the list can be retrieved using the public foo->getPrev() pointer.
   *
   * <B>Important</B>: If you plan to use this type in a multi-threaded environment,
   * it is strongly recommended to use the getNext(), setNext(), getPrev() and setPrev()

@@ -474,7 +474,7 @@ public:
 				{} /// FIXME: PWX_LOCK(this)
 				elem_t* xTail = tail;
 				{} /// FIXME: PWX_UNLOCK(this)
-				toRemove = base_t::remNextElem (GET_PREV_PTR(xTail));
+				toRemove = base_t::remNextElem (xTail->getPrev());
 			}
 			else if (localCount)
 				toRemove = remNext (nullptr);
@@ -822,8 +822,8 @@ private:
 				{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
 			}
 
-			if (head && !head->destroyed() && (GET_PREV_PTR(head) != tail))
-				SET_PREV_PTR(head, tail)
+			if (head && !head->destroyed() && (head->getPrev() != tail))
+				head->setPrev(tail);
 
 			while (tail && tail->destroyed()) {
 				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
@@ -831,8 +831,8 @@ private:
 				{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
 			}
 
-			if (tail && !tail->destroyed() && (GET_NEXT_PTR(tail) != head))
-				SET_NEXT_PTR(tail, head)
+			if (tail && !tail->destroyed() && (tail->getNext() != head))
+				tail->setNext(head);
 			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
 		}
 		PWX_CATCH_AND_FORGET(CException)
