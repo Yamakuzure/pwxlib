@@ -51,6 +51,7 @@ namespace pwx
 class VElement : public CLockable
 {
 public:
+
 	/* ===============================================
 	 * === Public types                            ===
 	 * ===============================================
@@ -71,6 +72,27 @@ public:
 
 
 	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
+
+	/** @brief returns true if the data was destroyed
+	  *
+	  * The destructor of TSingleElement and TDoubleElement
+	  * will try to get a final lock on the element when it
+	  * is destroyed. If another thread acquires a lock
+	  * between the data destruction and this final dtor lock,
+	  * destroyed() will return "true".
+	  *
+	  * @return true if the element is within its destruction process.
+	**/
+	bool destroyed() const noexcept
+	{
+		return isDestroyed.load(std::memory_order_acquire);
+	}
+
+
+	/* ===============================================
 	 * === Public members                          ===
 	 * ===============================================
 	*/
@@ -78,6 +100,18 @@ public:
 	mutable
 	std::atomic_uint_fast32_t
 	eNr; //!< Number of the element
+
+
+protected:
+
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	 */
+
+	mutable
+	std::atomic_bool
+	isDestroyed; //!< Should be set to true by the destructors of deriving classes.
 
 }; // class VContainer
 
