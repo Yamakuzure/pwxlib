@@ -85,7 +85,7 @@ catch (pwx::CException &e) { \
 #define THREAD_END(thrdName) \
 if (cont->try_lock()) { \
 	/* This means we can lock it. Because we *have* a lock still? */ \
-	uint32_t lC = cont->count_locks(); \
+	uint32_t lC = cont->lock_count(); \
 	if (lC > 1) { \
 		{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
 		cerr << "== Thread " << thId << " \"" << thrdName << "\" ==\n"; \
