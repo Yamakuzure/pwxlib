@@ -187,7 +187,16 @@
 #define PWX_CATCH_AND_FORGET(except) catch(except&) { }
 
 
-/** @brief Use object->lock and trace possible exceptions
+/** @brief Alias for the current threads get_id()
+  *
+  * <I>Prerequisites</I>: <thread>
+  *
+  * @return The std::thread::id of the current thread.
+**/
+#define CURRENT_THREAD_ID std::this_thread::get_id()
+
+
+/** @brief Use object->lock if @a object is defined
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
@@ -195,27 +204,13 @@
 **/
 #define PWX_LOCK(object) { \
 	if (object) {\
-		PWX_TRY_STD_FURTHER(object->lock(), "IllegalLock", "lock() failed") \
+		(object)->lock(); \
 		LOG_LOCK(object) \
 	} \
 }
 
 
-/** @brief Use object->lock and throw possible exceptions away
-  *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to lock.
-**/
-#define PWX_LOCK_NOEXCEPT(object) { \
-	if (object) { \
-		PWX_TRY(object->lock()) \
-		PWX_CATCH_AND_FORGET(pwx::CException) \
-		LOG_LOCK(object) \
-} }
-
-
-/** @brief Use object->try_lock
+/** @brief Use object->try_lock if @a object is defined
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
@@ -225,7 +220,7 @@
 #define PWX_TRY_LOCK(object) ((object) ? (object)->try_lock() : false)
 
 
-/** @brief Use object->unlock and trace possible exceptions
+/** @brief Use object->unlock if @a object is defined.
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
@@ -233,24 +228,10 @@
 **/
 #define PWX_UNLOCK(object) { \
 	if (object) { \
-		PWX_TRY_STD_FURTHER(object->unlock(), "IllegalUnlock", "unlock() failed") \
+		(object)->unlock(); \
 		LOG_UNLOCK(object) \
 	} \
 }
-
-
-/** @brief Use object->unlock and throw possible exceptions away
-  *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to unlock.
-**/
-#define PWX_UNLOCK_NOEXCEPT(object) { \
-	if (object) { \
-		PWX_TRY(object->unlock()) \
-		PWX_CATCH_AND_FORGET(pwx::CException) \
-		LOG_UNLOCK(object) \
-} }
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
@@ -291,62 +272,6 @@
 	std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B); \
 	LOG_LOCK_GUARD(objA) \
 	LOG_LOCK_GUARD(objB)
-
-
-/** @brief Macro to use ->next member directly or use a getNext() function
-  *
-  * <I>Prerequisites</I>: "pwx/types/TSingleElement.h" or "pwx/types/TDoubleElement.h"
-  *
-  * @param obj pointer of the object whose next pointer is to be retrieved
-  * @return the next pointer of obj or nullptr if there is none.
-**/
-#if defined(LIBPWX_DEBUG)
-#  define GET_NEXT_PTR(obj) _debug_get_next(obj)
-#else
-#  define GET_NEXT_PTR(obj) ((obj)->getNext())
-#endif // defined(LIBPWX_DEBUG)
-
-
-/** @brief Macro to use ->prev member directly or use a getPrev() function
-  *
-  * <I>Prerequisites</I>: "pwx/types/TDoubleElement.h"
-  *
-  * @param obj pointer of the object whose prev pointer is to be retrieved
-  * @return the prev pointer of obj or nullptr if there is none.
-**/
-#if defined(LIBPWX_DEBUG)
-#  define GET_PREV_PTR(obj) _debug_get_prev(obj)
-#else
-#  define GET_PREV_PTR(obj) ((obj)->getPrev())
-#endif // defined(LIBPWX_DEBUG)
-
-
-/** @brief Macro to set ->next member directly or use a setNext function
-  *
-  * <I>Prerequisites</I>: "pwx/types/TSingleElement.h" or "pwx/types/TDoubleElement.h"
-  *
-  * @param obj pointer of the object whose next pointer is to be retrieved
-  * @param new_next pointer to where the next pointer should be directed
-**/
-#if defined(LIBPWX_DEBUG)
-#  define SET_NEXT_PTR(obj, new_next) _debug_set_next(obj, new_next);
-#else
-#  define SET_NEXT_PTR(obj, new_next) (obj)->setNext(new_next);
-#endif // defined(LIBPWX_DEBUG)
-
-
-/** @brief Macro to set ->prev member directly or use a setPrev function
-  *
-  * <I>Prerequisites</I>: "pwx/types/TDoubleElement.h"
-  *
-  * @param obj pointer of the object whose prev pointer is to be retrieved
-  * @param new_prev pointer to where the prev pointer should be directed
-**/
-#if defined(LIBPWX_DEBUG)
-#  define SET_PREV_PTR(obj, new_prev) _debug_set_prev(obj, new_prev);
-#else
-#  define SET_PREV_PTR(obj, new_prev) (obj)->setPrev(new_prev);
-#endif // defined(LIBPWX_DEBUG)
 
 
 /** @brief return true if two C-Strings are equal ignoring case
