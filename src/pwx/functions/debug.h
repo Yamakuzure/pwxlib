@@ -2,9 +2,9 @@
 #ifndef PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED
 #define PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED 1
 
-/** @file
+/** @file debug.h
   *
-  * @brief debug.h
+  * @brief Debugging utilities that do nothing unless LIBPWX_DEBUG is defined.
   *
   * Macros and functions to react on the various debugging modes.
   * They are designed to be used everywhere appropriate, getting
@@ -32,28 +32,19 @@
 **/
 
 // Handle includes and defines
-#ifdef LIBPWX_DEBUG
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 # include <cstdio>
 # include <cstring>
-# ifdef PWX_THREADDEBUG
-#   include <mutex>
-# endif
-#endif // LIBPWX_DEBUG
+# include <atomic>
+#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 namespace pwx {
 
 // If any debugging mode is activated, a central logging functions is needed:
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
-// The central log needs a log mutex if multi threading is used:
-# ifdef PWX_THREADDEBUG
-	static std::recursive_mutex _pwx_internal_LOG_mutex;
-#   define _LOCK_LOG_MUTEX   { try { pwx::_pwx_internal_LOG_mutex.lock(); } catch (...) {}   }
-#   define _UNLOCK_LOG_MUTEX { try { pwx::_pwx_internal_LOG_mutex.unlock(); } catch (...) {} }
-# else
-#   define _LOCK_LOG_MUTEX   { }
-#   define _UNLOCK_LOG_MUTEX { }
-#endif // PWX_THREADDEBUG
+// The central log needs a log lock:
+static std::atomic_flag _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
 
 // The main logging function:
 void debug_log(const char* fmt, ...);
@@ -62,9 +53,10 @@ void debug_log(const char* fmt, ...);
 # define DEBUG_LOG(part, fmt, ...) { \
 	char trace_info[1024]; \
 	snprintf(trace_info, 256, "[%s] %s:%d - %s : %s\n", part, basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-	_LOCK_LOG_MUTEX \
+	while (_pwx_internal_LOG_output_lock.test_and_set(std::memory_order_acquire)) \
+		std::this_thread::yield(); \
 	pwx::debug_log(trace_info, __VA_ARGS__); \
-	_UNLOCK_LOG_MUTEX \
+	_pwx_internal_LOG_output_lock.clear(std::memory_order_release); \
 }
 #else
 # define DEBUG_LOG(...) {}
@@ -81,37 +73,6 @@ void debug_log(const char* fmt, ...);
 # define LOG_UNLOCK(...) {}
 # define LOG_LOCK_GUARD(...) {}
 #endif // PWX_THREADDEBUG
-
-// Specialized templates to get/set next/prev pointers with checks and logging:
-#ifdef LIBPWX_DEBUG
-template<typename T> T* _debug_get_next(T* obj)
-{
-	if (obj) return (obj)->getNext();
-	DEBUG_LOG("GET NEXT", "%s is nullptr!", "obj")
-	return nullptr;
-}
-
-template<typename T> T* _debug_get_prev(T* obj)
-{
-	if (obj) return (obj)->getPrev();
-	DEBUG_LOG("GET PREV", "%s is nullptr!", "obj")
-	return nullptr;
-}
-
-template<typename T> void _debug_set_next(T* obj, void* new_next)
-{
-	if (obj) (obj)->setNext(static_cast<T*>(new_next));
-	else DEBUG_LOG("SET NEXT", "%s is nullptr!", "obj")
-}
-
-template<typename T> void _debug_set_prev(T* obj, void* new_prev)
-{
-	if (obj) (obj)->setPrev(static_cast<T*>(new_prev));
-	else DEBUG_LOG("SET PREV", "%s is nullptr!", "obj")
-}
-#endif // LIBPWX_DEBUG
-
-
 
 } // namespace pwx
 #endif // PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED
