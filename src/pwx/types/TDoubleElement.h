@@ -50,24 +50,23 @@ namespace pwx
   * Further the operator* is overloaded and **foo will result in a reference to the
   * data.
   *
-  * The next element in the list can be retrieved using the public foo->getNext() pointer.
-  * The previous element in the list can be retrieved using the public foo->getPrev() pointer.
+  * The next element in the list can be retrieved using the public foo->next pointer.
+  * The previous element in the list can be retrieved using the public foo->prev pointer.
   *
-  * <B>Important</B>: If you plan to use this type in a multi-threaded environment,
-  * it is strongly recommended to use the getNext(), setNext(), getPrev() and setPrev()
-  * functions to manipulate the next and prev pointers. These methods will lock the
-  * element prior any read/write access.
+  * If you plan to use this type in a multi-threaded environment, you can use the
+  * getNext(), getPrev(), setNext() and setPrev() functions to manipulate the next and
+  * prev pointers. These methods will lock the element prior any read/write access.
+  *
+
+FIXME: Test whether atomic load/store aren't enough.
+
+  * However, as the next and prev pointers are wrapped into std::atomic, you can use its
+  * load/store functions to avoid locking instead.
   *
   * It is recommended that you use the much more advanced std::list unless you
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the element are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling elements via VElement whether they are used concurrently or not?
-  * === : EMXIF ===
 **/
 template<typename data_t>
 struct PWX_API TDoubleElement : public VElement
@@ -80,6 +79,7 @@ struct PWX_API TDoubleElement : public VElement
 	typedef VElement                base_t;
 	typedef TDoubleElement<data_t>  elem_t;
 	typedef std::shared_ptr<data_t> share_t;
+	typedef std::atomic<elem_t*>    neighbor_t;
 
 
 	/* ===============================================
@@ -95,7 +95,9 @@ struct PWX_API TDoubleElement : public VElement
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
 	TDoubleElement (data_t* data_, void (*destroy_) (data_t* data_)) noexcept
-	: data (data_, TVarDeleter<data_t> (destroy_))
+	: data (data_, TVarDeleter<data_t> (destroy_)),
+	  next(ATOMIC_VAR_INIT(nullptr)),
+	  prev(ATOMIC_VAR_INIT(nullptr))
 	{ }
 
 
@@ -139,43 +141,29 @@ struct PWX_API TDoubleElement : public VElement
 	 * ===============================================
 	*/
 
-	/** @brief returns true if the data  was destroyed
-	  *
-	  * The destructor will try to get a final lock on the
-	  * element when it is destroyed. If another thread
-	  * acquires a lock between the data destruction and
-	  * this final dtor lock, destroy() will return "true".
-	  *
-	  * @return true if the element is within its destruction process.
-	**/
-	bool destroyed() const noexcept { return isDestroyed; }
-
-
 	/** @brief returns a pointer to the next element or nullptr if there is none.
 	  *
-	  * This method will lock this element and is therefore safe to use
+	  * This method will use atomic::load() and is therefore safe to use
 	  * in a multi-threaded environment.
 	  *
 	  * @return the next pointer or nullptr if there is none.
 	**/
 	elem_t* getNext() const noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
-		return next;
+		return next.load(std::memory_order_acquire);
 	}
 
 
 	/** @brief returns a pointer to the prev element or nullptr if there is none.
 	  *
-	  * This method will lock this element and is therefore safe to use
+	  * This method will use atomic::load() and is therefore safe to use
 	  * in a multi-threaded environment.
 	  *
 	  * @return the prev pointer or nullptr if there is none.
 	**/
 	elem_t* getPrev() const noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
-		return prev;
+		return prev.load(std::memory_order_acquire);
 	}
 
 
@@ -188,8 +176,9 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(elem_t, this)
-		next = new_next;
+		PWX_LOCK(this)
+		next.store(new_next, std::memory_order_release);
+		PWX_UNLOCK(this)
 	}
 
 
@@ -202,8 +191,9 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setPrev(elem_t* new_prev) noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(elem_t, this)
-		prev = new_prev;
+		PWX_LOCK(this)
+		prev.store(new_prev, std::memory_order_release);
+		PWX_UNLOCK(this)
 	}
 
 
@@ -224,7 +214,7 @@ struct PWX_API TDoubleElement : public VElement
 	elem_t& operator= (const elem_t &src) noexcept
 	{
 		if (this != &src) {
-			{} /// FIXME: PWX_LOCK_GUARD (elem_t, this)
+			PWX_LOCK_GUARD (elem_t, this)
 			data	= src.data;
 		}
 	}
@@ -269,31 +259,20 @@ struct PWX_API TDoubleElement : public VElement
 	 * ===============================================
 	*/
 
-	share_t data;           //!< The data this list element points to, wrapped in a shared_ptr.
-	elem_t* next = nullptr; //!< The next element in the list or nullptr if this is the tail
-	elem_t* prev = nullptr; //!< The previous element in the list or nullptr if this is the head
+	share_t    data; //!< The data this list element points to, wrapped in a shared_ptr.
+	neighbor_t next; //!< The next element in the list or nullptr if this is the tail
+	neighbor_t prev; //!< The previous element in the list or nullptr if this is the head
 
 
-private:
-
-	/* ===============================================
-	 * === Private methods                         ===
-	 * ===============================================
-	*/
-
-	/// @brief internal method to directly set the number
-	void setNr(const uint32_t newNr) const noexcept
-	{
-		eNr = newNr;
-	}
-
+protected:
 
 	/* ===============================================
-	 * === Private members                         ===
+	 * === Protected members                       ===
 	 * ===============================================
-	*/
+	 */
 
-	bool isDestroyed = false; //!< Set to false by the dtor to let other threads react if they ask destroyed().
+	using base_t::isDestroyed;
+
 }; // struct TDoubleElement
 
 
@@ -309,16 +288,16 @@ private:
 template<typename data_t>
 TDoubleElement<data_t>::~TDoubleElement() noexcept
 {
-	isDestroyed = true;
+	isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		{} /// FIXME: PWX_LOCK_GUARD (elem_t, this)
+		PWX_LOCK_GUARD (elem_t, this)
 		PWX_TRY(data.reset()) // the shared_ptr will delete the data now
 		catch(...) { }
 	}
 	// Do another locking, so that threads having had to wait while the data
 	// was destroyed have a chance now to react before the object is gone.
-	{} /// FIXME: PWX_LOCK_GUARD (elem_t, this)
+	PWX_LOCK_GUARD (elem_t, this)
 }
 
 
