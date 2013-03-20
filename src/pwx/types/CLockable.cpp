@@ -10,7 +10,7 @@ namespace pwx
   */
 CLockable::CLockable() noexcept
  :	CL_Lock_Count(0),
-	CL_Do_Locking(true),
+	CL_Do_Locking(ATOMIC_VAR_INIT(true)),
 	CL_Lock(ATOMIC_FLAG_INIT),
 	CL_Thread_ID(std::thread::id())
 { /* --- nothing to do here. ---*/ }
@@ -18,9 +18,11 @@ CLockable::CLockable() noexcept
 
 /** @brief Copy ctor
   *
-  * Nothing to do, all objects have their private locking.
+  * All objects have their private locking.
+  * Only the state whether to actually do the locking is copied.
   */
-CLockable::CLockable (const CLockable&) noexcept
+CLockable::CLockable (const CLockable &src) noexcept
+ :	CL_Do_Locking(ATOMIC_VAR_INIT(src.CL_Do_Locking.load(std::memory_order_acquire)))
 { /* --- nothing to do here. ---*/ }
 
 
@@ -39,9 +41,13 @@ CLockable::~CLockable() noexcept
 
 /** @brief Assignment operator
   *
-  * Nothing to do, all objects have their private mutex.
+  * All objects have their private locking.
+  * Only the state whether to actually do the locking is copied.
   */
-CLockable &CLockable::operator= (const CLockable&) noexcept
-{ return *this; }
+CLockable &CLockable::operator= (const CLockable &src) noexcept
+{
+	CL_Do_Locking.store(src.CL_Do_Locking.load(std::memory_order_acquire), std::memory_order_release);
+	return *this;
+}
 
 } // namespace pwx

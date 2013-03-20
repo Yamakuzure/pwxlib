@@ -75,7 +75,7 @@ public:
 	*/
 
 	explicit CLockable() noexcept;
-	CLockable (const CLockable&) noexcept;
+	CLockable (const CLockable &src) noexcept;
 	virtual ~CLockable() noexcept;
 
 
@@ -208,7 +208,7 @@ public:
 	 * ===============================================
 	*/
 
-	CLockable& operator= (const CLockable&) noexcept;
+	CLockable& operator= (const CLockable &src) noexcept;
 
 
 private:
