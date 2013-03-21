@@ -57,9 +57,13 @@ namespace pwx
   * getNext(), getPrev(), setNext() and setPrev() functions to manipulate the next and
   * prev pointers. These methods will lock the element prior any read/write access.
   *
-
-FIXME: Test whether atomic load/store aren't enough.
-
+  * To insert any element into a list you can use insertNext() to have it inserted
+  * after the called element or insertPrev() to have it inserted before the called
+  * element safely.
+  *
+  * To remove an element from a list, you can use remove(), removeNext() and
+  * removePrev() to have it removed safely.
+  *
   * However, as the next and prev pointers are wrapped into std::atomic, you can use its
   * load/store functions to avoid locking instead.
   *
@@ -167,33 +171,270 @@ struct PWX_API TDoubleElement : public VElement
 	}
 
 
+	/** @brief insert an element after this element.
+	  *
+	  * This is an extra method to not only set the next pointer
+	  * of this element, but the next pointer of the inserted element
+	  * safely, too, in a multi-threaded environment.
+	  *
+	  * @param[in] new_next target where the next pointer should point at.
+	**/
+	void insertNext(elem_t* new_next) noexcept
+	{
+		if (!destroyed() && new_next && (new_next != this) && !new_next->destroyed()) {
+			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
+
+			// Now that we have the double lock, it is crucial to
+			// check again. Otherwise we might just insert a destroyed element.
+			if (!destroyed() && !new_next->destroyed()) {
+				// Safe old next pointer.
+				elem_t* oldNext = this->getNext();
+
+				// Set the neighborhood of the new next
+				new_next->next.store(oldNext, std::memory_order_relaxed);
+				new_next->prev.store(this, std::memory_order_relaxed);
+
+				// Inform the old next neighbor of its new predecessor
+				if (oldNext)
+					oldNext->setPrev(new_next);
+
+				// Store new next neighbor.
+				setNext(new_next);
+			}
+		}
+	}
+
+
+	/** @brief insert an element before this element.
+	  *
+	  * This is an extra method to not only set the prev pointer
+	  * of this element, but the prev pointer of the inserted element
+	  * safely, too, in a multi-threaded environment.
+	  *
+	  * @param[in] new_prev target where the prev pointer should point at.
+	**/
+	void insertPrev(elem_t* new_prev) noexcept
+	{
+		if (!destroyed() && new_prev && (new_prev != this) && !new_prev->destroyed()) {
+			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
+
+			// Now that we have the double lock, it is crucial to
+			// check again. Otherwise we might just insert a destroyed element.
+			if (!destroyed() && !new_prev->destroyed()) {
+				// Safe old prev pointer.
+				elem_t* oldPrev = this->getPrev();
+
+				// Set the neighborhood of the new prev
+				new_prev->next.store(this, std::memory_order_relaxed);
+				new_prev->prev.store(oldPrev, std::memory_order_relaxed);
+
+				// Inform the old prev neighbor of its new successor
+				if (oldPrev)
+					oldPrev->setNext(new_prev);
+
+				// Store new prev neighbor.
+				setPrev(new_prev);
+			}
+		}
+	}
+
+
+	/** @brief remove this element from a list.
+	  *
+	  * This method removes this element from a list in a thread safe way.
+	**/
+	void remove() noexcept
+	{
+		// Do an acquiring test before the element is actually locked
+		if (next.load(std::memory_order_acquire) || prev.load(std::memory_order_acquire)) {
+			PWX_LOCK(this)
+			elem_t* oldPrev = nullptr;
+			elem_t* oldNext = nullptr;
+
+			/* The challenge here is to do this without deadlocks.
+			 * Basically the neighbors need to be locked in turn.
+			 * But if another thread has a lock on one of those
+			 * waiting to get a lock on this, a deadlock will happen.
+			 * The solution is to go some try_lock() lengths until
+			 * everybody is happy.
+			 * Further more while we yield lock-free, another thread
+			 * might have just removed our next or previous neighbor.
+			 * It is therefore necessary to always use getNext() and
+			 * getPrev() to have the real current neighbor.
+			 */
+
+			// 1: Handle previous neighbor
+			while ((oldPrev = this->getPrev()) && !oldPrev->try_lock()) {
+				// oldPrev is valid, but we can not lock.
+				PWX_UNLOCK(this)
+				std::this_thread::yield();
+				PWX_LOCK(this)
+			}
+
+			// If oldPrev is valid now, it is also locked:
+			if (oldPrev) {
+				if (oldPrev->getNext() == this)
+					// Still points to this, so make it point to next instead
+					oldPrev->setNext(this->getNext());
+				oldPrev->unlock();
+				oldPrev = nullptr;
+			}
+
+			// 2: Handle next neighbor
+			while ((oldNext = this->getNext()) && !oldNext->try_lock()) {
+				// oldNext is valid, but we can not lock.
+				PWX_UNLOCK(this)
+				std::this_thread::yield();
+				PWX_LOCK(this)
+			}
+
+			// If oldNext is valid now, it is also locked:
+			if (oldNext) {
+				if (oldNext->getPrev() == this)
+					// Still points to this, so make it point to prev instead
+					oldNext->setPrev(this->getPrev());
+				oldNext->unlock();
+				oldNext = nullptr;
+			}
+
+			PWX_UNLOCK(this)
+		} // End of having at least one neighbor to handle
+	}
+
+
+	/** @brief remove the next element from a list.
+	  *
+	  * This method removes the successor of this element
+	  * from a list in a thread safe way.
+	**/
+	void removeNext() noexcept
+	{
+		elem_t* toRemove = nullptr;
+		// Do an acquiring test before the element is actually locked
+		if ( (toRemove = this->getNext()) ) {
+			PWX_LOCK(toRemove)
+			elem_t* oldNext = nullptr;
+
+			/* See notes in TDoubleElement::remove() */
+
+			// 1: Handle previous neighbor aka "this" first
+			while ((this->getNext() == toRemove) && !this->try_lock()) {
+				// Can't lock this, so yield until possible
+				PWX_UNLOCK(toRemove)
+				std::this_thread::yield();
+				PWX_LOCK(toRemove)
+			}
+
+			// Now if next still points to toRemove, this is locked:
+			if (this->getNext() == toRemove) {
+				this->setNext(toRemove->getNext());
+				this->unlock();
+			}
+
+			// 2: Handle next neighbor
+			while ((oldNext = toRemove->getNext()) && !oldNext->try_lock()) {
+				// oldNext is valid, but we can not lock.
+				PWX_UNLOCK(toRemove)
+				std::this_thread::yield();
+				PWX_LOCK(toRemove)
+			}
+
+			// If oldNext is valid now, it is also locked:
+			if (oldNext) {
+				if (oldNext->getPrev() == toRemove)
+					// Still points to toRemove, so make it point to prev instead
+					oldNext->setPrev(toRemove->getPrev());
+				oldNext->unlock();
+				oldNext = nullptr;
+			}
+
+			// 3: Clear neighborhood of toRemove:
+			toRemove->setPrev(nullptr);
+			toRemove->setNext(nullptr);
+
+			PWX_UNLOCK(toRemove)
+		} // End of having at least one neighbor to handle
+	}
+
+
+	/** @brief remove the previous element from a list.
+	  *
+	  * This method removes the predecessor of this element
+	  * from a list in a thread safe way.
+	**/
+	void removePrev() noexcept
+	{
+		elem_t* toRemove = nullptr;
+		// Do an acquiring test before the element is actually locked
+		if ( (toRemove = this->getPrev()) ) {
+			PWX_LOCK(toRemove)
+			elem_t* oldPrev = nullptr;
+
+			/* See notes in TDoubleElement::remove() */
+
+			// 1: Handle next neighbor aka "this" first
+			while ((this->getPrev() == toRemove) && !this->try_lock()) {
+				// Can't lock this, so yield until possible
+				PWX_UNLOCK(toRemove)
+				std::this_thread::yield();
+				PWX_LOCK(toRemove)
+			}
+
+			// Now if prev still points to toRemove, this is locked:
+			if (this->getPrev() == toRemove) {
+				this->setPrev(toRemove->getPrev());
+				this->unlock();
+			}
+
+			// 2: Handle prev neighbor
+			while ((oldPrev = toRemove->getPrev()) && !oldPrev->try_lock()) {
+				// oldPrev is valid, but we can not lock.
+				PWX_UNLOCK(toRemove)
+				std::this_thread::yield();
+				PWX_LOCK(toRemove)
+			}
+
+			// If oldPrev is valid now, it is also locked:
+			if (oldPrev) {
+				if (oldPrev->getNext() == toRemove)
+					// Still points to toRemove, so make it point to next instead
+					oldPrev->setNext(toRemove->getNext());
+				oldPrev->unlock();
+				oldPrev = nullptr;
+			}
+
+			// 3: Clear neighborhood of toRemove:
+			toRemove->setPrev(nullptr);
+			toRemove->setNext(nullptr);
+
+			PWX_UNLOCK(toRemove)
+		} // End of having at least one neighbor to handle
+	}
+
+
 	/** @brief set the next pointer to another element.
 	  *
-	  * This method will lock this element and is therefore safe to use
+	  * This method will use atomic::store() and is therefore safe to use
 	  * in a multi-threaded environment.
 	  *
 	  * @param[in] next target where the next pointer should point at.
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		PWX_LOCK(this)
 		next.store(new_next, std::memory_order_release);
-		PWX_UNLOCK(this)
 	}
 
 
 	/** @brief set the prev pointer to another element.
 	  *
-	  * This method will lock this element and is therefore safe to use
+	  * This method will use atomic::store() is therefore safe to use
 	  * in a multi-threaded environment.
 	  *
 	  * @param[in] prev target where the prev pointer should point at.
 	**/
 	void setPrev(elem_t* new_prev) noexcept
 	{
-		PWX_LOCK(this)
 		prev.store(new_prev, std::memory_order_release);
-		PWX_UNLOCK(this)
 	}
 
 
@@ -213,9 +454,11 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t& operator= (const elem_t &src) noexcept
 	{
-		if (this != &src) {
-			PWX_LOCK_GUARD (elem_t, this)
-			data	= src.data;
+		if ((this != &src) && !destroyed() && !src.destroyed()) {
+			PWX_DOUBLE_LOCK(elem_t, this, elem_t, const_cast<elem_t*>(&src))
+			if (!destroyed() && !src.destroyed())
+				data = src.data;
+				// note: destroy method wrapped in data!
 		}
 	}
 
@@ -229,6 +472,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	data_t &operator*()
 	{
+		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr TDoubleElement<T>->data",
@@ -246,6 +490,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	const data_t &operator*() const
 	{
+		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr TDoubleElement<T>->data",
@@ -291,13 +536,21 @@ TDoubleElement<data_t>::~TDoubleElement() noexcept
 	isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		PWX_LOCK_GUARD (elem_t, this)
-		PWX_TRY(data.reset()) // the shared_ptr will delete the data now
-		catch(...) { }
+		// Produce a lock guard before checking again.
+		PWX_NAMED_LOCK_GUARD(Make_Exclusive, elem_t, this)
+		// So the lock is only generated if there is a possibility
+		// that we have to delete data, but another thread might
+		// have made a copy in the mean time before "isDestroyed"
+		// was finished setting to true.
+		if (1 == data.use_count()) {
+			PWX_TRY(data.reset()) // the shared_ptr will delete the data now
+			catch(...) { }
+
+			// Do another locking, so that threads having had to wait while the data
+			// was destroyed have a chance now to react before the object is gone.
+			PWX_NAMED_LOCK_GUARD (Lock_After_Delete, elem_t, this)
+		}
 	}
-	// Do another locking, so that threads having had to wait while the data
-	// was destroyed have a chance now to react before the object is gone.
-	PWX_LOCK_GUARD (elem_t, this)
 }
 
 
