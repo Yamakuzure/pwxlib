@@ -598,6 +598,7 @@ TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, c
   * means that it will be copied onto your result. In other words: The difference
   * elements are copied twice!
   *
+  * @param[in] lhs reference of the ring from which to substract.
   * @param[in] rhs reference of the ring to substract.
   * @return reference to this.
 **/

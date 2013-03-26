@@ -189,7 +189,7 @@
 
 /** @brief Alias for the current threads get_id()
   *
-  * <I>Prerequisites</I>: <thread>
+  * <I>Prerequisites</I>: thread
   *
   * @return The std::thread::id of the current thread.
 **/
@@ -238,7 +238,7 @@
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
-  * @param name a string to add to the local variable name to be able to use more than one guard
+  * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
@@ -276,7 +276,7 @@
 
 /** @brief return true if two C-Strings are equal ignoring case
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -287,7 +287,7 @@
 
 /** @brief return true if two C-Strings are not equal ignoring case
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -298,7 +298,7 @@
 
 /** @brief true if @a a is "lower" than @a b ignoring case
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -309,7 +309,7 @@
 
 /** @brief true if @a a is "greater" than @a b ignoring case
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -320,7 +320,7 @@
 
 /** @brief return true if two C-Strings are equal
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -331,7 +331,7 @@
 
 /** @brief return true if two C-Strings are not equal
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -342,7 +342,7 @@
 
 /** @brief true if @a a is "lower" than @a b
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -353,7 +353,7 @@
 
 /** @brief true if @a a is "greater" than @a b
   *
-  * <I>Prerequisites</I>: <cstring>
+  * <I>Prerequisites</I>: cstring
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -364,7 +364,7 @@
 
 /** @brief true if @a a is of the same type as @a b
   *
-  * <I>Prerequisites</I>: <type_traits>
+  * <I>Prerequisites</I>: type_traits
   *
   * @param a left type
   * @param b right type
@@ -375,7 +375,7 @@
 
 /** @brief true if @a a is a pointer
   *
-  * <I>Prerequisites</I>: <type_traits>
+  * <I>Prerequisites</I>: type_traits
   *
   * @param a type to check
   * @return true if @a is a pointer
@@ -385,7 +385,7 @@
 
 /** @brief true if @a a is an integral type
   *
-  * <I>Prerequisites</I>: <type_traits>
+  * <I>Prerequisites</I>: type_traits
   *
   * @param a type to check
   * @return true if @a is an integral type
@@ -395,7 +395,7 @@
 
 /** @brief true if @a a is a floating point type
   *
-  * <I>Prerequisites</I>: <type_traits>
+  * <I>Prerequisites</I>: type_traits
   *
   * @param a type to check
   * @return true if @a is a floating point type
@@ -405,7 +405,7 @@
 
 /** @brief true if @a a is an array
   *
-  * <I>Prerequisites</I>: <type_traits>
+  * <I>Prerequisites</I>: type_traits
   *
   * @param a type to check
   * @return true if @a is an array
@@ -415,7 +415,7 @@
 
 /** @brief Check whether file @a f exists
   *
-  * <I>Prerequisites</I>: <unistd.h>
+  * <I>Prerequisites</I>: unistd.h
   *
   * @param f A file or directory to check
   * @return true if @a exists
@@ -425,7 +425,7 @@
 
 /** @brief Check whether file @a f is executable
   *
-  * <I>Prerequisites</I>: <unistd.h>
+  * <I>Prerequisites</I>: unistd.h
   *
   * @param f A file or directory to check
   * @return true if @a is executable
@@ -435,7 +435,7 @@
 
 /** @brief Check whether file @a f is writable
   *
-  * <I>Prerequisites</I>: <unistd.h>
+  * <I>Prerequisites</I>: unistd.h
   *
   * @param f A file or directory to check
   * @return true if @a is writable
@@ -445,7 +445,7 @@
 
 /** @brief Check whether file @a f is readable
   *
-  * <I>Prerequisites</I>: <unistd.h>
+  * <I>Prerequisites</I>: unistd.h
   *
   * @param f A file or directory to check
   * @return true if @a is readable
@@ -455,7 +455,7 @@
 
 /** @brief Check whether file @a f is readable and writable
   *
-  * <I>Prerequisites</I>: <unistd.h>
+  * <I>Prerequisites</I>: unistd.h
   *
   * @param f A file or directory to check
   * @return true if @a is readable and writable

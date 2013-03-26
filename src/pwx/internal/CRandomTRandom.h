@@ -34,7 +34,7 @@ namespace pwx {
 
 /** @internal
   * @namespace private_
-  * @brief all private functions that are to be used in library compilation units only reside here
+  * @brief all private functions, that are to be used in library compilation units only, reside here
 **/
 namespace private_ {
 
