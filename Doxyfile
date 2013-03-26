@@ -1,7 +1,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "PrydeWorX Library"
-PROJECT_NUMBER         = 0.8.6
-PROJECT_BRIEF          = "JBoH Library for C++ development"
+PROJECT_NUMBER         = 0.9.0-rc1
+PROJECT_BRIEF          = "Tools Library for C++ development"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = ./doc
 CREATE_SUBDIRS         = NO
@@ -22,7 +22,7 @@ ABBREVIATE_BRIEF       = "The $name class" \
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = YES
 FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        =
+STRIP_FROM_PATH        = src
 STRIP_FROM_INC_PATH    =
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
@@ -30,7 +30,7 @@ QT_AUTOBRIEF           = NO
 MULTILINE_CPP_IS_BRIEF = NO
 INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
-TAB_SIZE               = 2
+TAB_SIZE               = 4
 ALIASES                =
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
@@ -86,58 +86,46 @@ WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO
 WARN_FORMAT            = "$file:$line: $text"
 WARN_LOGFILE           =
-INPUT                  = pwxLib/CCnfFileHandler.h \
-                         pwxLib/CMemRingFactory.h \
-                         pwxLib/CRandom.h \
-                         pwxLib/CSinCosTables.h \
-                         pwxLib/CWaveColor.h \
-                         pwxLib/external/stdint.h \
-                         pwxLib/internal/ArgImpl.h \
-                         pwxLib/internal/ArgTypes.h \
-                         pwxLib/internal/ArgTypesBase.h \
-                         pwxLib/internal/CConfigData.h \
-                         pwxLib/internal/CConfigDataImpl.h \
-                         pwxLib/internal/CConfigFile.h \
-                         pwxLib/internal/CConfigFileImpl.h \
-                         pwxLib/internal/CConfigGroup.h \
-                         pwxLib/internal/CConfigGroupImpl.h \
-                         pwxLib/internal/CFHexceptions.h \
-                         pwxLib/internal/CItem.h \
-                         pwxLib/internal/CMRFImpl.h \
-                         pwxLib/internal/CMRIImpl.h \
-                         pwxLib/internal/CMemRing.h \
-                         pwxLib/internal/CRNGImpl.h \
-                         pwxLib/internal/CRandomHash.h \
-                         pwxLib/internal/CRandomName.h \
-                         pwxLib/internal/CRandomNoise.h \
-                         pwxLib/internal/CRandomRandom.h \
-                         pwxLib/internal/CRandomSimplex.h \
-                         pwxLib/internal/CRandomStatics.h \
-                         pwxLib/internal/CRandomWordConstants.h \
-                         pwxLib/internal/CSCTImpl.h \
-                         pwxLib/internal/CWaveColorImpl.h \
-                         pwxLib/internal/CWCexceptions.h \
-                         pwxLib/internal/CfhImpl.h \
-                         pwxLib/internal/CfhTypes.h \
-                         pwxLib/internal/DefaultMutex.h \
-                         pwxLib/internal/DefaultTempTools.h \
-                         pwxLib/internal/MRFexceptions.h \
-                         pwxLib/internal/MRIntImpl.h \
-                         pwxLib/internal/MSVCwarnPop.h \
-                         pwxLib/internal/MSVCwarnPush.h \
-                         pwxLib/internal/MSVCwrap.h \
-                         pwxLib/internal/TItem.h \
-                         pwxLib/internal/TMRIImpl.h \
-                         pwxLib/internal/TMRTImpl.h \
-                         pwxLib/internal/TMRT_insert.h \
-                         pwxLib/internal/TMemRing.h \
-                         pwxLib/internal/sWave.h \
-                         pwxLib/tools/Args.h \
-                         pwxLib/tools/DefaultDefines.h \
-                         pwxLib/tools/Exception.h \
-                         pwxLib/tools/MRInterface.h \
-                         pwxLib/tools/MathHelpers.h \
-                         pwxLib/tools/StreamHelpers.h
+INPUT                  = src/pwx.h \
+						 src/pwx/base/VContainer.cpp \
+						 src/pwx/base/VContainer.h \
+						 src/pwx/base/VElement.cpp \
+						 src/pwx/base/VElement.h \
+						 src/pwx/container.h \
+						 src/pwx/container/TDoubleList.h \
+						 src/pwx/container/TDoubleRing.h \
+						 src/pwx/container/TQueue.h \
+						 src/pwx/container/TSet.h \
+						 src/pwx/container/TSingleList.h \
+						 src/pwx/container/TSingleRing.h \
+						 src/pwx/container/TStack.h \
+						 src/pwx/functions/debug.cpp \
+						 src/pwx/functions/debug.h \
+						 src/pwx/functions/set_func.h \
+						 src/pwx/functions/set_fwd.h \
+						 src/pwx/general.h \
+						 src/pwx/general/compiler.h \
+						 src/pwx/general/macros.h \
+						 src/pwx/general/templates.h \
+						 src/pwx/internal/CRandomConstants.h \
+						 src/pwx/internal/CRandomTHash.cpp \
+						 src/pwx/internal/CRandomTHash.h \
+						 src/pwx/internal/CRandomTRandom.h \
+						 src/pwx/internal/CRandomWordConstants.h \
+						 src/pwx/tools.h \
+						 src/pwx/tools/StreamHelpers.cpp \
+						 src/pwx/tools/StreamHelpers.h \
+						 src/pwx/types.h \
+						 src/pwx/types/CException.cpp \
+						 src/pwx/types/CException.h \
+						 src/pwx/types/CLockable.cpp \
+						 src/pwx/types/CLockable.h \
+						 src/pwx/types/TDoubleElement.h \
+						 src/pwx/types/TSingleElement.h \
+						 src/pwx/types/TVarDeleter.h \
+						 src/pwx/worker.h \
+						 src/pwx/worker/CRandom.cpp \
+						 src/pwx/worker/CRandom.h
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.h
 RECURSIVE              = NO
@@ -247,10 +235,7 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = pwxLib \
-                         pwxLib/external \
-                         pwxLib/internal \
-                         pwxLib/tools
+INCLUDE_PATH           = src
 INCLUDE_FILE_PATTERNS  = *.h
 PREDEFINED             = PWX_INTERNAL= \
                          PWX_VISIBLE= \
