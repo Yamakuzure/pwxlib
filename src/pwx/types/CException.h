@@ -37,12 +37,6 @@
 #include <exception>
 
 
-/** @namespace pwx
-  *
-  * @brief Namespace for everything PrydeWorX related
-  *
-  * All PrydeWorX projects reside in this namespace and it's sub-namespaces.
-**/
 namespace pwx
 {
 
