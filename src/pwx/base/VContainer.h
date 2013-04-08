@@ -73,9 +73,11 @@ public:
 	 * ===============================================
 	*/
 
-	virtual void     clear()       noexcept PWX_VIRTUAL_PURE;
-	virtual bool     empty() const noexcept PWX_VIRTUAL_PURE;
-	virtual uint32_t size()  const noexcept PWX_VIRTUAL_PURE;
+	virtual void     clear()                 noexcept PWX_VIRTUAL_PURE;
+	virtual void     disable_thread_safety() noexcept PWX_VIRTUAL_PURE;
+	virtual bool     empty()           const noexcept PWX_VIRTUAL_PURE;
+	virtual void     enable_thread_safety()  noexcept PWX_VIRTUAL_PURE;
+	virtual uint32_t size()            const noexcept PWX_VIRTUAL_PURE;
 
 
 protected:
@@ -85,6 +87,8 @@ protected:
 	 * ===============================================
 	*/
 
+	mutable
+	std::atomic_bool beThreadSafe; //!< Use next/prev pointers directly if set to false.
 	mutable
 	std::atomic_bool doRenumber; //!< If set to true, a renumbering is done before retrieving elements by index
 	mutable
