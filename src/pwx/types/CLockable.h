@@ -45,8 +45,9 @@ namespace pwx
   * <UL>
   * <LI>clear_locks() - remove all locks for the current thread.</LI>
   * <LI>do_locking(bool) - if set to false, no real locking is done.
-  * This is useful if you use anything derived from CLOckable in a single
+  * This is useful if you use anything derived from CLockable in a single
   * threaded environment. The default is to do locking.</LI>
+  * <LI>is_locking() - returns true if the locking mechanism is turned on.</LI>
   * <LI>lock() - acquire lock for the current thread.</LI>
   * <LI>lock_count() - return the number of locks the current thread has.</LI>
   * <LI>try_lock() - try to acquire lock for the current thread and return true on success.</LI>
@@ -128,6 +129,13 @@ public:
 				CL_Lock.clear(std::memory_order_release);
 			}
         }
+	}
+
+
+	/// @brief return true if the locking is turned on.
+	bool is_locking() const noexcept
+	{
+		return CL_Do_Locking.load(std::memory_order_acquire);
 	}
 
 
