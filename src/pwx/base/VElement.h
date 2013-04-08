@@ -99,7 +99,7 @@ public:
 
 	mutable
 	std::atomic_uint_fast32_t
-	eNr; //!< Number of the element
+	eNr = ATOMIC_VAR_INIT(0); //!< Number of the element
 
 
 protected:
@@ -111,7 +111,10 @@ protected:
 
 	mutable
 	std::atomic_bool
-	isDestroyed; //!< Should be set to true by the destructors of deriving classes.
+	isDestroyed = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
+	mutable
+	std::atomic_bool
+	isRemoved = ATOMIC_VAR_INIT(true);    //!< Set to true by ctor and remove*(), set to false by insert*() methods.
 
 }; // class VContainer
 
