@@ -37,62 +37,62 @@
   * All classes, structs, constants, functions and macros should be documented.
   * Therefore what follows are some general notes and discussions.
   *
-  * <ol>
-  * <li>Workers<br />
+  * <OL>
+  * <LI>Workers<br />
   * The library instantiates standard 'workers' for various tasks. There is a
-  * central worker <i>RNG</i> that is used for thread safe random number, random
-  * names and hash generation. <i>SCT</i> is a simple object providing sine/cosine
-  * tables of variable precision. <i>DCF</i> is used to generate and manage data
-  * containers of variable types. <i>WCH</i> is the wave color handler that can
-  * transform wavelengths to RGB and vice versa. <i>PAP</i> is the program argument
+  * central worker <I>RNG</I> that is used for thread safe random number, random
+  * names and hash generation. <I>SCT</I> is a simple object providing sine/cosine
+  * tables of variable precision. <I>DCF</I> is used to generate and manage data
+  * containers of variable types. <I>WCH</I> is the wave color handler that can
+  * transform wavelengths to RGB and vice versa. <I>PAP</I> is the program argument
   * parser that can be used to handle arguments to, and help texts from a program.
-  * Finally <i>CFH</i> is a handler for configuration files of various styles like
-  * 'shell' or 'ini'.</li>
-  * <li>Thread safety<br />
+  * Finally <I>CFH</I> is a handler for configuration files of various styles like
+  * 'shell' or 'ini'.</LI>
+  * <LI>Thread safety<br />
   * Basically there are three basic principles on how to handle multi threaded
   * environments:
-  * <table border='1'>
-  * <tr><th>Principle</th><th>Advantages</th><th>Disadvantages</th></tr>
-  * <tr>
-  *   <td>Users responsibility</td>
-  *   <td><ul>
-  *     <li>Simplest interface</li>
-  *     <li>Simplest implementation</li>
-  *     <li>Best performance in single threaded environment</li>
-  *     <li>No overhead</li>
-  *   </ul></td><td><ul>
-  *     <li>User has to know when to lock</li>
-  *     <li>User has to debug all issues from multi threaded usage</li>
-  *     <li>All locks are external, blocking all parallel work</li>
-  *     <li>Multi threading can become useless if the work done outside of
-  * locks is too minimal.</li>
-  *   </ul></td>
-  * </tr><tr>
-  *   <td>API big locks</td>
-  *   <td><ul>
-  *     <li>Interface stays being simple, but relies on accessors.</li>
-  *     <li>Interface methods simply lock on all accesses</li>
-  *     <li>User does not need to care about anything, everything is
-  * automatically thread safe.</li>
-  *   </ul></td><td><ul>
-  *     <li>All parallel work is automatically blocked</li>
-  *     <li>Same impact (and overhead) on single threaded usage</li>
-  *     <li>Multi threading can become useless if the work done outside of
-  * locks is too minimal.</li>
-  *   </ul></td>
-  * </tr><tr>
-  *   <td>Internal locking on demand</td>
-  *   <td><ul>
-  *     <li>Memory barriers/fences can be used instead of locks where appropriate</li>
-  *     <li>No user intervention needed</li>
-  *     <li>A lot more parallel work can be done</li>
-  *   </ul></td><td><ul>
-  *     <li>More complex interface</li>
-  *     <li>Most complex implementation</li>
-  *     <li>Additional memory overhead to catch &quot;unfortunate&quot; locking order</li>
-  *   </ul></td>
-  * </tr>
-  * </table>
+  * <TABLE border='1'>
+  * <TR><TH>Principle</TH><TH>Advantages</TH><TH>Disadvantages</TH></TR>
+  * <TR>
+  *   <TD>Users responsibility</TD>
+  *   <TD><UL>
+  *     <LI>Simplest interface</LI>
+  *     <LI>Simplest implementation</LI>
+  *     <LI>Best performance in single threaded environment</LI>
+  *     <LI>No overhead</LI>
+  *   </UL></TD><TD><UL>
+  *     <LI>User has to know when to lock</LI>
+  *     <LI>User has to debug all issues from multi threaded usage</LI>
+  *     <LI>All locks are external, blocking all parallel work</LI>
+  *     <LI>Multi threading can become useless if the work done outside of
+  * locks is too minimal.</LI>
+  *   </UL></TD>
+  * </TR><TR>
+  *   <TD>API big locks</TD>
+  *   <TD><UL>
+  *     <LI>Interface stays being simple, but relies on accessors.</LI>
+  *     <LI>Interface methods simply lock on all accesses</LI>
+  *     <LI>User does not need to care about anything, everything is
+  * automatically thread safe.</LI>
+  *   </UL></TD><TD><UL>
+  *     <LI>All parallel work is automatically blocked</LI>
+  *     <LI>Same impact (and overhead) on single threaded usage</LI>
+  *     <LI>Multi threading can become useless if the work done outside of
+  * locks is too minimal.</LI>
+  *   </UL></TD>
+  * </TR><TR>
+  *   <TD>Internal locking on demand</TD>
+  *   <TD><UL>
+  *     <LI>Memory barriers/fences can be used instead of locks where appropriate</LI>
+  *     <LI>No user intervention needed</LI>
+  *     <LI>A lot more parallel work can be done</LI>
+  *   </UL></TD><TD><UL>
+  *     <LI>More complex interface</LI>
+  *     <LI>Most complex implementation</LI>
+  *     <LI>Additional memory overhead to catch &quot;unfortunate&quot; locking order</LI>
+  *   </UL></TD>
+  * </TR>
+  * </TABLE>
   * Most libraries offering functionality like the pwxLib use the first principle.
   * It helps greatly to focus on functionality instead of tiny implementation details.
   * However it is a principle where single threaded usage is often better (and faster)
@@ -106,13 +106,13 @@
   * the internal locking and use the first principle instead.
   *
   * This can be done in two ways:
-  * <ul><li>All classes derived from pwx::CLockable inherit the method do_locking(bool)
-  * which can be used to turn off (and later on) the locking mechanisms.</li>
-  * <li>As the basic calls are still present, all containers defined in pwx/container
+  * <UL><LI>All classes derived from pwx::CLockable inherit the method do_locking(bool)
+  * which can be used to turn off (and later on) the locking mechanisms.</LI>
+  * <LI>As the basic calls are still present, all containers defined in pwx/container
   * allow their members to be used directly. So if you just want to &quot;march&quot;
   * a container, you can just get the head element and then walk through the container
-  * using each elements next pointer.</li></ul>
-  * </ol>
+  * using each elements next pointer.</LI></UL>
+  * </OL>
 **/
 namespace pwx
 {
