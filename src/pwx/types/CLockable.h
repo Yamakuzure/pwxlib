@@ -161,7 +161,7 @@ public:
 	/** @brief return the number of locks on this object *this* thread has
 	  * @return the number of current locks held by the calling thread
 	**/
-	uint32_t lock_count() noexcept
+	uint32_t lock_count() const noexcept
 	{
 		if (CURRENT_THREAD_ID == CL_Thread_ID)
 			return CL_Lock_Count;
