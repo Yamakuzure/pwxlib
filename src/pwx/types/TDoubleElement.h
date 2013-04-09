@@ -218,7 +218,7 @@ struct PWX_API TDoubleElement : public VElement
 	  * element that it is stored in a container even without a next
 	  * pointer set.
 	**/
-	void insert() const noexcept
+	void insert() noexcept
 	{
 		isRemoved.store(false, std::memory_order_release);
 	}
@@ -377,7 +377,7 @@ struct PWX_API TDoubleElement : public VElement
 	  * Both the next and previous elements will be notified and
 	  * the pointers to them set to nullptr.
 	**/
-	void remove() const noexcept
+	void remove() noexcept
 	{
 		// Do an acquiring test before the element is actually locked
 		if (next.load(std::memory_order_acquire) || prev.load(std::memory_order_acquire)) {

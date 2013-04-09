@@ -203,7 +203,7 @@ struct PWX_API TSingleElement : public VElement
 	  * element that it is stored in a container even without a next
 	  * pointer set.
 	**/
-	void insert() const noexcept
+	void insert() noexcept
 	{
 		isRemoved.store(false, std::memory_order_release);
 	}
@@ -272,9 +272,9 @@ struct PWX_API TSingleElement : public VElement
 	  * The next pointer of the element will be set to nullptr
 	  * by this method.
 	**/
-	void remove() const noexcept
+	void remove() noexcept
 	{
-		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		PWX_LOCK_GUARD(elem_t, this)
 		setNext(nullptr);
 		isRemoved.store(true, std::memory_order_release);
 	}
