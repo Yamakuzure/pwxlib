@@ -46,16 +46,17 @@ namespace pwx
   * to destroy the data when the element is deleted. If no such function was set,
   * the standard delete operator is used instead.
   *
+  * This container is designed to work safely in a multi-threaded environment.
+  * See below for more on single and multi threaded usage.
+  *
   * It is recommended that you use the much more advanced std::list unless you
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
-  * === : EMXIF ===
+  * <B>Notes on multi threaded environments</B>
+  *
+  * If you plan to use this container in a strictly single-threaded way, you can
+  * turn off most of the thread safety measures with disable_thread_safety().
 **/
 template<typename data_t, typename elem_t = TDoubleElement<data_t> >
 class PWX_API TDoubleList : public TSingleList<data_t, elem_t>
@@ -66,8 +67,8 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TSingleList<data_t, elem_t> base_t;
-	typedef TDoubleList<data_t, elem_t> list_t;
+	typedef TSingleList<data_t, elem_t> base_t; //!< Base type of this list
+	typedef TDoubleList<data_t, elem_t> list_t; //!< Type of this list
 
 
 	/* ===============================================
@@ -105,14 +106,8 @@ public:
 	TDoubleList (const list_t &src) noexcept :
 		base_t (src)
 	{
-		// The copy ctor of base_t has already copied all elements.
-		// But they do not have a valid prev pointer, yet.
-		curr = head;
-		while (curr != tail) {
-			if (curr && curr->getNext())
-				curr->getNext()->setPrev(curr);
-			curr = curr->getNext();
-		}
+		// No need to do anything. The base ctor copies all elements using
+		// protInsert() which is actually in this class.
 	}
 
 
@@ -134,23 +129,22 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		while (head || curr || tail) {
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
-			elem_t* toDelete = tail ? tail : head ? head : curr;
-			if (toDelete) {
-				if (head == toDelete)
-					privRemove(nullptr, toDelete);
-				else
-					privRemove(toDelete->getPrev(), toDelete);
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
-				PWX_TRY(privDelete(toDelete))
-				catch(...) {
-					std::this_thread::yield();
+		elem_t* toDelete = nullptr;
+		while (tail) {
+			PWX_LOCK(this)
+			if (tail) {
+				toDelete = tail;
+				privRemove(toDelete);
+
+				// Now that the element is removed, we do not
+				// need to have a full lock any more
+				PWX_UNLOCK(this)
+				if (toDelete) {
+					PWX_TRY(protDelete(toDelete))
+					catch(...) { } // We can't do anything about that
 				}
-			} // End of deleting element
-			else
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
-		} // end of while tail, head, curr
+			} // end of having head after lock is acquired.
+		} // end of while head
 	}
 
 
@@ -165,7 +159,7 @@ public:
 	**/
 	virtual uint32_t delData (data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return privDelete(remData(data)))
+		PWX_TRY_PWX_FURTHER(return protDelete(remData(data)))
 	}
 
 
@@ -184,7 +178,7 @@ public:
 	**/
 	virtual uint32_t delElem (elem_t* elem)
 	{
-		PWX_TRY_PWX_FURTHER(return privDelete(remElem(elem)))
+		PWX_TRY_PWX_FURTHER(return protDelete(remElem(elem)))
 	}
 
 
@@ -210,7 +204,7 @@ public:
 	**/
 	virtual uint32_t delPrev (data_t* next)
 	{
-		PWX_TRY_PWX_FURTHER(return privDelete(remPrev(next)))
+		PWX_TRY_PWX_FURTHER(return protDelete(remPrev(next)))
 	}
 
 
@@ -236,11 +230,13 @@ public:
 	**/
 	virtual uint32_t delPrevElem (elem_t* next)
 	{
-		PWX_TRY_PWX_FURTHER(return privDelete(remPrevElem(next)))
+		PWX_TRY_PWX_FURTHER(return protDelete(remPrevElem(next)))
 	}
 
 
+	using base_t::disable_thread_safety;
 	using base_t::empty;
+	using base_t::enable_thread_safety;
 	using base_t::find;
 	using base_t::get;
 	using base_t::getData;
@@ -354,11 +350,7 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		if (size() > 1) {
-			{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
-			return remNextElem (tail->getPrev());
-		}
-		return remNext (nullptr);
+		return privRemoveElem(tail);
 	}
 
 
@@ -481,52 +473,9 @@ protected:
 	*/
 
 	using base_t::destroy;
+	using base_t::protDelete;
 	using base_t::protFind;
-
-	/// @brief simple method to insert an element into the list
-	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem) noexcept
-	{
-		{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
-		uint32_t localCount   = size();
-		bool     needRenumber = true;
-
-		if (insPrev) {
-			// Maintain tail first
-			if (tail == insPrev) {
-				// In this case a full renumbering is not needed.
-				needRenumber = false;
-				insElem->eNr = tail->eNr + 1;
-				tail = insElem;
-			}
-			// Then take care of a possible next neighbor
-			insElem->setNext(insPrev->getNext());
-			if (insElem->getNext())
-				insElem->getNext()->setPrev(insElem);
-			// And the previous, of course
-			insPrev->setNext(insElem);
-			insElem->setPrev(insPrev);
-		} else if (localCount) {
-			insElem->setNext(head);
-			if (head)
-				head->setPrev(insElem);
-			head = insElem;
-		} else {
-			// If we had no elements yet, head and tail need to be set:
-			head = insElem;
-			tail = insElem;
-		}
-
-		// Set curr and renumber the list
-		curr       = insElem;
-		localCount = ++eCount;
-		if (needRenumber)
-			doRenumber = true;
-		{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
-
-		return localCount;
-	}
-
-
+	using base_t::protInsert;
 	using base_t::protRenumber;
 
 
@@ -554,66 +503,36 @@ private:
 	 *            where appropriate.
 	*/
 
-	/// @brief Delete the element behind @a prev
-	virtual uint32_t privDelete(elem_t* removed)
-	{
-		try {
-			{} /// FIXME: PWX_LOCK(this)
-			uint32_t localCount = size();
-			{} /// FIXME: PWX_UNLOCK(this)
-			if (removed) {
-				{} /// FIXME: PWX_LOCK(removed)
-				if (!removed->destroyed())
-					delete removed;
-				else
-					{} /// FIXME: PWX_UNLOCK(removed)
-			}
-			return localCount;
-		}
-		PWX_THROW_PWXSTD_FURTHER ("delete", "Deleting an element in TDoubleList::privDelete() failed.")
-	}
-
-
 	/// @brief Search until the next element contains the searched data
+	// Note: This method must be invoked with a lock in place! It does *NOT* lock!
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-		elem_t*  oldCurr = curr;
-		elem_t*  xHead   = head;
-		elem_t*  xTail   = tail;
-		{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+		elem_t*  xPrev   = curr;
+		elem_t*  xCurr   = xPrev->next.load(std::memory_order_acquire);
 
-		elem_t*  xCurr   = oldCurr->getNext(); // Go upwards first
-
-		while (xCurr && (xCurr != xTail) ) {
+		while (xPrev && (xPrev != tail)) {
 			if (xCurr->data.get() == data) {
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
 				curr = xCurr;
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
-				return xCurr->getPrev();
+				return xPrev;
 			}
-			xCurr = xCurr->getNext();
-		} // End of moving upwards
+			xPrev = xCurr;
+			xCurr = xCurr->next.load(std::memory_order_relaxed);
+		}
 
-		// If no result has been found, move downwards if oldCurr is not head
-		if (oldCurr != xHead) {
-			xCurr = oldCurr->getPrev();
+		// If we are here, prev points to tail. No match found.
+		xCurr = curr;
+		xPrev = xCurr->prev.load(std::memory_order_relaxed);
 
-			while (xCurr) {
-				if (xCurr->data.get() == data) {
-					{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-					curr = xCurr;
-					{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
-					return xCurr->getPrev();
-				}
-				if (xCurr == xHead)
-					xCurr = nullptr; // done, not found
-				else
-					xCurr = xCurr->getPrev();
-			} // End of moving downwards
-		} // End of having started beyond head
+		while (xCurr && (xCurr != head)) {
+			if (xCurr->data.get() == data) {
+				curr = xCurr;
+				return xPrev;
+			}
+			xPrev = xCurr;
+			xCurr = xCurr->prev.load(std::memory_order_relaxed);
+		}
 
-		// If we are here, xCurr is nullptr. no match found
+		// Here xCurr points to head, no match found.
 		return nullptr;
 	}
 
@@ -622,117 +541,128 @@ private:
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
 		protRenumber();
-		uint32_t localCount = size();
 
-		if (localCount) {
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-			elem_t*  xHead = head;
-			elem_t*  xTail = tail;
+		// It is necessary to lock briefly to ensure a consistent
+		// start of the search with a minimum of checks
+		PWX_LOCK(const_cast<list_t*>(this))
+
+		uint32_t locCnt = eCount.load(std::memory_order_acquire);
+
+		if (locCnt) {
 			elem_t*  xCurr = curr ? curr : head;
+			uint32_t xNr   = xCurr->eNr.load(std::memory_order_acquire);
 
-			// See note in TSingleList about why a local number is used.
-			uint32_t xNr   = xCurr->eNr;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+			PWX_UNLOCK(const_cast<list_t*>(this))
 
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> (index < 0
-												   ? localCount - (std::abs (index) % localCount)
-												   : index % localCount);
-			// Unfortunately this results in xIdx equaling localCount
+												   ? locCnt - (std::abs (index) % locCnt)
+												   : index % locCnt);
+
+			// Unfortunately this results in xIdx equaling locCnt
 			// (which is wrong) if index is a negative multiple of
-			// localCount:
-			if (xIdx >= localCount)
-				xIdx = xIdx % localCount;
+			// locCnt:
+			if (xIdx >= locCnt)
+				xIdx %= locCnt;
 
 			// Is xCurr already correct?
 			if (xIdx == xNr)
 				return xCurr;
 
-			// Is xIdx the next member, like in an upward for loop?
+			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
-				xCurr = xCurr->getNext();
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-				curr  = xCurr;
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+				      ? xCurr->getNext()
+				      : xCurr->next.load(std::memory_order_relaxed);
+				PWX_LOCK(const_cast<list_t*>(this))
+				curr = xCurr;
+				PWX_UNLOCK(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
-			// Is xIdx the prev member, like in a downward for loop?
-			if (xNr && (xIdx == (xNr - 1)) ) {
-				xCurr = xCurr->getPrev();
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-				curr  = xCurr;
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
+			// Or the previous
+			if (xIdx == (xNr - 1)) {
+				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+				      ? xCurr->getPrev()
+				      : xCurr->prev.load(std::memory_order_relaxed);
+				PWX_LOCK(const_cast<list_t*>(this))
+				curr = xCurr;
+				PWX_UNLOCK(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
 			// Is it the head we want?
 			if (0 == xIdx)
-				return xHead;
+				return head;
 
 			// Or tail ?
-			if ( (localCount - 1) == xIdx)
-				return xTail;
+			if ( (locCnt - 1) == xIdx)
+				/* Note: Although, after unlocking, tail might be pointing
+				 * somewhere else, the check is against locCnt to ensure
+				 * that any call to index -1 retrieves the current tail.
+				 */
+				return tail;
 
-			/* Manual search with four possibilities:
-			 * A) xIdx is between xNr and eCount
-			 *   1: xIdx is nearer to xNr    -> move upwards from xCurr
-			 *   2: xIdx is nearer to eCount -> move downwards from tail
-			 * B) xIdx is between 0 and xNr
-			 *   1: xIdx is nearer to 0      -> move upwards from head
-			 *   2: xIdx is nearer to xNr    -> move downwards from xCurr
-			*/
-			bool goUp = true;
-			if (xIdx > xNr) {
-				// A) xIdx is between xNr and localCount
-				if ( (xIdx - xNr) <= ( (localCount - xNr) / 2)) {
-					// 1: xIdx is nearer to xNr -> move upwards from curr
-					xCurr = xCurr->getNext();
-					++xNr;
-				} else {
-					// 2: xIdx is nearer to localCount -> move downwards from tail
-					goUp  = false;
-					xCurr = xTail->getPrev();
-					xNr   = localCount - 2;
-				}
-			} // end of group A
-			else {
-				// B) xIdx is between 0 and xNr
-				if (xIdx <= (xNr / 2)) {
-					// 1: xIdx is nearer to 0 -> move upwards from head
-					xCurr = xHead->getNext();
-					xNr  = 1;
-				} else {
-					// 2: xIdx is nearer to eNr -> move downwards from curr
-					goUp = false;
-					xCurr = xCurr->getPrev();
-					--xNr;
-				}
-			} // end of group B
+			// Ok, let's go. But xCurr is already checked
+			bool upwards = true;
+			if (xIdx < xNr) {
+				upwards = false;
+				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+					  ? head->getPrev()
+					  : head->prev.load(std::memory_order_relaxed);
+				--xNr;
+			} else {
+				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+					  ? xCurr->getNext()
+					  : xCurr->next.load(std::memory_order_relaxed);
+				++xNr;
+			}
 
-			// Now solve the move by a simple while loop:
-			while (xCurr && (xIdx != xNr)) {
-				xCurr = goUp ? xCurr->getNext() : xCurr->getPrev();
-				xNr += goUp ? 1 : -1;
+			// Now look into the rest
+			while ( xCurr && (xNr != xIdx)) {
 
-				// Same solution to a "dead-end" like in the single list
-				if ( (xTail == xCurr) || (xHead == xCurr) ) {
-					try {
-						{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-						curr = xCurr;
-						return privGetElementByIndex(index);
+				/* There is one critical possibility here:
+				 * If more than one element is removed while we traverse
+				 * the list, it might happen that xIdx is suddenly beyond
+				 * eCount or we reach head, first.
+				 * If this happens xCurr and xIdx have to be "warped"
+				 * around head and tail if xCurr reaches head or tail
+				 */
+				if (tail == xCurr) {
+					PWX_LOCK(const_cast<list_t*>(this))
+					// Do a double check, maybe the warp is not needed any more
+					if (tail == xCurr) {
+						xIdx -= eCount.load(std::memory_order_acquire);
+						xCurr = head;
+						xNr   = 0;
 					}
-					PWX_CATCH_AND_FORGET(std::exception)
+					PWX_UNLOCK(const_cast<list_t*>(this))
+				} else if ((head == xCurr)) {
+					PWX_LOCK(const_cast<list_t*>(this))
+					if (head == xCurr) {
+						xIdx += eCount.load(std::memory_order_acquire);
+						xCurr = tail;
+						xNr   = xCurr->eNr.load(std::memory_order_acquire);
+					}
+				} // End of consistency check
+				else {
+					if (upwards)
+						xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+							  ? xCurr->getNext()
+							  : xCurr->next.load(std::memory_order_relaxed);
+					else
+						xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+							  ? xCurr->getPrev()
+							  : xCurr->prev.load(std::memory_order_relaxed);
+					xNr += upwards ? 1 : -1;
 				}
-			}
 
-			// If xCurr is still set, it points to where it should now:
-			if (xCurr) {
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(const_cast<list_t*>(this))
-				curr = xCurr;
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(const_cast<list_t*>(this))
-			}
+			} // end of searching loop
 
+			// xCurr is sure to be pointing where it should now.
+			PWX_LOCK(const_cast<list_t*>(this))
+			curr = xCurr;
+			PWX_UNLOCK(const_cast<list_t*>(this))
 			return xCurr;
 		}
 
@@ -744,65 +674,67 @@ private:
 	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
 	{
 		// 1: Prepare the next element
-		elem_t* nextElement = next ? const_cast<elem_t*>(find(next)) : nullptr;
-		if (next && (nullptr == nextElement))
+		elem_t* nextElement = next ? const_cast<elem_t*>(protFind(next)) : nullptr;
+		if (next && (nullptr == nextElement)) {
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this doubly linked list")
+		}
+
+		// Now nextElement must not change any more
+		if (nextElement)
+			PWX_LOCK(nextElement)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 3: Do the real insert
-		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = nextElement
+					 ? this->beThreadSafe.load(std::memory_order_relaxed)
+						? nextElement->getPrev()
+						: nextElement->prev.load(std::memory_order_relaxed)
+					 : tail;
+		if (nextElement)
+			PWX_UNLOCK(nextElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
 	/// @brief preparation method to insert data before an element
 	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
-		// 1: Prepare the next element
-		elem_t* nextElement = next;
-
-#ifdef PWX_THREADDEBUG
-		if (nextElement) {
-			{} /// FIXME: PWX_LOCK(nextElement)
-			while (nextElement->destroyed()) {
-				// This is bad. It means that someone manually deleted the element.
-				// If the element still has a prev, or if it is the last element,
-				// we can, however, continue.
-				uint32_t localCount = size();
-				if ((localCount > 1) && nextElement->getPrev()) {
-					{} /// FIXME: PWX_LOCK(nextElement->getPrev())
-					{} /// FIXME: PWX_UNLOCK(nextElement)
-					nextElement = nextElement->getPrev();
-				}
-				else if (localCount < 2) {
-					{} /// FIXME: PWX_UNLOCK(nextElement)
-					nextElement = nullptr; // New head about
-				}
-				else {
-					{} /// FIXME: PWX_UNLOCK(nextElement)
-					// my bad...
-					PWX_THROW("Illegal Condition", "Next element destroyed",
-							  "An element used as next for insertion is destroyed.")
-				}
-			} // End of ensuring a valid nextElement
-		}
-		if (nextElement) {} /// FIXME: PWX_UNLOCK(nextElement)
-#endif // PWX_THREADDEBUG
+		// 1: next, if set, must not change any more
+		if (next)
+			PWX_LOCK(next)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (next)
+				PWX_UNLOCK(next)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 3: Do the real insert
-		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = next
+					 ? this->beThreadSafe.load(std::memory_order_relaxed)
+						? next->getPrev()
+						: next->prev.load(std::memory_order_relaxed)
+					 : tail;
+		if (next)
+			PWX_UNLOCK(next)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
@@ -810,149 +742,142 @@ private:
 	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
 	{
 		// 1: Prepare the next element
-		elem_t* nextElement = next ? const_cast<elem_t*>(find(next)) : nullptr;
-		if (next && (nullptr == nextElement))
+		elem_t* nextElement = next ? const_cast<elem_t*>(protFind(next)) : nullptr;
+		if (next && (nullptr == nextElement)) {
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this doubly linked list")
+		}
+
+		// Now nextElement must not change any more
+		if (nextElement)
+			PWX_LOCK(nextElement)
 
 		// 2: Check source:
-		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
-			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
 			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 4: Do the real insert
-		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = nextElement
+					 ? this->beThreadSafe.load(std::memory_order_relaxed)
+						? nextElement->getPrev()
+						: nextElement->prev.load(std::memory_order_relaxed)
+					 : tail;
+		if (nextElement)
+			PWX_UNLOCK(nextElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before an element
 	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
-		// 1: Prepare the next element
-		elem_t* nextElement = next;
-
-#ifdef PWX_THREADDEBUG
-		if (nextElement) {
-			{} /// FIXME: PWX_LOCK(nextElement)
-			while (nextElement->destroyed()) {
-				// This is bad. It means that someone manually deleted the element.
-				// If the element still has a prev, or if it is the last element,
-				// we can, however, continue.
-				uint32_t localCount = size();
-				if ((localCount > 1) && nextElement->getPrev()) {
-					{} /// FIXME: PWX_LOCK(nextElement->getPrev())
-					{} /// FIXME: PWX_UNLOCK(nextElement)
-					nextElement = nextElement->getPrev();
-				}
-				else if (localCount < 2) {
-					{} /// FIXME: PWX_UNLOCK(nextElement)
-					nextElement = nullptr; // New head about
-				}
-				else {
-					{} /// FIXME: PWX_UNLOCK(nextElement)
-					// my bad...
-					PWX_THROW("Illegal Condition", "Next element destroyed",
-							  "An element used as next for insertion is destroyed.")
-				}
-			} // End of ensuring a valid nextElement
-		}
-		if (nextElement) {} /// FIXME: PWX_UNLOCK(nextElement)
-#endif // PWX_THREADDEBUG
+		// 1: next, if set must not change any more
+		if (next)
+			PWX_LOCK(next)
 
 		// 2: Check source:
-		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (next)
+				PWX_UNLOCK(next)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			if (next)
+				PWX_UNLOCK(next)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 4: Do the real insert
-		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = next
+					 ? this->beThreadSafe.load(std::memory_order_relaxed)
+						? next->getPrev()
+						: next->prev.load(std::memory_order_relaxed)
+					 : tail;
+		if (next)
+			PWX_UNLOCK(next)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
-	/// @brief simple method to remove an element from the list
-	virtual void privRemove (elem_t* prev, elem_t* elem) noexcept
+	/// @brief simple method to remove an element from the list.
+	/// This method does *NOT* lock, a lock must be in place!
+	virtual void privRemove (elem_t* elem) noexcept
 	{
-		if (elem) {
-			bool needRenumber = true;
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
+		// return at once if there is no element to remove
+		if (!elem)
+			return;
 
-			// maintain tail and head first
-			if (tail == elem) {
-				// In this case no full renumbering
-				// is required, only last number off.
-				needRenumber = false;
-				if (head == elem)
-					// The last item is going bye bye, now!
-					tail = nullptr;
-				else
-					tail = prev;
-			}
+		bool needRenumber = true;
 
-			if (elem == head) {
-				// If this was the last element, tail is nullptr now.
-				if (tail)
-					head = elem->getNext();
-				else
-					head = nullptr;
-			}
+		/* The following scenarios are possible:
+		 * 1: elem is head
+		 * 2: elem is tail
+		 * 3: elem is something else.
+		*/
+		if (head == elem)
+			// Case 1
+			head = this->beThreadSafe.load(std::memory_order_relaxed)
+				  ? head->getNext()
+				  : head->next.load(std::memory_order_relaxed);
+		else if (tail == elem) {
+			// Case 2:
+			needRenumber = false;
+			tail = this->beThreadSafe.load(std::memory_order_relaxed)
+				  ? tail->getPrev()
+				  : tail->prev.load(std::memory_order_relaxed);
+		}
+		elem->remove();
 
+		eCount.fetch_sub(1, std::memory_order_relaxed);
 
-			// now maintain the neighbors
-			if (prev && (prev != elem)) {
-					prev->setNext(elem->getPrev());
-				curr = prev;
-			} else
-				curr = head;
-
-			if (curr && curr->getNext())
-				curr->getNext()->setPrev(curr);
-
-			// Finally elem does not need pointers to its neighbors any more
-			// and the list needs to be renumbered
-			elem->setNext(nullptr);
-			elem->setPrev(nullptr);
-			--eCount;
-			if (needRenumber)
-				doRenumber = true;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
-		} // end of having an element to remove
+		if (needRenumber)
+			doRenumber.store(true, std::memory_order_relaxed);
 	}
 
 
 	/// @brief simple wrapper to prepare the direct removal of data
 	virtual elem_t* privRemoveData(data_t* data) noexcept
 	{
+		// Need a big lock, only one removal at a time!
+		PWX_LOCK_GUARD(list_t, this)
+
 		elem_t* toRemove = nullptr;
 
 		if ( (nullptr == data) || (nullptr == (toRemove = find (data))) )
 			return nullptr;
 
-		privRemove (toRemove->getPrev(), toRemove);
+		privRemove (toRemove);
 
 		return toRemove;
 	}
@@ -961,14 +886,18 @@ private:
 	/// @brief simple wrapper to prepare the direct removal of an element
 	virtual elem_t* privRemoveElem(elem_t* elem) noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(elem_t, elem)
+		if (nullptr == elem)
+			return nullptr;
+
+		// Need a big lock, only one removal at a time!
+		PWX_DOUBLE_LOCK(list_t, this, elem_t, elem)
 
 		if (elem->destroyed())
 			// If it is deleted, it can not be removed as it is already detached.
 			// And more important: It will go away after the unlock!
 			return nullptr;
 
-		privRemove (elem->getPrev(), elem);
+		privRemove (elem);
 
 		return elem;
 	}
@@ -979,11 +908,20 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeData(data_t* next) noexcept
 	{
+		// Need a big lock, only one removal at a time!
+		PWX_LOCK_GUARD(list_t, this)
+
 		elem_t* xNext = next ? find (next) : nullptr;
-		elem_t* toRemove = xNext ? xNext->getPrev() : tail;
+		elem_t* toRemove = xNext
+						 ? this->beThreadSafe.load(std::memory_order_relaxed)
+							? xNext->getPrev()
+							: xNext->prev.load(std::memory_order_relaxed)
+						 : next
+							? nullptr
+							: tail;
 
 		if (toRemove)
-			privRemove (toRemove->getPrev(), toRemove);
+			privRemove (toRemove);
 
 		return toRemove;
 	}
@@ -994,11 +932,16 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeElem(elem_t* next) noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		// Need a big lock, only one removal at a time!
+		PWX_LOCK_GUARD(list_t, this)
 
-		elem_t* toRemove = next ? next->getPrev() : tail;
+		elem_t* toRemove = next
+						 ? this->beThreadSafe.load(std::memory_order_relaxed)
+							? next->getPrev()
+							: next->prev.load(std::memory_order_relaxed)
+						 : tail;
 		if (toRemove)
-			privRemove (toRemove->getPrev(), toRemove);
+			privRemove (toRemove);
 
 		return toRemove;
 	}
@@ -1054,6 +997,7 @@ TDoubleList<data_t, elem_t> operator+ (const TDoubleList<data_t, elem_t> &lhs, c
   * means that it will be copied onto your result. In other words: The difference
   * elements are copied twice!
   *
+  * @param[in] lhs reference of the list from which to substract.
   * @param[in] rhs reference of the list to substract.
   * @return reference to this.
 **/
