@@ -92,6 +92,19 @@ public:
 	}
 
 
+	/** @brief return true if the element is a member of a container
+	  *
+	  * For this to work derived elements and containers using these
+	  * have to maintain isRemoved accordingly.
+	  *
+	  * @return true if the element is a member of any container
+	**/
+	bool inserted() const noexcept
+	{
+		return !isRemoved.load(std::memory_order_acquire);
+	}
+
+
 	/* ===============================================
 	 * === Public members                          ===
 	 * ===============================================
