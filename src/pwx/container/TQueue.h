@@ -122,7 +122,9 @@ public:
 	using base_t::delNextElem;
 	using base_t::delPrev;
 	using base_t::delPrevElem;
+	using base_t::disable_thread_safety;
 	using base_t::empty;
+	using base_t::enable_thread_safety;
 	using base_t::find;
 	using base_t::get;
 	using base_t::getData;
