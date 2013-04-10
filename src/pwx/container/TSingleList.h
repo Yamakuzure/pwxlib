@@ -514,8 +514,8 @@ public:
 		// Note: The guard is needed to ensure that no thread changes the
 		// number of elements beyond the border of eCount > 1
 		return (eCount.load(std::memory_order_acquire) > 1
-				? remNextElem (const_cast<elem_t* > (privGetElementByIndex (-2)))
-				: remNext (nullptr));
+				? privRemoveAfterElement(const_cast<elem_t* > (privGetElementByIndex (-2)))
+				: privRemoveAfterData(nullptr));
 	}
 
 
@@ -530,7 +530,7 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		return remNext (nullptr);
+		return privRemoveAfterData(nullptr);
 	}
 
 
