@@ -48,12 +48,7 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
-  * === : EMXIF ===
+  * @see pwx::TSingleList for further information.
 **/
 template<typename data_t, typename elem_t = TSingleElement<data_t> >
 class PWX_API TSingleRing : public TSingleList<data_t, elem_t>
@@ -64,8 +59,8 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TSingleList<data_t, elem_t> base_t;
-	typedef TSingleRing<data_t, elem_t> list_t;
+	typedef TSingleList<data_t, elem_t> base_t; //!< Base type of the ring
+	typedef TSingleRing<data_t, elem_t> list_t; //!< Type of this ring
 
 
 	/* ===============================================
@@ -286,17 +281,9 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		elem_t* toRemove = nullptr;
-		uint32_t localCount = size();
-		try {
-			if (localCount > 1)
-				toRemove = base_t::remNextElem (base_t::operator[] (-2));
-			else if (localCount)
-				toRemove = remNext (nullptr);
-			if (toRemove)
-				privConnectEnds();
-		}
-		PWX_CATCH_AND_FORGET(CException)
+		elem_t* toRemove = base_t::pop_back();
+		if (toRemove)
+			privConnectEnds();
 		return toRemove;
 	}
 
@@ -312,14 +299,9 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		elem_t* toRemove = nullptr;
-		try {
-			if (size())
-				toRemove = base_t::remNext(nullptr);
-			if (toRemove)
-				privConnectEnds();
-		}
-		PWX_CATCH_AND_FORGET(CException)
+		elem_t* toRemove = base_t::pop_front();
+		if (toRemove)
+			privConnectEnds();
 		return toRemove;
 	}
 
@@ -337,10 +319,7 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		{} /// FIXME: PWX_LOCK(this)
-		elem_t* xTail = tail;
-		{} /// FIXME: PWX_UNLOCK(this)
-		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, data))
+		PWX_TRY_PWX_FURTHER (base_t::push_back (data))
 		return privConnectEnds();
 	}
 
@@ -355,10 +334,7 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		{} /// FIXME: PWX_LOCK(this)
-		elem_t* xTail = tail;
-		{} /// FIXME: PWX_UNLOCK(this)
-		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, src))
+		PWX_TRY_PWX_FURTHER (base_t::push_back (src))
 		return privConnectEnds();
 	}
 
@@ -412,8 +388,7 @@ public:
 	**/
 	virtual elem_t* remNext (data_t* prev) noexcept
 	{
-		elem_t* toRemove = nullptr;
-		toRemove = base_t::remNext (prev);
+		elem_t* toRemove = base_t::remNext (prev);
 		if (toRemove)
 			privConnectEnds();
 		return toRemove;
@@ -440,8 +415,7 @@ public:
 	**/
 	virtual elem_t* remNextElem (elem_t* prev) noexcept
 	{
-		elem_t* toRemove = nullptr;
-		toRemove = base_t::remNextElem (prev);
+		elem_t* toRemove = base_t::remNextElem (prev);
 		if (toRemove)
 			privConnectEnds();
 		return toRemove;
@@ -517,6 +491,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::eCount;
 	using base_t::head;
 	using base_t::tail;
 
@@ -530,21 +505,27 @@ private:
 	/// @brief simple private method to make sure the ring is closed
 	virtual uint32_t privConnectEnds() noexcept
 	{
-		try {
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
+		// Return early if nothing is to be done:
+		if (!head || !tail || (head == tail->getNext()))
+			return eCount.load(std::memory_order_acquire);
 
+		if (this->beThreadSafe.load(std::memory_order_relaxed)) {
+			// In this case we do a lock cycle until a valid tail is
+			// found or the ring is empty
+			PWX_LOCK(this)
 			while (tail && tail->destroyed()) {
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
+				PWX_UNLOCK(this)
 				std::this_thread::yield();
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
+				PWX_LOCK(this)
 			}
-
-			if (tail && !tail->destroyed() && (tail->next != head))
+			// Now tail is either nullptr (ring is empty) or valid and locked.
+			if (tail && (head != tail->getNext()))
 				tail->setNext(head);
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
-		}
-		PWX_CATCH_AND_FORGET(CException)
-		return size();
+		} // End of thread safe connection
+		else
+			tail->next.store(head, std::memory_order_relaxed);
+
+		return eCount.load(std::memory_order_acquire);
 	}
 }; // class TSingleRing
 
@@ -576,9 +557,7 @@ TSingleRing<data_t, elem_t>::~TSingleRing() noexcept
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	{} /// FIXME: PWX_LOCK(&lhs)
 	TSingleRing<data_t, elem_t> result (lhs);
-	{} /// FIXME: PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result += rhs)
@@ -605,9 +584,7 @@ TSingleRing<data_t, elem_t> operator+ (const TSingleRing<data_t, elem_t> &lhs, c
 template<typename data_t, typename elem_t>
 TSingleRing<data_t, elem_t> operator- (const TSingleRing<data_t, elem_t> &lhs, const TSingleRing<data_t, elem_t> &rhs)
 {
-	{} /// FIXME: PWX_LOCK(&lhs)
 	TSingleRing<data_t, elem_t> result (lhs);
-	{} /// FIXME: PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result -= rhs)
