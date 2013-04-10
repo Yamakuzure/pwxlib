@@ -37,8 +37,8 @@ namespace pwx
   *
   * @brief Template to build doubly linked rings of variable types
   *
-  * The doubly linked ring is an extension to the singly linked ring.
-  * The head element has a prev pointer pointing to tail rather than nullptr.
+  * The doubly linked ring is a doubly linked list with a tail having a next
+  * pointer to head which has a prev pointer to tail.
   *
   * The constructor takes an optional destroy(T*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
@@ -48,12 +48,7 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::list.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
-  * === : EMXIF ===
+  * @see pwx::TDoubleList for further information.
 **/
 template<typename data_t, typename elem_t = TDoubleElement<data_t> >
 class PWX_API TDoubleRing : public TDoubleList<data_t, elem_t>
@@ -64,8 +59,8 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TDoubleList<data_t, elem_t> base_t;
-	typedef TDoubleRing<data_t, elem_t> list_t;
+	typedef TDoubleList<data_t, elem_t> base_t; //!< Base type of the ring
+	typedef TDoubleRing<data_t, elem_t> list_t; //!< Type of this ring
 
 
 	/* ===============================================
@@ -467,21 +462,9 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		elem_t*  toRemove   = nullptr;
-		uint32_t localCount = size();
-		try {
-			if (localCount > 1) {
-				{} /// FIXME: PWX_LOCK(this)
-				elem_t* xTail = tail;
-				{} /// FIXME: PWX_UNLOCK(this)
-				toRemove = base_t::remNextElem (xTail->getPrev());
-			}
-			else if (localCount)
-				toRemove = remNext (nullptr);
-			if (toRemove)
-				privConnectEnds();
-		}
-		PWX_CATCH_AND_FORGET(CException)
+		elem_t*  toRemove   = base_t::pop_back();
+		if (toRemove)
+			privConnectEnds();
 		return toRemove;
 	}
 
@@ -497,14 +480,9 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		elem_t* toRemove = nullptr;
-		try {
-			if (size())
-				toRemove = base_t::remNext(nullptr);
-			if (toRemove)
-				privConnectEnds();
-		}
-		PWX_CATCH_AND_FORGET(CException)
+		elem_t* toRemove = base_t::pop_front();
+		if (toRemove)
+			privConnectEnds();
 		return toRemove;
 	}
 
@@ -522,10 +500,7 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		{} /// FIXME: PWX_LOCK(this)
-		elem_t* xTail = tail;
-		{} /// FIXME: PWX_UNLOCK(this)
-		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, data))
+		PWX_TRY_PWX_FURTHER (base_t::push_back(data))
 		return privConnectEnds();
 	}
 
@@ -540,10 +515,7 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		{} /// FIXME: PWX_LOCK(this)
-		elem_t* xTail = tail;
-		{} /// FIXME: PWX_UNLOCK(this)
-		PWX_TRY_PWX_FURTHER (base_t::insNextElem (xTail, src))
+		PWX_TRY_PWX_FURTHER (base_t::push_back(src))
 		return privConnectEnds();
 	}
 
@@ -800,6 +772,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::eCount;
 	using base_t::head;
 	using base_t::tail;
 
@@ -813,30 +786,40 @@ private:
 	/// @brief simple private method to make sure the ring is closed
 	virtual uint32_t privConnectEnds() noexcept
 	{
-		try {
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
+		// Return early if nothing is to be done:
+		if (!head || !tail || ((head == tail->getNext()) && (tail == head->getPrev())) )
+			return eCount.load(std::memory_order_acquire);
 
-			while (head && head->destroyed()) {
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
-				std::this_thread::yield();
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
-			}
-
-			if (head && !head->destroyed() && (head->getPrev() != tail))
-				head->setPrev(tail);
-
+		if (this->beThreadSafe.load(std::memory_order_relaxed)) {
+			// In this case we do a lock cycle until a valid tail is
+			// found or the ring is empty
+			PWX_LOCK(this)
 			while (tail && tail->destroyed()) {
-				{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
+				PWX_UNLOCK(this)
 				std::this_thread::yield();
-				{} /// FIXME: PWX_LOCK_NOEXCEPT(this)
+				PWX_LOCK(this)
 			}
-
-			if (tail && !tail->destroyed() && (tail->getNext() != head))
+			// Now tail is either nullptr (ring is empty) or valid and locked.
+			if (tail && (head != tail->getNext()))
 				tail->setNext(head);
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(this)
+
+			// The same has to be done with head->prev
+			PWX_LOCK(this)
+			while (head && head->destroyed()) {
+				PWX_UNLOCK(this)
+				std::this_thread::yield();
+				PWX_LOCK(this)
+			}
+			// Now head is either nullptr (ring is empty) or valid and locked.
+			if (head && (tail != head->getPrev()))
+				head->setPrev(tail);
+		} // End of thread safe connection
+		else {
+			head->prev.store(tail, std::memory_order_relaxed);
+			tail->next.store(head, std::memory_order_relaxed);
 		}
-		PWX_CATCH_AND_FORGET(CException)
-		return size();
+
+		return eCount.load(std::memory_order_acquire);
 	}
 }; // class TDoubleRing
 
@@ -868,9 +851,7 @@ TDoubleRing<data_t, elem_t>::~TDoubleRing() noexcept
 template<typename data_t, typename elem_t>
 TDoubleRing<data_t, elem_t> operator+ (const TDoubleRing<data_t, elem_t> &lhs, const TDoubleRing<data_t, elem_t> &rhs)
 {
-	{} /// FIXME: PWX_LOCK(&lhs)
 	TDoubleRing<data_t, elem_t> result (lhs);
-	{} /// FIXME: PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result += rhs)
@@ -897,9 +878,7 @@ TDoubleRing<data_t, elem_t> operator+ (const TDoubleRing<data_t, elem_t> &lhs, c
 template<typename data_t, typename elem_t>
 TDoubleRing<data_t, elem_t> operator- (const TDoubleRing<data_t, elem_t> &lhs, const TDoubleRing<data_t, elem_t> &rhs)
 {
-	{} /// FIXME: PWX_LOCK(&lhs)
 	TDoubleRing<data_t, elem_t> result (lhs);
-	{} /// FIXME: PWX_UNLOCK(&lhs)
 
 	if (&lhs != &rhs) {
 		PWX_TRY_PWX_FURTHER (result -= rhs)
