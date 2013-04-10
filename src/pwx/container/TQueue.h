@@ -40,8 +40,8 @@ namespace pwx
   *
   * @brief Template to build queues of variable types
   *
-  * The queue is a basic container deriving TDoubleList to manage its data
-  * pointers. The queue is deriving from (isA) instead of using (hasA) a
+  * The queue is a basic container derived from TDoubleList to manage its
+  * elements. The queue is deriving from (isA) instead of using (hasA) a
   * a TDoubleList to enable it to be used like a list if necessary without
   * having to copy a lot of code.
   *
@@ -53,12 +53,7 @@ namespace pwx
   * unless you need to store a very large number of elements and can not live with
   * the downside of every element having to be copied into the std container.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
-  * === : EMXIF ===
+  * @see pwx::TDoubleList for further information.
 **/
 template<typename data_t>
 class PWX_API TQueue : public TDoubleList<data_t>
@@ -69,9 +64,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TDoubleElement<data_t>      elem_t;
-	typedef TDoubleList<data_t, elem_t> base_t;
-	typedef TQueue<data_t>              list_t;
+	typedef TDoubleElement<data_t>      elem_t; //!< Type of the stored elements
+	typedef TDoubleList<data_t, elem_t> base_t; //!< Base type of the queue
+	typedef TQueue<data_t>              list_t; //!< Type of this queue
 
 
 	/* ===============================================

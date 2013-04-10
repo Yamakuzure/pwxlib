@@ -40,8 +40,8 @@ namespace pwx
   *
   * @brief Template to build stacks of variable types
   *
-  * The stack is a basic container deriving TSingleList to manage its data
-  * pointers. The stack is deriving from (isA) instead of using (hasA) a
+  * The stack is a basic container derived from TSingleList to manage its
+  * elements. The stack is deriving from (isA) instead of using (hasA) a
   * TSingleList to enable it to be used like a list if necessary without
   * having to copy a lot of code.
   *
@@ -59,12 +59,7 @@ namespace pwx
   * need to store a very large number of elements and can not live with the
   * downside of every element having to be copied into the std::stack.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
-  * === : EMXIF ===
+  * @see pwx::TSingleList for further information.
 **/
 template<typename data_t>
 class PWX_API TStack : public TSingleList<data_t>
@@ -75,9 +70,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TSingleElement<data_t>      elem_t;
-	typedef TSingleList<data_t, elem_t> base_t;
-	typedef TStack<data_t>              list_t;
+	typedef TSingleElement<data_t>      elem_t; //!< Type of the stored elements
+	typedef TSingleList<data_t, elem_t> base_t; //!< Base type of the stack
+	typedef TStack<data_t>              list_t; //!< Type of this stack
 
 
 	/* ===============================================
