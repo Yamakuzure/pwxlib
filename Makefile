@@ -7,7 +7,7 @@ DEBUG := YES
 # The following switch produces massive output and should
 # not be enabled lightly. Make sure to disable it before
 # running tools like helgrind or DRD on any pwxLib program!
-THREADDEBUG := YES
+THREADDEBUG := NO
 
 # Note: You can add additional debugging options in pwx/functions/debug.h
 

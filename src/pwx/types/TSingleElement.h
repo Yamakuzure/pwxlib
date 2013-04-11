@@ -196,16 +196,54 @@ struct PWX_API TSingleElement : public VElement
 	}
 
 
-	/** @brief tell the element that it has been inserted.
+	/** @brief insert an element before another
 	  *
-	  * If an element becomes the last or only element of a container,
-	  * it has no next element. This method can be used to tell the
-	  * element that it is stored in a container even without a next
-	  * pointer set.
+	  * This is a special insertion method that is to be used if
+	  * this element is to become the new head of a container.
+	  * In this special case there is no element to use insertNext()
+	  * from, so this method does the handling.
+	  *
+	  * If either this or the @a new_next element is marked as destroyed,
+	  * a pwx::CException is thrown. Such a condition implies that
+	  * there is something seriously wrong.
+	  *
+	  * if @a new_next is either nullptr or this element, the element
+	  * will only be marked as inserted.
+	  *
+	  * @param[in] new_next target where the next pointer should point at.
 	**/
-	void insert() noexcept
+	void insertBefore(elem_t* new_next)
 	{
-		isRemoved.store(false, std::memory_order_release);
+		if (!new_next || (new_next == this)) {
+			isRemoved.store(false, std::memory_order_release);
+			return;
+		}
+
+		if (!destroyed() && !new_next->destroyed()) {
+			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
+
+			/* Now that we have the double lock, it is crucial to
+			 * check again. Otherwise we might just insert a destroyed element.
+			*/
+			if (destroyed())
+				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+						"The element to insert has been destroyed while waiting for the lock!")
+
+			if (new_next->destroyed())
+				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+						"The inserting element has been destroyed while waiting for the lock!")
+
+			// Store new next neighbor
+			setNext(new_next);
+
+			// Mark as inserted
+			isRemoved.store(false, std::memory_order_release);
+		} else if (destroyed())
+			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+					"Tried to insert an element that has already been destroyed!")
+		else
+			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+					"Tried to insert an element after an already destroyed element!")
 	}
 
 
@@ -219,12 +257,8 @@ struct PWX_API TSingleElement : public VElement
 	  * a pwx::CException is thrown. Such a condition implies that
 	  * there is something seriously wrong.
 	  *
-	  * If this element is marked as removed, it is simply assumed to
-	  * be a single element in a container and will be marked as not
-	  * removed by the insert.
-	  *
-	  * On the other hand, if @a new_next is either this element or
-	  * nullptr, the method simply does nothing.
+	  * If @a new_next is either this element or nullptr, the method
+	  * simply does nothing.
 	  *
 	  * @param[in] new_next target where the next pointer should point at.
 	**/
@@ -247,15 +281,14 @@ struct PWX_API TSingleElement : public VElement
 				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 						"The element to insert has been destroyed while waiting for the lock!")
 
-			// Safe old next pointer.
-			elem_t* xOldNext = this->getNext();
+			// Insert the new element
+			new_next->next.store(next.load(std::memory_order_acquire),
+								std::memory_order_release);
+			new_next->isRemoved.store(false, std::memory_order_release);
 
-			// Set the neighborhood of the new next
-			new_next->next.store(xOldNext, std::memory_order_relaxed);
-
-			// Store new next neighbor and tell it that it has been inserted
+			// Store new next neighbor
 			setNext(new_next);
-			new_next->insert();
+
 		} else if (destroyed())
 			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
 					"Tried to insert an element after an already destroyed element!")
@@ -291,6 +324,7 @@ struct PWX_API TSingleElement : public VElement
 	void removeNext()
 	{
 		elem_t* toRemove = nullptr;
+
 		// Do an acquiring test before the element is actually locked
 		if ( (toRemove = this->getNext()) ) {
 			PWX_LOCK_GUARD(elem_t, toRemove)
@@ -299,7 +333,7 @@ struct PWX_API TSingleElement : public VElement
 			/* See notes in TDoubleElement::remove() */
 
 			// Do a release->yield->lock cycle until this is locked
-			while ((this->getNext() == toRemove) && !this->try_lock()) {
+			while ((this->getNext() == toRemove) && !PWX_TRY_LOCK(this) ) {
 				// Can't lock this, so yield until possible
 				PWX_UNLOCK(toRemove)
 				std::this_thread::yield();
@@ -309,7 +343,7 @@ struct PWX_API TSingleElement : public VElement
 			// Now if next still points to toRemove, this is locked:
 			if (this->getNext() == toRemove) {
 				this->setNext(xOldNext);
-				this->unlock();
+				PWX_UNLOCK(this);
 			} else
 				// Otherwise toRemove went away, which is bad
 				PWX_THROW("Illegal_Remove", "Next element to remove went away",

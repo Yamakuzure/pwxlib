@@ -211,16 +211,28 @@ struct PWX_API TDoubleElement : public VElement
 	}
 
 
-	/** @brief tell the element that it has been inserted.
+	/** @brief insert an element before another
 	  *
-	  * If an element becomes the last or only element of a container,
-	  * it has no next element. This method can be used to tell the
-	  * element that it is stored in a container even without a next
-	  * pointer set.
+	  * This is a special insertion method that is to be used if
+	  * this element is the first element of a container.
+	  *
+	  * if @a new_next is *not* nullptr or this element, the
+	  * insertion will be done by its insertPrev() method.
+	  *
+	  * If either this or the @a new_next element is marked as destroyed,
+	  * a pwx::CException is thrown. Such a condition implies that
+	  * there is something seriously wrong.
+	  *
+	  * @param[in] new_next target where the next pointer should point at.
 	**/
-	void insert() noexcept
+	void insertBefore(elem_t* new_next)
 	{
-		isRemoved.store(false, std::memory_order_release);
+		if (!new_next || (new_next == this)) {
+			isRemoved.store(false, std::memory_order_release);
+			return;
+		}
+
+		PWX_TRY_PWX_FURTHER(new_next->insertPrev(this))
 	}
 
 
@@ -278,9 +290,10 @@ struct PWX_API TDoubleElement : public VElement
 				}
 			}
 
-			// Set the neighborhood of the new next
-			new_next->next.store(xOldNext, std::memory_order_relaxed);
-			new_next->prev.store(this, std::memory_order_relaxed);
+			// Insert the new element
+			new_next->next.store(xOldNext, std::memory_order_release);
+			new_next->prev.store(this, std::memory_order_release);
+			new_next->isRemoved.store(false, std::memory_order_release);
 
 			// Store new next and prev neighbor.
 			setNext(new_next);
@@ -354,6 +367,7 @@ struct PWX_API TDoubleElement : public VElement
 			// Set the neighborhood of the new prev
 			new_prev->next.store(this, std::memory_order_relaxed);
 			new_prev->prev.store(xOldPrev, std::memory_order_relaxed);
+			new_prev->isRemoved.store(false, std::memory_order_release);
 
 			// Store new next and prev neighbor.
 			setPrev(new_prev);
@@ -382,8 +396,8 @@ struct PWX_API TDoubleElement : public VElement
 		// Do an acquiring test before the element is actually locked
 		if (next.load(std::memory_order_acquire) || prev.load(std::memory_order_acquire)) {
 			PWX_LOCK(this)
-			elem_t* xOldPrev = nullptr;
-			elem_t* xOldNext = nullptr;
+			elem_t* xOldPrev = getPrev();
+			elem_t* xOldNext = getNext();
 
 			/* The challenge here is to do this without deadlocks.
 			 * Basically the neighbors need to be locked in turn.
@@ -398,7 +412,7 @@ struct PWX_API TDoubleElement : public VElement
 			 */
 
 			// 1: Handle previous neighbor
-			while ((xOldPrev = this->getPrev()) && !xOldPrev->try_lock()) {
+			while (xOldPrev && (xOldPrev == getPrev()) && !PWX_TRY_LOCK(xOldPrev) ) {
 				// xOldPrev is valid, but we can not lock.
 				PWX_UNLOCK(this)
 				std::this_thread::yield();
@@ -410,12 +424,12 @@ struct PWX_API TDoubleElement : public VElement
 				if (xOldPrev->getNext() == this)
 					// Still points to this, so make it point to next instead
 					xOldPrev->setNext(this->getNext());
-				xOldPrev->unlock();
+				PWX_UNLOCK(xOldPrev);
 				xOldPrev = nullptr;
 			}
 
 			// 2: Handle next neighbor
-			while ((xOldNext = this->getNext()) && !xOldNext->try_lock()) {
+			while (xOldNext && (xOldNext == getNext()) && !PWX_TRY_LOCK(xOldNext)) {
 				// xOldNext is valid, but we can not lock.
 				PWX_UNLOCK(this)
 				std::this_thread::yield();
@@ -427,7 +441,7 @@ struct PWX_API TDoubleElement : public VElement
 				if (xOldNext->getPrev() == this)
 					// Still points to this, so make it point to prev instead
 					xOldNext->setPrev(this->getPrev());
-				xOldNext->unlock();
+				PWX_UNLOCK(xOldNext);
 				xOldNext = nullptr;
 			}
 
@@ -450,32 +464,9 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void removeNext()
 	{
-		elem_t* toRemove = nullptr;
-
-		// Do an acquiring test before the element is actually locked
-		if ( (toRemove = this->getNext()) ) {
-			PWX_LOCK_GUARD(elem_t, toRemove)
-
-			/* See notes in TDoubleElement::remove() */
-
-			// Lock this, the former previous neighbor
-			while ((this->getNext() == toRemove) && !this->try_lock()) {
-				// Can't lock this, so yield until possible
-				PWX_UNLOCK(toRemove)
-				std::this_thread::yield();
-				PWX_LOCK(toRemove)
-			}
-
-			// Now if next still points to toRemove, this is locked:
-			if (this->getNext() == toRemove)
-				toRemove->remove();
-			else {
-				// Otherwise toRemove went away, which is bad
-				PWX_UNLOCK(toRemove)
-				PWX_THROW("Illegal_Remove", "Next element to remove went away",
-						"A next element to remove went away while waiting for the lock!")
-			}
-		} // End of having a next element to remove
+		elem_t* toRemove = getNext();
+		if (toRemove)
+			PWX_TRY_PWX_FURTHER(toRemove->remove())
 	}
 
 
@@ -489,32 +480,9 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void removePrev()
 	{
-		elem_t* toRemove = nullptr;
-
-		// Do an acquiring test before the element is actually locked
-		if ( (toRemove = this->getPrev()) ) {
-			PWX_LOCK_GUARD(elem_t, toRemove)
-
-			/* See notes in TDoubleElement::remove() */
-
-			// Lock this, the former next neighbor
-			while ((this->getPrev() == toRemove) && !this->try_lock()) {
-				// Can't lock this, so yield until possible
-				PWX_UNLOCK(toRemove)
-				std::this_thread::yield();
-				PWX_LOCK(toRemove)
-			}
-
-			// Now if next still points to toRemove, this is locked:
-			if (this->getPrev() == toRemove)
-				toRemove->remove();
-			else {
-				// Otherwise toRemove went away, which is bad
-				PWX_UNLOCK(toRemove)
-				PWX_THROW("Illegal_Remove", "Previous element to remove went away",
-						"A previous element to remove went away while waiting for the lock!")
-			}
-		} // End of having a next element to remove
+		elem_t* toRemove = getPrev();
+		if (toRemove)
+			PWX_TRY_PWX_FURTHER(toRemove->remove())
 	}
 
 
