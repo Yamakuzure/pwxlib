@@ -970,33 +970,30 @@ protected:
 
 		curr = insElem;
 
-		/// @todo : This can surely be shortened to less code duplication, can't it?
-		if (!locCnt) {
-			// Case 1: The list is empty
-			head = tail = insElem;
-			insElem->insert();
-			PWX_UNLOCK(this)
-		} else if (nullptr == insPrev) {
-			// Case 2: A new head is to be set
-			insElem->next.store(head, std::memory_order_release);
-			head = insElem;
-			insElem->insert();
-			doRenumber.store(true, std::memory_order_release);
-			PWX_UNLOCK(this)
-		} else if (insPrev == tail) {
-			// Case 3: A new tail is to be set
-			tail->next.store(insElem, std::memory_order_release);
-			insElem->eNr.store(
-				tail->eNr.load(std::memory_order_acquire) + 1,
-				std::memory_order_release);
-			insElem->insert();
-			tail = insElem;
-			PWX_UNLOCK(this)
-		} else {
-			// Case 4: A normal insertion
+		if (locCnt && insPrev && (tail != insPrev)) {
+			// Case 4: A normal insert
 			doRenumber.store(true, std::memory_order_release);
 			PWX_UNLOCK(this)
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
+		} else {
+			if (!locCnt) {
+				// Case 1: The list is empty
+				head = tail = insElem;
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
+			} else if (nullptr == insPrev) {
+				// Case 2: A new head is to be set
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(head))
+				head = insElem;
+				doRenumber.store(true, std::memory_order_release);
+			} else if (insPrev == tail) {
+				// Case 3: A new tail is to be set
+				insElem->eNr.store(
+					tail->eNr.load(std::memory_order_acquire) + 1,
+					std::memory_order_release);
+				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
+				tail = insElem;
+			}
+			PWX_UNLOCK(this)
 		}
 
 		// Raise eCount and set renumbering mode
@@ -1341,8 +1338,6 @@ private:
 		if (!elem)
 			return;
 
-		bool needRenumber = true;
-
 		/* The following scenarios are possible:
 		 * 1: elem is head
 		 * 2: elem is tail
@@ -1354,18 +1349,18 @@ private:
 				  ? head->getNext()
 				  : head->next.load(std::memory_order_relaxed);
 			elem->remove();
-		} else if (tail == elem) {
-			// Case 2:
-			needRenumber = false;
-			tail = prev;
-			elem->remove();
-		} else
+			doRenumber.store(true, std::memory_order_release);
+		} else {
+			if (tail == elem)
+				// Case 2:
+				tail = prev;
 			PWX_TRY_PWX_FURTHER(prev->removeNext())
+		}
 
-		eCount.fetch_sub(1, std::memory_order_relaxed);
-
-		if (needRenumber)
-			doRenumber.store(true, std::memory_order_relaxed);
+		if (1 == eCount.fetch_sub(1)) {
+			// The list is empty!
+			curr = head = tail = nullptr;
+		}
 	}
 
 
