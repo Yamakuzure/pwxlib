@@ -50,7 +50,7 @@ namespace pwx
   * Unsorted sets will generally be much closer to O(n) on any insertion and
   * random access than sorted sets.
   *
-  * The set inherits from TDoubleList to manage its data pointers. Every element is
+  * The set is derived from TDoubleList to manage its element. Every element is
   * checked for uniqueness before storing it in a set.
   *
   * This is done on the data level, not pointer level. This makes it necessary for
@@ -67,12 +67,7 @@ namespace pwx
   * to store a very large number of elements and can not live with the downside of
   * every element having to be copied into the std container.
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, changes to the container are done in a locked state."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling Containers via VContainer whether they are used concurrently or not?
-  * === : EMXIF ===
+  * @see pwx::TDoubleList for further information.
 **/
 template<typename data_t>
 class PWX_API TSet : public TDoubleList<data_t>
@@ -83,9 +78,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TDoubleElement<data_t>      elem_t;
-	typedef TDoubleList<data_t, elem_t> base_t;
-	typedef TSet<data_t>                list_t;
+	typedef TDoubleElement<data_t>      elem_t; //!< Type of the stored elements
+	typedef TDoubleList<data_t, elem_t> base_t; //!< Base type of the set
+	typedef TSet<data_t>                list_t; //!< Type of this set
 
 
 	/* ===============================================
@@ -145,7 +140,9 @@ public:
 	using base_t::delNextElem;
 	using base_t::delPrev;
 	using base_t::delPrevElem;
+	using base_t::disable_thread_safety;
 	using base_t::empty;
+	using base_t::enable_thread_safety;
 	using base_t::find;
 
 
@@ -228,22 +225,24 @@ public:
 	virtual bool isSubsetOf(const list_t &src) const noexcept
 	{
 		bool     result     = true;
-		uint32_t localCount = size();
 
 		// The empty set is always a subset of everything.
-		if (localCount && (this != &src)) {
-			if (src.size()) {
-				{} /// FIXME: PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
+		if ( eCount.load(std::memory_order_acquire)
+		  && (this != &src)) {
+			if (src.eCount.load(std::memory_order_acquire)) {
+				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
 				elem_t* xCurr  = head;
 				bool    isDone = false;
 
 				// A simple loop will do, because we can use privFindData directly.
 				while (result && xCurr && !isDone) {
 					if (src.privFindData(**xCurr)) {
-						if (xCurr == head)
+						if (xCurr == tail)
 							isDone = true;
 						else
-							xCurr = xCurr->getNext();
+							xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+								  ? xCurr->next.load(std::memory_order_acquire)
+								  : xCurr->next.load(std::memory_order_relaxed);
 					} else
 						result = false;
 				}
@@ -258,46 +257,7 @@ public:
 	using base_t::pop;
 	using base_t::pop_back;
 	using base_t::pop_front;
-
-
-	/** @brief push an element onto the set
-	  *
-	  * This is the regular set operation pushing an element
-	  * onto the end of the set.
-	  *
-	  * To add an element to the front, use unshift() or push_front().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] data data pointer to store.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push(data_t* data)
-	{
-		PWX_TRY_PWX_FURTHER(return push_back(data))
-	}
-
-
-	/** @brief push an element copy onto the set
-	  *
-	  * This is the regular set operation pushing an element
-	  * copy onto the end of the set.
-	  *
-	  * To add an element to the front, use unshift() or push_front().
-	  *
-	  * If the new element can not be created, a pwx::CException with
-	  * the name "ElementCreationFailed" is thrown.
-	  *
-	  * @param[in] src element to copy.
-	  * @return number of elements stored after the operation.
-	**/
-	virtual uint32_t push(const elem_t &src)
-	{
-		PWX_TRY_PWX_FURTHER(return push_back(src))
-	}
-
-
+	using base_t::push;
 	using base_t::push_back;
 	using base_t::push_front;
 	using base_t::remData;
@@ -323,11 +283,31 @@ public:
 	**/
 	virtual void reset(const list_t &src) noexcept
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		// A big lock on both is needed to ensure that
+		// a) Nothing is added by another thread and
+		// b) src can not go away before the reset is done.
+		if (this->beThreadSafe) {
+			PWX_LOCK(this)
+			if (this != &src) {
+				while (!const_cast<list_t*>(&src)->try_lock()) {
+					PWX_UNLOCK(this)
+					std::this_thread::yield();
+					PWX_LOCK(this)
+				}
+			}
+		}
+
+		// Now do the work
 		clear();
 		if (&src != this) {
 			destroy  = src.destroy;
 			isSorted = src.isSorted;
+		}
+
+		// Unlock if needed
+		if (this->beThreadSafe) {
+			PWX_UNLOCK(const_cast<list_t*>(&src))
+			PWX_UNLOCK(this)
 		}
 	}
 
@@ -349,7 +329,7 @@ public:
 	**/
 	virtual elem_t* shift()
 	{
-		PWX_TRY_PWX_FURTHER(return pop_back())
+		PWX_TRY_PWX_FURTHER(return base_t::pop_back())
 	}
 
 
@@ -371,7 +351,7 @@ public:
 	**/
 	virtual uint32_t unshift(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return push_front(data))
+		PWX_TRY_PWX_FURTHER(return base_t::push_front(data))
 	}
 
 
@@ -390,7 +370,7 @@ public:
 	**/
 	virtual uint32_t unshift(const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER(return push_front(src))
+		PWX_TRY_PWX_FURTHER(return base_t::push_front(src))
 	}
 
 
@@ -410,7 +390,7 @@ public:
 	virtual list_t &operator= (const list_t &rhs)
 	{
 		if (&rhs != this) {
-			{} /// FIXME: PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy = rhs.destroy;
 			PWX_TRY_PWX_FURTHER (*this += rhs)
@@ -439,6 +419,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::eCount;
 	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
@@ -471,8 +452,9 @@ private:
 	{
 		// Note: As the consistency of the content of a set is more important
 		//       than anything, a big lock is a must-have here!
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-		uint32_t localCount = size();
+		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		uint32_t localCount = eCount.load(std::memory_order_acquire);
+
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
 		 * 1: If head is larger, data can not be in the set
@@ -512,7 +494,7 @@ private:
 			}
 
 			// Quick exit if tail is wanted:
-			if (**head == data) {
+			if (**tail == data) {
 				curr = tail;
 				return curr;
 			}
@@ -567,7 +549,8 @@ private:
 	/// @brief preparation method to insert data behind data
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		// All preparation methods use big locks to ensure data consistency!
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
@@ -578,13 +561,24 @@ private:
 					   "Element not found",
 					   "The searched element can not be found in this singly linked list")
 
+		// Now prevElement must not change any more
+		if (prevElement)
+			PWX_LOCK(prevElement)
+
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 3: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
@@ -592,39 +586,29 @@ private:
 	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = isSorted ? curr : prev;
-
-#ifdef PWX_THREADDEBUG
-		if (prevElement) {
-			uint32_t localCount = size();
-			while (prevElement->destroyed()) {
-				// This is bad. It means that someone manually deleted the element.
-				// If the element still has a next, or if it is the last element,
-				// we can, however, continue.
-				if ((localCount > 1) && prevElement->getNext())
-					prevElement = prevElement->getNext();
-				else if (localCount < 2)
-					prevElement = nullptr; // New head about
-				else
-					// my bad...
-					PWX_THROW("Illegal Condition", "Previous element destroyed",
-							  "An element used as prev for insertion is destroyed.")
-			} // End of ensuring a valid prevElement
-		}
-#endif // PWX_THREADDEBUG
+		if (prevElement)
+			PWX_LOCK(prevElement)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 3: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
@@ -632,7 +616,7 @@ private:
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
@@ -642,25 +626,37 @@ private:
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this singly linked list")
+		if (prevElement)
+			PWX_LOCK(prevElement)
 
 		// 2: Check source:
-		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 4: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
@@ -668,46 +664,43 @@ private:
 	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
 		// 1: Prepare the previous element
 		elem_t* prevElement = isSorted ? curr : prev;
-
-#ifdef PWX_THREADDEBUG
-		if (prevElement) {
-			uint32_t localCount = size();
-			while (prevElement->destroyed()) {
-				if ((localCount > 1) && prev->getNext())
-					prevElement = prevElement->getNext();
-				else if (localCount < 2)
-					prevElement = nullptr; // New head about
-				else
-					PWX_THROW("Illegal Condition", "Previous element destroyed",
-							  "An element used as prev for insertion is destroyed.")
-			} // End of ensuring a valid prevElement
-		}
-#endif // PWX_THREADDEBUG
+		if (prevElement)
+			PWX_LOCK(prevElement)
 
 		// 2: Check source:
-		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 4: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
@@ -715,161 +708,180 @@ private:
 	/// @brief preparation method to insert data before data
 	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
 		// 1: Prepare the next element
-		elem_t* nextElement = isSorted ? curr : next ? const_cast<elem_t*>(find(next)) : nullptr;
+		elem_t* nextElement = !isSorted && next ? const_cast<elem_t*>(find(next)) : nullptr;
 		if (!isSorted && next && (nullptr == nextElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this doubly linked list")
+		if (nextElement)
+			PWX_LOCK(nextElement)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 3: Do the real insert
-		if (isSorted)
-			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
-		else
-			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = isSorted
+					 ? curr
+					 : nextElement
+						? this->beThreadSafe.load(std::memory_order_relaxed)
+							? nextElement->getPrev()
+							: nextElement->prev.load(std::memory_order_relaxed)
+						: tail;
+		if (nextElement)
+			PWX_UNLOCK(nextElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
 	/// @brief preparation method to insert data before an element
 	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*data))
 			return size();
 
 		// 1: Prepare the next element
-		elem_t* nextElement = isSorted ? curr : next;
-
-#ifdef PWX_THREADDEBUG
-		if (nextElement) {
-			uint32_t localCount = size();
-			while (nextElement->destroyed()) {
-				// This is bad. It means that someone manually deleted the element.
-				// If the element still has a prev, or if it is the last element,
-				// we can, however, continue.
-				if ((localCount > 1) && nextElement->getPrev())
-					nextElement = nextElement->getPrev();
-				else if (localCount < 2)
-					nextElement = nullptr; // New head about
-				else
-					// my bad...
-					PWX_THROW("Illegal Condition", "Next element destroyed",
-							  "An element used as next for insertion is destroyed.")
-			} // End of ensuring a valid nextElement
-		}
-#endif // PWX_THREADDEBUG
+		elem_t* nextElement = !isSorted && next ? next : nullptr;
+		if (nextElement)
+			PWX_LOCK(nextElement)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (data, destroy),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 3: Do the real insert
-		PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = isSorted
+					 ? curr
+					 : nextElement
+						? this->beThreadSafe.load(std::memory_order_relaxed)
+							? nextElement->getPrev()
+							: nextElement->prev.load(std::memory_order_relaxed)
+						: tail;
+		if (nextElement)
+			PWX_UNLOCK(nextElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before data
 	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
 		// 1: Prepare the next element
-		elem_t* nextElement = isSorted ? curr : next ? const_cast<elem_t*>(find(next)) : nullptr;
+		elem_t* nextElement = !isSorted && next ? const_cast<elem_t*>(find(next)) : nullptr;
 		if (!isSorted && next && (nullptr == nextElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this doubly linked list")
+		if (nextElement)
+			PWX_LOCK(nextElement)
 
 		// 2: Check source:
-		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 4: Do the real insert
-		if (isSorted)
-			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
-		else
-			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = isSorted
+					 ? curr
+					 : nextElement
+						? this->beThreadSafe.load(std::memory_order_relaxed)
+							? nextElement->getPrev()
+							: nextElement->prev.load(std::memory_order_relaxed)
+						: tail;
+		if (nextElement)
+			PWX_UNLOCK(nextElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before an element
 	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
-		{} /// FIXME: PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(list_t, this)
 		if (privFindData(*src))
 			return size();
 
-		// 1: Prepare the previous element
-		elem_t* nextElement = isSorted ? curr : next;
-
-#ifdef PWX_THREADDEBUG
-		if (nextElement) {
-			uint32_t localCount = size();
-			while (nextElement->destroyed()) {
-				// This is bad. It means that someone manually deleted the element.
-				// If the element still has a prev, or if it is the last element,
-				// we can, however, continue.
-				if ((localCount > 1) && nextElement->getPrev())
-					nextElement = nextElement->getPrev();
-				else if (localCount < 2)
-					nextElement = nullptr; // New head about
-				else
-					// my bad...
-					PWX_THROW("Illegal Condition", "Next element destroyed",
-							  "An element used as next for insertion is destroyed.")
-			} // End of ensuring a valid nextElement
-		}
-#endif // PWX_THREADDEBUG
+		// 1: Prepare the next element
+		elem_t* nextElement = !isSorted && next ? next : nullptr;
+		if (nextElement)
+			PWX_LOCK(nextElement)
 
 		// 2: Check source:
-		{} /// FIXME: PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY_STD_FURTHER (newElement = new elem_t (src),
-							 "ElementCreationFailed",
-							 "The Creation of a new list element failed.")
-		{} /// FIXME: PWX_UNLOCK(const_cast<elem_t*>(&src))
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			if (nextElement)
+				PWX_UNLOCK(nextElement)
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+			newElement->do_locking(false);
 
 		// 4: Do the real insert
-		if (isSorted)
-			PWX_TRY_PWX_FURTHER(return protInsert(curr, newElement))
-		else
-			PWX_TRY_PWX_FURTHER(return protInsert(nextElement ? nextElement->getPrev() : nullptr, newElement))
+		elem_t* prev = isSorted
+					 ? curr
+					 : nextElement
+						? this->beThreadSafe.load(std::memory_order_relaxed)
+							? nextElement->getPrev()
+							: nextElement->prev.load(std::memory_order_relaxed)
+						: tail;
+		if (nextElement)
+			PWX_UNLOCK(nextElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 }; // class TSet
