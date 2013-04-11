@@ -475,7 +475,70 @@ protected:
 	using base_t::destroy;
 	using base_t::protDelete;
 	using base_t::protFind;
-	using base_t::protInsert;
+
+
+	/** @brief simple method to insert an element into the list
+	  *
+	  * If either @a insPrev or @a insElem is marked as destroyed,
+	  * a pwx::CException is thrown. Such a condition implies that
+	  * there is something seriously wrong.
+	  *
+	  * @param[in] insPrev Element after which the new element is to be inserted
+	  * @param[in] insElem The element to insert.
+	  * @return The number of elements in the list after the insertion
+	**/
+	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem)
+	{
+		/* There are four possibilities:
+		 * 1: The list is empty
+		 *    head, tail and curr have to be set to the new
+		 *    element, no full renumbering is needed then.
+		 * 2: insPrev is nullptr
+		 *    head has to be changed to be the new element
+		 * 3: insPrev is tail
+		 *    tail has to be set to the new element, no full
+		 *    renumbering is needed then.
+		 * 4: Otherwise insPrev->insertNext() can do the insertion
+		*/
+		PWX_LOCK(this)
+
+		uint32_t locCnt = eCount.load(std::memory_order_acquire);
+
+		curr = insElem;
+
+		if (locCnt && insPrev && (tail != insPrev)) {
+			// Case 4: A normal insert
+			doRenumber.store(true, std::memory_order_release);
+			PWX_UNLOCK(this)
+			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
+		} else {
+			if (!locCnt) {
+				// Case 1: The list is empty
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
+				head = tail = insElem;
+			} else if (nullptr == insPrev) {
+				// Case 2: A new head is to be set
+				PWX_TRY_PWX_FURTHER(head->insertPrev(insElem))
+				head = insElem;
+				doRenumber.store(true, std::memory_order_release);
+			} else if (insPrev == tail) {
+				// Case 3: A new tail is to be set
+				insElem->eNr.store(
+					tail->eNr.load(std::memory_order_acquire) + 1,
+					std::memory_order_release);
+				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
+				tail = insElem;
+			}
+			PWX_UNLOCK(this)
+		}
+
+		// Raise eCount and set renumbering mode
+		eCount.fetch_add(1, std::memory_order_release);
+
+		return eCount.load(std::memory_order_acquire);
+	}
+
+
 	using base_t::protRenumber;
 
 
@@ -608,8 +671,8 @@ private:
 			if (xIdx < xNr) {
 				upwards = false;
 				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-					  ? head->getPrev()
-					  : head->prev.load(std::memory_order_relaxed);
+					  ? xCurr->getPrev()
+					  : xCurr->prev.load(std::memory_order_relaxed);
 				--xNr;
 			} else {
 				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
@@ -838,31 +901,30 @@ private:
 		if (!elem)
 			return;
 
-		bool needRenumber = true;
-
 		/* The following scenarios are possible:
 		 * 1: elem is head
 		 * 2: elem is tail
 		 * 3: elem is something else.
 		*/
-		if (head == elem)
+		if (head == elem) {
 			// Case 1
 			head = this->beThreadSafe.load(std::memory_order_relaxed)
 				  ? head->getNext()
 				  : head->next.load(std::memory_order_relaxed);
-		else if (tail == elem) {
+			doRenumber.store(true, std::memory_order_relaxed);
+		} else if (tail == elem)
 			// Case 2:
-			needRenumber = false;
 			tail = this->beThreadSafe.load(std::memory_order_relaxed)
 				  ? tail->getPrev()
 				  : tail->prev.load(std::memory_order_relaxed);
-		}
+		else
+			doRenumber.store(true, std::memory_order_relaxed);
 		elem->remove();
 
-		eCount.fetch_sub(1, std::memory_order_relaxed);
-
-		if (needRenumber)
-			doRenumber.store(true, std::memory_order_relaxed);
+		if (1 == eCount.fetch_sub(1)) {
+			// The list is empty!
+			curr = head = tail = nullptr;
+		}
 	}
 
 
