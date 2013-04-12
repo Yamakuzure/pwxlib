@@ -92,6 +92,33 @@ public:
 	}
 
 
+	/** @brief disable thread safety
+	  *
+	  * This method disables all thread safety measures.
+	  *
+	  * <B>Warning</B>: It is completely unchecked whether the
+	  * element is used by more than one thread. If concurrent
+	  * threads work with this element while this method is
+	  * called, the outcome is unpredictable.
+	  */
+	virtual void disable_thread_safety() noexcept
+	{
+		this->do_locking(false);
+		beThreadSafe.store(false, std::memory_order_release);
+	}
+
+
+	/** @brief enable thread safety
+	  *
+	  * This method enables all thread safety measures.
+	  */
+	virtual void enable_thread_safety() noexcept
+	{
+		this->do_locking(true);
+		beThreadSafe.store(true, std::memory_order_release);
+	}
+
+
 	/** @brief return true if the element is a member of a container
 	  *
 	  * For this to work derived elements and containers using these
@@ -122,6 +149,9 @@ protected:
 	 * ===============================================
 	 */
 
+	mutable
+	std::atomic_bool
+	beThreadSafe = ATOMIC_VAR_INIT(true); //!< Use next/prev pointers directly if set to false.
 	mutable
 	std::atomic_bool
 	isDestroyed = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.

@@ -216,7 +216,7 @@ public:
 		elem_t* xCurr = head;
 		do {
 			if (xCurr) {
-				xCurr->do_locking(false);
+				xCurr->disable_thread_safety();
 				xCurr = xCurr->next.load(std::memory_order_relaxed);
 			}
 		} while (xCurr && xCurr != tail);
@@ -248,7 +248,7 @@ public:
 		elem_t* xCurr = head;
 		do {
 			if (xCurr) {
-				xCurr->do_locking(true);
+				xCurr->enable_thread_safety();
 				xCurr = xCurr->next.load(std::memory_order_relaxed);
 			}
 		} while (xCurr && xCurr != tail);
@@ -722,7 +722,7 @@ public:
 			while (rhsCurr && !isDone) {
 				PWX_TRY_PWX_FURTHER (privInsElemBehindElem (tail, *rhsCurr))
 				if (!isTS)
-					tail->do_locking(false);
+					tail->disable_thread_safety();
 				if (rhsCurr == rhs.tail)
 					isDone = true;
 				else
@@ -1210,7 +1210,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
 		if (prevElement)
@@ -1235,7 +1235,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
 		if (prev)
@@ -1282,7 +1282,7 @@ private:
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
 		if (prevElement)
@@ -1321,7 +1321,7 @@ private:
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
 		if (prev)

@@ -574,7 +574,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
 		if (prevElement)
@@ -604,7 +604,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
 		if (prevElement)
@@ -652,7 +652,7 @@ private:
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
 		if (prevElement)
@@ -696,7 +696,7 @@ private:
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
 		if (prevElement)
@@ -730,7 +730,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
 		elem_t* prev = isSorted
@@ -767,7 +767,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
 		elem_t* prev = isSorted
@@ -820,7 +820,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
 		elem_t* prev = isSorted
@@ -869,7 +869,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
-			newElement->do_locking(false);
+			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
 		elem_t* prev = isSorted
