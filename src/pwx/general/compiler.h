@@ -92,8 +92,8 @@
 #include <cstdint>
 
 // Debug? (Ensure it is loaded if macros.h isn't needed)
-#ifdef LIBPWX_DEBUG
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 # include "pwx/functions/debug.h"
-#endif // LIBPWX_DEBUG
+#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 #endif // PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED

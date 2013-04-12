@@ -28,9 +28,9 @@
 **/
 
 // Debug? (Ensure it is loaded if compiler.h isn't needed)
-#ifdef LIBPWX_DEBUG
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 # include "pwx/functions/debug.h"
-#endif // LIBPWX_DEBUG
+#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 /** @brief Return the sign as -1 or +1 of an expression
   *
