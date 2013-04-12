@@ -190,9 +190,14 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if ( isRemoved.load(std::memory_order_acquire) )
-			return oldNext.load(std::memory_order_acquire);
-		return next.load(std::memory_order_acquire);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			elem_t* curNext = next.load(std::memory_order_acquire);
+			if ( !curNext
+			  && isRemoved.load(std::memory_order_acquire) )
+				return oldNext.load(std::memory_order_acquire);
+			return curNext;
+		}
+		return next.load(std::memory_order_relaxed);
 	}
 
 
@@ -205,9 +210,14 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getPrev() const noexcept
 	{
-		if ( isRemoved.load(std::memory_order_acquire) )
-			return oldPrev.load(std::memory_order_acquire);
-		return prev.load(std::memory_order_acquire);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			elem_t* curPrev = prev.load(std::memory_order_acquire);
+			if ( !curPrev
+			  && isRemoved.load(std::memory_order_acquire) )
+				return oldPrev.load(std::memory_order_acquire);
+			return curPrev;
+		}
+		return prev.load(std::memory_order_relaxed);
 	}
 
 
@@ -228,7 +238,9 @@ struct PWX_API TDoubleElement : public VElement
 	void insertBefore(elem_t* new_next)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, std::memory_order_release);
+			isRemoved.store(false, beThreadSafe.load(std::memory_order_relaxed)
+								? std::memory_order_release
+								: std::memory_order_relaxed);
 			return;
 		}
 
@@ -261,52 +273,64 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (!destroyed() && !new_next->destroyed()) {
-			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			// Do locking and double checks if this has to be thread safe
+			if (!destroyed() && !new_next->destroyed()) {
+				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
 
-			/* Now that we have the double lock, it is crucial to
-			 * check again. Otherwise we might just insert a destroyed element.
-			*/
-			if (destroyed())
-				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-						"The inserting element has been destroyed while waiting for the lock!")
+				/* Now that we have the double lock, it is crucial to
+				 * check again. Otherwise we might just insert a destroyed element.
+				*/
+				if (destroyed())
+					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+							"The inserting element has been destroyed while waiting for the lock!")
 
-			if (new_next->destroyed())
-				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-						"The element to insert has been destroyed while waiting for the lock!")
+				if (new_next->destroyed())
+					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+							"The element to insert has been destroyed while waiting for the lock!")
 
-			// Safe old next pointer.
-			elem_t* xOldNext = this->getNext();
+				// Safe old next pointer.
+				elem_t* xOldNext = this->getNext();
 
-			// Before we can go ahead it is important to check and lock the
-			// old next, as it has to get its prev pointer manipulated
-			if (xOldNext) {
-				PWX_LOCK(xOldNext)
-				// Check its status, it must not be destroyed either
-				if (xOldNext->destroyed()) {
-					PWX_UNLOCK(xOldNext)
-					PWX_THROW("Illegal_Insert", "The next element is destroyed",
-							"The next element has been destroyed while waiting for the lock!")
+				// Before we can go ahead it is important to check and lock the
+				// old next , as it has to get its prev pointer manipulated
+				if (xOldNext) {
+					PWX_LOCK(xOldNext)
+					// Check its status, it must not be destroyed either
+					if (xOldNext->destroyed()) {
+						PWX_UNLOCK(xOldNext)
+						PWX_THROW("Illegal_Insert", "The next element is destroyed",
+								"The next element has been destroyed while waiting for the lock!")
+					}
 				}
-			}
 
-			// Insert the new element
-			new_next->next.store(xOldNext, std::memory_order_release);
-			new_next->prev.store(this, std::memory_order_release);
-			new_next->isRemoved.store(false, std::memory_order_release);
+				// Insert the new element
+				new_next->next.store(xOldNext, std::memory_order_release);
+				new_next->prev.store(this, std::memory_order_release);
+				new_next->isRemoved.store(false, std::memory_order_release);
 
-			// Store new next and prev neighbor.
-			setNext(new_next);
-			if (xOldNext) {
-				xOldNext->setPrev(new_next);
-				PWX_UNLOCK(xOldNext)
-			}
-		} else if (destroyed())
-			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-					"Tried to insert an element after an already destroyed element!")
-		else
-			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-					"Tried to insert an element that has already been destroyed!")
+				// Store new next and prev neighbor
+				setNext(new_next);
+				if (xOldNext) {
+					xOldNext->setPrev(new_next);
+					PWX_UNLOCK(xOldNext)
+				}
+			} else if (destroyed())
+				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+						"Tried to insert an element after an already destroyed element!")
+			else
+				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+						"Tried to insert an element that has already been destroyed!")
+		} else {
+			// Otherwise do it directly and relaxed
+			elem_t* xOldNext = next.load(std::memory_order_relaxed);
+			new_next->next.store(xOldNext, std::memory_order_relaxed);
+			new_next->prev.store(this, std::memory_order_relaxed);
+			new_next->isRemoved.store(false, std::memory_order_relaxed);
+			next.store(new_next, std::memory_order_relaxed);
+			if (xOldNext)
+				xOldNext->prev.store(new_next, std::memory_order_relaxed);
+		}
 	}
 
 
@@ -335,52 +359,64 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_prev || (new_prev == this))
 			return;
 
-		if (!destroyed() && !new_prev->destroyed()) {
-			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			// Do locking and double checks if this has to be thread safe
+			if (!destroyed() && !new_prev->destroyed()) {
+				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
 
-			/* Now that we have the double lock, it is crucial to
-			 * check again. Otherwise we might just insert a destroyed element.
-			*/
-			if (destroyed())
-				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-						"The inserting element has been destroyed while waiting for the lock!")
+				/* Now that we have the double lock, it is crucial to
+				 * check again. Otherwise we might just insert a destroyed element.
+				*/
+				if (destroyed())
+					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+							"The inserting element has been destroyed while waiting for the lock!")
 
-			if (new_prev->destroyed())
-				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-						"The element to insert has been destroyed while waiting for the lock!")
+				if (new_prev->destroyed())
+					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+							"The element to insert has been destroyed while waiting for the lock!")
 
-			// Safe old prev pointer.
-			elem_t* xOldPrev = this->getPrev();
+				// Safe old prev pointer.
+				elem_t* xOldPrev = this->getPrev();
 
-			// Before we can go ahead it is important to check and lock the
-			// old prev , as it has to get its next pointer manipulated
-			if (xOldPrev) {
-				PWX_LOCK(xOldPrev)
-				// Check its status, it must not be destroyed either
-				if (xOldPrev->destroyed()) {
-					PWX_UNLOCK(xOldPrev)
-					PWX_THROW("Illegal_Insert", "The previous element is destroyed",
-							"The previous element has been destroyed while waiting for the lock!")
+				// Before we can go ahead it is important to check and lock the
+				// old prev , as it has to get its next pointer manipulated
+				if (xOldPrev) {
+					PWX_LOCK(xOldPrev)
+					// Check its status, it must not be destroyed either
+					if (xOldPrev->destroyed()) {
+						PWX_UNLOCK(xOldPrev)
+						PWX_THROW("Illegal_Insert", "The previous element is destroyed",
+								"The previous element has been destroyed while waiting for the lock!")
+					}
 				}
-			}
 
-			// Set the neighborhood of the new prev
-			new_prev->next.store(this, std::memory_order_relaxed);
+				// Set the neighborhood of the new prev
+				new_prev->next.store(this, std::memory_order_relaxed);
+				new_prev->prev.store(xOldPrev, std::memory_order_relaxed);
+				new_prev->isRemoved.store(false, std::memory_order_release);
+
+				// Store new next and prev neighbor.
+				setPrev(new_prev);
+				if (xOldPrev) {
+					xOldPrev->setNext(new_prev);
+					PWX_UNLOCK(xOldPrev)
+				}
+			} else if (destroyed())
+				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+						"Tried to insert an element before an already destroyed element!")
+			else
+				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+						"Tried to insert an element that has already been destroyed!")
+		} else {
+			// Otherwise do it directly and relaxed
+			elem_t* xOldPrev = prev.load(std::memory_order_relaxed);
 			new_prev->prev.store(xOldPrev, std::memory_order_relaxed);
-			new_prev->isRemoved.store(false, std::memory_order_release);
-
-			// Store new next and prev neighbor.
-			setPrev(new_prev);
-			if (xOldPrev) {
-				xOldPrev->setNext(new_prev);
-				PWX_UNLOCK(xOldPrev)
-			}
-		} else if (destroyed())
-			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-					"Tried to insert an element before an already destroyed element!")
-		else
-			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-					"Tried to insert an element that has already been destroyed!")
+			new_prev->next.store(this, std::memory_order_relaxed);
+			new_prev->isRemoved.store(false, std::memory_order_relaxed);
+			prev.store(new_prev, std::memory_order_relaxed);
+			if (xOldPrev)
+				xOldPrev->next.store(new_prev, std::memory_order_relaxed);
+		}
 	}
 
 
@@ -393,64 +429,82 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		// Do an acquiring test before the element is actually locked
-		if (next.load(std::memory_order_acquire) || prev.load(std::memory_order_acquire)) {
-			PWX_LOCK(this)
-			elem_t* xOldPrev = getPrev();
-			elem_t* xOldNext = getNext();
-
-			/* The challenge here is to do this without deadlocks.
-			 * Basically the neighbors need to be locked in turn.
-			 * But if another thread has a lock on one of those
-			 * waiting to get a lock on this, a deadlock will happen.
-			 * The solution is to go some try_lock() lengths until
-			 * everybody is happy.
-			 * Further more while we yield lock-free, another thread
-			 * might have just removed our next or previous neighbor.
-			 * It is therefore necessary to always use getNext() and
-			 * getPrev() to have the real current neighbor.
-			 */
-
-			// 1: Handle previous neighbor
-			while (xOldPrev && (xOldPrev == getPrev()) && !PWX_TRY_LOCK(xOldPrev) ) {
-				// xOldPrev is valid, but we can not lock.
-				PWX_UNLOCK(this)
-				std::this_thread::yield();
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			// Do an acquiring test before the element is actually locked
+			if (next.load(std::memory_order_acquire) || prev.load(std::memory_order_acquire)) {
 				PWX_LOCK(this)
-			}
+				elem_t* xOldPrev = getPrev();
+				elem_t* xOldNext = getNext();
 
-			// If xOldPrev is valid now, it is also locked:
-			if (xOldPrev) {
-				if (xOldPrev->getNext() == this)
-					// Still points to this, so make it point to next instead
-					xOldPrev->setNext(this->getNext());
-				PWX_UNLOCK(xOldPrev);
-				xOldPrev = nullptr;
-			}
+				/* The challenge here is to do this without deadlocks.
+				 * Basically the neighbors need to be locked in turn.
+				 * But if another thread has a lock on one of those
+				 * waiting to get a lock on this, a deadlock will happen.
+				 * The solution is to go some try_lock() lengths until
+				 * everybody is happy.
+				 * Further more while we yield lock-free, another thread
+				 * might have just removed our next or previous neighbor.
+				 * It is therefore necessary to always use getNext() and
+				 * getPrev() to have the real current neighbor.
+				 */
 
-			// 2: Handle next neighbor
-			while (xOldNext && (xOldNext == getNext()) && !PWX_TRY_LOCK(xOldNext)) {
-				// xOldNext is valid, but we can not lock.
+				// 1: Handle previous neighbor
+				while (xOldPrev && (xOldPrev == getPrev()) && !PWX_TRY_LOCK(xOldPrev) ) {
+					// xOldPrev is valid, but we can not lock.
+					PWX_UNLOCK(this)
+					std::this_thread::yield();
+					PWX_LOCK(this)
+				}
+
+				// If xOldPrev is valid now, it is also locked:
+				if (xOldPrev) {
+					if (xOldPrev->getNext() == this)
+						// Still points to this, so make it point to next instead
+						xOldPrev->setNext(this->getNext());
+					PWX_UNLOCK(xOldPrev);
+					xOldPrev = nullptr;
+				}
+
+				// 2: Handle next neighbor
+				while (xOldNext && (xOldNext == getNext()) && !PWX_TRY_LOCK(xOldNext)) {
+					// xOldNext is valid, but we can not lock.
+					PWX_UNLOCK(this)
+					std::this_thread::yield();
+					PWX_LOCK(this)
+				}
+
+				// If xOldNext is valid now, it is also locked:
+				if (xOldNext) {
+					/// @todo : FIXME: This can lead to dead locks!
+					if (xOldNext->getPrev() == this)
+						// Still points to this, so make it point to prev instead
+						xOldNext->setPrev(this->getPrev());
+					PWX_UNLOCK(xOldNext);
+					xOldNext = nullptr;
+				}
+
+				// 3: Remove neighborhood:
+				this->setPrev(nullptr);
+				this->setNext(nullptr);
+				this->isRemoved.store(true, std::memory_order_release);
 				PWX_UNLOCK(this)
-				std::this_thread::yield();
-				PWX_LOCK(this)
-			}
+			} // End of having at least one neighbor to handle
+		} else {
+			// No thread safety? Then just kick it out:
+			elem_t* xOldNext = next.load(std::memory_order_relaxed);
+			elem_t* xOldPrev = prev.load(std::memory_order_relaxed);
 
-			// If xOldNext is valid now, it is also locked:
-			if (xOldNext) {
-				if (xOldNext->getPrev() == this)
-					// Still points to this, so make it point to prev instead
-					xOldNext->setPrev(this->getPrev());
-				PWX_UNLOCK(xOldNext);
-				xOldNext = nullptr;
-			}
+			if (xOldNext && (xOldNext != this))
+				xOldNext->prev.store(xOldNext, std::memory_order_relaxed);
 
-			// 3: Remove neighborhood:
-			this->setPrev(nullptr);
-			this->setNext(nullptr);
-			this->isRemoved.store(true, std::memory_order_release);
-			PWX_UNLOCK(this)
-		} // End of having at least one neighbor to handle
+			if (xOldPrev && (xOldPrev != this))
+				xOldPrev->next.store(xOldNext, std::memory_order_relaxed);
+
+			prev.store(nullptr, std::memory_order_relaxed);
+			next.store(nullptr, std::memory_order_relaxed);
+
+			isRemoved.store(true, std::memory_order_relaxed);
+		}
 	}
 
 
@@ -491,14 +545,20 @@ struct PWX_API TDoubleElement : public VElement
 	  * This method will use atomic::store() and is therefore safe to use
 	  * in a multi-threaded environment.
 	  *
+	  * <B>Important</B>: This method will *<B>NOT</B>* change the prev
+	  * pointer of @a new_next!
+	  *
 	  * @param[in] new_next target where the next pointer should point at.
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		elem_t* currNext = next.load(std::memory_order_acquire);
-		next.store(new_next, std::memory_order_release);
-		if (currNext)
-			oldNext.store(currNext, std::memory_order_release);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			elem_t* currNext = next.load(std::memory_order_acquire);
+			next.store(new_next, std::memory_order_release);
+			if (currNext)
+				oldNext.store(currNext, std::memory_order_release);
+		} else
+			next.store(new_next, std::memory_order_relaxed);
 	}
 
 
@@ -507,14 +567,20 @@ struct PWX_API TDoubleElement : public VElement
 	  * This method will use atomic::store() is therefore safe to use
 	  * in a multi-threaded environment.
 	  *
+	  * <B>Important</B>: This method will *<B>NOT</B>* change the next
+	  * pointer of @a new_prev!
+	  *
 	  * @param[in] new_prev target where the prev pointer should point at.
 	**/
 	void setPrev(elem_t* new_prev) noexcept
 	{
-		elem_t* currPrev = prev.load(std::memory_order_acquire);
-		prev.store(new_prev, std::memory_order_release);
-		if (currPrev)
-			oldPrev.store(currPrev, std::memory_order_release);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			elem_t* currPrev = prev.load(std::memory_order_acquire);
+			prev.store(new_prev, std::memory_order_release);
+			if (currPrev)
+				oldPrev.store(currPrev, std::memory_order_release);
+		} else
+			prev.store(new_prev, std::memory_order_relaxed);
 	}
 
 

@@ -73,10 +73,11 @@ namespace pwx
   * <B>Notes on multi threaded environments</B>
   *
   * If you plan to use an element in a strictly single-threaded way, you can use
-  * the function do_locking(bool) inherited from CLockable to disable the locking
-  * mechanism. You can then use insertNext() / removeNext() without the locking
-  * overhead. However, as the locking is enabled by default, it might be more
-  * convenient to simply use the next pointers directly.
+  * the function disable_thread_safety() inherited from VElement to disable the
+  * locking mechanism and have the getter and setter methods be less restrictive.
+  * You can then use insertNext() / removeNext() without the locking overhead.
+  * However, as the locking is enabled by default, it might be more convenient
+  * to simply use the next pointers directly.<BR />
   *
   * <I>Critical work flows</I>
   *
@@ -190,9 +191,14 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if ( isRemoved.load(std::memory_order_acquire) )
-			return oldNext.load(std::memory_order_acquire);
-		return next.load(std::memory_order_acquire);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			elem_t* curNext = next.load(std::memory_order_acquire);
+			if ( !curNext
+			  && isRemoved.load(std::memory_order_acquire) )
+				return oldNext.load(std::memory_order_acquire);
+			return curNext;
+		}
+		return next.load(std::memory_order_relaxed);
 	}
 
 
@@ -215,29 +221,38 @@ struct PWX_API TSingleElement : public VElement
 	void insertBefore(elem_t* new_next)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, std::memory_order_release);
+			isRemoved.store(false, beThreadSafe.load(std::memory_order_relaxed)
+								? std::memory_order_release
+								: std::memory_order_relaxed);
 			return;
 		}
 
 		if (!destroyed() && !new_next->destroyed()) {
-			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
+			if (beThreadSafe.load(std::memory_order_relaxed)) {
+				// Do locking and double checks if this has to be thread safe
+				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
 
-			/* Now that we have the double lock, it is crucial to
-			 * check again. Otherwise we might just insert a destroyed element.
-			*/
-			if (destroyed())
-				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-						"The element to insert has been destroyed while waiting for the lock!")
+				/* Now that we have the double lock, it is crucial to
+				 * check again. Otherwise we might just insert a destroyed element.
+				*/
+				if (destroyed())
+					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+							"The element to insert has been destroyed while waiting for the lock!")
 
-			if (new_next->destroyed())
-				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-						"The inserting element has been destroyed while waiting for the lock!")
+				if (new_next->destroyed())
+					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+							"The inserting element has been destroyed while waiting for the lock!")
 
-			// Store new next neighbor
-			setNext(new_next);
+				// Store new next neighbor
+				setNext(new_next);
 
-			// Mark as inserted
-			isRemoved.store(false, std::memory_order_release);
+				// Mark as inserted
+				isRemoved.store(false, std::memory_order_release);
+			} else {
+				// Otherwise do it directly and relaxed
+				next.store(new_next, std::memory_order_relaxed);
+				isRemoved.store(false, std::memory_order_relaxed);
+			}
 		} else if (destroyed())
 			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 					"Tried to insert an element that has already been destroyed!")
@@ -267,34 +282,42 @@ struct PWX_API TSingleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (!destroyed() && !new_next->destroyed()) {
-			PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			// Do locking and double checks if this has to be thread safe
+			if (!destroyed() && !new_next->destroyed()) {
+				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
 
-			/* Now that we have the double lock, it is crucial to
-			 * check again. Otherwise we might just insert a destroyed element.
-			*/
-			if (destroyed())
+				/* Now that we have the double lock, it is crucial to
+				 * check again. Otherwise we might just insert a destroyed element.
+				*/
+				if (destroyed())
+					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+							"The inserting element has been destroyed while waiting for the lock!")
+
+				if (new_next->destroyed())
+					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+							"The element to insert has been destroyed while waiting for the lock!")
+
+				// Insert the new element
+				new_next->next.store(next.load(std::memory_order_acquire),
+									std::memory_order_release);
+				new_next->isRemoved.store(false, std::memory_order_release);
+
+				// Store new next neighbor
+				setNext(new_next);
+			} else if (destroyed())
 				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-						"The inserting element has been destroyed while waiting for the lock!")
-
-			if (new_next->destroyed())
+						"Tried to insert an element after an already destroyed element!")
+			else
 				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-						"The element to insert has been destroyed while waiting for the lock!")
-
-			// Insert the new element
-			new_next->next.store(next.load(std::memory_order_acquire),
-								std::memory_order_release);
-			new_next->isRemoved.store(false, std::memory_order_release);
-
-			// Store new next neighbor
-			setNext(new_next);
-
-		} else if (destroyed())
-			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
-					"Tried to insert an element after an already destroyed element!")
-		else
-			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
-					"Tried to insert an element that has already been destroyed!")
+						"Tried to insert an element that has already been destroyed!")
+		} else {
+			// Otherwise do it directly and relaxed
+			new_next->next.store(next.load(std::memory_order_relaxed),
+								std::memory_order_relaxed);
+			new_next->isRemoved.store(false, std::memory_order_relaxed);
+			next.store(new_next, std::memory_order_relaxed);
+		}
 	}
 
 
@@ -307,9 +330,14 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		PWX_LOCK_GUARD(elem_t, this)
-		setNext(nullptr);
-		isRemoved.store(true, std::memory_order_release);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			PWX_LOCK_GUARD(elem_t, this)
+			setNext(nullptr);
+			isRemoved.store(true, std::memory_order_release);
+		} else {
+			next.store(nullptr, std::memory_order_relaxed);
+			isRemoved.store(true, std::memory_order_relaxed);
+		}
 	}
 
 
@@ -325,33 +353,41 @@ struct PWX_API TSingleElement : public VElement
 	{
 		elem_t* toRemove = nullptr;
 
+		// Exit at once if there is no next to remove:
+		if ( !(toRemove = this->getNext()) )
+			return;
+
 		// Do an acquiring test before the element is actually locked
-		if ( (toRemove = this->getNext()) ) {
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			/* See notes in TDoubleElement::remove() */
 			PWX_LOCK_GUARD(elem_t, toRemove)
 			elem_t* xOldNext = toRemove->getNext();
 
-			/* See notes in TDoubleElement::remove() */
-
 			// Do a release->yield->lock cycle until this is locked
-			while ((this->getNext() == toRemove) && !PWX_TRY_LOCK(this) ) {
+			while (  (this->getNext() == toRemove)
+				  && (toRemove != this)
+				  && !PWX_TRY_LOCK(this) ) {
 				// Can't lock this, so yield until possible
 				PWX_UNLOCK(toRemove)
 				std::this_thread::yield();
 				PWX_LOCK(toRemove)
 			}
 
-			// Now if next still points to toRemove, this is locked:
+			// Now if next still points to toRemove, this is locked or equals its next:
 			if (this->getNext() == toRemove) {
-				this->setNext(xOldNext);
+				if (this != toRemove)
+					this->setNext(xOldNext);
 				PWX_UNLOCK(this);
 			} else
 				// Otherwise toRemove went away, which is bad
 				PWX_THROW("Illegal_Remove", "Next element to remove went away",
 						"A next element to remove went away while waiting for the lock!")
 
-			// 2: Remove neighborhood:
-			toRemove->remove();
-		} // End of having a neighbor to handle
+		} else if (this != toRemove)
+			// Without the thread safety needs, this is a lot simpler:
+			next.store(toRemove->next.load(std::memory_order_relaxed), std::memory_order_relaxed);
+		// Remove neighborhood:
+		toRemove->remove();
 	}
 
 
@@ -364,10 +400,13 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		elem_t* currNext = next.load(std::memory_order_acquire);
-		next.store(new_next, std::memory_order_release);
-		if (currNext)
-			oldNext.store(currNext, std::memory_order_release);
+		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			elem_t* currNext = next.load(std::memory_order_acquire);
+			next.store(new_next, std::memory_order_release);
+			if (currNext)
+				oldNext.store(currNext, std::memory_order_release);
+		} else
+			next.store(new_next, std::memory_order_relaxed);
 	}
 
 
@@ -476,22 +515,29 @@ private:
 template<typename data_t>
 TSingleElement<data_t>::~TSingleElement() noexcept
 {
-	isDestroyed.store(true);
+	if (beThreadSafe.load(std::memory_order_acquire))
+		isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		// Produce a lock guard before checking again.
-		PWX_NAMED_LOCK_GUARD(Make_Exclusive, elem_t, this)
-		// So the lock is only generated if there is a possibility
-		// that we have to delete data, but another thread might
-		// have made a copy in the mean time before "isDestroyed"
-		// was finished setting to true.
-		if (1 == data.use_count()) {
-			PWX_TRY(data.reset()) // the shared_ptr will delete the data now
-			catch(...) { }
+		if (beThreadSafe.load(std::memory_order_acquire)) {
+			// Produce a lock guard before checking again.
+			PWX_NAMED_LOCK_GUARD(Make_Exclusive, elem_t, this)
+			// So the lock is only generated if there is a possibility
+			// that we have to delete data, but another thread might
+			// have made a copy in the mean time before "isDestroyed"
+			// was finished setting to true.
+			if (1 == data.use_count()) {
+				PWX_TRY(data.reset()) // the shared_ptr will delete the data now
+				catch(...) { }
 
-			// Do another locking, so that threads having had to wait while the data
-			// was destroyed have a chance now to react before the object is gone.
-			PWX_NAMED_LOCK_GUARD (Lock_After_Delete, elem_t, this)
+				// Do another locking, so that threads having had to wait while the data
+				// was destroyed have a chance now to react before the object is gone.
+				PWX_NAMED_LOCK_GUARD (Lock_After_Delete, elem_t, this)
+			}
+		} else {
+			// No thread safety? Then just do it!
+			PWX_TRY(data.reset())
+			catch(...) { }
 		}
 	}
 }
