@@ -147,7 +147,7 @@ public:
 	{
 		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
 			if (CURRENT_THREAD_ID != CL_Thread_ID) {
-				while (CL_Lock.test_and_set(std::memory_order_acquire))
+				while (CL_Lock.test_and_set())
 					std::this_thread::yield();
 				// Got it now, so note it:
 				CL_Thread_ID  = CURRENT_THREAD_ID;
@@ -177,16 +177,15 @@ public:
 	  */
 	bool try_lock() noexcept
 	{
-		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
-			if (CURRENT_THREAD_ID != CL_Thread_ID) {
-				if (CL_Lock.test_and_set(std::memory_order_acquire)) {
-					// Got it now, so note it:
-					CL_Thread_ID  = CURRENT_THREAD_ID;
-					CL_Lock_Count = 1;
-					return true;
-				}
-				return false; // Nope, and only condition for a no-no.
+		if ( CL_Do_Locking.load(std::memory_order_acquire)
+		  && (CURRENT_THREAD_ID != CL_Thread_ID) ) {
+			if (!CL_Lock.test_and_set()) {
+				// Got it now, so note it:
+				CL_Thread_ID  = CURRENT_THREAD_ID;
+				CL_Lock_Count = 1;
+				return true;
 			}
+			return false; // Nope, and only condition for a no-no.
 		}
 
 		// return true otherwise, we are fine.
