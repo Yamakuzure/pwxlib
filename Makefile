@@ -9,6 +9,14 @@ DEBUG := YES
 # running tools like helgrind or DRD on any pwxLib program!
 THREADDEBUG := NO
 
+# If the following is set to YES, glibc is told to annotate inter thread
+# synchronization events. This is needed if you do not want to get
+# plenty of false results in Helgrind.
+# See
+# Note: You must have valgrind installed on your system and
+#       valgrind/helgrind.h somewhere it can be found (like /usr/include)
+ANNOTATIONS := YES 
+
 # Note: You can add additional debugging options in pwx/functions/debug.h
 
 # Set to YES to include profiling info
@@ -107,6 +115,9 @@ ifeq (YES, ${THREADDEBUG})
   CXXFLAGS := ${CXXFLAGS} -DPWX_THREADDEBUG
 endif
 
+ifeq (YES, ${ANNOTATIONS})
+  CXXFLAGS := ${CXXFLAGS} -DPWX_ANNOTATIONS
+endif
 
 # ------------------------------------
 # Rules

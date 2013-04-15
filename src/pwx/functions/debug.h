@@ -35,13 +35,18 @@
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 # include <cstdio>
 # include <cstring>
+# include <atomic>
+#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
+
+#if defined(PWX_ANNOTATIONS)
 /* Add Race Detector annotations.
  * See http://gcc.gnu.org/onlinedocs/libstdc++/manual/debug.html#debug.races why
  */
+#include <valgrind/helgrind.h>
 # define _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE(A) ANNOTATE_HAPPENS_BEFORE(A)
 # define _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER(A)  ANNOTATE_HAPPENS_AFTER(A)
-# include <atomic>
-#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
+#endif // ANNOTATIONS
+
 
 namespace pwx {
 
