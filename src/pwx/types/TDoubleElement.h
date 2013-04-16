@@ -449,15 +449,18 @@ struct PWX_API TDoubleElement : public VElement
 				 */
 
 				// 1: Handle previous neighbor
-				while (xOldPrev && (xOldPrev == getPrev()) && !PWX_TRY_LOCK(xOldPrev) ) {
+				while ( xOldPrev
+					&& (xOldPrev != this)
+					&& (xOldPrev == getPrev())
+					&& !PWX_TRY_LOCK(xOldPrev) ) {
 					// xOldPrev is valid, but we can not lock.
 					PWX_UNLOCK(this)
 					std::this_thread::yield();
 					PWX_LOCK(this)
 				}
 
-				// If xOldPrev is valid now, it is also locked:
-				if (xOldPrev) {
+				// If xOldPrev is valid now, it is also locked or this:
+				if (xOldPrev && (xOldPrev != this)) {
 					if (xOldPrev->getNext() == this)
 						// Still points to this, so make it point to next instead
 						xOldPrev->setNext(this->getNext());
@@ -466,15 +469,18 @@ struct PWX_API TDoubleElement : public VElement
 				}
 
 				// 2: Handle next neighbor
-				while (xOldNext && (xOldNext == getNext()) && !PWX_TRY_LOCK(xOldNext)) {
+				while ( xOldNext
+					&& (xOldNext != this)
+					&& (xOldNext == getNext())
+					&& !PWX_TRY_LOCK(xOldNext)) {
 					// xOldNext is valid, but we can not lock.
 					PWX_UNLOCK(this)
 					std::this_thread::yield();
 					PWX_LOCK(this)
 				}
 
-				// If xOldNext is valid now, it is also locked:
-				if (xOldNext) {
+				// If xOldNext is valid now, it is also locked or this element:
+				if (xOldNext && (xOldNext != this)) {
 					/// @todo : FIXME: This can lead to dead locks!
 					if (xOldNext->getPrev() == this)
 						// Still points to this, so make it point to prev instead
@@ -512,15 +518,12 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * This method removes the successor of this element
 	  * from a list in a thread safe way.
-	  *
-	  * If the next element gets moved or removed while this
-	  * thread waits for the lock, a pwx::CException is thrown.
 	**/
-	void removeNext()
+	void removeNext() noexcept
 	{
 		elem_t* toRemove = getNext();
 		if (toRemove)
-			PWX_TRY_PWX_FURTHER(toRemove->remove())
+			toRemove->remove();
 	}
 
 
@@ -528,15 +531,12 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * This method removes the predecessor of this element
 	  * from a list in a thread safe way.
-	  *
-	  * If the previous element gets moved or removed while this
-	  * thread waits for the lock, a pwx::CException is thrown.
 	**/
-	void removePrev()
+	void removePrev() noexcept
 	{
 		elem_t* toRemove = getPrev();
 		if (toRemove)
-			PWX_TRY_PWX_FURTHER(toRemove->remove())
+			toRemove->remove();
 	}
 
 

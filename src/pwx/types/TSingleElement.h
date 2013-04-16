@@ -374,18 +374,16 @@ struct PWX_API TSingleElement : public VElement
 			}
 
 			// Now if next still points to toRemove, this is locked or equals its next:
-			if (this->getNext() == toRemove) {
-				if (this != toRemove)
-					this->setNext(xOldNext);
+			if ( (this->getNext() == toRemove)
+			  && (this != toRemove) ) {
+				this->setNext(xOldNext);
 				PWX_UNLOCK(this);
-			} else
-				// Otherwise toRemove went away, which is bad
-				PWX_THROW("Illegal_Remove", "Next element to remove went away",
-						"A next element to remove went away while waiting for the lock!")
+			}
 
 		} else if (this != toRemove)
 			// Without the thread safety needs, this is a lot simpler:
 			next.store(toRemove->next.load(std::memory_order_relaxed), std::memory_order_relaxed);
+
 		// Remove neighborhood:
 		toRemove->remove();
 	}
@@ -545,5 +543,3 @@ TSingleElement<data_t>::~TSingleElement() noexcept
 } // namespace pwx
 
 #endif // PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED
-
-
