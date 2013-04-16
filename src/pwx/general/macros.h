@@ -193,7 +193,7 @@
   *
   * @return The std::thread::id of the current thread.
 **/
-#define CURRENT_THREAD_ID std::this_thread::get_id()
+#define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
 
 
 /** @brief Use object->lock if @a object is defined
