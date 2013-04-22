@@ -31,6 +31,21 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#if defined(PWX_ANNOTATIONS)
+/* Add Race Detector annotations.
+ * See http://gcc.gnu.org/onlinedocs/libstdc++/manual/debug.html#debug.races why
+ */
+#include <valgrind/helgrind.h>
+# if defined(_GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE)
+#   undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE
+# endif
+# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE(A) ANNOTATE_HAPPENS_BEFORE(A)
+# if defined(_GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER)
+#   undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER
+# endif
+# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER(A)  ANNOTATE_HAPPENS_AFTER(A)
+#endif // ANNOTATIONS
+
 // Handle includes and defines
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 # include <cstdio>
@@ -38,23 +53,11 @@
 # include <atomic>
 #endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
-#if defined(PWX_ANNOTATIONS)
-/* Add Race Detector annotations.
- * See http://gcc.gnu.org/onlinedocs/libstdc++/manual/debug.html#debug.races why
- */
-#include <valgrind/helgrind.h>
-# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE(A) ANNOTATE_HAPPENS_BEFORE(A)
-# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER(A)  ANNOTATE_HAPPENS_AFTER(A)
-#endif // ANNOTATIONS
-
 
 namespace pwx {
 
 // If any debugging mode is activated, a central logging functions is needed:
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-
-// The central log needs a log lock:
-static std::atomic_flag _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
 
 // The main logging function:
 void debug_log(const char* fmt, ...);
@@ -62,11 +65,9 @@ void debug_log(const char* fmt, ...);
 // And the main wrapper:
 # define DEBUG_LOG(part, fmt, ...) { \
 	char trace_info[1024]; \
-	snprintf(trace_info, 256, "[%s] %s:%d - %s : %s\n", part, basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-	while (_pwx_internal_LOG_output_lock.test_and_set(std::memory_order_acquire)) \
-		std::this_thread::yield(); \
+	snprintf(trace_info, 256, "[%8s] %s:%d - %s : %s\n", \
+			part, basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
 	pwx::debug_log(trace_info, __VA_ARGS__); \
-	_pwx_internal_LOG_output_lock.clear(std::memory_order_release); \
 }
 #else
 # define DEBUG_LOG(...) {}
@@ -75,16 +76,49 @@ void debug_log(const char* fmt, ...);
 
 // Specialized logging macros for mutex locking/unlocking
 #ifdef PWX_THREADDEBUG
-# define THREAD_LOG          DEBUG_LOG
-# define LOG_LOCK(obj)       THREAD_LOG("LOCK", "%s has %d locks", #obj, obj->lock_count())
-# define LOG_UNLOCK(obj)     THREAD_LOG("UNLOCK", "%s has %d locks", #obj, obj->lock_count())
-# define LOG_LOCK_GUARD(obj) THREAD_LOG("GUARD", "%s has %d locks", #obj, obj->lock_count())
+/** @internal
+  * Almost same as DEBUG_LOG, just adds current thread id
+  * and is deactivated unless PWX_THREADDEBUG is defined.
+**/
+# define THREAD_LOG(part, fmt, ...) { \
+	char trace_info[1024]; \
+	snprintf(trace_info, 256, "tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
+		CURRENT_THREAD_ID, part, \
+		basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
+	pwx::debug_log(trace_info, __VA_ARGS__); \
+}
+/** @internal
+  * @brief Special macro to log locking states.
+  * IMPORTANT: If @a to_lock are anything else but an object derived from pwx::CLockable,
+  * this macro will possible cause crashes or won't even compile.
+  * @param action C-String with the name of the function that will be called without parentheses.
+  * @param locker object that is calling @a action()
+  * @param to_lock pointer to a CLockable derived object that is going to be locked/used
+ **/
+# define DEBUG_LOCK_STATE(action, locker, to_lock) { \
+	if (to_lock) \
+		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
+					#locker, action, #to_lock, #to_lock, \
+					to_lock->CL_Lock_Count, \
+					to_lock->is_locked() ? "locked" : "unlocked", \
+					to_lock->CL_Thread_ID) \
+	else \
+		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
+					#locker, action, #to_lock, #to_lock, 0, "n/a", 0) \
+}
+# define LOG_LOCK(obj)       THREAD_LOG("LOCK", "Locked %s (has %d locks now)", #obj, obj->lock_count())
+# define LOG_UNLOCK(obj)     THREAD_LOG("UNLOCK", "Unlocked %s (has %d locks now)", #obj, obj->lock_count())
+# define LOG_LOCK_GUARD(obj) THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, obj->lock_count())
 #else
 # define THREAD_LOG(...) {}
+# define DEBUG_LOCK_STATE(action, locker, to_lock) {}
 # define LOG_LOCK(...) {}
 # define LOG_UNLOCK(...) {}
 # define LOG_LOCK_GUARD(...) {}
 #endif // PWX_THREADDEBUG
+
+
+
 
 } // namespace pwx
 #endif // PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED
