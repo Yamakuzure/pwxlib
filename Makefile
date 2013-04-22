@@ -15,7 +15,7 @@ THREADDEBUG := NO
 # See
 # Note: You must have valgrind installed on your system and
 #       valgrind/helgrind.h somewhere it can be found (like /usr/include)
-ANNOTATIONS := YES 
+ANNOTATIONS := YES
 
 # Note: You can add additional debugging options in pwx/functions/debug.h
 
@@ -122,7 +122,9 @@ endif
 # ------------------------------------
 # Rules
 # ------------------------------------
-.PHONY: clean testlib documentation docinstall hashbuilder install userinstall tools torture all library help
+.PHONY: clean cleanlibrary cleantools testlib documentation docinstall \
+		hashbuilder install userinstall \
+		test tools torture all library help
 .SUFFIXES: .cpp
 
 %.o: %.cpp
@@ -212,13 +214,19 @@ tools: depend library
 	@echo "Making all in $(TOOLDIR)"
 	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" FONT_PATH="$(FONT_PATH)" FONT_NAME="$(FONT_NAME)" make -C $(TOOLDIR))
 
-clean:
+cleanlibrary:
 	@echo "Cleaning library and object files"
 	@rm -f $(LIB_DYN) $(LIB_STA) $(MODULES)
+
+cleantest:
 	@echo "Cleaning all in $(TESTDIR)"
 	@make -C $(TESTDIR) clean
+
+clean: cleanlibrary cleantest
 #	@echo "Cleaning all in $(TOOLDIR)"
 #	@make -C $(TOOLDIR) clean
+
+test: testlib hashbuilder torture
 
 $(LIBDIR)/$(LIB_DYN): $(MODULES)
 	@echo "Linking $(LIBDIR)/$(LIB_DYN)"
