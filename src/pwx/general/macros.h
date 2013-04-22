@@ -28,9 +28,7 @@
 **/
 
 // Debug? (Ensure it is loaded if compiler.h isn't needed)
-#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-# include "pwx/functions/debug.h"
-#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
+#include <pwx/functions/debug.h>
 
 /** @brief Return the sign as -1 or +1 of an expression
   *
@@ -254,7 +252,7 @@
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
-#define PWX_LOCK_GUARD(T, object) PWX_NAMED_LOCK_GUARD(Default, T, object)
+#define PWX_LOCK_GUARD(T, object) PWX_NAMED_LOCK_GUARD(__FUNCTION__, T, object)
 
 
 /** @brief Lock two elements simultaneously
@@ -267,12 +265,11 @@
   * @param objB pointer to the second object to lock
 **/
 #define PWX_DOUBLE_LOCK(Ta, objA, Tb, objB) \
-	std::unique_lock<Ta> pwx_libpwx_double_lock_A(*objA, std::defer_lock); \
-	std::unique_lock<Tb> pwx_libpwx_double_lock_B(*objB, std::defer_lock); \
-	std::lock(pwx_libpwx_double_lock_A, pwx_libpwx_double_lock_B); \
+	std::unique_lock<Ta> pwx_double_lock_A##__FUNCTION__(*objA, std::defer_lock); \
+	std::unique_lock<Tb> pwx_double_lock_B##__FUNCTION__(*objB, std::defer_lock); \
+	std::lock(pwx_double_lock_A##__FUNCTION__, pwx_double_lock_B##__FUNCTION__); \
 	LOG_LOCK_GUARD(objA) \
 	LOG_LOCK_GUARD(objB)
-
 
 /** @brief return true if two C-Strings are equal ignoring case
   *
