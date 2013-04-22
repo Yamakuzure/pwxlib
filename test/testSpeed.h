@@ -14,7 +14,7 @@ typedef std::atomic_bool aBool;
 /// @brief struct doing synchronized start/stop for additions of items into containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
 template<typename list_t>
-struct thAdder : public pwx::CLockable
+struct thAdder
 {
 	volatile
 	aBool   isRunning;
@@ -28,7 +28,7 @@ struct thAdder : public pwx::CLockable
 	{
 		cont = cont_;
 		milliseconds sleepTime( 1 );
-		while (!isRunning.load(std::memory_order_acquire)) {
+		while (!this->isRunning.load(std::memory_order_acquire)) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
 		}
@@ -46,15 +46,20 @@ struct thAdder : public pwx::CLockable
 			// FIXME: Not yet!cont->clear_locks();
 		}
 
-		isRunning.store(false, std::memory_order_release);
-		std::this_thread::yield();
+		// Set thread to not running in a loop to be absolutely sure
+		// this operator does not exit until isRunning is false.
+		while (this->isRunning.load(std::memory_order_acquire)) {
+			this->isRunning.store(false, std::memory_order_release);
+			std::this_thread::sleep_for( sleepTime );
+			std::this_thread::yield();
+		}
 	}
 };
 
 /// @brief struct doing synchronized start/stop for clearing containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart on creation !
 template<typename list_t>
-struct thClearer : public pwx::CLockable
+struct thClearer
 {
 	volatile
 	aBool   isRunning;
@@ -68,7 +73,7 @@ struct thClearer : public pwx::CLockable
 	{
 		cont = cont_;
 		milliseconds sleepTime( 1 );
-		while (!isRunning.load(std::memory_order_acquire)) {
+		while (!this->isRunning.load(std::memory_order_acquire)) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
 		}
@@ -81,8 +86,13 @@ struct thClearer : public pwx::CLockable
 			// FIXME: Not yet!cont->clear_locks();
 		}
 
-		isRunning.store(false, std::memory_order_release);
-		std::this_thread::yield();
+		// Set thread to not running in a loop to be absolutely sure
+		// this operator does not exit until isRunning is false.
+		while (this->isRunning.load(std::memory_order_acquire)) {
+			this->isRunning.store(false, std::memory_order_release);
+			std::this_thread::sleep_for( sleepTime );
+			std::this_thread::yield();
+		}
 	}
 };
 
