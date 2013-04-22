@@ -43,7 +43,7 @@ struct thAdder
 		uint32_t remaining = 0;
 		if ( ( remaining = cont->lock_count() ) ) {
 			cerr << "ERROR: " << remaining << " locks upon thAdder exit!" << endl;
-			// FIXME: Not yet!cont->clear_locks();
+			cont->clear_locks();
 		}
 
 		// Set thread to not running in a loop to be absolutely sure
@@ -83,7 +83,7 @@ struct thClearer
 		uint32_t remaining = 0;
 		if ( ( remaining = cont->lock_count() ) ) {
 			cerr << "ERROR: " << remaining << " locks upon thClearer exit!" << endl;
-			// FIXME: Not yet!cont->clear_locks();
+			cont->clear_locks();
 		}
 
 		// Set thread to not running in a loop to be absolutely sure
