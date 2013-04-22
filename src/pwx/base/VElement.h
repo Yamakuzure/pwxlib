@@ -27,11 +27,11 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <pwx/general/macros.h>
+#include <pwx/types/CLockable.h>
+#include <pwx/types/TVarDeleter.h>
 #include <atomic>
 #include <memory>
-#include "pwx/types/CLockable.h"
-#include "pwx/types/TVarDeleter.h"
-#include "pwx/general/macros.h"
 
 namespace pwx
 {

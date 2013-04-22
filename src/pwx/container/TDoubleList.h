@@ -27,8 +27,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/container/TSingleList.h"
-#include "pwx/types/TDoubleElement.h"
+#include <pwx/container/TSingleList.h>
+#include <pwx/types/TDoubleElement.h>
 
 namespace pwx
 {
@@ -514,6 +514,8 @@ protected:
 			PWX_UNLOCK(this)
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
 		} else {
+			PWX_LOCK_GUARD(list_t, this)
+			PWX_UNLOCK(this)
 			if (!locCnt) {
 				// Case 1: The list is empty
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
@@ -531,7 +533,6 @@ protected:
 				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
 				tail = insElem;
 			}
-			PWX_UNLOCK(this)
 		}
 
 		// Raise eCount and set renumbering mode

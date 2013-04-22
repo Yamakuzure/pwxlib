@@ -27,9 +27,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <atomic>
-#include "pwx/types/CLockable.h"
-#include "pwx/general/macros.h"
+#include <pwx/general/macros.h>
+#include <pwx/types/CLockable.h>
 
 namespace pwx
 {

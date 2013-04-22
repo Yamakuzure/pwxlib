@@ -2,12 +2,12 @@
 #  define PWX_EXPORTS 1
 #endif
 
+#include <pwx/tools/StreamHelpers.h>
+
 #include <cstdlib>
 #include <vector>
 #include <cstring>
 #include <unistd.h>
-
-#include "pwx/tools/StreamHelpers.h"
 
 namespace pwx
 {

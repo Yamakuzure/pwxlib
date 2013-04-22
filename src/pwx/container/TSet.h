@@ -27,10 +27,10 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/types/CLockable.h"
-#include "pwx/general/macros.h"
-#include "pwx/container/TDoubleList.h"
-#include "pwx/functions/set_fwd.h"
+#include <pwx/types/CLockable.h>
+#include <pwx/general/macros.h>
+#include <pwx/container/TDoubleList.h>
+#include <pwx/functions/set_fwd.h>
 
 namespace pwx
 {
@@ -899,7 +899,7 @@ TSet<data_t>::~TSet() noexcept
 
 } // namespace pwx
 
-#include "pwx/functions/set_func.h"
+#include <pwx/functions/set_func.h>
 
 #endif // PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 

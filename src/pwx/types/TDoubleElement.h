@@ -27,7 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/base/VElement.h"
+#include <pwx/base/VElement.h>
 
 namespace pwx
 {

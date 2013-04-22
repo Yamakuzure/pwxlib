@@ -62,7 +62,7 @@
  * --- this is a debugging build                                     ---
  * ---------------------------------------------------------------------
 */
-#if defined(LIBPWX_DEBUG)
+#if defined(LIBPWX_DEBUG) || !defined(PWX_EXPORTS)
 # define PWX_PRIVATE_INLINE
 #else
 # define PWX_PRIVATE_INLINE inline
@@ -84,16 +84,15 @@
 #define PWX_WARNUNUSED   __attribute__ ((warn_unused_result))
 
 
+// Debug? (Ensure it is loaded if macros.h isn't needed)
+#include <pwx/functions/debug.h>
+
+
 /* ------------------------------------------------------------------
  * --- To be damn sure how many bits which integral type uses the ---
  * -- stdint types are needed.                                    ---
  * ------------------------------------------------------------------
 */
 #include <cstdint>
-
-// Debug? (Ensure it is loaded if macros.h isn't needed)
-#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-# include "pwx/functions/debug.h"
-#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 #endif // PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED

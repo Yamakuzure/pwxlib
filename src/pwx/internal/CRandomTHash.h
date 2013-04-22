@@ -28,9 +28,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/general/compiler.h"
-#include "pwx/general/macros.h"
-#include "pwx/internal/CRandomConstants.h"
+#include <pwx/general/compiler.h>
+#include <pwx/general/macros.h>
+#include <pwx/internal/CRandomConstants.h>
 #include <cstdlib>
 #include <type_traits>
 #include <cmath>
@@ -134,9 +134,8 @@ hash algorithm, and a better production of random values:
 
    ================================================================================================ */
 
-// Prototype for "inline = outline" methods
-PWX_PRIVATE_INLINE uint32_t private_hash_str(const char* key, size_t keyLen) noexcept;
-PWX_PRIVATE_INLINE uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept;
+uint32_t private_hash_str(const char* key, size_t keyLen) noexcept;
+uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept;
 
 using constants::fullMaxInt;
 using constants::fullMaxLong;

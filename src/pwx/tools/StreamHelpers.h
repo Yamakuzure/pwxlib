@@ -27,11 +27,12 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <pwx/general/compiler.h>
+#include <pwx/general/macros.h>
+
 #include <fstream>
 #include <sstream>
 
-#include <pwx/general/compiler.h>
-#include <pwx/general/macros.h>
 
 namespace pwx
 {

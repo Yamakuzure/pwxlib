@@ -28,7 +28,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/container/TDoubleList.h"
+#include <pwx/container/TDoubleList.h>
 
 namespace pwx
 {
@@ -804,7 +804,6 @@ private:
 				tail->setNext(head);
 
 			// The same has to be done with head->prev
-			PWX_LOCK(this)
 			while (head && head->destroyed()) {
 				PWX_UNLOCK(this)
 				std::this_thread::yield();
@@ -813,6 +812,7 @@ private:
 			// Now head is either nullptr (ring is empty) or valid and locked.
 			if (head && (tail != head->getPrev()))
 				head->setPrev(tail);
+			PWX_UNLOCK(this)
 		} // End of thread safe connection
 		else {
 			head->prev.store(tail, std::memory_order_relaxed);

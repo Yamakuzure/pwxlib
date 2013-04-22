@@ -2,6 +2,10 @@
 #ifndef PWX_LIBPWX_TEST_HASH_BUILDER_H_INCLUDED
 #define PWX_LIBPWX_TEST_HASH_BUILDER_H_INCLUDED 1
 
+#include <pwx.h>
+using pwx::RNG;
+using pwx::adjRight;
+
 #include <chrono>
 #include <iostream>
 using std::cout;
@@ -22,9 +26,6 @@ typedef std::chrono::high_resolution_clock::time_point hrTime_t;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
-#include <pwx.h>
-using pwx::RNG;
-using pwx::adjRight;
 
 /// @internal build a numerical hash list
 template<typename T>

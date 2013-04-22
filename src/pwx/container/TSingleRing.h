@@ -28,7 +28,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/container/TSingleList.h"
+#include <pwx/container/TSingleList.h>
 
 namespace pwx
 {
@@ -521,6 +521,7 @@ private:
 			// Now tail is either nullptr (ring is empty) or valid and locked.
 			if (tail && (head != tail->getNext()))
 				tail->setNext(head);
+			PWX_UNLOCK(this)
 		} // End of thread safe connection
 		else
 			tail->next.store(head, std::memory_order_relaxed);
