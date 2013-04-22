@@ -27,7 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/base/VElement.h"
+#include <pwx/base/VElement.h>
 
 namespace pwx
 {
@@ -230,6 +230,8 @@ struct PWX_API TSingleElement : public VElement
 		if (!destroyed() && !new_next->destroyed()) {
 			if (beThreadSafe.load(std::memory_order_relaxed)) {
 				// Do locking and double checks if this has to be thread safe
+				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
+				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, new_next)
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
 
 				/* Now that we have the double lock, it is crucial to
@@ -261,7 +263,6 @@ struct PWX_API TSingleElement : public VElement
 					"Tried to insert an element after an already destroyed element!")
 	}
 
-
 	/** @brief insert an element after this element.
 	  *
 	  * This is an extra method to not only set the next pointer
@@ -285,6 +286,8 @@ struct PWX_API TSingleElement : public VElement
 		if (beThreadSafe.load(std::memory_order_relaxed)) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
+				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
+				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, new_next)
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
 
 				/* Now that we have the double lock, it is crucial to
@@ -331,6 +334,7 @@ struct PWX_API TSingleElement : public VElement
 	void remove() noexcept
 	{
 		if (beThreadSafe.load(std::memory_order_relaxed)) {
+			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_LOCK_GUARD(elem_t, this)
 			setNext(nullptr);
 			isRemoved.store(true, std::memory_order_release);
@@ -360,10 +364,12 @@ struct PWX_API TSingleElement : public VElement
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe.load(std::memory_order_relaxed)) {
 			/* See notes in TDoubleElement::remove() */
+			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, toRemove)
 			PWX_LOCK_GUARD(elem_t, toRemove)
 			elem_t* xOldNext = toRemove->getNext();
 
 			// Do a release->yield->lock cycle until this is locked
+			DEBUG_LOCK_STATE("PWX_TRY_LOCK", this, this)
 			while (  (this->getNext() == toRemove)
 				  && (toRemove != this)
 				  && !PWX_TRY_LOCK(this) ) {
@@ -377,6 +383,7 @@ struct PWX_API TSingleElement : public VElement
 			if ( (this->getNext() == toRemove)
 			  && (this != toRemove) ) {
 				this->setNext(xOldNext);
+				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this);
 			}
 
@@ -519,6 +526,7 @@ TSingleElement<data_t>::~TSingleElement() noexcept
 	if (1 == data.use_count()) {
 		if (beThreadSafe.load(std::memory_order_acquire)) {
 			// Produce a lock guard before checking again.
+			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_NAMED_LOCK_GUARD(Make_Exclusive, elem_t, this)
 			// So the lock is only generated if there is a possibility
 			// that we have to delete data, but another thread might
@@ -530,6 +538,7 @@ TSingleElement<data_t>::~TSingleElement() noexcept
 
 				// Do another locking, so that threads having had to wait while the data
 				// was destroyed have a chance now to react before the object is gone.
+				DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 				PWX_NAMED_LOCK_GUARD (Lock_After_Delete, elem_t, this)
 			}
 		} else {

@@ -27,8 +27,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "pwx/base/VContainer.h"
-#include "pwx/types/TSingleElement.h"
+#include <pwx/base/VContainer.h>
+#include <pwx/types/TSingleElement.h>
 
 namespace pwx
 {
@@ -975,15 +975,20 @@ protected:
 		if (locCnt && insPrev && (tail != insPrev)) {
 			// Case 4: A normal insert
 			doRenumber.store(true, std::memory_order_release);
+			DEBUG_LOCK_STATE("insertNext", insPrev, insElem)
 			PWX_UNLOCK(this)
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
 		} else {
+			PWX_LOCK_GUARD(list_t, this)
+			PWX_UNLOCK(this)
 			if (!locCnt) {
 				// Case 1: The list is empty
 				head = tail = insElem;
+				DEBUG_LOCK_STATE("insertBefore", insElem, insElem)
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
 			} else if (nullptr == insPrev) {
 				// Case 2: A new head is to be set
+				DEBUG_LOCK_STATE("insertBefore", insElem, head)
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(head))
 				head = insElem;
 				doRenumber.store(true, std::memory_order_release);
@@ -992,10 +997,11 @@ protected:
 				insElem->eNr.store(
 					tail->eNr.load(std::memory_order_acquire) + 1,
 					std::memory_order_release);
+				DEBUG_LOCK_STATE("insertNext", tail, insElem)
 				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
 				tail = insElem;
 			}
-			PWX_UNLOCK(this)
+			DEBUG_LOCK_STATE("lock_guard_dtor", this, this)
 		}
 
 		// Raise eCount and set renumbering mode
