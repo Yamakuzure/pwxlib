@@ -8,15 +8,6 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="clean">
-				<Option output="../libpwx" prefix_auto="1" extension_auto="1" />
-				<Option object_output="./" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
-			</Target>
 			<Target title="library">
 				<Option output="../libpwx" prefix_auto="1" extension_auto="1" />
 				<Option object_output="./" />
@@ -29,59 +20,321 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="clean">
+				<Option output="../libpwx" prefix_auto="1" extension_auto="1" />
+				<Option object_output="./" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="cleanlibrary">
+				<Option output="pwx" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="cleantest">
+				<Option output="pwx" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="test">
+				<Option output="pwx" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="testlib">
+				<Option output="../testlib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="torture">
+				<Option output="../torture" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="hashbuilder">
+				<Option output="../hashbuilder" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="documentation">
+				<Option output="libpwx" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-DPWX_THREADS" />
 		</Compiler>
-		<Unit filename="../AUTHORS" />
-		<Unit filename="../COPYING" />
-		<Unit filename="../ChangeLog" />
-		<Unit filename="../Doxyfile" />
-		<Unit filename="../INSTALL" />
-		<Unit filename="../Makefile" />
-		<Unit filename="../README" />
-		<Unit filename="../TODO" />
-		<Unit filename="../src/pwx.h" />
-		<Unit filename="../src/pwx/base/VContainer.cpp" />
-		<Unit filename="../src/pwx/base/VContainer.h" />
-		<Unit filename="../src/pwx/base/VElement.cpp" />
-		<Unit filename="../src/pwx/base/VElement.h" />
-		<Unit filename="../src/pwx/container.h" />
-		<Unit filename="../src/pwx/container/TDoubleList.h" />
-		<Unit filename="../src/pwx/container/TDoubleRing.h" />
-		<Unit filename="../src/pwx/container/TQueue.h" />
-		<Unit filename="../src/pwx/container/TSet.h" />
-		<Unit filename="../src/pwx/container/TSingleList.h" />
-		<Unit filename="../src/pwx/container/TSingleRing.h" />
-		<Unit filename="../src/pwx/container/TStack.h" />
-		<Unit filename="../src/pwx/functions/debug.cpp" />
-		<Unit filename="../src/pwx/functions/debug.h" />
-		<Unit filename="../src/pwx/functions/set_func.h" />
-		<Unit filename="../src/pwx/functions/set_fwd.h" />
-		<Unit filename="../src/pwx/general.h" />
-		<Unit filename="../src/pwx/general/compiler.h" />
-		<Unit filename="../src/pwx/general/macros.h" />
-		<Unit filename="../src/pwx/general/templates.h" />
-		<Unit filename="../src/pwx/internal/CRandomConstants.h" />
-		<Unit filename="../src/pwx/internal/CRandomTHash.cpp" />
-		<Unit filename="../src/pwx/internal/CRandomTHash.h" />
-		<Unit filename="../src/pwx/internal/CRandomTRandom.h" />
-		<Unit filename="../src/pwx/internal/CRandomWordConstants.h" />
-		<Unit filename="../src/pwx/tools.h" />
-		<Unit filename="../src/pwx/tools/StreamHelpers.cpp" />
-		<Unit filename="../src/pwx/tools/StreamHelpers.h" />
-		<Unit filename="../src/pwx/types.h" />
-		<Unit filename="../src/pwx/types/CException.cpp" />
-		<Unit filename="../src/pwx/types/CException.h" />
-		<Unit filename="../src/pwx/types/CLockable.cpp" />
-		<Unit filename="../src/pwx/types/CLockable.h" />
-		<Unit filename="../src/pwx/types/TDoubleElement.h" />
-		<Unit filename="../src/pwx/types/TSingleElement.h" />
-		<Unit filename="../src/pwx/types/TVarDeleter.h" />
-		<Unit filename="../src/pwx/worker.h" />
-		<Unit filename="../src/pwx/worker/CRandom.cpp" />
-		<Unit filename="../src/pwx/worker/CRandom.h" />
+		<Unit filename="../AUTHORS">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../COPYING">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../ChangeLog">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../Doxyfile">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../INSTALL">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../Makefile">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../README">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../TODO">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/base/VContainer.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/base/VContainer.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/base/VElement.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/base/VElement.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TDoubleList.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TDoubleRing.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TQueue.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TSet.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TSingleList.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TSingleRing.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/container/TStack.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/functions/debug.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/functions/debug.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/functions/set_func.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/functions/set_fwd.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/general.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/general/compiler.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/general/macros.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/general/templates.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/internal/CRandomConstants.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/internal/CRandomTHash.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/internal/CRandomTHash.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/internal/CRandomTRandom.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/internal/CRandomWordConstants.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/tools.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/tools/StreamHelpers.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/tools/StreamHelpers.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/CException.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/CException.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/CLockable.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/CLockable.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/TDoubleElement.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/TSingleElement.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/types/TVarDeleter.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/worker.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/worker/CRandom.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../src/pwx/worker/CRandom.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/Makefile">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/destroy.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/destroy.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/env.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/hash_builder.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/hash_builder.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testListRing.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testRNG.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testRNG.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testRNG_func.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testSet.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testSpeed.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/testStackQueue.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/test_lib.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/test_lib.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/torture.cpp">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
+		<Unit filename="../test/torture.h">
+			<Option target="clean" />
+			<Option target="library" />
+		</Unit>
 		<Extensions>
 			<envvars />
 			<code_completion />
