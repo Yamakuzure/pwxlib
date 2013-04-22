@@ -1,7 +1,7 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include "pwx/types/CLockable.h"
+#include <pwx/types/CLockable.h>
 
 namespace pwx
 {
@@ -38,6 +38,7 @@ CLockable::CLockable (const CLockable &src) noexcept
   */
 CLockable::~CLockable() noexcept
 {
+	DEBUG_LOCK_STATE("~CLockable", this, this)
 	clear_locks();
 	// the return value is unimportant, we can't do
 	// anything about it in the middle of a dtor anyway.

@@ -30,7 +30,7 @@
 #include <pwx/general/compiler.h>
 #include <pwx/types/CException.h>
 #include <pwx/general/macros.h>
-#include <pwx/functions/debug.h>
+#include <atomic>
 #include <mutex>
 #include <thread>
 #include <cstring>
@@ -95,9 +95,15 @@ public:
 	**/
 	bool clear_locks() noexcept
 	{
-		if ( (CURRENT_THREAD_ID == CL_Thread_ID) && is_locked() ) {
-			CL_Lock_Count = 1;
-			this->unlock();
+		if (CURRENT_THREAD_ID == CL_Thread_ID) {
+			if (is_locked() || try_lock()) {
+				THREAD_LOG("base", "clear_locks(), Owner id (%lu), %u locks [%s]",
+						CL_Thread_ID, CL_Lock_Count,
+						is_locked() ? "locked" : "not locked")
+				CL_Lock_Count = 1;
+				this->unlock();
+			}
+
 			return true;
 		}
 
@@ -157,8 +163,9 @@ public:
 		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
 			size_t ctid = CURRENT_THREAD_ID;
 			if ( (ctid != CL_Thread_ID) || !is_locked()) {
-				THREAD_LOG("base", "Thread id (%d) lock(), Owner id (%d) [%s]",
-						ctid, CL_Thread_ID, is_locked() ? "locked" : "not locked")
+				THREAD_LOG("base", "lock(), Owner id (%lu), %u locks [%s]",
+						CL_Thread_ID, CL_Lock_Count,
+						is_locked() ? "locked" : "not locked")
 				while (CL_Lock.test_and_set())
 					std::this_thread::yield();
 				// Got it now, so note it:
@@ -192,10 +199,10 @@ public:
 	{
 		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( ctid != CL_Thread_ID
-			  || !CL_Is_Locked.load(std::memory_order_acquire) ) {
-				THREAD_LOG("base", "Thread id (%d) try_lock(), Owner id (%d) [%s]",
-						ctid, CL_Thread_ID, is_locked() ? "locked" : "not locked")
+			if ( (ctid != CL_Thread_ID) || !is_locked() ) {
+				THREAD_LOG("base", "try_lock(), Owner id (%lu), %u locks [%s]",
+						CL_Thread_ID, CL_Lock_Count,
+						is_locked() ? "locked" : "not locked")
 				if (!CL_Lock.test_and_set()) {
 					// Got it now, so note it:
 					CL_Thread_ID  = ctid;
@@ -220,12 +227,15 @@ public:
 	void unlock() noexcept
 	{
         if ( CL_Do_Locking.load(std::memory_order_acquire)
-		  && (CURRENT_THREAD_ID == CL_Thread_ID)
-		  && is_locked()) {
-			if (0 == --CL_Lock_Count) {
+		  && (CURRENT_THREAD_ID == CL_Thread_ID)) {
+			THREAD_LOG("base", "unlock(), Owner id (%lu), %u locks [%s]",
+					CL_Thread_ID, CL_Lock_Count,
+					is_locked() ? "locked" : "not locked")
+			if ((0 == --CL_Lock_Count) || !is_locked()) {
 				CL_Thread_ID  = 0;
-				CL_Lock.clear(std::memory_order_release);
+				CL_Lock_Count = 0;
 				CL_Is_Locked.store(false, std::memory_order_release);
+				CL_Lock.clear(std::memory_order_release);
 			}
 		}
 	}
@@ -239,7 +249,11 @@ public:
 	CLockable& operator= (const CLockable &src) noexcept;
 
 
+// If the DEBUG_LOCK_STATE is enabled, the members need to be acceddible from
+// the callers, which must be derived from CLockable anyway.
+#ifndef PWX_THREADDEBUG
 private:
+#endif // PWX_THREADDEBUG
 
 	/* ===============================================
 	 * === Private members                         ===
