@@ -16,6 +16,7 @@ typedef std::atomic_bool aBool;
 template<typename list_t>
 struct thAdder : public pwx::CLockable
 {
+	volatile
 	aBool   isRunning;
 	list_t* cont  = nullptr;
 
@@ -27,7 +28,7 @@ struct thAdder : public pwx::CLockable
 	{
 		cont = cont_;
 		milliseconds sleepTime( 1 );
-		while (!isRunning.load()) {
+		while (!isRunning.load(std::memory_order_acquire)) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
 		}
@@ -38,7 +39,15 @@ struct thAdder : public pwx::CLockable
 			}
 		}
 
-		isRunning.store(false);
+		DEBUG_LOCK_STATE("clear_locks", thAdder, cont)
+		uint32_t remaining = 0;
+		if ( ( remaining = cont->lock_count() ) ) {
+			cerr << "ERROR: " << remaining << " locks upon thAdder exit!" << endl;
+			// FIXME: Not yet!cont->clear_locks();
+		}
+
+		isRunning.store(false, std::memory_order_release);
+		std::this_thread::yield();
 	}
 };
 
@@ -47,6 +56,7 @@ struct thAdder : public pwx::CLockable
 template<typename list_t>
 struct thClearer : public pwx::CLockable
 {
+	volatile
 	aBool   isRunning;
 	list_t* cont = nullptr;
 
@@ -58,13 +68,21 @@ struct thClearer : public pwx::CLockable
 	{
 		cont = cont_;
 		milliseconds sleepTime( 1 );
-		while (!isRunning.load()) {
+		while (!isRunning.load(std::memory_order_acquire)) {
 			std::this_thread::sleep_for( sleepTime );
 			std::this_thread::yield();
 		}
 		if (cont) cont->clear();
 
-		isRunning.store(false);
+		DEBUG_LOCK_STATE("clear_locks", thClearer, cont)
+		uint32_t remaining = 0;
+		if ( ( remaining = cont->lock_count() ) ) {
+			cerr << "ERROR: " << remaining << " locks upon thClearer exit!" << endl;
+			// FIXME: Not yet!cont->clear_locks();
+		}
+
+		isRunning.store(false, std::memory_order_release);
+		std::this_thread::yield();
 	}
 };
 
@@ -236,8 +254,7 @@ int32_t testSpeedMT (sEnv &env)
 				delete threads[nr];
 				threads[nr] = nullptr;
 			}
-		} else
-			std::this_thread::yield();
+		}
     }
 
 	uint32_t contSize = intCont.size();
@@ -267,8 +284,7 @@ int32_t testSpeedMT (sEnv &env)
 				delete threads[nr];
 				threads[nr] = nullptr;
 			}
-		} else
-			std::this_thread::yield();
+		}
     }
 
 	// Bring out the needed time in ms:
