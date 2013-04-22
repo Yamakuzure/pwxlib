@@ -201,7 +201,7 @@
   * @param object pointer to the object to lock.
 **/
 #define PWX_LOCK(object) { \
-	if (object) {\
+	if (nullptr != object) {\
 		(object)->lock(); \
 		LOG_LOCK(object) \
 	} \
@@ -225,7 +225,7 @@
   * @param object pointer to the object to unlock.
 **/
 #define PWX_UNLOCK(object) { \
-	if (object) { \
+	if (nullptr != object) { \
 		(object)->unlock(); \
 		LOG_UNLOCK(object) \
 	} \

@@ -291,7 +291,6 @@ public:
 			if (this != &src) {
 				while (!const_cast<list_t*>(&src)->try_lock()) {
 					PWX_UNLOCK(this)
-					std::this_thread::yield();
 					PWX_LOCK(this)
 				}
 			}

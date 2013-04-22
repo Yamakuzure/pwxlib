@@ -442,7 +442,7 @@ struct PWX_API TDoubleElement : public VElement
 				 * waiting to get a lock on this, a deadlock will happen.
 				 * The solution is to go some try_lock() lengths until
 				 * everybody is happy.
-				 * Further more while we yield lock-free, another thread
+				 * Further more while we wait for the new lock, another thread
 				 * might have just removed our next or previous neighbor.
 				 * It is therefore necessary to always use getNext() and
 				 * getPrev() to have the real current neighbor.
@@ -455,7 +455,6 @@ struct PWX_API TDoubleElement : public VElement
 					&& !PWX_TRY_LOCK(xOldPrev) ) {
 					// xOldPrev is valid, but we can not lock.
 					PWX_UNLOCK(this)
-					std::this_thread::yield();
 					PWX_LOCK(this)
 				}
 
@@ -475,7 +474,6 @@ struct PWX_API TDoubleElement : public VElement
 					&& !PWX_TRY_LOCK(xOldNext)) {
 					// xOldNext is valid, but we can not lock.
 					PWX_UNLOCK(this)
-					std::this_thread::yield();
 					PWX_LOCK(this)
 				}
 

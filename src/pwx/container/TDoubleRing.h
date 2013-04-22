@@ -796,7 +796,6 @@ private:
 			PWX_LOCK(this)
 			while (tail && tail->destroyed()) {
 				PWX_UNLOCK(this)
-				std::this_thread::yield();
 				PWX_LOCK(this)
 			}
 			// Now tail is either nullptr (ring is empty) or valid and locked.
@@ -806,7 +805,6 @@ private:
 			// The same has to be done with head->prev
 			while (head && head->destroyed()) {
 				PWX_UNLOCK(this)
-				std::this_thread::yield();
 				PWX_LOCK(this)
 			}
 			// Now head is either nullptr (ring is empty) or valid and locked.

@@ -44,24 +44,21 @@ const long double maxRandomValue   = static_cast<long double>(std::random_device
 const long double minRandomValue   = static_cast<long double>(std::random_device::min());
 const long double randomValueRange = maxRandomValue - minRandomValue;
 
-static std::random_device privRandDev_;
-static rand_t lastRndValue = 0;  //!< The last generated random value
-
+static std::random_device  privRandDev_;
+static std::atomic<rand_t> lastRndValue = ATOMIC_VAR_INIT(0);
 
 /// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-/// Important: RNG has to be _LOCKED_ before using this function!
 rand_t private_get_random() noexcept
 {
 	rand_t randVal = privRandDev_();
-	while (randVal == lastRndValue)
+	while (randVal == lastRndValue.load(std::memory_order_acquire))
 		randVal = privRandDev_();
-	lastRndValue = randVal;
+	lastRndValue.store(randVal, std::memory_order_release);
 	return randVal;
 }
 
 
 /// @internal random number handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-/// Important: RNG has to be _LOCKED_ before using this function!
 template<typename Tval>
 Tval private_random(Tval min_, Tval max_) noexcept
 {
@@ -95,7 +92,6 @@ Tval private_random(Tval min_, Tval max_) noexcept
 }
 
 /// @internal random character handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-/// Important: RNG has to be _LOCKED_ before using this function!
 size_t private_random_str(char* dest, size_t min_, size_t max_) noexcept
 {
 	static const uint8_t lowA = 'a';

@@ -168,6 +168,7 @@ public:
 						is_locked() ? "locked" : "not locked")
 				while (CL_Lock.test_and_set())
 					std::this_thread::yield();
+
 				// Got it now, so note it:
 				CL_Thread_ID  = ctid;
 				CL_Lock_Count = 1;

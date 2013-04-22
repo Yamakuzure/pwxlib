@@ -368,14 +368,13 @@ struct PWX_API TSingleElement : public VElement
 			PWX_LOCK_GUARD(elem_t, toRemove)
 			elem_t* xOldNext = toRemove->getNext();
 
-			// Do a release->yield->lock cycle until this is locked
+			// Do a lock cycle until this is locked
 			DEBUG_LOCK_STATE("PWX_TRY_LOCK", this, this)
 			while (  (this->getNext() == toRemove)
 				  && (toRemove != this)
 				  && !PWX_TRY_LOCK(this) ) {
 				// Can't lock this, so yield until possible
 				PWX_UNLOCK(toRemove)
-				std::this_thread::yield();
 				PWX_LOCK(toRemove)
 			}
 

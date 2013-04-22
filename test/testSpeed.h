@@ -27,11 +27,8 @@ struct thAdder
 	void operator()(list_t* cont_, data_t start, data_t toAdd, data_t maxAdd)
 	{
 		cont = cont_;
-		milliseconds sleepTime( 1 );
-		while (!this->isRunning.load(std::memory_order_acquire)) {
-			std::this_thread::sleep_for( sleepTime );
-			std::this_thread::yield();
-		}
+		while (!this->isRunning.load(std::memory_order_acquire)) { }
+
 		if (cont) {
 			for (data_t nr = 0; nr < toAdd; ++nr) {
 				PWX_TRY_PWX_FURTHER(cont->push(new data_t(start)))
@@ -48,11 +45,8 @@ struct thAdder
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while (this->isRunning.load(std::memory_order_acquire)) {
+		while (this->isRunning.load(std::memory_order_acquire))
 			this->isRunning.store(false, std::memory_order_release);
-			std::this_thread::sleep_for( sleepTime );
-			std::this_thread::yield();
-		}
 	}
 };
 
@@ -72,11 +66,7 @@ struct thClearer
 	void operator()(list_t* cont_)
 	{
 		cont = cont_;
-		milliseconds sleepTime( 1 );
-		while (!this->isRunning.load(std::memory_order_acquire)) {
-			std::this_thread::sleep_for( sleepTime );
-			std::this_thread::yield();
-		}
+		while (!this->isRunning.load(std::memory_order_acquire)) { }
 		if (cont) cont->clear();
 
 		DEBUG_LOCK_STATE("clear_locks", thClearer, cont)
@@ -88,11 +78,8 @@ struct thClearer
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while (this->isRunning.load(std::memory_order_acquire)) {
+		while (this->isRunning.load(std::memory_order_acquire))
 			this->isRunning.store(false, std::memory_order_release);
-			std::this_thread::sleep_for( sleepTime );
-			std::this_thread::yield();
-		}
 	}
 };
 
