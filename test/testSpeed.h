@@ -135,21 +135,52 @@ int32_t testSpeedST (sEnv &env)
 	hrTime_t startTimeAdd = hrClock::now();
     adder(&intCont, lowest, localMaxElem, maxAdd);
 
-	// Now clear them up again:
-	uint32_t contSize = intCont.size();
+	// Stop time, safe container size and do a consistency check
 	hrTime_t endTimeAdd = hrClock::now();
+	uint32_t contSize = intCont.size();
+
+	bool isNextOK  = true;
+	bool isOrderOK = true;
+	uint32_t currNr = 1;
+	auto*  curr   = intCont[0]; // Is head and number 0
+	auto*  next   = curr;
+
+	while (isNextOK && isOrderOK && (currNr < contSize) ) {
+		next = intCont[currNr];
+		if (next != curr->getNext())
+			isNextOK = false;
+		else if (isSameType(list_t, set_t) && (**curr >= **next))
+			isOrderOK = false;
+		else {
+			++currNr;
+			curr = next;
+		}
+	} // End of consistency checking
+
+
+	// Now clear them up again:
+	hrTime_t startTimeClr = hrClock::now();
 	intCont.clear();
 
 	// Bring out the needed time in ms:
 	hrTime_t endTimeClr = hrClock::now();
 	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
-	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - endTimeAdd  ).count();
+	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr  ).count();
 	cout << adjRight(5,0) << elapsedAdd << " ms /";
 	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
 		cout << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
+		++env.testFail;
+		result = EXIT_FAILURE;
+	} else if (!isNextOK) {
+		cout << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
+		++env.testFail;
+		result = EXIT_FAILURE;
+	} else if (!isOrderOK) {
+		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1);
+		cout << ": " << **curr << " >= " << **next << "!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else
@@ -250,8 +281,27 @@ int32_t testSpeedMT (sEnv &env)
 		}
     }
 
-	uint32_t contSize = intCont.size();
+	// Stop time, safe container size and do a consistency check
 	hrTime_t endTimeAdd = hrClock::now();
+	uint32_t contSize = intCont.size();
+
+	bool isNextOK  = true;
+	bool isOrderOK = true;
+	uint32_t currNr = 1;
+	auto*  curr   = intCont[0]; // Is head and number 0
+	auto*  next   = curr;
+
+	while (isNextOK && isOrderOK && (currNr < contSize) ) {
+		next = intCont[currNr];
+		if (next != curr->getNext())
+			isNextOK = false;
+		else if (isSameType(list_t, set_t) && (**curr >= **next))
+			isOrderOK = false;
+		else {
+			++currNr;
+			curr = next;
+		}
+	} // End of consistency checking
 
 	// Now clear the container up again:
     for (size_t nr = 0; nr < maxThreads; ++nr)
@@ -290,6 +340,15 @@ int32_t testSpeedMT (sEnv &env)
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
 		cout << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
+		++env.testFail;
+		result = EXIT_FAILURE;
+	} else if (!isNextOK) {
+		cout << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
+		++env.testFail;
+		result = EXIT_FAILURE;
+	} else if (!isOrderOK) {
+		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1);
+		cout << ": " << **curr << " >= " << **next << "!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else
