@@ -32,18 +32,7 @@
 **/
 
 #if defined(PWX_ANNOTATIONS)
-/* Add Race Detector annotations.
- * See http://gcc.gnu.org/onlinedocs/libstdc++/manual/debug.html#debug.races why
- */
-#include <valgrind/helgrind.h>
-# if defined(_GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE)
-#   undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE
-# endif
-# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE(A) ANNOTATE_HAPPENS_BEFORE(A)
-# if defined(_GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER)
-#   undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER
-# endif
-# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER(A)  ANNOTATE_HAPPENS_AFTER(A)
+# include <valgrind/helgrind.h>
 #endif // ANNOTATIONS
 
 // Handle includes and defines
