@@ -88,8 +88,6 @@ struct thClearer
   *
   * The test is simple: Add maxElements random elements,
   * clear the container and measure how long this takes.
-  *
-  * Note: If this is set_t, only 10% of maxElements are used.
 **/
 template<typename list_t>
 int32_t testSpeedST (sEnv &env)
@@ -110,10 +108,9 @@ int32_t testSpeedST (sEnv &env)
 		cout << " Stacks                ( 1 thread ) : ";
 	else if (isSameType (list_t, queue_t))
 		cout << " Queues                ( 1 thread ) : ";
-	else if (isSameType (list_t, set_t)) {
-		localMaxElem /= 10;
-		cout << " Sets " << adjRight(7,0) << localMaxElem << " elements ( 1 thread ) : ";
-	} else {
+	else if (isSameType (list_t, set_t))
+		cout << " Sets                  ( 1 thread ) : ";
+	else {
 		cout << " Nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
 	}
@@ -166,8 +163,6 @@ int32_t testSpeedST (sEnv &env)
   *
   * The test is simple: Add maxElements random elements,
   * clear the container and measure how long this takes.
-  *
-  * Note: If this is set_t, only 10% of maxElements are used.
 **/
 template<typename list_t>
 int32_t testSpeedMT (sEnv &env)
@@ -188,10 +183,9 @@ int32_t testSpeedMT (sEnv &env)
 		cout << " Stacks                (" << adjRight (2,0) << maxThreads << " threads) : ";
 	else if (isSameType (list_t, queue_t))
 		cout << " Queues                (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, set_t)) {
-		localMaxElem /= 10;
-		cout << " Sets " << adjRight(7,0) << localMaxElem << " elements (" << adjRight (2,0) << maxThreads << " threads) : ";
-	} else {
+	else if (isSameType (list_t, set_t))
+		cout << " Sets                  (" << adjRight (2,0) << maxThreads << " threads) : ";
+	else {
 		cout << " Nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
 	}
