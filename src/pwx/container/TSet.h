@@ -574,12 +574,18 @@ private:
 				*/
 
 				// Step 1: Move up until curr is larger
-				while (data > **curr)
-					curr = curr->getNext();
+				while (data > **curr) {
+					curr = this->beThreadSafe.load(std::memory_order_relaxed)
+						 ? curr->getNext()
+						 : curr->next.load(std::memory_order_relaxed);
+				}
 
 				// Step 2: Move down until curr is smaller
-				while (**curr > data)
-					curr = curr->getPrev();
+				while (**curr > data) {
+					curr = this->beThreadSafe.load(std::memory_order_relaxed)
+						 ? curr->getPrev()
+						 : curr->prev.load(std::memory_order_relaxed);
+				}
 
 				/* Due to this order curr is now either pointing to an element
 				 * holding data, or the next smaller element. The latter detail
@@ -589,11 +595,16 @@ private:
 				*/
 				return (**curr == data ? curr : nullptr);
 			} else {
-				curr = head->getNext();
+				curr = this->beThreadSafe.load(std::memory_order_relaxed)
+					 ? head->getNext()
+					 : head->next.load(std::memory_order_relaxed);
 
 				// Note: head and tail are already checked.
-				while ((curr != tail) && (**curr != data))
-					curr = curr->getNext();
+				while ((curr != tail) && (**curr != data)) {
+					curr = this->beThreadSafe.load(std::memory_order_relaxed)
+						 ? curr->getNext()
+						 : curr->next.load(std::memory_order_relaxed);
+				}
 
 				// Because tail is already checked, a pointer comparison will do:
 				return (curr != tail ? curr : nullptr);
