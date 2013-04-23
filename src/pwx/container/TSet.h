@@ -160,7 +160,7 @@ public:
 	**/
 	virtual elem_t* find (data_t &data) noexcept
 	{
-		return const_cast<elem_t* > (privFindData(static_cast<const data_t> (data)));
+		return const_cast<elem_t* > (privFindData(static_cast<const data_t> (data), nullptr));
 	}
 
 
@@ -178,7 +178,7 @@ public:
 	**/
 	virtual const elem_t* find (const data_t &data) const noexcept
 	{
-		return privFindData(data);
+		return privFindData(data, nullptr);
 	}
 
 
@@ -236,7 +236,7 @@ public:
 
 				// A simple loop will do, because we can use privFindData directly.
 				while (result && xCurr && !isDone) {
-					if (src.privFindData(**xCurr)) {
+					if (src.privFindData(**xCurr, nullptr)) {
 						if (xCurr == tail)
 							isDone = true;
 						else
@@ -497,22 +497,30 @@ private:
 	  * The protFind() method of the containers search for pointers, while
 	  * this special method searches for the data behind the pointers.
 	  *
-	  * If the set is sorted and @a data can not be found, then curr points
-	  * to the element which would precede an element holding @a data if
-	  * it where present. With this special outcome the inserting methods
-	  * can simply use insNextElem() with curr to add data in a sorted way.
+	  * If the set is sorted and @a data can not be found, then @a start
+	  * points to the element which would precede an element holding @a data
+	  * if it where present. With this special outcome the inserting methods
+	  * can simply use insNextElem() with @a start to add data in a sorted way.
 	  * The only detail to look at is the situation when the new element
-	  * must become the new head. In this special case, <B>curr is set to
-	  * nullptr</B> and <B>eNr is set to -1</B>.
+	  * must become the new head. In this special case, <B>@a start is set to
+	  * nullptr</B>.
+	  *
+	  * If @a start is set to nullptr, it simply isn't used and the search
+	  * starts with <I>curr</I>.
+	  *
+	  * Important: Although this method uses <I>curr</I> if @a start points to
+	  * nullptr, <I>curr</I> is not set here.
 	  *
 	  * @param[in] data reference of the data to search.
+	  * @param[in,out] start pointer pointer from where to start, stores where to end.
 	  * @return pointer to the element or nullptr if @a data is not present in the set.
 	**/
-	const elem_t* privFindData (const data_t &data) const noexcept
+	const elem_t* privFindData (const data_t &data, elem_t** start) const noexcept
 	{
-		// Note: Methods that call privFindData() to prepare an insertion
-		//       should lock the whole set first!
+		// Note: Methods that call privFindData() to prepare an insertion should
+		//       search again after start is adjusted and a lock is acquired.
 		uint32_t localCount = eCount.load(std::memory_order_acquire);
+		elem_t*  xCurr      = (start && *start) ? *start : curr ? curr : head;
 
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
@@ -522,22 +530,20 @@ private:
 		if (localCount) {
 			// Quick exit if sorted set assumption 1 is correct:
 			if (isSorted && (**head > data)) {
-				curr = nullptr;
+				if (start)
+					*start = nullptr;
 				return nullptr;
 			}
 
-			// Reset curr if a previous search has invalidated it:
-			if (nullptr == curr)
-				curr = head;
-
-			// Quick exit if curr is correct:
-			if (**curr == data)
-				return curr;
+			// Quick exit if xCurr is correct:
+			if (**xCurr == data)
+				return xCurr;
 
 			// Quick exit if head is wanted:
 			if (**head == data) {
-				curr = head;
-				return curr;
+				if (start)
+					*start = head;
+				return head;
 			}
 			// End of having at least one element
 		} else
@@ -548,14 +554,16 @@ private:
 		if (localCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
 			if (isSorted && (data > **tail)) {
-				curr = tail;
+				if (start)
+					*start = tail;
 				return nullptr;
 			}
 
 			// Quick exit if tail is wanted:
 			if (**tail == data) {
-				curr = tail;
-				return curr;
+				if (start)
+					*start = tail;
+				return tail;
 			}
 		} // End of having at least two elements
 
@@ -574,40 +582,42 @@ private:
 				*/
 
 				// Step 1: Move up until curr is larger
-				while (data > **curr) {
-					curr = this->beThreadSafe.load(std::memory_order_relaxed)
-						 ? curr->getNext()
-						 : curr->next.load(std::memory_order_relaxed);
+				while (xCurr && (data > **xCurr)) {
+					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+						  ? xCurr->getNext()
+						  : xCurr->next.load(std::memory_order_relaxed);
 				}
 
 				// Step 2: Move down until curr is smaller
-				while (**curr > data) {
-					curr = this->beThreadSafe.load(std::memory_order_relaxed)
-						 ? curr->getPrev()
-						 : curr->prev.load(std::memory_order_relaxed);
+				while (xCurr && (**xCurr > data)) {
+					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+						  ? xCurr->getPrev()
+						  : xCurr->prev.load(std::memory_order_relaxed);
 				}
-
-				/* Due to this order curr is now either pointing to an element
-				 * holding data, or the next smaller element. The latter detail
-				 * is important for the sorted insertion. If data is not found,
-				 * all inserting methods can now insert a new element holding
-				 * the searched data using insNextElem() on curr.
-				*/
-				return (**curr == data ? curr : nullptr);
 			} else {
-				curr = this->beThreadSafe.load(std::memory_order_relaxed)
-					 ? head->getNext()
-					 : head->next.load(std::memory_order_relaxed);
+				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+					  ? head->getNext()
+					  : head->next.load(std::memory_order_relaxed);
 
 				// Note: head and tail are already checked.
-				while ((curr != tail) && (**curr != data)) {
-					curr = this->beThreadSafe.load(std::memory_order_relaxed)
-						 ? curr->getNext()
-						 : curr->next.load(std::memory_order_relaxed);
+				while ((xCurr != tail) && (**xCurr != data)) {
+					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
+						  ? xCurr->getNext()
+						  : xCurr->next.load(std::memory_order_relaxed);
 				}
-
-				// Because tail is already checked, a pointer comparison will do:
-				return (curr != tail ? curr : nullptr);
+			}
+			/* Due to this order curr is now either pointing to an element
+			 * holding data, or the next smaller element. The latter detail
+			 * is important for the sorted insertion. If data is not found,
+			 * all inserting methods can now insert a new element holding
+			 * the searched data using insNextElem() on curr.
+			*/
+			if (xCurr && (**xCurr == data))
+				return xCurr;
+			else {
+				if (start)
+					*start = xCurr;
+				return nullptr;
 			}
 		} // End of having at least 3 elements
 
@@ -619,23 +629,39 @@ private:
 	/// @brief preparation method to insert data behind data
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		// All preparation methods use big locks to ensure data consistency!
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*data))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*data, &xCurr))
 			return size();
 
 		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? curr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
+		elem_t* prevElement = isSorted ? xCurr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
 		if (!isSorted && prev && (nullptr == prevElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
-					   "The searched element can not be found in this singly linked list")
+					   "The searched element can not be found in this set")
 
+
+		// 2: All preparation methods check twice and use big locks to ensure data consistency!
+		PWX_LOCK_GUARD(list_t, this)
 		// Now prevElement must not change any more
 		if (prevElement)
 			PWX_LOCK(prevElement)
+		// And search again
+		if (privFindData(*data, &xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			return size();
+		} else if (isSorted && (prevElement != xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			prevElement = xCurr;
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
 
-		// 2: Create a new element
+
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (data, destroy))
 		catch(std::exception &e) {
@@ -646,7 +672,7 @@ private:
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 3: Do the real insert
+		// 4: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
@@ -656,16 +682,33 @@ private:
 	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*data))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*data, &xCurr))
 			return size();
 
 		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? curr : prev;
+		elem_t* prevElement = isSorted ? xCurr : prev;
+
+		// 2: All preparation methods check twice and use big locks to ensure data consistency!
+		PWX_LOCK_GUARD(list_t, this)
+		// Now prevElement must not change any more
 		if (prevElement)
 			PWX_LOCK(prevElement)
+		// And search again
+		if (privFindData(*data, &xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			return size();
+		} else if (isSorted && (prevElement != xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			prevElement = xCurr;
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
 
-		// 2: Create a new element
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (data, destroy))
 		catch(std::exception &e) {
@@ -676,7 +719,7 @@ private:
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 3: Do the real insert
+		// 4: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
@@ -686,20 +729,23 @@ private:
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*src))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*src, &xCurr))
 			return size();
 
 		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? curr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
+		elem_t* prevElement = isSorted ? xCurr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
 		if (!isSorted && prev && (nullptr == prevElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this singly linked list")
-		if (prevElement)
-			PWX_LOCK(prevElement)
 
 		// 2: Check source:
+		PWX_LOCK_GUARD(list_t, this)
+		// Now prevElement must not change any more
+		if (prevElement)
+			PWX_LOCK(prevElement)
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
@@ -711,7 +757,21 @@ private:
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: Create a new element
+		// 3: All preparation methods check twice and use big locks to ensure data consistency!
+		if (privFindData(*src, &xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			return size();
+		} else if (isSorted && (prevElement != xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			prevElement = xCurr;
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
+
+		// 4: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
@@ -724,7 +784,7 @@ private:
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 4: Do the real insert
+		// 5: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
@@ -734,16 +794,21 @@ private:
 	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*src))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*src, &xCurr))
 			return size();
 
 		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? curr : prev;
+		elem_t* prevElement = isSorted ? xCurr : prev;
 		if (prevElement)
 			PWX_LOCK(prevElement)
 
 		// 2: Check source:
+		PWX_LOCK_GUARD(list_t, this)
+		// Now prevElement must not change any more
+		if (prevElement)
+			PWX_LOCK(prevElement)
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
@@ -755,7 +820,21 @@ private:
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: Create a new element
+		// 3: All preparation methods check twice and use big locks to ensure data consistency!
+		if (privFindData(*src, &xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			return size();
+		} else if (isSorted && (prevElement != xCurr)) {
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			prevElement = xCurr;
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
+
+		// 4: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
@@ -768,7 +847,7 @@ private:
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 4: Do the real insert
+		// 5: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
@@ -778,180 +857,281 @@ private:
 	/// @brief preparation method to insert data before data
 	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*data))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*data, &xCurr))
 			return size();
 
+
 		// 1: Prepare the next element
+		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
 		elem_t* nextElement = !isSorted && next ? const_cast<elem_t*>(find(next)) : nullptr;
 		if (!isSorted && next && (nullptr == nextElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this doubly linked list")
-		if (nextElement)
-			PWX_LOCK(nextElement)
 
-		// 2: Create a new element
+		// 2: All preparation methods check twice and use big locks to ensure data consistency!
+		PWX_LOCK_GUARD(list_t, this)
+
+		if (!isSorted && nextElement)
+			PWX_LOCK(nextElement)
+		if (isSorted && prevElement)
+			PWX_LOCK(prevElement)
+
+		if (privFindData(*data, &xCurr)) {
+			if (!isSorted && nextElement)
+				PWX_UNLOCK(nextElement)
+			if (isSorted && prevElement)
+				PWX_UNLOCK(prevElement)
+			return size();
+		} else if (isSorted) {
+			if (xCurr != prevElement) {
+				if (prevElement)
+					PWX_UNLOCK(prevElement)
+				prevElement = xCurr;
+				if (prevElement)
+					PWX_LOCK(prevElement)
+			}
+		} else if (nextElement) {
+			PWX_UNLOCK(nextElement)
+			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
+						? nextElement->getPrev()
+						: nextElement->prev.load(std::memory_order_relaxed);
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
+
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (data, destroy))
 		catch(std::exception &e) {
-			if (nextElement)
-				PWX_UNLOCK(nextElement)
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 3: Do the real insert
-		elem_t* prev = isSorted
-					 ? curr
-					 : nextElement
-						? this->beThreadSafe.load(std::memory_order_relaxed)
-							? nextElement->getPrev()
-							: nextElement->prev.load(std::memory_order_relaxed)
-						: tail;
-		if (nextElement)
-			PWX_UNLOCK(nextElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
+		// 4: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
 	}
 
 
 	/// @brief preparation method to insert data before an element
 	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*data))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*data, &xCurr))
 			return size();
 
 		// 1: Prepare the next element
+		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
 		elem_t* nextElement = !isSorted && next ? next : nullptr;
-		if (nextElement)
-			PWX_LOCK(nextElement)
 
-		// 2: Create a new element
+		// 2: All preparation methods check twice and use big locks to ensure data consistency!
+		PWX_LOCK_GUARD(list_t, this)
+
+		if (!isSorted && nextElement)
+			PWX_LOCK(nextElement)
+		if (isSorted && prevElement)
+			PWX_LOCK(prevElement)
+
+		if (privFindData(*data, &xCurr)) {
+			if (!isSorted && nextElement)
+				PWX_UNLOCK(nextElement)
+			if (isSorted && prevElement)
+				PWX_UNLOCK(prevElement)
+			return size();
+		} else if (isSorted) {
+			if (xCurr != prevElement) {
+				if (prevElement)
+					PWX_UNLOCK(prevElement)
+				prevElement = xCurr;
+				if (prevElement)
+					PWX_LOCK(prevElement)
+			}
+		} else if (nextElement) {
+			PWX_UNLOCK(nextElement)
+			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
+						? nextElement->getPrev()
+						: nextElement->prev.load(std::memory_order_relaxed);
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
+
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (data, destroy))
 		catch(std::exception &e) {
-			if (nextElement)
-				PWX_UNLOCK(nextElement)
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 3: Do the real insert
-		elem_t* prev = isSorted
-					 ? curr
-					 : nextElement
-						? this->beThreadSafe.load(std::memory_order_relaxed)
-							? nextElement->getPrev()
-							: nextElement->prev.load(std::memory_order_relaxed)
-						: tail;
-		if (nextElement)
-			PWX_UNLOCK(nextElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
+		// 4: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before data
 	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*src))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*src, &xCurr))
 			return size();
 
 		// 1: Prepare the next element
+		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
 		elem_t* nextElement = !isSorted && next ? const_cast<elem_t*>(find(next)) : nullptr;
 		if (!isSorted && next && (nullptr == nextElement))
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this doubly linked list")
-		if (nextElement)
-			PWX_LOCK(nextElement)
 
 		// 2: Check source:
+		PWX_LOCK_GUARD(list_t, this)
+		if (!isSorted && nextElement)
+			PWX_LOCK(nextElement)
+		if (isSorted && prevElement)
+			PWX_LOCK(prevElement)
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (nextElement)
+			if (!isSorted && nextElement)
 				PWX_UNLOCK(nextElement)
+			if (isSorted && prevElement)
+				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: Create a new element
+		// 3: All preparation methods check twice and use big locks to ensure data consistency!
+		if (privFindData(*src, &xCurr)) {
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (!isSorted && nextElement)
+				PWX_UNLOCK(nextElement)
+			if (isSorted && prevElement)
+				PWX_UNLOCK(prevElement)
+			return size();
+		} else if (isSorted) {
+			if (xCurr != prevElement) {
+				if (prevElement)
+					PWX_UNLOCK(prevElement)
+				prevElement = xCurr;
+				if (prevElement)
+					PWX_LOCK(prevElement)
+			}
+		} else if (nextElement) {
+			PWX_UNLOCK(nextElement)
+			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
+						? nextElement->getPrev()
+						: nextElement->prev.load(std::memory_order_relaxed);
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
+
+		// 4: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
-			if (nextElement)
-				PWX_UNLOCK(nextElement)
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 4: Do the real insert
-		elem_t* prev = isSorted
-					 ? curr
-					 : nextElement
-						? this->beThreadSafe.load(std::memory_order_relaxed)
-							? nextElement->getPrev()
-							: nextElement->prev.load(std::memory_order_relaxed)
-						: tail;
-		if (nextElement)
-			PWX_UNLOCK(nextElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
+		// 5: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before an element
 	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
-		PWX_LOCK_GUARD(list_t, this)
-		if (privFindData(*src))
+		elem_t* xCurr = curr;
+
+		if (privFindData(*src, &xCurr))
 			return size();
 
 		// 1: Prepare the next element
+		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
 		elem_t* nextElement = !isSorted && next ? next : nullptr;
-		if (nextElement)
-			PWX_LOCK(nextElement)
 
 		// 2: Check source:
+		PWX_LOCK_GUARD(list_t, this)
+		if (!isSorted && nextElement)
+			PWX_LOCK(nextElement)
+		if (isSorted && prevElement)
+			PWX_LOCK(prevElement)
 		PWX_LOCK(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (nextElement)
+			if (!isSorted && nextElement)
 				PWX_UNLOCK(nextElement)
+			if (isSorted && prevElement)
+				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: Create a new element
+		// 3: All preparation methods check twice and use big locks to ensure data consistency!
+		if (privFindData(*src, &xCurr)) {
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			if (!isSorted && nextElement)
+				PWX_UNLOCK(nextElement)
+			if (isSorted && prevElement)
+				PWX_UNLOCK(prevElement)
+			return size();
+		} else if (isSorted) {
+			if (xCurr != prevElement) {
+				if (prevElement)
+					PWX_UNLOCK(prevElement)
+				prevElement = xCurr;
+				if (prevElement)
+					PWX_LOCK(prevElement)
+			}
+		} else if (nextElement) {
+			PWX_UNLOCK(nextElement)
+			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
+						? nextElement->getPrev()
+						: nextElement->prev.load(std::memory_order_relaxed);
+			if (prevElement)
+				PWX_LOCK(prevElement)
+		}
+
+		// 4: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
-			if (nextElement)
-				PWX_UNLOCK(nextElement)
+			if (prevElement)
+				PWX_UNLOCK(prevElement)
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe.load(std::memory_order_relaxed))
 			newElement->disable_thread_safety();
 
-		// 4: Do the real insert
-		elem_t* prev = isSorted
-					 ? curr
-					 : nextElement
-						? this->beThreadSafe.load(std::memory_order_relaxed)
-							? nextElement->getPrev()
-							: nextElement->prev.load(std::memory_order_relaxed)
-						: tail;
-		if (nextElement)
-			PWX_UNLOCK(nextElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
+		// 5: Do the real insert
+		if (prevElement)
+			PWX_UNLOCK(prevElement)
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
 	}
 
 }; // class TSet
