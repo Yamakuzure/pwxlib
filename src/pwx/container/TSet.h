@@ -410,7 +410,67 @@ protected:
 	*/
 	using base_t::destroy;
 	using base_t::protFind;
-	using base_t::protInsert;
+
+
+	/** @brief simple method to insert an element into the list
+	  *
+	  * If either @a insPrev or @a insElem is marked as destroyed,
+	  * a pwx::CException is thrown. Such a condition implies that
+	  * there is something seriously wrong.
+	  *
+	  * This is the protInsert() method from TDoubleList without locks. All
+	  * private insertion methods in TSet have to lock the set anyway.
+	  *
+	  * @param[in] insPrev Element after which the new element is to be inserted
+	  * @param[in] insElem The element to insert.
+	  * @return The number of elements in the list after the insertion
+	**/
+	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem)
+	{
+		/* There are four possibilities:
+		 * 1: The list is empty
+		 *    head, tail and curr have to be set to the new
+		 *    element, no full renumbering is needed then.
+		 * 2: insPrev is nullptr
+		 *    head has to be changed to be the new element
+		 * 3: insPrev is tail
+		 *    tail has to be set to the new element, no full
+		 *    renumbering is needed then.
+		 * 4: Otherwise insPrev->insertNext() can do the insertion
+		*/
+		uint32_t locCnt = eCount.load(std::memory_order_acquire);
+
+		curr = insElem;
+
+		if (locCnt && insPrev && (tail != insPrev)) {
+			// Case 4: A normal insert
+			doRenumber.store(true, std::memory_order_release);
+			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
+		} else {
+			if (!locCnt) {
+				// Case 1: The list is empty
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
+				head = tail = insElem;
+			} else if (nullptr == insPrev) {
+				// Case 2: A new head is to be set
+				PWX_TRY_PWX_FURTHER(head->insertPrev(insElem))
+				head = insElem;
+				doRenumber.store(true, std::memory_order_release);
+			} else if (insPrev == tail) {
+				// Case 3: A new tail is to be set
+				insElem->eNr.store(
+					tail->eNr.load(std::memory_order_acquire) + 1,
+					std::memory_order_release);
+				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
+				tail = insElem;
+			}
+		}
+
+		// Raise eCount and set renumbering mode
+		eCount.fetch_add(1, std::memory_order_release);
+
+		return eCount.load(std::memory_order_acquire);
+	}
 
 
 	/* ===============================================
@@ -419,6 +479,7 @@ protected:
 	*/
 
 	using base_t::eCount;
+	using base_t::doRenumber;
 	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
@@ -449,9 +510,8 @@ private:
 	**/
 	const elem_t* privFindData (const data_t &data) const noexcept
 	{
-		// Note: As the consistency of the content of a set is more important
-		//       than anything, a big lock is a must-have here!
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		// Note: Methods that call privFindData() to prepare an insertion
+		//       should lock the whole set first!
 		uint32_t localCount = eCount.load(std::memory_order_acquire);
 
 		/* Note:
