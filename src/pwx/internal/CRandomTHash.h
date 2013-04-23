@@ -77,7 +77,7 @@ Statistics with 10M Hashes (65535 for (uint16_t)) after the following changes:
    ------------+------------+----------+------------+----------+--------------------------------------
   Result: The floating point hashing has improved greatly. But the random result for float suggests,
           that a higher integer range is needed. And the hash result for double and long double is
-          far from being really good. Maybe it would be better t0 mix the floating point bytes directly
+          far from being really good. Maybe it would be better to mix the floating point bytes directly
           into an uint32_t hash.
           And for (u)int16_t a specialized hash loop is needed that simply goes from lowest to max.
 
@@ -126,9 +126,9 @@ hash algorithm, and a better production of random values:
    ------------+-------------+----------+-------------+----------+--------------------------------------
    Type        | Unique rand |    Quota | Unique Hash |    Quota | Result
    ------------+-------------+----------+-------------+----------+--------------------------------------
-   Long Double |  9988379 |  98.88 % |  9947530 |  99.59% | Random is great, Hash is great!
-   Double      |  9988475 |  98.88 % |  9952956 |  99.64 % | Random is great, Hash is great!
-   Float       |  9067506 |  90.68 % |  9011867 |  99.39 % | Random is very good, Hash is great!
+   Long Double |   9,988,379 |  98.88 % |   9,947,530 |  99.59 % | Random is great, Hash is great!
+   Double      |   9,988,475 |  98.88 % |   9,952,956 |  99.64 % | Random is great, Hash is great!
+   Float       |   9,067,506 |  90.68 % |   9,011,867 |  99.39 % | Random is very good, Hash is great!
    ------------+-------------+----------+-------------+----------+--------------------------------------
   Result: I think we can leave it now as is.
 

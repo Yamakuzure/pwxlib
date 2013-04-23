@@ -50,7 +50,6 @@ uint32_t private_hash_str(const char* key, size_t keyLen) noexcept
 
 
 /// @internal generate a hash out of an uint8_t buffer. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-/// IMPORTANT: max keyLen is 32!
 uint32_t private_hash_buf(const uint8_t* key, size_t keyLen) noexcept
 {
 	uint32_t xHash = 0, part = 0;
