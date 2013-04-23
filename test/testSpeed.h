@@ -120,6 +120,7 @@ int32_t testSpeedST (sEnv &env)
 	cout.flush();
 
 	list_t intCont; // The list
+	intCont.disable_thread_safety(); // This is strictly single threaded.
 
 	// To make the testing of the sets easier, we use a counting loop, so no doublets
 	// are tried to be pushed onto a set.
@@ -198,6 +199,7 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Now the threaded part:
 	list_t intCont; // The list
+	intCont.enable_thread_safety(); // Although superfluous (enabled by default), test the call.
 
 	// To make the testing of the sets easier, we use a counting loop, so no doublets
 	// are tried to be pushed onto a set.

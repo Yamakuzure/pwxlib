@@ -38,6 +38,7 @@ int32_t testStackQueue (sEnv &env)
 	cout << "----------------------------" << endl;
 
 	list_t intCont (do_not_destroy); // The list
+	intCont.disable_thread_safety(); // This is strictly single threaded.
 	int32_t numbers[5] = { 1, 2, 3, 4, 5 }; // The integers to store
 
 	/***************************************************************************

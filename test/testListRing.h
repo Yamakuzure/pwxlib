@@ -43,6 +43,7 @@ int32_t testListRing (sEnv &env)
 	cout << "----------------------------" << endl;
 
 	list_t intCont (do_not_destroy); // The list
+	intCont.disable_thread_safety(); // This is strictly single threaded.
 
 	/** A) Create a container and add 5 integers **/
 	cout << adjRight (4, 0) << ++env.testCount << " A) Add five integers : ";
