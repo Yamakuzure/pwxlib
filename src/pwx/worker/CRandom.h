@@ -39,13 +39,6 @@ namespace pwx {
   * This class produces a static instance called pwx::RNG, meaning
   * "Random Name/Noise/Number Generator".
   *
-  * === FIXME : ===
-  * original: "If PWX_THREADS is defined, all operations will be thread save."
-  * -> This must be changed. No automatic locking all the time, but run time
-  *     variable handling of thread safety.
-  *    - How ? Maybe telling RNG with a function whether it is used concurrently or not?
-  * === : EMXIF ===
-  *
   * The following sets of functions are available:
   *
   * - random()
@@ -213,7 +206,6 @@ private:
 	PWX_PRIVATE_INLINE double  noiseD   (double x, double y, double z) const noexcept;
 	PWX_PRIVATE_INLINE double  noiseD   (double x, double y, double z, double w) const noexcept;
 	PWX_PRIVATE_INLINE int32_t doubToInt(double val) const noexcept;
-
 
 	/* ===============================================
 	 * === Private operators					   ===

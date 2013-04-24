@@ -782,6 +782,7 @@ CRandom::CRandom() noexcept
 				spxOffs[i][j] = 0;
 		}
 	}
+  DEBUG_LOG("RNG ctor", "RNG initialized with seed %d", seed)
 }
 
 
@@ -938,7 +939,7 @@ uint32_t CRandom::hash (std::string &key) const noexcept
 **/
 double CRandom::noise (int32_t x) const noexcept
 {
-	return (1.0 - (static_cast<double> (hash (x) & constants::fullMaxInt) / constants::noiseMod));
+	return (1.0 - (static_cast<double>(hash(x)) / constants::noiseMod));
 }
 
 
@@ -953,8 +954,8 @@ double CRandom::noise (int32_t x) const noexcept
 double CRandom::noise (int32_t x, int32_t y) const noexcept
 {
 	return (1.0 - (static_cast<double> (
-					(hash (x) & constants::halfMaxInt)
-					+	(hash (y) & constants::halfMaxInt)
+					  (hash(x) & constants::fullMaxInt)
+					+ (hash(y) & constants::fullMaxInt)
 				   ) / constants::noiseMod));
 }
 
@@ -971,9 +972,9 @@ double CRandom::noise (int32_t x, int32_t y) const noexcept
 double CRandom::noise (int32_t x, int32_t y, int32_t z) const noexcept
 {
 	return (1.0 - (static_cast<double> (
-						(hash (x) & constants::halfMaxInt)
-					+	(hash (y) & constants::fourthMaxInt)
-					+	(hash (z) & constants::fourthMaxInt)
+					  (hash(x) & constants::fullMaxInt)
+					+ (hash(y) & constants::halfMaxInt)
+					+ (hash(z) & constants::halfMaxInt)
 				   ) / constants::noiseMod));
 }
 
@@ -991,10 +992,10 @@ double CRandom::noise (int32_t x, int32_t y, int32_t z) const noexcept
 double CRandom::noise (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept
 {
 	return (1.0 - (static_cast<double> (
-						(hash (x) & constants::fourthMaxInt)
-					+	(hash (y) & constants::fourthMaxInt)
-					+	(hash (z) & constants::fourthMaxInt)
-					+	(hash (w) & constants::fourthMaxInt)
+					  (hash(x) & constants::halfMaxInt)
+					+ (hash(y) & constants::halfMaxInt)
+					+ (hash(z) & constants::halfMaxInt)
+					+ (hash(w) & constants::halfMaxInt)
 				   ) / constants::noiseMod));
 }
 
