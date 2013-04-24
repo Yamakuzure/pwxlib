@@ -305,8 +305,8 @@ struct PWX_API TDoubleElement : public VElement
 				}
 
 				// Insert the new element
-				new_next->next.store(xOldNext, std::memory_order_release);
-				new_next->prev.store(this, std::memory_order_release);
+				new_next->setNext(xOldNext);
+				new_next->setPrev(this);
 				new_next->isRemoved.store(false, std::memory_order_release);
 
 				// Store new next and prev neighbor
@@ -391,8 +391,8 @@ struct PWX_API TDoubleElement : public VElement
 				}
 
 				// Set the neighborhood of the new prev
-				new_prev->next.store(this, std::memory_order_relaxed);
-				new_prev->prev.store(xOldPrev, std::memory_order_relaxed);
+				new_prev->setNext(this);
+				new_prev->setPrev(xOldPrev);
 				new_prev->isRemoved.store(false, std::memory_order_release);
 
 				// Store new next and prev neighbor.

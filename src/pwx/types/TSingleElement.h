@@ -302,8 +302,7 @@ struct PWX_API TSingleElement : public VElement
 							"The element to insert has been destroyed while waiting for the lock!")
 
 				// Insert the new element
-				new_next->next.store(next.load(std::memory_order_acquire),
-									std::memory_order_release);
+				new_next->setNext(this->getNext());
 				new_next->isRemoved.store(false, std::memory_order_release);
 
 				// Store new next neighbor
