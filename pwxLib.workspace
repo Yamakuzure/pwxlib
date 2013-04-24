@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="pwxLibNG">
-		<Project filename="cb/pwxLib_JBOH.cbp" />
 		<Project filename="cb/libpwx.cbp" />
+		<Project filename="cb/pwxLib_JBOH.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

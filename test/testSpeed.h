@@ -144,15 +144,24 @@ int32_t testSpeedST (sEnv &env)
 	uint32_t currNr = 1;
 	auto*  curr   = intCont[0]; // Is head and number 0
 	auto*  next   = curr;
+	auto   cVal   = **curr;
+	auto   nVal   = **next;
+	auto   pcVal  = cVal; // prev from curr
+	auto   nnVal  = nVal; // next from next
 
 	while (isNextOK && isOrderOK && (currNr < contSize) ) {
 		next = intCont[currNr];
 		if (next != curr->getNext())
 			isNextOK = false;
-		else if (isSameType(list_t, set_t) && (**curr >= **next))
+		else if (isSameType(list_t, set_t) && (**curr >= **next)) {
 			isOrderOK = false;
-		else {
+			cVal = curr ? **curr : 0;
+			nVal = next ? **next : 0;
+			nnVal = (next && next->getNext()) ? **(next->getNext()) : 0;
+		} else {
 			++currNr;
+			if (isSameType(list_t, set_t))
+				pcVal = curr ? **curr : 0;
 			curr = next;
 		}
 	} // End of consistency checking
@@ -180,7 +189,7 @@ int32_t testSpeedST (sEnv &env)
 		result = EXIT_FAILURE;
 	} else if (!isOrderOK) {
 		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1);
-		cout << ": " << **curr << " >= " << **next << "!" << endl;
+		cout << ": (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else
@@ -290,15 +299,24 @@ int32_t testSpeedMT (sEnv &env)
 	uint32_t currNr = 1;
 	auto*  curr   = intCont[0]; // Is head and number 0
 	auto*  next   = curr;
+	auto   cVal   = **curr;
+	auto   nVal   = **next;
+	auto   pcVal  = cVal; // prev from curr
+	auto   nnVal  = nVal; // next from next
 
 	while (isNextOK && isOrderOK && (currNr < contSize) ) {
 		next = intCont[currNr];
 		if (next != curr->getNext())
 			isNextOK = false;
-		else if (isSameType(list_t, set_t) && (**curr >= **next))
+		else if (isSameType(list_t, set_t) && (**curr >= **next)) {
 			isOrderOK = false;
-		else {
+			cVal  = curr ? **curr : 0;
+			nVal  = next ? **next : 0;
+			nnVal = (next && next->getNext()) ? **(next->getNext()) : 0;
+		} else {
 			++currNr;
+			if (isSameType(list_t, set_t))
+				pcVal = curr ? **curr : 0;
 			curr = next;
 		}
 	} // End of consistency checking
@@ -348,7 +366,7 @@ int32_t testSpeedMT (sEnv &env)
 		result = EXIT_FAILURE;
 	} else if (!isOrderOK) {
 		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1);
-		cout << ": " << **curr << " >= " << **next << "!" << endl;
+		cout << ": (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else

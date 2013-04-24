@@ -6,7 +6,7 @@
 #include "testRNG.h"
 using pwx::RNG;
 
-const uint32_t hashMaxElements = maxElements;
+const uint32_t rngMaxElements = maxElements;
 const int16_t maxInt16  = std::numeric_limits<int16_t>::max();
 const int16_t minInt16  = std::numeric_limits<int16_t>::min();
 const int32_t maxUInt32 = std::numeric_limits<uint32_t>::max();
@@ -18,7 +18,7 @@ void testRNG_hash(sEnv &env)
 {
 	static const T maxTval = std::numeric_limits<T>::max();
 	static const T minTval = std::numeric_limits<T>::lowest();
-	uint32_t numOfElem = env.doSpeed ? hashMaxElements : 10;
+	uint32_t numOfElem = env.doSpeed ? rngMaxElements : 10;
 	uint32_t curHash   = 0;
 	uint32_t minHash   = maxUInt32;
 	uint32_t maxHash   = 0;
@@ -57,7 +57,7 @@ void testRNG_hash(sEnv &env)
 void testRNG_hash_char(sEnv &env)
 {
 	char     buf[18];
-	uint32_t numOfElem = env.doSpeed ? hashMaxElements : 10;
+	uint32_t numOfElem = env.doSpeed ? rngMaxElements : 10;
 	uint32_t curHash   = 0;
 	uint32_t minHash   = maxUInt32;
 	uint32_t maxHash   = 0;
@@ -94,7 +94,7 @@ void testRNG_hash_str(sEnv &env)
 {
 	char        buf[18];
 	std::string str;
-	uint32_t    numOfElem = env.doSpeed ? hashMaxElements : 10;
+	uint32_t    numOfElem = env.doSpeed ? rngMaxElements : 10;
 	uint32_t    curHash   = 0;
 	uint32_t    minHash   = maxUInt32;
 	uint32_t    maxHash   = 0;
