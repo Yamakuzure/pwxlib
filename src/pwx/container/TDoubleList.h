@@ -637,9 +637,7 @@ private:
 
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-				      ? xCurr->getNext()
-				      : xCurr->next.load(std::memory_order_relaxed);
+				xCurr = xCurr->getNext();
 				PWX_LOCK(const_cast<list_t*>(this))
 				curr = xCurr;
 				PWX_UNLOCK(const_cast<list_t*>(this))
@@ -648,9 +646,7 @@ private:
 
 			// Or the previous
 			if (xIdx == (xNr - 1)) {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-				      ? xCurr->getPrev()
-				      : xCurr->prev.load(std::memory_order_relaxed);
+				xCurr = xCurr->getPrev();
 				PWX_LOCK(const_cast<list_t*>(this))
 				curr = xCurr;
 				PWX_UNLOCK(const_cast<list_t*>(this))
@@ -673,14 +669,10 @@ private:
 			bool upwards = true;
 			if (xIdx < xNr) {
 				upwards = false;
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-					  ? xCurr->getPrev()
-					  : xCurr->prev.load(std::memory_order_relaxed);
+				xCurr = xCurr->getPrev();
 				--xNr;
 			} else {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-					  ? xCurr->getNext()
-					  : xCurr->next.load(std::memory_order_relaxed);
+				xCurr = xCurr->getNext();
 				++xNr;
 			}
 
@@ -713,13 +705,9 @@ private:
 				} // End of consistency check
 				else {
 					if (upwards)
-						xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-							  ? xCurr->getNext()
-							  : xCurr->next.load(std::memory_order_relaxed);
+						xCurr = xCurr->getNext();
 					else
-						xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-							  ? xCurr->getPrev()
-							  : xCurr->prev.load(std::memory_order_relaxed);
+						xCurr = xCurr->getPrev();
 					xNr += upwards ? 1 : -1;
 				}
 
@@ -763,11 +751,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
-		elem_t* prev = nextElement
-					 ? this->beThreadSafe.load(std::memory_order_relaxed)
-						? nextElement->getPrev()
-						: nextElement->prev.load(std::memory_order_relaxed)
-					 : tail;
+		elem_t* prev = nextElement ? nextElement->getPrev() : tail;
 		if (nextElement)
 			PWX_UNLOCK(nextElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -793,11 +777,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
-		elem_t* prev = next
-					 ? this->beThreadSafe.load(std::memory_order_relaxed)
-						? next->getPrev()
-						: next->prev.load(std::memory_order_relaxed)
-					 : tail;
+		elem_t* prev = next ? next->getPrev() : tail;
 		if (next)
 			PWX_UNLOCK(next)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -843,11 +823,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
-		elem_t* prev = nextElement
-					 ? this->beThreadSafe.load(std::memory_order_relaxed)
-						? nextElement->getPrev()
-						: nextElement->prev.load(std::memory_order_relaxed)
-					 : tail;
+		elem_t* prev = nextElement ? nextElement->getPrev() : tail;
 		if (nextElement)
 			PWX_UNLOCK(nextElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -885,11 +861,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
-		elem_t* prev = next
-					 ? this->beThreadSafe.load(std::memory_order_relaxed)
-						? next->getPrev()
-						: next->prev.load(std::memory_order_relaxed)
-					 : tail;
+		elem_t* prev = next ? next->getPrev() : tail;
 		if (next)
 			PWX_UNLOCK(next)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -911,15 +883,11 @@ private:
 		*/
 		if (head == elem) {
 			// Case 1
-			head = this->beThreadSafe.load(std::memory_order_relaxed)
-				  ? head->getNext()
-				  : head->next.load(std::memory_order_relaxed);
+			head = head->getNext();
 			doRenumber.store(true, std::memory_order_relaxed);
 		} else if (tail == elem)
 			// Case 2:
-			tail = this->beThreadSafe.load(std::memory_order_relaxed)
-				  ? tail->getPrev()
-				  : tail->prev.load(std::memory_order_relaxed);
+			tail = tail->getPrev();
 		else
 			doRenumber.store(true, std::memory_order_relaxed);
 		elem->remove();
@@ -969,6 +937,7 @@ private:
 
 
 	/** @brief simple wrapper to prepare the removal of an element before data
+	  * If @a next data can not be found, nothing happens and nullptr is returned.
 	  * @return nullptr if @a next is held by the first element or the list is empty.
 	**/
 	virtual elem_t* privRemoveBeforeData(data_t* next) noexcept
@@ -977,13 +946,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* xNext = next ? find (next) : nullptr;
-		elem_t* toRemove = xNext
-						 ? this->beThreadSafe.load(std::memory_order_relaxed)
-							? xNext->getPrev()
-							: xNext->prev.load(std::memory_order_relaxed)
-						 : next
-							? nullptr
-							: tail;
+		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : head;
 
 		if (toRemove)
 			privRemove (toRemove);
@@ -1000,11 +963,7 @@ private:
 		// Need a big lock, only one removal at a time!
 		PWX_LOCK_GUARD(list_t, this)
 
-		elem_t* toRemove = next
-						 ? this->beThreadSafe.load(std::memory_order_relaxed)
-							? next->getPrev()
-							: next->prev.load(std::memory_order_relaxed)
-						 : tail;
+		elem_t* toRemove = next ? next->getPrev() : tail;
 		if (toRemove)
 			privRemove (toRemove);
 

@@ -1118,9 +1118,7 @@ private:
 
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-				      ? xCurr->getNext()
-				      : xCurr->next.load(std::memory_order_relaxed);
+				xCurr = xCurr->getNext();
 				PWX_LOCK(const_cast<list_t*>(this))
 				curr = xCurr;
 				PWX_UNLOCK(const_cast<list_t*>(this))
@@ -1141,17 +1139,13 @@ private:
 
 			// Ok, let's go. But only start from head if we currently are beyond.
 			if (xIdx < xNr) {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-					  ? head->getNext()
-					  : head->next.load(std::memory_order_relaxed);
+				xCurr = head->getNext();
 				xNr  = 1;
 			}
 
 			// Otherwise the next of xCurr is already checked, so skip it
 			else {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-					  ? xCurr->getNext()
-					  : xCurr->next.load(std::memory_order_relaxed);
+				xCurr = xCurr->getNext();
 				++xNr;
 			}
 
@@ -1175,9 +1169,7 @@ private:
 					PWX_UNLOCK(const_cast<list_t*>(this))
 				} // End of consistency check
 				else {
-					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-						  ? xCurr->getNext()
-						  : xCurr->next.load(std::memory_order_relaxed);
+					xCurr = xCurr->getNext();
 					++xNr;
 				}
 
@@ -1353,9 +1345,7 @@ private:
 		*/
 		if (head == elem) {
 			// Case 1
-			head = this->beThreadSafe.load(std::memory_order_relaxed)
-				  ? head->getNext()
-				  : head->next.load(std::memory_order_relaxed);
+			head = head->getNext();
 			elem->remove();
 			doRenumber.store(true, std::memory_order_release);
 		} else {
@@ -1373,6 +1363,7 @@ private:
 
 
 	/** @brief remove the element after the specified data
+	  * If @a prev data can not be found, nothing happens and nullptr is returned.
 	  * @return nullptr if the element holding @a prev is the last element or the list is empty.
 	**/
 	virtual elem_t* privRemoveAfterData(data_t* prev) noexcept
@@ -1381,13 +1372,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* xPrev    = prev ? const_cast<elem_t*>(protFind (prev)) : nullptr;
-		elem_t* toRemove = xPrev
-						 ? this->beThreadSafe.load(std::memory_order_relaxed)
-							? xPrev->getNext()
-							: xPrev->next.load(std::memory_order_relaxed)
-						 : prev
-							? nullptr
-							: head;
+		elem_t* toRemove = xPrev ? xPrev->getNext() : prev ? nullptr : head;
 
 		if (toRemove)
 			privRemove (xPrev, toRemove);
@@ -1404,11 +1389,7 @@ private:
 		// Need a big lock, only one removal at a time!
 		PWX_LOCK_GUARD(list_t, this)
 
-		elem_t* toRemove = prev
-						 ? this->beThreadSafe.load(std::memory_order_relaxed)
-							? prev->getNext()
-							: prev->next.load(std::memory_order_relaxed)
-						 : head;
+		elem_t* toRemove = prev ? prev->getNext() : head;
 		if (toRemove)
 			privRemove (prev, toRemove);
 

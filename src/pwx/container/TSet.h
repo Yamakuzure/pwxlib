@@ -240,9 +240,7 @@ public:
 						if (xCurr == tail)
 							isDone = true;
 						else
-							xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-								  ? xCurr->next.load(std::memory_order_acquire)
-								  : xCurr->next.load(std::memory_order_relaxed);
+							xCurr = xCurr->getNext();
 					} else
 						result = false;
 				}
@@ -521,6 +519,7 @@ private:
 		//       search again after start is adjusted and a lock is acquired.
 		uint32_t localCount = eCount.load(std::memory_order_acquire);
 		elem_t*  xCurr      = (start && *start) ? *start : curr ? curr : head;
+		elem_t*  xOld       = nullptr; // To fix thread concurrency
 
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
@@ -540,11 +539,8 @@ private:
 				return xCurr;
 
 			// Quick exit if head is wanted:
-			if (**head == data) {
-				if (start)
-					*start = head;
+			if (**head == data)
 				return head;
-			}
 			// End of having at least one element
 		} else
 			// return immediately if there are no elements
@@ -560,11 +556,8 @@ private:
 			}
 
 			// Quick exit if tail is wanted:
-			if (**tail == data) {
-				if (start)
-					*start = tail;
+			if (**tail == data)
 				return tail;
-			}
 		} // End of having at least two elements
 
 		// The complete search is useless unless there are at least three elements:
@@ -582,31 +575,36 @@ private:
 				*/
 
 				// Step 1: Move up until curr is larger
-				while (xCurr && (data > **xCurr)) {
-					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-						  ? xCurr->getNext()
-						  : xCurr->next.load(std::memory_order_relaxed);
+				while (xCurr && (data > **xCurr) && (tail != xCurr)) {
+					xOld  = xCurr;
+					xCurr = xCurr->getNext();
+					if (nullptr == xCurr)
+						// Should not happen unless someone does something stupid
+						// with different threads. (like torture does ;))
+						xCurr = xOld ? xOld : head;
 				}
 
 				// Step 2: Move down until curr is smaller
-				while (xCurr && (**xCurr > data)) {
-					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-						  ? xCurr->getPrev()
-						  : xCurr->prev.load(std::memory_order_relaxed);
+				if (nullptr == xCurr) xCurr = tail; // Might happen due to thread concurrency
+
+				while (xCurr && (**xCurr > data) && (head != xCurr)) {
+					xOld  = xCurr;
+					xCurr = xCurr->getPrev();
+					if (nullptr == xCurr)
+						xCurr = xOld ? xOld : tail; // dito
 				}
 			} else {
-				xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-					  ? head->getNext()
-					  : head->next.load(std::memory_order_relaxed);
+				xCurr = head->getNext();
 
 				// Note: head and tail are already checked.
-				while ((xCurr != tail) && (**xCurr != data)) {
-					xCurr = this->beThreadSafe.load(std::memory_order_relaxed)
-						  ? xCurr->getNext()
-						  : xCurr->next.load(std::memory_order_relaxed);
+				while (xCurr && (xCurr != tail) && (**xCurr != data)) {
+					xOld  = xCurr;
+					xCurr = xCurr->getNext();
+					if (nullptr == xCurr)
+						xCurr = xOld ? xOld : head; // dito
 				}
 			}
-			/* Due to this order curr is now either pointing to an element
+			/* Due to this order xCurr is now either pointing to an element
 			 * holding data, or the next smaller element. The latter detail
 			 * is important for the sorted insertion. If data is not found,
 			 * all inserting methods can now insert a new element holding
@@ -895,9 +893,7 @@ private:
 			}
 		} else if (nextElement) {
 			PWX_UNLOCK(nextElement)
-			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
-						? nextElement->getPrev()
-						: nextElement->prev.load(std::memory_order_relaxed);
+			prevElement = nextElement->getPrev();
 			if (prevElement)
 				PWX_LOCK(prevElement)
 		}
@@ -956,9 +952,7 @@ private:
 			}
 		} else if (nextElement) {
 			PWX_UNLOCK(nextElement)
-			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
-						? nextElement->getPrev()
-						: nextElement->prev.load(std::memory_order_relaxed);
+			prevElement = nextElement->getPrev();
 			if (prevElement)
 				PWX_LOCK(prevElement)
 		}
@@ -1034,9 +1028,7 @@ private:
 			}
 		} else if (nextElement) {
 			PWX_UNLOCK(nextElement)
-			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
-						? nextElement->getPrev()
-						: nextElement->prev.load(std::memory_order_relaxed);
+			prevElement = nextElement->getPrev();
 			if (prevElement)
 				PWX_LOCK(prevElement)
 		}
@@ -1109,9 +1101,7 @@ private:
 			}
 		} else if (nextElement) {
 			PWX_UNLOCK(nextElement)
-			prevElement = this->beThreadSafe.load(std::memory_order_relaxed)
-						? nextElement->getPrev()
-						: nextElement->prev.load(std::memory_order_relaxed);
+			prevElement = nextElement->getPrev();
 			if (prevElement)
 				PWX_LOCK(prevElement)
 		}
