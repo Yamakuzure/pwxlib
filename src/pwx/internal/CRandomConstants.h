@@ -49,7 +49,7 @@ const int32_t fullMinInt    = std::numeric_limits<int32_t>::lowest();
 const int32_t halfMaxInt    = fullMaxInt >> 1;
 const int32_t fourthMaxInt  = halfMaxInt >> 1;
 const int64_t fullMaxLong   = std::numeric_limits<int64_t>::max();
-const double  noiseMod      = static_cast<double>(halfMaxInt);
+const double  noiseMod      = static_cast<double>(fullMaxInt);
 
 
 /** Simplex manipulation grid **/
