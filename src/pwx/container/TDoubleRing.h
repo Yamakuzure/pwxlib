@@ -787,34 +787,34 @@ private:
 	virtual uint32_t privConnectEnds() noexcept
 	{
 		// Return early if nothing is to be done:
-		if (!head || !tail || ((head == tail->getNext()) && (tail == head->getPrev())) )
+		if (!head() || !tail() || ((head() == tail()->getNext()) && (tail() == head()->getPrev())) )
 			return eCount.load(std::memory_order_acquire);
 
 		if (this->beThreadSafe.load(std::memory_order_relaxed)) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
 			PWX_LOCK(this)
-			while (tail && tail->destroyed()) {
+			while (tail() && tail()->destroyed()) {
 				PWX_UNLOCK(this)
 				PWX_LOCK(this)
 			}
 			// Now tail is either nullptr (ring is empty) or valid and locked.
-			if (tail && (head != tail->getNext()))
-				tail->setNext(head);
+			if (tail() && (head() != tail()->getNext()))
+				tail()->setNext(head());
 
-			// The same has to be done with head->prev
-			while (head && head->destroyed()) {
+			// The same has to be done with head()->prev
+			while (head() && head()->destroyed()) {
 				PWX_UNLOCK(this)
 				PWX_LOCK(this)
 			}
 			// Now head is either nullptr (ring is empty) or valid and locked.
-			if (head && (tail != head->getPrev()))
-				head->setPrev(tail);
+			if (head() && (tail() != head()->getPrev()))
+				head()->setPrev(tail());
 			PWX_UNLOCK(this)
 		} // End of thread safe connection
 		else {
-			head->prev.store(tail, std::memory_order_relaxed);
-			tail->next.store(head, std::memory_order_relaxed);
+			head()->prev.store(tail(), std::memory_order_relaxed);
+			tail()->next.store(head(), std::memory_order_relaxed);
 		}
 
 		return eCount.load(std::memory_order_acquire);

@@ -231,13 +231,13 @@ public:
 		  && (this != &src)) {
 			if (src.eCount.load(std::memory_order_acquire)) {
 				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
-				elem_t* xCurr  = head;
+				elem_t* xCurr  = head();
 				bool    isDone = false;
 
 				// A simple loop will do, because we can use privFindData directly.
 				while (result && xCurr && !isDone) {
 					if (src.privFindData(**xCurr, nullptr)) {
-						if (xCurr == tail)
+						if (xCurr == tail())
 							isDone = true;
 						else
 							xCurr = xCurr->getNext();
@@ -438,9 +438,9 @@ protected:
 		*/
 		uint32_t locCnt = eCount.load(std::memory_order_acquire);
 
-		curr = insElem;
+		curr(insElem);
 
-		if (locCnt && insPrev && (tail != insPrev)) {
+		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
 			doRenumber.store(true, std::memory_order_release);
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
@@ -448,19 +448,20 @@ protected:
 			if (!locCnt) {
 				// Case 1: The list is empty
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
-				head = tail = insElem;
+				head(insElem);
+				tail(insElem);
 			} else if (nullptr == insPrev) {
 				// Case 2: A new head is to be set
-				PWX_TRY_PWX_FURTHER(head->insertPrev(insElem))
-				head = insElem;
+				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem))
+				head(insElem);
 				doRenumber.store(true, std::memory_order_release);
-			} else if (insPrev == tail) {
+			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail->eNr.load(std::memory_order_acquire) + 1,
+					tail()->eNr.load(std::memory_order_acquire) + 1,
 					std::memory_order_release);
-				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
-				tail = insElem;
+				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
+				tail(insElem);
 			}
 		}
 
@@ -518,7 +519,7 @@ private:
 		// Note: Methods that call privFindData() to prepare an insertion should
 		//       search again after start is adjusted and a lock is acquired.
 		uint32_t localCount = eCount.load(std::memory_order_acquire);
-		elem_t*  xCurr      = (start && *start) ? *start : curr ? curr : head;
+		elem_t*  xCurr      = (start && *start) ? *start : curr() ? curr() : head();
 		elem_t*  xOld       = nullptr; // To fix thread concurrency
 
 		/* Note:
@@ -528,7 +529,7 @@ private:
 		*/
 		if (localCount) {
 			// Quick exit if sorted set assumption 1 is correct:
-			if (isSorted && (**head > data)) {
+			if (isSorted && (**head() > data)) {
 				if (start)
 					*start = nullptr;
 				return nullptr;
@@ -539,8 +540,8 @@ private:
 				return xCurr;
 
 			// Quick exit if head is wanted:
-			if (**head == data)
-				return head;
+			if (**head() == data)
+				return head();
 			// End of having at least one element
 		} else
 			// return immediately if there are no elements
@@ -549,15 +550,15 @@ private:
 		// Checking tail does only make sense if we have at least 2 element
 		if (localCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
-			if (isSorted && (data > **tail)) {
+			if (isSorted && (data > **tail())) {
 				if (start)
-					*start = tail;
+					*start = tail();
 				return nullptr;
 			}
 
 			// Quick exit if tail is wanted:
-			if (**tail == data)
-				return tail;
+			if (**tail() == data)
+				return tail();
 		} // End of having at least two elements
 
 		// The complete search is useless unless there are at least three elements:
@@ -573,35 +574,44 @@ private:
 				 * about this is the absence of any need to check curr against
 				 * head or tail.
 				*/
-
 				// Step 1: Move up until curr is larger
-				while (xCurr && (data > **xCurr) && (tail != xCurr)) {
+				while (xCurr && (data > **xCurr) && (tail() != xCurr)) {
 					xOld  = xCurr;
 					xCurr = xCurr->getNext();
 					if (nullptr == xCurr)
 						// Should not happen unless someone does something stupid
 						// with different threads. (like torture does ;))
-						xCurr = xOld ? xOld : head;
+						xCurr = xOld ? xOld : head();
 				}
 
 				// Step 2: Move down until curr is smaller
-				if (nullptr == xCurr) xCurr = tail; // Might happen due to thread concurrency
+				if (nullptr == xCurr) xCurr = tail(); // Might happen due to thread concurrency
 
-				while (xCurr && (**xCurr > data) && (head != xCurr)) {
+				while (xCurr && (**xCurr > data) && (head() != xCurr)) {
 					xOld  = xCurr;
 					xCurr = xCurr->getPrev();
 					if (nullptr == xCurr)
-						xCurr = xOld ? xOld : tail; // dito
+						xCurr = xOld ? xOld : tail(); // dito
+				}
+
+				// Step 3: If there are massive removes/insertions the result might be wrong.
+				elem_t* xNext = xCurr ? xCurr->getNext() : nullptr;
+				elem_t* xPrev = xCurr ? xCurr->getPrev() : nullptr;
+				if (xCurr && ((xNext && (data > **xNext)) || (xPrev && (**xPrev > data)))) {
+					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+					if (start)
+						*start = xCurr;
+					return privFindData(data, start);
 				}
 			} else {
-				xCurr = head->getNext();
+				xCurr = head()->getNext();
 
 				// Note: head and tail are already checked.
-				while (xCurr && (xCurr != tail) && (**xCurr != data)) {
+				while (xCurr && (xCurr != tail() ) && (**xCurr != data)) {
 					xOld  = xCurr;
 					xCurr = xCurr->getNext();
 					if (nullptr == xCurr)
-						xCurr = xOld ? xOld : head; // dito
+						xCurr = xOld ? xOld : head(); // dito
 				}
 			}
 			/* Due to this order xCurr is now either pointing to an element
@@ -627,7 +637,7 @@ private:
 	/// @brief preparation method to insert data behind data
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*data, &xCurr))
 			return size();
@@ -680,7 +690,7 @@ private:
 	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*data, &xCurr))
 			return size();
@@ -727,7 +737,7 @@ private:
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*src, &xCurr))
 			return size();
@@ -792,7 +802,7 @@ private:
 	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*src, &xCurr))
 			return size();
@@ -855,7 +865,7 @@ private:
 	/// @brief preparation method to insert data before data
 	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*data, &xCurr))
 			return size();
@@ -912,14 +922,14 @@ private:
 		// 4: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
 	}
 
 
 	/// @brief preparation method to insert data before an element
 	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*data, &xCurr))
 			return size();
@@ -971,14 +981,14 @@ private:
 		// 4: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before data
 	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*src, &xCurr))
 			return size();
@@ -1048,14 +1058,14 @@ private:
 		// 5: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy before an element
 	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
-		elem_t* xCurr = curr;
+		elem_t* xCurr = curr();
 
 		if (privFindData(*src, &xCurr))
 			return size();
@@ -1121,7 +1131,7 @@ private:
 		// 5: Do the real insert
 		if (prevElement)
 			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail, newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
 	}
 
 }; // class TSet

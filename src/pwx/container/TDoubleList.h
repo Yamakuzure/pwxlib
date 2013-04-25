@@ -130,10 +130,10 @@ public:
 	virtual void clear() noexcept
 	{
 		elem_t* toDelete = nullptr;
-		while (tail) {
+		while (tail()) {
 			PWX_LOCK(this)
-			if (tail) {
-				toDelete = tail;
+			if (tail()) {
+				toDelete = tail();
 				privRemove(toDelete);
 
 				// Now that the element is removed, we do not
@@ -352,7 +352,7 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		return privRemoveElem(tail);
+		return privRemoveElem(tail());
 	}
 
 
@@ -506,9 +506,9 @@ protected:
 
 		uint32_t locCnt = eCount.load(std::memory_order_acquire);
 
-		curr = insElem;
+		curr(insElem);
 
-		if (locCnt && insPrev && (tail != insPrev)) {
+		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
 			doRenumber.store(true, std::memory_order_release);
 			PWX_UNLOCK(this)
@@ -519,19 +519,20 @@ protected:
 			if (!locCnt) {
 				// Case 1: The list is empty
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
-				head = tail = insElem;
+				head(insElem);
+				tail(insElem);
 			} else if (nullptr == insPrev) {
 				// Case 2: A new head is to be set
-				PWX_TRY_PWX_FURTHER(head->insertPrev(insElem))
-				head = insElem;
+				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem))
+				head(insElem);
 				doRenumber.store(true, std::memory_order_release);
-			} else if (insPrev == tail) {
+			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail->eNr.load(std::memory_order_acquire) + 1,
+					tail()->eNr.load(std::memory_order_acquire) + 1,
 					std::memory_order_release);
-				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
-				tail = insElem;
+				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
+				tail(insElem);
 			}
 		}
 
@@ -573,12 +574,12 @@ private:
 	// Note: This method must be invoked with a lock in place! It does *NOT* lock!
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		elem_t*  xPrev   = curr;
+		elem_t*  xPrev   = curr();
 		elem_t*  xCurr   = xPrev->next.load(std::memory_order_acquire);
 
-		while (xPrev && (xPrev != tail)) {
+		while (xPrev && (xPrev != tail() )) {
 			if (xCurr->data.get() == data) {
-				curr = xCurr;
+				curr(xCurr);
 				return xPrev;
 			}
 			xPrev = xCurr;
@@ -586,12 +587,12 @@ private:
 		}
 
 		// If we are here, prev points to tail. No match found.
-		xCurr = curr;
+		xCurr = curr();
 		xPrev = xCurr->prev.load(std::memory_order_relaxed);
 
-		while (xCurr && (xCurr != head)) {
+		while (xCurr && (xCurr != head() )) {
 			if (xCurr->data.get() == data) {
-				curr = xCurr;
+				curr(xCurr);
 				return xPrev;
 			}
 			xPrev = xCurr;
@@ -615,7 +616,7 @@ private:
 		uint32_t locCnt = eCount.load(std::memory_order_acquire);
 
 		if (locCnt) {
-			elem_t*  xCurr = curr ? curr : head;
+			elem_t*  xCurr = curr() ? curr() : head();
 			uint32_t xNr   = xCurr->eNr.load(std::memory_order_acquire);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
@@ -639,7 +640,7 @@ private:
 			if (xIdx == (xNr + 1)) {
 				xCurr = xCurr->getNext();
 				PWX_LOCK(const_cast<list_t*>(this))
-				curr = xCurr;
+				curr(xCurr);
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return xCurr;
 			}
@@ -648,14 +649,14 @@ private:
 			if (xIdx == (xNr - 1)) {
 				xCurr = xCurr->getPrev();
 				PWX_LOCK(const_cast<list_t*>(this))
-				curr = xCurr;
+				curr(xCurr);
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return xCurr;
 			}
 
 			// Is it the head we want?
 			if (0 == xIdx)
-				return head;
+				return head();
 
 			// Or tail ?
 			if ( (locCnt - 1) == xIdx)
@@ -663,7 +664,7 @@ private:
 				 * somewhere else, the check is against locCnt to ensure
 				 * that any call to index -1 retrieves the current tail.
 				 */
-				return tail;
+				return tail();
 
 			// Ok, let's go. But xCurr is already checked
 			bool upwards = true;
@@ -686,20 +687,20 @@ private:
 				 * If this happens xCurr and xIdx have to be "warped"
 				 * around head and tail if xCurr reaches head or tail
 				 */
-				if (tail == xCurr) {
+				if (tail() == xCurr) {
 					PWX_LOCK(const_cast<list_t*>(this))
 					// Do a double check, maybe the warp is not needed any more
-					if (tail == xCurr) {
+					if (tail() == xCurr) {
 						xIdx -= eCount.load(std::memory_order_acquire);
-						xCurr = head;
+						xCurr = head();
 						xNr   = 0;
 					}
 					PWX_UNLOCK(const_cast<list_t*>(this))
-				} else if ((head == xCurr)) {
+				} else if ((head() == xCurr)) {
 					PWX_LOCK(const_cast<list_t*>(this))
-					if (head == xCurr) {
+					if (head() == xCurr) {
 						xIdx += eCount.load(std::memory_order_acquire);
-						xCurr = tail;
+						xCurr = tail();
 						xNr   = xCurr->eNr.load(std::memory_order_acquire);
 					}
 				} // End of consistency check
@@ -715,7 +716,7 @@ private:
 
 			// xCurr is sure to be pointing where it should now.
 			PWX_LOCK(const_cast<list_t*>(this))
-			curr = xCurr;
+			curr(xCurr);
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return xCurr;
 		}
@@ -751,7 +752,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
-		elem_t* prev = nextElement ? nextElement->getPrev() : tail;
+		elem_t* prev = nextElement ? nextElement->getPrev() : tail();
 		if (nextElement)
 			PWX_UNLOCK(nextElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -777,7 +778,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
-		elem_t* prev = next ? next->getPrev() : tail;
+		elem_t* prev = next ? next->getPrev() : tail();
 		if (next)
 			PWX_UNLOCK(next)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -823,7 +824,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
-		elem_t* prev = nextElement ? nextElement->getPrev() : tail;
+		elem_t* prev = nextElement ? nextElement->getPrev() : tail();
 		if (nextElement)
 			PWX_UNLOCK(nextElement)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -861,7 +862,7 @@ private:
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
-		elem_t* prev = next ? next->getPrev() : tail;
+		elem_t* prev = next ? next->getPrev() : tail();
 		if (next)
 			PWX_UNLOCK(next)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
@@ -881,20 +882,22 @@ private:
 		 * 2: elem is tail
 		 * 3: elem is something else.
 		*/
-		if (head == elem) {
+		if (head() == elem) {
 			// Case 1
-			head = head->getNext();
+			head(head()->getNext());
 			doRenumber.store(true, std::memory_order_relaxed);
-		} else if (tail == elem)
+		} else if (tail() == elem)
 			// Case 2:
-			tail = tail->getPrev();
+			tail(tail()->getPrev());
 		else
 			doRenumber.store(true, std::memory_order_relaxed);
 		elem->remove();
 
 		if (1 == eCount.fetch_sub(1)) {
 			// The list is empty!
-			curr = head = tail = nullptr;
+			curr(nullptr);
+			head(nullptr);
+			tail(nullptr);
 		}
 	}
 
@@ -946,7 +949,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* xNext = next ? find (next) : nullptr;
-		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : head;
+		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : head();
 
 		if (toRemove)
 			privRemove (toRemove);
@@ -963,7 +966,7 @@ private:
 		// Need a big lock, only one removal at a time!
 		PWX_LOCK_GUARD(list_t, this)
 
-		elem_t* toRemove = next ? next->getPrev() : tail;
+		elem_t* toRemove = next ? next->getPrev() : tail();
 		if (toRemove)
 			privRemove (toRemove);
 
