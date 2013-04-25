@@ -67,6 +67,7 @@ public:
 
 	typedef VContainer                  base_t; //!< Base type of the list
 	typedef TSingleList<data_t, elem_t> list_t; //!< Type of this list
+	typedef typename elem_t::neighbor_t neighbor_t; //!< Type of elements enighbors, used for curr, head and tail.
 
 
 	/* ===============================================
@@ -130,9 +131,9 @@ public:
 	virtual void clear() noexcept
 	{
 		elem_t* toDelete = nullptr;
-		while (head) {
+		while (head()) {
 			PWX_LOCK(this)
-			if (head) {
+			if (head()) {
 				toDelete = privRemoveAfterElement(nullptr);
 				// Now that the element is removed, we do not
 				// need to have a full lock any more
@@ -215,13 +216,13 @@ public:
 	{
 		PWX_LOCK(this)
 		this->do_locking(false);
-		elem_t* xCurr = head;
+		elem_t* xCurr = head();
 		do {
 			if (xCurr) {
 				xCurr->disable_thread_safety();
 				xCurr = xCurr->next.load(std::memory_order_relaxed);
 			}
-		} while (xCurr && xCurr != tail);
+		} while (xCurr && xCurr != tail());
 		this->beThreadSafe.store(false, std::memory_order_relaxed);
 		PWX_UNLOCK(this) // Just for the record
 	}
@@ -247,13 +248,13 @@ public:
 	void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		elem_t* xCurr = head;
+		elem_t* xCurr = head();
 		do {
 			if (xCurr) {
 				xCurr->enable_thread_safety();
 				xCurr = xCurr->next.load(std::memory_order_relaxed);
 			}
-		} while (xCurr && xCurr != tail);
+		} while (xCurr && xCurr != tail());
 		this->beThreadSafe.store(true, std::memory_order_release);
 	}
 
@@ -574,7 +575,7 @@ public:
 	**/
 	virtual uint32_t push_back (data_t *data)
 	{
-		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (tail, data))
+		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (tail(), data))
 	}
 
 
@@ -588,7 +589,7 @@ public:
 	**/
 	virtual uint32_t push_back (const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (tail, src))
+		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (tail(), src))
 	}
 
 
@@ -717,15 +718,15 @@ public:
 	{
 		if (&rhs != this) {
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			elem_t* rhsCurr = rhs.head;
+			elem_t* rhsCurr = rhs.head();
 			bool    isDone  = false;
 			bool    isTS    = this->beThreadSafe.load(std::memory_order_acquire);
 
 			while (rhsCurr && !isDone) {
-				PWX_TRY_PWX_FURTHER (privInsElemBehindElem (tail, *rhsCurr))
+				PWX_TRY_PWX_FURTHER (privInsElemBehindElem (tail(), *rhsCurr))
 				if (!isTS)
-					tail->disable_thread_safety();
-				if (rhsCurr == rhs.tail)
+					tail()->disable_thread_safety();
+				if (rhsCurr == rhs.tail())
 					isDone = true;
 				else
 					rhsCurr = rhsCurr->next;
@@ -748,7 +749,7 @@ public:
 	{
 		if (&rhs != this) {
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
-			elem_t* rhsCurr = rhs.head;
+			elem_t* rhsCurr = rhs.head();
 			elem_t* lhsPrev = nullptr;
 			data_t* rhsData = nullptr;
 			bool    isDone  = false;
@@ -757,7 +758,7 @@ public:
 				rhsData = rhsCurr->data.get();
 
 				// Head must be treated first, privFindPrev won't help.
-				if (rhsData == head->data.get())
+				if (rhsData == head()->data.get())
 					PWX_TRY_PWX_FURTHER(protDelete(remNextElem(nullptr)))
 				else {
 					lhsPrev = privFindPrev(rhsData);
@@ -765,7 +766,7 @@ public:
 						PWX_TRY_PWX_FURTHER(protDelete(remNextElem(lhsPrev)))
 				}
 
-				if (rhsCurr == rhs.tail)
+				if (rhsCurr == rhs.tail())
 					isDone = true;
 				else
 					rhsCurr = rhsCurr->next;
@@ -838,6 +839,79 @@ protected:
 
 	void (*destroy) (data_t* data_);
 
+	// accessors for curr/head/tail
+
+	/// @brief return curr according to thread safety setting
+	elem_t* curr() const
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			return curr_.load(std::memory_order_relaxed);
+		else
+			return curr_.load(std::memory_order_acquire);
+	}
+
+
+	/// @brief set curr to @a new_curr according to thread safety settings
+	void curr(elem_t* new_curr) const
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			curr_.store(new_curr, std::memory_order_relaxed);
+		else
+			curr_.store(new_curr, std::memory_order_release);
+	}
+
+
+	/// @brief set curr to @a new_curr according to thread safety settings
+	void curr(elem_t* new_curr)
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			curr_.store(new_curr, std::memory_order_relaxed);
+		else
+			curr_.store(new_curr, std::memory_order_release);
+	}
+
+
+	/// @brief return head according to thread safety setting
+	elem_t* head() const
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			return head_.load(std::memory_order_relaxed);
+		else
+			return head_.load(std::memory_order_acquire);
+	}
+
+
+	/// @brief set head to @a new_head according to thread safety settings
+	void head(elem_t* new_head)
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			head_.store(new_head, std::memory_order_relaxed);
+		else
+			head_.store(new_head, std::memory_order_release);
+	}
+
+
+	/// @brief return tail according to thread safety setting
+	elem_t* tail() const
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			return tail_.load(std::memory_order_relaxed);
+		else
+			return tail_.load(std::memory_order_acquire);
+	}
+
+
+	/// @brief set tail to @a new_tail according to thread safety settings
+	void tail(elem_t* new_tail)
+	{
+		if (this->beThreadSafe.load(std::memory_order_relaxed))
+			tail_.store(new_tail, std::memory_order_relaxed);
+		else
+			tail_.store(new_tail, std::memory_order_release);
+	}
+
+
+	// Overridable protected methods
 
 	/** @brief Delete the element @a removed
 	  *
@@ -880,15 +954,15 @@ protected:
 		PWX_LOCK(const_cast<list_t*>(this))
 
 		// Exit if curr is nullptr (list emptied while we waited for the lock)
-		if (nullptr == curr) {
+		if (nullptr == curr()) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return nullptr;
 		}
 
 		// Quick exit if curr is already what we want:
-		if (curr->data.get() == data) {
+		if (curr()->data.get() == data) {
 			// Safe curr first, so it isn't changed before being returned
-			result = curr;
+			result = curr();
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return result;
 		}
@@ -897,37 +971,37 @@ protected:
 		if (eCount.load(std::memory_order_acquire) > 1) {
 
 			// Exit if head is wanted...
-			if (head->data.get() == data) {
-				curr   = head;
-				result = curr;
+			if (head()->data.get() == data) {
+				curr(head());
+				result = curr();
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return result;
 			}
 
 			// ...or tail
-			if (tail->data.get() == data) {
-				curr   = tail;
-				result = curr;
+			if (tail()->data.get() == data) {
+				curr(tail());
+				result = curr();
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return result;
 			}
 
 			// Otherwise we have to search for it (head and tail are already checked):
 			if (this->beThreadSafe.load(std::memory_order_acquire)) {
-				elem_t* xCurr = head->getNext();
+				elem_t* xCurr = head()->getNext();
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
-				while (!result && xCurr && (xCurr != tail)) {
+				while (!result && xCurr && (xCurr != tail() )) {
 					if (xCurr->data.get() == data)
 						result = xCurr;
 					else
 						xCurr = xCurr->getNext();
 				}
 			} else {
-				elem_t* xCurr = head->next.load(std::memory_order_relaxed);
+				elem_t* xCurr = head()->next.load(std::memory_order_relaxed);
 				// No need to unlock, PWX_LOCK hasn't done anything anyway.
 
-				while (!result && xCurr && (xCurr != tail)) {
+				while (!result && xCurr && (xCurr != tail() )) {
 					if (xCurr->data.get() == data)
 						result = xCurr;
 					else
@@ -970,9 +1044,9 @@ protected:
 
 		uint32_t locCnt = eCount.load(std::memory_order_acquire);
 
-		curr = insElem;
+		curr(insElem);
 
-		if (locCnt && insPrev && (tail != insPrev)) {
+		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
 			doRenumber.store(true, std::memory_order_release);
 			DEBUG_LOCK_STATE("insertNext", insPrev, insElem)
@@ -983,23 +1057,24 @@ protected:
 			PWX_UNLOCK(this)
 			if (!locCnt) {
 				// Case 1: The list is empty
-				head = tail = insElem;
+				head(insElem);
+				tail(insElem);
 				DEBUG_LOCK_STATE("insertBefore", insElem, insElem)
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
 			} else if (nullptr == insPrev) {
 				// Case 2: A new head is to be set
-				DEBUG_LOCK_STATE("insertBefore", insElem, head)
-				PWX_TRY_PWX_FURTHER(insElem->insertBefore(head))
-				head = insElem;
+				DEBUG_LOCK_STATE("insertBefore", insElem, head())
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(head() ))
+				head(insElem);
 				doRenumber.store(true, std::memory_order_release);
-			} else if (insPrev == tail) {
+			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail->eNr.load(std::memory_order_acquire) + 1,
+					tail()->eNr.load(std::memory_order_acquire) + 1,
 					std::memory_order_release);
-				DEBUG_LOCK_STATE("insertNext", tail, insElem)
-				PWX_TRY_PWX_FURTHER(tail->insertNext(insElem))
-				tail = insElem;
+				DEBUG_LOCK_STATE("insertNext", tail(), insElem)
+				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
+				tail(insElem);
 			}
 			DEBUG_LOCK_STATE("lock_guard_dtor", this, this)
 		}
@@ -1025,13 +1100,13 @@ protected:
 			if (!doRenumber.load(std::memory_order_acquire))
 				return;
 
-			elem_t*  xCurr  = head;
+			elem_t*  xCurr  = head();
 			uint32_t xNr    = 0;
 			bool     isDone = false;
 
 			while (xCurr && !isDone) {
 				xCurr->eNr.store(xNr++, std::memory_order_relaxed);
-				if (xCurr == tail)
+				if (xCurr == tail() )
 					isDone = true;
 				else
 					xCurr = xCurr->next;
@@ -1041,15 +1116,6 @@ protected:
 		}
 	}
 
-	/* ===============================================
-	 * === Protected members                       ===
-	 * ===============================================
-	*/
-
-	mutable
-	elem_t*  curr   = nullptr;   //!< pointer to the currently handled element
-	elem_t*  head   = nullptr;   //!< pointer to the first element
-	elem_t*  tail   = nullptr;   //!< pointer to the last element
 
 private:
 	/* ===============================================
@@ -1067,12 +1133,12 @@ private:
 	// Note: This method must be invoked with a lock in place! It does *NOT* lock!
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-		elem_t*  xPrev = head;
+		elem_t*  xPrev = head();
 		elem_t*  xCurr = xPrev->next.load(std::memory_order_acquire);
 
-		while (xPrev && (xPrev != tail)) {
+		while (xPrev && (xPrev != tail() )) {
 			if (xCurr->data.get() == data) {
-				curr = xCurr;
+				curr(xCurr);
 				return xPrev;
 			}
 			xPrev = xCurr;
@@ -1096,7 +1162,7 @@ private:
 		uint32_t locCnt = eCount.load(std::memory_order_acquire);
 
 		if (locCnt) {
-			elem_t*  xCurr = curr ? curr : head;
+			elem_t*  xCurr = curr() ? curr() : head();
 			uint32_t xNr   = xCurr->eNr.load(std::memory_order_acquire);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
@@ -1119,15 +1185,13 @@ private:
 			// Is xIdx the next member, like in a for loop?
 			if (xIdx == (xNr + 1)) {
 				xCurr = xCurr->getNext();
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr = xCurr;
-				PWX_UNLOCK(const_cast<list_t*>(this))
+				curr(xCurr);
 				return xCurr;
 			}
 
 			// Is it the head we want?
 			if (0 == xIdx)
-				return head;
+				return head();
 
 			// Or tail ?
 			if ( (locCnt - 1) == xIdx)
@@ -1135,11 +1199,11 @@ private:
 				 * somewhere else, the check is against locCnt to ensure
 				 * that any call to index -1 retrieves the current tail.
 				 */
-				return tail;
+				return tail();
 
 			// Ok, let's go. But only start from head if we currently are beyond.
 			if (xIdx < xNr) {
-				xCurr = head->getNext();
+				xCurr = head()->getNext();
 				xNr  = 1;
 			}
 
@@ -1158,12 +1222,12 @@ private:
 				 * eCount. If this happens xCurr and xIdx have to be "warped"
 				 * around tail -> head if xCurr reaches tail
 				 */
-				if (tail == xCurr) {
+				if (tail() == xCurr) {
 					PWX_LOCK(const_cast<list_t*>(this))
 					// Do a double check, maybe the warp is not needed any more
-					if (tail == xCurr) {
+					if (tail() == xCurr) {
 						xIdx -= eCount.load(std::memory_order_acquire);
-						xCurr = head;
+						xCurr = head();
 						xNr   = 0;
 					}
 					PWX_UNLOCK(const_cast<list_t*>(this))
@@ -1177,7 +1241,7 @@ private:
 
 			// xCurr is sure to be pointing where it should now.
 			PWX_LOCK(const_cast<list_t*>(this))
-			curr = xCurr;
+			curr(xCurr);
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return xCurr;
 		}
@@ -1343,21 +1407,23 @@ private:
 		 * 2: elem is tail
 		 * 3: elem is something else.
 		*/
-		if (head == elem) {
+		if (head() == elem) {
 			// Case 1
-			head = head->getNext();
+			head(head()->getNext());
 			elem->remove();
 			doRenumber.store(true, std::memory_order_release);
 		} else {
-			if (tail == elem)
+			if (tail() == elem)
 				// Case 2:
-				tail = prev;
+				tail(prev);
 			PWX_TRY_PWX_FURTHER(prev->removeNext())
 		}
 
 		if (1 == eCount.fetch_sub(1)) {
 			// The list is empty!
-			curr = head = tail = nullptr;
+			curr(nullptr);
+			head(nullptr);
+			tail(nullptr);
 		}
 	}
 
@@ -1372,7 +1438,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* xPrev    = prev ? const_cast<elem_t*>(protFind (prev)) : nullptr;
-		elem_t* toRemove = xPrev ? xPrev->getNext() : prev ? nullptr : head;
+		elem_t* toRemove = xPrev ? xPrev->getNext() : prev ? nullptr : head();
 
 		if (toRemove)
 			privRemove (xPrev, toRemove);
@@ -1389,12 +1455,23 @@ private:
 		// Need a big lock, only one removal at a time!
 		PWX_LOCK_GUARD(list_t, this)
 
-		elem_t* toRemove = prev ? prev->getNext() : head;
+		elem_t* toRemove = prev ? prev->getNext() : head();
 		if (toRemove)
 			privRemove (prev, toRemove);
 
 		return toRemove;
 	}
+
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	*/
+
+	mutable
+	neighbor_t curr_ = ATOMIC_VAR_INIT(nullptr); //!< pointer to the currently handled element
+	neighbor_t head_ = ATOMIC_VAR_INIT(nullptr); //!< pointer to the first element
+	neighbor_t tail_ = ATOMIC_VAR_INIT(nullptr); //!< pointer to the last element
 }; // class TSingleList
 
 
