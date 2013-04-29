@@ -303,6 +303,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../test/testRNG_func.cpp" />
 		<Unit filename="../test/testRNG_func.h">
 			<Option target="clean" />
 			<Option target="library" />

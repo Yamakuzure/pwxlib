@@ -3,8 +3,6 @@
 #include <limits>
 #include <cmath>
 
-const double fullMaxDouble = std::numeric_limits<double>::max();
-const double fullMinDouble = std::numeric_limits<double>::lowest();
 
 /** @brief central function to test pwx::RNG
   *
@@ -123,8 +121,8 @@ int32_t testRNG (sEnv &env)
 	/************************************************************************
 	** C) Noise functions                                                  **
 	************************************************************************/
-	cout << " C) Noise functions with " << testMaxElements << " keys (min/max)" << endl;
-	// This is so small that we can do it here:
+	cout << " C) Noise functions with " << testMaxElements << " keys (min/max (ms))" << endl;
+
 	int32_t maxX = testMaxElements;
 	int32_t maxY = static_cast<int32_t>(std::floor(std::pow(static_cast<float>(maxX), 1. / 2.)));
 	int32_t maxZ = static_cast<int32_t>(std::floor(std::pow(static_cast<float>(maxX), 1. / 3.)));
@@ -137,116 +135,24 @@ int32_t testRNG (sEnv &env)
 
 	DEBUG_LOG("noise", "maxX: %d, maxY: %d, maxZ: %d, maxW: %d", maxX, maxY, maxZ, maxW)
 
-	double curNoise = 0.;
-
 	// A) 1 dimension
-	double maxNoise = fullMinDouble;
-	double minNoise = fullMaxDouble;
 	DEBUG_LOG("noise", "%d + %d missed", maxX, miss)
-	cout << adjRight (4, 0) << ++env.testCount << " 1 dimension  x       : "; cout.flush();
-	for (int32_t x = 0; x < maxX; ++x) {
-		curNoise = RNG.noise(x);
-		if (curNoise > maxNoise) maxNoise = curNoise;
-		if (curNoise < minNoise) minNoise = curNoise;
-	}
-	cout << adjRight(2,7) << minNoise << " / " << adjRight(2,7) << maxNoise;
-	if (maxNoise > minNoise) {
-		cout << " : SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << " : FAILED!" << endl;
-		++env.testFail;
-	}
+	testRNG_noise(env, 1, maxX, miss);
 
 	// B) 2 dimensions
-	maxNoise = fullMinDouble;
-	minNoise = fullMaxDouble;
 	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxY, 2.));
 	DEBUG_LOG("noise", "%d + %d missed", static_cast<int32_t>(std::pow(maxY, 2.)), miss)
-	cout << adjRight (4, 0) << ++env.testCount << " 2 dimensions x,y     : "; cout.flush();
-	for (int32_t x = 0; x < maxY; ++x) {
-		for (int32_t y = 0; y < maxY; ++y) {
-			curNoise = RNG.noise(x,y);
-			if (curNoise > maxNoise) maxNoise = curNoise;
-			if (curNoise < minNoise) minNoise = curNoise;
-		}
-	}
-	// Add "miss"ed iterations
-	for (int32_t val = 0; val < miss; ++val) {
-		curNoise = RNG.noise(maxY + val, maxY + val);
-		if (curNoise > maxNoise) maxNoise = curNoise;
-		if (curNoise < minNoise) minNoise = curNoise;
-	}
-	cout << adjRight(2,7) << minNoise << " / " << adjRight(2,7) << maxNoise;
-	if (maxNoise > minNoise) {
-		cout << " : SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << " : FAILED!" << endl;
-		++env.testFail;
-	}
+	testRNG_noise(env, 2, maxY, miss);
 
 	// C) 3 dimensions
-	maxNoise = fullMinDouble;
-	minNoise = fullMaxDouble;
 	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxZ, 3.));
 	DEBUG_LOG("noise", "%d + %d missed", static_cast<int32_t>(std::pow(maxZ, 3.)), miss)
-	cout << adjRight (4, 0) << ++env.testCount << " 3 dimensions x,y,z   : "; cout.flush();
-	for (int32_t x = 0; x < maxZ; ++x) {
-		for (int32_t y = 0; y < maxZ; ++y) {
-			for (int32_t z = 0; z < maxZ; ++z) {
-				curNoise = RNG.noise(x,y,z);
-				if (curNoise > maxNoise) maxNoise = curNoise;
-				if (curNoise < minNoise) minNoise = curNoise;
-			}
-		}
-	}
-	// Add "miss"ed iterations
-	for (int32_t val = 0; val < miss; ++val) {
-		curNoise = RNG.noise(maxZ + val, maxZ + val, maxZ + val);
-		if (curNoise > maxNoise) maxNoise = curNoise;
-		if (curNoise < minNoise) minNoise = curNoise;
-	}
-	cout << adjRight(2,7) << minNoise << " / " << adjRight(2,7) << maxNoise;
-	if (maxNoise > minNoise) {
-		cout << " : SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << " : FAILED!" << endl;
-		++env.testFail;
-	}
+	testRNG_noise(env, 3, maxZ, miss);
 
 	// D) 4 dimensions
-	maxNoise = fullMinDouble;
-	minNoise = fullMaxDouble;
 	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxW, 4.));
 	DEBUG_LOG("noise", "%d + %d missed", static_cast<int32_t>(std::pow(maxW, 4.)), miss)
-	cout << adjRight (4, 0) << ++env.testCount << " 4 dimensions x,y,z,w : "; cout.flush();
-	for (int32_t x = 0; x < maxW; ++x) {
-		for (int32_t y = 0; y < maxW; ++y) {
-			for (int32_t z = 0; z < maxW; ++z) {
-				for (int32_t w = 0; w < maxW; ++w) {
-					curNoise = RNG.noise(x,y,z,w);
-					if (curNoise > maxNoise) maxNoise = curNoise;
-					if (curNoise < minNoise) minNoise = curNoise;
-				}
-			}
-		}
-	}
-	// Add "miss"ed iterations
-	for (int32_t val = 0; val < miss; ++val) {
-		curNoise = RNG.noise(maxW + val, maxW + val, maxW + val, maxW + val);
-		if (curNoise > maxNoise) maxNoise = curNoise;
-		if (curNoise < minNoise) minNoise = curNoise;
-	}
-	cout << adjRight(2,7) << minNoise << " / " << adjRight(2,7) << maxNoise;
-	if (maxNoise > minNoise) {
-		cout << " : SUCCESS" << endl;
-		++env.testSuccess;
-	} else {
-		cout << " : FAILED!" << endl;
-		++env.testFail;
-	}
+	testRNG_noise(env, 4, maxW, miss);
 
 
 	/************************************************************************
