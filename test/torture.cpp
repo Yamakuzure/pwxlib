@@ -70,10 +70,6 @@ int32_t main(int32_t argc, char** argv)
 		}
 	}
 
-	// Is the output lock helper still there?
-	if (outLock)
-		delete outLock;
-
 	return result;
 }
 
@@ -133,9 +129,6 @@ int32_t setTestType(const char* chType, eTestType &testType)
 int32_t startTest(uint32_t numThreads, eTestType testType)
 {
 	int32_t result = EXIT_SUCCESS;
-
-	// The outLock Helper is needed now:
-	PWX_TRY_STD_FURTHER(outLock = new pwx::CLockable, "new_failed", "Couldn't create output lock helper")
 
 	if ((EXIT_SUCCESS == result)
 	  && ( (testType == E_TEST_ALL)

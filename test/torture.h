@@ -18,8 +18,16 @@ const data_t maxValue = std::numeric_limits<data_t>::max();
 const data_t minValue = std::numeric_limits<data_t>::lowest();
 
 // --- output lock helper ---
-pwx::CLockable* outLock; //!< Just lock before c[out|err]ing anything and unlock afterwards.
+pwx::CLockable outLock; //!< Just lock before c[out|err]ing anything and unlock afterwards.
 
+
+// Centralize the thread identification output
+#define THREAD_IDENT(channel, thrdName) \
+	channel << "Thread 0x"; \
+	std::hex(channel); \
+	channel << thId; \
+	std::dec(channel); \
+	channel << " \"" << thrdName << "\"";
 
 // The threads all share the same header with the default
 // methods ctor, dtor, copy ctor and operator=. This little
@@ -37,45 +45,55 @@ pwx::CLockable* outLock; //!< Just lock before c[out|err]ing anything and unlock
 // All threads should print out that they are created, what
 // they are, wait for the start and then that they are started.
 #define THRD_STARTER(thrdName) \
-	auto thId = std::this_thread::get_id(); \
+	size_t thId = CURRENT_THREAD_ID; \
 	cont = static_cast<list_t*>(cont_); \
-	{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
-	cout << "Thread " << thId << " \"" << thrdName << "\" created" << endl; \
-	{} /** FIXME: PWX_UNLOCK_NOEXCEPT(outLock) **/ \
+	outLock.lock(); \
+	cout << "[Create] "; \
+	THREAD_IDENT(cout, thrdName) \
+	cout << endl; \
+	outLock.unlock(); \
 	waitForStart(); \
 	std::chrono::milliseconds threadStartWaitTime( 1 ); \
 	std::this_thread::sleep_for(threadStartWaitTime); \
-	{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
-	cout << "Thread " << thId << " \"" << thrdName << "\" started" << endl; \
-	{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+	outLock.lock(); \
+	cout << "[Start] "; \
+	THREAD_IDENT(cout, thrdName) \
+	cout << endl; \
+	outLock.unlock();
 
 
 // This little macro is only meant to make the catch blocks in each
 // of the thread implementations better readable. No great magic, though...
 #define THRD_CATCHER(thrdName) \
 catch (pwx::CException &e) { \
-	{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
-	cerr << "== Thread " << thId << " \"" << thrdName << "\" ==\n"; \
+	outLock.lock(); \
+	cerr << "[Catch] == "; \
+	THREAD_IDENT(cerr, thrdName) \
+	cerr << " ==\n"; \
 	cerr << "pwx exception \"" << e.name() << "\" caught!" << endl; \
 	cerr << "What : \"" << e.what() << "\"" << endl; \
 	cerr << "What : \"" << e.desc() << "\"" << endl; \
 	cerr << "Where: \"" << e.where() << "\"" << endl; \
 	cerr << "pFunc: \"" << e.pfunc() << "\"" << endl; \
 	cerr << "\nTrace:\n" << e.trace() << "\n-----" << endl; \
-	{} /** FIXME: PWX_UNLOCK_NOEXCEPT (outLock) **/ \
+	outLock.unlock(); \
 	isKilled = true; \
 } catch (std::exception &e) { \
-	{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
-	cerr << "== Thread " << thId << " \"" << thrdName << "\" ==\n"; \
+	outLock.lock(); \
+	cerr << "[Catch] == "; \
+	THREAD_IDENT(cerr, thrdName) \
+	cerr << " ==\n"; \
 	cerr << "std exception caught!" << endl; \
 	cerr << "What : \"" << e.what() << "\"" << endl; \
-	{} /** FIXME: PWX_UNLOCK_NOEXCEPT(outLock) **/ \
+	outLock.unlock(); \
 	isKilled = true; \
 } catch (...) { \
-	{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
-	cerr << "== Thread " << thId << " \"" << thrdName << "\" ==\n"; \
+	outLock.lock(); \
+	cerr << "[Catch] == "; \
+	THREAD_IDENT(cerr, thrdName) \
+	cerr << " ==\n"; \
 	cerr << "Something completely unknown was caught!" << endl; \
-	{} /**/ FIXME: PWX_UNLOCK_NOEXCEPT(outLock) **/ \
+	outLock.unlock(); \
 	isKilled = true; \
 }
 
@@ -83,14 +101,19 @@ catch (pwx::CException &e) { \
 // left on the container. If remaining locks are found, a message is
 // issued and the locks cleared.
 #define THREAD_END(thrdName) \
+cout << "[Stop ] "; \
+THREAD_IDENT(cout, thrdName) \
+cout << endl; \
 if (cont->try_lock()) { \
 	/* This means we can lock it. Because we *have* a lock still? */ \
 	uint32_t lC = cont->lock_count(); \
 	if (lC > 1) { \
-		{} /** FIXME: PWX_LOCK_NOEXCEPT(outLock) **/ \
-		cerr << "== Thread " << thId << " \"" << thrdName << "\" ==\n"; \
+		outLock.lock(); \
+		cerr << "== "; \
+		THREAD_IDENT(cerr, thrdName) \
+		cerr << " ==\n"; \
 		cerr << (lC - 1) << " locks still held on the container!" << endl; \
-		{} /**/ FIXME: PWX_UNLOCK_NOEXCEPT(outLock) **/ \
+		outLock.unlock(); \
 	} \
 	cont->clear_locks(); \
 } \
@@ -202,11 +225,12 @@ struct thrdPush : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did push() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "Push")
+			cout << " did push() " << valCount << " times.\n";
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("Push")
@@ -234,11 +258,12 @@ struct thrdPushFront : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did push_front() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "PushFront")
+			cout << " did push_front() " << valCount << " times.\n";
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("PushFront")
@@ -266,11 +291,12 @@ struct thrdPushBack : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did push_back() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "PushBack")
+			cout << " did push_back() " << valCount << " times.\n";
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("PushBack")
@@ -314,15 +340,16 @@ struct thrdPop : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did pop() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "Pop")
+			cout << " did pop() " << valCount << " times.\n";
 			if (valCount) {
 				cout << " -> minimum value found: " << minValue;
 				cout << "\n -> maximum value found: " << maxValue << endl;
 			}
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		} // End of having a container to use
 
 		THREAD_END("Pop")
@@ -366,15 +393,16 @@ struct thrdPopFront : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did pop_front() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "PopFront")
+			cout << " did pop_front() " << valCount << " times.\n";
 			if (valCount) {
 				cout << " -> minimum value found: " << minValue;
 				cout << "\n -> maximum value found: " << maxValue << endl;
 			}
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		} // End of having a container to use
 
 		THREAD_END("PopFront")
@@ -418,15 +446,16 @@ struct thrdPopBack : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did pop_back() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "PopBack")
+			cout << " did pop_back() " << valCount << " times.\n";
 			if (valCount) {
 				cout << " -> minimum value found: " << minValue;
 				cout << "\n -> maximum value found: " << maxValue << endl;
 			}
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		} // End of having a container to use
 
 		THREAD_END("PopBack")
@@ -456,11 +485,12 @@ struct thrdInsert : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did Insert() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "Insert")
+			cout << " did Insert() " << valCount << " times.\n";
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("Insert")
@@ -509,15 +539,16 @@ struct thrdRemove : public thrdBase
 			} // End of iteration loop
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did remNextElem() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "Remove")
+			cout << " did remNextElem() " << valCount << " times.\n";
 			if (valCount) {
 				cout << " -> minimum value found: " << minValue;
 				cout << "\n -> maximum value found: " << maxValue << endl;
 			}
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 
 		} // End of having a container
 
@@ -556,11 +587,12 @@ struct thrdDelete : public thrdBase
 			}
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did delete() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "Delete")
+			cout << " did delete() " << valCount << " times.\n";
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("Delete")
@@ -605,15 +637,16 @@ struct thrdGet : public thrdBase
 			} // End of iteration loop
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did get() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "Get")
+			cout << " did get() " << valCount << " times.\n";
 			if (valCount) {
 				cout << " -> minimum value found: " << minValue;
 				cout << "\n -> maximum value found: " << maxValue << endl;
 			}
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		} // End of having a container
 
 		THREAD_END("Get")
@@ -655,15 +688,16 @@ struct thrdGetData : public thrdBase
 			} // End of iteration loop
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " did getData() " << valCount << " times.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "GetData")
+			cout << " did getData() " << valCount << " times.\n";
 			if (valCount) {
 				cout << " -> minimum value found: " << minValue;
 				cout << "\n -> maximum value found: " << maxValue << endl;
 			}
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		} // End of having a container
 
 
@@ -694,12 +728,13 @@ struct thrdOpAdd : public thrdBase
 			THRD_CATCHER("OpAdd")
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " used operator+=  and copied ";
+			outLock.lock();
+			THREAD_IDENT(cout, "OpAdd")
+			cout << " used operator+=  and copied ";
 			cout << newCont.size() << " elements." << endl;
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("OpAdd")
@@ -735,13 +770,14 @@ struct thrdOpSub : public thrdBase
 			THRD_CATCHER("OpSub")
 
 			// Get some stats out:
-			{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
-			cout << "Thread " << thId << " cloned " << oldSize << "elements.\n";
+			outLock.lock();
+			THREAD_IDENT(cout, "OpSub")
+			cout << " cloned " << oldSize << " elements.\n";
 			cout << " -> used operator-= to delete " << (oldSize - newCont.size()) << " elements, ";
 			cout << " now holding " << newCont.size() << " elements." << endl;
 			if (isKilled)
 				cout << "=== The thread has been killed! ===" << endl;
-			{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+			outLock.unlock();
 		}
 
 		THREAD_END("OpSub")
@@ -813,17 +849,17 @@ int32_t do_test(uint32_t numThreads)
 	// Now the threads can be created:
     PWX_TRY_STD_FURTHER(threads = new std::thread*[numThreads], "new_failed", "Couldn't create threads array")
 	for (size_t i = 0; i < numThreads; ++i) {
-		{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
+		outLock.lock();
 		cout << "Creating thread number " << (i + 1) << endl;
-		{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+		outLock.unlock();
 		PWX_TRY_STD_FURTHER(threads[i] = new std::thread(std::ref(*(worker[i])), &cont),
 							"new_failed", "do_test could not call new operator on std::thread")
 	}
 
 	// And GO!
-	{} /// FIXME: PWX_LOCK_NOEXCEPT(outLock)
+	outLock.lock();
 	cout << "Starting threads" << endl;
-	{} /// FIXME: PWX_UNLOCK_NOEXCEPT(outLock)
+	outLock.unlock();
 
 	for (size_t i = 0; i < numThreads; ++i)
 		worker[i]->isRunning = true;
