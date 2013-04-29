@@ -26,7 +26,7 @@ INCDIR   = -I../src
 
 %.o: %.cpp
 	@echo "Compiling $@"
-	@$(CXX) $(INCDIR) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(INCDIR) $(CXXFLAGS) -o $@ -c $<
 
 all: $(TARGET_hb) $(TARGET_tl)
 
@@ -38,15 +38,15 @@ torture: depend $(TARGET_to)
 
 $(TARGET_hb): $(MODULES_hb)
 	@echo "Linking $(TARGET_hb) ..."
-	@$(CXX) -o $(TARGET_hb) $(LDFLAGS) -L../lib -lpwx $(MODULES_hb)
+	$(CXX) -o $(TARGET_hb) $(LDFLAGS) -L../lib -lpwx $(MODULES_hb)
 
 $(TARGET_tl): $(MODULES_tl)
 	@echo "Linking $(TARGET_tl) ..."
-	@$(CXX) -o $(TARGET_tl) $(LDFLAGS) -L../lib -lpwx $(MODULES_tl)
+	$(CXX) -o $(TARGET_tl) $(LDFLAGS) -L../lib -lpwx $(MODULES_tl)
 
 $(TARGET_to): $(MODULES_to)
 	@echo "Linking $(TARGET_to) ..."
-	@$(CXX) -o $(TARGET_to) $(LDFLAGS) -L../lib -lpwx $(MODULES_to)
+	$(CXX) -o $(TARGET_to) $(LDFLAGS) -L../lib -lpwx $(MODULES_to)
 
 clean:
 	@echo "Cleaning $(TARGET_hb), $(TARGET_tl), $(TARGET_to) and object files"

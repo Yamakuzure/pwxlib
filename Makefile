@@ -133,7 +133,7 @@ endif
 
 %.o: %.cpp
 	@echo "Compiling $@"
-	@$(CXX) $(INCDIR) $(CXXFLAGS) $(LIBCXXFLAGS) -o $@ -c $<
+	$(CXX) $(INCDIR) $(CXXFLAGS) $(LIBCXXFLAGS) -o $@ -c $<
 
 all:
 	@echo "No build target specified!"
@@ -234,7 +234,7 @@ test: testlib hashbuilder torture
 
 $(LIBDIR)/$(LIB_DYN): $(MODULES)
 	@echo "Linking $(LIBDIR)/$(LIB_DYN)"
-	@$(CXX) $(LDFLAGS) $(LIBLDFLAGS) -Wl,-soname,$(LIB_DYN).$(VERSION) -o $(LIBDIR)/$(LIB_DYN) $(MODULES)
+	$(CXX) $(LDFLAGS) $(LIBLDFLAGS) -Wl,-soname,$(LIB_DYN).$(VERSION) -o $(LIBDIR)/$(LIB_DYN) $(MODULES)
 	@ln -sf $(LIB_DYN) $(LIBDIR)/$(LIB_DYN).$(VERSION)
 
 $(LIBDIR)/$(LIB_STA): $(MODULES)
