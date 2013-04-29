@@ -116,10 +116,6 @@ ifeq (YES, ${THREADDEBUG})
 endif
 
 ifeq (YES, ${ANNOTATIONS})
-  # Add Race Detector annotations.
-  # See http://gcc.gnu.org/onlinedocs/libstdc++/manual/debug.html#debug.races why
-  CXXFLAGS := ${CXXFLAGS} -D_GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE=ANNOTATE_HAPPENS_BEFORE
-  CXXFLAGS := ${CXXFLAGS} -D_GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER=ANNOTATE_HAPPENS_AFTER
   CXXFLAGS := ${CXXFLAGS} -DPWX_ANNOTATIONS
 endif
 

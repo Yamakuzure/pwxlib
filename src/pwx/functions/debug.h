@@ -32,6 +32,25 @@
 **/
 
 #if defined(PWX_ANNOTATIONS)
+// In short: If LIBPWX_DEBUG is defined, the annotations are re-defined so the
+// compiler gives information about the include chain that is wrong. Otherwise
+// only notify and undef.
+# ifdef _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE
+#   pragma message "_GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE already defined!"
+#   pragma message "Annotations might not work correctly, please check your include order."
+#   ifndef LIBPWX_DEBUG
+#     undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE
+#   endif
+# endif
+# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE(a) ANNOTATE_HAPPENS_BEFORE(a)
+# ifdef _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER
+#   pragma message "_GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER already defined!"
+#   pragma message "Annotations might not work correctly, please check your include order."
+#   ifndef LIBPWX_DEBUG
+#     undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER
+#   endif
+# endif
+# define _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER(a)  ANNOTATE_HAPPENS_AFTER(a)
 # include <valgrind/helgrind.h>
 #endif // ANNOTATIONS
 
