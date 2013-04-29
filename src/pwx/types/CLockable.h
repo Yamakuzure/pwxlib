@@ -95,12 +95,12 @@ public:
 	**/
 	bool clear_locks() noexcept
 	{
-		if (CURRENT_THREAD_ID == CL_Thread_ID) {
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(std::memory_order_acquire)) {
 			if (is_locked() || try_lock()) {
 				THREAD_LOG("base", "clear_locks(), Owner id (%lu), %u locks [%s]",
-						CL_Thread_ID, CL_Lock_Count,
+						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
-				CL_Lock_Count = 1;
+				CL_Lock_Count.store(1, std::memory_order_release);
 				this->unlock();
 			}
 
@@ -131,8 +131,8 @@ public:
 			CL_Do_Locking.store(doLock, std::memory_order_release);
 			if (!doLock) {
 				// Nuke the lock acquired above:
-				CL_Lock_Count = 0;
-				CL_Thread_ID  = 0;
+				CL_Lock_Count.store(0, std::memory_order_release);
+				CL_Thread_ID.store(0, std::memory_order_release);
 				CL_Is_Locked.store(false, std::memory_order_release);
 				CL_Lock.clear(std::memory_order_release);
 			}
@@ -162,19 +162,20 @@ public:
 	{
 		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( (ctid != CL_Thread_ID) || !is_locked()) {
+			if ( (ctid != CL_Thread_ID.load(std::memory_order_acquire))
+			  || !is_locked()) {
 				THREAD_LOG("base", "lock(), Owner id (%lu), %u locks [%s]",
-						CL_Thread_ID, CL_Lock_Count,
+						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
 				while (CL_Lock.test_and_set())
 					std::this_thread::yield();
 
 				// Got it now, so note it:
-				CL_Thread_ID  = ctid;
-				CL_Lock_Count = 1;
+				CL_Thread_ID.store(ctid, std::memory_order_release);
+				CL_Lock_Count.store(1, std::memory_order_release);
 				CL_Is_Locked.store(true, std::memory_order_release);
 			} else
-				++CL_Lock_Count;
+				CL_Lock_Count.fetch_add(1, std::memory_order_release);
 		}
 	}
 
@@ -184,8 +185,8 @@ public:
 	**/
 	uint32_t lock_count() const noexcept
 	{
-		if (CURRENT_THREAD_ID == CL_Thread_ID)
-			return CL_Lock_Count;
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(std::memory_order_acquire))
+			return CL_Lock_Count.load(std::memory_order_acquire);
 		return 0;
 	}
 
@@ -200,14 +201,15 @@ public:
 	{
 		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( (ctid != CL_Thread_ID) || !is_locked() ) {
+			if ( (ctid != CL_Thread_ID.load(std::memory_order_acquire))
+			  || !is_locked() ) {
 				THREAD_LOG("base", "try_lock(), Owner id (%lu), %u locks [%s]",
-						CL_Thread_ID, CL_Lock_Count,
+						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
 				if (!CL_Lock.test_and_set()) {
 					// Got it now, so note it:
-					CL_Thread_ID  = ctid;
-					CL_Lock_Count = 1;
+					CL_Thread_ID.store(ctid, std::memory_order_release);
+					CL_Lock_Count.store(1, std::memory_order_release);
 					CL_Is_Locked.store(true, std::memory_order_release);
 					return true;
 				}
@@ -228,13 +230,13 @@ public:
 	void unlock() noexcept
 	{
         if ( CL_Do_Locking.load(std::memory_order_acquire)
-		  && (CURRENT_THREAD_ID == CL_Thread_ID)) {
+		  && (CURRENT_THREAD_ID == CL_Thread_ID.load(std::memory_order_acquire))) {
 			THREAD_LOG("base", "unlock(), Owner id (%lu), %u locks [%s]",
-					CL_Thread_ID, CL_Lock_Count,
+					CL_Thread_ID.load(), CL_Lock_Count.load(),
 					is_locked() ? "locked" : "not locked")
-			if ((0 == --CL_Lock_Count) || !is_locked()) {
-				CL_Thread_ID  = 0;
-				CL_Lock_Count = 0;
+			if ((1 == CL_Lock_Count.fetch_sub(1)) || !is_locked()) {
+				CL_Thread_ID.store(0, std::memory_order_release);
+				CL_Lock_Count.store(0, std::memory_order_release);
 				CL_Is_Locked.store(false, std::memory_order_release);
 				CL_Lock.clear(std::memory_order_release);
 			}
@@ -261,11 +263,11 @@ private:
 	 * ===============================================
 	*/
 
-	std::atomic_bool CL_Do_Locking; //!< If set to false with do_locking(false), no real locking is done.
-	std::atomic_bool CL_Is_Locked;  //!< Set to true if a lock is imposed, atomic_flag can't do it.
-	std::atomic_flag CL_Lock;       //!< Instead of a costly mutex atomic_flag spinlocks are used.
-	uint32_t         CL_Lock_Count; //!< How many times the current thread has locked.
-	size_t           CL_Thread_ID;  //!< The owning thread of a lock
+	std::atomic_bool      CL_Do_Locking; //!< If set to false with do_locking(false), no real locking is done.
+	std::atomic_bool      CL_Is_Locked;  //!< Set to true if a lock is imposed, atomic_flag can't do it.
+	std::atomic_flag      CL_Lock;       //!< Instead of a costly mutex atomic_flag spinlocks are used.
+	std::atomic<uint32_t> CL_Lock_Count; //!< How many times the current thread has locked.
+	std::atomic<size_t>   CL_Thread_ID;  //!< The owning thread of a lock
 }; // class CLockable
 
 } // namespace pwx
