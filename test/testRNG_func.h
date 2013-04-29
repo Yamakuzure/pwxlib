@@ -2,9 +2,10 @@
 #ifndef PWX_LIBPWX_TEST_TESTRNG_FUNC_H_INCLUDED
 #define PWX_LIBPWX_TEST_TESTRNG_FUNC_H_INCLUDED 1
 
-#include <limits>
 #include "testRNG.h"
 using pwx::RNG;
+
+#include <limits>
 
 const uint32_t rngMaxElements = maxElements;
 const int16_t maxInt16  = std::numeric_limits<int16_t>::max();
