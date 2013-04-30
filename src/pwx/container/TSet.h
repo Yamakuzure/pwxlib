@@ -440,6 +440,25 @@ protected:
 
 		curr(insElem);
 
+		// If this is a sorted set, check consistency.
+		// Note  : If we reach this point, the set is locked!
+		// Note2 : Otherwise we have a problem!
+#ifdef LIBPWX_DEBUG
+		if (this->beThreadSafe.load(std::memory_order_relaxed) && !this->lock_count())
+			PWX_THROW("MissingLock", "TSet::protInsert() called without a lock in place!",
+						"This is evil and must be fixed NOW!")
+		if (isSorted && insPrev && insElem && (**insPrev > **insElem)) {
+			DEBUG_LOG("TSet", "insPrev: % 5d - \"%s\"",
+						insPrev->eNr.load(),
+						to_string(**insPrev).c_str())
+			DEBUG_LOG("TSet", "insElem: % 5d - \"%s\"",
+						insElem->eNr.load(),
+						to_string(**insElem).c_str())
+			PWX_THROW("BustedOrder", "insPrev is LARGER than insElem ? What the hell?",
+						"This is evil ans must be fixed NOW!")
+		}
+#endif // LIBPWX_DEBUG
+
 		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
 			doRenumber.store(true, std::memory_order_release);
@@ -470,6 +489,9 @@ protected:
 
 		return eCount.load(std::memory_order_acquire);
 	}
+
+
+	using base_t::protRenumber;
 
 
 	/* ===============================================
@@ -635,6 +657,7 @@ private:
 				if (xCurr && ( (xPrev && (**xPrev > data)) || (xNext && (data > **xNext)) ) ) {
 					// This is bad. Something busted the set!
 					if (reentered) {
+						protRenumber();
 
 						DEBUG_LOG("TSet", "Double recursion detected with %d locks",
 										this->lock_count())
@@ -643,6 +666,9 @@ private:
 						DEBUG_LOG("TSet", "head : nr % 5d, data \"%s\"",
 									head() ? head()->eNr.load() : -1,
 									head() ? to_string(**head()).c_str() : "nullptr")
+						DEBUG_LOG("TSet", "start: nr % 5d, data \"%s\"",
+									(start && *start) ? (*start)->eNr.load() : -1,
+									(start && *start) ? to_string(**(*start)).c_str() : "nullptr")
 						DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"",
 									xPrev ? xPrev->eNr.load() : -1,
 									xPrev ? to_string(**xPrev).c_str() : "nullptr")
