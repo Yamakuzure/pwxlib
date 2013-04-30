@@ -491,6 +491,7 @@ private:
 	 * ===============================================
 	*/
 
+
 	/** @brief find an element holding the specified @a data
 	  *
 	  * The protFind() method of the containers search for pointers, while
@@ -514,8 +515,14 @@ private:
 	  * @param[in,out] start pointer pointer from where to start, stores where to end.
 	  * @return pointer to the element or nullptr if @a data is not present in the set.
 	**/
-	const elem_t* privFindData (const data_t &data, elem_t** start) const noexcept
+	const elem_t* privFindData (const data_t &data, elem_t** start,
+								bool reentered = false) const noexcept
 	{
+#define PFD_SET_START(new_start) { \
+			if (start) { \
+				*start = new_start; \
+			} \
+		}
 		// Note: Methods that call privFindData() to prepare an insertion should
 		//       search again after start is adjusted and a lock is acquired.
 		uint32_t localCount = eCount.load(std::memory_order_acquire);
@@ -530,8 +537,7 @@ private:
 		if (localCount) {
 			// Quick exit if sorted set assumption 1 is correct:
 			if (isSorted && (**head() > data)) {
-				if (start)
-					*start = nullptr;
+				PFD_SET_START(nullptr)
 				return nullptr;
 			}
 
@@ -551,8 +557,7 @@ private:
 		if (localCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
 			if (isSorted && (data > **tail())) {
-				if (start)
-					*start = tail();
+				PFD_SET_START(tail())
 				return nullptr;
 			}
 
@@ -571,37 +576,104 @@ private:
 			if (isSorted) {
 				/* Here we know that data is definitely in the range of the set.
 				 * It is larger than head an smaller than tail. The good thing
-				 * about this is the absence of any need to check curr against
+				 * about this is the absence of any need to check xCurr against
 				 * head or tail.
+				 * Pitfalls: If this is a multi-threaded environment there are some
+				 * nasty issues that can arise:
+				 * A) If data is larger than head but smaller than heads next
+				 *    element, and another thread removes head just now, xCurr
+				 *    will end up being nullptr when going down.
+				 * B) The same happens with tail vice versa.
 				*/
-				// Step 1: Move up until curr is larger
-				while (xCurr && (data > **xCurr) && (tail() != xCurr)) {
-					xOld  = xCurr;
-					xCurr = xCurr->getNext();
-					if (nullptr == xCurr)
-						// Should not happen unless someone does something stupid
-						// with different threads. (like torture does ;))
-						xCurr = xOld ? xOld : head();
+
+				// Step 1: Move up until data is no longer larger than **xCurr
+				bool doStop = false;
+				while (!doStop && xCurr && (data > **xCurr)) {
+					if (tail() == xCurr)
+						doStop = true;
+					else {
+						xOld  = xCurr;
+						xCurr = xCurr->getNext();
+						if (nullptr == xCurr)
+							// Should not happen unless someone does something stupid
+							// with different threads. (like torture does ;))
+							xCurr = xOld ? xOld : head();
+					}
+				} // End of wandering up
+
+				// Step 2: check whether we reached tail and assumption 2 is suddenly valid
+				if (doStop && (data > **tail())) {
+					PFD_SET_START(tail())
+					return nullptr;
 				}
 
-				// Step 2: Move down until curr is smaller
+				// Step 3: Check whether xCurr was busted
 				if (nullptr == xCurr) xCurr = tail(); // Might happen due to thread concurrency
 
-				while (xCurr && (**xCurr > data) && (head() != xCurr)) {
-					xOld  = xCurr;
-					xCurr = xCurr->getPrev();
-					if (nullptr == xCurr)
-						xCurr = xOld ? xOld : tail(); // dito
+				// Step 4: Go down until data is no longer smaller than **xCurr
+				doStop = false;
+				while (!doStop && xCurr && (**xCurr > data)) {
+					if (head() == xCurr)
+						doStop = true;
+					else {
+						xOld  = xCurr;
+						xCurr = xCurr->getPrev();
+						if (nullptr == xCurr)
+							xCurr = xOld ? xOld : tail(); // dito
+					}
+				} // End of wandering down
+
+				// Step 5: check whether we reached head and assumption 1 is suddenly valid
+				if (doStop && (**head() > data)) {
+					PFD_SET_START(nullptr)
+					return nullptr;
 				}
 
-				// Step 3: If there are massive removes/insertions the result might be wrong.
+				// Step 6: Check that we really really reached a valid end, or re-enter with a lock:
 				elem_t* xNext = xCurr ? xCurr->getNext() : nullptr;
 				elem_t* xPrev = xCurr ? xCurr->getPrev() : nullptr;
-				if (xCurr && ((xNext && (data > **xNext)) || (xPrev && (**xPrev > data)))) {
+				if (xCurr && ( (xPrev && (**xPrev > data)) || (xNext && (data > **xNext)) ) ) {
+					// This is bad. Something busted the set!
+					if (reentered) {
+
+						DEBUG_LOG("TSet", "Double recursion detected with %d locks",
+										this->lock_count())
+						DEBUG_LOG("TSet", "Searching for data \"%s\"",
+										to_string(data).c_str())
+						DEBUG_LOG("TSet", "head : nr % 5d, data \"%s\"",
+									head() ? head()->eNr.load() : -1,
+									head() ? to_string(**head()).c_str() : "nullptr")
+						DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"",
+									xPrev ? xPrev->eNr.load() : -1,
+									xPrev ? to_string(**xPrev).c_str() : "nullptr")
+						DEBUG_LOG("TSet", "xCurr: nr % 5d, data \"%s\"",
+									xCurr ? xCurr->eNr.load() : -1,
+									xCurr ? to_string(**xCurr).c_str() : "nullptr")
+						DEBUG_LOG("TSet", "xNext: nr % 5d, data \"%s\"",
+									xNext ? xNext->eNr.load() : -1,
+									xNext ? to_string(**xNext).c_str() : "nullptr")
+						DEBUG_LOG("TSet", "tail : nr % 5d, data \"%s\"",
+									tail() ? tail()->eNr.load() : -1,
+									tail() ? to_string(**tail()).c_str() : "nullptr")
+
+						// This is FUBAR! No exception can fix this!
+#ifndef LIBPWX_DEBUG
+						// I know that it says "noexcept". This is intentional
+						// to have at least some message and a possible std::terminate()
+						PWX_THROW("Broken_TSet",
+								"TSet is FUBAR! Please enable DEBUG in the Makefile",
+								"TSet is FUBAR! Please enable DEBUG in the Makefile")
+#endif // LIBPWX_DEBUG
+						std::terminate();
+					} // is busted? Otherwise another thread simply interfered
+
+					if (start && (*start == xCurr) )
+						*start = head();
+					else if (!start)
+						curr(head()); // Used if no start pointer given
+
 					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-					if (start)
-						*start = xCurr;
-					return privFindData(data, start);
+					return this->privFindData(data, start, true);
 				}
 			} else {
 				xCurr = head()->getNext();
@@ -623,12 +695,12 @@ private:
 			if (xCurr && (**xCurr == data))
 				return xCurr;
 			else {
-				if (start)
-					*start = xCurr;
+				PFD_SET_START(xCurr)
 				return nullptr;
 			}
 		} // End of having at least 3 elements
 
+#undef PFD_SET_START
 
 		return nullptr;
 	}
