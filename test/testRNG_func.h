@@ -56,6 +56,7 @@ void testRNG_hash(sEnv &env)
 
 void testRNG_hash_char(sEnv &env);
 void testRNG_hash_str(sEnv &env);
+void testRNG_name(sEnv &env, bool longName, bool multiWord);
 void testRNG_noise(sEnv &env, int32_t dimensions, int32_t maxVal, int32_t miss);
 
 #endif // PWX_LIBPWX_TEST_TESTRNG_FUNC_H_INCLUDED

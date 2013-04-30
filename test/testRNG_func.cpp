@@ -79,6 +79,40 @@ void testRNG_hash_str(sEnv &env)
 }
 
 
+/// @internal test function for RNG.rndName()
+void testRNG_name(sEnv &env, bool longName, bool multiWord)
+{
+	char* name = nullptr;
+	bool  isOK = true;
+
+	cout << adjRight(4,0) << ++env.testCount;
+	cout << (longName ? " long names, " : " short names, ");
+	cout << (multiWord ? "multi word" : "single word") << endl;
+	cout << "      --------------------" << endl;
+
+	for (int i = 1 ; i <= 10 ; ++i) {
+		double x = RNG.random(100.0);
+		double y = RNG.random(100.0);
+		double z = RNG.random(100.0);
+		name = RNG.rndName(x, y, z, longName, multiWord);
+		if (name) {
+			cout << "  " << adjRight(4,0) << i << ".: \"" << name << "\"" << endl;
+			free(name);
+		} else {
+			cerr << "ERROR: rndName(" << x << ", " << y << ", " << z << ", ";
+			cerr << (longName ? "true, " : "false, ");
+			cerr << (multiWord ? "true)" : "false)");
+			cerr << " returned nullptr!" << endl;
+			++env.testFail;
+		}
+	}
+
+	if (isOK)
+		++env.testSuccess;
+	cout << "      --------------------" << endl;
+}
+
+
 /// @internal test function for RNG.noise()
 void testRNG_noise(sEnv &env, int32_t dimensions, int32_t maxVal, int32_t miss)
 {

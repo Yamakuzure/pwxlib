@@ -133,31 +133,30 @@ int32_t testRNG (sEnv &env)
 	if (maxZ < 1) maxZ = 1;
 	if (maxW < 1) maxW = 1;
 
-	DEBUG_LOG("noise", "maxX: %d, maxY: %d, maxZ: %d, maxW: %d", maxX, maxY, maxZ, maxW)
-
 	// A) 1 dimension
-	DEBUG_LOG("noise", "%d + %d missed", maxX, miss)
 	testRNG_noise(env, 1, maxX, miss);
 
 	// B) 2 dimensions
 	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxY, 2.));
-	DEBUG_LOG("noise", "%d + %d missed", static_cast<int32_t>(std::pow(maxY, 2.)), miss)
 	testRNG_noise(env, 2, maxY, miss);
 
 	// C) 3 dimensions
 	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxZ, 3.));
-	DEBUG_LOG("noise", "%d + %d missed", static_cast<int32_t>(std::pow(maxZ, 3.)), miss)
 	testRNG_noise(env, 3, maxZ, miss);
 
 	// D) 4 dimensions
 	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxW, 4.));
-	DEBUG_LOG("noise", "%d + %d missed", static_cast<int32_t>(std::pow(maxW, 4.)), miss)
 	testRNG_noise(env, 4, maxW, miss);
 
 
 	/************************************************************************
 	** D) Random name functions                                            **
 	************************************************************************/
+	cout << " D) Random name functions, 10 names each" << endl;
+	testRNG_name(env, false, false);
+	testRNG_name(env, false, true);
+	testRNG_name(env, true,  false);
+	testRNG_name(env, true,  true);
 
 	/************************************************************************
 	** E) Simplex Noise functions                                          **
