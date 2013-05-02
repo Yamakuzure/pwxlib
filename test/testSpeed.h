@@ -27,7 +27,7 @@ struct thAdder
 	void operator()(list_t* cont_, data_t start, data_t toAdd, data_t maxAdd)
 	{
 		cont = cont_;
-		while (!this->isRunning.load(std::memory_order_acquire)) { }
+		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
 
 		if (cont) {
 			for (data_t nr = 0; nr < toAdd; ++nr) {
@@ -45,8 +45,8 @@ struct thAdder
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while (this->isRunning.load(std::memory_order_acquire))
-			this->isRunning.store(false, std::memory_order_release);
+		while (this->isRunning.load(PWX_MEMORDER_ACQUIRE))
+			this->isRunning.store(false, PWX_MEMORDER_RELEASE);
 	}
 };
 
@@ -66,7 +66,7 @@ struct thClearer
 	void operator()(list_t* cont_)
 	{
 		cont = cont_;
-		while (!this->isRunning.load(std::memory_order_acquire)) { }
+		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
 		if (cont) cont->clear();
 
 		DEBUG_LOCK_STATE("clear_locks", thClearer, cont)
@@ -78,8 +78,8 @@ struct thClearer
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while (this->isRunning.load(std::memory_order_acquire))
-			this->isRunning.store(false, std::memory_order_release);
+		while (this->isRunning.load(PWX_MEMORDER_ACQUIRE))
+			this->isRunning.store(false, PWX_MEMORDER_RELEASE);
 	}
 };
 
@@ -188,8 +188,9 @@ int32_t testSpeedST (sEnv &env)
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else if (!isOrderOK) {
-		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1);
-		cout << ": (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
+		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
+		cout << " -> (prev) curr >= next (next->next)" << endl;
+		cout << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else
@@ -365,8 +366,9 @@ int32_t testSpeedMT (sEnv &env)
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else if (!isOrderOK) {
-		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1);
-		cout << ": (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
+		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
+		cout << " -> (prev) curr >= next (next->next)" << endl;
+		cout << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else

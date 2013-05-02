@@ -220,10 +220,10 @@ public:
 		do {
 			if (xCurr) {
 				xCurr->disable_thread_safety();
-				xCurr = xCurr->next.load(std::memory_order_relaxed);
+				xCurr = xCurr->getNext();
 			}
 		} while (xCurr && xCurr != tail());
-		this->beThreadSafe.store(false, std::memory_order_relaxed);
+		this->beThreadSafe.store(false, PWX_MEMORDER_RELAXED);
 		PWX_UNLOCK(this) // Just for the record
 	}
 
@@ -231,7 +231,7 @@ public:
 	/// @brief return true if this container is empty
 	virtual bool empty() const noexcept
 	{
-		return !eCount.load(std::memory_order_acquire);
+		return !eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -252,10 +252,10 @@ public:
 		do {
 			if (xCurr) {
 				xCurr->enable_thread_safety();
-				xCurr = xCurr->next.load(std::memory_order_relaxed);
+				xCurr = xCurr->getNext();
 			}
 		} while (xCurr && xCurr != tail());
-		this->beThreadSafe.store(true, std::memory_order_release);
+		this->beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
 	}
 
 
@@ -516,7 +516,7 @@ public:
 		PWX_LOCK_GUARD(list_t, this)
 		// Note: The guard is needed to ensure that no thread changes the
 		// number of elements beyond the border of eCount > 1
-		return (eCount.load(std::memory_order_acquire) > 1
+		return (eCount.load(PWX_MEMORDER_ACQUIRE) > 1
 				? privRemoveAfterElement(const_cast<elem_t* > (privGetElementByIndex (-2)))
 				: privRemoveAfterData(nullptr));
 	}
@@ -671,7 +671,7 @@ public:
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept
 	{
-		return eCount.load(std::memory_order_acquire);
+		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -698,7 +698,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy      = rhs.destroy;
-			beThreadSafe = rhs.beThreadSafe.load(std::memory_order_relaxed);
+			beThreadSafe = rhs.beThreadSafe.load(PWX_MEMORDER_RELAXED);
 			PWX_TRY_PWX_FURTHER (return operator+=(rhs))
 		}
 		return *this;
@@ -720,7 +720,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			elem_t* rhsCurr = rhs.head();
 			bool    isDone  = false;
-			bool    isTS    = this->beThreadSafe.load(std::memory_order_acquire);
+			bool    isTS    = this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE);
 
 			while (rhsCurr && !isDone) {
 				PWX_TRY_PWX_FURTHER (privInsElemBehindElem (tail(), *rhsCurr))
@@ -844,70 +844,70 @@ protected:
 	/// @brief return curr according to thread safety setting
 	elem_t* curr() const
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			return curr_.load(std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			return curr_.load(PWX_MEMORDER_RELAXED);
 		else
-			return curr_.load(std::memory_order_acquire);
+			return curr_.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
 	/// @brief set curr to @a new_curr according to thread safety settings
 	void curr(elem_t* new_curr) const
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			curr_.store(new_curr, std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
 		else
-			curr_.store(new_curr, std::memory_order_release);
+			curr_.store(new_curr, PWX_MEMORDER_RELEASE);
 	}
 
 
 	/// @brief set curr to @a new_curr according to thread safety settings
 	void curr(elem_t* new_curr)
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			curr_.store(new_curr, std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
 		else
-			curr_.store(new_curr, std::memory_order_release);
+			curr_.store(new_curr, PWX_MEMORDER_RELEASE);
 	}
 
 
 	/// @brief return head according to thread safety setting
 	elem_t* head() const
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			return head_.load(std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			return head_.load(PWX_MEMORDER_RELAXED);
 		else
-			return head_.load(std::memory_order_acquire);
+			return head_.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
 	/// @brief set head to @a new_head according to thread safety settings
 	void head(elem_t* new_head)
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			head_.store(new_head, std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			head_.store(new_head, PWX_MEMORDER_RELAXED);
 		else
-			head_.store(new_head, std::memory_order_release);
+			head_.store(new_head, PWX_MEMORDER_RELEASE);
 	}
 
 
 	/// @brief return tail according to thread safety setting
 	elem_t* tail() const
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			return tail_.load(std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			return tail_.load(PWX_MEMORDER_RELAXED);
 		else
-			return tail_.load(std::memory_order_acquire);
+			return tail_.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
 	/// @brief set tail to @a new_tail according to thread safety settings
 	void tail(elem_t* new_tail)
 	{
-		if (this->beThreadSafe.load(std::memory_order_relaxed))
-			tail_.store(new_tail, std::memory_order_relaxed);
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+			tail_.store(new_tail, PWX_MEMORDER_RELAXED);
 		else
-			tail_.store(new_tail, std::memory_order_release);
+			tail_.store(new_tail, PWX_MEMORDER_RELEASE);
 	}
 
 
@@ -938,7 +938,7 @@ protected:
 					PWX_UNLOCK(removed)
 			} // end of if not destroyed yet
 		} // end of having an element to delete
-		return eCount.load(std::memory_order_acquire);
+		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -968,7 +968,7 @@ protected:
 		}
 
 		// The next does only make sense if we have more than one element
-		if (eCount.load(std::memory_order_acquire) > 1) {
+		if (eCount.load(PWX_MEMORDER_ACQUIRE) > 1) {
 
 			// Exit if head is wanted...
 			if (head()->data.get() == data) {
@@ -987,8 +987,8 @@ protected:
 			}
 
 			// Otherwise we have to search for it (head and tail are already checked):
-			if (this->beThreadSafe.load(std::memory_order_acquire)) {
-				elem_t* xCurr = head()->getNext();
+			elem_t* xCurr = head()->getNext();
+			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
 				while (!result && xCurr && (xCurr != tail() )) {
@@ -998,14 +998,13 @@ protected:
 						xCurr = xCurr->getNext();
 				}
 			} else {
-				elem_t* xCurr = head()->next.load(std::memory_order_relaxed);
 				// No need to unlock, PWX_LOCK hasn't done anything anyway.
 
 				while (!result && xCurr && (xCurr != tail() )) {
 					if (xCurr->data.get() == data)
 						result = xCurr;
 					else
-						xCurr = xCurr->next.load(std::memory_order_relaxed);
+						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);
 				}
 			} // End of manual traversing the container
 
@@ -1042,13 +1041,13 @@ protected:
 		*/
 		PWX_LOCK(this)
 
-		uint32_t locCnt = eCount.load(std::memory_order_acquire);
+		uint32_t locCnt = eCount.load(PWX_MEMORDER_ACQUIRE);
 
 		curr(insElem);
 
 		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
-			doRenumber.store(true, std::memory_order_release);
+			doRenumber.store(true, PWX_MEMORDER_RELEASE);
 			DEBUG_LOCK_STATE("insertNext", insPrev, insElem)
 			PWX_UNLOCK(this)
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
@@ -1066,12 +1065,12 @@ protected:
 				DEBUG_LOCK_STATE("insertBefore", insElem, head())
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(head() ))
 				head(insElem);
-				doRenumber.store(true, std::memory_order_release);
+				doRenumber.store(true, PWX_MEMORDER_RELEASE);
 			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail()->eNr.load(std::memory_order_acquire) + 1,
-					std::memory_order_release);
+					tail()->eNr.load(PWX_MEMORDER_ACQUIRE) + 1,
+					PWX_MEMORDER_RELEASE);
 				DEBUG_LOCK_STATE("insertNext", tail(), insElem)
 				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
 				tail(insElem);
@@ -1080,9 +1079,9 @@ protected:
 		}
 
 		// Raise eCount and set renumbering mode
-		eCount.fetch_add(1, std::memory_order_release);
+		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
 
-		return eCount.load(std::memory_order_acquire);
+		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -1090,14 +1089,14 @@ protected:
 	virtual void protRenumber() const noexcept
 	{
 		// Now do the renumbering if it is necessary:
-		if (doRenumber.load(std::memory_order_acquire)) {
+		if (doRenumber.load(PWX_MEMORDER_ACQUIRE)) {
 
 			// Do a big lock, so multiple threads calling this function
 			// won't renumber multiple times when once is enough.
 			PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 			// Check again, maybe this does not need any renumbering any more:
-			if (!doRenumber.load(std::memory_order_acquire))
+			if (!doRenumber.load(PWX_MEMORDER_ACQUIRE))
 				return;
 
 			elem_t*  xCurr  = head();
@@ -1105,14 +1104,14 @@ protected:
 			bool     isDone = false;
 
 			while (xCurr && !isDone) {
-				xCurr->eNr.store(xNr++, std::memory_order_relaxed);
+				xCurr->eNr.store(xNr++, PWX_MEMORDER_RELEASE);
 				if (xCurr == tail() )
 					isDone = true;
 				else
 					xCurr = xCurr->next;
 			}
 
-			doRenumber.store(false, std::memory_order_release);
+			doRenumber.store(false, PWX_MEMORDER_RELEASE);
 		}
 	}
 
@@ -1134,7 +1133,7 @@ private:
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
 		elem_t*  xPrev = head();
-		elem_t*  xCurr = xPrev->next.load(std::memory_order_acquire);
+		elem_t*  xCurr = xPrev->getNext();
 
 		while (xPrev && (xPrev != tail() )) {
 			if (xCurr->data.get() == data) {
@@ -1142,7 +1141,7 @@ private:
 				return xPrev;
 			}
 			xPrev = xCurr;
-			xCurr = xCurr->next.load(std::memory_order_relaxed);
+			xCurr = xCurr->getNext();
 		}
 
 		// If we are here, prev points to tail. No match found.
@@ -1159,11 +1158,11 @@ private:
 		// start of the search with a minimum of checks
 		PWX_LOCK(const_cast<list_t*>(this))
 
-		uint32_t locCnt = eCount.load(std::memory_order_acquire);
+		uint32_t locCnt = eCount.load(PWX_MEMORDER_ACQUIRE);
 
 		if (locCnt) {
 			elem_t*  xCurr = curr() ? curr() : head();
-			uint32_t xNr   = xCurr->eNr.load(std::memory_order_acquire);
+			uint32_t xNr   = xCurr->eNr.load(PWX_MEMORDER_ACQUIRE);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
 
@@ -1226,7 +1225,7 @@ private:
 					PWX_LOCK(const_cast<list_t*>(this))
 					// Do a double check, maybe the warp is not needed any more
 					if (tail() == xCurr) {
-						xIdx -= eCount.load(std::memory_order_acquire);
+						xIdx -= eCount.load(PWX_MEMORDER_ACQUIRE);
 						xCurr = head();
 						xNr   = 0;
 					}
@@ -1273,7 +1272,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
@@ -1298,7 +1297,7 @@ private:
 				PWX_UNLOCK(prev)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
@@ -1345,7 +1344,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1384,7 +1383,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1411,7 +1410,7 @@ private:
 			// Case 1
 			head(head()->getNext());
 			elem->remove();
-			doRenumber.store(true, std::memory_order_release);
+			doRenumber.store(true, PWX_MEMORDER_RELEASE);
 		} else {
 			if (tail() == elem)
 				// Case 2:

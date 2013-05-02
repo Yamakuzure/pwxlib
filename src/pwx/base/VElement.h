@@ -88,7 +88,7 @@ public:
 	**/
 	bool destroyed() const noexcept
 	{
-		return isDestroyed.load(std::memory_order_acquire);
+		return isDestroyed.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -104,7 +104,7 @@ public:
 	virtual void disable_thread_safety() noexcept
 	{
 		this->do_locking(false);
-		beThreadSafe.store(false, std::memory_order_release);
+		beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
 	}
 
 
@@ -115,7 +115,7 @@ public:
 	virtual void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		beThreadSafe.store(true, std::memory_order_release);
+		beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
 	}
 
 
@@ -128,7 +128,7 @@ public:
 	**/
 	bool inserted() const noexcept
 	{
-		return !isRemoved.load(std::memory_order_acquire);
+		return !isRemoved.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 

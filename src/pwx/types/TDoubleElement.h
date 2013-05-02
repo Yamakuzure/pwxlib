@@ -190,14 +190,14 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
-			elem_t* curNext = next.load(std::memory_order_acquire);
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+			elem_t* curNext = next.load(PWX_MEMORDER_ACQUIRE);
 			if ( !curNext
-			  && isRemoved.load(std::memory_order_acquire) )
-				return oldNext.load(std::memory_order_acquire);
+			  && isRemoved.load(PWX_MEMORDER_ACQUIRE) )
+				return oldNext.load(PWX_MEMORDER_ACQUIRE);
 			return curNext;
 		}
-		return next.load(std::memory_order_relaxed);
+		return next.load(PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -210,14 +210,14 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getPrev() const noexcept
 	{
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
-			elem_t* curPrev = prev.load(std::memory_order_acquire);
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+			elem_t* curPrev = prev.load(PWX_MEMORDER_ACQUIRE);
 			if ( !curPrev
-			  && isRemoved.load(std::memory_order_acquire) )
-				return oldPrev.load(std::memory_order_acquire);
+			  && isRemoved.load(PWX_MEMORDER_ACQUIRE) )
+				return oldPrev.load(PWX_MEMORDER_ACQUIRE);
 			return curPrev;
 		}
-		return prev.load(std::memory_order_relaxed);
+		return prev.load(PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -238,9 +238,9 @@ struct PWX_API TDoubleElement : public VElement
 	void insertBefore(elem_t* new_next)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, beThreadSafe.load(std::memory_order_relaxed)
-								? std::memory_order_release
-								: std::memory_order_relaxed);
+			isRemoved.store(false, beThreadSafe.load(PWX_MEMORDER_RELAXED)
+								? PWX_MEMORDER_RELEASE
+								: PWX_MEMORDER_RELAXED);
 			return;
 		}
 
@@ -273,7 +273,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
@@ -307,7 +307,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Insert the new element
 				new_next->setNext(xOldNext);
 				new_next->setPrev(this);
-				new_next->isRemoved.store(false, std::memory_order_release);
+				new_next->isRemoved.store(false, PWX_MEMORDER_RELEASE);
 
 				// Store new next and prev neighbor
 				setNext(new_next);
@@ -323,13 +323,13 @@ struct PWX_API TDoubleElement : public VElement
 						"Tried to insert an element that has already been destroyed!")
 		} else {
 			// Otherwise do it directly and relaxed
-			elem_t* xOldNext = next.load(std::memory_order_relaxed);
-			new_next->next.store(xOldNext, std::memory_order_relaxed);
-			new_next->prev.store(this, std::memory_order_relaxed);
-			new_next->isRemoved.store(false, std::memory_order_relaxed);
-			next.store(new_next, std::memory_order_relaxed);
+			elem_t* xOldNext = next.load(PWX_MEMORDER_RELAXED);
+			new_next->next.store(xOldNext, PWX_MEMORDER_RELAXED);
+			new_next->prev.store(this, PWX_MEMORDER_RELAXED);
+			new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
+			next.store(new_next, PWX_MEMORDER_RELAXED);
 			if (xOldNext)
-				xOldNext->prev.store(new_next, std::memory_order_relaxed);
+				xOldNext->prev.store(new_next, PWX_MEMORDER_RELAXED);
 		}
 	}
 
@@ -359,7 +359,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_prev || (new_prev == this))
 			return;
 
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
@@ -393,7 +393,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Set the neighborhood of the new prev
 				new_prev->setNext(this);
 				new_prev->setPrev(xOldPrev);
-				new_prev->isRemoved.store(false, std::memory_order_release);
+				new_prev->isRemoved.store(false, PWX_MEMORDER_RELEASE);
 
 				// Store new next and prev neighbor.
 				setPrev(new_prev);
@@ -409,13 +409,13 @@ struct PWX_API TDoubleElement : public VElement
 						"Tried to insert an element that has already been destroyed!")
 		} else {
 			// Otherwise do it directly and relaxed
-			elem_t* xOldPrev = prev.load(std::memory_order_relaxed);
-			new_prev->prev.store(xOldPrev, std::memory_order_relaxed);
-			new_prev->next.store(this, std::memory_order_relaxed);
-			new_prev->isRemoved.store(false, std::memory_order_relaxed);
-			prev.store(new_prev, std::memory_order_relaxed);
+			elem_t* xOldPrev = prev.load(PWX_MEMORDER_RELAXED);
+			new_prev->prev.store(xOldPrev, PWX_MEMORDER_RELAXED);
+			new_prev->next.store(this, PWX_MEMORDER_RELAXED);
+			new_prev->isRemoved.store(false, PWX_MEMORDER_RELAXED);
+			prev.store(new_prev, PWX_MEMORDER_RELAXED);
 			if (xOldPrev)
-				xOldPrev->next.store(new_prev, std::memory_order_relaxed);
+				xOldPrev->next.store(new_prev, PWX_MEMORDER_RELAXED);
 		}
 	}
 
@@ -429,9 +429,9 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
 			// Do an acquiring test before the element is actually locked
-			if (next.load(std::memory_order_acquire) || prev.load(std::memory_order_acquire)) {
+			if (next.load(PWX_MEMORDER_ACQUIRE) || prev.load(PWX_MEMORDER_ACQUIRE)) {
 				PWX_LOCK(this)
 				elem_t* xOldPrev = getPrev();
 				elem_t* xOldNext = getNext();
@@ -490,24 +490,24 @@ struct PWX_API TDoubleElement : public VElement
 				// 3: Remove neighborhood:
 				this->setPrev(nullptr);
 				this->setNext(nullptr);
-				this->isRemoved.store(true, std::memory_order_release);
+				this->isRemoved.store(true, PWX_MEMORDER_RELEASE);
 				PWX_UNLOCK(this)
 			} // End of having at least one neighbor to handle
 		} else {
 			// No thread safety? Then just kick it out:
-			elem_t* xOldNext = next.load(std::memory_order_relaxed);
-			elem_t* xOldPrev = prev.load(std::memory_order_relaxed);
+			elem_t* xOldNext = next.load(PWX_MEMORDER_RELAXED);
+			elem_t* xOldPrev = prev.load(PWX_MEMORDER_RELAXED);
 
 			if (xOldNext && (xOldNext != this))
-				xOldNext->prev.store(xOldNext, std::memory_order_relaxed);
+				xOldNext->prev.store(xOldNext, PWX_MEMORDER_RELAXED);
 
 			if (xOldPrev && (xOldPrev != this))
-				xOldPrev->next.store(xOldNext, std::memory_order_relaxed);
+				xOldPrev->next.store(xOldNext, PWX_MEMORDER_RELAXED);
 
-			prev.store(nullptr, std::memory_order_relaxed);
-			next.store(nullptr, std::memory_order_relaxed);
+			prev.store(nullptr, PWX_MEMORDER_RELAXED);
+			next.store(nullptr, PWX_MEMORDER_RELAXED);
 
-			isRemoved.store(true, std::memory_order_relaxed);
+			isRemoved.store(true, PWX_MEMORDER_RELAXED);
 		}
 	}
 
@@ -550,13 +550,13 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
-			elem_t* currNext = next.load(std::memory_order_acquire);
-			next.store(new_next, std::memory_order_release);
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+			elem_t* currNext = next.load(PWX_MEMORDER_ACQUIRE);
+			next.store(new_next, PWX_MEMORDER_RELEASE);
 			if (currNext)
-				oldNext.store(currNext, std::memory_order_release);
+				oldNext.store(currNext, PWX_MEMORDER_RELEASE);
 		} else
-			next.store(new_next, std::memory_order_relaxed);
+			next.store(new_next, PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -572,13 +572,13 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setPrev(elem_t* new_prev) noexcept
 	{
-		if (beThreadSafe.load(std::memory_order_relaxed)) {
-			elem_t* currPrev = prev.load(std::memory_order_acquire);
-			prev.store(new_prev, std::memory_order_release);
+		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+			elem_t* currPrev = prev.load(PWX_MEMORDER_ACQUIRE);
+			prev.store(new_prev, PWX_MEMORDER_RELEASE);
 			if (currPrev)
-				oldPrev.store(currPrev, std::memory_order_release);
+				oldPrev.store(currPrev, PWX_MEMORDER_RELEASE);
 		} else
-			prev.store(new_prev, std::memory_order_relaxed);
+			prev.store(new_prev, PWX_MEMORDER_RELAXED);
 	}
 
 

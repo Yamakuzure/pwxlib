@@ -788,9 +788,9 @@ private:
 	{
 		// Return early if nothing is to be done:
 		if (!head() || !tail() || ((head() == tail()->getNext()) && (tail() == head()->getPrev())) )
-			return eCount.load(std::memory_order_acquire);
+			return eCount.load(PWX_MEMORDER_ACQUIRE);
 
-		if (this->beThreadSafe.load(std::memory_order_relaxed)) {
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
 			PWX_LOCK(this)
@@ -813,11 +813,11 @@ private:
 			PWX_UNLOCK(this)
 		} // End of thread safe connection
 		else {
-			head()->prev.store(tail(), std::memory_order_relaxed);
-			tail()->next.store(head(), std::memory_order_relaxed);
+			head()->prev.store(tail(), PWX_MEMORDER_RELAXED);
+			tail()->next.store(head(), PWX_MEMORDER_RELAXED);
 		}
 
-		return eCount.load(std::memory_order_acquire);
+		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 }; // class TDoubleRing
 

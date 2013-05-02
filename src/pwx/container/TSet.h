@@ -227,9 +227,9 @@ public:
 		bool     result     = true;
 
 		// The empty set is always a subset of everything.
-		if ( eCount.load(std::memory_order_acquire)
+		if ( eCount.load(PWX_MEMORDER_ACQUIRE)
 		  && (this != &src)) {
-			if (src.eCount.load(std::memory_order_acquire)) {
+			if (src.eCount.load(PWX_MEMORDER_ACQUIRE)) {
 				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
 				elem_t* xCurr  = head();
 				bool    isDone = false;
@@ -436,32 +436,49 @@ protected:
 		 *    renumbering is needed then.
 		 * 4: Otherwise insPrev->insertNext() can do the insertion
 		*/
-		uint32_t locCnt = eCount.load(std::memory_order_acquire);
+		uint32_t locCnt = eCount.load(PWX_MEMORDER_ACQUIRE);
 
 		curr(insElem);
 
 		// If this is a sorted set, check consistency.
 		// Note  : If we reach this point, the set is locked!
 		// Note2 : Otherwise we have a problem!
-#ifdef LIBPWX_DEBUG
-		if (this->beThreadSafe.load(std::memory_order_relaxed) && !this->lock_count())
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
+#  if defined(PWX_THREADDEBUG)
+#    define LOCAL_DEBUG_LOG THREAD_LOG
+#  else
+#    define LOCAL_DEBUG_LOG DEBUG_LOG
+# endif
+		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED) && (0 == this->lock_count()) )
 			PWX_THROW("MissingLock", "TSet::protInsert() called without a lock in place!",
 						"This is evil and must be fixed NOW!")
-		if (isSorted && insPrev && insElem && (**insPrev > **insElem)) {
-			DEBUG_LOG("TSet", "insPrev: % 5d - \"%s\"",
+		if (isSorted && insPrev && insElem && (**insPrev >= **insElem)) {
+			LOCAL_DEBUG_LOG("TSet", "insPrev: % 5d - \"%s\"",
 						insPrev->eNr.load(),
 						to_string(**insPrev).c_str())
-			DEBUG_LOG("TSet", "insElem: % 5d - \"%s\"",
+			LOCAL_DEBUG_LOG("TSet", "insElem: % 5d - \"%s\"",
 						insElem->eNr.load(),
 						to_string(**insElem).c_str())
 			PWX_THROW("BustedOrder", "insPrev is LARGER than insElem ? What the hell?",
 						"This is evil ans must be fixed NOW!")
 		}
-#endif // LIBPWX_DEBUG
+		elem_t* xNext = insPrev ? insPrev->getNext() : nullptr;
+		if (isSorted && xNext && insElem && (**insElem >= **xNext)) {
+			LOCAL_DEBUG_LOG("TSet", "insElem: % 5d - \"%s\"",
+						insElem->eNr.load(),
+						to_string(**insElem).c_str())
+			LOCAL_DEBUG_LOG("TSet", "xNext  : % 5d - \"%s\"",
+						insPrev->eNr.load(),
+						to_string(**insPrev).c_str())
+			PWX_THROW("BustedOrder", "insElem is LARGER than insP ? What the hell?",
+						"This is evil ans must be fixed NOW!")
+		}
+#  undef LOCAL_DEBUG_LOG
+#endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
 		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
-			doRenumber.store(true, std::memory_order_release);
+			doRenumber.store(true, PWX_MEMORDER_RELEASE);
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
 		} else {
 			if (!locCnt) {
@@ -473,21 +490,21 @@ protected:
 				// Case 2: A new head is to be set
 				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem))
 				head(insElem);
-				doRenumber.store(true, std::memory_order_release);
+				doRenumber.store(true, PWX_MEMORDER_RELEASE);
 			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail()->eNr.load(std::memory_order_acquire) + 1,
-					std::memory_order_release);
+					tail()->eNr.load(PWX_MEMORDER_ACQUIRE) + 1,
+					PWX_MEMORDER_RELEASE);
 				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
 				tail(insElem);
 			}
 		}
 
 		// Raise eCount and set renumbering mode
-		eCount.fetch_add(1, std::memory_order_release);
+		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
 
-		return eCount.load(std::memory_order_acquire);
+		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -547,7 +564,7 @@ private:
 		}
 		// Note: Methods that call privFindData() to prepare an insertion should
 		//       search again after start is adjusted and a lock is acquired.
-		uint32_t localCount = eCount.load(std::memory_order_acquire);
+		uint32_t localCount = eCount.load(PWX_MEMORDER_ACQUIRE);
 		elem_t*  xCurr      = (start && *start) ? *start : curr() ? curr() : head();
 		elem_t*  xOld       = nullptr; // To fix thread concurrency
 
@@ -657,48 +674,67 @@ private:
 				if (xCurr && ( (xPrev && (**xPrev > data)) || (xNext && (data > **xNext)) ) ) {
 					// This is bad. Something busted the set!
 					if (reentered) {
-						protRenumber();
-
-						DEBUG_LOG("TSet", "Double recursion detected with %d locks",
-										this->lock_count())
-						DEBUG_LOG("TSet", "Searching for data \"%s\"",
-										to_string(data).c_str())
-						DEBUG_LOG("TSet", "head : nr % 5d, data \"%s\"",
-									head() ? head()->eNr.load() : -1,
-									head() ? to_string(**head()).c_str() : "nullptr")
-						DEBUG_LOG("TSet", "start: nr % 5d, data \"%s\"",
-									(start && *start) ? (*start)->eNr.load() : -1,
-									(start && *start) ? to_string(**(*start)).c_str() : "nullptr")
-						DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"",
-									xPrev ? xPrev->eNr.load() : -1,
-									xPrev ? to_string(**xPrev).c_str() : "nullptr")
-						DEBUG_LOG("TSet", "xCurr: nr % 5d, data \"%s\"",
-									xCurr ? xCurr->eNr.load() : -1,
-									xCurr ? to_string(**xCurr).c_str() : "nullptr")
-						DEBUG_LOG("TSet", "xNext: nr % 5d, data \"%s\"",
-									xNext ? xNext->eNr.load() : -1,
-									xNext ? to_string(**xNext).c_str() : "nullptr")
-						DEBUG_LOG("TSet", "tail : nr % 5d, data \"%s\"",
-									tail() ? tail()->eNr.load() : -1,
-									tail() ? to_string(**tail()).c_str() : "nullptr")
-
 						// This is FUBAR! No exception can fix this!
+
 #ifndef LIBPWX_DEBUG
 						// I know that it says "noexcept". This is intentional
 						// to have at least some message and a possible std::terminate()
 						PWX_THROW("Broken_TSet",
 								"TSet is FUBAR! Please enable DEBUG in the Makefile",
 								"TSet is FUBAR! Please enable DEBUG in the Makefile")
+#else
+#  define GET_OBJ_ENR(obj) obj ? obj->eNr.load() : -1
+#  define GET_OBJ_DAT(obj) obj ? to_string(**(obj)).c_str() : "nullptr"
+#  define GET_OBJ_ALL(obj) GET_OBJ_ENR(obj), GET_OBJ_DAT(obj)
+
+						protRenumber();
+
+						DEBUG_LOG("TSet", "Double recursion detected with %d locks",
+										this->lock_count())
+						DEBUG_LOG("TSet", "Searching for data \"%s\"",
+										to_string(data).c_str())
+						DEBUG_LOG("TSet", "head : nr % 5d, data \"%s\"", GET_OBJ_ALL(head()))
+						DEBUG_LOG("TSet", "start: nr % 5d, data \"%s\"",
+									(start && *start) ? (*start)->eNr.load() : -1,
+									(start && *start) ? to_string(**(*start)).c_str() : "nullptr")
+						elem_t* xShowPrev = xPrev;
+						for (int32_t i = 1; i < 5 ; ++i)
+							xShowPrev = (xPrev && xPrev->getPrev()) ? xPrev->getPrev() : xPrev;
+						while (xShowPrev && (xShowPrev != xPrev)) {
+							DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"", GET_OBJ_ALL(xShowPrev))
+							xShowPrev = xShowPrev->getNext();
+						}
+						DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"", GET_OBJ_ALL(xPrev))
+						DEBUG_LOG("TSet", "xCurr: nr % 5d, data \"%s\"", GET_OBJ_ALL(xCurr))
+						DEBUG_LOG("TSet", "xNext: nr % 5d, data \"%s\"", GET_OBJ_ALL(xNext))
+						elem_t* xShowNext = xNext;
+						for (int32_t i = 1; i < 5; ++i) {
+							if (xShowNext->getNext()) {
+								xShowNext = xShowNext->getNext();
+								DEBUG_LOG("TSet", "xNext: nr % 5d, data \"%s\"", GET_OBJ_ALL(xShowNext))
+							}
+						}
+						DEBUG_LOG("TSet", "tail : nr % 5d, data \"%s\"", GET_OBJ_ALL(tail()))
+
+#  undef GET_OBJ_ALL
+#  undef GET_OBJ_DAT
+#  undef GET_OBJ_ENR
+
+						PWX_THROW("Broken_TSet",
+								"The order is busted",
+								"Please investigate which of the above elements is wrong")
 #endif // LIBPWX_DEBUG
+						// The system *should* have terminated now, but make it sure to happen:
 						std::terminate();
 					} // is busted? Otherwise another thread simply interfered
+
+					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 					if (start && (*start == xCurr) )
 						*start = head();
 					else if (!start)
 						curr(head()); // Used if no start pointer given
 
-					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 					return this->privFindData(data, start, true);
 				}
 			} else {
@@ -775,7 +811,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -822,7 +858,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -887,7 +923,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -950,7 +986,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1014,7 +1050,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1073,7 +1109,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1150,7 +1186,7 @@ private:
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1223,7 +1259,7 @@ private:
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(std::memory_order_relaxed))
+		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert

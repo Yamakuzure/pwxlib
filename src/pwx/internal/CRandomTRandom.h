@@ -51,9 +51,9 @@ static std::atomic<rand_t> lastRndValue = ATOMIC_VAR_INIT(0);
 rand_t private_get_random() noexcept
 {
 	rand_t randVal = privRandDev_();
-	while (randVal == lastRndValue.load(std::memory_order_acquire))
+	while (randVal == lastRndValue.load(PWX_MEMORDER_ACQUIRE))
 		randVal = privRandDev_();
-	lastRndValue.store(randVal, std::memory_order_release);
+	lastRndValue.store(randVal, PWX_MEMORDER_RELEASE);
 	return randVal;
 }
 
