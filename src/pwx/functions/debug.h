@@ -107,9 +107,9 @@ void debug_log(const char* fmt, ...);
 	if (to_lock) \
 		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
 					#locker, action, #to_lock, #to_lock, \
-					to_lock->CL_Lock_Count, \
+					to_lock->CL_Lock_Count.load(), \
 					to_lock->is_locked() ? "locked" : "unlocked", \
-					to_lock->CL_Thread_ID) \
+					to_lock->CL_Thread_ID.load()) \
 	else \
 		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
 					#locker, action, #to_lock, #to_lock, 0, "n/a", 0) \

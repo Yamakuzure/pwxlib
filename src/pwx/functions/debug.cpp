@@ -1,4 +1,4 @@
-#include <pwx/functions/debug.h>
+#include <pwx/general/compiler.h>
 #include <cstdarg>
 #include <thread>
 
@@ -14,12 +14,12 @@ void debug_log(const char* fmt, ...)
     va_list ap;
     va_start (ap, fmt);
 
-	while (_pwx_internal_LOG_output_lock.test_and_set(std::memory_order_acquire))
+	while (_pwx_internal_LOG_output_lock.test_and_set(PWX_MEMORDER_ACQUIRE))
 		std::this_thread::yield();
 
     vfprintf (stderr, fmt, ap);
 
-	_pwx_internal_LOG_output_lock.clear(std::memory_order_release);
+	_pwx_internal_LOG_output_lock.clear(PWX_MEMORDER_RELEASE);
 
 	va_end(ap);
 }
