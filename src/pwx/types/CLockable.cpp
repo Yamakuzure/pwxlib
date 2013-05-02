@@ -23,7 +23,7 @@ CLockable::CLockable() noexcept
   * Only the state whether to actually do the locking is copied.
   */
 CLockable::CLockable (const CLockable &src) noexcept
- :	CL_Do_Locking(ATOMIC_VAR_INIT(src.CL_Do_Locking.load(std::memory_order_acquire))),
+ :	CL_Do_Locking(ATOMIC_VAR_INIT(src.CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE))),
 	CL_Is_Locked(ATOMIC_VAR_INIT(false)),
 	CL_Lock(ATOMIC_FLAG_INIT),
 	CL_Lock_Count(ATOMIC_VAR_INIT(0)),
@@ -52,7 +52,7 @@ CLockable::~CLockable() noexcept
   */
 CLockable &CLockable::operator= (const CLockable &src) noexcept
 {
-	CL_Do_Locking.store(src.CL_Do_Locking.load(std::memory_order_acquire), std::memory_order_release);
+	CL_Do_Locking.store(src.CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE), PWX_MEMORDER_RELEASE);
 	return *this;
 }
 

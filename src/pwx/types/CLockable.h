@@ -95,12 +95,12 @@ public:
 	**/
 	bool clear_locks() noexcept
 	{
-		if (CURRENT_THREAD_ID == CL_Thread_ID.load(std::memory_order_acquire)) {
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE)) {
 			if (is_locked() || try_lock()) {
 				THREAD_LOG("base", "clear_locks(), Owner id (%lu), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
-				CL_Lock_Count.store(1, std::memory_order_release);
+				CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
 				this->unlock();
 			}
 
@@ -125,16 +125,16 @@ public:
 	**/
 	void do_locking(bool doLock) noexcept
 	{
-        if (doLock != CL_Do_Locking.load(std::memory_order_acquire)) {
+        if (doLock != CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)) {
 			if (!doLock)
 				this->lock(); // Need this to ensure nobody relies on a lock now.
-			CL_Do_Locking.store(doLock, std::memory_order_release);
+			CL_Do_Locking.store(doLock, PWX_MEMORDER_RELEASE);
 			if (!doLock) {
 				// Nuke the lock acquired above:
-				CL_Lock_Count.store(0, std::memory_order_release);
-				CL_Thread_ID.store(0, std::memory_order_release);
-				CL_Is_Locked.store(false, std::memory_order_release);
-				CL_Lock.clear(std::memory_order_release);
+				CL_Lock_Count.store(0, PWX_MEMORDER_RELEASE);
+				CL_Thread_ID.store(0, PWX_MEMORDER_RELEASE);
+				CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
+				CL_Lock.clear(PWX_MEMORDER_RELEASE);
 			}
         }
 	}
@@ -143,14 +143,14 @@ public:
 	/// @brief return true if this object is currently locked
 	bool is_locked() const noexcept
 	{
-		return CL_Is_Locked.load(std::memory_order_acquire);
+		return CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
 	/// @brief return true if the locking is turned on.
 	bool is_locking() const noexcept
 	{
-		return CL_Do_Locking.load(std::memory_order_acquire);
+		return CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE);
 	}
 
 
@@ -160,22 +160,21 @@ public:
 	  */
 	void lock() noexcept
 	{
-		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
+		if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( (ctid != CL_Thread_ID.load(std::memory_order_acquire))
+			if ( (ctid != CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
 			  || !is_locked()) {
 				THREAD_LOG("base", "lock(), Owner id (%lu), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
-				while (CL_Lock.test_and_set())
-					std::this_thread::yield();
+				while (CL_Lock.test_and_set()) { }
 
 				// Got it now, so note it:
-				CL_Thread_ID.store(ctid, std::memory_order_release);
-				CL_Lock_Count.store(1, std::memory_order_release);
-				CL_Is_Locked.store(true, std::memory_order_release);
+				CL_Thread_ID.store(ctid, PWX_MEMORDER_RELEASE);
+				CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
+				CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
 			} else
-				CL_Lock_Count.fetch_add(1, std::memory_order_release);
+				CL_Lock_Count.fetch_add(1, PWX_MEMORDER_RELEASE);
 		}
 	}
 
@@ -185,8 +184,8 @@ public:
 	**/
 	uint32_t lock_count() const noexcept
 	{
-		if (CURRENT_THREAD_ID == CL_Thread_ID.load(std::memory_order_acquire))
-			return CL_Lock_Count.load(std::memory_order_acquire);
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
+			return CL_Lock_Count.load(PWX_MEMORDER_ACQUIRE);
 		return 0;
 	}
 
@@ -199,18 +198,18 @@ public:
 	  */
 	bool try_lock() noexcept
 	{
-		if ( CL_Do_Locking.load(std::memory_order_acquire) ) {
+		if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( (ctid != CL_Thread_ID.load(std::memory_order_acquire))
+			if ( (ctid != CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
 			  || !is_locked() ) {
 				THREAD_LOG("base", "try_lock(), Owner id (%lu), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
 				if (!CL_Lock.test_and_set()) {
 					// Got it now, so note it:
-					CL_Thread_ID.store(ctid, std::memory_order_release);
-					CL_Lock_Count.store(1, std::memory_order_release);
-					CL_Is_Locked.store(true, std::memory_order_release);
+					CL_Thread_ID.store(ctid, PWX_MEMORDER_RELEASE);
+					CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
+					CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
 					return true;
 				}
 				return false; // Nope, and only condition for a no-no.
@@ -229,16 +228,16 @@ public:
 	  */
 	void unlock() noexcept
 	{
-        if ( CL_Do_Locking.load(std::memory_order_acquire)
-		  && (CURRENT_THREAD_ID == CL_Thread_ID.load(std::memory_order_acquire))) {
+        if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)
+		  && (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))) {
 			THREAD_LOG("base", "unlock(), Owner id (%lu), %u locks [%s]",
 					CL_Thread_ID.load(), CL_Lock_Count.load(),
 					is_locked() ? "locked" : "not locked")
 			if ((1 == CL_Lock_Count.fetch_sub(1)) || !is_locked()) {
-				CL_Thread_ID.store(0, std::memory_order_release);
-				CL_Lock_Count.store(0, std::memory_order_release);
-				CL_Is_Locked.store(false, std::memory_order_release);
-				CL_Lock.clear(std::memory_order_release);
+				CL_Thread_ID.store(0, PWX_MEMORDER_RELEASE);
+				CL_Lock_Count.store(0, PWX_MEMORDER_RELEASE);
+				CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
+				CL_Lock.clear(PWX_MEMORDER_RELEASE);
 			}
 		}
 	}
