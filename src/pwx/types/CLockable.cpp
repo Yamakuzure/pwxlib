@@ -9,11 +9,6 @@ namespace pwx
 /** @brief Default ctor
   */
 CLockable::CLockable() noexcept
- :	CL_Do_Locking(ATOMIC_VAR_INIT(true)),
-	CL_Is_Locked(ATOMIC_VAR_INIT(false)),
-	CL_Lock(ATOMIC_FLAG_INIT),
-	CL_Lock_Count(ATOMIC_VAR_INIT(0)),
-	CL_Thread_ID(ATOMIC_VAR_INIT(0))
 { /* --- nothing to do here. ---*/ }
 
 
@@ -23,11 +18,7 @@ CLockable::CLockable() noexcept
   * Only the state whether to actually do the locking is copied.
   */
 CLockable::CLockable (const CLockable &src) noexcept
- :	CL_Do_Locking(ATOMIC_VAR_INIT(src.CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE))),
-	CL_Is_Locked(ATOMIC_VAR_INIT(false)),
-	CL_Lock(ATOMIC_FLAG_INIT),
-	CL_Lock_Count(ATOMIC_VAR_INIT(0)),
-	CL_Thread_ID(ATOMIC_VAR_INIT(0))
+ :	CL_Do_Locking(ATOMIC_VAR_INIT(src.CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)))
 { /* --- nothing to do here. ---*/ }
 
 

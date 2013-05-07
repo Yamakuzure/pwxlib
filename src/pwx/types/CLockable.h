@@ -97,9 +97,10 @@ public:
 	{
 		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE)) {
 			if (is_locked() || try_lock()) {
-				THREAD_LOG("base", "clear_locks(), Owner id (%lu), %u locks [%s]",
-						CL_Thread_ID.load(), CL_Lock_Count.load(),
-						is_locked() ? "locked" : "not locked")
+				if (CL_Do_Locking.load(PWX_MEMORDER_RELAXED))
+					THREAD_LOG("base", "clear_locks(), Owner id 0x(%lx), %u locks [%s]",
+							CL_Thread_ID.load(), CL_Lock_Count.load(),
+							is_locked() ? "locked" : "not locked")
 				CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
 				this->unlock();
 			}
@@ -118,19 +119,17 @@ public:
 	  * for objects to be used in concurrency or strictly single threaded.
 	  * The default is to turn locking on.
 	  *
-	  * Note: If a thread holds a lock while you turn locking off, this
-	  * method waits until a lock is acquired before turning locking off.
+	  * Note: If a thread holds a lock while you turn locking off, you
+	  * might get screwed. Simply don't do this.
 	  *
 	  * @param[in] doLock true to turn locking on, false to turn it off.
 	**/
 	void do_locking(bool doLock) noexcept
 	{
         if (doLock != CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)) {
-			if (!doLock)
-				this->lock(); // Need this to ensure nobody relies on a lock now.
 			CL_Do_Locking.store(doLock, PWX_MEMORDER_RELEASE);
 			if (!doLock) {
-				// Nuke the lock acquired above:
+				// Nuke all locks:
 				CL_Lock_Count.store(0, PWX_MEMORDER_RELEASE);
 				CL_Thread_ID.store(0, PWX_MEMORDER_RELEASE);
 				CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
@@ -164,7 +163,7 @@ public:
 			size_t ctid = CURRENT_THREAD_ID;
 			if ( (ctid != CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
 			  || !is_locked()) {
-				THREAD_LOG("base", "lock(), Owner id (%lu), %u locks [%s]",
+				THREAD_LOG("base", "lock(), Owner id 0x(%lx), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
 				while (CL_Lock.test_and_set()) { }
@@ -202,7 +201,7 @@ public:
 			size_t ctid = CURRENT_THREAD_ID;
 			if ( (ctid != CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
 			  || !is_locked() ) {
-				THREAD_LOG("base", "try_lock(), Owner id (%lu), %u locks [%s]",
+				THREAD_LOG("base", "try_lock(), Owner id 0x(%lx), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
 				if (!CL_Lock.test_and_set()) {
@@ -230,7 +229,7 @@ public:
 	{
         if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)
 		  && (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))) {
-			THREAD_LOG("base", "unlock(), Owner id (%lu), %u locks [%s]",
+			THREAD_LOG("base", "unlock(), Owner id 0x(%lx), %u locks [%s]",
 					CL_Thread_ID.load(), CL_Lock_Count.load(),
 					is_locked() ? "locked" : "not locked")
 			if ((1 == CL_Lock_Count.fetch_sub(1)) || !is_locked()) {
@@ -262,11 +261,16 @@ private:
 	 * ===============================================
 	*/
 
-	std::atomic_bool      CL_Do_Locking; //!< If set to false with do_locking(false), no real locking is done.
-	std::atomic_bool      CL_Is_Locked;  //!< Set to true if a lock is imposed, atomic_flag can't do it.
-	std::atomic_flag      CL_Lock;       //!< Instead of a costly mutex atomic_flag spinlocks are used.
-	std::atomic<uint32_t> CL_Lock_Count; //!< How many times the current thread has locked.
-	std::atomic<size_t>   CL_Thread_ID;  //!< The owning thread of a lock
+	std::atomic_bool
+	CL_Do_Locking = ATOMIC_VAR_INIT(true);   //!< If set to false with do_locking(false), no real locking is done.
+	std::atomic_bool
+	CL_Is_Locked  = ATOMIC_VAR_INIT(false);  //!< Set to true if a lock is imposed, atomic_flag can't do it.
+	std::atomic_flag
+	CL_Lock       = ATOMIC_FLAG_INIT;        //!< Instead of a costly mutex atomic_flag spinlocks are used.
+	std::atomic_uint_fast32_t
+	CL_Lock_Count = ATOMIC_VAR_INIT(0);      //!< How many times the current thread has locked.
+	std::atomic_size_t
+	CL_Thread_ID  = ATOMIC_VAR_INIT(0);      //!< The owning thread of a lock
 }; // class CLockable
 
 } // namespace pwx
