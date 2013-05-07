@@ -235,7 +235,7 @@ public:
 				bool    isDone = false;
 
 				// A simple loop will do, because we can use privFindData directly.
-				while (result && xCurr && !isDone) {
+				while (result && xCurr && xCurr->data.get() && !isDone) {
 					if (src.privFindData(**xCurr, nullptr)) {
 						if (xCurr == tail())
 							isDone = true;
@@ -417,7 +417,10 @@ protected:
 	  * there is something seriously wrong.
 	  *
 	  * This is the protInsert() method from TDoubleList without locks. All
-	  * private insertion methods in TSet have to lock the set anyway.
+	  * private insertion methods in TSet have to lock the set anyway, and
+	  * all removal methods do a big lock, too.
+	  * Further this variant of protInsert() does some extra checks to ensure
+	  * that the container consistency is ensured.
 	  *
 	  * @param[in] insPrev Element after which the new element is to be inserted
 	  * @param[in] insElem The element to insert.
@@ -443,37 +446,98 @@ protected:
 		// If this is a sorted set, check consistency.
 		// Note  : If we reach this point, the set is locked!
 		// Note2 : Otherwise we have a problem!
+
+		if (this->isSorted) {
+
+			/* In this case an extra check is in order
+			 * What can happen? Multiple threads might add elements.
+			 * Basically this is no problem, but if several threads
+			 * insert a new head AND there is bad luck with the
+			 * locking order AND there is a glitch with the atomic
+			 * access (OR there is a hidden bug I haven't found, yet)
+			 * insPrev might point to the wrong position.
+			 *
+			 * The following situations might occur:
+			 * 1) insPrev is nullptr, but head() is smaller than insElem
+			 * 2) insPrev is larger than insElem
+			 */
+
+			elem_t* xPrev = insPrev;
+
+			if (nullptr == xPrev) {
+				// Check possibility 1
+				xPrev = head();
+				while (xPrev && xPrev->compare(insElem) < 0)
+					xPrev = xPrev->getNext();
+				// Now we have either the next larger element (the
+				// new next to insElem) or nullptr meaning insElem
+				// will be the new tail.
+				if (xPrev)
+					xPrev = xPrev->getPrev();
+				else
+					xPrev = tail();
+				} else {
+					// Check possibility 2
+					while (xPrev && xPrev->compare(insElem) > 0)
+						xPrev = xPrev->getPrev();
+				}
+
+			// If xPrev is now different from insPrev, fix
+			// it and get an optional message out:
+			if (xPrev != insPrev) {
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
+				protRenumber();
+				DEBUG_ERR("TSet", "Fixed insPrev from nr %d (\"%s\") to nr %d (\"%s\")",
+							insPrev ? insPrev->eNr.load() : -1,
+							insPrev ? to_string(**insPrev).c_str() : "nullptr",
+							xPrev ? xPrev->eNr.load() : -1,
+							xPrev ? to_string(**xPrev).c_str() : "nullptr")
+#endif
+				insPrev = xPrev;
+			}
+		} // End of sorted check
+
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 #  if defined(PWX_THREADDEBUG)
-#    define LOCAL_DEBUG_LOG THREAD_LOG
+#    define LOCAL_DEBUG_ERR THREAD_ERR
 #  else
-#    define LOCAL_DEBUG_LOG DEBUG_LOG
-# endif
+#    define LOCAL_DEBUG_ERR DEBUG_ERR
+#  endif
+#  define GET_OBJ_ENR(obj) obj ? obj->eNr.load() : -1
+#  define GET_OBJ_DAT(obj) obj ? to_string(**(obj)).c_str() : "nullptr"
+#  define GET_OBJ_ALL(obj) GET_OBJ_ENR(obj), GET_OBJ_DAT(obj)
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED) && (0 == this->lock_count()) )
 			PWX_THROW("MissingLock", "TSet::protInsert() called without a lock in place!",
 						"This is evil and must be fixed NOW!")
-		if (isSorted && insPrev && insElem && (**insPrev >= **insElem)) {
-			LOCAL_DEBUG_LOG("TSet", "insPrev: % 5d - \"%s\"",
-						insPrev->eNr.load(),
-						to_string(**insPrev).c_str())
-			LOCAL_DEBUG_LOG("TSet", "insElem: % 5d - \"%s\"",
-						insElem->eNr.load(),
-						to_string(**insElem).c_str())
+		elem_t* xNext = insPrev ? insPrev->getNext() : nullptr;
+		if (isSorted && insPrev && insElem && (insPrev->compare(insElem) >= 0)) {
+			protRenumber();
+			if (insPrev)
+				LOCAL_DEBUG_ERR("TSet", "prevPrev: % 5d - \"%s\"", GET_OBJ_ALL(insPrev->getPrev()))
+			LOCAL_DEBUG_ERR("TSet", "insPrev : % 5d - \"%s\"", GET_OBJ_ALL(insPrev))
+			LOCAL_DEBUG_ERR("TSet", "insElem : % 5d - \"%s\"", GET_OBJ_ALL(insElem))
+			LOCAL_DEBUG_ERR("TSet", "prevNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext))
+			if (xNext)
+				LOCAL_DEBUG_ERR("TSet", "nextNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext->getNext()))
 			PWX_THROW("BustedOrder", "insPrev is LARGER than insElem ? What the hell?",
 						"This is evil ans must be fixed NOW!")
 		}
-		elem_t* xNext = insPrev ? insPrev->getNext() : nullptr;
-		if (isSorted && xNext && insElem && (**insElem >= **xNext)) {
-			LOCAL_DEBUG_LOG("TSet", "insElem: % 5d - \"%s\"",
-						insElem->eNr.load(),
-						to_string(**insElem).c_str())
-			LOCAL_DEBUG_LOG("TSet", "xNext  : % 5d - \"%s\"",
-						insPrev->eNr.load(),
-						to_string(**insPrev).c_str())
+		if (isSorted && xNext && insElem && (insElem->compare(xNext) >= 0)) {
+			protRenumber();
+			if (insPrev)
+				LOCAL_DEBUG_ERR("TSet", "prevPrev: % 5d - \"%s\"", GET_OBJ_ALL(insPrev->getPrev()))
+			LOCAL_DEBUG_ERR("TSet", "insPrev : % 5d - \"%s\"", GET_OBJ_ALL(insPrev))
+			LOCAL_DEBUG_ERR("TSet", "insElem : % 5d - \"%s\"", GET_OBJ_ALL(insElem))
+			LOCAL_DEBUG_ERR("TSet", "prevNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext))
+			if (xNext)
+				LOCAL_DEBUG_ERR("TSet", "nextNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext->getNext()))
 			PWX_THROW("BustedOrder", "insElem is LARGER than insP ? What the hell?",
 						"This is evil ans must be fixed NOW!")
 		}
-#  undef LOCAL_DEBUG_LOG
+#  undef GET_OBJ_ALL
+#  undef GET_OBJ_DAT
+#  undef GET_OBJ_ENR
+#  undef LOCAL_DEBUG_ERR
 #endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
 		if (locCnt && insPrev && (tail() != insPrev)) {
@@ -501,9 +565,8 @@ protected:
 			}
 		}
 
-		// Raise eCount and set renumbering mode
 		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
-
+		curr(insElem);
 		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
@@ -564,9 +627,12 @@ private:
 		}
 		// Note: Methods that call privFindData() to prepare an insertion should
 		//       search again after start is adjusted and a lock is acquired.
-		uint32_t localCount = eCount.load(PWX_MEMORDER_ACQUIRE);
+		//       Here, only a brief lock to get started is used
+		PWX_LOCK(const_cast<list_t*>(this))
+		uint32_t localCount = size();
 		elem_t*  xCurr      = (start && *start) ? *start : curr() ? curr() : head();
 		elem_t*  xOld       = nullptr; // To fix thread concurrency
+		PWX_UNLOCK(const_cast<list_t*>(this))
 
 		/* Note:
 		 * When the set is sorted, we can make some quick exit assumptions:
@@ -574,20 +640,22 @@ private:
 		 * 2: If tail is smaller, data can not be in the set
 		*/
 		if (localCount) {
-			// Quick exit if sorted set assumption 1 is correct:
-			if (isSorted && (**head() > data)) {
-				PFD_SET_START(nullptr)
-				return nullptr;
-			}
+			PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+			if (localCount) {
+				// Quick exit if sorted set assumption 1 is correct:
+				if (isSorted && (head()->compare(data) > 0)) {
+					PFD_SET_START(nullptr)
+					return nullptr;
+				}
 
-			// Quick exit if xCurr is correct:
-			if (**xCurr == data)
-				return xCurr;
+				// Quick exit if xCurr is correct:
+				if (!xCurr->compare(data))
+					return xCurr;
 
-			// Quick exit if head is wanted:
-			if (**head() == data)
-				return head();
-			// End of having at least one element
+				// Quick exit if head is wanted:
+				if (!head()->compare(data))
+					return head();
+			} // End of really having at least one element
 		} else
 			// return immediately if there are no elements
 			return nullptr;
@@ -595,13 +663,13 @@ private:
 		// Checking tail does only make sense if we have at least 2 element
 		if (localCount > 1) {
 			// Quick exit if sorted set assumption 2 is correct:
-			if (isSorted && (data > **tail())) {
+			if (isSorted && (tail()->compare(data) < 0)) {
 				PFD_SET_START(tail())
 				return nullptr;
 			}
 
 			// Quick exit if tail is wanted:
-			if (**tail() == data)
+			if (!tail()->compare(data))
 				return tail();
 		} // End of having at least two elements
 
@@ -627,7 +695,8 @@ private:
 
 				// Step 1: Move up until data is no longer larger than **xCurr
 				bool doStop = false;
-				while (!doStop && xCurr && (data > **xCurr)) {
+				while (!doStop && xCurr && xCurr->data.get()
+						&& (xCurr->compare(data) < 0)) {
 					if (tail() == xCurr)
 						doStop = true;
 					else {
@@ -641,7 +710,7 @@ private:
 				} // End of wandering up
 
 				// Step 2: check whether we reached tail and assumption 2 is suddenly valid
-				if (doStop && (data > **tail())) {
+				if (doStop && (tail()->compare(data) < 0)) {
 					PFD_SET_START(tail())
 					return nullptr;
 				}
@@ -651,7 +720,7 @@ private:
 
 				// Step 4: Go down until data is no longer smaller than **xCurr
 				doStop = false;
-				while (!doStop && xCurr && (**xCurr > data)) {
+				while (!doStop && xCurr && (xCurr->compare(data) > 0)) {
 					if (head() == xCurr)
 						doStop = true;
 					else {
@@ -663,7 +732,7 @@ private:
 				} // End of wandering down
 
 				// Step 5: check whether we reached head and assumption 1 is suddenly valid
-				if (doStop && (**head() > data)) {
+				if (doStop && (head()->compare(data) > 0)) {
 					PFD_SET_START(nullptr)
 					return nullptr;
 				}
@@ -671,7 +740,9 @@ private:
 				// Step 6: Check that we really really reached a valid end, or re-enter with a lock:
 				elem_t* xNext = xCurr ? xCurr->getNext() : nullptr;
 				elem_t* xPrev = xCurr ? xCurr->getPrev() : nullptr;
-				if (xCurr && ( (xPrev && (**xPrev > data)) || (xNext && (data > **xNext)) ) ) {
+				if (xCurr && (
+					  (xPrev && (xPrev->compare(data) > 0))
+					||(xNext && (xNext->compare(data) < 0)) ) ) {
 					// This is bad. Something busted the set!
 					if (reentered) {
 						// This is FUBAR! No exception can fix this!
@@ -741,7 +812,7 @@ private:
 				xCurr = head()->getNext();
 
 				// Note: head and tail are already checked.
-				while (xCurr && (xCurr != tail() ) && (**xCurr != data)) {
+				while (xCurr && (xCurr != tail() ) && (xCurr->compare(data))) {
 					xOld  = xCurr;
 					xCurr = xCurr->getNext();
 					if (nullptr == xCurr)
@@ -754,7 +825,7 @@ private:
 			 * all inserting methods can now insert a new element holding
 			 * the searched data using insNextElem() on curr.
 			*/
-			if (xCurr && (**xCurr == data))
+			if (xCurr && (!xCurr->compare(data)))
 				return xCurr;
 			else {
 				PFD_SET_START(xCurr)
