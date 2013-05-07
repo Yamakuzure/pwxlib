@@ -143,7 +143,7 @@ public:
 					PWX_TRY(protDelete(toDelete))
 					catch(...) { } // We can't do anything about that
 				}
-			} // end of having head after lock is acquired.
+			} // end of having tail after lock is acquired.
 			else
 				PWX_UNLOCK(this)
 		} // end of while head
