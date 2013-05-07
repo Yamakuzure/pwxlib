@@ -182,6 +182,86 @@ struct PWX_API TSingleElement : public VElement
 	 * ===============================================
 	*/
 
+	/** @brief compare this element with some data and return -1, 0, +1
+	  *
+	  * This is a convenient method that safely compares this element to
+	  * some data. If this elements data is larger than the other, the
+	  * method returns 1. If both are equal it returns 0 and 1 if the
+	  * other data is larger.
+	  *
+	  * This element get locked and checked against destruction and
+	  * nullptr data.
+	  *
+	  * @param[in] other reference to the data to compare with
+	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
+	**/
+	int32_t compare(const data_t &other) const noexcept
+	{
+		if (&other != this->data.get()) {
+			PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+
+			// A: Check destruction status
+			if (this->destroyed()) return -1;
+
+			// B: check Data status
+			data_t* thisData = this->data.get();
+
+			if (thisData)
+				return *thisData > other ?  1
+					 : other > *thisData ? -1 : 0;
+			else
+				return -1;
+		} // No else. compare(this->data.get()) always returns 0
+
+		return 0;
+	}
+
+
+	/** @brief compare this element with another and return -1, 0, +1
+	  *
+	  * This is a convenient method that safely compares this element to
+	  * another. If this elements data is larger than the others data,
+	  * the method returns 1. If both are equal it returns 0 and 1 if
+	  * the other elements data is larger.
+	  *
+	  * Both elements get locked and checked against destruction and
+	  * nullptr data.
+	  *
+	  * @param[in] other pointer to the element to compare with
+	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
+	**/
+	int32_t compare(const elem_t* const other) const noexcept
+	{
+		if (other) {
+			if (other != this) {
+				PWX_DOUBLE_LOCK(elem_t, const_cast<elem_t*>(this),
+								elem_t, const_cast<elem_t*>(other))
+
+				// A: Check destruction status
+				bool thisDest = this->destroyed();
+				bool otheDest = other->destroyed();
+
+				if (thisDest && otheDest)	return  0;
+				if (thisDest)				return -1;
+				if (otheDest)				return  1;
+
+				// B: check Data status
+				data_t* thisData = this->data.get();
+				data_t* otheData = other->data.get();
+
+				if (thisData && otheData)
+					return *thisData > *otheData ?  1
+						 : *otheData > *thisData ? -1 : 0;
+				if (thisData)	return  1;
+				if (otheData)	return -1;
+			} // No else. compare(this) always returns 0
+		} else
+			return 1; // The otehr is nullptr, this is always larger
+
+		return 0;
+	}
+
+
 	/** @brief returns a pointer to the next element or nullptr if there is none.
 	  *
 	  * This method uses atomic::load() and is therefore safe to use
@@ -451,7 +531,7 @@ struct PWX_API TSingleElement : public VElement
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
-						"nullptr TSingleElement<T>->data",
+						"nullptr element data",
 						"The pointer lhs->data to dereference is nullptr.")
 		return *data;
 	}
@@ -469,7 +549,7 @@ struct PWX_API TSingleElement : public VElement
 		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
-						"nullptr TSingleElement<T>->data",
+						"nullptr element data",
 						"The pointer lhs->data to dereference is nullptr.")
 		return *data;
 	}
@@ -493,6 +573,7 @@ protected:
 
 	using base_t::isDestroyed;
 	using base_t::isRemoved;
+
 
 private:
 
