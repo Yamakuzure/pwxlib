@@ -87,11 +87,14 @@ protected:
 	*/
 
 	mutable
-	std::atomic_bool beThreadSafe; //!< Use next/prev pointers directly if set to false.
+	std::atomic_bool
+	beThreadSafe = ATOMIC_VAR_INIT(true);  //!< Use next/prev pointers directly if set to false.
 	mutable
-	std::atomic_bool doRenumber; //!< If set to true, a renumbering is done before retrieving elements by index
+	std::atomic_bool
+	doRenumber   = ATOMIC_VAR_INIT(false); //!< If set to true, a renumbering is done before retrieving elements by index
 	mutable
-	std::atomic_uint eCount; //!< Current number of elements
+	std::atomic_uint_fast32_t
+	eCount       = ATOMIC_VAR_INIT(0);     //!< Current number of elements
 
 
 }; // class VContainer

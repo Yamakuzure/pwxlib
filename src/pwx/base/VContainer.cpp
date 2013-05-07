@@ -6,16 +6,15 @@
 namespace pwx {
 
 /// @brief VContainer default constructor.
-VContainer::VContainer() noexcept :
-	beThreadSafe(true),doRenumber(true), eCount(0)
+VContainer::VContainer() noexcept
 { }
 
 /// @brief VContainer copy constructor.
 VContainer::VContainer(const VContainer& src) noexcept :
 	base_t(src),
-	beThreadSafe((bool)src.beThreadSafe),
-	doRenumber((bool)src.doRenumber),
-	eCount((uint32_t)src.eCount)
+	beThreadSafe(src.beThreadSafe.load(PWX_MEMORDER_RELAXED)),
+	doRenumber(src.doRenumber.load(PWX_MEMORDER_ACQUIRE)),
+	eCount(src.eCount.load(PWX_MEMORDER_ACQUIRE))
 { }
 
 
