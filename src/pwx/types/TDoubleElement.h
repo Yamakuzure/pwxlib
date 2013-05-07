@@ -255,7 +255,7 @@ struct PWX_API TDoubleElement : public VElement
 				if (otheData)	return -1;
 			} // No else. compare(this) always returns 0
 		} else
-			return 1; // The otehr is nullptr, this is always larger
+			return 1; // The other is nullptr, this is always larger
 
 		return 0;
 	}

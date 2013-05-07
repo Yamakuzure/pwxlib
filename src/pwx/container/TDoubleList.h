@@ -536,9 +536,7 @@ protected:
 			}
 		}
 
-		// Raise eCount and set renumbering mode
 		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
-
 		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 

@@ -988,20 +988,24 @@ protected:
 				return result;
 			}
 
-			// Otherwise we have to search for it (head and tail are already checked):
-			elem_t* xCurr = head()->getNext();
+			// Otherwise we have to search for it.
+			elem_t* xCurr  = head()->getNext(); // head is already checked.
+			bool    isDone = false;
 			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
-				while (!result && xCurr && (xCurr != tail() )) {
+				while (!result && !isDone && xCurr) {
 					if (xCurr->data.get() == data)
 						result = xCurr;
+					else if (xCurr == tail())
+						isDone = true;
 					else
 						xCurr = xCurr->getNext();
 				}
 			} else {
 				// No need to unlock, PWX_LOCK hasn't done anything anyway.
-
+				// Further tail() is already checked and we don't assume
+				// it to change while the search is running.
 				while (!result && xCurr && (xCurr != tail() )) {
 					if (xCurr->data.get() == data)
 						result = xCurr;
@@ -1080,9 +1084,7 @@ protected:
 			DEBUG_LOCK_STATE("lock_guard_dtor", this, this)
 		}
 
-		// Raise eCount and set renumbering mode
 		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
-
 		return eCount.load(PWX_MEMORDER_ACQUIRE);
 	}
 
