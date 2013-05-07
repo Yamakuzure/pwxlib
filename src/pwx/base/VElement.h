@@ -104,7 +104,7 @@ public:
 	virtual void disable_thread_safety() noexcept
 	{
 		this->do_locking(false);
-		beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
 	}
 
 
@@ -115,7 +115,7 @@ public:
 	virtual void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
 	}
 
 
@@ -151,13 +151,13 @@ protected:
 
 	mutable
 	std::atomic_bool
-	beThreadSafe = ATOMIC_VAR_INIT(true); //!< Use next/prev pointers directly if set to false.
+	beThreadSafe = ATOMIC_VAR_INIT(true);  //!< Use next/prev pointers directly if set to false.
 	mutable
 	std::atomic_bool
-	isDestroyed = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
+	isDestroyed  = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
 	mutable
 	std::atomic_bool
-	isRemoved = ATOMIC_VAR_INIT(true);    //!< Set to true by ctor and remove*(), set to false by insert*() methods.
+	isRemoved    = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
 
 }; // class VContainer
 
