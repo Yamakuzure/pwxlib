@@ -69,17 +69,26 @@ namespace pwx {
 
 // The main logging function:
 void debug_log(const char* fmt, ...);
+void debug_err(const char* fmt, ...);
 
 // And the main wrapper:
 # define DEBUG_LOG(part, fmt, ...) { \
 	char trace_info[1024]; \
-	snprintf(trace_info, 256, "[%8s] %s:%d - %s : %s\n", \
+	snprintf(trace_info, 256, ">> [%8s] %s:%d - %s : %s\n", \
 			part, basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
 	pwx::debug_log(trace_info, __VA_ARGS__); \
 }
+# define DEBUG_ERR(part, fmt, ...) { \
+	char trace_info[1024]; \
+	snprintf(trace_info, 256, ">> [%8s] %s:%d - %s : %s\n", \
+			part, basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
+	pwx::debug_err(trace_info, __VA_ARGS__); \
+}
 #else
 # define DEBUG_LOG(...) {}
+# define DEBUG_ERR(...) {}
 # define debug_log(...) {} // Just in case someone uses it directly...
+# define debug_err(...) {}
 #endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 // Specialized logging macros for mutex locking/unlocking
@@ -90,10 +99,17 @@ void debug_log(const char* fmt, ...);
 **/
 # define THREAD_LOG(part, fmt, ...) { \
 	char trace_info[1024]; \
-	snprintf(trace_info, 256, "tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
+	snprintf(trace_info, 256, ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
 		CURRENT_THREAD_ID, part, \
 		basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
 	pwx::debug_log(trace_info, __VA_ARGS__); \
+}
+# define THREAD_ERR(part, fmt, ...) { \
+	char trace_info[1024]; \
+	snprintf(trace_info, 256, ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
+		CURRENT_THREAD_ID, part, \
+		basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
+	pwx::debug_err(trace_info, __VA_ARGS__); \
 }
 /** @internal
   * @brief Special macro to log locking states.
@@ -104,21 +120,22 @@ void debug_log(const char* fmt, ...);
   * @param to_lock pointer to a CLockable derived object that is going to be locked/used
  **/
 # define DEBUG_LOCK_STATE(action, locker, to_lock) { \
-	if (to_lock) \
+	if (to_lock && to_lock->is_locking()) \
 		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
 					#locker, action, #to_lock, #to_lock, \
 					to_lock->CL_Lock_Count.load(), \
 					to_lock->is_locked() ? "locked" : "unlocked", \
 					to_lock->CL_Thread_ID.load()) \
-	else \
-		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
-					#locker, action, #to_lock, #to_lock, 0, "n/a", 0) \
 }
-# define LOG_LOCK(obj)       THREAD_LOG("LOCK", "Locked %s (has %d locks now)", #obj, obj->lock_count())
-# define LOG_UNLOCK(obj)     THREAD_LOG("UNLOCK", "Unlocked %s (has %d locks now)", #obj, obj->lock_count())
-# define LOG_LOCK_GUARD(obj) THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, obj->lock_count())
+# define LOG_LOCK(obj)       if (obj && obj->is_locking()) \
+	THREAD_LOG("LOCK", "Locked %s (has %d locks now)", #obj, obj->lock_count())
+# define LOG_UNLOCK(obj)     if (obj && obj->is_locking()) \
+	THREAD_LOG("UNLOCK", "Unlocked %s (has %d locks now)", #obj, obj->lock_count())
+# define LOG_LOCK_GUARD(obj) if (obj && obj->is_locking()) \
+	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, obj->lock_count())
 #else
 # define THREAD_LOG(...) {}
+# define THREAD_ERR(...) {}
 # define DEBUG_LOCK_STATE(action, locker, to_lock) {}
 # define LOG_LOCK(...) {}
 # define LOG_UNLOCK(...) {}
