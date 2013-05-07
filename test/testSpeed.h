@@ -180,17 +180,17 @@ int32_t testSpeedST (sEnv &env)
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
-		cout << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
+		cerr << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else if (!isNextOK) {
-		cout << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
+		cerr << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else if (!isOrderOK) {
-		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
-		cout << " -> (prev) curr >= next (next->next)" << endl;
-		cout << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
+		cerr << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
+		cerr << " -> (prev) curr >= next (next->next)" << endl;
+		cerr << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else
@@ -358,17 +358,17 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Do we have had enough elements?
 	if (localMaxElem != contSize) {
-		cout << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
+		cerr << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else if (!isNextOK) {
-		cout << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
+		cerr << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else if (!isOrderOK) {
-		cout << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
-		cout << " -> (prev) curr >= next (next->next)" << endl;
-		cout << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
+		cerr << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
+		cerr << " -> (prev) curr >= next (next->next)" << endl;
+		cerr << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	} else
