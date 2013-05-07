@@ -223,7 +223,7 @@ public:
 				xCurr = xCurr->getNext();
 			}
 		} while (xCurr && xCurr != tail());
-		this->beThreadSafe.store(false, PWX_MEMORDER_RELAXED);
+		this->beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
 		PWX_UNLOCK(this) // Just for the record
 	}
 
@@ -671,7 +671,9 @@ public:
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept
 	{
-		return eCount.load(PWX_MEMORDER_ACQUIRE);
+		return this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
+			? eCount.load(PWX_MEMORDER_ACQUIRE)
+			: eCount.load(PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -729,7 +731,7 @@ public:
 				if (rhsCurr == rhs.tail())
 					isDone = true;
 				else
-					rhsCurr = rhsCurr->next;
+					rhsCurr = rhsCurr->getNext();
 			}
 		}
 		return *this;
@@ -769,7 +771,7 @@ public:
 				if (rhsCurr == rhs.tail())
 					isDone = true;
 				else
-					rhsCurr = rhsCurr->next;
+					rhsCurr = rhsCurr->getNext();
 			}
 
 		} else {
