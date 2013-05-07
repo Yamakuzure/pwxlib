@@ -847,9 +847,9 @@ protected:
 	elem_t* curr() const
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			return curr_.load(PWX_MEMORDER_RELAXED);
-		else
 			return curr_.load(PWX_MEMORDER_ACQUIRE);
+		else
+			return curr_.load(PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -857,9 +857,9 @@ protected:
 	void curr(elem_t* new_curr) const
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
-		else
 			curr_.store(new_curr, PWX_MEMORDER_RELEASE);
+		else
+			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -867,9 +867,9 @@ protected:
 	void curr(elem_t* new_curr)
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
-		else
 			curr_.store(new_curr, PWX_MEMORDER_RELEASE);
+		else
+			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -877,9 +877,9 @@ protected:
 	elem_t* head() const
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			return head_.load(PWX_MEMORDER_RELAXED);
-		else
 			return head_.load(PWX_MEMORDER_ACQUIRE);
+		else
+			return head_.load(PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -887,9 +887,9 @@ protected:
 	void head(elem_t* new_head)
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			head_.store(new_head, PWX_MEMORDER_RELAXED);
-		else
 			head_.store(new_head, PWX_MEMORDER_RELEASE);
+		else
+			head_.store(new_head, PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -897,9 +897,9 @@ protected:
 	elem_t* tail() const
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			return tail_.load(PWX_MEMORDER_RELAXED);
-		else
 			return tail_.load(PWX_MEMORDER_ACQUIRE);
+		else
+			return tail_.load(PWX_MEMORDER_RELAXED);
 	}
 
 
@@ -907,9 +907,9 @@ protected:
 	void tail(elem_t* new_tail)
 	{
 		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			tail_.store(new_tail, PWX_MEMORDER_RELAXED);
-		else
 			tail_.store(new_tail, PWX_MEMORDER_RELEASE);
+		else
+			tail_.store(new_tail, PWX_MEMORDER_RELAXED);
 	}
 
 
