@@ -3,13 +3,16 @@
 MAKEFLAGS += --no-print-directory
 
 TARGET_hb   := ../hashbuilder
+TARGET_ng   := ../namegen
 TARGET_tl   := ../testlib
 TARGET_to   := ../torture
 SOURCES_all := $(wildcard *.cpp)
 SOURCES_hb  := $(filter hash_builder.%, $(SOURCES_all))
-SOURCES_tl  := $(filter-out hash_builder.% torture.%, $(SOURCES_all))
+SOURCES_ng  := $(filter namegen.%, $(SOURCES_all))
+SOURCES_tl  := $(filter-out hash_builder.% namegen.% torture.%, $(SOURCES_all))
 SOURCES_to  := $(filter torture.%, $(SOURCES_all))
 MODULES_hb  := $(SOURCES_hb:.cpp=.o)
+MODULES_ng  := $(SOURCES_ng:.cpp=.o)
 MODULES_tl  := $(SOURCES_tl:.cpp=.o)
 MODULES_to  := $(SOURCES_to:.cpp=.o)
 CXX         := $(shell which g++)
@@ -21,7 +24,7 @@ INCDIR   = -I../src
 # ------------------------------------
 # Rules
 # ------------------------------------
-.PHONY: all clean hashbuilder testlib torture
+.PHONY: all clean hashbuilder namegen testlib torture
 .SUFFIXES: .cpp
 
 %.o: %.cpp
@@ -32,6 +35,8 @@ all: $(TARGET_hb) $(TARGET_tl)
 
 hashbuilder: depend $(TARGET_hb)
 
+namegen: depend $(TARGET_ng)
+
 testlib: depend $(TARGET_tl)
 
 torture: depend $(TARGET_to)
@@ -39,6 +44,10 @@ torture: depend $(TARGET_to)
 $(TARGET_hb): $(MODULES_hb)
 	@echo "Linking $(TARGET_hb) ..."
 	$(CXX) -o $(TARGET_hb) $(LDFLAGS) -L../lib -lpwx $(MODULES_hb)
+
+$(TARGET_ng): $(MODULES_ng)
+	@echo "Linking $(TARGET_ng) ..."
+	$(CXX) -o $(TARGET_ng) $(LDFLAGS) -L../lib -lpwx $(MODULES_ng)
 
 $(TARGET_tl): $(MODULES_tl)
 	@echo "Linking $(TARGET_tl) ..."

@@ -65,6 +65,12 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 			</Target>
+			<Target title="namegen">
+				<Option output="../namegen" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
 			<Target title="documentation">
 				<Option output="libpwx" prefix_auto="1" extension_auto="1" />
 				<Option type="0" />
@@ -255,6 +261,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/eNameSourceType.h" />
 		<Unit filename="../src/pwx/worker.h">
 			<Option target="clean" />
 			<Option target="library" />
@@ -291,6 +298,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../test/namegen.cpp" />
 		<Unit filename="../test/testListRing.h">
 			<Option target="clean" />
 			<Option target="library" />

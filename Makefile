@@ -15,9 +15,7 @@ THREADDEBUG := NO
 # See
 # Note: You must have valgrind installed on your system and
 #       valgrind/helgrind.h somewhere it can be found (like /usr/include)
-ANNOTATIONS := YES
-
-# Note: You can add additional debugging options in pwx/functions/debug.h
+ANNOTATIONS := NO
 
 # Set to YES to include profiling info
 PROFILE := NO
@@ -61,7 +59,7 @@ endif
 # Compiler and linker flags for release, debugging and profiling
 
 # DEBUG
-DBG_CXXFLAGS = -ggdb -DLIBPWX_DEBUG
+DBG_CXXFLAGS = -ggdb3 -DLIBPWX_DEBUG -D_DEBUG
 DBG_LDFLAGS  =
 
 # RELEASE
@@ -123,7 +121,7 @@ endif
 # Rules
 # ------------------------------------
 .PHONY: clean cleanlibrary cleantools testlib documentation docinstall \
-		hashbuilder install userinstall \
+		hashbuilder install namegen userinstall \
 		test tools torture all library help
 .SUFFIXES: .cpp
 
@@ -188,6 +186,10 @@ install: Makefile $(TARGET)
 
 library: depend $(LIBDIR)/$(TARGET)
 
+namegen: depend library
+	@echo "Making namegen in $(TESTDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) namegen)
+
 userinstall: Makefile $(TARGET)
 	@echo "Installing pwxLib into $(USRINST)"
 	@$(INSTALL) -d $(USRINST)/pwx
@@ -226,7 +228,7 @@ clean: cleanlibrary cleantest
 #	@echo "Cleaning all in $(TOOLDIR)"
 #	@make -C $(TOOLDIR) clean
 
-test: testlib hashbuilder torture
+test: testlib hashbuilder namegen torture
 
 $(LIBDIR)/$(LIB_DYN): $(MODULES)
 	@echo "Linking $(LIBDIR)/$(LIB_DYN)"
