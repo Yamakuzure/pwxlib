@@ -36,33 +36,21 @@
 */
 #if defined(_MSC_VER)
 #  pragma error "Visual C++ is not supported! Use gcc-4.5+ via cygwin or mingw instead."
-#elif defined(__GNUC__)
-#  if (__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5))
-#    error "gcc versions before gcc-4.5 are not supported. Please upgrade to a newer version."
-#  elif (!defined(__cplusplus) || (__cplusplus < 201103L)) && !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#    error "C++11 features must be enabled to compile and use libpwx."
-#  endif
-#else
-#  error "You need gcc 4.5 or newer to compile libpwx."
+#elif !defined(__GNUC__)
+#  error "You need gcc 4.7.3 / gcc-4.8.1 or newer to compile libpwx."
 #endif
 
 
 /* ---------------------------------------------------------------
  * --- gcc prior 4.7.3 / 4.8.1 have problems with std::atomic. ---
- * --- the (ugly) solution is to add an artificial brake:      ---
- * --- Instead of the regular release/acquire memory_order,    ---
- * --- the most strict memory_order_seq_cst is used.           ---
  * ---------------------------------------------------------------
 */
 #if (__GNUC_MINOR__ < 7) \
 	|| ((__GNUC_MINOR__ == 7) && (__GNUC_PATCHLEVEL__ < 3)) \
 	|| ((__GNUC_MINOR__ == 8) && (__GNUC_PATCHLEVEL__ < 1))
-# define PWX_MEMORDER_RELAXED std::memory_order_relaxed
-# define PWX_MEMORDER_CONSUME std::memory_order_consume
-# define PWX_MEMORDER_ACQUIRE std::memory_order_seq_cst
-# define PWX_MEMORDER_RELEASE std::memory_order_seq_cst
-# define PWX_MEMORDER_ACQ_REL std::memory_order_seq_cst
-# define PWX_MEMORDER_ACQ_CST std::memory_order_seq_cst
+#  error "gcc versions before gcc-4.7.3 / gcc-4.8.1 are not supported. Please upgrade to a newer version."
+#elif (!defined(__cplusplus) || (__cplusplus < 201103L)) && !defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  error "C++11 features must be enabled to compile and use libpwx."
 #else
 # define PWX_MEMORDER_RELAXED std::memory_order_relaxed
 # define PWX_MEMORDER_CONSUME std::memory_order_consume
