@@ -32,6 +32,7 @@
 #include <pwx/types/TVarDeleter.h>
 #include <pwx/types/TSingleElement.h>
 #include <pwx/types/TDoubleElement.h>
+#include <pwx/types/eNameSourceType.h>
 
 #endif // PWX_LIBPWX_PWX_TYPES_H_INCLUDED
 
