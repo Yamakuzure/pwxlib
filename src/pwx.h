@@ -61,6 +61,12 @@
   @endverbatim
 **/
 
+#define LIBPWX_MAJOR 0
+#define LIBPWX_MINOR 8
+#define LIBPWX_REVIS 6
+#define LIBPWX_PATCH 14
+#define LIBPWX_VERSION "0.8.6.14"
+
 #include <pwx/general.h>
 #include <pwx/tools.h>
 #include <pwx/types.h>
