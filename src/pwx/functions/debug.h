@@ -113,8 +113,8 @@ void debug_err(const char* fmt, ...);
 }
 /** @internal
   * @brief Special macro to log locking states.
-  * IMPORTANT: If @a to_lock are anything else but an object derived from pwx::CLockable,
-  * this macro will possible cause crashes or won't even compile.
+  * IMPORTANT: If @a to_lock is anything else but an object derived from pwx::CLockable,
+  * this macro will probably cause crashes or won't even compile.
   * @param action C-String with the name of the function that will be called without parentheses.
   * @param locker object that is calling @a action()
   * @param to_lock pointer to a CLockable derived object that is going to be locked/used
@@ -141,8 +141,6 @@ void debug_err(const char* fmt, ...);
 # define LOG_UNLOCK(...) {}
 # define LOG_LOCK_GUARD(...) {}
 #endif // PWX_THREADDEBUG
-
-
 
 
 } // namespace pwx

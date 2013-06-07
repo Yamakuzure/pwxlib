@@ -18,25 +18,24 @@ namespace pwx {
 
 CRandom RNG;
 
-
 /* --------------------------------------- *
  * --- Private Methods Implementations --- *
  * --------------------------------------- */
 
 /** @brief checkRule - check state and character against followup matrix rules from namecon
+  * Note: It is assumed, that all three characters are lowercase
 **/
-void CRandom::checkRule (int32_t &state, const char first, const char second, const char third) noexcept
+void CRandom::checkRule (uint32_t &state, const char first, const char second, const char third) noexcept
 {
-	int32_t one   = first  - NameConstants::chrOffsetLower;
-	int32_t two   = second - NameConstants::chrOffsetLower;
-	int32_t three = third  - NameConstants::chrOffsetLower;
+	int32_t one   = FUM_IDX(first);
+	int32_t two   = FUM_IDX(second);
+	int32_t three = FUM_IDX(third);
 
-	assert ( (first > -1) && (second > -1) && (third > -1));
+	assert ( (one > -1) && (two > -1) && (three > -1)
+		&& "ERROR: checkRule() with at least one illegal character called!");
 
 	if ( ( (one == two) && (two == three)) // eleminate tripple threats
-	|| (0 == (NameConstants::nameFUM[one][two]
-	& static_cast<int32_t> (std::pow (2, three)))
-	   )) {
+	  || (0 == (FUM_IDX_RULE(nst, one, two) & (1 << three)) ) ) {
 		// The desired character is not allowed to follow the set two chars
 		if (state & NameConstants::genNextIsCon)
 			state ^= NameConstants::genNextIsCon;
@@ -48,20 +47,20 @@ void CRandom::checkRule (int32_t &state, const char first, const char second, co
 
 /** @brief generate a syllable out of various rules
 **/
-int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &state, char * lastChrs) noexcept
+int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &state, char * lastChrs) noexcept
 {
-	int32_t charCount = 0;
-	int32_t charIndex = 0;
-	char    nextCon   = 0;     // Shortcut to the next consonant
-	char    nextVow   = 0;     // Shortcut to the next vowel
-	int32_t oldState  = state; // save state to revert if generation failed
-	char    oldLstChrs[2];     // Save lastChar to revert back if generation fails
-	int32_t oldWasLast = 0;    // Saves genLastIsVow(Con) to revert if the neding is illegal
-	int32_t conCount  = 0;     // Count generated consonants
-	int32_t vowCount  = 0;     // Count generated vowels
-	int32_t genTries  = 8;     // Eight tries to generate a syllable. That should be enough!
-	double  endChance = 0.0;   // propability to end (early)
-	double  vowChance = 0.0;   // 50% if last was consonant, 25% if last was vowel
+	int32_t  charCount = 0;
+	int32_t  charIndex = 0;
+	char     nextCon   = 0;     // Shortcut to the next consonant
+	char     nextVow   = 0;     // Shortcut to the next vowel
+	uint32_t oldState  = state; // save state to revert if generation failed
+	char     oldLstChrs[2];     // Save lastChar to revert back if generation fails
+	int32_t  oldWasLast = 0;    // Saves genLastIsVow(Con) to revert if the neding is illegal
+	int32_t  conCount  = 0;     // Count generated consonants
+	int32_t  vowCount  = 0;     // Count generated vowels
+	int32_t  genTries  = 8;     // Eight tries to generate a syllable. That should be enough!
+	double   endChance = 0.0;   // propability to end (early)
+	double   vowChance = 0.0;   // 50% if last was consonant, 25% if last was vowel
 
 	// Initialize syll and state
 	memset (syll, 0, 5);
@@ -78,10 +77,14 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 		 * 1) Determine charIndex and set shortcuts                          *
 		 *********************************************************************/
 		charIndex = static_cast<int32_t> (round (abs (idx)));
-		nextCon   = NameConstants::conList[charIndex % NameConstants::conListLen];
-		nextVow   = NameConstants::vowList[charIndex % NameConstants::vowListLen];
+		nextCon   = CL_CHR(nst, charIndex);
+		nextVow   = VL_CHR(nst, charIndex);
 		assert ( (nextCon > 0x60) && (nextCon < 0x7b)
-		&& (nextVow > 0x60) && (nextVow < 0x7b));
+			  && ( ( (nextVow > 0x60) && (nextVow < 0x7b) )
+				|| IS_UMLAUT_A(nextVow)
+				|| IS_UMLAUT_O(nextVow)
+				|| IS_UMLAUT_U(nextVow) )
+			  && "[C/V]L_CHR() returned illegal chars!");
 
 		/*********************************************************************
 		 * 2) Set chance to select a vowel next                              *
@@ -127,35 +130,29 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 			if (state & NameConstants::genPartStart) {
 				// On a part start, we need to check against the position:
 				if ( (state & NameConstants::genNextIsCon)
-				&& (0 == (NameConstants::genStartAllow
-				& NameConstants::nameFUM[syll[0] - NameConstants::chrOffsetLower]
-				[nextCon - NameConstants::chrOffsetLower])))
+				  && !FUM_ALLOW_START(nst, syll[0], nextCon) )
 					// What a pity, this combination is illegal on a part start
 					state ^= NameConstants::genNextIsCon;
 				else if ( (state & NameConstants::genNextIsVow)
-				&& (0 == (NameConstants::genStartAllow
-				& NameConstants::nameFUM[syll[0] - NameConstants::chrOffsetLower]
-				[nextVow - NameConstants::chrOffsetLower])))
+					   && !FUM_ALLOW_START(nst, syll[0], nextVow) )
 					// Nope, this vowel isn't  creating a legal part start
 					state ^= NameConstants::genNextIsVow;
 			} else {
 				// Somewhere else this is a normal checkrule
-				if ( (state & NameConstants::genNextIsCon)
-				&& (NameConstants::genMiddleAllow
-				& NameConstants::nameFUM[syll[0] - NameConstants::chrOffsetLower]
-				[nextCon - NameConstants::chrOffsetLower]))
-					checkRule (state, lastChrs[1], syll[0], nextCon);
-				else
-					// What a pity, this combination is illegal in the middle of a part
-					state ^= NameConstants::genNextIsCon;
-				if ( (state & NameConstants::genNextIsVow)
-				&& (NameConstants::genMiddleAllow
-				& NameConstants::nameFUM[syll[0] - NameConstants::chrOffsetLower]
-				[nextVow - NameConstants::chrOffsetLower]))
-					checkRule (state, lastChrs[1], syll[0], nextVow);
-				else
-					// What a pity, this combination is illegal in the middle of a part
-					state ^= NameConstants::genNextIsVow;
+				if (state & NameConstants::genNextIsCon) {
+					if (FUM_ALLOW_MIDDLE(nst, syll[0], nextCon) )
+						checkRule (state, lastChrs[1], syll[0], nextCon);
+					else
+						// What a pity, this combination is illegal in the middle of a part
+						state ^= NameConstants::genNextIsCon;
+				}
+				if (state & NameConstants::genNextIsVow) {
+					if (FUM_ALLOW_MIDDLE(nst, syll[0], nextVow))
+						checkRule (state, lastChrs[1], syll[0], nextVow);
+					else
+						// What a pity, this combination is illegal in the middle of a part
+						state ^= NameConstants::genNextIsCon;
+				}
 			}
 		}
 
@@ -223,21 +220,20 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 			if (simplex3D (idx, charIndex, (charCount * conCount) + (genTries * vowCount)) <= endChance) {
 				// We shall stop! But are we allowed to?
 				if ( ( (state & NameConstants::genPartEnd)    // This part ends, so:
-					   && (NameConstants::genEndAllow  // Is this combination allowed at a Parts end?
-						   & NameConstants::nameFUM[syll[charCount - 2] - NameConstants::chrOffsetLower]
-						   [syll[charCount - 1] - NameConstants::chrOffsetLower]))
-					 || ( (0 == (state & NameConstants::genPartEnd)) // This part shall go on, so:
-						  && (NameConstants::genMiddleAllow   // Is this combination allowed in the middle?
-							  & NameConstants::nameFUM[syll[charCount - 2] - NameConstants::chrOffsetLower]
-							  [syll[charCount - 1] - NameConstants::chrOffsetLower])))
+					// Is this combination allowed at a Parts end?
+					&& (FUM_ALLOW_END(nst, syll[charCount - 2], syll[charCount - 1])) )
+				  || ( (0 == (state & NameConstants::genPartEnd)) // This part shall go on, so:
+					// Is this combination allowed in the middle?
+					&& (FUM_ALLOW_MIDDLE(nst, syll[charCount - 2], syll[charCount - 1])) ) )
 					// Yeeees!
 					state |= NameConstants::genSyllEnd;
-				else if ( ( ( (state & NameConstants::genRoundC   // In round C or D, which are next, we go for a chance
-							   || state & NameConstants::genRoundD) // via noise, because we could simply go on as well.
-							  && (noise (hash (static_cast<int32_t> (step * (idx + charIndex + charCount
-											   + genTries + vowCount)))) > 0)
+				else if ( ( ( (state & NameConstants::genRoundC  // In round C or D, which are next, we go for a chance
+							|| state & NameConstants::genRoundD) // via noise, because we could simply go on as well.
+						  && (noise (hash (static_cast<int32_t> (
+												step * (idx + charIndex + charCount
+											  + genTries + vowCount)))) > 0)
 							) // But with a fourth char already, we _have_ to revert:
-							|| (0 == (state & (NameConstants::genRoundC | NameConstants::genRoundD)))
+						  || (0 == (state & (NameConstants::genRoundC | NameConstants::genRoundD)))
 						  ) // Finally we need tries left:
 						  && --genTries) {
 					// We simply search for a new char:
@@ -256,7 +252,6 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 						state ^= NameConstants::genLastIsCon;
 						conCount--;
 					} else if (state & NameConstants::genLastIsVow) {
-						syll[charCount++] = nextVow;
 						state ^= NameConstants::genLastIsVow;
 						vowCount--;
 					}
@@ -277,9 +272,24 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 
 	/*********************************************************************
 	 * 11) if genTries reached zero or we have 0 vow/conCount, we fail   *
+	 *     Further we check again if both part start and part end are    *
+	 *     valid if they are used/set/forced.                            *
 	 *********************************************************************/
 
-	if (genTries && vowCount && conCount) {
+	// Check part start
+	if ( (charCount > 1)
+	  && (state & NameConstants::genPartStart)
+	  && !FUM_ALLOW_START(nst, syll[0], syll[1]) )
+		// Not allowed, set genTries to zero to enforce failing
+		genTries = 0;
+	// check part end
+	if ( (charCount > 1)
+	  && (state & NameConstants::genPartEnd)
+	  && !FUM_ALLOW_END(nst, syll[charCount - 2], syll[charCount - 1]) )
+		// Not allowed, set genTries to zero to enforce failing
+		genTries = 0;
+
+	if (genTries && vowCount && conCount && (charCount > 1)) {
 		// great!
 		state ^= NameConstants::genSyllEnd;
 		if (state & NameConstants::genRoundC)
@@ -300,10 +310,7 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 
 		// If this is not a part end, but the last chars do not allow
 		// follow up characters, we have to force an ending:
-		if ( (0 == (state & NameConstants::genPartEnd))
-			 && (0 == (NameConstants::genCharMask
-					   & NameConstants::nameFUM[lastChrs[0] - NameConstants::chrOffsetLower]
-					   [lastChrs[1] - NameConstants::chrOffsetLower])))
+		if ( (0 == (state & NameConstants::genPartEnd)) && FUM_MUST_FINISH(nst, lastChrs[0], lastChrs[1]))
 			// Yep, we have to
 			state |= NameConstants::genPartEnd;
 		// We keep genLastIsCon/Vow for the next round
@@ -326,13 +333,18 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, int32_t &st
 double CRandom::getStepping (double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl) noexcept
 {
 	double result = (i * noise (cl) * noiseD (x,    z))
-	+ (i * noise (sl) * noiseD (y,    w))
-	+ (i * noise (pl) * noiseD (x, y, z, w));
+				  + (i * noise (sl) * noiseD (y,    w))
+				  + (i * noise (pl) * noiseD (x, y, z, w));
+	uint32_t ll = std::min(CL_LEN(nst), VL_LEN(nst));
+	uint32_t ul = std::max(CL_LEN(nst), VL_LEN(nst));
 
 	if ( (result <  0) && (result > -1.0)) result = -2.0 + noiseD (i);
 	if ( (result >= 0) && (result <  1.0)) result =  2.0 + noiseD (i);
-	while (abs (result) >= NameConstants::conListLen) result /= 7.3673L;
-	while (abs (result) <= NameConstants::vowListLen) result *= 1.7667L;
+
+	// The result will be between the size of the vowel
+	// and the consonant array.
+	while (abs (result) >= ul) result /= 7.3673L;
+	while (abs (result) <= ll) result *= 1.7667L;
 	return (result);
 }
 
@@ -763,7 +775,8 @@ int32_t CRandom::doubToInt (double val) const noexcept
 * to lastRndValue. The seed and Simplex data are initialized as well.
 **/
 CRandom::CRandom() noexcept
-: seed ( (private_::private_get_random() - (private_::randomValueRange / 2)) / 100)
+:	nst(NST_NAMES_EN),
+	seed ( (private_::private_get_random() - (private_::randomValueRange / 2)) / 100)
 {
 	// Initialize Simplex values:
 	for (int32_t i = 0; i < 5; i++) {
@@ -1483,7 +1496,7 @@ char * CRandom::rndName (double x, double y, double z, double w, int32_t chars, 
 	int32_t partsLeft  = std::max (1                  , parts);
 	int32_t syllsLeft  = std::max (1 +      partsLeft , sylls);
 	int32_t charsLeft  = std::max (2 + (3 * syllsLeft), chars);
-	int32_t genState   = NameConstants::genPartStart;
+	uint32_t genState  = NameConstants::genPartStart;
 	char    lastChrs[2] = { 0x0, 0x0 }; // This is an explicit array, no C-String, so no \0 ending
 	int32_t syllsDone  = 0;
 	double  index      = (x * simplex3D (y, z, w))
@@ -1552,6 +1565,15 @@ char * CRandom::rndName (double x, double y, double z, double w, int32_t chars, 
 	return (strdup (name.c_str()));
 }
 
+
+/** @brief set name source type to @a type
+  *
+  * @param[in] type the new name source type
+**/
+void CRandom::setNST (eNameSourceType type) noexcept
+{
+	nst = type;
+}
 
 /** @brief set Simplex Seed
   *

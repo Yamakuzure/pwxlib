@@ -29,6 +29,7 @@
 
 #include <pwx/general/compiler.h>
 #include <pwx/types/CLockable.h>
+#include <pwx/types/eNameSourceType.h>
 
 namespace pwx {
 
@@ -141,6 +142,7 @@ public:
 	char*       rndName  (double x, double y,                     int32_t chars, int32_t sylls, int32_t parts) noexcept;
 	char*       rndName  (double x, double y, double z,           int32_t chars, int32_t sylls, int32_t parts) noexcept;
 	char*       rndName  (double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts) noexcept;
+	void        setNST   (eNameSourceType type) noexcept;
 	void        setSeed  (int32_t newSeed) noexcept;
 	double      simplex1D(double x,                               double zoom = 1.0, double smooth = 1.0) noexcept;
 	double      simplex1D(double x,                               double zoom, double smooth, double reduction, int32_t waves) noexcept;
@@ -183,8 +185,8 @@ private:
 	 * ===============================================
 	*/
 
-	PWX_PRIVATE_INLINE void    checkRule  (int32_t &state, const char first, const char second, const char third) noexcept;
-	PWX_PRIVATE_INLINE int32_t genSyllable(double &idx, double step, char*  syll, int32_t &state, char*  lastChrs) noexcept PWX_WARNUNUSED;
+	PWX_PRIVATE_INLINE void    checkRule  (uint32_t &state, const char first, const char second, const char third) noexcept;
+	PWX_PRIVATE_INLINE int32_t genSyllable(double &idx, double step, char*  syll, uint32_t &state, char*  lastChrs) noexcept PWX_WARNUNUSED;
 	PWX_PRIVATE_INLINE double  getStepping(double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl) noexcept PWX_WARNUNUSED;
 
 	/* === Helper methods for Simplex Noise === */
@@ -217,14 +219,15 @@ private:
 	 * ===============================================
 	*/
 
-	int32_t  seed;          //!< General seed, can be changed with setSeed(new_value)
-	double   spxCorn[5];    //!< The Corners contributing to a simplex noise. (1D: 2, 4D: 5 corners)
-	double   spxDist[5][4]; //!< Simplex distance of a point to the simplex' corners
-	int32_t  spxGrads[5];   //!< Gradient table index for the simplex corners
-	int32_t  spxNorms[4];   //!< Normalized Coordinates for x, y, z, w
-	int32_t  spxOffs[3][4]; //!< Offsets for determining which vertice a dot is in
-	int32_t  spxPerms[4];   //!< Permutation table indices for x, y, z, w
-	int32_t  spxTab[512];   //!< A permutation table for simplex noise
+	eNameSourceType nst; //!< Type of the name source
+	int32_t         seed;          //!< General seed, can be changed with setSeed(new_value)
+	double          spxCorn[5];    //!< The Corners contributing to a simplex noise. (1D: 2, 4D: 5 corners)
+	double          spxDist[5][4]; //!< Simplex distance of a point to the simplex' corners
+	int32_t         spxGrads[5];   //!< Gradient table index for the simplex corners
+	int32_t         spxNorms[4];   //!< Normalized Coordinates for x, y, z, w
+	int32_t         spxOffs[3][4]; //!< Offsets for determining which vertice a dot is in
+	int32_t         spxPerms[4];   //!< Permutation table indices for x, y, z, w
+	int32_t         spxTab[512];   //!< A permutation table for simplex noise
 };
 
 extern CRandom RNG; //!< External instance of Random to be used
