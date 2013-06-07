@@ -572,7 +572,14 @@ struct PWX_API TDoubleElement : public VElement
 				this->setNext(nullptr);
 				this->isRemoved.store(true, PWX_MEMORDER_RELEASE);
 				PWX_UNLOCK(this)
-			} // End of having at least one neighbor to handle
+
+				// End of having at least one neighbor to handle
+			} else {
+				// Just set the neighbors
+				this->setPrev(nullptr);
+				this->setNext(nullptr);
+				this->isRemoved.store(true, PWX_MEMORDER_RELEASE);
+			}
 		} else {
 			// No thread safety? Then just kick it out:
 			elem_t* xOldNext = next.load(PWX_MEMORDER_RELAXED);
