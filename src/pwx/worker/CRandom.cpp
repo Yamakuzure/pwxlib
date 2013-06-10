@@ -274,27 +274,29 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &s
 	 *     valid if they are used/set/forced.                            *
 	 *********************************************************************/
 
-	// If this is not a part end, but the last chars do not allow
-	// follow up characters, we have to force an ending:
-	if ( (0 == (state & NameConstants::genPartEnd)) && FUM_MUST_FINISH(nst, lastChrs[0], lastChrs[1]))
-		// Yep, we have to
-		state |= NameConstants::genPartEnd;
+	// Do some tests about part starts, ends and the count of vowels/consonatns
+	if (genTries && (charCount > 1) && vowCount && conCount) {
+		// If this is not a part end, but the last chars do not allow
+		// follow up characters, we have to force an ending:
+		if ( (0 == (state & NameConstants::genPartEnd) )
+		  && FUM_MUST_FINISH(nst, syll[charCount - 2], syll[charCount - 1]) )
+			// Yep, we have to
+			state |= NameConstants::genPartEnd;
 
-	// Check part start
-	if ( (charCount > 1)
-	  && (state & NameConstants::genPartStart)
-	  && !FUM_ALLOW_START(nst, syll[0], syll[1]) )
-		// Not allowed, set genTries to zero to enforce failing
+		// To continue the combination of the first two characters must be allowed
+		// if this is a part start, and the last two must be allowed if this is a
+		// part end.
+		if ( ( (state & NameConstants::genPartStart)   // check part start
+			&& !FUM_ALLOW_START(nst, syll[0], syll[1]) )
+		  || ( (state & NameConstants::genPartEnd)     // check part end
+			&& !FUM_ALLOW_END(nst, syll[charCount - 2], syll[charCount - 1]) ) )
+			genTries = 0;
+	} else
 		genTries = 0;
 
-	// check part end
-	if ( (charCount > 1)
-	  && (state & NameConstants::genPartEnd)
-	  && !FUM_ALLOW_END(nst, syll[charCount - 2], syll[charCount - 1]) )
-		// Not allowed, set genTries to zero to enforce failing
-		genTries = 0;
 
-	if (genTries && vowCount && conCount && (charCount > 1)) {
+	// Finally cary on if we have genTries left, no tries left indicate failure.
+	if (genTries) {
 		// great!
 		state ^= NameConstants::genSyllEnd;
 		if (state & NameConstants::genRoundC)
@@ -322,6 +324,7 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &s
 		memset (syll, 0, 5);
 		charCount = 0;
 	}
+
 	return (charCount);
 }
 
