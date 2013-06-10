@@ -227,15 +227,13 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &s
 					&& (FUM_ALLOW_MIDDLE(nst, syll[charCount - 2], syll[charCount - 1])) ) )
 					// Yeeees!
 					state |= NameConstants::genSyllEnd;
-				else if ( ( ( (state & NameConstants::genRoundC  // In round C or D, which are next, we go for a chance
-							|| state & NameConstants::genRoundD) // via noise, because we could simply go on as well.
+				else if ( ( (0 == (state & (NameConstants::genRoundC | NameConstants::genRoundD)))
+							// If we do not have a fourth char, yet, a noise() chance is taken:
+						||( ( (state & NameConstants::genRoundC || state & NameConstants::genRoundD)
 						  && (noise (hash (static_cast<int32_t> (
 												step * (idx + charIndex + charCount
-											  + genTries + vowCount)))) > 0)
-							) // But with a fourth char already, we _have_ to revert:
-						  || (0 == (state & (NameConstants::genRoundC | NameConstants::genRoundD)))
-						  ) // Finally we need tries left:
-						  && --genTries) {
+											  + genTries + vowCount)))) > 0) )
+						  ) ) && --genTries) {
 					// We simply search for a new char:
 					syll[charCount--] = 0x0;
 					if (state & NameConstants::genRoundC) {
@@ -276,12 +274,19 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &s
 	 *     valid if they are used/set/forced.                            *
 	 *********************************************************************/
 
+	// If this is not a part end, but the last chars do not allow
+	// follow up characters, we have to force an ending:
+	if ( (0 == (state & NameConstants::genPartEnd)) && FUM_MUST_FINISH(nst, lastChrs[0], lastChrs[1]))
+		// Yep, we have to
+		state |= NameConstants::genPartEnd;
+
 	// Check part start
 	if ( (charCount > 1)
 	  && (state & NameConstants::genPartStart)
 	  && !FUM_ALLOW_START(nst, syll[0], syll[1]) )
 		// Not allowed, set genTries to zero to enforce failing
 		genTries = 0;
+
 	// check part end
 	if ( (charCount > 1)
 	  && (state & NameConstants::genPartEnd)
@@ -308,11 +313,6 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &s
 			syll[0] -= NameConstants::chrOffsetDown;
 		}
 
-		// If this is not a part end, but the last chars do not allow
-		// follow up characters, we have to force an ending:
-		if ( (0 == (state & NameConstants::genPartEnd)) && FUM_MUST_FINISH(nst, lastChrs[0], lastChrs[1]))
-			// Yep, we have to
-			state |= NameConstants::genPartEnd;
 		// We keep genLastIsCon/Vow for the next round
 	} else {
 		// what a pity...
