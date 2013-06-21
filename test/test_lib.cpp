@@ -33,6 +33,12 @@ int32_t main(int argc, char* argv[])
 		if (EXIT_SUCCESS == result) {
 			PWX_TRY_PWX_FURTHER (result = testSet<set_t> (env))
 		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testHash<chash_t> (env))
+		}
+		if (EXIT_SUCCESS == result) {
+			PWX_TRY_PWX_FURTHER (result = testHash<ohash_t> (env))
+		}
 
 		// --- test the speed of the containers ---
 		if (EXIT_SUCCESS == result) {

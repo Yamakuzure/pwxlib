@@ -70,6 +70,7 @@
 				<Option working_dir=".." />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-c 5" />
 			</Target>
 			<Target title="documentation">
 				<Option output="libpwx" prefix_auto="1" extension_auto="1" />
@@ -133,10 +134,12 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/base/VTHashBase.h" />
 		<Unit filename="../src/pwx/container.h">
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/container/TChainHash.h" />
 		<Unit filename="../src/pwx/container/TDoubleList.h">
 			<Option target="clean" />
 			<Option target="library" />
@@ -145,6 +148,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/container/TOpenHash.h" />
 		<Unit filename="../src/pwx/container/TQueue.h">
 			<Option target="clean" />
 			<Option target="library" />
@@ -241,6 +245,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/CHashBuilder.cpp" />
+		<Unit filename="../src/pwx/types/CHashBuilder.h" />
 		<Unit filename="../src/pwx/types/CLockable.cpp">
 			<Option target="clean" />
 			<Option target="library" />
@@ -253,6 +259,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/THashElement.h" />
 		<Unit filename="../src/pwx/types/TSingleElement.h">
 			<Option target="clean" />
 			<Option target="library" />
@@ -261,6 +268,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/eNameSourceType.cpp" />
 		<Unit filename="../src/pwx/types/eNameSourceType.h" />
 		<Unit filename="../src/pwx/worker.h">
 			<Option target="clean" />
@@ -299,6 +307,7 @@
 			<Option target="library" />
 		</Unit>
 		<Unit filename="../test/namegen.cpp" />
+		<Unit filename="../test/testHash.h" />
 		<Unit filename="../test/testListRing.h">
 			<Option target="clean" />
 			<Option target="library" />

@@ -34,6 +34,7 @@ const uint32_t maxThreads  = 8;
 #include "destroy.h"
 #include "testListRing.h"
 #include "testStackQueue.h"
+#include "testHash.h"
 #include "testSet.h"
 #include "testSpeed.h"
 #include "testRNG.h"
