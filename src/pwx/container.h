@@ -33,6 +33,8 @@
 #include <pwx/container/TDoubleList.h>
 #include <pwx/container/TDoubleRing.h>
 #include <pwx/container/TQueue.h>
+#include <pwx/container/TChainHash.h>
+#include <pwx/container/TOpenHash.h>
 #include <pwx/container/TSet.h>
 
 #endif // PWX_LIBPWX_PWX_CONTAINER_H_INCLUDED
