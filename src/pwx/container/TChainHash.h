@@ -129,7 +129,7 @@ public:
 	TChainHash( void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key, size_t keyLen),
 				size_t keyLen_) noexcept :
-		base_t(destroy_, hash_, keyLen_)
+		base_t(97, destroy_, hash_, keyLen_)
 	{ }
 
 
@@ -143,7 +143,7 @@ public:
 	**/
 	TChainHash( void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key)) noexcept :
-		base_t(destroy_, hash_)
+		base_t(97, destroy_, hash_)
 	{ }
 
 
@@ -154,7 +154,7 @@ public:
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
 	TChainHash(uint32_t (*destroy_) (data_t* data)) noexcept :
-		base_t(destroy_)
+		base_t(97, destroy_)
 	{ }
 
 
@@ -166,7 +166,7 @@ public:
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
 	TChainHash(size_t keyLen_) noexcept :
-		base_t (keyLen_)
+		base_t (97, keyLen_)
 	{ }
 
 
@@ -177,7 +177,7 @@ public:
 	  * full key usage
 	**/
 	TChainHash() noexcept :
-		base_t ()
+		base_t (97, 0)
 	{ }
 
 
