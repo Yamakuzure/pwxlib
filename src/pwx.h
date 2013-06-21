@@ -58,14 +58,16 @@
   * 0.8.6.13  2012-11-21  sed, PrydeWorX  Changed all containers to a new scheme: public methods do no real work, private
   *                                       and protected methods do the work and are overwritten where necessary.
   * 0.8.6.14  2012-11-22  sed, PrydeWorX  Removed PWX_INLINE macro, it is of no use any more in a real library!
+  * 0.8.7.0   2013-06-11  sed, PrydeWorX  After a lot of work all basic containers are now thread safe without using mutexes.
+  * 0.8.7.1   2013-06-21  sed, PrydeWorX  Chained and Open Hash Table containers are now available.
   @endverbatim
 **/
 
 #define LIBPWX_MAJOR 0
 #define LIBPWX_MINOR 8
-#define LIBPWX_REVIS 6
-#define LIBPWX_PATCH 14
-#define LIBPWX_VERSION "0.8.6.14"
+#define LIBPWX_REVIS 7
+#define LIBPWX_PATCH 1
+#define LIBPWX_VERSION "0.8.7.1"
 
 #include <pwx/general.h>
 #include <pwx/tools.h>
