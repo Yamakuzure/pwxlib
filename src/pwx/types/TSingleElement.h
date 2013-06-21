@@ -164,7 +164,7 @@ struct PWX_API TSingleElement : public VElement
 	  * deleted unless the last reference is gone.
 	  *
 	  * <B>Important</B>: Whether the element does locking or not
-	  * is *not* copied. It will silently turned on by default!
+	  * is *not* copied. It will silently be turned on by default!
 	  *
 	  * @param[in] src reference to the element to copy.
 	**/

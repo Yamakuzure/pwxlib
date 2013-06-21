@@ -67,7 +67,7 @@ public:
 
 	typedef VContainer                  base_t; //!< Base type of the list
 	typedef TSingleList<data_t, elem_t> list_t; //!< Type of this list
-	typedef typename elem_t::neighbor_t neighbor_t; //!< Type of elements enighbors, used for curr, head and tail.
+	typedef typename elem_t::neighbor_t neighbor_t; //!< Type of elements neighbors, used for curr, head and tail.
 
 
 	/* ===============================================
