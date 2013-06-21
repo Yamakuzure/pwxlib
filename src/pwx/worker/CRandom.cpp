@@ -346,8 +346,8 @@ double CRandom::getStepping (double i, double x, double y, double z, double w, i
 
 	// The result will be between the size of the vowel
 	// and the consonant array.
-	while (abs (result) >= ul) result /= 7.3673L;
-	while (abs (result) <= ll) result *= 1.7667L;
+	while (static_cast<uint32_t>(abs (result)) >= ul) result /= 7.3673L;
+	while (static_cast<uint32_t>(abs (result)) <= ll) result *= 1.7667L;
 	return (result);
 }
 

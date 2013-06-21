@@ -27,14 +27,14 @@
   *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   *
   * History and Changelog are maintained in pwx.h
-**/	
+**/
 
 
 namespace pwx {
 
 /** @brief [N]ame[S]ource[T]ype enum with NST_<type>_<language>
   * Note: The special language "all" is merged from all others.
-  * Note: The type "texts" includes everything from the type "names" 
+  * Note: The type "texts" includes everything from the type "names"
 **/
 enum eNameSourceType {
 	NST_NAMES_DE  = 0, // 1 file analyzed
@@ -46,40 +46,11 @@ enum eNameSourceType {
 	NST_NUM_TYPES = 6  // End-of-list marker! No valid source type!
 };
 
-/// @brief pre-increment for the source type
-eNameSourceType &operator++(eNameSourceType &type)
-{
-	if (type < NST_NUM_TYPES)
-		type = static_cast<eNameSourceType>(1 + static_cast<uint32_t>(type));
+eNameSourceType &operator++(eNameSourceType &type);
+eNameSourceType operator++ (eNameSourceType &type, int);
+eNameSourceType &operator--(eNameSourceType &type);
+eNameSourceType operator-- (eNameSourceType &type, int);
 
-	return type;
-}
-
-/// @brief post-increment for the source type
-eNameSourceType operator++(eNameSourceType &type, int)
-{
-	eNameSourceType tmp = type;
-	++type;
-	return tmp;
-}
-
-/// @brief pre-decrement for the source type
-eNameSourceType &operator--(eNameSourceType &type)
-{
-	if (type > NST_NAMES_DE)
-		type = static_cast<eNameSourceType>(-1 + static_cast<uint32_t>(type));
-
-	return type;
-}
-
-/// @brief post-decrement for the source type
-eNameSourceType operator--(eNameSourceType &type, int)
-{
-	eNameSourceType tmp = type;
-	--type;
-	return tmp;
-}
-	
 } // namespace pwx
 
 #endif // PWX_LIBPWX_PWX_TYPES_ENAMESOURCETYPE_H_INCLUDED
