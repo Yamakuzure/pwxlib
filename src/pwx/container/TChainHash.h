@@ -74,11 +74,19 @@ public:
 	  * To set any of the user methods, one of the specialized constructors
 	  * can be used.
 	  *
+	  * The @a maxLoad_ and @a dynGrow_ parameters can be used to tell the hash table
+	  * how much it should grow when the the specified load factor is reached.
+	  * The default for chained hash tables is to grow by a factor of 1.25 (25%) when
+	  * a load factor of 3.0 is reached.
+	  *
 	  * @param[in] initSize Initial size of the hash table.
 	  * @param[in] keyLen_ Length of the key to limit hash generation.
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TChainHash (size_t initSize, size_t keyLen_) noexcept:
-		base_t(initSize, keyLen_)
+	TChainHash(	size_t initSize, size_t keyLen_,
+				double maxLoad_, double dynGrow_) noexcept:
+		base_t(initSize, keyLen_, maxLoad_, dynGrow_)
 	{ }
 
 
@@ -87,16 +95,24 @@ public:
 	  * The full constructor initializes an empty hash with user defined delete
 	  * method, hashing method and key length. The initial size is the @a initSize
 	  *
+	  * The @a maxLoad_ and @a dynGrow_ parameters can be used to tell the hash table
+	  * how much it should grow when the the specified load factor is reached.
+	  * The default for chained hash tables is to grow by a factor of 1.25 (25%) when
+	  * a load factor of 3.0 is reached.
+	  *
 	  * @param[in] initSize The initial size of the table.
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TChainHash (size_t initSize,
+	TChainHash(	size_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_) noexcept :
-		base_t(initSize, destroy_, hash_, keyLen_)
+				size_t keyLen_,
+				double maxLoad_, double dynGrow_) noexcept :
+		base_t(initSize, destroy_, hash_, keyLen_, maxLoad_, dynGrow_)
 	{ }
 
 
@@ -106,14 +122,22 @@ public:
 	  * method and hashing method withour key length. The initial size is the
 	  * @a initSize
 	  *
+	  * The @a maxLoad_ and @a dynGrow_ parameters can be used to tell the hash table
+	  * how much it should grow when the the specified load factor is reached.
+	  * The default for chained hash tables is to grow by a factor of 1.25 (25%) when
+	  * a load factor of 3.0 is reached.
+	  *
 	  * @param[in] initSize The initial size of the table.
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash_ A pointer to a function that can hash the keys that are stored
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TChainHash (size_t initSize,
+	TChainHash(	size_t initSize,
 				void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key)) noexcept :
-		base_t(initSize, destroy_, hash_)
+				uint32_t (*hash_) (const key_t* key),
+				double maxLoad_, double dynGrow_) noexcept :
+		base_t(initSize, destroy_, hash_, maxLoad_, dynGrow_)
 	{ }
 
 
@@ -126,10 +150,10 @@ public:
 	  * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
-	TChainHash( void (*destroy_) (data_t* data),
+	TChainHash(	void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key, size_t keyLen),
 				size_t keyLen_) noexcept :
-		base_t(97, destroy_, hash_, keyLen_)
+		base_t(97, destroy_, hash_, keyLen_, 3.0, 1.25)
 	{ }
 
 
@@ -141,9 +165,9 @@ public:
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	**/
-	TChainHash( void (*destroy_) (data_t* data),
+	TChainHash(	void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key)) noexcept :
-		base_t(97, destroy_, hash_)
+		base_t(97, destroy_, hash_, 3.0, 1.25)
 	{ }
 
 
@@ -153,8 +177,8 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TChainHash(uint32_t (*destroy_) (data_t* data)) noexcept :
-		base_t(97, destroy_)
+	TChainHash(	uint32_t (*destroy_) (data_t* data)) noexcept :
+		base_t(97, destroy_, 3.0, 1.25)
 	{ }
 
 
@@ -165,8 +189,8 @@ public:
 	  *
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
-	TChainHash(size_t keyLen_) noexcept :
-		base_t (97, keyLen_)
+	TChainHash(	size_t keyLen_) noexcept :
+		base_t (97, keyLen_, 3.0, 1.25)
 	{ }
 
 
@@ -177,7 +201,7 @@ public:
 	  * full key usage
 	**/
 	TChainHash() noexcept :
-		base_t (97, 0)
+		base_t (97, 0, 3.0, 1.25)
 	{ }
 
 
@@ -190,7 +214,7 @@ public:
 	  *
 	  * @param[in] src reference of the hash to copy.
 	**/
-	TChainHash (const hash_t &src) :
+	TChainHash(	const hash_t &src) :
 		base_t (src)
 	{  }
 

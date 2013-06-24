@@ -87,11 +87,16 @@ public:
 	  *
 	  * @param[in] initSize Initial size of the hash table.
 	  * @param[in] keyLen_ Length of the key to limit hash generation.
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase (size_t initSize, size_t keyLen_) noexcept:
+	VTHashBase(	size_t initSize, size_t keyLen_,
+				double maxLoad_, double dynGrow_) noexcept:
 		hashBuilder (keyLen_),
 		hashSize (initSize),
-		hashTable (nullptr)
+		hashTable (nullptr),
+		maxLoadFactor(maxLoad_),
+		dynGrowFactor(dynGrow_)
 	{
 		// Generate the hash table
 		try {
@@ -119,12 +124,15 @@ public:
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase (size_t initSize,
+	VTHashBase(	size_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_) noexcept :
-		hash_t(initSize, keyLen_)
+				size_t keyLen_,
+				double maxLoad_, double dynGrow_) noexcept :
+		hash_t(initSize, keyLen_, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_limited = hash_;
@@ -140,11 +148,14 @@ public:
 	  * @param[in] initSize The initial size of the table.
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash_ A pointer to a function that can hash the keys that are stored
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase (size_t initSize,
+	VTHashBase(	size_t initSize,
 				void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key)) noexcept :
-		hash_t(initSize, (size_t)0)
+				uint32_t (*hash_) (const key_t* key),
+				double maxLoad_, double dynGrow_) noexcept :
+		hash_t(initSize, (size_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_user = hash_;
@@ -159,11 +170,14 @@ public:
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase( void (*destroy_) (data_t* data),
+	VTHashBase(	void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_) noexcept :
-		hash_t((size_t)100, keyLen_)
+				size_t keyLen_,
+				double maxLoad_, double dynGrow_) noexcept :
+		hash_t((size_t)100, keyLen_, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_limited = hash_;
@@ -177,10 +191,13 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase( void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key)) noexcept :
-		hash_t((size_t)100, (size_t)0)
+	VTHashBase(	void (*destroy_) (data_t* data),
+				uint32_t (*hash_) (const key_t* key),
+				double maxLoad_, double dynGrow_) noexcept :
+		hash_t((size_t)100, (size_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_user = hash_;
@@ -192,9 +209,12 @@ public:
 	  * This constructor only takes a destroy method.
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(uint32_t (*destroy_) (data_t* data)) noexcept :
-		hash_t((size_t)100, (size_t)0)
+	VTHashBase(	uint32_t (*destroy_) (data_t* data),
+				double maxLoad_, double dynGrow_) noexcept :
+		hash_t((size_t)100, (size_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 	}
@@ -206,21 +226,36 @@ public:
 	  * and hash methods to nullptr.
 	  *
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(size_t keyLen_) noexcept :
-		hash_t ((size_t)100, keyLen_)
+	VTHashBase(	size_t keyLen_,
+				double maxLoad_, double dynGrow_) noexcept :
+		hash_t ((size_t)100, keyLen_, maxLoad_, dynGrow_)
 	{ }
 
 
-	/** @brief empty constructor
+	/** @brief pseudo empty constructor
 	  *
-	  * The empty constructor uses the default constructor to set the data
-	  * destroy method and the hash method to the null pointer with
-	  * full key usage
+	  * The pseudo empty constructor uses the default constructor to
+	  * set the data destroy method and the hash method to the null
+	  * pointer with full key usage.
+	  *
+	  * However, because of the very different needs of chained
+	  * versus open hash tables, both the maximum load factor
+	  * and the dynamic growth rate must be set. A true empty
+	  * constructor is not possible.
+	  *
+	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
+	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase() noexcept :
-		hash_t ((size_t)100, (size_t)0)
+	VTHashBase(	double maxLoad_, double dynGrow_) noexcept :
+		hash_t ((size_t)100, (size_t)0, maxLoad_, dynGrow_)
 	{ }
+
+
+	/// Empty ctor is not available
+	VTHashBase() PWX_DELETE;
 
 
 	/** @brief copy constructor
@@ -232,14 +267,16 @@ public:
 	  *
 	  * @param[in] src reference of the hash to copy.
 	**/
-	VTHashBase (const hash_t &src) :
+	VTHashBase(	const hash_t &src) :
 		base_t (src),
 		destroy(src.destroy),
 		hash_user(src.hash_user),
 		hash_limited(src.hash_limited),
 		hashBuilder (src.hashBuilder.getKeyLen()),
 		hashSize (src.hashSize),
-		hashTable (nullptr)
+		hashTable (nullptr),
+		maxLoadFactor(src.maxLoadFactor),
+		dynGrowFactor(src.dynGrowFactor)
 	{
 		// Generate the hash table
 		try {
@@ -970,6 +1007,13 @@ private:
 	virtual elem_t* privRemove (const key_t &key) noexcept PWX_VIRTUAL_PURE;
 
 
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	*/
+
+	const double maxLoadFactor; //!< When the load factor reaches this, the table is grown.
+	const double dynGrowFactor; //!< When the table is automatically grown, it is grown by this factor.
 }; // class VTHashBase
 
 /** @brief default destructor
