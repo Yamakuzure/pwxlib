@@ -84,7 +84,7 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TChainHash(	size_t initSize, size_t keyLen_,
+	TChainHash(	uint32_t initSize, uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept:
 		base_t(initSize, keyLen_, maxLoad_, dynGrow_)
 	{ }
@@ -107,10 +107,10 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TChainHash(	size_t initSize,
+	TChainHash(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_,
+				uint32_t (*hash_) (const key_t* key, uint32_t keyLen),
+				uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept :
 		base_t(initSize, destroy_, hash_, keyLen_, maxLoad_, dynGrow_)
 	{ }
@@ -133,7 +133,7 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TChainHash(	size_t initSize,
+	TChainHash(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key),
 				double maxLoad_, double dynGrow_) noexcept :
@@ -151,8 +151,8 @@ public:
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
 	TChainHash(	void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_) noexcept :
+				uint32_t (*hash_) (const key_t* key, uint32_t keyLen),
+				uint32_t keyLen_) noexcept :
 		base_t(97, destroy_, hash_, keyLen_, 3.0, 1.25)
 	{ }
 
@@ -189,7 +189,7 @@ public:
 	  *
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
-	TChainHash(	size_t keyLen_) noexcept :
+	TChainHash(	uint32_t keyLen_) noexcept :
 		base_t (97, keyLen_, 3.0, 1.25)
 	{ }
 
@@ -248,10 +248,10 @@ public:
 	  * @param[in] targetSize the new size of the hash.
 	  * @return the resulting size
 	**/
-	virtual size_t grow(size_t targetSize)
+	virtual uint32_t grow(uint32_t targetSize)
 	{
 		PWX_LOCK_GUARD(hash_t, this)
-		size_t oldSize = this->sizeMax();
+		uint32_t oldSize = this->sizeMax();
 		if (targetSize > oldSize) {
 			setHashMethod(targetSize);
 			PWX_TRY_PWX_FURTHER(return base_t::grow(targetSize));
@@ -314,7 +314,7 @@ private:
 	  * @param[in] key const reference of the key to evaluate
 	  * @return the index an element with this key would have in the table
 	**/
-	virtual size_t privGetIndex(const key_t &key) const noexcept
+	virtual uint32_t privGetIndex(const key_t &key) const noexcept
 	{
 		uint32_t xHash = this->protGetHash(&key);
 
@@ -322,17 +322,17 @@ private:
 			return xHash % this->sizeMax();
 		else {
 			double dHash = static_cast<double>(xHash) * 0.618;
-			return static_cast<size_t>(std::floor( (dHash - std::floor(dHash) * this->sizeMax()) ));
+			return static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash) * this->sizeMax()) ));
 		}
 	}
 
 
 	/// @brief private insertion doing bucket filling to resolve collisions
-	virtual size_t privInsert(elem_t* elem)
+	virtual uint32_t privInsert(elem_t* elem)
 	{
 		PWX_LOCK_GUARD(hash_t, this)
 
-		size_t  idx  = privGetIndex(elem->key);
+		uint32_t  idx  = privGetIndex(elem->key);
 		elem_t* root = this->hashTable[idx];
 		if (root) {
 			elem_t* next = root->getNext();
@@ -360,7 +360,7 @@ private:
 	  * @param[in] index the index to remove
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemove (size_t index) noexcept
+	virtual elem_t* privRemove (uint32_t index) noexcept
 	{
 		elem_t* result = nullptr;
 		if ((index < this->sizeMax()) && hashTable[index]) {
@@ -390,7 +390,7 @@ private:
 	{
 		PWX_LOCK_GUARD(hash_t, this)
 
-		size_t index   = privGetIndex(key);
+		uint32_t index   = privGetIndex(key);
 		elem_t* result = hashTable[index];
 		elem_t* prev   = nullptr;
 
@@ -417,7 +417,7 @@ private:
 
 
 	/// @brief internal method to set the hashing method according to @a targetSize
-	void setHashMethod(size_t targetSize) noexcept
+	void setHashMethod(uint32_t targetSize) noexcept
 	{
 		CHMethod = CHM_Multiplication; // default the safe one
 
@@ -426,8 +426,8 @@ private:
 			// Test 2: For the division method to safely work, the size
 			// should be a prime number with a good distance to the
 			// next smaller and larger 2^x values:
-			size_t lowerBound = 64;
-			size_t upperBound = 128;
+			uint32_t lowerBound = 64;
+			uint32_t upperBound = 128;
 
 			// find bounds:
 			while (lowerBound > targetSize) {
@@ -440,8 +440,8 @@ private:
 				upperBound *= 2;
 			}
 
-			size_t middle  = (lowerBound + upperBound) / 2;
-			size_t midDist = middle > targetSize ? middle - targetSize : targetSize - middle;
+			uint32_t middle  = (lowerBound + upperBound) / 2;
+			uint32_t midDist = middle > targetSize ? middle - targetSize : targetSize - middle;
 
 			if (midDist < std::min((targetSize - lowerBound) / 2, (upperBound - targetSize) / 2) ) {
 				// Test 3: (almost) a prime number
@@ -449,7 +449,7 @@ private:
 				// 8 odd numbers (but 15) and must not be devidable by more
 				// than one
 				int divided = 0;
-				for (size_t divisor = 3; (divided < 2) && (divisor < 20); divisor += 2) {
+				for (uint32_t divisor = 3; (divided < 2) && (divisor < 20); divisor += 2) {
 					// 15 is already covered by 3 and 5
 					if (15 != divisor) {
 						if (!(targetSize % divisor))

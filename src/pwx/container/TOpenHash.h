@@ -78,7 +78,7 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TOpenHash(	size_t initSize, size_t keyLen_,
+	TOpenHash(	uint32_t initSize, uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept:
 		base_t(initSize, keyLen_, maxLoad_, dynGrow_)
 	{ }
@@ -101,10 +101,10 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TOpenHash(	size_t initSize,
+	TOpenHash(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_,
+				uint32_t (*hash_) (const key_t* key, uint32_t keyLen),
+				uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept :
 		base_t(initSize, destroy_, hash_, keyLen_, maxLoad_, dynGrow_)
 	{ }
@@ -127,7 +127,7 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TOpenHash(	size_t initSize,
+	TOpenHash(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key),
 				double maxLoad_, double dynGrow_) noexcept :
@@ -145,8 +145,8 @@ public:
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
 	TOpenHash(	void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_) noexcept :
+				uint32_t (*hash_) (const key_t* key, uint32_t keyLen),
+				uint32_t keyLen_) noexcept :
 		base_t(destroy_, hash_, keyLen_, 0.8, 1.5)
 	{ }
 
@@ -183,7 +183,7 @@ public:
 	  *
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
-	TOpenHash(	size_t keyLen_) noexcept :
+	TOpenHash(	uint32_t keyLen_) noexcept :
 		base_t (keyLen_, 0.8, 1.5)
 	{ }
 
@@ -291,24 +291,24 @@ private:
 	  * @param[in] allowVacated if set to true, the method will return indexes from vacated positions and jump those otherwise.
 	  * @return the index an element with this key would have in the table
 	**/
-	virtual size_t privGetIndex(const key_t &key, bool allowVacated) const noexcept
+	virtual uint32_t privGetIndex(const key_t &key, bool allowVacated) const noexcept
 	{
 		uint32_t xHash = this->protGetHash(&key);
 
 		// Use multiplication method for the base index
 		double dHash   = static_cast<double>(xHash) * 0.618;
-		size_t idxBase = static_cast<size_t>(std::floor( (dHash - std::floor(dHash) * this->sizeMax()) ));
+		uint32_t idxBase = static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash) * this->sizeMax()) ));
 
 		// Use division probing for the stepping
-		size_t tabSize = this->sizeMax();
-		size_t idxStep = xHash % (tabSize - (tabSize % 2 ? 1 : 3));
+		uint32_t tabSize = this->sizeMax();
+		uint32_t idxStep = xHash % (tabSize - (tabSize % 2 ? 1 : 3));
 
 		// idxStep must not be even
 		if (!(idxStep % 2))
 			idxStep += idxStep > 20 ? -1 : 1;
 
 		// Move down until an appropriate value is found
-		size_t oriStep = idxStep; // to revert if necessary
+		uint32_t oriStep = idxStep; // to revert if necessary
 		while ((idxStep > 1) && !(tabSize % idxStep))
 			idxStep -= 2;
 
@@ -322,8 +322,8 @@ private:
 		// Now probe the table until we are done or have found the key
 		bool   isFound   = false;
 		bool   isVacated = false;
-		size_t pos       = 0;
-		for (size_t i = 0; !isFound && (i < tabSize); ++i) {
+		uint32_t pos       = 0;
+		for (uint32_t i = 0; !isFound && (i < tabSize); ++i) {
 			pos       = (idxBase + (idxStep * i)) % tabSize;
 			isVacated = protIsVacated(pos);
 
@@ -359,18 +359,18 @@ private:
 	  * @param[in] key const reference of the key to evaluate
 	  * @return the index an element with this key would have in the table
 	**/
-	virtual size_t privGetIndex(const key_t &key) const noexcept
+	virtual uint32_t privGetIndex(const key_t &key) const noexcept
 	{
 		return privGetIndex(key, false);
 	}
 
 
 	/// @brief private insertion relying on privGetIndex() to resolve collisions
-	virtual size_t privInsert(elem_t* elem)
+	virtual uint32_t privInsert(elem_t* elem)
 	{
 		PWX_LOCK_GUARD(hash_t, this)
 
-		size_t  idx  = privGetIndex(elem->key, true); // Happy with vacated positions
+		uint32_t  idx  = privGetIndex(elem->key, true); // Happy with vacated positions
 
 		assert( ((nullptr == hashTable[idx]) || !protIsVacated(idx))
 			&& "ERROR: TOpenHash::privGetIndex(key, true) returned an occupied position!");
@@ -391,7 +391,7 @@ private:
 	  * @param[in] index the index to remove
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemove (size_t index) noexcept
+	virtual elem_t* privRemove (uint32_t index) noexcept
 	{
 		elem_t* result = nullptr;
 		if ((index < this->sizeMax()) && hashTable[index] && !protIsVacated(index)) {

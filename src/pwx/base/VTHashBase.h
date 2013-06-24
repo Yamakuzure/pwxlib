@@ -90,7 +90,7 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(	size_t initSize, size_t keyLen_,
+	VTHashBase(	uint32_t initSize, uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept:
 		hashBuilder (keyLen_),
 		hashSize (initSize),
@@ -101,7 +101,7 @@ public:
 		// Generate the hash table
 		try {
 			hashTable = new elem_t*[hashSize];
-			for (size_t i = 0; i < hashSize; ++i)
+			for (uint32_t i = 0; i < hashSize; ++i)
 				hashTable[i] = nullptr;
 		}
 		PWX_THROW_STD_FURTHER("VTHashBase failure", "HashTable could not be created")
@@ -127,10 +127,10 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(	size_t initSize,
+	VTHashBase(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_,
+				uint32_t (*hash_) (const key_t* key, uint32_t keyLen),
+				uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept :
 		hash_t(initSize, keyLen_, maxLoad_, dynGrow_)
 	{
@@ -151,11 +151,11 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(	size_t initSize,
+	VTHashBase(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key),
 				double maxLoad_, double dynGrow_) noexcept :
-		hash_t(initSize, (size_t)0, maxLoad_, dynGrow_)
+		hash_t(initSize, (uint32_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_user = hash_;
@@ -174,10 +174,10 @@ public:
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
 	VTHashBase(	void (*destroy_) (data_t* data),
-				uint32_t (*hash_) (const key_t* key, size_t keyLen),
-				size_t keyLen_,
+				uint32_t (*hash_) (const key_t* key, uint32_t keyLen),
+				uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept :
-		hash_t((size_t)100, keyLen_, maxLoad_, dynGrow_)
+		hash_t((uint32_t)100, keyLen_, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_limited = hash_;
@@ -197,7 +197,7 @@ public:
 	VTHashBase(	void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key),
 				double maxLoad_, double dynGrow_) noexcept :
-		hash_t((size_t)100, (size_t)0, maxLoad_, dynGrow_)
+		hash_t((uint32_t)100, (uint32_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 		hash_user = hash_;
@@ -214,7 +214,7 @@ public:
 	**/
 	VTHashBase(	uint32_t (*destroy_) (data_t* data),
 				double maxLoad_, double dynGrow_) noexcept :
-		hash_t((size_t)100, (size_t)0, maxLoad_, dynGrow_)
+		hash_t((uint32_t)100, (uint32_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
 	}
@@ -229,9 +229,9 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(	size_t keyLen_,
+	VTHashBase(	uint32_t keyLen_,
 				double maxLoad_, double dynGrow_) noexcept :
-		hash_t ((size_t)100, keyLen_, maxLoad_, dynGrow_)
+		hash_t ((uint32_t)100, keyLen_, maxLoad_, dynGrow_)
 	{ }
 
 
@@ -250,7 +250,7 @@ public:
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
 	VTHashBase(	double maxLoad_, double dynGrow_) noexcept :
-		hash_t ((size_t)100, (size_t)0, maxLoad_, dynGrow_)
+		hash_t ((uint32_t)100, (uint32_t)0, maxLoad_, dynGrow_)
 	{ }
 
 
@@ -281,7 +281,7 @@ public:
 		// Generate the hash table
 		try {
 			hashTable = new elem_t*[hashSize];
-			for (size_t i = 0; i < hashSize; ++i)
+			for (uint32_t i = 0; i < hashSize; ++i)
 				hashTable[i] = nullptr;
 		}
 		PWX_THROW_STD_FURTHER("VTHashBase copy failure", "HashTable could not be created")
@@ -314,7 +314,7 @@ public:
 	  * @param[in] src reference of the element to copy
 	  * @return the resulting number of stored elements
 	**/
-	virtual size_t add(const elem_t &src)
+	virtual uint32_t add(const elem_t &src)
 	{
 		// Use double search to only lock if the key is
 		// not found in the first run
@@ -344,7 +344,12 @@ public:
 					newElement->disable_thread_safety();
 
 				// 3: Do the real insert
-				return privInsert(newElement);
+				double newSize = privInsert(newElement);
+
+				// 4: Grow if needed
+				double maxSize = sizeMax();
+				if ((newSize / maxSize) > maxLoadFactor)
+					grow(static_cast<uint32_t>(maxSize * dynGrowFactor));
 			} // End of inner check
 		} // End of outer check
 
@@ -352,7 +357,7 @@ public:
 	}
 
 
-	virtual size_t add(const key_t &key, data_t* data)
+	virtual uint32_t add(const key_t &key, data_t* data)
 	{
 		// Use double search to only lock if the key is
 		// not found in the first run
@@ -370,7 +375,13 @@ public:
 					newElement->disable_thread_safety();
 
 				// 2: Do the real insert
-				return privInsert(newElement);
+				double newSize = privInsert(newElement);
+
+
+				// 3: Grow if needed
+				double maxSize = sizeMax();
+				if ((newSize / maxSize) > maxLoadFactor)
+					grow(static_cast<uint32_t>(maxSize * dynGrowFactor));
 			} // End of inner check
 		} // End of outer check
 
@@ -389,8 +400,8 @@ public:
 	virtual void clear() noexcept
 	{
 		elem_t* toDelete  = nullptr;
-		size_t  pos       = 0;
-		size_t  tabSize   = sizeMax();
+		uint32_t  pos       = 0;
+		uint32_t  tabSize   = sizeMax();
 
 		if (!hashTable) return; // Should never happen
 
@@ -469,8 +480,8 @@ public:
 	{
 		PWX_LOCK(this)
 		this->do_locking(false);
-		size_t  pos       = 0;
-		size_t  tabSize   = this->sizeMax();
+		uint32_t  pos       = 0;
+		uint32_t  tabSize   = this->sizeMax();
 		elem_t* xCurr     = nullptr;
 		while (pos < tabSize) {
 			xCurr = hashTable[pos];
@@ -507,8 +518,8 @@ public:
 	virtual void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		size_t  pos       = 0;
-		size_t  tabSize   = this->sizeMax();
+		uint32_t  pos       = 0;
+		uint32_t  tabSize   = this->sizeMax();
 		elem_t* xCurr     = nullptr;
 		while (pos < tabSize) {
 			xCurr = hashTable[pos];
@@ -586,7 +597,7 @@ public:
 	  * @param[in] targetSize the new size of the hash.
 	  * @return the resulting size
 	**/
-	virtual size_t grow(size_t targetSize)
+	virtual uint32_t grow(uint32_t targetSize)
 	{
 		if (targetSize > sizeMax()) {
             PWX_LOCK_GUARD(hash_t, this)
@@ -595,15 +606,15 @@ public:
 				elem_t** oldTab = hashTable;
 				try {
 					hashTable = new elem_t*[targetSize];
-					for (size_t i = 0; i < targetSize; ++i)
+					for (uint32_t i = 0; i < targetSize; ++i)
 						hashTable[i] = nullptr;
 				}
 				PWX_THROW_STD_FURTHER("grow failure", "Larger HashTable could not be created")
 
 				// --- Copy all elements ---
 				elem_t* toMove  = nullptr;
-				size_t  pos       = 0;
-				size_t  tabSize   = sizeMax();
+				uint32_t  pos       = 0;
+				uint32_t  tabSize   = sizeMax();
 
 				while (pos < tabSize) {
 					while (oldTab[pos] && (oldTab[pos] != vacated)) {
@@ -677,7 +688,7 @@ public:
 
 
 	/// @brief return the maximum number of places (elements for open, buckets for chained hashes)
-	size_t sizeMax() const noexcept
+	uint32_t sizeMax() const noexcept
 	{
 		return this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
 			? hashSize.load(PWX_MEMORDER_ACQUIRE)
@@ -709,7 +720,7 @@ public:
 			hash_limited = rhs.hash_limited;
 			hashBuilder.setKeyLen(rhs.hashBuilder.getKeyLen());
 
-			size_t tgtSize = rhs.sizeMax();
+			uint32_t tgtSize = rhs.sizeMax();
 			if (sizeMax() < tgtSize)
 				PWX_TRY_PWX_FURTHER(this->grow(tgtSize));
 
@@ -737,15 +748,15 @@ public:
 			PWX_DOUBLE_LOCK (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
 
 			// --- grow this table if needed ---
-			size_t rhsSize = rhs.sizeMax();
-			size_t lhsSize = this->sizeMax();
+			uint32_t rhsSize = rhs.sizeMax();
+			uint32_t lhsSize = this->sizeMax();
 
 			if (rhsSize > lhsSize)
 				PWX_TRY_PWX_FURTHER(this->grow(rhsSize));
 
 			// --- copy all elements ---
 			elem_t* rhsCurr = nullptr;
-			size_t  rhsPos  = 0;
+			uint32_t  rhsPos  = 0;
 			bool    isTS    = this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE);
 
 			while (rhsPos < rhsSize) {
@@ -776,10 +787,10 @@ public:
 		if (&rhs != this) {
 			PWX_DOUBLE_LOCK (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
 
-			size_t rhsSize = rhs.sizeMax();
+			uint32_t rhsSize = rhs.sizeMax();
 			elem_t* lhsCurr = nullptr;
 			elem_t* rhsCurr = nullptr;
-			size_t  rhsPos  = 0;
+			uint32_t  rhsPos  = 0;
 
 			while (rhsPos < rhsSize) {
 				if (!rhs.protIsVacated(rhsPos)) {
@@ -857,7 +868,7 @@ protected:
 
 	void     (*destroy)      (data_t* data)                     = nullptr;
 	uint32_t (*hash_user)    (const key_t*  key)                = nullptr;
-	uint32_t (*hash_limited) (const key_t*  key, size_t keyLen) = nullptr;
+	uint32_t (*hash_limited) (const key_t*  key, uint32_t keyLen) = nullptr;
 
 
 	/** @brief Delete the element @a removed
@@ -906,7 +917,7 @@ protected:
 	  * @param[in] index the index to check
 	  * @return true if the position is marked as vacated, false otherwise.
 	**/
-	bool protIsVacated(const size_t index) const noexcept
+	bool protIsVacated(const uint32_t index) const noexcept
 	{
 		if (index < this->sizeMax()) {
 			PWX_LOCK_GUARD(hash_t, const_cast<hash_t*>(this))
@@ -922,7 +933,7 @@ protected:
 	*/
 
 	CHashBuilder       hashBuilder; //!< instance that will handle the key generation
-	std::atomic_size_t hashSize;    //!< number of places to maintain
+	std::atomic_uint32_t hashSize;    //!< number of places to maintain
 	elem_t**           hashTable;   //!< the central array that is our hash
 	char*              vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
 	elem_t*            vacated;     //!< The Open Hash sets empty places to point at this.
@@ -947,7 +958,7 @@ private:
 	**/
 	virtual elem_t* privGet(const key_t &key) const noexcept
 	{
-		size_t  keyIdx = privGetIndex(key);
+		uint32_t  keyIdx = privGetIndex(key);
 		elem_t* xCurr  = hashTable[keyIdx];
 
 		while (xCurr && (*xCurr != key))
@@ -964,8 +975,8 @@ private:
 	virtual const elem_t* privGetByIndex(const int64_t index) const noexcept
 	{
 		// Mod index into range
-		size_t xSize = sizeMax();
-		size_t xIdx  = static_cast<size_t> (index < 0
+		uint32_t xSize = sizeMax();
+		uint32_t xIdx  = static_cast<uint32_t> (index < 0
 											? xSize - (std::abs (index) % xSize)
 											: index % xSize);
 
@@ -990,17 +1001,17 @@ private:
 	 * Therefore the inherited specialized hash tables need to determine
 	 * how to get the index of a key.
 	*/
-	virtual size_t privGetIndex(const key_t &key) const noexcept PWX_VIRTUAL_PURE;
+	virtual uint32_t privGetIndex(const key_t &key) const noexcept PWX_VIRTUAL_PURE;
 
 
 	// How collisions are resolved is a hash type specific matter
-	virtual size_t privInsert(elem_t* elem) PWX_VIRTUAL_PURE;
+	virtual uint32_t privInsert(elem_t* elem) PWX_VIRTUAL_PURE;
 
 
 	// This method must be implemented by the hash templates themselves, because
 	// the outcome of a remove is different whether it is a chained (nullptr)
 	// or open (vacated) hash.
-	virtual elem_t* privRemove (size_t index) noexcept PWX_VIRTUAL_PURE;
+	virtual elem_t* privRemove (uint32_t index) noexcept PWX_VIRTUAL_PURE;
 
 
 	// The same applies to removal by key:
@@ -1027,8 +1038,8 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept
 	PWX_LOCK_GUARD(hash_t, this)
 
 	// Wipe hash table
-	size_t  tabSize = sizeMax();
-	size_t  pos     = 0;
+	uint32_t  tabSize = sizeMax();
+	uint32_t  pos     = 0;
 	elem_t* xCurr   = nullptr;
 
 	while (pos < tabSize) {
