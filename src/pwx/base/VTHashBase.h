@@ -932,11 +932,12 @@ protected:
 	 * ===============================================
 	*/
 
-	CHashBuilder       hashBuilder; //!< instance that will handle the key generation
-	std::atomic_uint32_t hashSize;    //!< number of places to maintain
-	elem_t**           hashTable;   //!< the central array that is our hash
-	char*              vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
-	elem_t*            vacated;     //!< The Open Hash sets empty places to point at this.
+	CHashBuilder	hashBuilder; //!< instance that will handle the key generation
+	std::atomic_uint_fast32_t
+					hashSize;    //!< number of places to maintain
+	elem_t**		hashTable;   //!< the central array that is our hash
+	char*			vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
+	elem_t*			vacated;     //!< The Open Hash sets empty places to point at this.
 	// Note: vacated is placed here, so clear(), disable_thread_safety() and
 	//       enable_thread_safety() can be unified here as well. Otherwise
 	//       the hashes would need individual functions that only differ
