@@ -11,7 +11,7 @@ namespace pwx {
   *
   * @return the currently set key length
   */
-size_t CHashBuilder::getKeyLen() const noexcept
+uint32_t CHashBuilder::getKeyLen() const noexcept
 {
 	return keyLen;
 }
@@ -20,7 +20,7 @@ size_t CHashBuilder::getKeyLen() const noexcept
   *
   * @param[in] keyLen_ the key length to use in the future
   */
-void CHashBuilder::setKeyLen(size_t keyLen_) noexcept
+void CHashBuilder::setKeyLen(uint32_t keyLen_) noexcept
 {
 	keyLen = keyLen_;
 }

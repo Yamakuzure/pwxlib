@@ -65,7 +65,7 @@ public:
 	  *
 	  * @param[in] keyLen_ optional key length
 	**/
-	CHashBuilder(size_t keyLen_) noexcept :
+	CHashBuilder(uint32_t keyLen_) noexcept :
 		keyLen(keyLen_)
 	{ }
 
@@ -96,8 +96,8 @@ public:
 	 * ===============================================
 	*/
 
-	size_t getKeyLen()         const noexcept;
-	void   setKeyLen(size_t keyLen_) noexcept;
+	uint32_t getKeyLen()         const noexcept;
+	void   setKeyLen(uint32_t keyLen_) noexcept;
 
 
 	/* ===============================================
@@ -118,7 +118,7 @@ public:
 	  *
 	  * The operator has two optional parameters. The first is a pointer
 	  * to a general hash method, the second to a hash method taking
-	  * a second size_t argument called keyLen; although it is up to
+	  * a second uint32_t argument called keyLen; although it is up to
 	  * the method what it uses the key length for.
 	  *
 	  * @param[in] key pointer to the key to hash
@@ -129,7 +129,7 @@ public:
 	template<typename key_t>
 	uint32_t operator()(const key_t* key,
 			uint32_t (*hash_user)    (const key_t* key)                = nullptr,
-			uint32_t (*hash_limited) (const key_t* key, size_t keyLen) = nullptr
+			uint32_t (*hash_limited) (const key_t* key, uint32_t keyLen) = nullptr
 		) const noexcept
 	{
 		if (hash_user)
@@ -212,7 +212,7 @@ private:
 	 * ===============================================
 	*/
 
-	size_t keyLen = 0; //!< optional key length for C-String and std::string keys (0 = use strlen() on C-Strings)
+	uint32_t keyLen = 0; //!< optional key length for C-String and std::string keys (0 = use strlen() on C-Strings)
 
 
 }; // class CHashBuilder
