@@ -3,9 +3,7 @@
 
 /** @file CHashBuilder.h
   *
-  * @brief @todo add brief description
-  *
-  * @todo add extensive description
+  * @brief Class to get the hash of a value of variable type
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -36,9 +34,20 @@ namespace pwx {
 
 /** @class CHashBuilder
   *
-  * @brief Simple template to generate hashes out of keys
+  * @brief Simple class to generate hashes out of keys
   *
-  * @todo describe properly
+  * The class CHashBuilder can be used to conveniently get the
+  * hash value of a value of a variable type.
+  * This can be obtained by either providing a hashing function
+  * or, if the type is supported by RNG, using RNG.hash() on
+  * the value to hash.
+  *
+  * Currently RNG supports 8, 16, 32 and 64 bit signed and unsigned
+  * integers, float, double, C-Strings (char*) and std::string.
+  * Further a key length can be set when using either a user defined
+  * hashing function that supports a key length, or when using char*
+  * or std::string with RNG.hash().
+  *
 **/
 class CHashBuilder
 {
@@ -96,8 +105,8 @@ public:
 	 * ===============================================
 	*/
 
-	uint32_t getKeyLen()         const noexcept;
-	void   setKeyLen(uint32_t keyLen_) noexcept;
+	uint32_t getKeyLen()           const noexcept;
+	void     setKeyLen(uint32_t keyLen_) noexcept;
 
 
 	/* ===============================================
@@ -128,7 +137,7 @@ public:
 	**/
 	template<typename key_t>
 	uint32_t operator()(const key_t* key,
-			uint32_t (*hash_user)    (const key_t* key)                = nullptr,
+			uint32_t (*hash_user)    (const key_t* key)                  = nullptr,
 			uint32_t (*hash_limited) (const key_t* key, uint32_t keyLen) = nullptr
 		) const noexcept
 	{
