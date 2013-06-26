@@ -229,8 +229,16 @@ public:
 	using base_t::get;
 	using base_t::getData;
 	using base_t::grow;
+	using base_t::pop;
+	using base_t::pop_back;
+	using base_t::pop_front;
+	using base_t::push;
+	using base_t::push_back;
+	using base_t::push_front;
+	using base_t::shift;
 	using base_t::size;
 	using base_t::sizeMax;
+	using base_t::unshift;
 
 
 	/* ===============================================
@@ -372,7 +380,7 @@ private:
 
 		uint32_t  idx  = privGetIndex(elem->key, true); // Happy with vacated positions
 
-		assert( ((nullptr == hashTable[idx]) || !protIsVacated(idx))
+		assert( ((nullptr == hashTable[idx]) || protIsVacated(idx))
 			&& "ERROR: TOpenHash::privGetIndex(key, true) returned an occupied position!");
 
 		this->hashTable[idx] = elem;
@@ -391,7 +399,7 @@ private:
 	  * @param[in] index the index to remove
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemove (uint32_t index) noexcept
+	virtual elem_t* privRemoveIdx (uint32_t index) noexcept
 	{
 		elem_t* result = nullptr;
 		if ((index < this->sizeMax()) && hashTable[index] && !protIsVacated(index)) {
@@ -401,7 +409,7 @@ private:
 			// Note: Open Hashes mark empty positions with the "vacated" sentry
 			if ((index < this->sizeMax()) && hashTable[index] && !protIsVacated(index)) {
 				result = hashTable[index];
-				hashTable[index] = &vacated;
+				hashTable[index] = vacated;
 				result->remove();
 				eCount.fetch_sub(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
 									? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
@@ -419,9 +427,9 @@ private:
 	  * @param[in] key the key of the element to remove has
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemove (const key_t &key) noexcept
+	virtual elem_t* privRemoveKey (const key_t &key) noexcept
 	{
-		return privRemove(privGetIndex(key));
+		return privRemoveIdx(privGetIndex(key));
 	}
 }; // class TOpenHash
 

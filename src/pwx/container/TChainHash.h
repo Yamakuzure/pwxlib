@@ -260,8 +260,16 @@ public:
 	}
 
 
+	using base_t::pop;
+	using base_t::pop_back;
+	using base_t::pop_front;
+	using base_t::push;
+	using base_t::push_back;
+	using base_t::push_front;
+	using base_t::shift;
 	using base_t::size;
 	using base_t::sizeMax;
+	using base_t::unshift;
 
 
 	/* ===============================================
@@ -360,7 +368,7 @@ private:
 	  * @param[in] index the index to remove
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemove (uint32_t index) noexcept
+	virtual elem_t* privRemoveIdx (uint32_t index) noexcept
 	{
 		elem_t* result = nullptr;
 		if ((index < this->sizeMax()) && hashTable[index]) {
@@ -386,7 +394,7 @@ private:
 	  * @param[in] key the key of the element to remove has
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemove (const key_t &key) noexcept
+	virtual elem_t* privRemoveKey (const key_t &key) noexcept
 	{
 		PWX_LOCK_GUARD(hash_t, this)
 
