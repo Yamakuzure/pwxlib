@@ -46,6 +46,7 @@
 # endif
 
 #include <cmath>
+#include <cassert>
 
 namespace pwx {
 
@@ -407,14 +408,17 @@ public:
 
 		while (pos < tabSize) {
 			PWX_LOCK(this)
-			while (hashTable[pos] && (hashTable[pos] != vacated)) {
-				toDelete = privRemove(pos);
+			if (hashTable[pos] && (hashTable[pos] != vacated)) {
+				do {
+					toDelete = privRemoveIdx(pos);
+					PWX_UNLOCK(this)
+					if (toDelete) {
+						PWX_TRY(protDelete(toDelete))
+						catch(...) { } // We can't do anything about that
+					}
+				} while (hashTable[pos] && (hashTable[pos] != vacated));
+			} else
 				PWX_UNLOCK(this)
-				if (toDelete) {
-					PWX_TRY(protDelete(toDelete))
-					catch(...) { } // We can't do anything about that
-				}
-			}
 			++pos;
 		} // end of while pos < tabSize
 	}
@@ -618,7 +622,7 @@ public:
 
 				while (pos < tabSize) {
 					while (oldTab[pos] && (oldTab[pos] != vacated)) {
-						if ( ( toMove = privRemove(pos) ) )
+						if ( ( toMove = privRemoveIdx(pos) ) )
 							PWX_TRY_PWX_FURTHER(this->add(*toMove))
 						// Note: eCount is not affected. privRemove() will reduce
 						// it while add() increases it.
@@ -642,6 +646,123 @@ public:
 	}
 
 
+	/** @brief short alias for pop_back()
+	  *
+	  * This is a convenience function that removes the last element
+	  * found in the table. As it has to traverse the table, this
+	  * operation can be costly for large tables that only have elements
+	  * somewhere at the beginning.
+	  *
+	  * You have to delete the removed element by yourself.
+	  *
+	  * If the hash table is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the hash is empty
+	**/
+	virtual elem_t* pop() noexcept
+	{
+		return this->pop_back();
+	}
+
+
+	/** @brief alias to remove the last element (tail)
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the list is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the list is empty
+	**/
+	virtual elem_t* pop_back() noexcept
+	{
+		if (size() > 0) {
+			PWX_LOCK_GUARD(hash_t, this)
+			if (size() > 0) {
+				uint32_t maxPos = sizeMax();
+				for (uint32_t i = maxPos - 1; i > 0 ; --i) {
+					if (hashTable[i] && (hashTable[i] != vacated))
+						return privRemoveIdx(i);
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+
+	/** @brief alias to remove the first element (head)
+	  *
+	  * This is a convenience function that removes the first element
+	  * found in the table. As it has to traverse the table, this
+	  * operation can be costly for large tables that only have elements
+	  * somewhere at the end.
+	  *
+	  * You have to delete the removed element by yourself.
+	  *
+	  * If the hash table is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the hash is empty
+	**/
+	virtual elem_t* pop_front() noexcept
+	{
+		if (size() > 0) {
+			PWX_LOCK_GUARD(hash_t, this)
+			if (size() > 0) {
+				uint32_t maxPos = sizeMax();
+				for (uint32_t i = 0; i < maxPos ; ++i) {
+					if (hashTable[i] && (hashTable[i] != vacated))
+						return privRemoveIdx(i);
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with the other container types
+	virtual uint32_t push (const key_t &key, data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(key, data))
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with the other container types
+	virtual uint32_t push (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(src))
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with the other container types
+	virtual uint32_t push_back (const key_t &key, data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(key, data))
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with the other container types
+	virtual uint32_t push_back (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(src))
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with the other container types
+	virtual uint32_t push_front (const key_t &key, data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(key, data))
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with the other container types
+	virtual uint32_t push_front (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(src))
+	}
+
+
 	/** @brief remove the element with the key @a key
 	  *
 	  * If the hash table does not contain an element with the key
@@ -656,7 +777,7 @@ public:
 	**/
 	virtual elem_t* remElem(elem_t &elem) noexcept
 	{
-		return privRemove(elem.key);
+		return privRemoveKey(elem.key);
 	}
 
 
@@ -674,7 +795,14 @@ public:
 	**/
 	virtual elem_t* remKey(const key_t &key) noexcept
 	{
-		return privRemove(key);
+		return privRemoveKey(key);
+	}
+
+
+	/// @brief simple wrapper to pop_front() to be conformant with other containers
+	virtual elem_t* shift() noexcept
+	{
+		return this->pop_front();
 	}
 
 
@@ -693,6 +821,20 @@ public:
 		return this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
 			? hashSize.load(PWX_MEMORDER_ACQUIRE)
 			: hashSize.load(PWX_MEMORDER_RELAXED);
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with other containers
+	virtual uint32_t unshift(const key_t &key, data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(key, data))
+	}
+
+
+	/// @brief simple wrapper to add() to be conformant with other containers
+	virtual uint32_t unshift(const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return this->add(src))
 	}
 
 
@@ -755,17 +897,18 @@ public:
 				PWX_TRY_PWX_FURTHER(this->grow(rhsSize));
 
 			// --- copy all elements ---
-			elem_t* rhsCurr = nullptr;
-			uint32_t  rhsPos  = 0;
-			bool    isTS    = this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE);
+			elem_t*  rhsCurr = nullptr;
+			uint32_t rhsPos  = 0;
+			bool     isTS    = this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE);
 
 			while (rhsPos < rhsSize) {
 				if (!rhs.protIsVacated(rhsPos)) {
 					rhsCurr = rhs.hashTable[rhsPos];
-					if (rhsCurr) {
+					while (rhsCurr) {
 						PWX_TRY_PWX_FURTHER(this->add(*rhsCurr))
 						if (!isTS)
 							this->get(rhsCurr->key)->disable_thread_safety();
+						rhsCurr = rhsCurr->getNext();
 					}
 				}
 				++rhsPos;
@@ -795,10 +938,11 @@ public:
 			while (rhsPos < rhsSize) {
 				if (!rhs.protIsVacated(rhsPos)) {
 					rhsCurr = rhs.hashTable[rhsPos];
-					if (rhsCurr) {
-						lhsCurr = privRemove(rhsCurr->key);
+					while (rhsCurr) {
+						lhsCurr = privRemoveKey(rhsCurr->key);
 						if (lhsCurr)
 							PWX_TRY_PWX_FURTHER(protDelete(lhsCurr))
+						rhsCurr = rhsCurr->getNext();
 					}
 				}
 				++rhsPos;
@@ -1012,11 +1156,11 @@ private:
 	// This method must be implemented by the hash templates themselves, because
 	// the outcome of a remove is different whether it is a chained (nullptr)
 	// or open (vacated) hash.
-	virtual elem_t* privRemove (uint32_t index) noexcept PWX_VIRTUAL_PURE;
+	virtual elem_t* privRemoveIdx (uint32_t index) noexcept PWX_VIRTUAL_PURE;
 
 
 	// The same applies to removal by key:
-	virtual elem_t* privRemove (const key_t &key) noexcept PWX_VIRTUAL_PURE;
+	virtual elem_t* privRemoveKey (const key_t &key) noexcept PWX_VIRTUAL_PURE;
 
 
 	/* ===============================================
