@@ -4,15 +4,15 @@
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific set:
-typedef pwx::TChainHash<int, float>   chash_t;
-typedef pwx::TChainHash<int, float>   ohash_t;
-typedef pwx::THashElement<int, float> elem_t;
+typedef pwx::TChainHash<keydata_t, hashval_t>   chash_t;
+typedef pwx::TOpenHash<keydata_t, hashval_t>    ohash_t;
+typedef pwx::THashElement<keydata_t, hashval_t> elem_t;
 
 /** @brief test a specific set type template
   *
   ****************************************************************************
   ** === Generic template function to test hash type containers ===         **
-  ** A) Create a container and add 5 integer/float pairs                    **
+  ** A) Create a container and add 5 keydata_t/hashval_t pairs              **
   ** B) List three elements with keys 1, 3, 4 (1.1, 2.2, 4.4)               **
   ** C) Remove elements with the keys 2, 4 (2.2, 4.4)                       **
   ** D) Loop all remaining elements (1->1.1, 3->3.3, 5->5.5)                **
@@ -39,12 +39,12 @@ int32_t testHash (sEnv& env)
 
 	hash_t ifHash (do_not_destroy, nullptr); // The hash table
 	ifHash.disable_thread_safety(); // This is strictly single threaded.
-	int32_t keys[5]   = { 1,   2,   3,   4,   5   }; // These are the keys
-	float   values[5] = { 1.1, 2.2, 3.3, 4.4, 5.5 }; // These are the values
+	keydata_t keys[5]   = { 1,   2,   3,   4,   5   }; // These are the keys
+	hashval_t values[5] = { 1.1, 2.2, 3.3, 4.4, 5.5 }; // These are the values
 	size_t  pairCount = 0;
 
 	/***************************************************************************
-	** A) Create a container and add 5 integer/float pairs                    **
+	** A) Create a container and add 5 keydata_t/hashval_t pairs              **
 	***************************************************************************/
 	cout << adjRight (4, 0) << ++env.testCount << " A) Add five pairs : ";
 
@@ -68,9 +68,9 @@ int32_t testHash (sEnv& env)
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
 		cout << adjRight (4, 0) << ++env.testCount << " B) Elements 1->1.1, 3->3.3, 4.4 are : ";
-        float a = ifHash.getData(1);
-        float b = **(ifHash.get(3));
-        float c = *(ifHash.get(4)->data.get());
+        hashval_t a = ifHash.getData(1);
+        hashval_t b = **(ifHash.get(3));
+        hashval_t c = *(ifHash.get(4)->data.get());
 		cout << adjLeft(1,1) << (std::round(a * 10.0) / 10.0) << ", ";
 		cout << adjLeft(1,1) << (std::round(b * 10.0) / 10.0) << ", ";
 		cout << adjLeft(1,1) << (std::round(c * 10.0) / 10.0) << ": ";
@@ -93,8 +93,8 @@ int32_t testHash (sEnv& env)
 		cout << adjRight (4, 0) << ++env.testCount << " C) Remove elements 2->2.2, 4->4.4 : ";
 		elem_t* ea = ifHash.remKey(2); // Delete here
 		elem_t* eb = ifHash.get(4);    // Let the container delete it
-		float a = ea ? **ea : 0;
-		float b = eb ? **eb : 0;
+		hashval_t a = ea ? **ea : 0;
+		hashval_t b = eb ? **eb : 0;
 		if (eb) ifHash.delElem(*eb);   // aaaaaand it's gone.
 		cout << adjLeft(1,1) << (std::round(a * 10.0) / 10.0) << ", ";
 		cout << adjLeft(1,1) << (std::round(b * 10.0) / 10.0) << ": ";
@@ -123,16 +123,18 @@ int32_t testHash (sEnv& env)
 		// Here we loop using operator[] to directly access the hash table:
 		size_t maxCnt = ifHash.sizeMax();
 		size_t found  = 0;
-		float a = 0., b = 0., c = 0; // Values
+		hashval_t a = 0., b = 0., c = 0; // Values
 		size_t x = 0, y = 0, z = 0; // indexes
 		elem_t* curr;
 
 		for (size_t i = 0; i < maxCnt; ++i) {
-			if ( (curr = ifHash[i]) ) {
+			curr = ifHash[i];
+			while ( curr ) {
 				if (1 == curr->key) { a = **curr; x = i; }
 				if (3 == curr->key) { b = **curr; y = i; }
 				if (5 == curr->key) { c = **curr; z = i; }
 				++found;
+				curr = curr->getNext();
 			}
 		} // End of looping hash table
 
@@ -173,7 +175,8 @@ int32_t testHash (sEnv& env)
 		elem_t* curr;
 
 		for (size_t i = 0; i < maxCnt; ++i) {
-			if ( (curr = ifHash[i]) ) {
+			curr = ifHash[i];
+			while ( curr ) {
 				if ( (curr->key >= 1) && (curr->key <= 5) ) {
 					hasElem[curr->key - 1] = true;
 					++found;
@@ -185,6 +188,7 @@ int32_t testHash (sEnv& env)
 					// Quit this:
 					result = EXIT_FAILURE; // But we search the rest anyway
 				}
+				curr = curr->getNext();
 			}
 		} // End of looping hash table
 
@@ -219,7 +223,8 @@ int32_t testHash (sEnv& env)
 			elem_t* curr;
 
 			for (size_t i = 0; i < maxCnt; ++i) {
-				if ( (curr = ifHash[i]) ) {
+				curr = ifHash[i];
+				while (curr) {
 					if ( (curr->key >= 1) && (curr->key <= 5) ) {
 						hasElem[curr->key - 1] = true;
 						++found;
@@ -231,6 +236,7 @@ int32_t testHash (sEnv& env)
 						// Quit this:
 						result = EXIT_FAILURE; // But we search the rest anyway
 					}
+					curr = curr->getNext();
 				}
 			} // End of looping hash table
 

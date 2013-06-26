@@ -21,8 +21,8 @@ using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 
 
-/// Type for the data to test with containers
-typedef int32_t data_t;
+typedef int32_t keydata_t; //!< Type for the data to test with list containers, and type for the keys of hash containers
+typedef float   hashval_t; //!< Type for hash container values
 
 /// Number of elements to use with all mass and speed tests
 const uint32_t maxElements = 500000;

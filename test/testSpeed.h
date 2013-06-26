@@ -3,287 +3,139 @@
 #define PWX_LIBPWX_TESTLIB_TESTSPEED_H_INCLUDED 1
 
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
-#include <pwx/types/CLockable.h>
-#include <pwx/types/CException.h>
-#include <pwx/general/macros.h>
+#include "testThreads.h"
 
-// Shortcut - I'm lazy. ;)
-typedef std::atomic_bool aBool;
-
-
-/// @brief struct doing synchronized start/stop for additions of items into containers
-/// IMPORTANT: Single threaded calls _MUST_ set autostart to true on creation !
-template<typename list_t>
-struct thAdder
+/// @brief simple template to print the test description
+template<typename cont_t>
+int32_t printDescription(sEnv &env, uint32_t threadCount)
 {
-	volatile
-	aBool   isRunning;
-	list_t* cont  = nullptr;
-
-	explicit thAdder(bool autostart) : isRunning(autostart) { }
-	thAdder():thAdder(false) { }
-
-	/// @brief the working functions, called manually or by std::thread
-	void operator()(list_t* cont_, data_t start, data_t toAdd, data_t maxAdd)
-	{
-		cont = cont_;
-		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
-
-		if (cont) {
-			for (data_t nr = 0; nr < toAdd; ++nr) {
-				PWX_TRY_PWX_FURTHER(cont->push(new data_t(start)))
-				start += pwx::RNG.random(1, maxAdd);
-			}
-		}
-
-		DEBUG_LOCK_STATE("clear_locks", thAdder, cont)
-		uint32_t remaining = 0;
-		if ( ( remaining = cont->lock_count() ) ) {
-			cerr << "ERROR: " << remaining << " locks upon thAdder exit!" << endl;
-			cont->clear_locks();
-		}
-
-		// Set thread to not running in a loop to be absolutely sure
-		// this operator does not exit until isRunning is false.
-		while (this->isRunning.load(PWX_MEMORDER_ACQUIRE))
-			this->isRunning.store(false, PWX_MEMORDER_RELEASE);
-	}
-};
-
-/// @brief struct doing synchronized start/stop for clearing containers
-/// IMPORTANT: Single threaded calls _MUST_ set autostart on creation !
-template<typename list_t>
-struct thClearer
-{
-	volatile
-	aBool   isRunning;
-	list_t* cont = nullptr;
-
-	explicit thClearer(bool autostart) : isRunning(autostart) { }
-	thClearer() { thClearer(false); }
-
-	/// @brief the working functions, called manually or by std::thread
-	void operator()(list_t* cont_)
-	{
-		cont = cont_;
-		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
-		if (cont) cont->clear();
-
-		DEBUG_LOCK_STATE("clear_locks", thClearer, cont)
-		uint32_t remaining = 0;
-		if ( ( remaining = cont->lock_count() ) ) {
-			cerr << "ERROR: " << remaining << " locks upon thClearer exit!" << endl;
-			cont->clear_locks();
-		}
-
-		// Set thread to not running in a loop to be absolutely sure
-		// this operator does not exit until isRunning is false.
-		while (this->isRunning.load(PWX_MEMORDER_ACQUIRE))
-			this->isRunning.store(false, PWX_MEMORDER_RELEASE);
-	}
-};
-
-
-/** @brief Unified container speed test - single threaded
-  *
-  * The test is simple: Add maxElements random elements,
-  * clear the container and measure how long this takes.
-**/
-template<typename list_t>
-int32_t testSpeedST (sEnv &env)
-{
-	int32_t  result       = EXIT_SUCCESS;
-	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
-
 	cout << adjRight (4, 0) << ++env.testCount;
-	if (isSameType (list_t, single_list_t))
-		cout << " Singly linked lists   ( 1 thread ) : ";
-	else if (isSameType (list_t, double_list_t))
-		cout << " Doubly linked lists   ( 1 thread ) : ";
-	else if (isSameType (list_t, single_ring_t))
-		cout << " Singly linked rings   ( 1 thread ) : ";
-	else if (isSameType (list_t, double_ring_t))
-		cout << " Doubly linked rings   ( 1 thread ) : ";
-	else if (isSameType (list_t, stack_t))
-		cout << " Stacks                ( 1 thread ) : ";
-	else if (isSameType (list_t, queue_t))
-		cout << " Queues                ( 1 thread ) : ";
-	else if (isSameType (list_t, set_t))
-		cout << " Sets                  ( 1 thread ) : ";
+	if (isSameType (cont_t, single_list_t))
+		cout << " Singly linked lists   ";
+	else if (isSameType (cont_t, double_list_t))
+		cout << " Doubly linked lists   ";
+	else if (isSameType (cont_t, single_ring_t))
+		cout << " Singly linked rings   ";
+	else if (isSameType (cont_t, double_ring_t))
+		cout << " Doubly linked rings   ";
+	else if (isSameType (cont_t, stack_t))
+		cout << " Stacks                ";
+	else if (isSameType (cont_t, queue_t))
+		cout << " Queues                ";
+	else if (isSameType (cont_t, set_t))
+		cout << " Sets                  ";
+	else if (isSameType (cont_t, chash_t))
+		cout << " Chained Hash Tables   ";
+	else if (isSameType (cont_t, ohash_t))
+		cout << " Open Hash Tables      ";
 	else {
 		cout << " Nothing - the type is unknown!" << endl;
 		return EXIT_FAILURE;
 	}
+
+	cout << "(" << adjRight(2,0) << threadCount << " thread";
+	if (threadCount > 1)
+		cout << "s)  ";
+	else
+		cout << " )  ";
+
 	cout.flush();
 
-	list_t intCont; // The list
-	intCont.disable_thread_safety(); // This is strictly single threaded.
-
-	// To make the testing of the sets easier, we use a counting loop, so no doublets
-	// are tried to be pushed onto a set.
-	int32_t lowest, highest, maxAdd;
-
-	// Find a range where we can have localMaxElem evenly scattered
-	do {
-		lowest  = pwx::RNG.random(::std::numeric_limits<int32_t>::min() + 1, 0);
-		highest = pwx::RNG.random(::std::numeric_limits<int32_t>::max() - 1, 0);
-		maxAdd  = (highest - lowest + 1) / localMaxElem;
-	} while ((maxAdd < 2) || (static_cast<uint32_t>((highest - lowest) / maxAdd) < localMaxElem));
-
-	// Now add localMaxElem integers and start the counting.
-	thAdder<list_t> adder(true);
-	hrTime_t startTimeAdd = hrClock::now();
-    adder(&intCont, lowest, localMaxElem, maxAdd);
-
-	// Stop time, safe container size and do a consistency check
-	hrTime_t endTimeAdd = hrClock::now();
-	uint32_t contSize = intCont.size();
-
-	bool isNextOK  = true;
-	bool isOrderOK = true;
-	uint32_t currNr = 1;
-	auto*  curr   = intCont[0]; // Is head and number 0
-	auto*  next   = curr;
-	auto   cVal   = **curr;
-	auto   nVal   = **next;
-	auto   pcVal  = cVal; // prev from curr
-	auto   nnVal  = nVal; // next from next
-
-	while (isNextOK && isOrderOK && (currNr < contSize) ) {
-		next = intCont[currNr];
-		if (next != curr->getNext())
-			isNextOK = false;
-		else if (isSameType(list_t, set_t) && (**curr >= **next)) {
-			isOrderOK = false;
-			cVal = curr ? **curr : 0;
-			nVal = next ? **next : 0;
-			nnVal = (next && next->getNext()) ? **(next->getNext()) : 0;
-		} else {
-			++currNr;
-			if (isSameType(list_t, set_t))
-				pcVal = curr ? **curr : 0;
-			curr = next;
-		}
-	} // End of consistency checking
-
-
-	// Now clear them up again:
-	hrTime_t startTimeClr = hrClock::now();
-	intCont.clear();
-
-	// Bring out the needed time in ms:
-	hrTime_t endTimeClr = hrClock::now();
-	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
-	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr  ).count();
-	cout << adjRight(5,0) << elapsedAdd << " ms /";
-	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
-
-	// Do we have had enough elements?
-	if (localMaxElem != contSize) {
-		cerr << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
-		++env.testFail;
-		result = EXIT_FAILURE;
-	} else if (!isNextOK) {
-		cerr << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
-		++env.testFail;
-		result = EXIT_FAILURE;
-	} else if (!isOrderOK) {
-		cerr << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
-		cerr << " -> (prev) curr >= next (next->next)" << endl;
-		cerr << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
-		++env.testFail;
-		result = EXIT_FAILURE;
-	} else
-		++env.testSuccess;
-
-	return result;
+	return EXIT_SUCCESS;
 }
 
 
-/** @brief Unified container speed test - multi threaded
+/** @brief Unified list container speed test
   *
   * The test is simple: Add maxElements random elements,
   * clear the container and measure how long this takes.
 **/
-template<typename list_t>
-int32_t testSpeedMT (sEnv &env)
+template<
+	typename cont_t,  //!< Type of the container to test
+	typename key_t,   //!< Type of the key (if it is a hash) - also used for loop counting
+	typename value_t, //!< Type of the values to store in the container
+	typename thAdd_t, //!< Type of the thread class that adds elements
+	typename thClr_t  //!< Type of the thread class that clears the container
+> int32_t testSpeed (sEnv &env, cont_t &testCont, uint32_t threadCount)
 {
-	int32_t  result       = EXIT_SUCCESS;
+	int32_t result = printDescription<cont_t>(env, threadCount);
+	if (EXIT_SUCCESS != result)
+		return result; // printDescription() doesn't like cont_t
+
 	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
 
-	cout << adjRight (4, 0) << ++env.testCount;
-	if (isSameType (list_t, single_list_t))
-		cout << " Singly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, double_list_t))
-		cout << " Doubly linked lists   (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, single_ring_t))
-		cout << " Singly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, double_ring_t))
-		cout << " Doubly linked rings   (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, stack_t))
-		cout << " Stacks                (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, queue_t))
-		cout << " Queues                (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else if (isSameType (list_t, set_t))
-		cout << " Sets                  (" << adjRight (2,0) << maxThreads << " threads) : ";
-	else {
-		cout << " Nothing - the type is unknown!" << endl;
-		return EXIT_FAILURE;
-	}
-	cout.flush();
-
-	// Now the threaded part:
-	list_t intCont; // The list
-	intCont.enable_thread_safety(); // Although superfluous (enabled by default), test the call.
+	if (threadCount == 1)
+		testCont.disable_thread_safety(); // This is strictly single threaded.
+	else
+		testCont.enable_thread_safety(); // This is a multi threaded approach.
 
 	// To make the testing of the sets easier, we use a counting loop, so no doublets
 	// are tried to be pushed onto a set.
-	int32_t lowest, highest, maxAdd, part, interval, rest;
+	key_t   part   = localMaxElem, interval = 0, rest = 0;
+	value_t maxAdd = 0, lowest = 0;
 
 	// Find a range where we can have localMaxElem evenly scattered
-	do {
-		lowest  = pwx::RNG.random(::std::numeric_limits<int32_t>::min() + 1, 0);
-		highest = pwx::RNG.random(::std::numeric_limits<int32_t>::max() - 1, 0);
-		maxAdd  = (highest - lowest + 1) / localMaxElem;
-	} while ((maxAdd < 2) || (static_cast<uint32_t>((highest - lowest) / maxAdd) < localMaxElem));
+	{
+		value_t highest;
+		value_t lo = std::numeric_limits<value_t>::lowest() + static_cast<value_t>(1);
+		value_t hi = std::numeric_limits<value_t>::max()    - static_cast<value_t>(1);
+		value_t nu = static_cast<value_t>(0);
+		do {
+			lowest  = pwx::RNG.random(lo, nu);
+			highest = pwx::RNG.random(nu, hi);
+			maxAdd  = (highest - lowest + 1) / localMaxElem;
+		} while ((maxAdd < 2) || (static_cast<uint32_t>((highest - lowest) / maxAdd) < localMaxElem));
+	}
 
-	// The part is the number of elements each thread has to add:
-	part     = localMaxElem / maxThreads;
-	// The interval is the portion each thread has to add:
-	interval = part * maxAdd;
-	// The rest is the number of elements the final thread has to add
-	// to achieve the total number of localMaxElem
-	rest     = localMaxElem - (part * maxThreads);
+	if (threadCount > 1) {
+		// The part is the number of elements each thread has to add:
+		part     = localMaxElem / threadCount;
+		// The interval is the portion each thread has to add:
+		interval = part * maxAdd;
+		// The rest is the number of elements the final thread has to add
+		// to achieve the total number of localMaxElem
+		rest     = localMaxElem - (part * threadCount);
+	}
 
 	// Create the thread and the worker arrays:
-    std::thread*      threads [maxThreads];
-    thAdder<list_t>   adders  [maxThreads];
-    thClearer<list_t> clearers[maxThreads];
+    std::thread** threads;
+    thAdd_t*      adders;
+    thClr_t*      clearers;
+
+	// Create arrays:
+	PWX_TRY_STD_FURTHER(threads = new std::thread*[threadCount], "Thread array creation failed",
+						"operator new on std::thread* threw an exception")
+	PWX_TRY_STD_FURTHER(adders = new thAdd_t[threadCount], "Adder thread array creation failed",
+						"operator new thAdd_t threw an exception")
+	PWX_TRY_STD_FURTHER(clearers = new thClr_t[threadCount], "Clearer thread array creation failed",
+						"operator new on thClr_t threw an exception")
 
 	// Creation in a loop ...
-    for (size_t nr = 0; nr < maxThreads; ++nr) {
-		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(adders[nr]), &intCont, lowest,
-														part + (nr == (maxThreads - 1) ? rest : 0),
-														maxAdd),
-							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
+    for (size_t nr = 0; nr < threadCount; ++nr) {
+		key_t numStart  = nr * part;
+    	key_t numEnd    = numStart + part + (nr == (threadCount - 1) ? rest : 0);
+		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(adders[nr]), &testCont,
+														numStart, numEnd,
+														lowest, maxAdd),
+							"Thread creation failed", "testSpeed could not call new operator on std::thread")
 		lowest += interval;
     }
 
 	// Starting in a loop
 	hrTime_t startTimeAdd = hrClock::now();
-    for (size_t nr = 0; nr < maxThreads; ++nr)
-		adders[nr].isRunning.store(true);
+    for (size_t nr = 0; nr < threadCount; ++nr)
+		adders[nr].isRunning.store(true, PWX_MEMORDER_RELEASE);
 
     // ... joining in a loop.
     bool isFinished = false;
     while (!isFinished) {
 		isFinished = true;
-		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
-			if (adders[nr].isRunning.load())
+		for (size_t nr = 0; isFinished && (nr < threadCount); ++nr) {
+			if (adders[nr].isRunning.load(PWX_MEMORDER_ACQUIRE))
 				isFinished = false;
 		}
 		if (isFinished) {
-			for (size_t nr = 0; nr < maxThreads; ++nr) {
+			for (size_t nr = 0; nr < threadCount; ++nr) {
 				threads[nr]->join();
 				delete threads[nr];
 				threads[nr] = nullptr;
@@ -293,55 +145,60 @@ int32_t testSpeedMT (sEnv &env)
 
 	// Stop time, safe container size and do a consistency check
 	hrTime_t endTimeAdd = hrClock::now();
-	uint32_t contSize = intCont.size();
+	uint32_t contSize = testCont.size();
 
-	bool isNextOK  = true;
-	bool isOrderOK = true;
-	uint32_t currNr = 1;
-	auto*  curr   = intCont[0]; // Is head and number 0
-	auto*  next   = curr;
-	auto   cVal   = **curr;
-	auto   nVal   = **next;
-	auto   pcVal  = cVal; // prev from curr
-	auto   nnVal  = nVal; // next from next
+	// Do the calculations
+	bool     isNextOK  = true;
+	bool     isOrderOK = true;
+	uint32_t currNr    = 1;
+	auto*    curr      = testCont[0]; // Is head and number 0
+	auto*    next      = curr;
+	value_t  cVal      = 0;
+	value_t  nVal      = 0;
+	value_t  pcVal     = 0; // prev from curr
+	value_t  nnVal     = 0; // next from next
 
-	while (isNextOK && isOrderOK && (currNr < contSize) ) {
-		next = intCont[currNr];
-		if (next != curr->getNext())
-			isNextOK = false;
-		else if (isSameType(list_t, set_t) && (**curr >= **next)) {
-			isOrderOK = false;
-			cVal  = curr ? **curr : 0;
-			nVal  = next ? **next : 0;
-			nnVal = (next && next->getNext()) ? **(next->getNext()) : 0;
-		} else {
-			++currNr;
-			if (isSameType(list_t, set_t))
-				pcVal = curr ? **curr : 0;
-			curr = next;
-		}
-	} // End of consistency checking
+	// The consistency checks for the elements are only relevant for
+	// list type containers. Hash Tables can not be checked like that.
+	if (!isSameType(cont_t, chash_t) && !isSameType(cont_t, ohash_t)) {
+		while (isNextOK && isOrderOK && (currNr < contSize) ) {
+			next = testCont[currNr];
+			if (next != curr->getNext())
+				isNextOK = false;
+			else if (isSameType(cont_t, set_t) && (**curr >= **next)) {
+				isOrderOK = false;
+				cVal  = curr ? **curr : 0;
+				nVal  = next ? **next : 0;
+				nnVal = (next && next->getNext()) ? **(next->getNext()) : 0;
+			} else {
+				++currNr;
+				if (isSameType(cont_t, set_t))
+					pcVal = curr ? **curr : 0;
+				curr = next;
+			}
+		} // End of consistency checking
+	}
 
 	// Now clear the container up again:
-    for (size_t nr = 0; nr < maxThreads; ++nr)
-		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(clearers[nr]), &intCont),
+    for (size_t nr = 0; nr < threadCount; ++nr)
+		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(clearers[nr]), &testCont),
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
 
 	// Starting in a loop
 	hrTime_t startTimeClr = hrClock::now();
-    for (size_t nr = 0; nr < maxThreads; ++nr)
+    for (size_t nr = 0; nr < threadCount; ++nr)
 		clearers[nr].isRunning.store(true);
 
     // ... joining in a loop.
     isFinished = false;
     while (!isFinished) {
 		isFinished = true;
-		for (size_t nr = 0; isFinished && (nr < maxThreads); ++nr) {
+		for (size_t nr = 0; isFinished && (nr < threadCount); ++nr) {
 			if (clearers[nr].isRunning.load())
 				isFinished = false;
 		}
 		if (isFinished) {
-			for (size_t nr = 0; nr < maxThreads; ++nr) {
+			for (size_t nr = 0; nr < threadCount; ++nr) {
 				threads[nr]->join();
 				delete threads[nr];
 				threads[nr] = nullptr;
@@ -349,11 +206,16 @@ int32_t testSpeedMT (sEnv &env)
 		}
     }
 
+	// Clear the dynamic arrays
+	if (threads)  delete [] threads;
+	if (adders)   delete [] adders;
+	if (clearers) delete [] clearers;
+
 	// Bring out the needed time in ms:
 	hrTime_t endTimeClr = hrClock::now();
 	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
 	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr).count();
-	cout << adjRight(5,0) << elapsedAdd << " ms /";
+	cout << adjRight(6,0) << elapsedAdd << " ms /";
 	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
@@ -361,16 +223,26 @@ int32_t testSpeedMT (sEnv &env)
 		cerr << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
-	} else if (!isNextOK) {
+	}
+	// Is the ordering ok? (chain equals index)
+	else if (!isNextOK) {
 		cerr << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
-	} else if (!isOrderOK) {
+	}
+	// Is the set ordering ok? (next larger or equal)
+	else if (!isOrderOK) {
 		cerr << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
 		cerr << " -> (prev) curr >= next (next->next)" << endl;
 		cerr << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
+	}
+	// Is the container cleared?
+	else if (testCont.size() || testCont[0] || testCont[-1]) {
+		cerr << "    FAIL! The container has " << testCont.size() << " elements left\n";
+		cerr << "    with root being " << testCont[0] << " and tail being " << testCont[-1];
+		cerr << endl;
 	} else
 		++env.testSuccess;
 

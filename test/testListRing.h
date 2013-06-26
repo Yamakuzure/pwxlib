@@ -5,10 +5,10 @@
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific lists:
-typedef pwx::TSingleList<data_t> single_list_t;
-typedef pwx::TSingleRing<data_t> single_ring_t;
-typedef pwx::TDoubleList<data_t> double_list_t;
-typedef pwx::TDoubleRing<data_t> double_ring_t;
+typedef pwx::TSingleList<keydata_t> single_list_t;
+typedef pwx::TSingleRing<keydata_t> single_ring_t;
+typedef pwx::TDoubleList<keydata_t> double_list_t;
+typedef pwx::TDoubleRing<keydata_t> double_ring_t;
 
 
 /** @brief test a specific list based template

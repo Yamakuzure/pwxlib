@@ -5,8 +5,8 @@
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific stack/queue:
-typedef pwx::TStack<data_t> stack_t;
-typedef pwx::TQueue<data_t> queue_t;
+typedef pwx::TStack<keydata_t> stack_t;
+typedef pwx::TQueue<keydata_t> queue_t;
 
 /** @brief test a stack or queue type template
   *

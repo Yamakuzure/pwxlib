@@ -42,52 +42,117 @@ int32_t main(int argc, char* argv[])
 
 		// --- test the speed of the containers ---
 		if (EXIT_SUCCESS == result) {
+			uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
-			cout << " (Inserting " << (env.doSpeed ? maxElements : maxThreads * 100);
+			cout << " (Inserting " << localMaxElem;
 			cout << " random elements and clear up)" << endl;
 			cout << "                                               Add /      Clear" << endl;
-			PWX_TRY_PWX_FURTHER (result = testSpeedST<single_list_t> (env))
 
+// Little evil shortcut
+#define do_testSpeed(container_type, key_type, value_type, thread_type, thread_count) \
+try { \
+result = testSpeed<container_type, key_type, value_type, \
+	thread_type<container_type, key_type, value_type>, \
+	thClearer<container_type>>(env, testCont, thread_count); \
+} PWX_THROW_PWX_FURTHER
+
+/// DEBUG
+			// Chained Hash Tables
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_list_t> (env))
+				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
+								 do_not_destroy, nullptr, 3.0, 1.5);
+				do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+				}
 			}
+			// Open Hash Tables
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedST<double_list_t> (env))
+				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
+								 do_not_destroy, nullptr, 0.81, 1.5);
+				do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+				}
 			}
+/// !DEBUG
+			// Singly Linked Lists
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_list_t> (env))
+				single_list_t testCont(do_not_destroy);
+				do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
+			// Doubly Linked Lists
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedST<single_ring_t> (env))
+				double_list_t testCont(do_not_destroy);
+				do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
+			// Singly Linked rings
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<single_ring_t> (env))
+				single_ring_t testCont(do_not_destroy);
+				do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
+			// Doubly Linked Rings
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedST<double_ring_t> (env))
+				double_ring_t testCont(do_not_destroy);
+				do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
+			// Stacks
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<double_ring_t> (env))
+				stack_t testCont(do_not_destroy);
+				do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
+			// Queues
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedST<stack_t> (env))
+				queue_t testCont(do_not_destroy);
+				do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
+			// Sets
 			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<stack_t> (env))
+				set_t testCont(do_not_destroy);
+				do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, maxThreads)
+				}
 			}
-			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedST<queue_t> (env))
-			}
-			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<queue_t> (env))
-			}
-			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedST<set_t> (env))
-			}
-			if (EXIT_SUCCESS == result) {
-				PWX_TRY_PWX_FURTHER (result = testSpeedMT<set_t> (env))
-			}
+//			// Chained Hash Tables
+//			if (EXIT_SUCCESS == result) {
+//				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
+//								 do_not_destroy, nullptr, 3.0, 1.5);
+//				do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, 1)
+//				if (EXIT_SUCCESS == result) {
+//					do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+//				}
+//			}
+//			// Open Hash Tables
+//			if (EXIT_SUCCESS == result) {
+//				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
+//								 do_not_destroy, nullptr, 0.81, 1.5);
+//				do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, 1)
+//				if (EXIT_SUCCESS == result) {
+//					do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+//				}
+//			}
 		} // End of speed tests
+
+#undef do_testSpeed
 
 	// --- Test RNG worker ---
 	if (EXIT_SUCCESS == result ) {

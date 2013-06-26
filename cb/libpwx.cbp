@@ -337,6 +337,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../test/testThreads.h" />
 		<Unit filename="../test/test_lib.cpp">
 			<Option target="clean" />
 			<Option target="library" />

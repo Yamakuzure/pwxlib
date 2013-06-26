@@ -5,7 +5,7 @@
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific set:
-typedef pwx::TSet<data_t> set_t;
+typedef pwx::TSet<keydata_t> set_t;
 
 /** @brief test a specific set type template
   *
