@@ -6,9 +6,9 @@
   * @brief Virtual base class for hash containers
   *
   * This file consists of a base class template for the hash containers.
-  * It is not intended to be used singularily and is therefore virtual
-  * The common hash template does not include any collision
-  * resolving, this is implemented in the respective hash container.
+  * It is not intended to be used singularily and is therefore virtual.
+  * The common hash template does not include any collision resolving,
+  * this is implemented in the respective hash table container.
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -54,7 +54,18 @@ namespace pwx {
   *
   * @brief Virtual base class for hash containers
   *
-  * @todo describe properly
+  * There are two basic hash table containers, TChainHash
+  * and TOpenHash. The difference is the way the hash tables
+  * order their data and resolve collisions. While the chained
+  * hash table TChainHash uses buckets, the open hash table
+  * TOpenHash uses double hash probing.
+  *
+  * However, most operations are the same once the place for
+  * an element evaluated out of its key is known. These
+  * common operations are done in this base class, which
+  * call pure virtual private methods, that are then defined
+  * in TChainHash and TOpenHash to provide the proper
+  * collision resolving.
 **/
 template<typename key_t, typename data_t, typename elem_t = THashElement<key_t, data_t> >
 class VTHashBase : public VContainer
@@ -65,8 +76,8 @@ public:
 	 * ===============================================
 	*/
 
-	typedef VContainer                          base_t;        //!< Base type of the hash
-	typedef VTHashBase<key_t, data_t, elem_t>   hash_t;        //!< Type of this hash
+	typedef VContainer                          base_t; //!< Base type of the hash
+	typedef VTHashBase<key_t, data_t, elem_t>   hash_t; //!< Type of this hash
 
 
 	/* ===============================================
@@ -102,8 +113,7 @@ public:
 		// Generate the hash table
 		try {
 			hashTable = new elem_t*[hashSize];
-			for (uint32_t i = 0; i < hashSize; ++i)
-				hashTable[i] = nullptr;
+			memset(hashTable, 0, hashSize * sizeof(elem_t*));
 		}
 		PWX_THROW_STD_FURTHER("VTHashBase failure", "HashTable could not be created")
 
