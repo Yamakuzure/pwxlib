@@ -2,15 +2,18 @@
 # Turn of the "Entering/Leaving directory foo" funtionality
 MAKEFLAGS += --no-print-directory
 
+TARGET_cc   := ../clustercheck
 TARGET_hb   := ../hashbuilder
 TARGET_ng   := ../namegen
 TARGET_tl   := ../testlib
 TARGET_to   := ../torture
 SOURCES_all := $(wildcard *.cpp)
+SOURCES_cc  := $(filter cluster_check.%, $(SOURCES_all))
 SOURCES_hb  := $(filter hash_builder.%, $(SOURCES_all))
 SOURCES_ng  := $(filter namegen.%, $(SOURCES_all))
-SOURCES_tl  := $(filter-out hash_builder.% namegen.% torture.%, $(SOURCES_all))
+SOURCES_tl  := $(filter-out hash_builder.% namegen.% torture.% cluster_check.%, $(SOURCES_all))
 SOURCES_to  := $(filter torture.%, $(SOURCES_all))
+MODULES_cc  := $(SOURCES_cc:.cpp=.o)
 MODULES_hb  := $(SOURCES_hb:.cpp=.o)
 MODULES_ng  := $(SOURCES_ng:.cpp=.o)
 MODULES_tl  := $(SOURCES_tl:.cpp=.o)
@@ -24,7 +27,7 @@ INCDIR   = -I../src
 # ------------------------------------
 # Rules
 # ------------------------------------
-.PHONY: all clean hashbuilder namegen testlib torture
+.PHONY: all clean clustercheck hashbuilder namegen testlib torture
 .SUFFIXES: .cpp
 
 %.o: %.cpp
@@ -33,6 +36,8 @@ INCDIR   = -I../src
 
 all: $(TARGET_hb) $(TARGET_tl)
 
+clustercheck: depend $(TARGET_cc)
+
 hashbuilder: depend $(TARGET_hb)
 
 namegen: depend $(TARGET_ng)
@@ -40,6 +45,10 @@ namegen: depend $(TARGET_ng)
 testlib: depend $(TARGET_tl)
 
 torture: depend $(TARGET_to)
+
+$(TARGET_cc): $(MODULES_cc)
+	@echo "Linking $(TARGET_cc) ..."
+	$(CXX) -o $(TARGET_cc) $(LDFLAGS) -L../lib -lpwx $(MODULES_cc)
 
 $(TARGET_hb): $(MODULES_hb)
 	@echo "Linking $(TARGET_hb) ..."
@@ -58,8 +67,8 @@ $(TARGET_to): $(MODULES_to)
 	$(CXX) -o $(TARGET_to) $(LDFLAGS) -L../lib -lpwx $(MODULES_to)
 
 clean:
-	@echo "Cleaning $(TARGET_hb), $(TARGET_tl), $(TARGET_to) and object files"
-	@rm -f $(TARGET_hb) $(TARGET_tl) $(TARGET_to) $(MODULES_hb) $(MODULES_tl) $(MODULES_to)
+	@echo "Cleaning $(TARGET_cc) $(TARGET_hb), $(TARGET_tl), $(TARGET_to) and object files"
+	@rm -f $(TARGET_cc) $(TARGET_hb) $(TARGET_tl) $(TARGET_to) $(MODULES_cc) $(MODULES_hb) $(MODULES_tl) $(MODULES_to)
 
 # ------------------------------------
 # Create dependencies

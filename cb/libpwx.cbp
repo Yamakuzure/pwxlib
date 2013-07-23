@@ -59,6 +59,13 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 			</Target>
+			<Target title="clustercheck">
+				<Option output="../clustercheck" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="/tmp/clout 1000000" />
+			</Target>
 			<Target title="hashbuilder">
 				<Option output="../hashbuilder" prefix_auto="1" extension_auto="1" />
 				<Option working_dir=".." />
@@ -286,6 +293,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../test/cluster_check.cpp" />
+		<Unit filename="../test/cluster_check.h" />
 		<Unit filename="../test/destroy.cpp">
 			<Option target="clean" />
 			<Option target="library" />

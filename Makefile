@@ -121,7 +121,7 @@ endif
 # Rules
 # ------------------------------------
 .PHONY: clean cleanlibrary cleantools testlib documentation docinstall \
-		hashbuilder install namegen userinstall \
+		clustercheck hashbuilder install namegen userinstall \
 		test tools torture all library help
 .SUFFIXES: .cpp
 
@@ -165,6 +165,10 @@ docinstall: documentation
 	@$(INSTALL) doc/html/* $(DOCDIR)/html
 	@echo "Installing information files into $(DOCDIR)"
 	@$(INSTALL) $(DOCFILES) $(DOCDIR)
+
+clustercheck: depend library
+	@echo "Making clustercheck in $(TESTDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) clustercheck)
 
 hashbuilder: depend library
 	@echo "Making hash_builder in $(TESTDIR)"
