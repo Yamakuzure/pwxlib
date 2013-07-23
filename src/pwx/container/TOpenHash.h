@@ -225,9 +225,11 @@ public:
 	using base_t::clear;
 	using base_t::disable_thread_safety;
 	using base_t::empty;
+	using base_t::exists;
 	using base_t::enable_thread_safety;
 	using base_t::get;
 	using base_t::getData;
+	using base_t::getHops;
 	using base_t::grow;
 	using base_t::pop;
 	using base_t::pop_back;
@@ -297,43 +299,41 @@ private:
 	  *
 	  * @param[in] key const reference of the key to evaluate
 	  * @param[in] allowVacated if set to true, the method will return indexes from vacated positions and jump those otherwise.
+	  * @param[out] hops if not nullptr, the number of hops done to find the final position is noted in here.
 	  * @return the index an element with this key would have in the table
 	**/
-	virtual uint32_t privGetIndex(const key_t &key, bool allowVacated) const noexcept
+	virtual uint32_t privGetIndex(const key_t &key, bool allowVacated, uint32_t* hops) const noexcept
 	{
 		uint32_t xHash = this->protGetHash(&key);
 
 		// Use multiplication method for the base index
-		double dHash   = static_cast<double>(xHash) * 0.618;
-		uint32_t idxBase = static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash) * this->sizeMax()) ));
+		uint32_t tabSize = this->sizeMax();
+		double   dHash   = static_cast<double>(xHash) * 0.618;
+		uint32_t idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
+
 
 		// Use division probing for the stepping
-		uint32_t tabSize = this->sizeMax();
-		uint32_t idxStep = xHash % (tabSize - (tabSize % 2 ? 1 : 3));
-
-		// idxStep must not be even
-		if (!(idxStep % 2))
-			idxStep += idxStep > 20 ? -1 : 1;
+		uint32_t idxStep = xHash % (tabSize - (tabSize % 2 ? 2 : 1));
 
 		// Move down until an appropriate value is found
 		uint32_t oriStep = idxStep; // to revert if necessary
-		while ((idxStep > 1) && !(tabSize % idxStep))
-			idxStep -= 2;
+		while ( (idxStep > 2)
+			  && (!(tabSize % idxStep) || !(tabSize % (tabSize % idxStep)) ) )
+			--idxStep;
 
 		// Move up if this was not sucessful
-		if (!(tabSize % idxStep)) {
-			idxStep = oriStep + 2;
-			while (!(tabSize % idxStep))
-				idxStep += 2;
+		if ((idxStep < 3) || !(tabSize % idxStep) || !(tabSize % (tabSize % idxStep))) {
+			idxStep = oriStep + 1;
+			while (!(tabSize % idxStep) || !(tabSize % (tabSize % idxStep)) )
+				++idxStep;
 		}
 
 		// Now probe the table until we are done or have found the key
-		bool   isFound   = false;
-		bool   isVacated = false;
-		uint32_t pos       = 0;
+		bool     isFound   = false;
+		bool     isVacated = false;
+		uint32_t pos       = idxBase;
 		for (uint32_t i = 0; !isFound && (i < tabSize); ++i) {
-			pos       = (idxBase + (idxStep * i)) % tabSize;
-			isVacated = protIsVacated(pos);
+			isVacated = hashTable[pos] == vacated;
 
 			// we are done
 			if (	// a) the hashTable has a nullptr at pos or
@@ -343,18 +343,45 @@ private:
 					// c) allowVacated is true and the position is vacated
 				||	(isVacated && allowVacated) )
 				isFound = true;
+			else {
+				pos = (pos + idxStep) % tabSize;
+				if (hops) ++(*hops);
 
+				// check whether the stepping goes round
+				if ( ((i+1) < tabSize) && (pos == idxBase) ) {
+					// This means the idx stepping is screwed
+					DEBUG_ERR("open hash",
+							"Unfull probing at hop %u: pos %u == base %u, step %u in size %u",
+							*hops, pos, idxBase, idxStep, tabSize)
+					idxStep += idxStep % 2 ? 2 : 3;
+					pos = (pos + idxStep) % tabSize;
+				}
+			}
+		} // end of traversing the table
+
+#if defined(LIBPWX_DEBUG)
+		if (hops && (*hops == tabSize)) {
+			// This is really bad!
+			DEBUG_ERR("open hash", "\n---\nHash table seems to be full or %s is screwed:", __FUNCTION__)
+			DEBUG_ERR("open hash", "  Table size : %u", tabSize)
+			DEBUG_ERR("open hash", "  Elements   : %u", this->size())
+			DEBUG_ERR("open hash", "  Hops done  : %u", *hops) // Trivial, but the if() is not part of the output
+			DEBUG_ERR("open hash", "  Initial Idx: %u", idxBase % tabSize)
+			DEBUG_ERR("open hash", "  Stepping   : %u", idxStep)
+			DEBUG_ERR("open hash", "  Hash used  : %u\n---", xHash)
 		}
+#endif // defined(LIBPWX_DEBUG)
 
-		// Now "pos" points at the first nullptr place found
-		// or it points to a found element with the same key.
+		// Now "pos" points at the first nullptr place found,
+		// the first vacated position if accepted or to an
+		// element with the same key.
 
 		return pos;
 
 		// WARNING: If the hash table reaches load level 1.0 (all
 		// places used) and the key is not in the table, the
 		// whole thing would be screwed. That is one of the
-		// strongest reason to automatically grow on reaching
+		// strongest reasons to automatically grow on reaching
 		// load level 0.8.
 	}
 
@@ -369,7 +396,7 @@ private:
 	**/
 	virtual uint32_t privGetIndex(const key_t &key) const noexcept
 	{
-		return privGetIndex(key, false);
+		return privGetIndex(key, false, nullptr);
 	}
 
 
@@ -378,10 +405,37 @@ private:
 	{
 		PWX_LOCK_GUARD(hash_t, this)
 
-		uint32_t  idx  = privGetIndex(elem->key, true); // Happy with vacated positions
+		uint32_t  idx  = privGetIndex(elem->key, true, &(elem->hops));
 
-		assert( ((nullptr == hashTable[idx]) || protIsVacated(idx))
-			&& "ERROR: TOpenHash::privGetIndex(key, true) returned an occupied position!");
+#if defined(LIBPWX_DEBUG)
+		// The position must not be occupied
+		// Note: This used to be an assert, but the checks are too flat then.
+		uint32_t tabSize = this->sizeMax();
+		if (idx >= tabSize) {
+			DEBUG_ERR("open hash",
+					"privGetIndex returned %u on table size %u (insert key: \"%s\")",
+					idx, tabSize, pwx::to_string(elem->key).c_str())
+			PWX_THROW("out of bounds", "Index too large",
+					"The index returned by privGetIndex() is larger than the table size")
+		}
+		if ( (nullptr != hashTable[idx]) && (hashTable[idx] != vacated) ) {
+			if (*hashTable[idx] == elem->key) {
+				DEBUG_ERR("open hash",
+						"privInsert kalled with key \"%s\", already found at index %u",
+						pwx::to_string(elem->key).c_str(), idx)
+				DEBUG_ERR("open hash", " -> table size %u, hops performed %u", tabSize, elem->hops)
+				PWX_THROW("illegal index", "key already exists",
+						"privInsert called with an already stored key!")
+			} else {
+				DEBUG_ERR("open hash",
+						"privGetIndex returned index %u that is occupied with key \"%s\" (insert key: \"%s\")",
+						idx, pwx::to_string(hashTable[idx]->key).c_str(), pwx::to_string(elem->key).c_str())
+				DEBUG_ERR("open hash", " -> table size %u, hops performed %u", tabSize, elem->hops)
+				PWX_THROW("illegal index", "index occupied",
+						"The index returned by privGetIndex() is already taken!")
+			}
+		}
+#endif // defined(LIBPWX_DEBUG)
 
 		this->hashTable[idx] = elem;
 		eCount.fetch_add(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
@@ -407,7 +461,7 @@ private:
 			PWX_LOCK_GUARD(hash_t, this)
 
 			// Note: Open Hashes mark empty positions with the "vacated" sentry
-			if ((index < this->sizeMax()) && hashTable[index] && !protIsVacated(index)) {
+			if ((index < this->sizeMax()) && hashTable[index] && (hashTable[index] != vacated)) {
 				result = hashTable[index];
 				hashTable[index] = vacated;
 				result->remove();
