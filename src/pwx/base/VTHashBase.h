@@ -113,7 +113,8 @@ public:
 		// Generate the hash table
 		try {
 			hashTable = new elem_t*[hashSize];
-			memset(hashTable, 0, hashSize * sizeof(elem_t*));
+			for (size_t i = 0; i < hashSize; ++i)
+				hashTable[i] = nullptr;
 		}
 		PWX_THROW_STD_FURTHER("VTHashBase failure", "HashTable could not be created")
 
@@ -329,9 +330,9 @@ public:
 	{
 		// Use double search to only lock if the key is
 		// not found in the first run
-		if (nullptr == this->get(src.key)) {
+		if (!this->exists(src.key)) {
 			PWX_LOCK_GUARD(hash_t, this)
-			if (nullptr == this->get(src.key)) {
+			if (!this->exists(src.key)) {
 
 				// 1: Check source:
 				PWX_LOCK(const_cast<elem_t*>(&src))
@@ -372,9 +373,9 @@ public:
 	{
 		// Use double search to only lock if the key is
 		// not found in the first run
-		if (nullptr == this->get(key)) {
+		if (!this->exists(key)) {
 			PWX_LOCK_GUARD(hash_t, this)
-			if (nullptr == this->get(key)) {
+			if (!this->exists(key)) {
 
 				// 1: Create a new element
 				elem_t* newElement = nullptr;
@@ -519,6 +520,16 @@ public:
 	}
 
 
+	/// @brief return true if an element with @a key exists
+	virtual bool exists(const key_t &key) const noexcept
+	{
+		PWX_LOCK_GUARD(hash_t, const_cast<hash_t*>(this))
+		elem_t* elem = this->privGet(key);
+		if (elem && (elem != vacated) && (elem->key == key))
+			return true;
+		return false;
+	}
+
 	/** @brief enable thread safety
 	  *
 	  * This method enables all thread safety measures.
@@ -567,7 +578,7 @@ public:
 	**/
 	virtual elem_t* get(const key_t &key) noexcept
 	{
-		return const_cast<elem_t*>(privGet(static_cast<const key_t>(key)));
+		return const_cast<elem_t*>(privGet(key));
 	}
 
 
@@ -598,6 +609,24 @@ public:
 		PWX_TRY_PWX_FURTHER(return **(get(key)));
 	}
 
+
+	/** @brief return the number of "hops" needed when the element was inserted
+	  *
+	  * This method returns the number of hops (or collisions) that
+	  * were needed when inserting the element.
+	  *
+	  * If the element is nowhere inserted, it returns zero.
+	  *
+	  * @param[in] key The key to search for
+	  * @return number of hops needed.
+	**/
+	virtual uint32_t getHops(const key_t &key) const noexcept
+	{
+		elem_t* elem = privGet(key);
+		if (elem)
+			return elem->hops;
+		return 0;
+	}
 
 	/** @brief grow the size of a hash table
 	  *
@@ -1198,7 +1227,7 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept
 	elem_t* xCurr   = nullptr;
 
 	while (pos < tabSize) {
-		if (!protIsVacated(pos)) {
+		if (hashTable[pos] != vacated) {
 			while (hashTable[pos]) {
 				xCurr = hashTable[pos];
 				hashTable[pos] = xCurr->getNext();
