@@ -340,6 +340,7 @@ public:
 			next.store(nullptr, PWX_MEMORDER_RELAXED);
 			isRemoved.store(true, PWX_MEMORDER_RELAXED);
 		}
+		hops = 0;
 	}
 
 
@@ -523,6 +524,7 @@ public:
 	key_t      key;                             //!< The key that identifies this element
 	share_t    data; 							//!< The data this list element points to, wrapped in a shared_ptr.
 	neighbor_t next = ATOMIC_VAR_INIT(nullptr); //!< The next element in the list or nullptr if this is the tail.
+	uint32_t   hops = 0; // to track hops when inserting an element
 
 
 protected:
