@@ -231,9 +231,12 @@ public:
 	using base_t::clear;
 	using base_t::disable_thread_safety;
 	using base_t::empty;
+	using base_t::exists;
 	using base_t::enable_thread_safety;
 	using base_t::get;
 	using base_t::getData;
+	using base_t::getHops;
+
 
 
 	/** @brief grow the size of a hash table
@@ -340,13 +343,15 @@ private:
 	{
 		PWX_LOCK_GUARD(hash_t, this)
 
-		uint32_t  idx  = privGetIndex(elem->key);
-		elem_t* root = this->hashTable[idx];
+		uint32_t idx  = privGetIndex(elem->key);
+		elem_t*  root = this->hashTable[idx];
 		if (root) {
 			elem_t* next = root->getNext();
+			elem->hops   = 1;
 			while (next) {
 				root = next;
 				next = root->getNext();
+				++elem->hops;
 			}
 			root->setNext(elem);
 		} else
