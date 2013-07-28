@@ -31,6 +31,7 @@
 #include <pwx/general/compiler.h>
 #include <pwx/general/macros.h>
 #include <pwx/internal/CRandomConstants.h>
+#include <pwx/tools/MathHelpers.h>
 #include <cstdlib>
 #include <type_traits>
 #include <cmath>
@@ -130,7 +131,21 @@ hash algorithm, and a better production of random values:
    Double      |   9,988,475 |  98.88 % |   9,952,956 |  99.64 % | Random is great, Hash is great!
    Float       |   9,067,506 |  90.68 % |   9,011,867 |  99.39 % | Random is very good, Hash is great!
    ------------+-------------+----------+-------------+----------+--------------------------------------
-  Result: I think we can leave it now as is.
+  Result: I think we can leave it now as it is.
+
+Statistics with 10M hashes for float and (long) double after adding the sFloatPoint helper and using
+that to get integer representations.
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+   Type        | Unique rand |    Quota | Unique Hash |    Quota | Result
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+   Long Double |   9,988,312 |  98.88 % |   9,976,647 |  99.88 % | Random is great, Hash is great!
+   Double      |   9,988,392 |  98.88 % |   9,964,963 |  99.77 % | Random is great, Hash is great!
+   Float       |   9,068,003 |  90.68 % |   9,068,003 | 100.00 % | Random is very good, Hash is perfect!
+   ------------+-------------+----------+-------------+----------+--------------------------------------
+  Result: There wasn't much space above the previous results anyway. However, the new algorithm
+          is slightly faster. And hopefully it will solve the massive secondary clustering  of
+          the open adressed hash container when using floating point keys.
+          (Although, why would anyone use floating point types for hash keys anyway?)
 
    ================================================================================================ */
 
@@ -209,6 +224,24 @@ uint32_t private_hash_int(Tval key) noexcept
 		key ^= (key & fullMaxLong) >> 22; // key >>> 22
 		xHash = static_cast<uint32_t> (key);
 	}
+	// --- __int128_t must be split and combined
+	else if (isSameType(__int128_t, Tval)) {
+		static const size_t halfSize = sizeof(Tval) * 4;
+		int64_t  left  = static_cast<int64_t>((key >> halfSize) & 0xffffffffffffffff);
+		uint64_t right = static_cast<uint64_t>(key              & 0xffffffffffffffff);
+		uint32_t lres  = private_hash_int<int64_t>(left);
+		uint32_t rres  = private_hash_int<int64_t>(right);
+		/* Now combine the hashes the following way:
+		 * lres | left 16 bit  | right 16 bit
+		 *   op |     xor      |      +
+		 * rres | right 16 bit | left 16 bit
+		 *  =>  | new left 16b | new right 16b
+		*/
+		uint32_t lnew = (( (lres >> 16) & 0x0000ffff) ^ ( rres & 0x0000ffff )) << 16;
+		uint32_t rnew =  ( (rres >> 16) & 0x0000ffff) + ( lres & 0x0000ffff );
+		// Finally xor both together
+		xHash = lnew ^ rnew;
+	}
 
 	return xHash;
 }
@@ -218,9 +251,14 @@ uint32_t private_hash_int(Tval key) noexcept
 template<typename Tval>
 uint32_t private_hash_flt(const Tval* key) noexcept
 {
+	/* Try out the new math helpers
 	static const size_t  vSize  = sizeof(Tval);
 	const uint8_t* buf_ptr = reinterpret_cast<const uint8_t*>(key);
 	return private_hash_buf(buf_ptr, vSize);
+	--- */
+	typedef typename pwx::sFloatPoint<Tval>::Ti Ti;
+	pwx::sFloatPoint<Tval> f(*key);
+	return private_hash_int<Ti>(f.i);
 }
 
 
