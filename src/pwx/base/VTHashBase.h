@@ -50,6 +50,16 @@
 
 namespace pwx {
 
+/** @brief two-type enum determining the hashing type
+  * This allows the chained hash to use dynamic hashing types for its
+  * basic hash->idx function, while the open addressed hash uses
+  * this to determine what to use for the secondary hashing.
+**/
+enum eChainHashMethod {
+	CHM_Division = 1,  //!< Use the division method
+	CHM_Multiplication //!< Use the multiplication method
+};
+
 /** @class VTHashBase
   *
   * @brief Virtual base class for hash containers
@@ -654,6 +664,9 @@ public:
 				}
 				PWX_THROW_STD_FURTHER("grow failure", "Larger HashTable could not be created")
 
+				// --- Determine new hashing method ---
+				privSetHashMethod(targetSize);
+
 				// --- Copy all elements ---
 				elem_t* toMove  = nullptr;
 				uint32_t  pos       = 0;
@@ -1115,12 +1128,13 @@ protected:
 	 * ===============================================
 	*/
 
-	CHashBuilder	hashBuilder; //!< instance that will handle the key generation
+	eChainHashMethod CHMethod = CHM_Division; //!< Which Hashing method is used
+	CHashBuilder	 hashBuilder; //!< instance that will handle the key generation
 	std::atomic_uint_fast32_t
-					hashSize;    //!< number of places to maintain
-	elem_t**		hashTable;   //!< the central array that is our hash
-	char*			vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
-	elem_t*			vacated;     //!< The Open Hash sets empty places to point at this.
+					 hashSize;    //!< number of places to maintain
+	elem_t**		 hashTable;   //!< the central array that is our hash
+	char*			 vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
+	elem_t*			 vacated;     //!< The Open Hash sets empty places to point at this.
 	// Note: vacated is placed here, so clear(), disable_thread_safety() and
 	//       enable_thread_safety() can be unified here as well. Otherwise
 	//       the hashes would need individual functions that only differ
@@ -1200,6 +1214,56 @@ private:
 
 	// The same applies to removal by key:
 	virtual elem_t* privRemoveKey (const key_t &key) noexcept PWX_VIRTUAL_PURE;
+
+	/// @brief internal method to set the hashing method according to @a targetSize
+	void privSetHashMethod(uint32_t targetSize) noexcept
+	{
+		CHMethod = CHM_Multiplication; // default the safe one
+
+		// Test 1: Even sizes can't use the division method
+		if (targetSize % 2) {
+			// Test 2: For the division method to safely work, the size
+			// should be a prime number with a good distance to the
+			// next smaller and larger 2^x values:
+			uint32_t lowerBound = 64;
+			uint32_t upperBound = 128;
+
+			// find bounds:
+			while (lowerBound > targetSize) {
+				upperBound = lowerBound;
+				lowerBound /= 2;
+			}
+
+			while (upperBound < targetSize) {
+				lowerBound = upperBound;
+				upperBound *= 2;
+			}
+
+			uint32_t middle  = (lowerBound + upperBound) / 2;
+			uint32_t midDist = middle > targetSize ? middle - targetSize : targetSize - middle;
+
+			if (midDist < std::min((targetSize - lowerBound) / 2, (upperBound - targetSize) / 2) ) {
+				// Test 3: (almost) a prime number
+				// For this to test the size is simply divided by the first
+				// 8 odd numbers (but 15) and must not be devidable by more
+				// than one
+				int divided = 0;
+				for (uint32_t divisor = 3; (divided < 2) && (divisor < 20); divisor += 2) {
+					// 15 is already covered by 3 and 5
+					if (15 != divisor) {
+						if (!(targetSize % divisor))
+							++divided;
+					}
+
+					// Now if divided is lower than 2, the division method can be used
+					if (divided < 2)
+						CHMethod = CHM_Division;
+				} // End of checking divisors
+			} // End of valid Test 2
+		} // End of checking for an odd number
+		DEBUG_LOG("Hash base", "Hashing method set to \"%s\"",
+				CHMethod == CHM_Division ? "division" : "multiplication")
+	}
 
 
 	/* ===============================================

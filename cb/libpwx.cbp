@@ -232,6 +232,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/tools/MathHelpers.cpp" />
+		<Unit filename="../src/pwx/tools/MathHelpers.h" />
 		<Unit filename="../src/pwx/tools/StreamHelpers.cpp">
 			<Option target="clean" />
 			<Option target="library" />

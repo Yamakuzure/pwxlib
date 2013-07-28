@@ -32,11 +32,6 @@
 
 namespace pwx {
 
-/// @brief two-type enum to allow the chained hash to use dynamic hashing types
-enum eChainHashMethod {
-	CHM_Division = 1,  //!< Use the division method
-	CHM_Multiplication //!< Use the multiplication method
-};
 
 /** @class TChainHash
   *
@@ -236,33 +231,7 @@ public:
 	using base_t::get;
 	using base_t::getData;
 	using base_t::getHops;
-
-
-
-	/** @brief grow the size of a hash table
-	  *
-	  * This method increases the hash table by creating a new
-	  * table and moving all elements into the new one.
-	  *
-	  * This method does not shrink a table. It does nothing if
-	  * @a targetSize is not larger than the current size.
-	  * Therefore the resulting size is returned for you to check.
-	  *
-	  * @param[in] targetSize the new size of the hash.
-	  * @return the resulting size
-	**/
-	virtual uint32_t grow(uint32_t targetSize)
-	{
-		PWX_LOCK_GUARD(hash_t, this)
-		uint32_t oldSize = this->sizeMax();
-		if (targetSize > oldSize) {
-			setHashMethod(targetSize);
-			PWX_TRY_PWX_FURTHER(return base_t::grow(targetSize));
-		}
-		return oldSize;
-	}
-
-
+	using base_t::grow;
 	using base_t::pop;
 	using base_t::pop_back;
 	using base_t::pop_front;
@@ -301,6 +270,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::CHMethod;
 	using base_t::eCount;
 	using base_t::hashTable;
 
@@ -428,62 +398,6 @@ private:
 		return result;
 	}
 
-
-	/// @brief internal method to set the hashing method according to @a targetSize
-	void setHashMethod(uint32_t targetSize) noexcept
-	{
-		CHMethod = CHM_Multiplication; // default the safe one
-
-		// Test 1: Even sizes can't use the division method
-		if (targetSize % 2) {
-			// Test 2: For the division method to safely work, the size
-			// should be a prime number with a good distance to the
-			// next smaller and larger 2^x values:
-			uint32_t lowerBound = 64;
-			uint32_t upperBound = 128;
-
-			// find bounds:
-			while (lowerBound > targetSize) {
-				upperBound = lowerBound;
-				lowerBound /= 2;
-			}
-
-			while (upperBound < targetSize) {
-				lowerBound = upperBound;
-				upperBound *= 2;
-			}
-
-			uint32_t middle  = (lowerBound + upperBound) / 2;
-			uint32_t midDist = middle > targetSize ? middle - targetSize : targetSize - middle;
-
-			if (midDist < std::min((targetSize - lowerBound) / 2, (upperBound - targetSize) / 2) ) {
-				// Test 3: (almost) a prime number
-				// For this to test the size is simply divided by the first
-				// 8 odd numbers (but 15) and must not be devidable by more
-				// than one
-				int divided = 0;
-				for (uint32_t divisor = 3; (divided < 2) && (divisor < 20); divisor += 2) {
-					// 15 is already covered by 3 and 5
-					if (15 != divisor) {
-						if (!(targetSize % divisor))
-							++divided;
-					}
-
-					// Now if divided is lower than 2, the division method can be used
-					if (divided < 2)
-						CHMethod = CHM_Division;
-				} // End of checking divisors
-			} // End of valid Test 2
-		} // End of checking for an odd number
-	}
-
-
-	/* ===============================================
-	 * === Private members                         ===
-	 * ===============================================
-	*/
-
-	eChainHashMethod CHMethod = CHM_Division; //!< Which Hashing method is used
 
 }; // class TChainHash
 

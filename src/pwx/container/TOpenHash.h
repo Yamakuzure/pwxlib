@@ -270,6 +270,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::CHMethod;
 	using base_t::eCount;
 	using base_t::hashTable;
 	using base_t::vacated;
@@ -311,22 +312,20 @@ private:
 		double   dHash   = static_cast<double>(xHash) * 0.618;
 		uint32_t idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
 
+		// Use the current hashing method for the stepping (secondary hash)
+		uint32_t idxStep;
+		uint32_t secSize = tabSize - (tabSize % 2 ? 2 : 1);
+		if (CHM_Division == CHMethod)
+			idxStep = xHash % secSize;
+		else
+			idxStep = static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * secSize) );
 
-		// Use division probing for the stepping
-		uint32_t idxStep = xHash % (tabSize - (tabSize % 2 ? 2 : 1));
-
-		// Move down until an appropriate value is found
-		uint32_t oriStep = idxStep; // to revert if necessary
-		while ( (idxStep > 2)
-			  && (!(tabSize % idxStep) || !(tabSize % (tabSize % idxStep)) ) )
-			--idxStep;
-
-		// Move up if this was not sucessful
-		if ((idxStep < 3) || !(tabSize % idxStep) || !(tabSize % (tabSize % idxStep))) {
-			idxStep = oriStep + 1;
-			while (!(tabSize % idxStep) || !(tabSize % (tabSize % idxStep)) )
-				++idxStep;
-		}
+		// Be sure idxStep is sane:
+		if (idxStep < 3)
+			// On odd sizes a step of 2 always traverses all positions.
+			idxStep = tabSize % 2 ? tabSize - 1 : 2;
+		if (!tabSize % idxStep)
+			idxStep += 2;
 
 		// Now probe the table until we are done or have found the key
 		bool     isFound   = false;
@@ -351,9 +350,13 @@ private:
 				if ( ((i+1) < tabSize) && (pos == idxBase) ) {
 					// This means the idx stepping is screwed
 					DEBUG_ERR("open hash",
-							"Unfull probing at hop %u: pos %u == base %u, step %u in size %u",
-							*hops, pos, idxBase, idxStep, tabSize)
+							"Unfull probing at hop %s: pos %u == base %u, step %u in size %u",
+							hops ? pwx::to_string(*hops).c_str() : "n/a",
+							pos, idxBase, idxStep, tabSize)
 					idxStep += idxStep % 2 ? 2 : 3;
+					// Be sure idxStep does not end up being tabSize or we'll be here again next round.
+					if (idxStep == tabSize)
+						idxStep = 3;
 					pos = (pos + idxStep) % tabSize;
 				}
 			}
@@ -421,7 +424,7 @@ private:
 		if ( (nullptr != hashTable[idx]) && (hashTable[idx] != vacated) ) {
 			if (*hashTable[idx] == elem->key) {
 				DEBUG_ERR("open hash",
-						"privInsert kalled with key \"%s\", already found at index %u",
+						"privInsert called with key \"%s\", already found at index %u",
 						pwx::to_string(elem->key).c_str(), idx)
 				DEBUG_ERR("open hash", " -> table size %u, hops performed %u", tabSize, elem->hops)
 				PWX_THROW("illegal index", "key already exists",

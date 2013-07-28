@@ -482,6 +482,8 @@ public:
 	**/
 	bool operator==(const elem_t &rhs) const noexcept
 	{
+		if (isFloatType(key_t))
+			return areAlmostEqual(this->key, rhs.key);
 		return this->key == rhs.key;
 	}
 
@@ -492,6 +494,8 @@ public:
 	**/
 	bool operator==(const key_t &key_) const noexcept
 	{
+		if (isFloatType(key_t))
+			return areAlmostEqual(this->key, key_);
 		return this->key == key_;
 	}
 
@@ -502,6 +506,8 @@ public:
 	**/
 	bool operator!=(const elem_t &rhs) const noexcept
 	{
+		if (isFloatType(key_t))
+			return !areAlmostEqual(this->key, rhs.key);
 		return !(this->key == rhs.key);
 	}
 
@@ -512,6 +518,8 @@ public:
 	**/
 	bool operator!=(const key_t &key_) const noexcept
 	{
+		if (isFloatType(key_t))
+			return !areAlmostEqual(this->key, key_);
 		return !(this->key == key_);
 	}
 
