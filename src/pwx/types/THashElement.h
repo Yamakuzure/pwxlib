@@ -29,6 +29,7 @@
 **/
 
 #include <pwx/base/VElement.h>
+#include <pwx/tools/MathHelpers.h>
 
 namespace pwx
 {
