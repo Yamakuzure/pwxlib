@@ -56,26 +56,6 @@ result = testSpeed<container_type, key_type, value_type, \
 	thClearer<container_type>>(env, testCont, thread_count); \
 } PWX_THROW_PWX_FURTHER
 
-/// DEBUG
-			// Chained Hash Tables
-			if (EXIT_SUCCESS == result) {
-				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
-								 do_not_destroy, nullptr, 3.0, 1.5);
-				do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, 1)
-				if (EXIT_SUCCESS == result) {
-					do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
-				}
-			}
-			// Open Hash Tables
-			if (EXIT_SUCCESS == result) {
-				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
-								 do_not_destroy, nullptr, 0.81, 1.5);
-				do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, 1)
-				if (EXIT_SUCCESS == result) {
-					do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
-				}
-			}
-/// !DEBUG
 			// Singly Linked Lists
 			if (EXIT_SUCCESS == result) {
 				single_list_t testCont(do_not_destroy);
@@ -132,24 +112,24 @@ result = testSpeed<container_type, key_type, value_type, \
 					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, maxThreads)
 				}
 			}
-//			// Chained Hash Tables
-//			if (EXIT_SUCCESS == result) {
-//				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
-//								 do_not_destroy, nullptr, 3.0, 1.5);
-//				do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, 1)
-//				if (EXIT_SUCCESS == result) {
-//					do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
-//				}
-//			}
-//			// Open Hash Tables
-//			if (EXIT_SUCCESS == result) {
-//				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
-//								 do_not_destroy, nullptr, 0.81, 1.5);
-//				do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, 1)
-//				if (EXIT_SUCCESS == result) {
-//					do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
-//				}
-//			}
+			// Chained Hash Tables
+			if (EXIT_SUCCESS == result) {
+				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
+								 do_not_destroy, nullptr, 3.0, 1.5);
+				do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+				}
+			}
+			// Open Hash Tables
+			if (EXIT_SUCCESS == result) {
+				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
+								 do_not_destroy, nullptr, 0.81, 1.5);
+				do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, 1)
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+				}
+			}
 		} // End of speed tests
 
 #undef do_testSpeed

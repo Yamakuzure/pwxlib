@@ -30,6 +30,10 @@
 
 #include <pwx/base/VTHashBase.h>
 
+#if defined(LIBPWX_DEBUG)
+#  include <pwx/tools/StreamHelpers.h>
+#endif // LIBPWX_DEBUG
+
 namespace pwx {
 
 /** @class TOpenHash
@@ -262,6 +266,18 @@ protected:
 	*/
 
 	using base_t::protGetHash;
+
+
+	/** @brief use hashBuilder to generate a secondary hash out of primary hash
+	  * @param priHash pointer to the primary hash to hash again
+	  * @return uint32_t hash of @a priHash
+	**/
+	virtual uint32_t protGetSecHash(const uint32_t* priHash) const noexcept
+	{
+		return hashBuilder(priHash);
+	}
+
+
 	using base_t::protIsVacated;
 
 
@@ -271,6 +287,7 @@ protected:
 	*/
 
 	using base_t::CHMethod;
+	using base_t::hashBuilder;
 	using base_t::eCount;
 	using base_t::hashTable;
 	using base_t::vacated;
@@ -287,7 +304,7 @@ private:
 	  * This is the real index calculation that can be told where to
 	  * stop. VTHashBase::get() needs a method to get the index to a
 	  * key that does not end in vacated. But privInsert() is quite
-	  * happy populating vacated positions.
+	  * happy populating vacated (*) positions.
 	  *
 	  * In an open hash table the index is calculated using a double
 	  * hash method. Basically this means to use one base index and
@@ -298,6 +315,12 @@ private:
 	  * be chosen to allow the probing of all places before the first
 	  * is probed twice.
 	  *
+	  * "vacated" positions might not only be those marked with the
+	  * vacated sentry, but thos occupied by elements with fewer hops,
+	  * too. These are given back if @a hops is not nullptr.
+	  * The method to replace elements with fewer hops is called
+	  * "Robin Hood Hashing", and reduces secondary clustering.
+	  *
 	  * @param[in] key const reference of the key to evaluate
 	  * @param[in] allowVacated if set to true, the method will return indexes from vacated positions and jump those otherwise.
 	  * @param[out] hops if not nullptr, the number of hops done to find the final position is noted in here.
@@ -305,32 +328,40 @@ private:
 	**/
 	virtual uint32_t privGetIndex(const key_t &key, bool allowVacated, uint32_t* hops) const noexcept
 	{
-		uint32_t xHash = this->protGetHash(&key);
+		uint32_t priHash = this->protGetHash(&key);
 
 		// Use multiplication method for the base index
 		uint32_t tabSize = this->sizeMax();
-		double   dHash   = static_cast<double>(xHash) * 0.618;
+		double   dHash   = static_cast<double>(priHash) * 0.618;
 		uint32_t idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
 
 		// Use the current hashing method for the stepping (secondary hash)
+		uint32_t secHash = this->protGetSecHash(&priHash);
 		uint32_t idxStep;
 		uint32_t secSize = tabSize - (tabSize % 2 ? 2 : 1);
 		if (CHM_Division == CHMethod)
-			idxStep = xHash % secSize;
-		else
+			idxStep = secHash % secSize;
+		else {
+			dHash   = static_cast<double>(secHash) * 0.618;
 			idxStep = static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * secSize) );
+		}
 
 		// Be sure idxStep is sane:
 		if (idxStep < 3)
 			// On odd sizes a step of 2 always traverses all positions.
-			idxStep = tabSize % 2 ? tabSize - 1 : 2;
-		if (!tabSize % idxStep)
+			idxStep = tabSize % 2 ? 2 : tabSize - 1;
+		// tabSize must not be devidable by idxStep
+		if ( !(tabSize % idxStep) )
 			idxStep += 2;
+		// Both must not be the same, even or odd
+		if ( (tabSize % 2) == (idxStep % 2) )
+			++idxStep;
 
 		// Now probe the table until we are done or have found the key
-		bool     isFound   = false;
-		bool     isVacated = false;
-		uint32_t pos       = idxBase;
+		bool     isFound     = false;
+		bool     isVacated   = false;
+		bool     beRobinHood = allowVacated && hops;
+		uint32_t pos         = idxBase;
 		for (uint32_t i = 0; !isFound && (i < tabSize); ++i) {
 			isVacated = hashTable[pos] == vacated;
 
@@ -340,7 +371,9 @@ private:
 					// b) the hashTable has an element with the same key
 				||	(!isVacated && (*hashTable[pos] == key))
 					// c) allowVacated is true and the position is vacated
-				||	(isVacated && allowVacated) )
+				||	(isVacated && allowVacated)
+					// d) beRobinHood is true and the position is taken, but the element has fewer hops
+				||  (beRobinHood && !isVacated && (hashTable[pos]->hops < *hops)) )
 				isFound = true;
 			else {
 				pos = (pos + idxStep) % tabSize;
@@ -371,7 +404,8 @@ private:
 			DEBUG_ERR("open hash", "  Hops done  : %u", *hops) // Trivial, but the if() is not part of the output
 			DEBUG_ERR("open hash", "  Initial Idx: %u", idxBase % tabSize)
 			DEBUG_ERR("open hash", "  Stepping   : %u", idxStep)
-			DEBUG_ERR("open hash", "  Hash used  : %u\n---", xHash)
+			DEBUG_ERR("open hash", "  1st Hash   : %u\n---", priHash)
+			DEBUG_ERR("open hash", "  2nd Hash   : %u\n---", secHash)
 		}
 #endif // defined(LIBPWX_DEBUG)
 
@@ -411,9 +445,9 @@ private:
 		uint32_t  idx  = privGetIndex(elem->key, true, &(elem->hops));
 
 #if defined(LIBPWX_DEBUG)
-		// The position must not be occupied
+		// The position must not be occupied unless the hop count is smaller
 		// Note: This used to be an assert, but the checks are too flat then.
-		uint32_t tabSize = this->sizeMax();
+		uint32_t tabSize  = this->sizeMax();
 		if (idx >= tabSize) {
 			DEBUG_ERR("open hash",
 					"privGetIndex returned %u on table size %u (insert key: \"%s\")",
@@ -421,7 +455,10 @@ private:
 			PWX_THROW("out of bounds", "Index too large",
 					"The index returned by privGetIndex() is larger than the table size")
 		}
-		if ( (nullptr != hashTable[idx]) && (hashTable[idx] != vacated) ) {
+		if ( (nullptr != hashTable[idx])
+		  && (hashTable[idx] != vacated)
+		  && ( (hashTable[idx]->hops >= elem->hops)
+			|| (*hashTable[idx] == elem->key) ) ) {
 			if (*hashTable[idx] == elem->key) {
 				DEBUG_ERR("open hash",
 						"privInsert called with key \"%s\", already found at index %u",
@@ -429,20 +466,47 @@ private:
 				DEBUG_ERR("open hash", " -> table size %u, hops performed %u", tabSize, elem->hops)
 				PWX_THROW("illegal index", "key already exists",
 						"privInsert called with an already stored key!")
-			} else {
+			} else if (hashTable[idx]->hops >= elem->hops) {
 				DEBUG_ERR("open hash",
-						"privGetIndex returned index %u that is occupied with key \"%s\" (insert key: \"%s\")",
-						idx, pwx::to_string(hashTable[idx]->key).c_str(), pwx::to_string(elem->key).c_str())
-				DEBUG_ERR("open hash", " -> table size %u, hops performed %u", tabSize, elem->hops)
-				PWX_THROW("illegal index", "index occupied",
-						"The index returned by privGetIndex() is already taken!")
+						"Robin Hood failed and delivered %u hops when we have %u",
+						hashTable[idx]->hops, elem->hops)
+				DEBUG_ERR("open hash", " -> table size %u", tabSize)
+				PWX_THROW("illegal index", "not enough hops",
+						"An element to replace has more or equal hops")
 			}
 		}
 #endif // defined(LIBPWX_DEBUG)
 
-		this->hashTable[idx] = elem;
+		/* There are two possible situations now:
+		 * a) the position is occupied, but the element
+		 *    found has fewer hops.
+		 *    -> insert new element here, then find a new
+		 *       slot for the replaced.
+		 * b) the position is empty or marked as vacated
+		 *    -> insert new element here
+		*/
+		elem_t* oldElem = nullptr;
+		if (hashTable[idx] && (hashTable[idx] != vacated) )
+			// This is situation a)
+			oldElem = this->privRemoveIdx(idx);
+		hashTable[idx] = elem; // Fulfills both situations
 		eCount.fetch_add(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
 							? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+
+		// Now solve situation a)
+		while (oldElem) {
+			elem       = oldElem;
+			oldElem    = nullptr;
+			elem->hops = 0;
+			idx = privGetIndex(elem->key, true, &(elem->hops));
+			if (hashTable[idx] && (hashTable[idx] != vacated) )
+				// This is situation a) again
+				oldElem = this->privRemoveIdx(idx);
+			hashTable[idx] = elem; // Item is moved
+			eCount.fetch_add(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
+								? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+		}
+
 		return this->size();
 	}
 
