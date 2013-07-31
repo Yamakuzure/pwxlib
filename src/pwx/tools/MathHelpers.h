@@ -222,40 +222,6 @@ template<typename T> double getNormalizedDegree(const T degree)
 }
 
 
-/** @brief getNormalizedDegree (precision version)
-  *
-  * This helper method makes sure, that the provided @a degree is in a range of
-  * 0 <= result < (360 * 10^@a precision)
-  * The purpose is to make sure that the result is a valid index of the sine and
-  * cosine tables of SCT. So I daresay it won't be usefull for outside use.
-  *
-  * Warning: Although this is a template, it is your responsibility to use
-  * it with a sensible type! Type checking would have too much impact, so
-  * if you receive weird/wrong results because of the type you use, then
-  * you have been warned. ;-)
-  * But I guess you won't get a problem, as your @a degree will be transformed
-  * into a double anyway. So as long as your type can be converted, everything
-  * should be in order.
-  *
-  * @param[in] degree the degree you want to have re-calculated into a normalized range
-  * @param[in] precision precision for the degree, should be lastPrec for the wanted purpose
-  * @return the equivalent degree in a range between 0 and 360 as an _integer_
-  *
-**/
-template<typename T> int32_t getNormalizedDegree(const T degree, int32_t precision)
-{
-	assert(precision >= 0);
-	double  multipl = static_cast<double>(std::pow(10.L, precision));
-	int32_t normDeg = static_cast<int32_t>(std::round(static_cast<double>(degree) * multipl));
-	int32_t tabSize = static_cast<int32_t>(std::round(360.L * multipl));
-
-	if      (normDeg >= tabSize) normDeg %= tabSize;
-	else if (normDeg <  0      ) normDeg  = tabSize - (-normDeg % tabSize);
-
-	return (normDeg);
-}
-
-
 /** @brief degToRad
   *
   * Recalculate a @a degree into a radiant.
