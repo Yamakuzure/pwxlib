@@ -27,6 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+#include <pwx/tools/MathHelpers.h>
 #include <pwx/tools/StreamHelpers.h>
 
 
