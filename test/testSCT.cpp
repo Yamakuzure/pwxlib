@@ -128,7 +128,7 @@ static void testSpeed(int32_t precision, uint32_t testMaxElements)
 	tStart = hrClock::now();
 	if (precision < -1) {
 		for (uint32_t i = 0; i < testMaxElements; ++i) {
-			curSin = std::sin(RNG.random(0., 360.) * M_PIl / 180.0L);
+			curSin = std::sin(RNG.random(0., 360.) * M_PIl / 180.);
 			if (curSin < minSin) minSin = curSin;
 			if (curSin > maxSin) maxSin = curSin;
 		}
@@ -146,7 +146,7 @@ static void testSpeed(int32_t precision, uint32_t testMaxElements)
 	tStart = hrClock::now();
 	if (precision < -1) {
 		for (uint32_t i = 0; i < testMaxElements; ++i) {
-			curCos = std::cos(RNG.random(0., 360.) * M_PIl / 180.0L);
+			curCos = std::cos(RNG.random(0., 360.) * M_PIl / 180.);
 			if (curCos < minCos) minCos = curCos;
 			if (curCos > maxCos) maxCos = curCos;
 		}

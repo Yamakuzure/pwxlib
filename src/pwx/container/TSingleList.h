@@ -498,7 +498,7 @@ public:
 	**/
 	virtual elem_t* pop() noexcept
 	{
-		return pop_front();
+		return privRemoveAfterData(nullptr);
 	}
 
 
@@ -547,7 +547,7 @@ public:
 	**/
 	virtual uint32_t push (data_t *data)
 	{
-		PWX_TRY_PWX_FURTHER (return push_back (data))
+		PWX_TRY_PWX_FURTHER (return privInsDataBehindElem (tail(), data))
 	}
 
 
@@ -561,7 +561,7 @@ public:
 	**/
 	virtual uint32_t push (const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER (return push_back (src))
+		PWX_TRY_PWX_FURTHER (return privInsElemBehindElem (tail(), src))
 	}
 
 

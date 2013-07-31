@@ -200,23 +200,23 @@ template<typename T> double getNormalizedDegree(const T degree)
 {
 	double result = static_cast<double>(degree);
 
-	if ((result >= 360.0L) || (result < 0.0L)) {
+	if ((result >= 360.) || (result < 0.)) {
 		// We have to mod here, but in a split
-		if (result <  0.0L  ) {
-			int32_t modVal = static_cast<int32_t>(result / 360.0L);
-			double  reduct = SIGN(modVal) * 360.0L * modVal;
-			result  = 360.0L - (-result - reduct);
+		if (result <  0.  ) {
+			int32_t modVal = static_cast<int32_t>(result / 360.);
+			double  reduct = SIGN(modVal) * 360. * modVal;
+			result  = 360. - (-result - reduct);
 		}
 		// The reason for the split is, that the result can be
 		// exactly 360.0 now while reduct is higher than 360
-		if (result >= 360.0L) {
-			int32_t modVal = static_cast<int32_t>(result / 360.0L);
-			double  reduct = SIGN(modVal) * 360.0L * modVal;
+		if (result >= 360.) {
+			int32_t modVal = static_cast<int32_t>(result / 360.);
+			double  reduct = SIGN(modVal) * 360. * modVal;
 			result -= reduct;
 		}
 	}
 
-	assert ((result >= 0) && (result < 360.0L) && "getNormalizedDegree() double mod failed!");
+	assert ((result >= 0.) && (result < 360.) && "getNormalizedDegree() double mod failed!");
 
 	return (result);
 }
@@ -238,7 +238,7 @@ template<typename T> double getNormalizedDegree(const T degree)
 **/
 template<typename T> double degToRad(T degree)
 {
-	return (static_cast<double>(degree) * M_PIl / 180.0L);
+	return (static_cast<double>(degree) * M_PIl / 180.);
 }
 
 

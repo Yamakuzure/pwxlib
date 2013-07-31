@@ -267,7 +267,22 @@ public:
 	}
 
 
-	using base_t::pop;
+	/** @brief short alias for pop_front()
+	  *
+	  * You have to delete the removed element by yourself. If you do not intent
+	  * to work with the removed element, use delNext instead.
+	  *
+	  * If the ring is empty, nullptr is returned.
+	  *
+	  * @return a pointer to the removed element or nullptr if the ring is empty
+	**/
+	virtual elem_t* pop() noexcept
+	{
+		elem_t* toRemove = base_t::pop_front();
+		if (toRemove)
+			privConnectEnds();
+		return toRemove;
+	}
 
 
 	/** @brief alias to remove the last element (tail)
@@ -306,7 +321,34 @@ public:
 	}
 
 
-	using base_t::push;
+	/** @brief short alias for push_back(data_t *data)
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this ring after the insertion
+	**/
+	virtual uint32_t push (data_t *data)
+	{
+		PWX_TRY_PWX_FURTHER (base_t::push_back (data))
+		return privConnectEnds();
+	}
+
+
+	/** @brief short alias for push_back(const elem_t &src)
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] src reference to the element to copy
+	  * @return the number of elements in this ring after the insertion
+	**/
+	virtual uint32_t push (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER (base_t::push_back (src))
+		return privConnectEnds();
+	}
 
 
 	/** @brief alias to add a data pointer to the end of the ring.
