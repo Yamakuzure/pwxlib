@@ -38,5 +38,6 @@ const uint32_t maxThreads  = 8;
 #include "testSet.h"
 #include "testSpeed.h"
 #include "testRNG.h"
+#include "testSCT.h"
 
 #endif // PWX_LIBPWX_TEST_MAIN_H_INCLUDED

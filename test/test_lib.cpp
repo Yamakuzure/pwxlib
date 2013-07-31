@@ -139,6 +139,11 @@ result = testSpeed<container_type, key_type, value_type, \
 		PWX_TRY_PWX_FURTHER (result = testRNG (env))
 	}
 
+	// --- Test SCT worker ---
+	if (EXIT_SUCCESS == result ) {
+		PWX_TRY_PWX_FURTHER (result = testSCT (env))
+	}
+
 		// End of giant try
 	} catch (pwx::CException &e) {
 		cerr << "\n-----\npwx exception \"" << e.name() << "\" caught!" << endl;
