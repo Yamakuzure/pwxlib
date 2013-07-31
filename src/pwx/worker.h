@@ -28,6 +28,7 @@
 **/
 
 #include <pwx/worker/CRandom.h>
+#include <pwx/worker/CSinCosTable.h>
 
 #endif // PWX_LIBPWX_PWX_WORKER_H_INCLUDED
 

@@ -291,6 +291,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/worker/CSinCosTable.cpp" />
+		<Unit filename="../src/pwx/worker/CSinCosTable.h" />
 		<Unit filename="../test/Makefile">
 			<Option target="clean" />
 			<Option target="library" />
@@ -336,6 +338,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../test/testSCT.cpp" />
+		<Unit filename="../test/testSCT.h" />
 		<Unit filename="../test/testSet.h">
 			<Option target="clean" />
 			<Option target="library" />
