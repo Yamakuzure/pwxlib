@@ -4,8 +4,8 @@ using pwx::SCT;
 
 // just some global values for the results:
 static double  degrees[12]     = { 0.L, 90.L, 180.L, 270.L, 0, 0, 0, 0, 0, 0, 0, 0 };
-static double  diffRes[2][7][12]; // cos/sin, precision, index
-static int64_t speedRes[3][8]; // cos/sin/sincos, precision + manual
+static double  diffRes[2][6][12]; // cos/sin, precision, index
+static int64_t speedRes[3][7]; // cos/sin/sincos, precision + manual
 
 // Helper functions
 static void testDiff(int32_t angleIdx, int32_t precision);
@@ -14,7 +14,7 @@ static void testSpeed(int32_t precision, uint32_t testMaxElements);
 /** @brief central function to test pwx::SCT
   *
   *************************************************************************
-  ** Walk up from precision -1, 0, 1, 2, 3, 4, 5 and check for time and  **
+  ** Walk up from precision -1, 0, 1, 2, 3(, 4) and check for time and   **
   ** difference compared to standard manual calculation.                 **
   ** A) For the difference, 0, 90, 180, 270 and eight random values are  **
   **    tested.                                                          **
@@ -23,8 +23,9 @@ static void testSpeed(int32_t precision, uint32_t testMaxElements);
 **/
 int32_t testSCT (sEnv &env)
 {
-	int32_t      result = EXIT_SUCCESS;
-	uint32_t     testMaxElements = env.doSpeed ? maxElements : 10;
+	int32_t  result           = EXIT_SUCCESS;
+	uint32_t testMaxElements  = env.doSpeed ? maxElements : 10;
+	int32_t  testMaxPrecision = env.doSpeed ? 4 : 3;
 
 	// Add the eight random angles we wanted:
 	for (int idx = 4; idx < 12; ) {
@@ -41,31 +42,14 @@ int32_t testSCT (sEnv &env)
 	cout << "\nTest CSinCosTable instance pwx::SCT\n-----------------------------------" << endl;
 
 	/************************************************************************
-	** A) Difference tests                                                 **
+	** A) Difference tests  and B) speed tests combined.                   **
+	** This is done to not having to reinitialize the tables twice!        **
 	************************************************************************/
 	cout << " A) Test the difference between life calculations and table usage" << endl;
-
-	for (int32_t prec = -1 ; prec < 6; ++prec) {
-		cout << adjRight (4, 0) << ++env.testCount;
-		if (prec < 0)
-			cout << " life calculation\n";
-		else
-			cout << " precision " << prec << "\n";
-		cout << " degree |          sine |    difference |        cosine |   difference\n";
-		cout << " -------+---------------+---------------+---------------+--------------" << endl;
-		for (int32_t idx = 0; idx < 12; ++idx)
-			testDiff(idx, prec);
-		cout << " -------+---------------+---------------+---------------+--------------\n" << endl;
-		++env.testSuccess;
-	}
-
-
-	/************************************************************************
-	** B) Speed tests                                                      **
-	************************************************************************/
-	cout << " B) Test the speed of " << testMaxElements << " random sin/cos calculations" << endl;
-
-	for (int32_t prec = -2; prec < 6; ++prec) {
+	cout << "and\n B) Test the speed of " << testMaxElements << " random sin/cos calculations" << endl;
+	cout << "\n (  This is done or the tables would have to be\n";
+	cout << "    re-initialized twice for each precision!     )\n" << endl;
+	for (int32_t prec = -2 ; prec < (testMaxPrecision + 1); ++prec) {
 		cout << adjRight (4, 0) << ++env.testCount;
 
 		if (prec < -1)
@@ -75,6 +59,16 @@ int32_t testSCT (sEnv &env)
 		else
 			cout << " precision " << prec << "\n";
 
+		if (prec > -2) {
+			cout << " --- Test result precision ---\n";
+			cout << " degree |          sine |    difference |        cosine |   difference\n";
+			cout << " -------+---------------+---------------+---------------+--------------" << endl;
+			for (int32_t idx = 0; idx < 12; ++idx)
+				testDiff(idx, prec);
+			cout << " -------+---------------+---------------+---------------+--------------\n" << endl;
+		}
+
+		cout << " --- Test calculation speed ---\n";
 		cout << " type   |        minium |       maximum |     time | difference\n";
 		cout << " -------+---------------+---------------+----------+-----------" << endl;
 		testSpeed(prec, testMaxElements);
