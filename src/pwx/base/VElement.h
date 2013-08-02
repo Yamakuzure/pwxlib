@@ -132,6 +132,17 @@ public:
 	}
 
 
+	/** @brief return the current number of the element in a thread safe way
+	  * @return the current number of the element
+	**/
+	uint32_t nr()
+	{
+		return beThreadSafe.load(PWX_MEMORDER_RELAXED)
+				? eNr.load(PWX_MEMORDER_ACQUIRE)
+				: eNr.load(PWX_MEMORDER_RELAXED);
+	}
+
+
 	/* ===============================================
 	 * === Public members                          ===
 	 * ===============================================
