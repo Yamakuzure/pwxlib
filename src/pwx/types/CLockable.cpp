@@ -1,7 +1,7 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include <pwx/types/CLockable.h>
+#include "CLockable.h"
 
 namespace pwx
 {

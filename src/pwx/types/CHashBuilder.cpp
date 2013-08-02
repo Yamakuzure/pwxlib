@@ -3,7 +3,7 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include <pwx/types/CHashBuilder.h>
+#include "CHashBuilder.h"
 
 namespace pwx {
 

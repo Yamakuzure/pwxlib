@@ -2,7 +2,7 @@
 #  define PWX_EXPORTS 1
 #endif
 
-#include <pwx/tools/StreamHelpers.h>
+#include "StreamHelpers.h"
 
 #include <cstdlib>
 #include <vector>

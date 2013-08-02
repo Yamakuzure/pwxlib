@@ -1,7 +1,7 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include <pwx/types/eNameSourceType.h>
+#include "eNameSourceType.h"
 #include <cstdint>
 
 namespace pwx {

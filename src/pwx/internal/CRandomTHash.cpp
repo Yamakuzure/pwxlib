@@ -1,7 +1,7 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include <pwx/internal/CRandomTHash.h>
+#include "CRandomTHash.h"
 
 #include <cstring>
 

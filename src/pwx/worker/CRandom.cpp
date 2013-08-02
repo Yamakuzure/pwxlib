@@ -2,12 +2,12 @@
 #  define PWX_EXPORTS 1
 #endif
 
-#include <pwx/general/macros.h>
-#include <pwx/tools/StreamHelpers.h>
-#include <pwx/worker/CRandom.h>
-#include <pwx/internal/CRandomTRandom.h>
-#include <pwx/internal/CRandomTHash.h>
-#include <pwx/internal/CRandomWordConstants.h>
+#include "../general/macros.h"
+#include "../tools/StreamHelpers.h"
+#include "CRandom.h"
+#include "../internal/CRandomTRandom.h"
+#include "../internal/CRandomTHash.h"
+#include "../internal/CRandomWordConstants.h"
 
 #include <string>
 #include <cstring>

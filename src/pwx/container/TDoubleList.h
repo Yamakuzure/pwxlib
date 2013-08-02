@@ -476,7 +476,259 @@ protected:
 
 	using base_t::destroy;
 	using base_t::protDelete;
-	using base_t::protFind;
+
+
+	/// @brief Search until the current element contains the searched data
+	virtual const elem_t* protFind (const data_t* data) const noexcept
+	{
+		elem_t* result = nullptr;
+
+		/* The same rules apply as in the TSingleList version,
+		 * but being able to traverse backwards there are the
+		 * following changes:
+		 * A) Start with curr, not with root()
+		 * B) When traversing backwards, do not skip head for
+		 *    the same reasons tail sn't skipped when traversing
+		 *    forwards.
+		 */
+
+		// Return at once if the list is empty
+		if (empty())
+			return nullptr;
+
+		// Rule 1: Lock for the basic tests.
+		PWX_LOCK(const_cast<list_t*>(this))
+
+		// Exit if the list has been emptied while we waited for the lock
+		if (empty()) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr;
+		}
+
+		// Quick exit if curr is already what we want:
+		if (curr()->data.get() == data) {
+			// Safe curr first, so it isn't changed before being returned
+			result = curr();
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return result;
+		}
+
+		// The next does only make sense if we have more than one element
+		if (size() > 1) {
+
+			// Exit if head is wanted...
+			if (head()->data.get() == data) {
+				curr(head());
+				result = curr();
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return result;
+			}
+
+			// ...or tail
+			if (tail()->data.get() == data) {
+				curr(tail());
+				result = curr();
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return result;
+			}
+
+			// Otherwise we have to search for it.
+			elem_t* oldCurr = curr();
+			elem_t* xCurr   = oldCurr->getNext(); // curr is already checked.
+			bool    isDone = false;
+
+			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+				// oldCurr must be locked, it must not be removed
+				// or deleted now!
+				PWX_LOCK(oldCurr)
+
+				// This is rule 2: Unlock for traversal
+				PWX_UNLOCK(const_cast<list_t*>(this))
+
+				// Move upwards first
+				while (!result && !isDone && xCurr) {
+					// Rule 3: Re-check tail. It might be
+					// different from what was checked above
+					// once xCurr gets there.
+					if (xCurr->data.get() == data)
+						result = xCurr;
+					else if (xCurr == tail())
+						isDone = true;
+					else
+						xCurr = xCurr->getNext();
+				}
+
+				// Move downwards if there is no result, yet
+				if (!result) {
+					xCurr  = oldCurr->getPrev();
+					isDone = false;
+					PWX_UNLOCK(oldCurr)
+
+					while (!result && !isDone && xCurr) {
+						// Again, do not spare head.
+						if (xCurr->data.get() == data)
+							result = xCurr;
+						else if (xCurr == head())
+							isDone = true;
+						else
+							xCurr = xCurr->getPrev();
+					}
+					// End of moving downwards
+				} else
+					PWX_UNLOCK(oldCurr)
+			} else {
+				// No need to unlock, PWX_LOCK hasn't done anything anyway.
+				// Further tail() is already checked and we don't assume
+				// it to change while the search is running.
+				while (!result && xCurr && (xCurr != tail() )) {
+					if (xCurr->data.get() == data)
+						result = xCurr;
+					else
+						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);
+				}
+
+				// And downwards if there was no result, yet:
+				xCurr = oldCurr->prev.load(PWX_MEMORDER_RELAXED);
+				if (!result) {
+					while (!result && xCurr && (xCurr != head() )) {
+						if (xCurr->data.get() == data)
+							result = xCurr;
+						else
+							xCurr = xCurr->prev.load(PWX_MEMORDER_RELAXED);
+					}
+				}
+			} // End of manual traversing the container
+
+		} // End of handling a search with more than one element
+		else
+			PWX_UNLOCK(const_cast<list_t*>(this))
+
+		return result;
+	}
+
+
+	/// @brief Search until the current element contains the searched data content
+	virtual const elem_t* protFindData (const data_t &data) const noexcept
+	{
+		elem_t* result = nullptr;
+
+		/* The same three rules as when searching for an
+		 * element via its pointer apply here, too.
+		 */
+
+		// Return at once if the list is empty
+		if (empty())
+			return nullptr;
+
+		// Rule 1
+		PWX_LOCK(const_cast<list_t*>(this))
+
+		if (empty()) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr;
+		}
+
+		// Quick exit if curr is already what we want:
+		if (*curr() == data) {
+			// Safe curr first, so it isn't changed before being returned
+			result = curr();
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return result;
+		}
+
+		// The next does only make sense if we have more than one element
+		if (size() > 1) {
+
+			// Exit if head is wanted...
+			if (*head() == data) {
+				curr(head());
+				result = curr();
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return result;
+			}
+
+			// ...or tail
+			if (*tail() == data) {
+				curr(tail());
+				result = curr();
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return result;
+			}
+
+			// Otherwise we have to search for it.
+			elem_t* oldCurr = curr();
+			elem_t* xCurr   = oldCurr->getNext(); // curr is already checked.
+			bool    isDone  = false;
+
+			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+				// oldCurr must be locked, it must not be removed
+				// or deleted now!
+				PWX_LOCK(oldCurr)
+
+				// This is rule 2: Unlock for traversal
+				PWX_UNLOCK(const_cast<list_t*>(this))
+
+				// Move upwards first
+				while (!result && !isDone && xCurr) {
+					// Rule 3: Re-check tail.
+					// As the list is no longer locked,
+					// use compare() for element level
+					// locking.
+					if (0 == xCurr->compare(data))
+						result = xCurr;
+					else if (xCurr == tail())
+						isDone = true;
+					else
+						xCurr = xCurr->getNext();
+				}
+
+				// Move downwards if there is no result, yet
+				if (!result) {
+					xCurr  = oldCurr->getPrev();
+					isDone = false;
+					PWX_UNLOCK(oldCurr)
+
+					while (!result && !isDone && xCurr) {
+						// Again, do not spare head.
+						if (0 == xCurr->compare(data))
+							result = xCurr;
+						else if (xCurr == head())
+							isDone = true;
+						else
+							xCurr = xCurr->getPrev();
+					}
+					// End of moving downwards
+				} else
+					PWX_UNLOCK(oldCurr)
+			} else {
+				// No need to unlock, PWX_LOCK hasn't done anything anyway.
+				// Further tail() is already checked and we don't assume
+				// it to change while the search is running.
+				while (!result && xCurr && (xCurr != tail() )) {
+					if (*xCurr == data)
+						result = xCurr;
+					else
+						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);
+				}
+
+				// And downwards if there was no result, yet:
+				if (!result) {
+					xCurr = oldCurr->prev.load(PWX_MEMORDER_RELAXED);
+					while (!result && xCurr && (xCurr != head() )) {
+						if (*xCurr == data)
+							result = xCurr;
+						else
+							xCurr = xCurr->prev.load(PWX_MEMORDER_RELAXED);
+					}
+				}
+			} // End of manual traversing the container
+
+		} // End of handling a search with more than one element
+		else
+			PWX_UNLOCK(const_cast<list_t*>(this))
+
+		return result;
+	}
 
 
 	/** @brief simple method to insert an element into the list

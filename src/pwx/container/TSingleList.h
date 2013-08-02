@@ -259,13 +259,14 @@ public:
 	}
 
 
-	/** @brief find the element with the given @a data
+	/** @brief find the element with the given @a data pointer
 	  *
 	  * This method searches through the list and returns the element
 	  * with the given @a data or nullptr if @a data is not stored in this
-	  * list.
+	  * list. This method  searches for the pointer and <B>not</B> the
+	  * data itself! Use findData() to search for the content.
 	  *
-	  * @param data pointer to the data to find
+	  * @param data pointer to find
 	  * @return return a pointer to the element storing @a data
 	**/
 	virtual elem_t* find (data_t* data) noexcept
@@ -274,18 +275,53 @@ public:
 	}
 
 
-	/** @brief find the element with the given @a data
+	/** @brief find the element with the given @a data pointer
 	  *
 	  * This method searches through the list and returns a const pointer
 	  * to the element with the given @a data or nullptr if @a data is not stored
-	  * in this list.
+	  * in this list. This method  searches for the pointer and <B>not</B> the
+	  * data itself! Use findData() to search for the content.
 	  *
-	  * @param data pointer to the data to find
+	  * @param data pointer to find
 	  * @return return a const pointer to the element storing @a data
 	**/
 	virtual const elem_t* find (const data_t* data) const noexcept
 	{
 		return protFind(data);
+	}
+
+
+	/** @brief find the element with the given @a data content
+	  *
+	  * This method searches through the list and returns the element
+	  * with the given @a data or nullptr if @a data is not stored in this
+	  * list. This method  searches for the content behind the pointer and
+	  * <B>not</B> for the pointer data itself! Use find() to search for
+	  * the pointer.
+	  *
+	  * @param data pointer to the data content to find
+	  * @return return a pointer to the element storing @a data
+	**/
+	virtual elem_t* find (data_t &data) noexcept
+	{
+		return const_cast<elem_t* > (protFindData (static_cast<const data_t> (data)));
+	}
+
+
+	/** @brief find the element with the given @a data content
+	  *
+	  * This method searches through the list and returns the element
+	  * with the given @a data or nullptr if @a data is not stored in this
+	  * list. This method  searches for the content behind the pointer and
+	  * <B>not</B> for the pointer data itself! Use find() to search for
+	  * the pointer.
+	  *
+	  * @param data pointer to the data content to find
+	  * @return return a const pointer to the element storing @a data
+	**/
+	virtual const elem_t* find (const data_t &data) const noexcept
+	{
+		return protFindData(data);
 	}
 
 
@@ -949,14 +985,32 @@ protected:
 	{
 		elem_t* result = nullptr;
 
+		/* Some rules about searching for elements:
+		 * 1) root, tail and curr are checked first in a locked state.
+		 * 2) The point in time where the search starts is relevant.
+		 *    This means, that if the list is to be traversed, it
+		 *    will not be locked. If the searched element is inserted
+		 *    by another thread in a position the searching thread has
+		 *    already traversed, it will not be found.
+		 *    This is in order, because the element was not there when
+		 *    the search started.
+		 * 3) As new elements might be added to the end, the traversal
+		 *    stops after checking the actual tail if the element could
+		 *    not be found earlier.
+		 * However, as most people will insert using push(), push_back()
+		 * or add(), the element would replace tail and therefore be
+		 * found anyway.
+		 */
+
 		// Return at once if the list is empty
 		if (empty())
 			return nullptr;
 
+		// Rule 1: Lock for the basic tests.
 		PWX_LOCK(const_cast<list_t*>(this))
 
-		// Exit if curr is nullptr (list emptied while we waited for the lock)
-		if (nullptr == curr()) {
+		// Exit if the list has been emptied while we waited for the lock
+		if (empty()) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return nullptr;
 		}
@@ -970,7 +1024,7 @@ protected:
 		}
 
 		// The next does only make sense if we have more than one element
-		if (eCount.load(PWX_MEMORDER_ACQUIRE) > 1) {
+		if (size() > 1) {
 
 			// Exit if head is wanted...
 			if (head()->data.get() == data) {
@@ -992,9 +1046,13 @@ protected:
 			elem_t* xCurr  = head()->getNext(); // head is already checked.
 			bool    isDone = false;
 			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+				// This is rule 2: Unlock for traversal
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
 				while (!result && !isDone && xCurr) {
+					// Rule 3: Re-check tail. It might be
+					// different from what was checked above
+					// once xCurr gets there.
 					if (xCurr->data.get() == data)
 						result = xCurr;
 					else if (xCurr == tail())
@@ -1008,6 +1066,89 @@ protected:
 				// it to change while the search is running.
 				while (!result && xCurr && (xCurr != tail() )) {
 					if (xCurr->data.get() == data)
+						result = xCurr;
+					else
+						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);
+				}
+			} // End of manual traversing the container
+
+		} // End of handling a search with more than one element
+		else
+			PWX_UNLOCK(const_cast<list_t*>(this))
+
+		return result;
+	}
+
+
+	/// @brief Search until the current element contains the searched data content
+	virtual const elem_t* protFindData (const data_t &data) const noexcept
+	{
+		elem_t* result = nullptr;
+
+		/* The same three rules as when searching for an
+		 * element via its pointer apply here, too.
+		 */
+
+		// Return at once if the list is empty
+		if (empty())
+			return nullptr;
+
+		// Rule 1
+		PWX_LOCK(const_cast<list_t*>(this))
+
+		if (empty()) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr;
+		}
+
+		// Quick exit if curr is already what we want:
+		if (*curr() == data) {
+			// Safe curr first, so it isn't changed before being returned
+			result = curr();
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return result;
+		}
+
+		// The next does only make sense if we have more than one element
+		if (size() > 1) {
+
+			// Exit if head is wanted...
+			if (*head() == data) {
+				curr(head());
+				result = curr();
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return result;
+			}
+
+			// ...or tail
+			if (*tail() == data) {
+				curr(tail());
+				result = curr();
+				PWX_UNLOCK(const_cast<list_t*>(this))
+				return result;
+			}
+
+			// Otherwise we have to search for it.
+			elem_t* xCurr  = head()->getNext(); // head is already checked.
+			bool    isDone = false;
+			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+				// Rule 2:
+				PWX_UNLOCK(const_cast<list_t*>(this))
+
+				while (!result && !isDone && xCurr) {
+					// Note: The container is not locked any more,
+					// locking and checks are done on element level
+					// by compare() then.
+					if (0 == xCurr->compare(data))
+						result = xCurr;
+					else if (xCurr == tail())
+						isDone = true;
+					else
+						xCurr = xCurr->getNext();
+				}
+			} else {
+				while (!result && xCurr && (xCurr != tail() )) {
+					if (*xCurr == data)
 						result = xCurr;
 					else
 						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);

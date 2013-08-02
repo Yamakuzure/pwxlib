@@ -1,7 +1,7 @@
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif
-#include <pwx/base/VContainer.h>
+#include "VContainer.h"
 
 namespace pwx {
 

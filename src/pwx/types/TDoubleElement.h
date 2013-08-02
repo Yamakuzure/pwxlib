@@ -28,6 +28,7 @@
 **/
 
 #include <pwx/base/VElement.h>
+#include <pwx/tools/MathHelpers.h>
 
 namespace pwx
 {
@@ -205,10 +206,12 @@ struct PWX_API TDoubleElement : public VElement
 			// B: check Data status
 			data_t* thisData = this->data.get();
 
-			if (thisData)
+			if (thisData) {
+				if (isFloatType(data_t) && areAlmostEqual(*thisData, other))
+					return 0;
 				return *thisData > other ?  1
 					 : other > *thisData ? -1 : 0;
-			else
+			} else
 				return -1;
 		} // No else. compare(this->data.get()) always returns 0
 
@@ -248,9 +251,12 @@ struct PWX_API TDoubleElement : public VElement
 				data_t* thisData = this->data.get();
 				data_t* otheData = other->data.get();
 
-				if (thisData && otheData)
+				if (thisData && otheData) {
+					if (isFloatType(data_t) && areAlmostEqual(*thisData, *otheData))
+						return 0;
 					return *thisData > *otheData ?  1
 						 : *otheData > *thisData ? -1 : 0;
+				}
 				if (thisData)	return  1;
 				if (otheData)	return -1;
 			} // No else. compare(this) always returns 0
@@ -727,6 +733,30 @@ struct PWX_API TDoubleElement : public VElement
 						"nullptr TDoubleElement<T>->data",
 						"The data pointer to dereference is nullptr.")
 		return *data;
+	}
+
+
+	/** @brief return true if this element has the data @a data
+	  * @param[in] data_ const reference of the data to check
+	  * @return true if this element has the same data
+	**/
+	bool operator==(const data_t &data_) const noexcept
+	{
+		if (isFloatType(data_t))
+			return areAlmostEqual(*data, data_);
+		return *data == data_;
+	}
+
+
+	/** @brief return true if this element has differne data than @a data
+	  * @param[in] data_ const reference of the data to check
+	  * @return true if this element has different data
+	**/
+	bool operator!=(const data_t &data_) const noexcept
+	{
+		if (isFloatType(data_t))
+			return !areAlmostEqual(*data, data_);
+		return !(*data == data_);
 	}
 
 

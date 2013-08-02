@@ -1,4 +1,5 @@
-#include <pwx/general/compiler.h>
+#include "debug.h"
+#include "../general/compiler.h"
 #include <cstdarg>
 #include <thread>
 
