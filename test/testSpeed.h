@@ -312,8 +312,11 @@ template<
 	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
-	// Note: Sets might have less if values consists of doublets.
-	if (!isSameType(cont_t, set_t) && (localMaxElem != contSize)) {
+	// Note: Sets and Hashes might have less if values[] consists of doublets.
+	if ( !isSameType(cont_t, set_t)
+	  && !isSameType(cont_t, chash_t)
+	  && !isSameType(cont_t, ohash_t)
+	  && (localMaxElem != contSize)) {
 		cerr << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
