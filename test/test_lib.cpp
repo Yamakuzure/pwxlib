@@ -46,90 +46,98 @@ int32_t main(int argc, char* argv[])
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
 			cout << " (Inserting " << localMaxElem;
 			cout << " random elements and clear up)" << endl;
-			cout << "                                               Add /      Clear" << endl;
+			cout << "                                               Add /   Search /   Clear" << endl;
 
 // Little evil shortcut
-#define do_testSpeed(container_type, key_type, value_type, thread_type, thread_count) \
+#define do_testSpeed(container_type, key_type, value_type, adder_type, searcher_type, thread_count, values, retrieves) \
 try { \
 result = testSpeed<container_type, key_type, value_type, \
-	thread_type<container_type, key_type, value_type>, \
-	thClearer<container_type>>(env, testCont, thread_count); \
+	adder_type<container_type, key_type, value_type>, \
+	searcher_type<container_type, key_type, value_type>, \
+	thClearer<container_type>>(env, testCont, thread_count, values, retrieves); \
 } PWX_THROW_PWX_FURTHER
+
+			keydata_t* values    = nullptr;
+			keydata_t* retrieves = nullptr;
 
 			// Singly Linked Lists
 			if (EXIT_SUCCESS == result) {
 				single_list_t testCont(do_not_destroy);
-				do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Doubly Linked Lists
 			if (EXIT_SUCCESS == result) {
 				double_list_t testCont(do_not_destroy);
-				do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Singly Linked rings
 			if (EXIT_SUCCESS == result) {
 				single_ring_t testCont(do_not_destroy);
-				do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Doubly Linked Rings
 			if (EXIT_SUCCESS == result) {
 				double_ring_t testCont(do_not_destroy);
-				do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Stacks
 			if (EXIT_SUCCESS == result) {
 				stack_t testCont(do_not_destroy);
-				do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Queues
 			if (EXIT_SUCCESS == result) {
 				queue_t testCont(do_not_destroy);
-				do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Sets
 			if (EXIT_SUCCESS == result) {
 				set_t testCont(do_not_destroy);
-				do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, 1)
+				do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, maxThreads)
+					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
 				}
 			}
 			// Chained Hash Tables
 			if (EXIT_SUCCESS == result) {
 				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
 								 do_not_destroy, nullptr, 3.0, 1.5);
-				do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, 1)
+				do_testSpeed(chash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(chash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+					do_testSpeed(chash_t,hashval_t,  keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
 				}
 			}
 			// Open Hash Tables
 			if (EXIT_SUCCESS == result) {
 				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
 								 do_not_destroy, nullptr, 0.81, 1.5);
-				do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, 1)
+				do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(ohash_t, keydata_t, hashval_t, thAdderHash, maxThreads)
+					do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
 				}
 			}
+
+			// === Clear up values ===
+			if (values)    delete [] values;
+			if (retrieves) delete [] retrieves;
 		} // End of speed tests
 
 #undef do_testSpeed

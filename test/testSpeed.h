@@ -49,49 +49,72 @@ int32_t printDescription(sEnv &env, uint32_t threadCount)
   *
   * The test is simple: Add maxElements random elements,
   * clear the container and measure how long this takes.
+  *
+  * @param[in,out] env Environment
+  * @param[in,out] testCont the container to work with
+  * @param[in] threadCount Number of threads to start, 1 for single threaded work with disabled thread safety
+  * @param[in,out] values pointer to the values array to add. If *values is nullptr, the array will be created
+  * @param[in,out] retrieves pointer to the array holding the values to search. If *retrieves is nullptr,
+  * the array will be created
+  * @return EXIT_SUCCESS or EXIT_FAILURE.
 **/
 template<
 	typename cont_t,  //!< Type of the container to test
 	typename key_t,   //!< Type of the key (if it is a hash) - also used for loop counting
 	typename value_t, //!< Type of the values to store in the container
 	typename thAdd_t, //!< Type of the thread class that adds elements
+	typename thSrc_t, //!< Type of the thread class that searches for the retrieve values
 	typename thClr_t  //!< Type of the thread class that clears the container
-> int32_t testSpeed (sEnv &env, cont_t &testCont, uint32_t threadCount)
+> int32_t testSpeed (sEnv &env, cont_t &testCont, uint32_t threadCount, value_t** values, value_t** retrieves)
 {
+	// Needed anyway:
+	static const value_t lo = std::numeric_limits<value_t>::lowest() + static_cast<value_t>(1);
+	static const value_t hi = std::numeric_limits<value_t>::max()    - static_cast<value_t>(1);
+	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
+	uint32_t localMaxRet  = env.doSpeed ? maxElements / 1000 : maxThreads * 10;
+
+	/* --------------------------------------------------------------------
+	 * --- Pre-Step: Create values/retrieves arrays if not done already ---
+	 * --------------------------------------------------------------------
+	 */
+	// --- values ---
+	if (nullptr == *values) {
+		PWX_TRY_STD_FURTHER(*values = new value_t[localMaxElem],
+							"alloc_failed",
+							"Allocation of the values array failed!")
+		DEBUG_LOG("testSpeed", "Generating %u values to fill containers with", localMaxElem)
+		for (uint32_t i = 0; i < localMaxElem; ++i)
+			(*values)[i] = pwx::RNG.random(lo, hi);
+
+	}
+	// --- retrieves ---
+	if (nullptr == *retrieves) {
+		PWX_TRY_STD_FURTHER(*retrieves = new value_t[localMaxRet],
+							"alloc_failed",
+							"Allocation of the values array failed!")
+		DEBUG_LOG("testSpeed", "Generating %u values to search in containers for", localMaxRet)
+		for (uint32_t i = 0; i < localMaxRet; ++i)
+			(*retrieves)[i] = (*values)[pwx::RNG.random(static_cast<uint32_t>(0), localMaxElem - 1)];
+	}
+
+
+	/* -----------------------------
+	 * --- Get a description out ---
+	 * -----------------------------
+	 */
 	int32_t result = printDescription<cont_t>(env, threadCount);
 	if (EXIT_SUCCESS != result)
 		return result; // printDescription() doesn't like cont_t
-
-	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
 
 	if (threadCount == 1)
 		testCont.disable_thread_safety(); // This is strictly single threaded.
 	else
 		testCont.enable_thread_safety(); // This is a multi threaded approach.
 
-	// To make the testing of the sets easier, we use a counting loop, so no doublets
-	// are tried to be pushed onto a set.
-	key_t   part   = localMaxElem, interval = 0, rest = 0;
-	value_t maxAdd = 0, lowest = 0;
-
-	// Find a range where we can have localMaxElem evenly scattered
-	{
-		value_t highest;
-		value_t lo = std::numeric_limits<value_t>::lowest() + static_cast<value_t>(1);
-		value_t hi = std::numeric_limits<value_t>::max()    - static_cast<value_t>(1);
-		value_t nu = static_cast<value_t>(0);
-		do {
-			lowest  = pwx::RNG.random(lo, nu);
-			highest = pwx::RNG.random(nu, hi);
-			maxAdd  = (highest - lowest + 1) / localMaxElem;
-		} while ((maxAdd < 2) || (static_cast<uint32_t>((highest - lowest) / maxAdd) < localMaxElem));
-	}
-
+	key_t part = localMaxElem, rest = 0;
 	if (threadCount > 1) {
 		// The part is the number of elements each thread has to add:
 		part     = localMaxElem / threadCount;
-		// The interval is the portion each thread has to add:
-		interval = part * maxAdd;
 		// The rest is the number of elements the final thread has to add
 		// to achieve the total number of localMaxElem
 		rest     = localMaxElem - (part * threadCount);
@@ -101,6 +124,7 @@ template<
     std::thread** threads;
     thAdd_t*      adders;
     thClr_t*      clearers;
+    thSrc_t*      searchers;
 
 	// Create arrays:
 	PWX_TRY_STD_FURTHER(threads = new std::thread*[threadCount], "Thread array creation failed",
@@ -109,24 +133,32 @@ template<
 						"operator new thAdd_t threw an exception")
 	PWX_TRY_STD_FURTHER(clearers = new thClr_t[threadCount], "Clearer thread array creation failed",
 						"operator new on thClr_t threw an exception")
+	PWX_TRY_STD_FURTHER(searchers = new thSrc_t[threadCount], "Searcher thread array creation failed",
+						"operator new on thSrc_t threw an exception")
 
-	// Creation in a loop ...
+	/* --------------------------------------------------------------------
+	 * --- 1 A) Create the adder threads to start filling the container ---
+	 * --------------------------------------------------------------------
+	 */
     for (size_t nr = 0; nr < threadCount; ++nr) {
-		key_t numStart  = nr * part;
-    	key_t numEnd    = numStart + part + (nr == (threadCount - 1) ? rest : 0);
+		key_t thPart = part + (nr == (threadCount - 1) ? rest : 0);
 		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(adders[nr]), &testCont,
-														numStart, numEnd,
-														lowest, maxAdd),
+														*values, nr * part, thPart),
 							"Thread creation failed", "testSpeed could not call new operator on std::thread")
-		lowest += interval;
     }
 
-	// Starting in a loop
+	/* ---------------------------------------------------------
+	 * --- 1 B) Start the adder threads now they are created ---
+	 * ---------------------------------------------------------
+	 */
 	hrTime_t startTimeAdd = hrClock::now();
     for (size_t nr = 0; nr < threadCount; ++nr)
 		adders[nr].isRunning.store(true, PWX_MEMORDER_RELEASE);
 
-    // ... joining in a loop.
+	/* ----------------------------------------
+	 * --- 1 C) Join the adder threads back ---
+	 * ----------------------------------------
+	 */
     bool isFinished = false;
     while (!isFinished) {
 		isFinished = true;
@@ -141,10 +173,13 @@ template<
 				threads[nr] = nullptr;
 			}
 		}
-    }
-
-	// Stop time, safe container size and do a consistency check
+    } // End of loop-joining threads
 	hrTime_t endTimeAdd = hrClock::now();
+
+	/* --------------------------------------------------------------------
+	 * --- 2) Stop time, safe container size and do a consistency check ---
+	 * --------------------------------------------------------------------
+	 */
 	uint32_t contSize = testCont.size();
 
 	// Do the calculations
@@ -166,6 +201,7 @@ template<
 			if (next != curr->getNext())
 				isNextOK = false;
 			else if (isSameType(cont_t, set_t) && (**curr >= **next)) {
+				// Sets need a special test to check correct ordering
 				isOrderOK = false;
 				cVal  = curr ? **curr : 0;
 				nVal  = next ? **next : 0;
@@ -179,7 +215,65 @@ template<
 		} // End of consistency checking
 	}
 
-	// Now clear the container up again:
+	// Bring out the needed time in ms:
+	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
+	cout << adjRight(6,0) << elapsedAdd << " ms /"; cout.flush();
+
+	/* -----------------------------------------------------------
+	 * --- 3 A) Create the searcher threads to test retrieving ---
+	 * -----------------------------------------------------------
+	 */
+	part = localMaxRet;
+	rest = 0;
+	if (threadCount > 1) {
+		part = localMaxRet / threadCount;
+		rest = localMaxRet - (part * threadCount);
+	}
+    for (size_t nr = 0; nr < threadCount; ++nr) {
+		key_t thPart = part + (nr == (threadCount - 1) ? rest : 0);
+		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(searchers[nr]), &testCont,
+														*retrieves, nr * part, thPart),
+							"Thread creation failed", "testSpeed could not call new operator on std::thread")
+    }
+
+	/* ------------------------------------------------------------
+	 * --- 3 B) Start the searcher threads now they are created ---
+	 * ------------------------------------------------------------
+	 */
+	hrTime_t startTimeSrc = hrClock::now();
+    for (size_t nr = 0; nr < threadCount; ++nr)
+		searchers[nr].isRunning.store(true, PWX_MEMORDER_RELEASE);
+
+	/* -------------------------------------------
+	 * --- 3 C) Join the searcher threads back ---
+	 * -------------------------------------------
+	 */
+    isFinished = false;
+    while (!isFinished) {
+		isFinished = true;
+		for (size_t nr = 0; isFinished && (nr < threadCount); ++nr) {
+			if (searchers[nr].isRunning.load(PWX_MEMORDER_ACQUIRE))
+				isFinished = false;
+		}
+		if (isFinished) {
+			for (size_t nr = 0; nr < threadCount; ++nr) {
+				threads[nr]->join();
+				delete threads[nr];
+				threads[nr] = nullptr;
+			}
+		}
+    } // End of loop-joining threads
+	hrTime_t endTimeSrc = hrClock::now();
+
+	// Bring out the needed time in ms:
+	auto elapsedSrc = duration_cast<milliseconds>(endTimeSrc - startTimeSrc).count();
+	cout << adjRight(6,0) << elapsedSrc << " ms /"; cout.flush();
+
+	/* ----------------------------------------------
+	 * --- 4) Now clear the container up again    ---
+	 * ---    Using clear() this is much simpler! ---
+	 * ----------------------------------------------
+	 */
     for (size_t nr = 0; nr < threadCount; ++nr)
 		PWX_TRY_STD_FURTHER(threads[nr] = new std::thread(std::ref(clearers[nr]), &testCont),
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
@@ -205,21 +299,21 @@ template<
 			}
 		}
     }
+	hrTime_t endTimeClr = hrClock::now();
 
 	// Clear the dynamic arrays
-	if (threads)  delete [] threads;
-	if (adders)   delete [] adders;
-	if (clearers) delete [] clearers;
+	if (threads)   delete [] threads;
+	if (adders)    delete [] adders;
+	if (clearers)  delete [] clearers;
+	if (searchers) delete [] searchers;
 
 	// Bring out the needed time in ms:
-	hrTime_t endTimeClr = hrClock::now();
-	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
 	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr).count();
-	cout << adjRight(6,0) << elapsedAdd << " ms /";
 	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
 
 	// Do we have had enough elements?
-	if (localMaxElem != contSize) {
+	// Note: Sets might have less if values consists of doublets.
+	if (!isSameType(cont_t, set_t) && (localMaxElem != contSize)) {
 		cerr << "    FAIL! Only " << contSize << "/" << localMaxElem << " elements inserted!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;

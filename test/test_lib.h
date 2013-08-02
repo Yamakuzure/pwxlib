@@ -25,10 +25,11 @@ typedef int32_t keydata_t; //!< Type for the data to test with list containers, 
 typedef float   hashval_t; //!< Type for hash container values
 
 /// Number of elements to use with all mass and speed tests
-const uint32_t maxElements = 500000;
+//const uint32_t maxElements = 500000;
+const uint32_t maxElements = 50000;
 
 /// Number of threads to launch for parallel testing
-const uint32_t maxThreads  = 8;
+const uint32_t maxThreads  = 4;
 
 #include "env.h"
 #include "destroy.h"
