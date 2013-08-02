@@ -56,6 +56,9 @@ namespace pwx
   * This is done on the data level, not pointer level. This makes it necessary for
   * any data to support operator== and operator>.
   *
+  * Further more to be able to insert data in a sorted manner, the data must
+  * support operator- and give valid data back.
+  *
   * The constructor takes an optional destroy(data_t*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
   * the standard delete operator is used instead.
@@ -642,8 +645,8 @@ private:
 	  * data using one simple search, while this special version does
 	  * set specific tests to be able to ensure set safety.
 	  *
-	  * If the set is sorted and @a data can not be found, then @a start
-	  * points to the element which would precede an element holding @a data
+	  * If the set is sorted and @a data can not be found, then @a start is
+	  * pointed to the element which would precede an element holding @a data
 	  * if it where present. With this special outcome the inserting methods
 	  * can simply use insNextElem() with @a start to add data in a sorted way.
 	  * The only detail to look at is the situation when the new element
@@ -668,6 +671,15 @@ private:
 				*start = new_start; \
 			} \
 		}
+#define PFD_RETURN_EMPTY { \
+			PFD_SET_START(nullptr) \
+			return nullptr; \
+		}
+
+		// return at once if there are no elements
+		if (empty())
+			return nullptr;
+
 		// Note: Methods that call privFindData() to prepare an insertion should
 		//       search again after start is adjusted and a lock is acquired.
 		//       Here, only a brief lock to get started is used
@@ -683,16 +695,11 @@ private:
 		*/
 		if (size()) {
 			PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-			// return at once if there is no element any more
-			if (empty())
-				return nullptr;
 
 			// Quick exit if sorted set assumption 1 is correct:
-			if (isSorted && (1 == head()->compare(data)) ) {
+			if (isSorted && (1 == head()->compare(data)) )
 				// note: use compare() to catch floating point data!
-				PFD_SET_START(nullptr)
-				return nullptr;
-			}
+				PFD_RETURN_EMPTY
 
 			// Quick exit if xCurr is correct:
 			if (*xCurr == data)
@@ -704,7 +711,7 @@ private:
 
 		} else
 			// return immediately if there are no elements
-			return nullptr;
+			PFD_RETURN_EMPTY
 
 		// Checking tail does only make sense if we have at least 2 element
 		if (size() > 1) {
@@ -739,6 +746,29 @@ private:
 				 * B) The same happens with tail vice versa.
 				*/
 
+				// Pre-Step: Find out whether and to where to adjust xCurr:
+				if (!reentered && (!start || !*start)) {
+					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+					if (size())  {
+						int32_t  nrDistDown = xCurr->nr() - head()->nr();
+						int32_t  nrDistUp   = tail()->nr() - xCurr->nr();
+						data_t   dtDistDown = **xCurr - **head();
+						data_t   dtDistUp   = **tail() - **xCurr;
+
+						/* Instead of using xCurr directly it might be
+						 * a good idea to change to either head or tail
+						 * depending on the position and distance there
+						 * are.
+						 */
+						if ( (dtDistDown > dtDistUp ) && (nrDistUp > nrDistDown) )
+							// The target is in the upper half, but xCurr is in the lower half
+							xCurr = tail();
+						else if ( (dtDistUp > dtDistDown) && (nrDistDown > nrDistUp) )
+							// The reverse. Target in lower half, xCurr in upper half
+							xCurr = head();
+					}
+				}
+
 				// Step 1: Move up until data is no longer larger than **xCurr
 				bool doStop = false;
 				while (!doStop && xCurr && xCurr->data.get()
@@ -765,7 +795,7 @@ private:
 
 				// Safety check against emptied sets:
 				if (empty())
-					return nullptr;
+					PFD_RETURN_EMPTY
 
 				// Step 2: check whether we reached tail and assumption 2 is suddenly valid
 				if (doStop && (-1 == tail()->compare(data))) {
@@ -801,13 +831,11 @@ private:
 
 				// Safety check against emptied sets:
 				if (empty())
-					return nullptr;
+					PFD_RETURN_EMPTY
 
 				// Step 5: check whether we reached head and assumption 1 is suddenly valid
-				if (doStop && (1 == head()->compare(data))) {
-					PFD_SET_START(nullptr)
-					return nullptr;
-				}
+				if (doStop && (1 == head()->compare(data)))
+					PFD_RETURN_EMPTY
 
 				// Step 6: Check that we really really reached a valid end, or re-enter with a lock:
 				elem_t* xNext = xCurr ? xCurr->getNext() : nullptr;
@@ -818,7 +846,6 @@ private:
 					// This is bad. Something busted the set!
 					if (reentered) {
 						// This is FUBAR! No exception can fix this!
-
 #ifndef LIBPWX_DEBUG
 						// I know that it says "noexcept". This is intentional
 						// to have at least some message and a possible std::terminate()
@@ -884,13 +911,27 @@ private:
 			} else {
 				// Here we can do nothing but lock the set:
 				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
-				xCurr = head()->getNext();
+				if (!xCurr || !xCurr->inserted() || xCurr->destroyed())
+					xCurr = head();
+				elem_t* oldCurr = xCurr;
 
-				// Note: head and tail are already checked.
-				while (xCurr && (xCurr != tail() ) && (xCurr->compare(data))) {
-					xOld  = xCurr;
+				// Move up first:
+				while (xCurr && (xCurr != tail() ) && (xCurr->compare(data)))
 					xCurr = xCurr->getNext();
+
+				// If this wasn't enough, move down
+				if (!xCurr || xCurr->compare(data)) {
+					xCurr = oldCurr->getPrev();
+					while (xCurr && (xCurr != head() ) && (xCurr->compare(data)))
+						xCurr = xCurr->getPrev();
 				}
+
+				// A speciality in unsorted sets: If xCurr is now nullptr,
+				// it is set to tail.
+				// This (might) help speeding up insertions, because new
+				// elements are then added after tail.
+				if (nullptr == xCurr)
+					xCurr = tail();
 			}
 			/* Due to this order xCurr is now either pointing to an element
 			 * holding data, or the next smaller element. The latter detail
@@ -906,6 +947,7 @@ private:
 			}
 		} // End of having at least 3 elements
 
+#undef PFD_RETURN_EMPTY
 #undef PFD_SET_START
 
 		return nullptr;
