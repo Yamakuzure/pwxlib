@@ -228,6 +228,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/internal/TThreadElementStore.h" />
 		<Unit filename="../src/pwx/tools.h">
 			<Option target="clean" />
 			<Option target="library" />
