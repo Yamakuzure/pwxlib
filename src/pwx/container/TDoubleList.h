@@ -67,8 +67,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TSingleList<data_t, elem_t> base_t; //!< Base type of this list
-	typedef TDoubleList<data_t, elem_t> list_t; //!< Type of this list
+	typedef TSingleList<data_t, elem_t>           base_t;  //!< Base type of this list
+	typedef TDoubleList<data_t, elem_t>           list_t;  //!< Type of this list
+	typedef private_::TThreadElementStore<elem_t> store_t; //!< Storage for the thread id bound curr pointer
 
 
 	/* ===============================================
@@ -474,6 +475,9 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::curr;
+	using base_t::head;
+	using base_t::tail;
 	using base_t::destroy;
 	using base_t::protDelete;
 
@@ -668,22 +672,29 @@ protected:
 				// This is rule 2: Unlock for traversal
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
-				// Move upwards first
-				while (!result && !isDone && xCurr) {
-					// Rule 3: Re-check tail.
-					// As the list is no longer locked,
-					// use compare() for element level
-					// locking.
-					if (0 == xCurr->compare(data))
-						result = xCurr;
-					else if (xCurr == tail())
-						isDone = true;
-					else
-						xCurr = xCurr->getNext();
+				// Move upwards first, unless the search starts with tail
+				if (oldCurr != tail()) {
+					// Note: This distinction is necessary, because rings
+					//       connect tail to head and vice versa. If this
+					//       is a ring, oldcurr would point to tail and
+					//       xCurr to head, dead locking once more than
+					//       one thread does this.
+					while (!result && !isDone && xCurr) {
+						// Rule 3: Re-check tail.
+						// As the list is no longer locked,
+						// use compare() for element level
+						// locking.
+						if (0 == xCurr->compare(data))
+							result = xCurr;
+						else if (xCurr == tail())
+							isDone = true;
+						else
+							xCurr = xCurr->getNext();
+					}
 				}
 
 				// Move downwards if there is no result, yet
-				if (!result) {
+				if (!result && (oldCurr != head())) {
 					xCurr  = oldCurr->getPrev();
 					isDone = false;
 					PWX_UNLOCK(oldCurr)
@@ -801,11 +812,9 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::currStore;
 	using base_t::eCount;
 	using base_t::doRenumber;
-	using base_t::curr;
-	using base_t::head;
-	using base_t::tail;
 
 
 private:
@@ -1142,6 +1151,7 @@ private:
 			tail(tail()->getPrev());
 		else
 			doRenumber.store(true, PWX_MEMORDER_RELEASE);
+		currStore.invalidateElement(elem);
 		elem->remove();
 
 		if (1 == eCount.fetch_sub(1)) {

@@ -438,6 +438,10 @@ protected:
 	 * === Protected methods                       ===
 	 * ===============================================
 	*/
+
+	using base_t::curr;
+	using base_t::head;
+	using base_t::tail;
 	using base_t::destroy;
 	using base_t::protFind;
 
@@ -626,9 +630,6 @@ protected:
 
 	using base_t::eCount;
 	using base_t::doRenumber;
-	using base_t::curr;
-	using base_t::head;
-	using base_t::tail;
 
 	bool isSorted; //!< determines whether the set is sorted or not.
 

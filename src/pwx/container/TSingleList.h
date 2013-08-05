@@ -29,6 +29,7 @@
 
 #include <pwx/base/VContainer.h>
 #include <pwx/types/TSingleElement.h>
+#include <pwx/internal/TThreadElementStore.h>
 
 namespace pwx
 {
@@ -65,9 +66,10 @@ public:
 	 * ===============================================
 	*/
 
-	typedef VContainer                  base_t; //!< Base type of the list
-	typedef TSingleList<data_t, elem_t> list_t; //!< Type of this list
-	typedef typename elem_t::neighbor_t neighbor_t; //!< Type of elements neighbors, used for curr, head and tail.
+	typedef VContainer                            base_t;     //!< Base type of the list
+	typedef TSingleList<data_t, elem_t>           list_t;     //!< Type of this list
+	typedef typename elem_t::neighbor_t           neighbor_t; //!< Type of elements neighbors, used for curr, head and tail.
+	typedef private_::TThreadElementStore<elem_t> store_t;    //!< Storage for the thread id bound curr pointer
 
 
 	/* ===============================================
@@ -882,30 +884,21 @@ protected:
 	/// @brief return curr according to thread safety setting
 	elem_t* curr() const
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			return curr_.load(PWX_MEMORDER_ACQUIRE);
-		else
-			return curr_.load(PWX_MEMORDER_RELAXED);
+		return currStore.curr();
 	}
 
 
 	/// @brief set curr to @a new_curr according to thread safety settings
 	void curr(elem_t* new_curr) const
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			curr_.store(new_curr, PWX_MEMORDER_RELEASE);
-		else
-			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
+		currStore.curr(new_curr);
 	}
 
 
 	/// @brief set curr to @a new_curr according to thread safety settings
 	void curr(elem_t* new_curr)
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			curr_.store(new_curr, PWX_MEMORDER_RELEASE);
-		else
-			curr_.store(new_curr, PWX_MEMORDER_RELAXED);
+		currStore.curr(new_curr);
 	}
 
 
@@ -1261,6 +1254,14 @@ protected:
 	}
 
 
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
+
+	store_t currStore;
+
+
 private:
 	/* ===============================================
 	 * === Private methods                         ===
@@ -1554,18 +1555,19 @@ private:
 		if (head() == elem) {
 			// Case 1
 			head(head()->getNext());
+			currStore.invalidateElement(elem);
 			elem->remove();
 			doRenumber.store(true, PWX_MEMORDER_RELEASE);
 		} else {
 			if (tail() == elem)
 				// Case 2:
 				tail(prev);
+			currStore.invalidateElement(elem);
 			PWX_TRY_PWX_FURTHER(prev->removeNext())
 		}
 
 		if (1 == eCount.fetch_sub(1)) {
 			// The list is empty!
-			curr(nullptr);
 			head(nullptr);
 			tail(nullptr);
 		}
@@ -1612,8 +1614,6 @@ private:
 	 * ===============================================
 	*/
 
-	mutable
-	neighbor_t curr_ = ATOMIC_VAR_INIT(nullptr); //!< pointer to the currently handled element
 	neighbor_t head_ = ATOMIC_VAR_INIT(nullptr); //!< pointer to the first element
 	neighbor_t tail_ = ATOMIC_VAR_INIT(nullptr); //!< pointer to the last element
 }; // class TSingleList
