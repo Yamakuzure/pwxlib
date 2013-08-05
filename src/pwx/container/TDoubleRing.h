@@ -810,13 +810,20 @@ public:
 
 protected:
 	/* ===============================================
+	 * === Protected methods                       ===
+	 * ===============================================
+	*/
+
+	using base_t::head;
+	using base_t::tail;
+
+
+	/* ===============================================
 	 * === Protected members                       ===
 	 * ===============================================
 	*/
 
 	using base_t::eCount;
-	using base_t::head;
-	using base_t::tail;
 
 
 private:

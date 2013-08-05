@@ -349,13 +349,13 @@ private:
 		// Be sure idxStep is sane:
 		if (idxStep < 3)
 			// On odd sizes a step of 2 always traverses all positions.
-			idxStep = tabSize % 2 ? 2 : tabSize - 1;
-		// tabSize must not be devidable by idxStep
-		if ( !(tabSize % idxStep) )
-			idxStep += 2;
+			idxStep = tabSize % 2 ? 2 : 3;
 		// Both must not be the same, even or odd
 		if ( (tabSize % 2) == (idxStep % 2) )
 			++idxStep;
+		// tabSize must not be devidable by idxStep
+		while ( !(tabSize % idxStep) )
+			idxStep += 2;
 
 		// Now probe the table until we are done or have found the key
 		bool     isFound     = false;
