@@ -62,7 +62,7 @@ public:
 
 
 	/* ===============================================
-	 * === Public Constructors and destructors     ===
+	 * === Public constructors and destructors     ===
 	 * ===============================================
 	*/
 

@@ -576,9 +576,9 @@ THashElement<key_t, data_t>::~THashElement() noexcept
 
 	if (1 == data.use_count()) {
 		if (beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
-			// Produce a lock guard before checking again.
-			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
-			PWX_NAMED_LOCK_GUARD(Make_Exclusive, elem_t, this)
+			// Lock the element before checking again.
+			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
+			PWX_LOCK(this)
 			// So the lock is only generated if there is a possibility
 			// that we have to delete data, but another thread might
 			// have made a copy in the mean time before "isDestroyed"
@@ -587,10 +587,15 @@ THashElement<key_t, data_t>::~THashElement() noexcept
 				PWX_TRY(data.reset()) // the shared_ptr will delete the data now
 				catch(...) { }
 
-				// Do another locking, so that threads having had to wait while the data
+				// Do a lock cycle, so that threads having had to wait while the data
 				// was destroyed have a chance now to react before the object is gone.
+				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
+				PWX_UNLOCK(this)
 				DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
-				PWX_NAMED_LOCK_GUARD (Lock_After_Delete, elem_t, this)
+				PWX_LOCK_GUARD (elem_t, this)
+			} else {
+				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
+				PWX_UNLOCK(this)
 			}
 		} else {
 			// No thread safety? Then just do it!
