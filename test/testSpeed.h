@@ -70,8 +70,8 @@ template<
 	// Needed anyway:
 	static const value_t lo = std::numeric_limits<value_t>::lowest() + static_cast<value_t>(1);
 	static const value_t hi = std::numeric_limits<value_t>::max()    - static_cast<value_t>(1);
-	uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
-	uint32_t localMaxRet  = env.doSpeed ? maxElements / 1000 : maxThreads * 10;
+	uint32_t localMaxElem = maxElements;
+	uint32_t localMaxRet  = maxElements / 1000;
 
 	/* --------------------------------------------------------------------
 	 * --- Pre-Step: Create values/retrieves arrays if not done already ---

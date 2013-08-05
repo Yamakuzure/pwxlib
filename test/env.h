@@ -8,7 +8,10 @@ struct sEnv
 	int32_t testCount   = 0;
 	int32_t testSuccess = 0;
 	int32_t testFail    = 0;
-	bool    doSpeed     = true;
+	bool    doCont      = false;
+	bool    doSpeed     = false;
+	bool    doRNG       = false;
+	bool    doSCT       = false;
 };
 
 #endif // PWX_LIBPWX_TEST_ENV_H_INCLUDED

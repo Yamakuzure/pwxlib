@@ -8,7 +8,6 @@ const double fullMinDouble = std::numeric_limits<double>::lowest();
 void testRNG_hash_char(sEnv &env)
 {
 	char     buf[18];
-	uint32_t numOfElem = env.doSpeed ? rngMaxElements : 10;
 	uint32_t curHash   = 0;
 	uint32_t minHash   = maxUInt32;
 	uint32_t maxHash   = 0;
@@ -17,7 +16,7 @@ void testRNG_hash_char(sEnv &env)
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < numOfElem; ++i) {
+	for (size_t i = 0; i < maxElements; ++i) {
 		strLen = RNG.random(buf, 8, 17);
 		tStart = hrClock::now();
 		curHash = RNG.hash(buf, strLen);
@@ -46,7 +45,6 @@ void testRNG_hash_str(sEnv &env)
 {
 	char        buf[18];
 	std::string str;
-	uint32_t    numOfElem = env.doSpeed ? rngMaxElements : 10;
 	uint32_t    curHash   = 0;
 	uint32_t    minHash   = maxUInt32;
 	uint32_t    maxHash   = 0;
@@ -54,7 +52,7 @@ void testRNG_hash_str(sEnv &env)
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < numOfElem; ++i) {
+	for (size_t i = 0; i < maxElements; ++i) {
 		RNG.random(buf, 8, 17);
 		str.assign(buf);
 		tStart = hrClock::now();

@@ -17,8 +17,7 @@
 **/
 int32_t testRNG (sEnv &env)
 {
-	int32_t result           = EXIT_SUCCESS;
-	uint32_t testMaxElements = env.doSpeed ? rngMaxElements : 10;
+	int32_t result = EXIT_SUCCESS;
 
 	cout << "\nTest CRandom instance pwx::RNG\n------------------------------" << endl;
 
@@ -93,7 +92,7 @@ int32_t testRNG (sEnv &env)
 	/************************************************************************
 	** B) Hash functions                                                   **
 	************************************************************************/
-	cout << " B) Hash functions with " << testMaxElements;
+	cout << " B) Hash functions with " << maxElements;
 	cout << " keys (min/max (hash / loop ms))" << endl;
 	cout << adjRight (4, 0) << ++env.testCount << " int16_t    : "; cout.flush();
 	testRNG_hash<int16_t>(env);
@@ -121,9 +120,9 @@ int32_t testRNG (sEnv &env)
 	/************************************************************************
 	** C) Noise functions                                                  **
 	************************************************************************/
-	cout << " C) Noise functions with " << testMaxElements << " keys (min/max (ms))" << endl;
+	cout << " C) Noise functions with " << maxElements << " keys (min/max (ms))" << endl;
 
-	int32_t maxX = testMaxElements;
+	int32_t maxX = maxElements;
 	int32_t maxY = static_cast<int32_t>(std::floor(std::pow(static_cast<float>(maxX), 1. / 2.)));
 	int32_t maxZ = static_cast<int32_t>(std::floor(std::pow(static_cast<float>(maxX), 1. / 3.)));
 	int32_t maxW = static_cast<int32_t>(std::floor(std::pow(static_cast<float>(maxX), 1. / 4.)));
@@ -137,15 +136,15 @@ int32_t testRNG (sEnv &env)
 	testRNG_noise(env, 1, maxX, miss);
 
 	// B) 2 dimensions
-	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxY, 2.));
+	miss     = maxElements - static_cast<int32_t>(std::pow(maxY, 2.));
 	testRNG_noise(env, 2, maxY, miss);
 
 	// C) 3 dimensions
-	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxZ, 3.));
+	miss     = maxElements - static_cast<int32_t>(std::pow(maxZ, 3.));
 	testRNG_noise(env, 3, maxZ, miss);
 
 	// D) 4 dimensions
-	miss     = testMaxElements - static_cast<int32_t>(std::pow(maxW, 4.));
+	miss     = maxElements - static_cast<int32_t>(std::pow(maxW, 4.));
 	testRNG_noise(env, 4, maxW, miss);
 
 

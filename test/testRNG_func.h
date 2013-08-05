@@ -7,7 +7,6 @@ using pwx::RNG;
 
 #include <limits>
 
-const uint32_t rngMaxElements = maxElements;
 const int16_t maxInt16  = std::numeric_limits<int16_t>::max();
 const int16_t minInt16  = std::numeric_limits<int16_t>::min();
 const int32_t maxUInt32 = std::numeric_limits<uint32_t>::max();
@@ -19,7 +18,6 @@ void testRNG_hash(sEnv &env)
 {
 	static const T maxTval = std::numeric_limits<T>::max();
 	static const T minTval = std::numeric_limits<T>::lowest();
-	uint32_t numOfElem = env.doSpeed ? rngMaxElements : 10;
 	uint32_t curHash   = 0;
 	uint32_t minHash   = maxUInt32;
 	uint32_t maxHash   = 0;
@@ -28,7 +26,7 @@ void testRNG_hash(sEnv &env)
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < numOfElem; ++i) {
+	for (size_t i = 0; i < maxElements; ++i) {
 		tStart = hrClock::now();
 		curHash = RNG.hash(start);
 		tUsed += hrClock::now() - tStart;

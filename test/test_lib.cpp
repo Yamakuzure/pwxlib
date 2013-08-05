@@ -5,47 +5,77 @@ int32_t main(int argc, char* argv[])
 	int32_t result  = EXIT_SUCCESS;
 	sEnv env;
 
-	// Disable speed test?
-	if ((argc > 1) && (STREQ(argv[1], "--no-speed-test")))
-		env.doSpeed = false;
+	// Handle arguments
+	uint32_t doWhichTests = 0;
+	bool     showHelp     = false;
+	for (int i = 1; !showHelp && (i < argc); ++i) {
+		if (STRCEQ(argv[i], "--help") || STRCEQ(argv[i], "-h")) showHelp = true;
+		else if (STRCEQ(argv[i], "--cont")  || STRCEQ(argv[i], "-c")) doWhichTests |= doTestContainers;
+		else if (STRCEQ(argv[i], "--speed") || STRCEQ(argv[i], "-p")) doWhichTests |= doTestSpeed;
+		else if (STRCEQ(argv[i], "--rng")   || STRCEQ(argv[i], "-r")) doWhichTests |= doTestRNG;
+		else if (STRCEQ(argv[i], "--sct")   || STRCEQ(argv[i], "-s")) doWhichTests |= doTestSCT;
+	}
+
+	// Need help?
+	if (showHelp) {
+		cout << "Usage: " << argv[0] << " [options]\n" << endl;
+		cout << "Options:\n";
+		cout << "  -c  --cont   test containers\n";
+		cout << "  -h  --help   Show this help and exit\n";
+		cout << "  -p  --speed  test the speed of the containers\n";
+		cout << "  -r  --rng    test RNG\n";
+		cout << "  -s  --sct    test SCT\n";
+		cout << "All tests are done by default." << endl;
+		return EXIT_SUCCESS;
+	}
+
+	// do all tests?
+	if (0 == doWhichTests)
+		doWhichTests = doTestAll;
+
+	// Now tell env about the tests
+	if (doWhichTests & doTestContainers) env.doCont  = true;
+	if (doWhichTests & doTestSpeed)      env.doSpeed = true;
+	if (doWhichTests & doTestRNG)        env.doRNG   = true;
+	if (doWhichTests & doTestSCT)        env.doSCT   = true;
 
 	// Wrap a giant try/catch around just everything to trace immediately
 	try {
-		// --- General container tests ---
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testListRing<single_list_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testListRing<double_list_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testListRing<single_ring_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testListRing<double_ring_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testStackQueue<stack_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testStackQueue<queue_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testSet<set_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testHash<chash_t> (env))
-		}
-		if (EXIT_SUCCESS == result) {
-			PWX_TRY_PWX_FURTHER (result = testHash<ohash_t> (env))
-		}
+		if (env.doCont) {
+			// --- General container tests ---
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testListRing<single_list_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testListRing<double_list_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testListRing<single_ring_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testListRing<double_ring_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testStackQueue<stack_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testStackQueue<queue_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testSet<set_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testHash<chash_t> (env))
+			}
+			if (EXIT_SUCCESS == result) {
+				PWX_TRY_PWX_FURTHER (result = testHash<ohash_t> (env))
+			}
+		} // End of container tests
 
 		// --- test the speed of the containers ---
-		if (EXIT_SUCCESS == result) {
-			uint32_t localMaxElem = env.doSpeed ? maxElements : maxThreads * 100;
+		if ((EXIT_SUCCESS == result) && env.doSpeed) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
-			cout << " (Inserting " << localMaxElem;
-			cout << " random elements and clear up)" << endl;
+			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
 			cout << "                                               Add /   Search /   Clear" << endl;
 
 // Little evil shortcut
@@ -118,7 +148,7 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Chained Hash Tables
 			if (EXIT_SUCCESS == result) {
-				chash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 2.9)),
+				chash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 2.873)),
 								 do_not_destroy, nullptr, 3.0, 1.5);
 				do_testSpeed(chash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
@@ -127,7 +157,7 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Open Hash Tables
 			if (EXIT_SUCCESS == result) {
-				ohash_t testCont(static_cast<uint32_t>(std::ceil(localMaxElem / 0.79)),
+				ohash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 0.79)),
 								 do_not_destroy, nullptr, 0.81, 1.5);
 				do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
@@ -143,12 +173,12 @@ result = testSpeed<container_type, key_type, value_type, \
 #undef do_testSpeed
 
 	// --- Test RNG worker ---
-	if (EXIT_SUCCESS == result ) {
+	if ((EXIT_SUCCESS == result) && env.doRNG) {
 		PWX_TRY_PWX_FURTHER (result = testRNG (env))
 	}
 
 	// --- Test SCT worker ---
-	if (EXIT_SUCCESS == result ) {
+	if ((EXIT_SUCCESS == result) && env.doSCT) {
 		PWX_TRY_PWX_FURTHER (result = testSCT (env))
 	}
 
