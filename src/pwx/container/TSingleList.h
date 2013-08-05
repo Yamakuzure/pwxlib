@@ -134,19 +134,11 @@ public:
 	{
 		elem_t* toDelete = nullptr;
 		while (head()) {
-			PWX_LOCK(this)
-			if (head()) {
-				toDelete = privRemoveAfterElement(nullptr);
-				// Now that the element is removed, we do not
-				// need to have a full lock any more
-				PWX_UNLOCK(this)
-				if (toDelete) {
-					PWX_TRY(protDelete(toDelete))
-					catch(...) { } // We can't do anything about that
-				}
-			} // end of having head after lock is acquired.
-			else
-				PWX_UNLOCK(this)
+			toDelete = privRemoveAfterElement(nullptr);
+			if (toDelete) {
+				PWX_TRY(protDelete(toDelete))
+				catch(...) { } // We can't do anything about that
+			}
 		} // end of while head
 	}
 

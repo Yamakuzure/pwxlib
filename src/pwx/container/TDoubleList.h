@@ -132,22 +132,12 @@ public:
 	{
 		elem_t* toDelete = nullptr;
 		while (tail()) {
-			PWX_LOCK(this)
-			if (tail()) {
-				toDelete = tail();
-				privRemove(toDelete);
-
-				// Now that the element is removed, we do not
-				// need to have a full lock any more
-				PWX_UNLOCK(this)
-				if (toDelete) {
-					PWX_TRY(protDelete(toDelete))
-					catch(...) { } // We can't do anything about that
-				}
-			} // end of having tail after lock is acquired.
-			else
-				PWX_UNLOCK(this)
-		} // end of while head
+			toDelete = privRemoveBeforeElem(nullptr);
+			if (toDelete) {
+				PWX_TRY(protDelete(toDelete))
+				catch(...) { } // We can't do anything about that
+			}
+		} // end of while tail
 	}
 
 
@@ -1210,7 +1200,7 @@ private:
 		PWX_LOCK_GUARD(list_t, this)
 
 		elem_t* xNext = next ? find (next) : nullptr;
-		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : head();
+		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : tail();
 
 		if (toRemove)
 			privRemove (toRemove);
