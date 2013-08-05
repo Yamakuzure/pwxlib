@@ -751,22 +751,19 @@ private:
 				if (!reentered && (!start || !*start)) {
 					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 					if (size())  {
-						int32_t  nrDistDown = xCurr->nr() - head()->nr();
-						int32_t  nrDistUp   = tail()->nr() - xCurr->nr();
-						data_t   dtDistDown = **xCurr - **head();
-						data_t   dtDistUp   = **tail() - **xCurr;
+						data_t distHead = data - **head();
+						data_t distCurr = 1 == xCurr->compare(data) ? **xCurr - data : data - **xCurr;
+						data_t distTail = **tail() - data;
 
 						/* Instead of using xCurr directly it might be
 						 * a good idea to change to either head or tail
 						 * depending on the position and distance there
 						 * are.
 						 */
-						if ( (dtDistDown > dtDistUp ) && (nrDistUp > nrDistDown) )
-							// The target is in the upper half, but xCurr is in the lower half
-							xCurr = tail();
-						else if ( (dtDistUp > dtDistDown) && (nrDistDown > nrDistUp) )
-							// The reverse. Target in lower half, xCurr in upper half
+						if ( (distCurr > distHead) && (distTail > distHead) )
 							xCurr = head();
+						else if ( (distCurr > distTail) && (distHead > distTail) )
+							xCurr = tail();
 					}
 				}
 
