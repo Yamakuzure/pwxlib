@@ -277,7 +277,7 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* curNext = next.load(memOrdLoad);
 			if ( !curNext
 			  && isRemoved.load(memOrdLoad) )
@@ -312,7 +312,7 @@ struct PWX_API TSingleElement : public VElement
 		}
 
 		if (!destroyed() && !new_next->destroyed()) {
-			if (beThreadSafe.load(memOrdLoad)) {
+			if (beThreadSafe()) {
 				// Do locking and double checks if this has to be thread safe
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, new_next)
@@ -367,7 +367,7 @@ struct PWX_API TSingleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
@@ -415,7 +415,7 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_LOCK_GUARD(elem_t, this)
 			setNext(nullptr);
@@ -444,7 +444,7 @@ struct PWX_API TSingleElement : public VElement
 			return;
 
 		// Do an acquiring test before the element is actually locked
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			/* See notes in TDoubleElement::remove() */
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, toRemove)
 			PWX_LOCK_GUARD(elem_t, toRemove)
@@ -486,7 +486,7 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* currNext = next.load(memOrdLoad);
 			next.store(new_next, memOrdStore);
 			if (currNext)
@@ -626,11 +626,11 @@ private:
 template<typename data_t>
 TSingleElement<data_t>::~TSingleElement() noexcept
 {
-	if (beThreadSafe.load(memOrdLoad))
+	if (beThreadSafe())
 		isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
 			PWX_LOCK(this)
