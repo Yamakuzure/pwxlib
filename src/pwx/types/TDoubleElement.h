@@ -276,7 +276,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* curNext = next.load(memOrdLoad);
 			if ( !curNext
 			  && isRemoved.load(memOrdLoad) )
@@ -296,7 +296,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getPrev() const noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* curPrev = prev.load(memOrdLoad);
 			if ( !curPrev
 			  && isRemoved.load(memOrdLoad) )
@@ -357,7 +357,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
@@ -443,7 +443,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_prev || (new_prev == this))
 			return;
 
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
@@ -513,7 +513,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Do an acquiring test before the element is actually locked
 			if (next.load(memOrdLoad) || prev.load(memOrdLoad)) {
 				PWX_LOCK(this)
@@ -641,7 +641,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* currNext = next.load(memOrdLoad);
 			next.store(new_next, memOrdStore);
 			if (currNext)
@@ -663,7 +663,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setPrev(elem_t* new_prev) noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* currPrev = prev.load(memOrdLoad);
 			prev.store(new_prev, memOrdStore);
 			if (currPrev)
@@ -804,11 +804,11 @@ private:
 template<typename data_t>
 TDoubleElement<data_t>::~TDoubleElement() noexcept
 {
-	if (beThreadSafe.load(memOrdLoad))
+	if (beThreadSafe())
 		isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
 			PWX_LOCK(this)
