@@ -61,12 +61,12 @@ namespace private_ {
   * stored element for the calling thread and curr(elem) which will
   * store a new element for the calling thread.
   *
-  * If disable_thread_safety() is called, the storage will no longer
+  * If beThreadSafe(false) is called, the storage will no longer
   * use the internal hash table but simply change/retrieve on general
-  * curr pointer. This can be reversed using enable_thread_safety().
+  * curr pointer. This can be reversed using beThreadSafe(true).
 **/
 template<typename curr_t>
-class PWX_API TThreadElementStore
+class PWX_API TThreadElementStore : public CLockable
 {
 public:
 
@@ -75,10 +75,10 @@ public:
 	 * ===============================================
 	*/
 
+	typedef CLockable                    base_t;
 	typedef TThreadElementStore<curr_t>  store_t;
 	typedef TOpenHash<size_t, curr_t>    hash_t;
 	typedef THashElement<size_t, curr_t> elem_t;
-	typedef std::memory_order            mord_t;
 	typedef std::atomic_bool             abool_t;
 
 
@@ -106,7 +106,13 @@ public:
 	/// @brief delegating ctor setting default size of 47
 	TThreadElementStore() noexcept : store_t(47) { }
 
-	~TThreadElementStore() PWX_DEFAULT;
+
+	/// @brief default dtor
+	virtual ~TThreadElementStore() noexcept
+	{
+		currs.clear();
+	}
+
 
 	// No copying:
     TThreadElementStore(TThreadElementStore&) PWX_DELETE;
@@ -121,7 +127,7 @@ public:
 	/// @brief return the calling threads current element
 	curr_t* curr() const noexcept
 	{
-		if (this->beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* elem = currs.get(CURRENT_THREAD_ID);
 			return elem ? elem->data.get() : nullptr;
 		} else
@@ -135,7 +141,7 @@ public:
 	///       calling layer
 	curr_t* curr() noexcept
 	{
-		if (this->beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* elem = currs.get(CURRENT_THREAD_ID);
 			return elem ? elem->data.get() : nullptr;
 		} else
@@ -146,7 +152,7 @@ public:
 	/// @brief delete old element and add a new one unless @a new_curr is nullptr
 	void curr(const curr_t* new_curr) const noexcept
 	{
-		if (this->beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			currs.delKey(CURRENT_THREAD_ID);
 			if (new_curr) {
 				PWX_TRY(currs.add(CURRENT_THREAD_ID, const_cast<curr_t*>(new_curr)))
@@ -160,7 +166,7 @@ public:
 	/// @brief delete old element and add a new one unless @a new_curr is nullptr
 	void curr(curr_t* new_curr) noexcept
 	{
-		if (this->beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			currs.delKey(CURRENT_THREAD_ID);
 			if (new_curr) {
 				PWX_TRY(currs.add(CURRENT_THREAD_ID, new_curr))
@@ -174,9 +180,9 @@ public:
 	/// @brief stop using the hash table, maintain one pointer directly
 	void disable_thread_safety()
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			oneCurr = nullptr;
-			beThreadSafe.store(false, memOrdStore);
+			beThreadSafe(false);
 			memOrdLoad  = PWX_MEMORDER_RELAXED;
 			memOrdStore = PWX_MEMORDER_RELAXED;
 		}
@@ -186,11 +192,11 @@ public:
 	/// @brief stop maintaining one pointer, use the hash table
 	void enable_thread_safety()
 	{
-		if (!beThreadSafe.load(memOrdLoad)) {
+		if (!beThreadSafe()) {
 			memOrdLoad  = PWX_MEMORDER_ACQUIRE;
 			memOrdStore = PWX_MEMORDER_RELEASE;
 			this->currs.clear();
-			this->beThreadSafe.store(true, memOrdStore);
+			beThreadSafe(true);
 		}
 	}
 
@@ -198,7 +204,7 @@ public:
 	/// @brief delete all entries that point to @a old_curr
 	void invalidateElement(const curr_t* old_curr) const noexcept
 	{
-		if (this->beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			uint32_t currSize = currs.sizeMax();
 			elem_t*  elem     = nullptr;
 			for (uint32_t i = 0; i < currSize; ++i) {
@@ -218,6 +224,11 @@ public:
 	}
 
 
+protected:
+
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
+
 
 private:
 
@@ -228,11 +239,8 @@ private:
 
 	mutable
 	hash_t  currs;                                //!< Used when thread saftey is enabled (default)
-	mord_t  memOrdLoad   = PWX_MEMORDER_ACQUIRE;  //!< memory order for load() according to thread safety setting
-	mord_t  memOrdStore  = PWX_MEMORDER_RELEASE;  //!< memory order for store() according to thread safety setting
 	mutable
 	curr_t* oneCurr      = nullptr;               //!< Used when thread safety is disabled
-	abool_t	beThreadSafe = ATOMIC_VAR_INIT(true); //!< Use next/prev pointers directly if set to false.
 };
 
 } // namespace private
