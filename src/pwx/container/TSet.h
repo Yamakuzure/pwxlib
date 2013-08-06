@@ -316,7 +316,7 @@ public:
 		// A big lock on both is needed to ensure that
 		// a) Nothing is added by another thread and
 		// b) src can not go away before the reset is done.
-		if (this->beThreadSafe) {
+		if (beThreadSafe()) {
 			PWX_LOCK(this)
 			if (this != &src) {
 				while (!const_cast<list_t*>(&src)->try_lock()) {
@@ -334,7 +334,7 @@ public:
 		}
 
 		// Unlock if needed
-		if (this->beThreadSafe) {
+		if (beThreadSafe()) {
 			PWX_UNLOCK(const_cast<list_t*>(&src))
 			PWX_UNLOCK(this)
 		}
@@ -439,6 +439,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::beThreadSafe;
 	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
@@ -555,7 +556,7 @@ protected:
 #  define GET_OBJ_ENR(obj) obj ? obj->eNr.load() : -1
 #  define GET_OBJ_DAT(obj) obj ? to_string(**(obj)).c_str() : "nullptr"
 #  define GET_OBJ_ALL(obj) GET_OBJ_ENR(obj), GET_OBJ_DAT(obj)
-		if (this->beThreadSafe.load(memOrdLoad) && (0 == this->lock_count()) )
+		if (this->beThreadSafe() && (0 == this->lock_count()) )
 			PWX_THROW("MissingLock", "TSet::protInsert() called without a lock in place!",
 						"This is evil and must be fixed NOW!")
 		elem_t* xNext = insPrev ? insPrev->getNext() : nullptr;
@@ -996,7 +997,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1043,7 +1044,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1108,7 +1109,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1171,7 +1172,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1235,7 +1236,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1294,7 +1295,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1371,7 +1372,7 @@ private:
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1444,7 +1445,7 @@ private:
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
