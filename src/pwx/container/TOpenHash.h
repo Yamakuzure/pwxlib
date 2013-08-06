@@ -287,9 +287,11 @@ protected:
 	*/
 
 	using base_t::CHMethod;
-	using base_t::hashBuilder;
 	using base_t::eCount;
+	using base_t::hashBuilder;
 	using base_t::hashTable;
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 	using base_t::vacated;
 
 private:
@@ -490,8 +492,7 @@ private:
 			// This is situation a)
 			oldElem = this->privRemoveIdx(idx);
 		hashTable[idx] = elem; // Fulfills both situations
-		eCount.fetch_add(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-							? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+		eCount.fetch_add(1, memOrdStore);
 
 		// Now solve situation a)
 		while (oldElem) {
@@ -503,8 +504,7 @@ private:
 				// This is situation a) again
 				oldElem = this->privRemoveIdx(idx);
 			hashTable[idx] = elem; // Item is moved
-			eCount.fetch_add(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-								? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+			eCount.fetch_add(1, memOrdStore);
 		}
 
 		return this->size();
@@ -532,8 +532,7 @@ private:
 				result = hashTable[index];
 				hashTable[index] = vacated;
 				result->remove();
-				eCount.fetch_sub(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-									? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+				eCount.fetch_sub(1, memOrdStore);
 			} // End of outer check
 		} // End of outer check
 
