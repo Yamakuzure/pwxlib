@@ -259,9 +259,9 @@ public:
 		bool     result     = true;
 
 		// The empty set is always a subset of everything.
-		if ( eCount.load(PWX_MEMORDER_ACQUIRE)
+		if ( eCount.load(memOrdLoad)
 		  && (this != &src)) {
-			if (src.eCount.load(PWX_MEMORDER_ACQUIRE)) {
+			if (src.eCount.load(memOrdLoad)) {
 				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
 				elem_t* xCurr  = head();
 				bool    isDone = false;
@@ -475,7 +475,7 @@ protected:
 		 *    renumbering is needed then.
 		 * 4: Otherwise insPrev->insertNext() can do the insertion
 		*/
-		uint32_t locCnt = eCount.load(PWX_MEMORDER_ACQUIRE);
+		uint32_t locCnt = eCount.load(memOrdLoad);
 
 		curr(insElem);
 
@@ -555,7 +555,7 @@ protected:
 #  define GET_OBJ_ENR(obj) obj ? obj->eNr.load() : -1
 #  define GET_OBJ_DAT(obj) obj ? to_string(**(obj)).c_str() : "nullptr"
 #  define GET_OBJ_ALL(obj) GET_OBJ_ENR(obj), GET_OBJ_DAT(obj)
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED) && (0 == this->lock_count()) )
+		if (this->beThreadSafe.load(memOrdLoad) && (0 == this->lock_count()) )
 			PWX_THROW("MissingLock", "TSet::protInsert() called without a lock in place!",
 						"This is evil and must be fixed NOW!")
 		elem_t* xNext = insPrev ? insPrev->getNext() : nullptr;
@@ -591,7 +591,7 @@ protected:
 
 		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
-			doRenumber.store(true, PWX_MEMORDER_RELEASE);
+			this->doRenumber.store(true, memOrdStore);
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
 		} else {
 			if (!locCnt) {
@@ -603,20 +603,20 @@ protected:
 				// Case 2: A new head is to be set
 				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem))
 				head(insElem);
-				doRenumber.store(true, PWX_MEMORDER_RELEASE);
+				this->doRenumber.store(true, memOrdStore);
 			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail()->eNr.load(PWX_MEMORDER_ACQUIRE) + 1,
-					PWX_MEMORDER_RELEASE);
+					tail()->eNr.load(memOrdLoad) + 1,
+					memOrdStore);
 				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
 				tail(insElem);
 			}
 		}
 
-		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
+		eCount.fetch_add(1, memOrdStore);
 		curr(insElem);
-		return eCount.load(PWX_MEMORDER_ACQUIRE);
+		return eCount.load(memOrdLoad);
 	}
 
 
@@ -629,7 +629,8 @@ protected:
 	*/
 
 	using base_t::eCount;
-	using base_t::doRenumber;
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 
 	bool isSorted; //!< determines whether the set is sorted or not.
 
@@ -995,7 +996,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1042,7 +1043,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1107,7 +1108,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1170,7 +1171,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1234,7 +1235,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1293,7 +1294,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1370,7 +1371,7 @@ private:
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
@@ -1443,7 +1444,7 @@ private:
 			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 5: Do the real insert
