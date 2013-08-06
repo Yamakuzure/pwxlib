@@ -210,6 +210,7 @@ public:
 	{
 		PWX_LOCK(this)
 		this->do_locking(false);
+		this->currStore.disable_thread_safety();
 		elem_t* xCurr = head();
 		do {
 			if (xCurr) {
@@ -217,7 +218,7 @@ public:
 				xCurr = xCurr->getNext();
 			}
 		} while (xCurr && xCurr != tail());
-		this->beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(false, memOrdStore);
 		PWX_UNLOCK(this) // Just for the record
 	}
 
@@ -225,7 +226,7 @@ public:
 	/// @brief return true if this container is empty
 	virtual bool empty() const noexcept
 	{
-		return !eCount.load(PWX_MEMORDER_ACQUIRE);
+		return !eCount.load(memOrdLoad);
 	}
 
 
@@ -242,6 +243,7 @@ public:
 	void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
+		this->currStore.enable_thread_safety();
 		elem_t* xCurr = head();
 		do {
 			if (xCurr) {
@@ -249,7 +251,7 @@ public:
 				xCurr = xCurr->getNext();
 			}
 		} while (xCurr && xCurr != tail());
-		this->beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(true, memOrdStore);
 	}
 
 
@@ -546,7 +548,7 @@ public:
 		PWX_LOCK_GUARD(list_t, this)
 		// Note: The guard is needed to ensure that no thread changes the
 		// number of elements beyond the border of eCount > 1
-		return (eCount.load(PWX_MEMORDER_ACQUIRE) > 1
+		return (eCount.load(memOrdLoad) > 1
 				? privRemoveAfterElement(const_cast<elem_t* > (privGetElementByIndex (-2)))
 				: privRemoveAfterData(nullptr));
 	}
@@ -701,9 +703,7 @@ public:
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept
 	{
-		return this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-			? eCount.load(PWX_MEMORDER_ACQUIRE)
-			: eCount.load(PWX_MEMORDER_RELAXED);
+		return this->eCount.load(memOrdLoad);
 	}
 
 
@@ -730,7 +730,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy      = rhs.destroy;
-			beThreadSafe = rhs.beThreadSafe.load(PWX_MEMORDER_RELAXED);
+			beThreadSafe = rhs.beThreadSafe.load(memOrdLoad);
 			PWX_TRY_PWX_FURTHER (return operator+=(rhs))
 		}
 		return *this;
@@ -752,7 +752,7 @@ public:
 			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			elem_t* rhsCurr = rhs.head();
 			bool    isDone  = false;
-			bool    isTS    = this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE);
+			bool    isTS    = this->beThreadSafe.load(memOrdLoad);
 
 			while (rhsCurr && !isDone) {
 				PWX_TRY_PWX_FURTHER (privInsElemBehindElem (tail(), *rhsCurr))
@@ -897,40 +897,28 @@ protected:
 	/// @brief return head according to thread safety setting
 	elem_t* head() const
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			return head_.load(PWX_MEMORDER_ACQUIRE);
-		else
-			return head_.load(PWX_MEMORDER_RELAXED);
+		return head_.load(memOrdLoad);
 	}
 
 
 	/// @brief set head to @a new_head according to thread safety settings
 	void head(elem_t* new_head)
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			head_.store(new_head, PWX_MEMORDER_RELEASE);
-		else
-			head_.store(new_head, PWX_MEMORDER_RELAXED);
+		head_.store(new_head, memOrdStore);
 	}
 
 
 	/// @brief return tail according to thread safety setting
 	elem_t* tail() const
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			return tail_.load(PWX_MEMORDER_ACQUIRE);
-		else
-			return tail_.load(PWX_MEMORDER_RELAXED);
+		return tail_.load(memOrdLoad);
 	}
 
 
 	/// @brief set tail to @a new_tail according to thread safety settings
 	void tail(elem_t* new_tail)
 	{
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
-			tail_.store(new_tail, PWX_MEMORDER_RELEASE);
-		else
-			tail_.store(new_tail, PWX_MEMORDER_RELAXED);
+		tail_.store(new_tail, memOrdStore);
 	}
 
 
@@ -961,7 +949,7 @@ protected:
 					PWX_UNLOCK(removed)
 			} // end of if not destroyed yet
 		} // end of having an element to delete
-		return eCount.load(PWX_MEMORDER_ACQUIRE);
+		return eCount.load(memOrdLoad);
 	}
 
 
@@ -1001,9 +989,10 @@ protected:
 		}
 
 		// Quick exit if curr is already what we want:
-		if (curr()->data.get() == data) {
+		elem_t* xCurr = curr();
+		if (xCurr->data.get() == data) {
 			// Safe curr first, so it isn't changed before being returned
-			result = curr();
+			result = xCurr;
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return result;
 		}
@@ -1012,25 +1001,27 @@ protected:
 		if (size() > 1) {
 
 			// Exit if head is wanted...
-			if (head()->data.get() == data) {
-				curr(head());
-				result = curr();
+			elem_t* xHead = head();
+			if ((xHead != xCurr) && (xHead->data.get() == data)) {
+				curr(xHead);
+				result = xHead;
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return result;
 			}
 
 			// ...or tail
-			if (tail()->data.get() == data) {
-				curr(tail());
-				result = curr();
+			elem_t* xTail = tail();
+			if ((xTail != xCurr) && (xTail->data.get() == data)) {
+				curr(xTail);
+				result = xTail;
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return result;
 			}
 
 			// Otherwise we have to search for it.
-			elem_t* xCurr  = head()->getNext(); // head is already checked.
-			bool    isDone = false;
-			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+			bool isDone = false;
+			xCurr = xHead->getNext(); // head is already checked.
+			if (this->beThreadSafe.load(memOrdLoad)) {
 				// This is rule 2: Unlock for traversal
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
@@ -1038,9 +1029,10 @@ protected:
 					// Rule 3: Re-check tail. It might be
 					// different from what was checked above
 					// once xCurr gets there.
-					if (xCurr->data.get() == data)
+					if (xCurr->data.get() == data) {
 						result = xCurr;
-					else if (xCurr == tail())
+						curr(xCurr);
+					} else if (xCurr == tail())
 						isDone = true;
 					else
 						xCurr = xCurr->getNext();
@@ -1050,10 +1042,11 @@ protected:
 				// Further tail() is already checked and we don't assume
 				// it to change while the search is running.
 				while (!result && xCurr && (xCurr != tail() )) {
-					if (xCurr->data.get() == data)
+					if (xCurr->data.get() == data) {
 						result = xCurr;
-					else
-						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);
+						curr(xCurr);
+					} else
+						xCurr = xCurr->next.load(memOrdLoad);
 				}
 			} // End of manual traversing the container
 
@@ -1087,9 +1080,9 @@ protected:
 		}
 
 		// Quick exit if curr is already what we want:
-		if (*curr() == data) {
-			// Safe curr first, so it isn't changed before being returned
-			result = curr();
+		elem_t* xCurr = curr();
+		if (*xCurr == data) {
+			result = xCurr;
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return result;
 		}
@@ -1098,25 +1091,27 @@ protected:
 		if (size() > 1) {
 
 			// Exit if head is wanted...
-			if (*head() == data) {
-				curr(head());
-				result = curr();
+			elem_t* xHead = head();
+			if ((xHead != xCurr) && (*xHead == data)) {
+				curr(xHead);
+				result = xHead;
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return result;
 			}
 
 			// ...or tail
-			if (*tail() == data) {
-				curr(tail());
-				result = curr();
+			elem_t* xTail = tail();
+			if ((xTail != xCurr) && (*xTail == data)) {
+				curr(xTail);
+				result = xTail;
 				PWX_UNLOCK(const_cast<list_t*>(this))
 				return result;
 			}
 
 			// Otherwise we have to search for it.
-			elem_t* xCurr  = head()->getNext(); // head is already checked.
-			bool    isDone = false;
-			if (this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+			bool isDone = false;
+			xCurr = xHead->getNext(); // head is already checked.
+			if (this->beThreadSafe.load(memOrdLoad)) {
 				// Rule 2:
 				PWX_UNLOCK(const_cast<list_t*>(this))
 
@@ -1124,19 +1119,21 @@ protected:
 					// Note: The container is not locked any more,
 					// locking and checks are done on element level
 					// by compare() then.
-					if (0 == xCurr->compare(data))
+					if (0 == xCurr->compare(data)) {
 						result = xCurr;
-					else if (xCurr == tail())
+						curr(xCurr);
+					} else if (xCurr == tail())
 						isDone = true;
 					else
 						xCurr = xCurr->getNext();
 				}
 			} else {
 				while (!result && xCurr && (xCurr != tail() )) {
-					if (*xCurr == data)
+					if (*xCurr == data) {
 						result = xCurr;
-					else
-						xCurr = xCurr->next.load(PWX_MEMORDER_RELAXED);
+						curr(xCurr);
+					} else
+						xCurr = xCurr->next.load(memOrdLoad);
 				}
 			} // End of manual traversing the container
 
@@ -1173,13 +1170,13 @@ protected:
 		*/
 		PWX_LOCK(this)
 
-		uint32_t locCnt = eCount.load(PWX_MEMORDER_ACQUIRE);
+		uint32_t locCnt = size();
 
 		curr(insElem);
 
 		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
-			doRenumber.store(true, PWX_MEMORDER_RELEASE);
+			this->doRenumber.store(true, memOrdStore);
 			DEBUG_LOCK_STATE("insertNext", insPrev, insElem)
 			PWX_UNLOCK(this)
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
@@ -1197,12 +1194,12 @@ protected:
 				DEBUG_LOCK_STATE("insertBefore", insElem, head())
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(head() ))
 				head(insElem);
-				doRenumber.store(true, PWX_MEMORDER_RELEASE);
+				this->doRenumber.store(true, memOrdStore);
 			} else if (insPrev == tail() ) {
 				// Case 3: A new tail is to be set
 				insElem->eNr.store(
-					tail()->eNr.load(PWX_MEMORDER_ACQUIRE) + 1,
-					PWX_MEMORDER_RELEASE);
+					tail()->eNr.load(memOrdLoad) + 1,
+					memOrdStore);
 				DEBUG_LOCK_STATE("insertNext", tail(), insElem)
 				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
 				tail(insElem);
@@ -1210,8 +1207,8 @@ protected:
 			DEBUG_LOCK_STATE("lock_guard_dtor", this, this)
 		}
 
-		eCount.fetch_add(1, PWX_MEMORDER_RELEASE);
-		return eCount.load(PWX_MEMORDER_ACQUIRE);
+		eCount.fetch_add(1, memOrdStore);
+		return eCount.load(memOrdLoad);
 	}
 
 
@@ -1219,29 +1216,30 @@ protected:
 	virtual void protRenumber() const noexcept
 	{
 		// Now do the renumbering if it is necessary:
-		if (doRenumber.load(PWX_MEMORDER_ACQUIRE)) {
+		if (doRenumber.load(memOrdLoad)) {
 
 			// Do a big lock, so multiple threads calling this function
 			// won't renumber multiple times when once is enough.
 			PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
 
 			// Check again, maybe this does not need any renumbering any more:
-			if (!doRenumber.load(PWX_MEMORDER_ACQUIRE))
+			if (!doRenumber.load(memOrdLoad))
 				return;
 
-			elem_t*  xCurr  = head();
-			uint32_t xNr    = 0;
-			bool     isDone = false;
+			elem_t*           xCurr  = head();
+			elem_t*           xTail  = tail();
+			uint32_t          xNr    = 0;
+			bool              isDone = false;
 
 			while (xCurr && !isDone) {
-				xCurr->eNr.store(xNr++, PWX_MEMORDER_RELEASE);
-				if (xCurr == tail() )
+				xCurr->eNr.store(xNr++, memOrdStore);
+				if (xCurr == xTail )
 					isDone = true;
 				else
 					xCurr = xCurr->next;
 			}
 
-			doRenumber.store(false, PWX_MEMORDER_RELEASE);
+			this->doRenumber.store(false, memOrdStore);
 		}
 	}
 
@@ -1252,6 +1250,8 @@ protected:
 	*/
 
 	store_t currStore;
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 
 
 private:
@@ -1296,11 +1296,11 @@ private:
 		// start of the search with a minimum of checks
 		PWX_LOCK(const_cast<list_t*>(this))
 
-		uint32_t locCnt = eCount.load(PWX_MEMORDER_ACQUIRE);
+		uint32_t locCnt = eCount.load(memOrdLoad);
 
 		if (locCnt) {
 			elem_t*  xCurr = curr() ? curr() : head();
-			uint32_t xNr   = xCurr->eNr.load(PWX_MEMORDER_ACQUIRE);
+			uint32_t xNr   = xCurr->eNr.load(memOrdLoad);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
 
@@ -1363,7 +1363,7 @@ private:
 					PWX_LOCK(const_cast<list_t*>(this))
 					// Do a double check, maybe the warp is not needed any more
 					if (tail() == xCurr) {
-						xIdx -= eCount.load(PWX_MEMORDER_ACQUIRE);
+						xIdx -= eCount.load(memOrdLoad);
 						xCurr = head();
 						xNr   = 0;
 					}
@@ -1410,7 +1410,7 @@ private:
 				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
@@ -1435,7 +1435,7 @@ private:
 				PWX_UNLOCK(prev)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
@@ -1482,7 +1482,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1521,7 +1521,7 @@ private:
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		PWX_UNLOCK(const_cast<elem_t*>(&src))
-		if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+		if (!this->beThreadSafe.load(memOrdLoad))
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1549,7 +1549,7 @@ private:
 			head(head()->getNext());
 			currStore.invalidateElement(elem);
 			elem->remove();
-			doRenumber.store(true, PWX_MEMORDER_RELEASE);
+			this->doRenumber.store(true, memOrdStore);
 		} else {
 			if (tail() == elem)
 				// Case 2:
