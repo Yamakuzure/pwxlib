@@ -30,8 +30,6 @@
 #include <pwx/general/macros.h>
 #include <pwx/types/CLockable.h>
 #include <pwx/types/TVarDeleter.h>
-#include <atomic>
-#include <memory>
 
 namespace pwx
 {
@@ -57,9 +55,10 @@ public:
 	 * ===============================================
 	*/
 
-	typedef CLockable  base_t;
-	typedef VElement   elem_t;
-
+	typedef CLockable                 base_t;
+	typedef VElement                  elem_t;
+	typedef std::atomic_bool          abool_t;
+	typedef std::atomic_uint_fast32_t aui32_t;
 
 	/* ===============================================
 	 * === Public constructors and destructors     ===
@@ -104,7 +103,7 @@ public:
 	virtual void disable_thread_safety() noexcept
 	{
 		this->do_locking(false);
-		this->beThreadSafe.store(false, memOrdStore);
+		this->beThreadSafe(false);
 	}
 
 
@@ -115,7 +114,7 @@ public:
 	virtual void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		this->beThreadSafe.store(true, memOrdStore);
+		this->beThreadSafe(true);
 	}
 
 
@@ -147,8 +146,7 @@ public:
 	*/
 
 	mutable
-	std::atomic_uint_fast32_t
-	eNr = ATOMIC_VAR_INIT(0); //!< Number of the element
+	aui32_t eNr = ATOMIC_VAR_INIT(0); //!< Number of the element
 
 
 protected:
@@ -159,14 +157,9 @@ protected:
 	 */
 
 	mutable
-	std::atomic_bool
-	beThreadSafe = ATOMIC_VAR_INIT(true);  //!< Use next/prev pointers directly if set to false.
+	abool_t isDestroyed = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
 	mutable
-	std::atomic_bool
-	isDestroyed  = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
-	mutable
-	std::atomic_bool
-	isRemoved    = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
+	abool_t isRemoved   = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
 
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
