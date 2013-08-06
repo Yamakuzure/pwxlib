@@ -72,6 +72,7 @@ template<
 	static const value_t hi = std::numeric_limits<value_t>::max()    - static_cast<value_t>(1);
 	uint32_t localMaxElem = maxElements;
 	uint32_t localMaxRet  = maxElements / 1000;
+    int64_t  maxNeededMS  = 0;
 
 	/* --------------------------------------------------------------------
 	 * --- Pre-Step: Create values/retrieves arrays if not done already ---
@@ -151,7 +152,6 @@ template<
 	 * --- 1 B) Start the adder threads now they are created ---
 	 * ---------------------------------------------------------
 	 */
-	hrTime_t startTimeAdd = hrClock::now();
     for (size_t nr = 0; nr < threadCount; ++nr)
 		adders[nr].isRunning.store(true, PWX_MEMORDER_RELEASE);
 
@@ -159,7 +159,7 @@ template<
 	 * --- 1 C) Join the adder threads back ---
 	 * ----------------------------------------
 	 */
-    bool isFinished = false;
+    bool isFinished    = false;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < threadCount); ++nr) {
@@ -169,12 +169,13 @@ template<
 		if (isFinished) {
 			for (size_t nr = 0; nr < threadCount; ++nr) {
 				threads[nr]->join();
+				if (adders[nr].timeMS > maxNeededMS)
+					maxNeededMS = adders[nr].timeMS;
 				delete threads[nr];
 				threads[nr] = nullptr;
 			}
 		}
     } // End of loop-joining threads
-	hrTime_t endTimeAdd = hrClock::now();
 
 	/* --------------------------------------------------------------------
 	 * --- 2) Stop time, safe container size and do a consistency check ---
@@ -216,8 +217,7 @@ template<
 	}
 
 	// Bring out the needed time in ms:
-	auto elapsedAdd = duration_cast<milliseconds>(endTimeAdd - startTimeAdd).count();
-	cout << adjRight(6,0) << elapsedAdd << " ms /"; cout.flush();
+	cout << adjRight(6,0) << maxNeededMS << " ms /"; cout.flush();
 
 	/* -----------------------------------------------------------
 	 * --- 3 A) Create the searcher threads to test retrieving ---
@@ -240,7 +240,6 @@ template<
 	 * --- 3 B) Start the searcher threads now they are created ---
 	 * ------------------------------------------------------------
 	 */
-	hrTime_t startTimeSrc = hrClock::now();
     for (size_t nr = 0; nr < threadCount; ++nr)
 		searchers[nr].isRunning.store(true, PWX_MEMORDER_RELEASE);
 
@@ -248,7 +247,8 @@ template<
 	 * --- 3 C) Join the searcher threads back ---
 	 * -------------------------------------------
 	 */
-    isFinished = false;
+    isFinished  = false;
+	maxNeededMS = 0;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < threadCount); ++nr) {
@@ -258,16 +258,16 @@ template<
 		if (isFinished) {
 			for (size_t nr = 0; nr < threadCount; ++nr) {
 				threads[nr]->join();
+				if (searchers[nr].timeMS > maxNeededMS)
+					maxNeededMS = searchers[nr].timeMS;
 				delete threads[nr];
 				threads[nr] = nullptr;
 			}
 		}
     } // End of loop-joining threads
-	hrTime_t endTimeSrc = hrClock::now();
 
 	// Bring out the needed time in ms:
-	auto elapsedSrc = duration_cast<milliseconds>(endTimeSrc - startTimeSrc).count();
-	cout << adjRight(6,0) << elapsedSrc << " ms /"; cout.flush();
+	cout << adjRight(6,0) << maxNeededMS << " ms /"; cout.flush();
 
 	/* ----------------------------------------------
 	 * --- 4) Now clear the container up again    ---
@@ -279,12 +279,12 @@ template<
 							"Thread creation failed", "testSpeedMT could not call new operator on std::thread")
 
 	// Starting in a loop
-	hrTime_t startTimeClr = hrClock::now();
     for (size_t nr = 0; nr < threadCount; ++nr)
 		clearers[nr].isRunning.store(true);
 
     // ... joining in a loop.
-    isFinished = false;
+    isFinished  = false;
+    maxNeededMS = 0;
     while (!isFinished) {
 		isFinished = true;
 		for (size_t nr = 0; isFinished && (nr < threadCount); ++nr) {
@@ -294,12 +294,13 @@ template<
 		if (isFinished) {
 			for (size_t nr = 0; nr < threadCount; ++nr) {
 				threads[nr]->join();
+				if (clearers[nr].timeMS > maxNeededMS)
+					maxNeededMS = clearers[nr].timeMS;
 				delete threads[nr];
 				threads[nr] = nullptr;
 			}
 		}
     }
-	hrTime_t endTimeClr = hrClock::now();
 
 	// Clear the dynamic arrays
 	if (threads)   delete [] threads;
@@ -308,8 +309,7 @@ template<
 	if (searchers) delete [] searchers;
 
 	// Bring out the needed time in ms:
-	auto elapsedClr = duration_cast<milliseconds>(endTimeClr - startTimeClr).count();
-	cout << adjRight(5,0) << elapsedClr << " ms" << endl;
+	cout << adjRight(5,0) << maxNeededMS << " ms" << endl;
 
 	// Do we have had enough elements?
 	// Note: Sets and Hashes might have less if values[] consists of doublets.

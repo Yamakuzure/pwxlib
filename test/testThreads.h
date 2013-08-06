@@ -30,13 +30,17 @@ public:
 	virtual void operator()(cont_t* cont_, value_t* values, size_t start, key_t part)
 	{
 		cont = cont_;
-		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
+		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) {
+			std::this_thread::yield();
+		}
 
 		if (cont) {
-			size_t stop = start + part;
+			size_t   stop      = start + part;
+			hrTime_t startTime = hrClock::now();
 			for (size_t idx = start; idx < stop; ++idx) {
 				PWX_TRY_PWX_FURTHER(this->privAddToCont(idx, &values[idx]))
 			}
+			this->timeMS = duration_cast<milliseconds>(hrClock::now() - startTime).count();
 		}
 
 		DEBUG_LOCK_STATE("clear_locks", thAdderBase, cont)
@@ -58,6 +62,7 @@ public:
 	 */
 	cont_t*          cont      = nullptr;
 	std::atomic_bool isRunning = ATOMIC_VAR_INIT(false);
+	int64_t          timeMS    = 0;
 
 private:
 	/* ==================================================================
@@ -96,6 +101,7 @@ public:
 	 */
 	using base_t::cont;
 	using base_t::isRunning;
+	using base_t::timeMS;
 
 private:
 	/* ==================================================================
@@ -138,6 +144,7 @@ public:
 	 */
 	using base_t::cont;
 	using base_t::isRunning;
+	using base_t::timeMS;
 
 private:
 	/* ==================================================================
@@ -178,12 +185,14 @@ public:
 		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
 
 		if (cont) {
-			size_t stop  = start + part;
-			key_t  found = 0;
+			size_t   stop      = start + part;
+			hrTime_t startTime = hrClock::now();
+			key_t    found     = 0;
 			for (size_t idx = start; idx < stop; ++idx) {
 				if (privFindInCont(&retrieves[idx]))
 					++found;
 			}
+			this->timeMS = duration_cast<milliseconds>(hrClock::now() - startTime).count();
 			if (found != part)
 				cerr << "ERROR: " << (part - found) << " values not found in the container!" << endl;
 		}
@@ -207,6 +216,7 @@ public:
 	 */
 	cont_t*          cont      = nullptr;
 	std::atomic_bool isRunning = ATOMIC_VAR_INIT(false);
+	int64_t          timeMS    = 0;
 
 
 private:
@@ -246,6 +256,7 @@ public:
 	 */
 	using base_t::cont;
 	using base_t::isRunning;
+	using base_t::timeMS;
 
 private:
 	/* ========================================================
@@ -287,6 +298,7 @@ public:
 	 */
 	using base_t::cont;
 	using base_t::isRunning;
+	using base_t::timeMS;
 
 private:
 	/* ========================================================
@@ -325,7 +337,11 @@ public:
 		cont = cont_;
 		while (!this->isRunning.load(PWX_MEMORDER_ACQUIRE)) { }
 
-		if (cont) cont->clear();
+		if (cont) {
+			hrTime_t startTime = hrClock::now();
+			cont->clear();
+			this->timeMS = duration_cast<milliseconds>(hrClock::now() - startTime).count();
+		}
 
 		DEBUG_LOCK_STATE("clear_locks", thClearer, cont)
 		uint32_t remaining = 0;
@@ -346,6 +362,7 @@ public:
 	 */
 	std::atomic_bool isRunning = ATOMIC_VAR_INIT(false);
 	cont_t*          cont      = nullptr;
+	int64_t          timeMS    = 0;
 };
 
 #endif // PWX_LIBPWX_TEST_TESTTHREADS_H_INCLUDED
