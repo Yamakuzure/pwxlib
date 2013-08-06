@@ -531,7 +531,7 @@ protected:
 			elem_t* xCurr   = oldCurr->getNext(); // curr is already checked.
 			bool    isDone = false;
 
-			if (this->beThreadSafe.load(memOrdLoad)) {
+			if (this->beThreadSafe()) {
 				// oldCurr must be locked, it must not be removed
 				// or deleted now!
 				PWX_LOCK(oldCurr)
@@ -654,7 +654,7 @@ protected:
 			elem_t* xCurr   = oldCurr->getNext(); // curr is already checked.
 			bool    isDone  = false;
 
-			if (this->beThreadSafe.load(memOrdLoad)) {
+			if (this->beThreadSafe()) {
 				// oldCurr must be locked, it must not be removed
 				// or deleted now!
 				PWX_LOCK(oldCurr)
@@ -999,7 +999,7 @@ private:
 				PWX_UNLOCK(nextElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
@@ -1025,7 +1025,7 @@ private:
 				PWX_UNLOCK(next)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 3: Do the real insert
@@ -1071,7 +1071,7 @@ private:
 				PWX_UNLOCK(nextElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
@@ -1109,7 +1109,7 @@ private:
 				PWX_UNLOCK(next)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		if (!this->beThreadSafe.load(memOrdLoad))
+		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
