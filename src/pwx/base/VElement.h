@@ -88,7 +88,7 @@ public:
 	**/
 	bool destroyed() const noexcept
 	{
-		return isDestroyed.load(PWX_MEMORDER_ACQUIRE);
+		return isDestroyed.load(memOrdLoad);
 	}
 
 
@@ -104,7 +104,7 @@ public:
 	virtual void disable_thread_safety() noexcept
 	{
 		this->do_locking(false);
-		this->beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(false, memOrdStore);
 	}
 
 
@@ -115,7 +115,7 @@ public:
 	virtual void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		this->beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(true, memOrdStore);
 	}
 
 
@@ -128,7 +128,7 @@ public:
 	**/
 	bool inserted() const noexcept
 	{
-		return !isRemoved.load(PWX_MEMORDER_ACQUIRE);
+		return !isRemoved.load(memOrdLoad);
 	}
 
 
@@ -137,9 +137,7 @@ public:
 	**/
 	uint32_t nr()
 	{
-		return beThreadSafe.load(PWX_MEMORDER_RELAXED)
-				? eNr.load(PWX_MEMORDER_ACQUIRE)
-				: eNr.load(PWX_MEMORDER_RELAXED);
+		return eNr.load(memOrdLoad);
 	}
 
 
@@ -170,6 +168,8 @@ protected:
 	std::atomic_bool
 	isRemoved    = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
 
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 }; // class VContainer
 
 #if defined(PWX_EXPORTS)
