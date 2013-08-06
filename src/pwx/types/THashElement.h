@@ -252,7 +252,7 @@ public:
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* curNext = next.load(memOrdLoad);
 			if ( !curNext
 			  && isRemoved.load(memOrdLoad) )
@@ -283,7 +283,7 @@ public:
 		if (!new_next || (new_next == this))
 			return;
 
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
@@ -331,7 +331,7 @@ public:
 	**/
 	void remove() noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_LOCK_GUARD(elem_t, this)
 			setNext(nullptr);
@@ -361,7 +361,7 @@ public:
 			return;
 
 		// Do an acquiring test before the element is actually locked
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			/* See notes in TDoubleElement::remove() */
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, toRemove)
 			PWX_LOCK_GUARD(elem_t, toRemove)
@@ -403,7 +403,7 @@ public:
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			elem_t* currNext = next.load(memOrdLoad);
 			next.store(new_next, memOrdStore);
 			if (currNext)
@@ -570,11 +570,11 @@ private:
 template<typename key_t, typename data_t>
 THashElement<key_t, data_t>::~THashElement() noexcept
 {
-	if (beThreadSafe.load(memOrdLoad))
+	if (beThreadSafe())
 		isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		if (beThreadSafe.load(memOrdLoad)) {
+		if (beThreadSafe()) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
 			PWX_LOCK(this)
