@@ -88,6 +88,7 @@ public:
 
 	typedef VContainer                          base_t; //!< Base type of the hash
 	typedef VTHashBase<key_t, data_t, elem_t>   hash_t; //!< Type of this hash
+	typedef std::atomic_uint_fast32_t           aui32_t;
 
 
 	/* ===============================================
@@ -362,7 +363,7 @@ public:
 					PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new hash element failed.")
 				}
 				PWX_UNLOCK(const_cast<elem_t*>(&src))
-				if (!this->beThreadSafe.load(memOrdLoad))
+				if (!this->beThreadSafe())
 					newElement->disable_thread_safety();
 
 				// 3: Do the real insert
@@ -393,7 +394,7 @@ public:
 				catch(std::exception &e) {
 					PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new hash element failed.")
 				}
-				if (!this->beThreadSafe.load(memOrdLoad))
+				if (!this->beThreadSafe())
 					newElement->disable_thread_safety();
 
 				// 2: Do the real insert
@@ -518,7 +519,7 @@ public:
 			}
 			++pos;
 		}
-		this->beThreadSafe.store(false, memOrdStore);
+		this->beThreadSafe(false);
 		PWX_UNLOCK(this) // Just for the record
 	}
 
@@ -566,7 +567,7 @@ public:
 			}
 			++pos;
 		}
-		this->beThreadSafe.store(true, memOrdStore);
+		this->beThreadSafe(true);
 	}
 
 
@@ -911,7 +912,7 @@ public:
 			if (sizeMax() < tgtSize)
 				PWX_TRY_PWX_FURTHER(this->grow(tgtSize));
 
-			beThreadSafe = rhs.beThreadSafe.load(memOrdLoad);
+			beThreadSafe(rhs.beThreadSafe());
 			PWX_TRY_PWX_FURTHER (return operator+=(rhs))
 		}
 		return *this;
@@ -944,7 +945,7 @@ public:
 			// --- copy all elements ---
 			elem_t*  rhsCurr = nullptr;
 			uint32_t rhsPos  = 0;
-			bool     isTS    = this->beThreadSafe.load(memOrdLoad);
+			bool     isTS    = this->beThreadSafe();
 
 			while (rhsPos < rhsSize) {
 				if (!rhs.protIsVacated(rhsPos)) {
@@ -1123,8 +1124,7 @@ protected:
 
 	eChainHashMethod CHMethod = CHM_Division; //!< Which Hashing method is used
 	CHashBuilder	 hashBuilder; //!< instance that will handle the key generation
-	std::atomic_uint_fast32_t
-					 hashSize;    //!< number of places to maintain
+	aui32_t          hashSize;    //!< number of places to maintain
 	elem_t**		 hashTable;   //!< the central array that is our hash
 	char*			 vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
 	elem_t*			 vacated;     //!< The Open Hash sets empty places to point at this.
