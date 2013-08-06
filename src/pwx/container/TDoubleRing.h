@@ -824,6 +824,8 @@ protected:
 	*/
 
 	using base_t::eCount;
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 
 
 private:
@@ -837,9 +839,9 @@ private:
 	{
 		// Return early if nothing is to be done:
 		if (!head() || !tail() || ((head() == tail()->getNext()) && (tail() == head()->getPrev())) )
-			return eCount.load(PWX_MEMORDER_ACQUIRE);
+			return eCount.load(memOrdLoad);
 
-		if (this->beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (this->beThreadSafe.load(memOrdLoad)) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
 			PWX_LOCK(this)
@@ -862,11 +864,11 @@ private:
 			PWX_UNLOCK(this)
 		} // End of thread safe connection
 		else {
-			head()->prev.store(tail(), PWX_MEMORDER_RELAXED);
-			tail()->next.store(head(), PWX_MEMORDER_RELAXED);
+			head()->prev.store(tail(), memOrdStore);
+			tail()->next.store(head(), memOrdStore);
 		}
 
-		return eCount.load(PWX_MEMORDER_ACQUIRE);
+		return eCount.load(memOrdLoad);
 	}
 }; // class TDoubleRing
 
