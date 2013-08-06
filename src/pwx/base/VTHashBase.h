@@ -362,7 +362,7 @@ public:
 					PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new hash element failed.")
 				}
 				PWX_UNLOCK(const_cast<elem_t*>(&src))
-				if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+				if (!this->beThreadSafe.load(memOrdLoad))
 					newElement->disable_thread_safety();
 
 				// 3: Do the real insert
@@ -393,7 +393,7 @@ public:
 				catch(std::exception &e) {
 					PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new hash element failed.")
 				}
-				if (!this->beThreadSafe.load(PWX_MEMORDER_RELAXED))
+				if (!this->beThreadSafe.load(memOrdLoad))
 					newElement->disable_thread_safety();
 
 				// 2: Do the real insert
@@ -518,7 +518,7 @@ public:
 			}
 			++pos;
 		}
-		this->beThreadSafe.store(false, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(false, memOrdStore);
 		PWX_UNLOCK(this) // Just for the record
 	}
 
@@ -526,7 +526,7 @@ public:
 	/// @brief return true if this container is empty
 	virtual bool empty() const noexcept
 	{
-		return !eCount.load(PWX_MEMORDER_ACQUIRE);
+		return !eCount.load(memOrdLoad);
 	}
 
 
@@ -566,7 +566,7 @@ public:
 			}
 			++pos;
 		}
-		this->beThreadSafe.store(true, PWX_MEMORDER_RELEASE);
+		this->beThreadSafe.store(true, memOrdStore);
 	}
 
 
@@ -683,10 +683,7 @@ public:
 				}
 
 				// --- Set new size ---
-				hashSize.store(targetSize,
-								this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-								? PWX_MEMORDER_RELEASE
-								: PWX_MEMORDER_RELAXED);
+				hashSize.store(targetSize, memOrdStore);
 
 				// --- Delete old table ---
 				PWX_TRY_STD_FURTHER(delete [] oldTab, "Delete failed",
@@ -861,18 +858,14 @@ public:
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept
 	{
-		return this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-			? eCount.load(PWX_MEMORDER_ACQUIRE)
-			: eCount.load(PWX_MEMORDER_RELAXED);
+		return this->eCount.load(memOrdLoad);
 	}
 
 
 	/// @brief return the maximum number of places (elements for open, buckets for chained hashes)
 	uint32_t sizeMax() const noexcept
 	{
-		return this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-			? hashSize.load(PWX_MEMORDER_ACQUIRE)
-			: hashSize.load(PWX_MEMORDER_RELAXED);
+		return this->hashSize.load(memOrdLoad);
 	}
 
 
@@ -918,7 +911,7 @@ public:
 			if (sizeMax() < tgtSize)
 				PWX_TRY_PWX_FURTHER(this->grow(tgtSize));
 
-			beThreadSafe = rhs.beThreadSafe.load(PWX_MEMORDER_RELAXED);
+			beThreadSafe = rhs.beThreadSafe.load(memOrdLoad);
 			PWX_TRY_PWX_FURTHER (return operator+=(rhs))
 		}
 		return *this;
@@ -951,7 +944,7 @@ public:
 			// --- copy all elements ---
 			elem_t*  rhsCurr = nullptr;
 			uint32_t rhsPos  = 0;
-			bool     isTS    = this->beThreadSafe.load(PWX_MEMORDER_ACQUIRE);
+			bool     isTS    = this->beThreadSafe.load(memOrdLoad);
 
 			while (rhsPos < rhsSize) {
 				if (!rhs.protIsVacated(rhsPos)) {
@@ -1092,7 +1085,7 @@ protected:
 					PWX_UNLOCK(removed)
 			} // end of if not destroyed yet
 		} // end of having an element to delete
-		return eCount.load(PWX_MEMORDER_ACQUIRE);
+		return eCount.load(memOrdLoad);
 	}
 
 
