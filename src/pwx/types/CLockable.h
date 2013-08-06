@@ -68,8 +68,15 @@ namespace pwx
 **/
 class PWX_API CLockable
 {
-
 public:
+
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
+
+	typedef std::memory_order mord_t;
+
 
 	/* ===============================================
 	 * === Public Constructors and destructor      ===
@@ -95,13 +102,13 @@ public:
 	**/
 	bool clear_locks() noexcept
 	{
-		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE)) {
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(memOrdLoad)) {
 			if (is_locked() || try_lock()) {
-				if (CL_Do_Locking.load(PWX_MEMORDER_RELAXED))
+				if (CL_Do_Locking.load(memOrdLoad))
 					THREAD_LOG("base", "clear_locks(), Owner id 0x(%lx), %u locks [%s]",
 							CL_Thread_ID.load(), CL_Lock_Count.load(),
 							is_locked() ? "locked" : "not locked")
-				CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
+				CL_Lock_Count.store(1, memOrdStore);
 				this->unlock();
 			}
 
@@ -126,14 +133,25 @@ public:
 	**/
 	void do_locking(bool doLock) noexcept
 	{
-        if (doLock != CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)) {
-			CL_Do_Locking.store(doLock, PWX_MEMORDER_RELEASE);
+        if (doLock != CL_Do_Locking.load(memOrdLoad)) {
+			// If locking is enabled, change memory order now to strict
+			if (doLock) {
+				memOrdLoad  = PWX_MEMORDER_ACQUIRE;
+				memOrdStore = PWX_MEMORDER_RELEASE;
+			}
+
+			CL_Do_Locking.store(doLock, memOrdStore);
+
 			if (!doLock) {
 				// Nuke all locks:
-				CL_Lock_Count.store(0, PWX_MEMORDER_RELEASE);
-				CL_Thread_ID.store(0, PWX_MEMORDER_RELEASE);
-				CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
-				CL_Lock.clear(PWX_MEMORDER_RELEASE);
+				CL_Lock_Count.store(0, memOrdStore);
+				CL_Thread_ID.store(0, memOrdStore);
+				CL_Is_Locked.store(false, memOrdStore);
+				CL_Lock.clear(memOrdStore);
+
+				// The memory order is relaxed last
+				memOrdLoad  = PWX_MEMORDER_RELAXED;
+				memOrdStore = PWX_MEMORDER_RELAXED;
 			}
         }
 	}
@@ -142,14 +160,14 @@ public:
 	/// @brief return true if this object is currently locked
 	bool is_locked() const noexcept
 	{
-		return CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE);
+		return CL_Is_Locked.load(memOrdLoad);
 	}
 
 
 	/// @brief return true if the locking is turned on.
 	bool is_locking() const noexcept
 	{
-		return CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE);
+		return CL_Do_Locking.load(memOrdLoad);
 	}
 
 
@@ -159,9 +177,9 @@ public:
 	  */
 	void lock() noexcept
 	{
-		if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE) ) {
+		if ( CL_Do_Locking.load(memOrdLoad) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( (ctid != CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
+			if ( (ctid != CL_Thread_ID.load(memOrdLoad))
 			  || !is_locked()) {
 				THREAD_LOG("base", "lock(), Owner id 0x(%lx), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
@@ -169,11 +187,11 @@ public:
 				while (CL_Lock.test_and_set()) { }
 
 				// Got it now, so note it:
-				CL_Thread_ID.store(ctid, PWX_MEMORDER_RELEASE);
-				CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
-				CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
+				CL_Thread_ID.store(ctid, memOrdStore);
+				CL_Lock_Count.store(1, memOrdStore);
+				CL_Is_Locked.store(true, memOrdStore);
 			} else
-				CL_Lock_Count.fetch_add(1, PWX_MEMORDER_RELEASE);
+				CL_Lock_Count.fetch_add(1, memOrdStore);
 		}
 	}
 
@@ -183,8 +201,8 @@ public:
 	**/
 	uint32_t lock_count() const noexcept
 	{
-		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
-			return CL_Lock_Count.load(PWX_MEMORDER_ACQUIRE);
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(memOrdLoad))
+			return CL_Lock_Count.load(memOrdLoad);
 		return 0;
 	}
 
@@ -197,18 +215,18 @@ public:
 	  */
 	bool try_lock() noexcept
 	{
-		if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE) ) {
+		if ( CL_Do_Locking.load(memOrdLoad) ) {
 			size_t ctid = CURRENT_THREAD_ID;
-			if ( (ctid != CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))
+			if ( (ctid != CL_Thread_ID.load(memOrdLoad))
 			  || !is_locked() ) {
 				THREAD_LOG("base", "try_lock(), Owner id 0x(%lx), %u locks [%s]",
 						CL_Thread_ID.load(), CL_Lock_Count.load(),
 						is_locked() ? "locked" : "not locked")
 				if (!CL_Lock.test_and_set()) {
 					// Got it now, so note it:
-					CL_Thread_ID.store(ctid, PWX_MEMORDER_RELEASE);
-					CL_Lock_Count.store(1, PWX_MEMORDER_RELEASE);
-					CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
+					CL_Thread_ID.store(ctid, memOrdStore);
+					CL_Lock_Count.store(1, memOrdStore);
+					CL_Is_Locked.store(true, memOrdStore);
 					return true;
 				}
 				return false; // Nope, and only condition for a no-no.
@@ -227,16 +245,16 @@ public:
 	  */
 	void unlock() noexcept
 	{
-        if ( CL_Do_Locking.load(PWX_MEMORDER_ACQUIRE)
-		  && (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_ACQUIRE))) {
+        if ( CL_Do_Locking.load(memOrdLoad)
+		  && (CURRENT_THREAD_ID == CL_Thread_ID.load(memOrdLoad))) {
 			THREAD_LOG("base", "unlock(), Owner id 0x(%lx), %u locks [%s]",
 					CL_Thread_ID.load(), CL_Lock_Count.load(),
 					is_locked() ? "locked" : "not locked")
 			if ((1 == CL_Lock_Count.fetch_sub(1)) || !is_locked()) {
-				CL_Thread_ID.store(0, PWX_MEMORDER_RELEASE);
-				CL_Lock_Count.store(0, PWX_MEMORDER_RELEASE);
-				CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
-				CL_Lock.clear(PWX_MEMORDER_RELEASE);
+				CL_Thread_ID.store(0, memOrdStore);
+				CL_Lock_Count.store(0, memOrdStore);
+				CL_Is_Locked.store(false, memOrdStore);
+				CL_Lock.clear(memOrdStore);
 			}
 		}
 	}
@@ -248,6 +266,17 @@ public:
 	*/
 
 	CLockable& operator= (const CLockable &src) noexcept;
+
+
+protected:
+
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
+
+	mord_t memOrdLoad  = PWX_MEMORDER_ACQUIRE;   //!< to be used with atomic::load()
+	mord_t memOrdStore = PWX_MEMORDER_RELEASE;   //!< to be used with atomic::store()
 
 
 // If the DEBUG_LOCK_STATE is enabled, the members need to be acceddible from
