@@ -14,6 +14,7 @@ class thAdderBase
 {
 public:
 	typedef thAdderBase<cont_t, key_t, value_t> th_t;
+	typedef std::atomic_bool                    abool_t;
 
 	/* =================================
 	 * === constructors / destructor ===
@@ -60,9 +61,9 @@ public:
 	 * === Public members ===
 	 * ======================
 	 */
-	cont_t*          cont      = nullptr;
-	std::atomic_bool isRunning = ATOMIC_VAR_INIT(false);
-	int64_t          timeMS    = 0;
+	cont_t* cont      = nullptr;
+	abool_t isRunning = ATOMIC_VAR_INIT(false);
+	int64_t timeMS    = 0;
 
 private:
 	/* ==================================================================
@@ -166,6 +167,7 @@ class thSearcherBase
 {
 public:
 	typedef thSearcherBase<cont_t, key_t, value_t> base_t;
+	typedef std::atomic_bool                       abool_t;
 
 	/* =================================
 	 * === constructors / destructor ===
@@ -214,9 +216,9 @@ public:
 	 * === Public members ===
 	 * ======================
 	 */
-	cont_t*          cont      = nullptr;
-	std::atomic_bool isRunning = ATOMIC_VAR_INIT(false);
-	int64_t          timeMS    = 0;
+	cont_t* cont      = nullptr;
+	abool_t isRunning = ATOMIC_VAR_INIT(false);
+	int64_t timeMS    = 0;
 
 
 private:
