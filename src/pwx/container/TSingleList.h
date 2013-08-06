@@ -1299,8 +1299,10 @@ private:
 		uint32_t locCnt = eCount.load(memOrdLoad);
 
 		if (locCnt) {
-			elem_t*  xCurr = curr() ? curr() : head();
-			uint32_t xNr   = xCurr->eNr.load(memOrdLoad);
+			elem_t*  xCurr = curr();
+			if (nullptr == xCurr)
+				xCurr = head();
+			uint32_t xNr = xCurr->eNr.load(memOrdLoad);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
 
@@ -1377,9 +1379,7 @@ private:
 			} // end of searching loop
 
 			// xCurr is sure to be pointing where it should now.
-			PWX_LOCK(const_cast<list_t*>(this))
 			curr(xCurr);
-			PWX_UNLOCK(const_cast<list_t*>(this))
 			return xCurr;
 		}
 
@@ -1562,6 +1562,7 @@ private:
 			// The list is empty!
 			head(nullptr);
 			tail(nullptr);
+			curr(nullptr);
 		}
 	}
 
