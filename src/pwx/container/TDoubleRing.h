@@ -841,7 +841,7 @@ private:
 		if (!head() || !tail() || ((head() == tail()->getNext()) && (tail() == head()->getPrev())) )
 			return eCount.load(memOrdLoad);
 
-		if (this->beThreadSafe.load(memOrdLoad)) {
+		if (this->beThreadSafe()) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
 			PWX_LOCK(this)
