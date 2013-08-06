@@ -276,14 +276,14 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
-			elem_t* curNext = next.load(PWX_MEMORDER_ACQUIRE);
+		if (beThreadSafe.load(memOrdLoad)) {
+			elem_t* curNext = next.load(memOrdLoad);
 			if ( !curNext
-			  && isRemoved.load(PWX_MEMORDER_ACQUIRE) )
-				return oldNext.load(PWX_MEMORDER_ACQUIRE);
+			  && isRemoved.load(memOrdLoad) )
+				return oldNext.load(memOrdLoad);
 			return curNext;
 		}
-		return next.load(PWX_MEMORDER_RELAXED);
+		return next.load(memOrdLoad);
 	}
 
 
@@ -296,14 +296,14 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	elem_t* getPrev() const noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
-			elem_t* curPrev = prev.load(PWX_MEMORDER_ACQUIRE);
+		if (beThreadSafe.load(memOrdLoad)) {
+			elem_t* curPrev = prev.load(memOrdLoad);
 			if ( !curPrev
-			  && isRemoved.load(PWX_MEMORDER_ACQUIRE) )
-				return oldPrev.load(PWX_MEMORDER_ACQUIRE);
+			  && isRemoved.load(memOrdLoad) )
+				return oldPrev.load(memOrdLoad);
 			return curPrev;
 		}
-		return prev.load(PWX_MEMORDER_RELAXED);
+		return prev.load(memOrdLoad);
 	}
 
 
@@ -324,9 +324,7 @@ struct PWX_API TDoubleElement : public VElement
 	void insertBefore(elem_t* new_next)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, beThreadSafe.load(PWX_MEMORDER_RELAXED)
-								? PWX_MEMORDER_RELEASE
-								: PWX_MEMORDER_RELAXED);
+			isRemoved.store(false, memOrdStore);
 			return;
 		}
 
@@ -359,7 +357,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
@@ -393,7 +391,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Insert the new element
 				new_next->setNext(xOldNext);
 				new_next->setPrev(this);
-				new_next->isRemoved.store(false, PWX_MEMORDER_RELEASE);
+				new_next->isRemoved.store(false, memOrdStore);
 
 				// Store new next and prev neighbor
 				setNext(new_next);
@@ -409,13 +407,13 @@ struct PWX_API TDoubleElement : public VElement
 						"Tried to insert an element that has already been destroyed!")
 		} else {
 			// Otherwise do it directly and relaxed
-			elem_t* xOldNext = next.load(PWX_MEMORDER_RELAXED);
-			new_next->next.store(xOldNext, PWX_MEMORDER_RELAXED);
-			new_next->prev.store(this, PWX_MEMORDER_RELAXED);
-			new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
-			next.store(new_next, PWX_MEMORDER_RELAXED);
+			elem_t* xOldNext = next.load(memOrdLoad);
+			new_next->next.store(xOldNext, memOrdStore);
+			new_next->prev.store(this, memOrdStore);
+			new_next->isRemoved.store(false, memOrdStore);
+			next.store(new_next, memOrdStore);
 			if (xOldNext)
-				xOldNext->prev.store(new_next, PWX_MEMORDER_RELAXED);
+				xOldNext->prev.store(new_next, memOrdStore);
 		}
 	}
 
@@ -445,7 +443,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (!new_prev || (new_prev == this))
 			return;
 
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
 				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
@@ -479,7 +477,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Set the neighborhood of the new prev
 				new_prev->setNext(this);
 				new_prev->setPrev(xOldPrev);
-				new_prev->isRemoved.store(false, PWX_MEMORDER_RELEASE);
+				new_prev->isRemoved.store(false, memOrdStore);
 
 				// Store new next and prev neighbor.
 				setPrev(new_prev);
@@ -495,13 +493,13 @@ struct PWX_API TDoubleElement : public VElement
 						"Tried to insert an element that has already been destroyed!")
 		} else {
 			// Otherwise do it directly and relaxed
-			elem_t* xOldPrev = prev.load(PWX_MEMORDER_RELAXED);
-			new_prev->prev.store(xOldPrev, PWX_MEMORDER_RELAXED);
-			new_prev->next.store(this, PWX_MEMORDER_RELAXED);
-			new_prev->isRemoved.store(false, PWX_MEMORDER_RELAXED);
-			prev.store(new_prev, PWX_MEMORDER_RELAXED);
+			elem_t* xOldPrev = prev.load(memOrdLoad);
+			new_prev->prev.store(xOldPrev, memOrdStore);
+			new_prev->next.store(this, memOrdStore);
+			new_prev->isRemoved.store(false, memOrdStore);
+			prev.store(new_prev, memOrdStore);
 			if (xOldPrev)
-				xOldPrev->next.store(new_prev, PWX_MEMORDER_RELAXED);
+				xOldPrev->next.store(new_prev, memOrdStore);
 		}
 	}
 
@@ -515,9 +513,9 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			// Do an acquiring test before the element is actually locked
-			if (next.load(PWX_MEMORDER_ACQUIRE) || prev.load(PWX_MEMORDER_ACQUIRE)) {
+			if (next.load(memOrdLoad) || prev.load(memOrdLoad)) {
 				PWX_LOCK(this)
 				elem_t* xOldPrev = getPrev();
 				elem_t* xOldNext = getNext();
@@ -576,7 +574,7 @@ struct PWX_API TDoubleElement : public VElement
 				// 3: Remove neighborhood:
 				this->setPrev(nullptr);
 				this->setNext(nullptr);
-				this->isRemoved.store(true, PWX_MEMORDER_RELEASE);
+				this->isRemoved.store(true, memOrdStore);
 				PWX_UNLOCK(this)
 
 				// End of having at least one neighbor to handle
@@ -584,23 +582,23 @@ struct PWX_API TDoubleElement : public VElement
 				// Just set the neighbors
 				this->setPrev(nullptr);
 				this->setNext(nullptr);
-				this->isRemoved.store(true, PWX_MEMORDER_RELEASE);
+				this->isRemoved.store(true, memOrdStore);
 			}
 		} else {
 			// No thread safety? Then just kick it out:
-			elem_t* xOldNext = next.load(PWX_MEMORDER_RELAXED);
-			elem_t* xOldPrev = prev.load(PWX_MEMORDER_RELAXED);
+			elem_t* xOldNext = next.load(memOrdLoad);
+			elem_t* xOldPrev = prev.load(memOrdLoad);
 
 			if (xOldNext && (xOldNext != this))
-				xOldNext->prev.store(xOldNext, PWX_MEMORDER_RELAXED);
+				xOldNext->prev.store(xOldNext, memOrdStore);
 
 			if (xOldPrev && (xOldPrev != this))
-				xOldPrev->next.store(xOldNext, PWX_MEMORDER_RELAXED);
+				xOldPrev->next.store(xOldNext, memOrdStore);
 
-			prev.store(nullptr, PWX_MEMORDER_RELAXED);
-			next.store(nullptr, PWX_MEMORDER_RELAXED);
+			prev.store(nullptr, memOrdStore);
+			next.store(nullptr, memOrdStore);
 
-			isRemoved.store(true, PWX_MEMORDER_RELAXED);
+			isRemoved.store(true, memOrdStore);
 		}
 	}
 
@@ -643,13 +641,13 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
-			elem_t* currNext = next.load(PWX_MEMORDER_ACQUIRE);
-			next.store(new_next, PWX_MEMORDER_RELEASE);
+		if (beThreadSafe.load(memOrdLoad)) {
+			elem_t* currNext = next.load(memOrdLoad);
+			next.store(new_next, memOrdStore);
 			if (currNext)
-				oldNext.store(currNext, PWX_MEMORDER_RELEASE);
+				oldNext.store(currNext, memOrdStore);
 		} else
-			next.store(new_next, PWX_MEMORDER_RELAXED);
+			next.store(new_next, memOrdStore);
 	}
 
 
@@ -665,13 +663,13 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	void setPrev(elem_t* new_prev) noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
-			elem_t* currPrev = prev.load(PWX_MEMORDER_ACQUIRE);
-			prev.store(new_prev, PWX_MEMORDER_RELEASE);
+		if (beThreadSafe.load(memOrdLoad)) {
+			elem_t* currPrev = prev.load(memOrdLoad);
+			prev.store(new_prev, memOrdStore);
 			if (currPrev)
-				oldPrev.store(currPrev, PWX_MEMORDER_RELEASE);
+				oldPrev.store(currPrev, memOrdStore);
 		} else
-			prev.store(new_prev, PWX_MEMORDER_RELAXED);
+			prev.store(new_prev, memOrdStore);
 	}
 
 
@@ -806,11 +804,11 @@ private:
 template<typename data_t>
 TDoubleElement<data_t>::~TDoubleElement() noexcept
 {
-	if (beThreadSafe.load(PWX_MEMORDER_ACQUIRE))
+	if (beThreadSafe.load(memOrdLoad))
 		isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		if (beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
 			PWX_LOCK(this)
