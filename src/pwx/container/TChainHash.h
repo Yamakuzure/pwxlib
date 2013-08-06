@@ -273,6 +273,8 @@ protected:
 	using base_t::CHMethod;
 	using base_t::eCount;
 	using base_t::hashTable;
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 
 
 private:
@@ -327,8 +329,7 @@ private:
 		} else
 			this->hashTable[idx] = elem;
 
-		eCount.fetch_add(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-							? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+		eCount.fetch_add(1, memOrdStore);
 		return this->size();
 	}
 
@@ -355,8 +356,7 @@ private:
 				result = hashTable[index];
 				hashTable[index] = result->getNext();
 				result->remove();
-				eCount.fetch_sub(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-									? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+				eCount.fetch_sub(1, memOrdStore);
 			} // End of outer check
 		} // End of outer check
 
@@ -391,8 +391,7 @@ private:
 				hashTable[index] = result->getNext();
 				result->remove();
 			}
-			eCount.fetch_sub(1, this->beThreadSafe.load(PWX_MEMORDER_RELAXED)
-								? PWX_MEMORDER_RELEASE : PWX_MEMORDER_RELAXED);
+			eCount.fetch_sub(1, memOrdStore);
 		}
 
 		return result;

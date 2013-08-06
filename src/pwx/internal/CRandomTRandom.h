@@ -47,6 +47,7 @@ const long double randomValueRange = maxRandomValue - minRandomValue;
 static std::random_device  privRandDev_;
 static std::atomic<rand_t> lastRndValue = ATOMIC_VAR_INIT(0);
 
+
 /// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 rand_t private_get_random() noexcept
 {
