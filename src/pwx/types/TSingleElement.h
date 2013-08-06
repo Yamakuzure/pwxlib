@@ -277,14 +277,14 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	elem_t* getNext() const noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
-			elem_t* curNext = next.load(PWX_MEMORDER_ACQUIRE);
+		if (beThreadSafe.load(memOrdLoad)) {
+			elem_t* curNext = next.load(memOrdLoad);
 			if ( !curNext
-			  && isRemoved.load(PWX_MEMORDER_ACQUIRE) )
-				return oldNext.load(PWX_MEMORDER_ACQUIRE);
+			  && isRemoved.load(memOrdLoad) )
+				return oldNext.load(memOrdLoad);
 			return curNext;
 		}
-		return next.load(PWX_MEMORDER_RELAXED);
+		return next.load(memOrdLoad);
 	}
 
 
@@ -307,14 +307,12 @@ struct PWX_API TSingleElement : public VElement
 	void insertBefore(elem_t* new_next)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, beThreadSafe.load(PWX_MEMORDER_RELAXED)
-								? PWX_MEMORDER_RELEASE
-								: PWX_MEMORDER_RELAXED);
+			isRemoved.store(false, memOrdStore);
 			return;
 		}
 
 		if (!destroyed() && !new_next->destroyed()) {
-			if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+			if (beThreadSafe.load(memOrdLoad)) {
 				// Do locking and double checks if this has to be thread safe
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, new_next)
@@ -335,11 +333,11 @@ struct PWX_API TSingleElement : public VElement
 				setNext(new_next);
 
 				// Mark as inserted
-				isRemoved.store(false, PWX_MEMORDER_RELEASE);
+				isRemoved.store(false, memOrdStore);
 			} else {
 				// Otherwise do it directly and relaxed
-				next.store(new_next, PWX_MEMORDER_RELAXED);
-				isRemoved.store(false, PWX_MEMORDER_RELAXED);
+				next.store(new_next, memOrdStore);
+				isRemoved.store(false, memOrdStore);
 			}
 		} else if (destroyed())
 			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
@@ -369,7 +367,7 @@ struct PWX_API TSingleElement : public VElement
 		if (!new_next || (new_next == this))
 			return;
 
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
 				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK", this, this)
@@ -389,7 +387,7 @@ struct PWX_API TSingleElement : public VElement
 
 				// Insert the new element
 				new_next->setNext(this->getNext());
-				new_next->isRemoved.store(false, PWX_MEMORDER_RELEASE);
+				new_next->isRemoved.store(false, memOrdStore);
 
 				// Store new next neighbor
 				setNext(new_next);
@@ -401,10 +399,9 @@ struct PWX_API TSingleElement : public VElement
 						"Tried to insert an element that has already been destroyed!")
 		} else {
 			// Otherwise do it directly and relaxed
-			new_next->next.store(next.load(PWX_MEMORDER_RELAXED),
-								PWX_MEMORDER_RELAXED);
-			new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
-			next.store(new_next, PWX_MEMORDER_RELAXED);
+			new_next->next.store(next.load(memOrdLoad),memOrdStore);
+			new_next->isRemoved.store(false, memOrdStore);
+			next.store(new_next, memOrdStore);
 		}
 	}
 
@@ -418,14 +415,14 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void remove() noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_LOCK_GUARD(elem_t, this)
 			setNext(nullptr);
-			isRemoved.store(true, PWX_MEMORDER_RELEASE);
+			isRemoved.store(true, memOrdStore);
 		} else {
-			next.store(nullptr, PWX_MEMORDER_RELAXED);
-			isRemoved.store(true, PWX_MEMORDER_RELAXED);
+			next.store(nullptr, memOrdStore);
+			isRemoved.store(true, memOrdStore);
 		}
 	}
 
@@ -447,7 +444,7 @@ struct PWX_API TSingleElement : public VElement
 			return;
 
 		// Do an acquiring test before the element is actually locked
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			/* See notes in TDoubleElement::remove() */
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, toRemove)
 			PWX_LOCK_GUARD(elem_t, toRemove)
@@ -473,7 +470,7 @@ struct PWX_API TSingleElement : public VElement
 
 		} else if (this != toRemove)
 			// Without the thread safety needs, this is a lot simpler:
-			next.store(toRemove->next.load(PWX_MEMORDER_RELAXED), PWX_MEMORDER_RELAXED);
+			next.store(toRemove->next.load(memOrdLoad), memOrdStore);
 
 		// Remove neighborhood:
 		toRemove->remove();
@@ -489,13 +486,13 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void setNext(elem_t* new_next) noexcept
 	{
-		if (beThreadSafe.load(PWX_MEMORDER_RELAXED)) {
-			elem_t* currNext = next.load(PWX_MEMORDER_ACQUIRE);
-			next.store(new_next, PWX_MEMORDER_RELEASE);
+		if (beThreadSafe.load(memOrdLoad)) {
+			elem_t* currNext = next.load(memOrdLoad);
+			next.store(new_next, memOrdStore);
 			if (currNext)
-				oldNext.store(currNext, PWX_MEMORDER_RELEASE);
+				oldNext.store(currNext, memOrdStore);
 		} else
-			next.store(new_next, PWX_MEMORDER_RELAXED);
+			next.store(new_next, memOrdStore);
 	}
 
 
@@ -629,11 +626,11 @@ private:
 template<typename data_t>
 TSingleElement<data_t>::~TSingleElement() noexcept
 {
-	if (beThreadSafe.load(PWX_MEMORDER_ACQUIRE))
+	if (beThreadSafe.load(memOrdLoad))
 		isDestroyed.store(true);
 
 	if (1 == data.use_count()) {
-		if (beThreadSafe.load(PWX_MEMORDER_ACQUIRE)) {
+		if (beThreadSafe.load(memOrdLoad)) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
 			PWX_LOCK(this)
