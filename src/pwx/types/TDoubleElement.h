@@ -391,7 +391,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Insert the new element
 				new_next->setNext(xOldNext);
 				new_next->setPrev(this);
-				new_next->isRemoved.store(false, memOrdStore);
+				new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
 
 				// Store new next and prev neighbor
 				setNext(new_next);
@@ -406,7 +406,7 @@ struct PWX_API TDoubleElement : public VElement
 				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 						"Tried to insert an element that has already been destroyed!")
 		} else {
-			// Otherwise do it directly and relaxed
+			// Otherwise do it directly
 			elem_t* xOldNext = next.load(memOrdLoad);
 			new_next->next.store(xOldNext, memOrdStore);
 			new_next->prev.store(this, memOrdStore);
@@ -477,7 +477,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Set the neighborhood of the new prev
 				new_prev->setNext(this);
 				new_prev->setPrev(xOldPrev);
-				new_prev->isRemoved.store(false, memOrdStore);
+				new_prev->isRemoved.store(false, PWX_MEMORDER_RELAXED);
 
 				// Store new next and prev neighbor.
 				setPrev(new_prev);
@@ -492,7 +492,7 @@ struct PWX_API TDoubleElement : public VElement
 				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 						"Tried to insert an element that has already been destroyed!")
 		} else {
-			// Otherwise do it directly and relaxed
+			// Otherwise do it directly
 			elem_t* xOldPrev = prev.load(memOrdLoad);
 			new_prev->prev.store(xOldPrev, memOrdStore);
 			new_prev->next.store(this, memOrdStore);

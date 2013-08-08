@@ -190,7 +190,7 @@ struct PWX_API TSingleElement : public VElement
 	  * method returns 1. If both are equal it returns 0 and 1 if the
 	  * other data is larger.
 	  *
-	  * This element get locked and checked against destruction and
+	  * This element gets locked and checked against destruction and
 	  * nullptr data.
 	  *
 	  * @param[in] other reference to the data to compare with
@@ -333,9 +333,9 @@ struct PWX_API TSingleElement : public VElement
 				setNext(new_next);
 
 				// Mark as inserted
-				isRemoved.store(false, memOrdStore);
+				isRemoved.store(false, PWX_MEMORDER_RELAXED);
 			} else {
-				// Otherwise do it directly and relaxed
+				// Otherwise do it directly
 				next.store(new_next, memOrdStore);
 				isRemoved.store(false, memOrdStore);
 			}
@@ -387,7 +387,7 @@ struct PWX_API TSingleElement : public VElement
 
 				// Insert the new element
 				new_next->setNext(this->getNext());
-				new_next->isRemoved.store(false, memOrdStore);
+				new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
 
 				// Store new next neighbor
 				setNext(new_next);
@@ -398,7 +398,7 @@ struct PWX_API TSingleElement : public VElement
 				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 						"Tried to insert an element that has already been destroyed!")
 		} else {
-			// Otherwise do it directly and relaxed
+			// Otherwise do it directly
 			new_next->next.store(next.load(memOrdLoad),memOrdStore);
 			new_next->isRemoved.store(false, memOrdStore);
 			next.store(new_next, memOrdStore);
@@ -446,8 +446,8 @@ struct PWX_API TSingleElement : public VElement
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe()) {
 			/* See notes in TDoubleElement::remove() */
-			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, toRemove)
-			PWX_LOCK_GUARD(elem_t, toRemove)
+			DEBUG_LOCK_STATE("PWX_LOCK", this, toRemove)
+			PWX_LOCK(toRemove)
 			elem_t* xOldNext = toRemove->getNext();
 
 			// Do a lock cycle until this is locked
@@ -455,7 +455,7 @@ struct PWX_API TSingleElement : public VElement
 			while (  (this->getNext() == toRemove)
 				  && (toRemove != this)
 				  && !PWX_TRY_LOCK(this) ) {
-				// Can't lock this, so yield until possible
+				// Can't lock this, so cycle until possible
 				PWX_UNLOCK(toRemove)
 				PWX_LOCK(toRemove)
 			}
@@ -466,7 +466,9 @@ struct PWX_API TSingleElement : public VElement
 				this->setNext(xOldNext);
 				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this);
+				DEBUG_LOCK_STATE("PWX_UNLOCK", this, toRemove)
 			}
+			PWX_UNLOCK(toRemove)
 
 		} else if (this != toRemove)
 			// Without the thread safety needs, this is a lot simpler:

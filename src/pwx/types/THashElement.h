@@ -303,7 +303,7 @@ public:
 
 				// Insert the new element
 				new_next->setNext(this->getNext());
-				new_next->isRemoved.store(false, memOrdStore);
+				new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
 
 				// Store new next neighbor
 				setNext(new_next);
@@ -314,7 +314,7 @@ public:
 				PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 						"Tried to insert an element that has already been destroyed!")
 		} else {
-			// Otherwise do it directly and relaxed
+			// Otherwise do it directly
 			new_next->next.store(next.load(memOrdLoad), memOrdStore);
 			new_next->isRemoved.store(false, memOrdStore);
 			next.store(new_next, memOrdStore);
@@ -335,7 +335,7 @@ public:
 			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_LOCK_GUARD(elem_t, this)
 			setNext(nullptr);
-			isRemoved.store(true, memOrdStore);
+			isRemoved.store(true, PWX_MEMORDER_RELAXED);
 		} else {
 			next.store(nullptr, memOrdStore);
 			isRemoved.store(true, memOrdStore);
@@ -363,8 +363,8 @@ public:
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe()) {
 			/* See notes in TDoubleElement::remove() */
-			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, toRemove)
-			PWX_LOCK_GUARD(elem_t, toRemove)
+			DEBUG_LOCK_STATE("PWX_LOCK", this, toRemove)
+			PWX_LOCK(toRemove)
 			elem_t* xOldNext = toRemove->getNext();
 
 			// Do a lock cycle until this is locked
@@ -384,6 +384,7 @@ public:
 				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this);
 			}
+			PWX_UNLOCK(toRemove)
 
 		} else if (this != toRemove)
 			// Without the thread safety needs, this is a lot simpler:

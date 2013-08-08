@@ -130,7 +130,7 @@ public:
 	/** @brief return the current number of the element in a thread safe way
 	  * @return the current number of the element
 	**/
-	uint32_t nr()
+	uint32_t nr() const noexcept
 	{
 		return eNr.load(memOrdLoad);
 	}
