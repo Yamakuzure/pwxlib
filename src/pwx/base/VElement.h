@@ -101,7 +101,6 @@ public:
 	virtual void disable_thread_safety() noexcept
 	{
 		this->do_locking(false);
-		this->beThreadSafe(false);
 	}
 
 
@@ -112,7 +111,6 @@ public:
 	virtual void enable_thread_safety() noexcept
 	{
 		this->do_locking(true);
-		this->beThreadSafe(true);
 	}
 
 
