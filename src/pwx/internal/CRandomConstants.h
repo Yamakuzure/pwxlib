@@ -28,7 +28,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <cstdint>
+#include <pwx/general/types.h>
 #include <limits>
 
 namespace pwx {
