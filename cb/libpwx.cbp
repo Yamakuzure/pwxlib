@@ -272,6 +272,7 @@
 			<Option target="library" />
 		</Unit>
 		<Unit filename="../src/pwx/types/THashElement.h" />
+		<Unit filename="../src/pwx/types/TLockGuards.h" />
 		<Unit filename="../src/pwx/types/TSingleElement.h">
 			<Option target="clean" />
 			<Option target="library" />

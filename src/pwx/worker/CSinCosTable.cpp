@@ -10,6 +10,7 @@
 
 #include "../general/macros.h"
 #include "../tools/MathHelpers.h"
+#include "../types/TLockGuards.h"
 #include "CSinCosTable.h"
 
 namespace pwx {

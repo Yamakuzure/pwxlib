@@ -234,25 +234,85 @@
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
 #define PWX_NAMED_LOCK_GUARD(Name, T, object) \
-	std::lock_guard<T> pwx_libpwx_lock_guard_##Name(*object); \
+	pwx::TLockGuard<T> pwx_libpwx_lock_guard_##Name(object); \
 	LOG_LOCK_GUARD(object)
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
   *
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
 #define PWX_LOCK_GUARD(T, object) PWX_NAMED_LOCK_GUARD(__FUNCTION__, T, object)
+
+
+/** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+  * @param Ta the type of the first object to lock
+  * @param objA pointer to the first object to lock
+  * @param Tb the type of the second object to lock
+  * @param objB pointer to the second object to lock
+**/
+#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, Ta, objA, Tb, objB) \
+	pwx::TDoubleLockGuard<Ta, Tb> pwx_libpwx_lock_guard_##Name(objA, objB); \
+	LOG_DOUBLE_LOCK_GUARD(objA, objB)
+
+
+/** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  *
+  * @param Ta the type of the first object to lock
+  * @param objA pointer to the first object to lock
+  * @param Tb the type of the second object to lock
+  * @param objB pointer to the second object to lock
+**/
+#define PWX_DOUBLE_LOCK_GUARD(Ta, objA, Tb, objB) \
+	PWX_NAMED_DOUBLE_LOCK_GUARD(__FUNCTION__, Ta, objA, Tb, objB)
+
+
+/** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+  * @param Ta the type of the first object to lock
+  * @param objA pointer to the first object to lock
+  * @param Tb the type of the second object to lock
+  * @param objB pointer to the second object to lock
+  * @param Tc the type of the second object to lock
+  * @param objC pointer to the second object to lock
+**/
+#define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, Ta, objA, Tb, objB, Tc, objC) \
+	pwx::TDoubleLockGuard<Ta, Tb, Tc> pwx_libpwx_lock_guard_##Name(objA, objB, objC); \
+	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
+
+
+/** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  *
+  * @param Ta the type of the first object to lock
+  * @param objA pointer to the first object to lock
+  * @param Tb the type of the second object to lock
+  * @param objB pointer to the second object to lock
+  * @param Tc the type of the second object to lock
+  * @param objC pointer to the second object to lock
+**/
+#define PWX_TRIPLE_LOCK_GUARD(Ta, objA, Tb, objB, Tc, objC) \
+	PWX_NAMED_TRIPLE_LOCK_GUARD(__FUNCTION__, Ta, objA, Tb, objB, Tc, objC)
 
 
 /** @brief Lock two elements simultaneously
@@ -268,8 +328,8 @@
 	std::unique_lock<Ta> pwx_double_lock_A##__FUNCTION__(*objA, std::defer_lock); \
 	std::unique_lock<Tb> pwx_double_lock_B##__FUNCTION__(*objB, std::defer_lock); \
 	std::lock(pwx_double_lock_A##__FUNCTION__, pwx_double_lock_B##__FUNCTION__); \
-	LOG_LOCK_GUARD(objA) \
-	LOG_LOCK_GUARD(objB)
+	LOG_LOCK(objA) \
+	LOG_LOCK(objB)
 
 /** @brief return true if two C-Strings are equal ignoring case
   *
