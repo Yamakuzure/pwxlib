@@ -55,8 +55,6 @@ public:
 
 	typedef CLockable                 base_t;
 	typedef VContainer                list_t;
-	typedef std::atomic_bool          abool_t;
-	typedef std::atomic_uint_fast32_t aui32_t;
 
 
 	/* ===============================================

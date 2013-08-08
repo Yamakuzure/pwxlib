@@ -79,7 +79,6 @@ public:
 	typedef TThreadElementStore<curr_t>  store_t;
 	typedef TOpenHash<size_t, curr_t>    hash_t;
 	typedef THashElement<size_t, curr_t> elem_t;
-	typedef std::atomic_bool             abool_t;
 
 
 	/* ===============================================

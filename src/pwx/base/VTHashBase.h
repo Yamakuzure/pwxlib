@@ -88,7 +88,6 @@ public:
 
 	typedef VContainer                          base_t; //!< Base type of the hash
 	typedef VTHashBase<key_t, data_t, elem_t>   hash_t; //!< Type of this hash
-	typedef std::atomic_uint_fast32_t           aui32_t;
 
 
 	/* ===============================================

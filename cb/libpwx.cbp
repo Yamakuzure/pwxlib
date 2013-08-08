@@ -209,6 +209,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/general/types.h" />
 		<Unit filename="../src/pwx/internal/CRandomConstants.h">
 			<Option target="clean" />
 			<Option target="library" />

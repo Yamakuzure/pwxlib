@@ -104,10 +104,9 @@
 
 
 /* ------------------------------------------------------------------
- * --- To be damn sure how many bits which integral type uses the ---
- * -- stdint types are needed.                                    ---
+ * --- Include needed types and typedefs now                      ---
  * ------------------------------------------------------------------
 */
-#include <cstdint>
+#include <pwx/general/types.h>
 
 #endif // PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED
