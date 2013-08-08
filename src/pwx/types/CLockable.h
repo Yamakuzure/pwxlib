@@ -30,10 +30,10 @@
 #include <pwx/general/compiler.h>
 #include <pwx/types/CException.h>
 #include <pwx/general/macros.h>
-#include <atomic>
 #include <mutex>
 #include <thread>
 #include <cstring>
+
 
 namespace pwx
 {
@@ -44,10 +44,13 @@ namespace pwx
   *
   * Any class that is derived from this class gains the following methods:
   * <UL>
+  * <LI>beThreadSafe() - alias for <I>is_locking()</I>.</LI>
+  * <LI>beThreadSafe(bool) - alias for <I>do_locking(bool)</I>.</LI>
   * <LI>clear_locks() - remove all locks for the current thread.</LI>
   * <LI>do_locking(bool) - if set to false, no real locking is done.
   * This is useful if you use anything derived from CLockable in a single
   * threaded environment. The default is to do locking.</LI>
+  * <LI>is_locked() - returns true if the object is currently locked.</LI>
   * <LI>is_locking() - returns true if the locking mechanism is turned on.</LI>
   * <LI>lock() - acquire lock for the current thread.</LI>
   * <LI>lock_count() - return the number of locks the current thread has.</LI>
@@ -60,26 +63,39 @@ namespace pwx
   * for a lock in the meantime, or if the destroying thread is not the
   * lock owner, the behavior is undefined.
   *
+  * <I>Enabling/Disabling locking</I> : If you want to switch to a non-locking
+  * mode, this will require the switching thread to get a lock first. This way
+  * you will not leave your object in a state where turning locking back on
+  * suddenly leaves you with a lock from a long-gone thread.<BR/>
+  * Rule of thumb: Do only turn off locking directly after instanciating your
+  * object and before any other thread might have accessed it!
+
   * <B>Important</B>: It is strongly recommended that you use std::lock_guard
   * or std::unique_lock to do the locking of any object derived from
   * pwx::CLockable. You can use PWX_LOCK_GUARD(type, pointer) and
   * PWX_DOUBLE_LOCK(typeA, ptrA, typeB, ptrB) to do this rather simply. They
   * are defined in pwx/general/macros.h.
+  *
+  * <I>atomic_flag spinlock</I> versus <I>mutex</I>:<BR/>
+  * By default CLockable is compiled with PWX_USE_FLAGSPIN defined. This can
+  * be controlled by setting USE_SPINLOCK in the main Makefile to either YES
+  * or NO.<BR/>
+  * If you think using the full std::mutex for doing the locking then you can
+  * set this value to NO and compare the outcome of the speed tests of the
+  * testlib program.
 **/
 class PWX_API CLockable
 {
 public:
 
 	/* ===============================================
-	 * === Public types                            ===
+	 * === Public Types                            ===
 	 * ===============================================
 	*/
 
-	typedef std::memory_order         mord_t;
-	typedef std::atomic_bool          abool_t;
-	typedef std::atomic_flag          aflag_t;
-	typedef std::atomic_uint_fast32_t aui32_t;
-	typedef std::atomic_size_t        asize_t;
+#ifndef PWX_USE_FLAGSPIN
+	typedef std::mutex lock_t;
+#endif // !PWX_USE_FLAGSPIN
 
 
 	/* ===============================================
@@ -101,7 +117,7 @@ public:
 	void     beThreadSafe(bool doLock)       noexcept; //!< set thread safety to @a doLock
 	bool     clear_locks ()                  noexcept; //!< remove all locks
 	void     do_locking  (bool doLock)       noexcept; //!< set thread safety to @a doLock
-	bool     is_locked   ()            const noexcept; //!< return true if this object is locked by this thread
+	bool     is_locked   ()            const noexcept; //!< return true if this object is locked
 	bool     is_locking  ()            const noexcept; //!< true if thread safety is turned on
 	void     lock        ()                  noexcept; //!< lock this object
 	uint32_t lock_count  ()            const noexcept; //!< number of locks this thread holds on this object
@@ -128,9 +144,11 @@ protected:
 	mord_t  memOrdStore  = PWX_MEMORDER_RELEASE;   //!< to be used with atomic::store()
 
 
-// If the DEBUG_LOCK_STATE is enabled, the members need to be acceddible from
+// If the DEBUG_LOCK_STATE is enabled, the members need to be accessible from
 // the callers, which must be derived from CLockable anyway.
-#ifndef PWX_THREADDEBUG
+#ifdef PWX_THREADDEBUG
+public:
+#else
 private:
 #endif // PWX_THREADDEBUG
 
@@ -141,7 +159,13 @@ private:
 
 	abool_t CL_Do_Locking = ATOMIC_VAR_INIT(true);   //!< If set to false with do_locking(false), no real locking is done.
 	abool_t CL_Is_Locked  = ATOMIC_VAR_INIT(false);  //!< Set to true if a lock is imposed, atomic_flag can't do it.
+
+#ifdef PWX_USE_FLAGSPIN
 	aflag_t CL_Lock       = ATOMIC_FLAG_INIT;        //!< Instead of a costly mutex atomic_flag spinlocks are used.
+#else
+	lock_t CL_Lock;                                  //!< Use standard mutex to handle locking
+#endif // PWX_USE_FLAGSPIN
+
 	aui32_t CL_Lock_Count = ATOMIC_VAR_INIT(0);      //!< How many times the current thread has locked.
 	asize_t CL_Thread_ID  = ATOMIC_VAR_INIT(0);      //!< The owning thread of a lock
 }; // class CLockable

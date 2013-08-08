@@ -219,7 +219,6 @@ public:
 			}
 		} while (xCurr && xCurr != tail());
 		this->beThreadSafe(false);
-		PWX_UNLOCK(this) // Just for the record
 	}
 
 
