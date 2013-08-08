@@ -182,8 +182,6 @@ public:
 		if (beThreadSafe()) {
 			oneCurr = nullptr;
 			beThreadSafe(false);
-			memOrdLoad  = PWX_MEMORDER_RELAXED;
-			memOrdStore = PWX_MEMORDER_RELAXED;
 		}
 	}
 
@@ -192,8 +190,6 @@ public:
 	void enable_thread_safety()
 	{
 		if (!beThreadSafe()) {
-			memOrdLoad  = PWX_MEMORDER_ACQUIRE;
-			memOrdStore = PWX_MEMORDER_RELEASE;
 			this->currs.clear();
 			beThreadSafe(true);
 		}
