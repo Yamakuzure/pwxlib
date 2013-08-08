@@ -26,6 +26,55 @@ GRAPHITE := NO
 # Set to YES to build a static version of the library
 STATIC := NO
 
+# Set to NO to use mutex instead of atomic_flag spinlocks
+# By default pwxLib uses yielding spinlocks (see below
+# for an explanation), but there might be reasons to use
+# mutexes instead.
+# Using spinlocks is not only more lightweight (an atomic_flag instead
+# of a full scale mutex), but it has a bit better performance, too.
+# Examples: (50,000 random elements inserted/removed, 50 elements
+#            retireved, 8 threads)
+#                              yielding spinlocks     |        mutextes
+#                            Add /   Search /   Clear |      Add /   Search /   Clear
+#  Singly linked lists    234 ms /   113 ms /  589 ms |   219 ms /    83 ms /  686 ms
+#  Doubly linked lists    239 ms /   190 ms /  655 ms |   217 ms /    86 ms /  687 ms
+#  Singly linked rings    243 ms /   105 ms /  605 ms |   224 ms /   116 ms /  681 ms
+#  Doubly linked rings    244 ms /    96 ms /  622 ms |   214 ms /   125 ms /  738 ms
+#  Stacks                 232 ms /    90 ms /  586 ms |   219 ms /   131 ms /  709 ms
+#  Queues                 241 ms /   124 ms /  644 ms |   209 ms /   131 ms /  730 ms
+#  Sets                 34320 ms /   199 ms /  621 ms | 38920 ms /   199 ms /  753 ms
+#  Chained Hash Tables     84 ms /     0 ms /   83 ms |   188 ms /     0 ms /  157 ms
+#  Open Hash Tables       131 ms /     0 ms /  143 ms |   207 ms /     0 ms /  442 ms
+# @todo: Update statistic and default decision once all containers use
+#        the new currStore correctly and once the memory fences are realxed
+#        where appropriate.
+USE_SPINLOCK := YES
+
+# The following settings lets threads do a yield() whenever
+# they wait to get the spinlock. This setting is ignored
+# if USE_SPINLOCK is set to NO
+# By default threads do yield, as this results in a much better
+# performance when inserting or removing elements from containers.
+# The performance of retrievals, howerver, is slightly better
+# without the yield.
+# Examples: (50,000 random elements inserted/removed, 50 elements
+#            retireved, 8 threads)
+#                              yield() enabled        | yield() disabled
+#                            Add /   Search /   Clear |      Add /   Search /   Clear
+#  Singly linked lists    234 ms /   113 ms /  589 ms |   824 ms /   106 ms / 2613 ms
+#  Doubly linked lists    239 ms /   190 ms /  655 ms |   560 ms /   244 ms / 2080 ms
+#  Singly linked rings    243 ms /   105 ms /  605 ms |   800 ms /   169 ms / 2395 ms
+#  Doubly linked rings    244 ms /    96 ms /  622 ms |   714 ms /   176 ms / 2406 ms
+#  Stacks                 232 ms /    90 ms /  586 ms |   657 ms /   144 ms / 2865 ms
+#  Queues                 241 ms /   124 ms /  644 ms |   500 ms /   210 ms / 2145 ms
+#  Sets                 34320 ms /   199 ms /  621 ms | 54680 ms /   290 ms / 2556 ms
+#  Chained Hash Tables     84 ms /     0 ms /   83 ms |   346 ms /     0 ms /  226 ms
+#  Open Hash Tables       131 ms /     0 ms /  143 ms |   577 ms /     0 ms /  595 ms
+# @todo: Update statistic and default decision once all containers use
+#        the new currStore correctly and once the memory fences are realxed
+#        where appropriate.
+USE_SPINLOCK_YIELD := YES
+
 # ===================================================================
 # Turn of the "Entering/Leaving directory foo" funtionality
 MAKEFLAGS += --no-print-directory
@@ -115,6 +164,13 @@ endif
 
 ifeq (YES, ${ANNOTATIONS})
   CXXFLAGS := ${CXXFLAGS} -DPWX_ANNOTATIONS
+endif
+
+ifeq (YES, ${USE_SPINLOCK})
+  CXXFLAGS := ${CXXFLAGS} -DPWX_USE_FLAGSPIN
+  ifeq (YES, ${USE_SPINLOCK_YIELD})
+    CXXFLAGS := ${CXXFLAGS} -DPWX_USE_FLAGSPIN_YIELD
+  endif
 endif
 
 # ------------------------------------
