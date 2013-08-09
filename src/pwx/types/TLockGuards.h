@@ -93,6 +93,7 @@ private:
 template<typename Ta, typename Tb>
 class PWX_API TDoubleLockGuard
 {
+public:
 
 	/* ===============================================
 	 * === Public constructors and destructors     ===
@@ -162,6 +163,7 @@ private:
 template<typename Ta, typename Tb, typename Tc>
 class PWX_API TTripleLockGuard
 {
+public:
 
 	/* ===============================================
 	 * === Public constructors and destructors     ===
