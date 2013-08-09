@@ -76,6 +76,31 @@ public:
 	TLockGuard &operator=(const TLockGuard&) PWX_DELETE;
 
 
+	/* ===============================================
+	 * === Public Methods                          ===
+	 * ===============================================
+	*/
+
+	/** @brief reset all locks
+	  *
+	  * This method can be used to replace the locked object
+	  * with another one. The first will be unlocked, and the
+	  * new one locked. If @a new_obj is nullptr, only the
+	  * old one is unlocked.
+	  *
+	  * If you submit the same pointer again, it is unlocked
+	  * and then locked again.
+	  *
+	  * @param[in] new_obj pointer to the new object to lock
+	**/
+	void reset(const T* new_obj)
+	{
+		if (obj)            obj->unlock();
+		if (obj != new_obj) obj = const_cast<T*>(new_obj);
+		if (obj)            obj->lock();
+	}
+
+
 private:
 
 	/* ===============================================
@@ -111,6 +136,65 @@ public:
 		objA(const_cast<Ta*>(objA_)),
 		objB(const_cast<Tb*>(objB_))
 	{
+		privLockAll();
+	}
+
+
+	/** @brief default destructor
+	  * This is non-virtual. Do _NOT_ derive from this class!
+	**/
+	~TDoubleLockGuard()
+	{
+		privUnlockAll();
+	}
+
+
+	// No empty ctor, no assigning, no copying
+	TDoubleLockGuard() PWX_DELETE;
+	TDoubleLockGuard(const TDoubleLockGuard&) PWX_DELETE;
+	TDoubleLockGuard &operator=(const TDoubleLockGuard&) PWX_DELETE;
+
+
+	/* ===============================================
+	 * === Public Methods                          ===
+	 * ===============================================
+	*/
+
+	/** @brief reset all locks
+	  *
+	  * This method can be used to replace the locked objects
+	  * with other ones. The first will be unlocked, and the
+	  * new ones locked. If either @a new_objA or @a new_objB
+	  * is nullptr, only the corresponding old ones are
+	  * unlocked.
+	  *
+	  * If you submit the same pointer again, it is unlocked
+	  * and then locked again.
+	  *
+	  * @param[in] new_objA pointer to the first new object to lock
+	  * @param[in] new_objB pointer to the second new object to lock
+	**/
+	void reset(const Ta* new_objA, const Tb* new_objB)
+	{
+		privUnlockAll();
+
+		if (objA != new_objA) objA = const_cast<Ta*>(new_objA);
+		if (objB != new_objB) objB = const_cast<Tb*>(new_objB);
+
+		privLockAll();
+	}
+
+
+private:
+
+	/* ===============================================
+	 * === Private Methods                         ===
+	 * ===============================================
+	*/
+
+	/// @brief the internal method that does the actual locking
+	void privLockAll()
+	{
 		bool lockedA = objA ? false : true;
 		bool lockedB = objB ? false : true;
 
@@ -130,23 +214,13 @@ public:
 	}
 
 
-	/** @brief default destructor
-	  * This is non-virtual. Do _NOT_ derive from this class!
-	**/
-	~TDoubleLockGuard()
+	/// @brief The internal method that does the unlocking
+	void privUnlockAll()
 	{
 		if (objA) objA->unlock();
 		if (objB) objB->unlock();
 	}
 
-
-	// No empty ctor, no assigning, no copying
-	TDoubleLockGuard() PWX_DELETE;
-	TDoubleLockGuard(const TDoubleLockGuard&) PWX_DELETE;
-	TDoubleLockGuard &operator=(const TDoubleLockGuard&) PWX_DELETE;
-
-
-private:
 
 	/* ===============================================
 	 * === Private Members                         ===
@@ -184,6 +258,67 @@ public:
 		objB(const_cast<Tb*>(objB_)),
 		objC(const_cast<Tc*>(objC_))
 	{
+		privLockAll();
+	}
+
+
+	/** @brief default destructor
+	  * This is non-virtual. Do _NOT_ derive from this class!
+	**/
+	~TTripleLockGuard()
+	{
+		privUnlockAll();
+	}
+
+
+	// No empty ctor, no assigning, no copying
+	TTripleLockGuard() PWX_DELETE;
+	TTripleLockGuard(const TTripleLockGuard&) PWX_DELETE;
+	TTripleLockGuard &operator=(const TTripleLockGuard&) PWX_DELETE;
+
+
+	/* ===============================================
+	 * === Public Methods                          ===
+	 * ===============================================
+	*/
+
+	/** @brief reset all locks
+	  *
+	  * This method can be used to replace the locked objects
+	  * with other ones. The first will be unlocked, and the
+	  * new ones locked. If either @a new_objA, @a new_objB or
+	  * @a new_objC is nullptr, only the corresponding old
+	  * ones are unlocked.
+	  *
+	  * If you submit the same pointer again, it is unlocked
+	  * and then locked again.
+	  *
+	  * @param[in] new_objA pointer to the first new object to lock
+	  * @param[in] new_objB pointer to the second new object to lock
+	  * @param[in] new_objC pointer to the third new object to lock
+	**/
+	void reset(const Ta* new_objA, const Tb* new_objB, const Tc* new_objC)
+	{
+		privUnlockAll();
+
+		if (objA != new_objA) objA = const_cast<Ta*>(new_objA);
+		if (objB != new_objB) objB = const_cast<Tb*>(new_objB);
+		if (objC != new_objC) objC = const_cast<Tc*>(new_objC);
+
+		privLockAll();
+	}
+
+
+private:
+
+	/* ===============================================
+	 * === Private Methods                         ===
+	 * ===============================================
+	*/
+
+	/// @brief the internal method that does the actual locking
+	void privLockAll()
+	{
 		bool lockedA = objA ? false : true;
 		bool lockedB = objB ? false : true;
 		bool lockedC = objC ? false : true;
@@ -206,24 +341,14 @@ public:
 	}
 
 
-	/** @brief default destructor
-	  * This is non-virtual. Do _NOT_ derive from this class!
-	**/
-	~TTripleLockGuard()
+	/// @brief The internal method that does the unlocking
+	void privUnlockAll()
 	{
 		if (objA) objA->unlock();
 		if (objB) objB->unlock();
 		if (objC) objC->unlock();
 	}
 
-
-	// No empty ctor, no assigning, no copying
-	TTripleLockGuard() PWX_DELETE;
-	TTripleLockGuard(const TTripleLockGuard&) PWX_DELETE;
-	TTripleLockGuard &operator=(const TTripleLockGuard&) PWX_DELETE;
-
-
-private:
 
 	/* ===============================================
 	 * === Private Members                         ===
