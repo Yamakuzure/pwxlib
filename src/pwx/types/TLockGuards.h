@@ -54,8 +54,8 @@ public:
 	  * unless it is nullptr, in which case it does nothing.
 	  * @param[in] obj_ the object to lock, it must have a lock() method.
 	**/
-	explicit TLockGuard(T* obj_) :
-		obj(obj_)
+	explicit TLockGuard(const T* obj_) :
+		obj(const_cast<T*>(obj_))
 	{
 		if (obj) obj->lock();
 	}
@@ -107,8 +107,9 @@ public:
 	  * @param[in] objA_ the first object to lock, it must have a try_lock() method.
 	  * @param[in] objB_ the second object to lock, it must have a try_lock() method.
 	**/
-	explicit TDoubleLockGuard(Ta* objA_, Tb* objB_) :
-		objA(objA_), objB(objB_)
+	explicit TDoubleLockGuard(const Ta* objA_, const Tb* objB_) :
+		objA(const_cast<Ta*>(objA_)),
+		objB(const_cast<Tb*>(objB_))
 	{
 		bool lockedA = objA ? false : true;
 		bool lockedB = objB ? false : true;
@@ -178,8 +179,10 @@ public:
 	  * @param[in] objB_ the second object to lock, it must have a try_lock() method.
 	  * @param[in] objC_ the third object to lock, it must have a try_lock() method.
 	**/
-	explicit TTripleLockGuard(Ta* objA_, Tb* objB_, Tc* objC_) :
-		objA(objA_), objB(objB_), objC(objC_)
+	explicit TTripleLockGuard(const Ta* objA_, const Tb* objB_, const Tc* objC_) :
+		objA(const_cast<Ta*>(objA_)),
+		objB(const_cast<Tb*>(objB_)),
+		objC(const_cast<Tc*>(objC_))
 	{
 		bool lockedA = objA ? false : true;
 		bool lockedB = objB ? false : true;
