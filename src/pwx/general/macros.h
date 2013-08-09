@@ -234,7 +234,7 @@
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param T the type of the object to lock
@@ -247,7 +247,7 @@
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
   *
   * @param T the type of the object to lock
   * @param object pointer to the object to lock
@@ -257,7 +257,7 @@
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param Ta the type of the first object to lock
@@ -272,7 +272,7 @@
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
   *
   * @param Ta the type of the first object to lock
   * @param objA pointer to the first object to lock
@@ -285,7 +285,7 @@
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param Ta the type of the first object to lock
@@ -302,7 +302,7 @@
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/CLockable.h pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
   *
   * @param Ta the type of the first object to lock
   * @param objA pointer to the first object to lock
