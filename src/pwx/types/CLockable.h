@@ -59,9 +59,19 @@ namespace pwx
   * </UL>
   *
   * If the owning thread destroys the CLockable instance, the destructor will
-  * try to unlock completely before going away. If another thread waits
-  * for a lock in the meantime, or if the destroying thread is not the
-  * lock owner, the behavior is undefined.
+  * unlock completely before going away. If another thread waits for a lock in
+  * the meantime, or if the destroying thread is not the lock owner, the
+  * behavior is undefined.
+  *
+  * This class implements a recursive behavior. Every call to lock() by the
+  * current lock owner is counted. To unlock, the same amount of calls of the
+  * unlock() method is required.<BR/>
+  * However, there are two methods that might help out of tight spots, enabling
+  * otherwise impossible techniques: The method clear_locks() will completely
+  * unlock, no matter how often lock() was called. Further a thread can ask the
+  * object with lock_count() how many locks it currently holds.<BR />
+  * Please keep in mind, however, that your design might be flawed if you find
+  * yourself in a situation in which you really need either method.
   *
   * <I>Enabling/Disabling locking</I> : If you want to switch to a non-locking
   * mode, this will require the switching thread to get a lock first. This way

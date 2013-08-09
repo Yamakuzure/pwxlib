@@ -6,6 +6,30 @@
 namespace pwx
 {
 
+/* -----------------------------------------------------------------------------------------------------
+ * --- Some notes about the private members:                                                         ---
+ * --- CL_Do_Locking : This is a value that will most probably never change. The general use case to ---
+ * ---                 touch it would be disabling it right after object creation. It is therefore   ---
+ * ---                 save to load relaxed in any case. However, a change must be visible at once,  ---
+ * ---                 so any change must be in release memory order.                                ---
+ * --- CL_Is_Locked    This is set by lock() and try_lock() to true, and false by unlock(). This is  ---
+ * ---                 of no interest to the internal methods. But any thread might check this value ---
+ * ---                 from anywhere anytime. It is therefore inevitable to store in relase and to   ---
+ * ---                 load in acquire memory order.                                                 ---
+ * --- CL_Lock         The lock, if using a spinlock, mut be cleared in relase memory order to be    ---
+ * ---                 sure that a waiting thread does not waste a cycle by a superfluous yield().   ---
+ * --- CL_Lock_Count   This is a value that is only used by the currently owning thread. There is no ---
+ * ---                 reason why any acces shouldn't be in relaxed memory order.                    ---
+ * --- CL_Thread_ID    The same applies for the stored thread id. Whether a thread sets it to its own---
+ * ---                 id during locking, or sets it to 0x0 during unlocking, it will always be      ---
+ * ---                 different to not woning threads.                                              ---
+ * --- About memOrdLoad and memOrdStore:                                                             ---
+ * --- As the memory order is an enum, that can be used directly, both should not be used inside the ---
+ * --- implementation, unless it would require to question CL_Do_Locking otherwise. It does mean     ---
+ * --- nothing for the performance, but for clarity.                                                 ---
+ * ---------------------------------------------------------------------------------------------------*/
+
+
 /** @brief Default ctor
   */
 CLockable::CLockable() noexcept
@@ -32,6 +56,10 @@ CLockable::CLockable (const CLockable &src) noexcept
 CLockable::~CLockable() noexcept
 {
 	DEBUG_LOCK_STATE("~CLockable", this, this)
+#ifdef PWX_USE_FLAGSPIN
+	// Simply move the id to this thread:
+	CL_Thread_ID.store(CURRENT_THREAD_ID, PWX_MEMORDER_RELAXED);
+#endif // PWX_USE_FLAGSPIN
 	clear_locks();
 	// the return value is unimportant, we can't do
 	// anything about it in the middle of a dtor anyway.
@@ -82,26 +110,22 @@ void CLockable::beThreadSafe(bool doLock) noexcept
 bool CLockable::clear_locks() noexcept
 {
 	if (CL_Do_Locking.load(PWX_MEMORDER_RELAXED)) {
-		if (CL_Is_Locked.load(memOrdLoad)) {
-			if (CURRENT_THREAD_ID == CL_Thread_ID.load(memOrdLoad) ) {
-				THREAD_LOG("base", "clear_locks(), Owner id 0x%08lx, %u locks [%s]",
-						CL_Thread_ID.load(memOrdLoad),
-						CL_Lock_Count.load(memOrdLoad),
-						CL_Is_Locked.load(memOrdLoad) ? "locked" : "not locked")
-				CL_Lock_Count.store(0, PWX_MEMORDER_RELAXED);
-				CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
+		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_RELAXED) ) {
+			THREAD_LOG("base", "clear_locks(), Owner id 0x%08lx, %u locks [%s]",
+					CL_Thread_ID.load(PWX_MEMORDER_RELAXED),
+					CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
+					CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
+			CL_Lock_Count.store(0, PWX_MEMORDER_RELAXED);
+			CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
+			CL_Is_Locked.store(false, PWX_MEMORDER_RELAXED);
 #ifdef PWX_USE_FLAGSPIN
-				CL_Is_Locked.store(false, PWX_MEMORDER_RELAXED);
-				CL_Lock.clear(memOrdStore); // This *must* be last!
+			CL_Lock.clear(memOrdStore); // This *must* be last!
 #else
-				CL_Lock.unlock();
-				CL_Is_Locked.store(false, memOrdStore); // an dthis mujst be last with mutexes
-
+			CL_Lock.unlock();
 #endif // PWX_USE_FLAGSPIN
-			} // End of trying from within the right thread
-			else
-				return false; // Not from this thread!
-		} // End of needing unlock
+		} // End of trying from within the right thread
+		else
+			return false; // Not from this thread!
 	} // End of having to care about locking
 
 	return true;
@@ -118,7 +142,7 @@ bool CLockable::clear_locks() noexcept
 **/
 void CLockable::do_locking(bool doLock) noexcept
 {
-	if (doLock != CL_Do_Locking.load(memOrdLoad)) {
+	if (doLock != CL_Do_Locking.load(PWX_MEMORDER_RELAXED)) {
 		// If locking is enabled, change memory order now to strict
 		if (doLock) {
 			memOrdLoad  = PWX_MEMORDER_ACQUIRE;
@@ -127,45 +151,41 @@ void CLockable::do_locking(bool doLock) noexcept
 
 		// Switch now, so other threads stop locking
 		// If this is a switch "on", it is finished anyway.
-		CL_Do_Locking.store(doLock, memOrdStore);
+		CL_Do_Locking.store(doLock, PWX_MEMORDER_RELEASE);
 
 		if (!doLock) {
-			bool needUnlock = false;
-			if (CL_Is_Locked.load(memOrdLoad)) {
-				needUnlock = true;
-				/* If this is locked it is either by this or another
-				 * thread, so an additional unlock() is needed.
-				 * Unfortunately, if another thread owns the lock,
-				 * this thread has first to claim the lock.
+			/* If this is not locked by the calling thread, it
+			 * is either not locked or locked by another thread.
+			 * In any case before disabling locking, this very
+			 * thread must be the exclusive user.
+			 */
+			if (CL_Thread_ID.load(PWX_MEMORDER_RELAXED) != CURRENT_THREAD_ID) {
+				/* Sorry for the code doubling, but lock() would listen
+				 * to CL_Do_Locking and that has to be false by now.
 				 */
-				if (CL_Thread_ID.load(memOrdLoad) != CURRENT_THREAD_ID) {
-					/* Sorry for the code doubling, but lock() would listen
-					 * to CL_Do_Locking and that has to be false by now.
-					 */
-					std::this_thread::yield(); // to be sure this thread is last
+				std::this_thread::yield(); // to be sure this thread is last
 #ifdef PWX_USE_FLAGSPIN
-					while (CL_Lock.test_and_set()) {
+				while (CL_Lock.test_and_set()) {
 # ifdef PWX_USE_FLAGSPIN_YIELD
-						std::this_thread::yield();
+					std::this_thread::yield();
 # endif // PWX_USE_FLAGSPIN_YIELD
-					}
+				}
 #else
-					CL_Lock.lock();
+				CL_Lock.lock();
 #endif // PWX_USE_FLAGSPIN
-				} // end of having to gain the lock
-			} // End of having a locked state
+			} // end of having to gain the lock
 
 			// Nuke all data:
 			CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
 			CL_Lock_Count.store(0, PWX_MEMORDER_RELAXED);
-			if (needUnlock) {
 #ifdef PWX_USE_FLAGSPIN
-				CL_Lock.clear(PWX_MEMORDER_RELAXED);
+            // Note: Here it is in order to clear relaxed, as no
+            //       other thread should be waitng right now.
+			CL_Lock.clear(PWX_MEMORDER_RELAXED);
 #else
-				CL_Lock.unlock();
+			CL_Lock.unlock();
 #endif // PWX_USE_FLAGSPIN
-			}
-			CL_Is_Locked.store(false, memOrdStore);
+			CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
 			// The memory order is relaxed last
 			memOrdLoad  = PWX_MEMORDER_RELAXED;
 			memOrdStore = PWX_MEMORDER_RELAXED;
@@ -197,13 +217,13 @@ void CLockable::lock() noexcept
 	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED) ) {
 		size_t ctid = CURRENT_THREAD_ID;
 		THREAD_LOG("base", "lock(), Owner id 0x%08lx, %u locks [%s]",
-				ctid, CL_Lock_Count.load(memOrdLoad),
-				CL_Is_Locked.load(memOrdLoad) ? "locked" : "not locked")
+				ctid, CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
+				CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
 
 		// For both the spinlock and the mutex an action
 		// is only taken if this object is not already
 		// locked by this thread
-		if ( ctid != CL_Thread_ID.load(memOrdLoad) ) {
+		if ( ctid != CL_Thread_ID.load(PWX_MEMORDER_RELAXED) ) {
 #ifdef PWX_USE_FLAGSPIN
 			while (CL_Lock.test_and_set()) {
 # ifdef PWX_USE_FLAGSPIN_YIELD
@@ -215,7 +235,7 @@ void CLockable::lock() noexcept
 #endif // PWX_USE_FLAGSPIN
 
 			// Got it now, so note it:
-			CL_Is_Locked.store(true, memOrdStore);
+			CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
 			CL_Thread_ID.store(ctid, PWX_MEMORDER_RELAXED);
 			CL_Lock_Count.store(1, PWX_MEMORDER_RELAXED);
 		} else
@@ -230,7 +250,7 @@ void CLockable::lock() noexcept
 **/
 uint32_t CLockable::lock_count() const noexcept
 {
-	if (CURRENT_THREAD_ID == CL_Thread_ID.load(memOrdLoad))
+	if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_RELAXED))
 		return CL_Lock_Count.load(PWX_MEMORDER_RELAXED);
 	return 0;
 }
@@ -247,21 +267,22 @@ bool CLockable::try_lock() noexcept
 	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED) ) {
 		size_t ctid = CURRENT_THREAD_ID;
 		THREAD_LOG("base", "try_lock(), Owner id 0x%08lx, %u locks [%s]",
-				CL_Thread_ID.load(), CL_Lock_Count.load(),
-				CL_Is_Locked.load(memOrdLoad) ? "locked" : "not locked")
+				CL_Thread_ID.load(PWX_MEMORDER_RELAXED),
+				CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
+				CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
 
 		// Same as with locking: Only try if this thread does
 		// not already own the lock
-		if (ctid != CL_Thread_ID.load(memOrdLoad)) {
+		if (ctid != CL_Thread_ID.load(PWX_MEMORDER_RELAXED)) {
 #ifdef PWX_USE_FLAGSPIN
 			if (!CL_Lock.test_and_set()) {
 #else
 			if (CL_Lock.try_lock()) {
 #endif // PWX_USE_FLAGSPIN
 				// Got it now, so note it:
+				CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
 				CL_Thread_ID.store(ctid, PWX_MEMORDER_RELAXED);
 				CL_Lock_Count.store(1, PWX_MEMORDER_RELAXED);
-				CL_Is_Locked.store(true, memOrdStore);
 				return true;
 			}
 			return false; // Nope, and only condition for a no-no.
@@ -281,17 +302,18 @@ bool CLockable::try_lock() noexcept
 void CLockable::unlock() noexcept
 {
 	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED)
-	  && (CURRENT_THREAD_ID == CL_Thread_ID.load(memOrdLoad))) {
+	  && (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_RELAXED))) {
 		THREAD_LOG("base", "unlock(), Owner id 0x%08lx, %u locks [%s]",
-				CL_Thread_ID.load(), CL_Lock_Count.load(),
-				CL_Is_Locked.load(memOrdLoad) ? "locked" : "not locked")
+				CL_Thread_ID.load(PWX_MEMORDER_RELAXED),
+				CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
+				CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
 
 		if (1 == CL_Lock_Count.fetch_sub(1, PWX_MEMORDER_RELAXED)) {
 			// The lock will go away now:
 			CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
 			CL_Is_Locked.store(false, PWX_MEMORDER_RELAXED);
 #ifdef PWX_USE_FLAGSPIN
-			CL_Lock.clear(memOrdStore);
+			CL_Lock.clear(PWX_MEMORDER_RELEASE);
 #else
 			CL_Lock.unlock();
 #endif // PWX_USE_FLAGSPIN
