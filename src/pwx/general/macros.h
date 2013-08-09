@@ -296,7 +296,7 @@
   * @param objC pointer to the second object to lock
 **/
 #define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, Ta, objA, Tb, objB, Tc, objC) \
-	pwx::TDoubleLockGuard<Ta, Tb, Tc> pwx_libpwx_lock_guard_##Name(objA, objB, objC); \
+	pwx::TTripleLockGuard<Ta, Tb, Tc> pwx_libpwx_lock_guard_##Name(objA, objB, objC); \
 	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
 
 
