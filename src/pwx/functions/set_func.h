@@ -71,7 +71,7 @@ TSet<data_t>* set_difference(const TSet<data_t>* const lhs, const TSet<data_t>* 
 	// Actions is only needed if lhs is not the empty
 	// set and lhs and rhs are not the same set
 	if (lhs->size() && (lhs != rhs)) {
-		PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(lhs), list_t, const_cast<list_t*>(rhs))
+		PWX_DOUBLE_LOCK_GUARD(list_t, const_cast<list_t*>(lhs), list_t, const_cast<list_t*>(rhs))
 
 		/* Two possibilities:
 		 * 1.: rhs is the empty set. Then newSet is a simple copy of lhs
@@ -164,7 +164,7 @@ TSet<data_t>* set_intersection(const TSet<data_t>* const lhs, const TSet<data_t>
 
 	// Action is only needed if neither is the empty set
 	if (lhs->size() && rhs->size()) {
-		PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(lhs), list_t, const_cast<list_t*>(rhs))
+		PWX_DOUBLE_LOCK_GUARD(list_t, const_cast<list_t*>(lhs), list_t, const_cast<list_t*>(rhs))
 
 		/* Two possibilities:
 		 * 1.: rhs and lhs are equal, then we simply copy lhs

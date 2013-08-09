@@ -262,7 +262,7 @@ public:
 		if ( eCount.load(memOrdLoad)
 		  && (this != &src)) {
 			if (src.eCount.load(memOrdLoad)) {
-				PWX_DOUBLE_LOCK(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
+				PWX_DOUBLE_LOCK_GUARD(list_t, const_cast<list_t*>(this), list_t, const_cast<list_t*>(&src))
 				elem_t* xCurr  = head();
 				bool    isDone = false;
 
@@ -419,7 +419,7 @@ public:
 	virtual list_t &operator= (const list_t &rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy = rhs.destroy;
 			PWX_TRY_PWX_FURTHER (*this += rhs)

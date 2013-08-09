@@ -899,7 +899,7 @@ public:
 	virtual hash_t &operator= (const hash_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
 			clear();
 			destroy      = rhs.destroy;
 			hash_user    = rhs.hash_user;
@@ -931,7 +931,7 @@ public:
 	virtual hash_t &operator+= (const hash_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
 
 			// --- grow this table if needed ---
 			uint32_t rhsSize = rhs.sizeMax();
@@ -972,7 +972,7 @@ public:
 	virtual hash_t &operator-= (const hash_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
 
 			uint32_t rhsSize = rhs.sizeMax();
 			elem_t* lhsCurr = nullptr;

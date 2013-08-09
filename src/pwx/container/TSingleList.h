@@ -726,7 +726,7 @@ public:
 	virtual list_t &operator= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			clear();
 			destroy      = rhs.destroy;
 			beThreadSafe(rhs.beThreadSafe());
@@ -748,7 +748,7 @@ public:
 	virtual list_t &operator+= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			elem_t* rhsCurr = rhs.head();
 			bool    isDone  = false;
 			bool    isTS    = this->beThreadSafe();
@@ -779,7 +779,7 @@ public:
 	virtual list_t &operator-= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
 			elem_t* rhsCurr = rhs.head();
 			elem_t* lhsPrev = nullptr;
 			data_t* rhsData = nullptr;

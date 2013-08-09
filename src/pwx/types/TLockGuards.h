@@ -123,7 +123,7 @@ public:
 
 				// Yield, so the threads that have the lock(s)
 				// have time to do their work and release them.
-					std::this_thread::yield();
+				std::this_thread::yield();
 			}
 		}
 	}
@@ -197,7 +197,7 @@ public:
 
 				// Yield, so the threads that have the lock(s)
 				// have time to do their work and release them.
-					std::this_thread::yield();
+				std::this_thread::yield();
 			}
 		}
 	}

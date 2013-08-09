@@ -1178,7 +1178,7 @@ private:
 			return nullptr;
 
 		// Need a big lock, only one removal at a time!
-		PWX_DOUBLE_LOCK(list_t, this, elem_t, elem)
+		PWX_DOUBLE_LOCK_GUARD(list_t, this, elem_t, elem)
 
 		if (elem->destroyed())
 			// If it is deleted, it can not be removed as it is already detached.

@@ -236,7 +236,7 @@ struct PWX_API TDoubleElement : public VElement
 	{
 		if (other) {
 			if (other != this) {
-				PWX_DOUBLE_LOCK(elem_t, const_cast<elem_t*>(this),
+				PWX_DOUBLE_LOCK_GUARD(elem_t, const_cast<elem_t*>(this),
 								elem_t, const_cast<elem_t*>(other))
 
 				// A: Check destruction status
@@ -360,7 +360,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
-				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_next)
+				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_next)
 
 				/* Now that we have the double lock, it is crucial to
 				 * check again. Otherwise we might just insert a destroyed element.
@@ -446,7 +446,7 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
-				PWX_DOUBLE_LOCK(elem_t, this, elem_t, new_prev)
+				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_prev)
 
 				/* Now that we have the double lock, it is crucial to
 				 * check again. Otherwise we might just insert a destroyed element.
@@ -690,7 +690,7 @@ struct PWX_API TDoubleElement : public VElement
 	elem_t& operator= (const elem_t &src) noexcept
 	{
 		if ((this != &src) && !destroyed() && !src.destroyed()) {
-			PWX_DOUBLE_LOCK(elem_t, this, elem_t, const_cast<elem_t*>(&src))
+			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, const_cast<elem_t*>(&src))
 			if (!destroyed() && !src.destroyed())
 				data = src.data;
 				// note: destroy method wrapped in data!
