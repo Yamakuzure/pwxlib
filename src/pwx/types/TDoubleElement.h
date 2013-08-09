@@ -236,8 +236,7 @@ struct PWX_API TDoubleElement : public VElement
 	{
 		if (other) {
 			if (other != this) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, const_cast<elem_t*>(this),
-								elem_t, const_cast<elem_t*>(other))
+				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, other)
 
 				// A: Check destruction status
 				bool thisDest = this->destroyed();
@@ -360,11 +359,11 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_next)
+				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, this->getNext(), elem_t, new_next)
+				elem_t* xOldNext  = this->getNext();
+				bool    extraLock = false;
 
-				/* Now that we have the double lock, it is crucial to
-				 * check again. Otherwise we might just insert a destroyed element.
-				*/
+				// Check again to be sure not to handle destroyed elements
 				if (destroyed())
 					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
 							"The inserting element has been destroyed while waiting for the lock!")
@@ -373,19 +372,19 @@ struct PWX_API TDoubleElement : public VElement
 					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 							"The element to insert has been destroyed while waiting for the lock!")
 
-				// Safe old next pointer.
-				elem_t* xOldNext = this->getNext();
-
-				// Before we can go ahead it is important to check and lock the
-				// old next , as it has to get its prev pointer manipulated
+				// Before we can go ahead it is important to check the old
+				// next , as it has to get its prev pointer manipulated
 				if (xOldNext) {
-					PWX_LOCK(xOldNext)
-					// Check its status, it must not be destroyed either
-					if (xOldNext->destroyed()) {
-						PWX_UNLOCK(xOldNext)
+					// The old next must be the right one:
+					if (!xOldNext->is_locked()) {
+						// It has changed, lock it now.
+						PWX_LOCK(xOldNext)
+						extraLock = true;
+					}
+					// It must not be destroyed
+					if (xOldNext->destroyed())
 						PWX_THROW("Illegal_Insert", "The next element is destroyed",
 								"The next element has been destroyed while waiting for the lock!")
-					}
 				}
 
 				// Insert the new element
@@ -397,9 +396,11 @@ struct PWX_API TDoubleElement : public VElement
 				setNext(new_next);
 				if (xOldNext) {
 					xOldNext->setPrev(new_next);
-					PWX_UNLOCK(xOldNext)
+					if (extraLock)
+						PWX_UNLOCK(xOldNext)
 				}
-			} else if (destroyed())
+			}
+			else if (destroyed())
 				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
 						"Tried to insert an element after an already destroyed element!")
 			else
@@ -446,11 +447,11 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_prev)
+				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, this->getPrev(), elem_t, new_prev)
+				elem_t* xOldPrev  = this->getPrev();
+				bool    extraLock = false;
 
-				/* Now that we have the double lock, it is crucial to
-				 * check again. Otherwise we might just insert a destroyed element.
-				*/
+				// Check again to be sure not to handle destroyed elements
 				if (destroyed())
 					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
 							"The inserting element has been destroyed while waiting for the lock!")
@@ -459,19 +460,19 @@ struct PWX_API TDoubleElement : public VElement
 					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 							"The element to insert has been destroyed while waiting for the lock!")
 
-				// Safe old prev pointer.
-				elem_t* xOldPrev = this->getPrev();
-
-				// Before we can go ahead it is important to check and lock the
-				// old prev , as it has to get its next pointer manipulated
+				// Before we can go ahead it is important to check the old
+				// prev , as it has to get its next pointer manipulated
 				if (xOldPrev) {
-					PWX_LOCK(xOldPrev)
-					// Check its status, it must not be destroyed either
-					if (xOldPrev->destroyed()) {
-						PWX_UNLOCK(xOldPrev)
-						PWX_THROW("Illegal_Insert", "The previous element is destroyed",
-								"The previous element has been destroyed while waiting for the lock!")
+					// The old prev must be the right one:
+					if (!xOldPrev->is_locked()) {
+						// It has changed, lock it now.
+						PWX_LOCK(xOldPrev)
+						extraLock = true;
 					}
+					// It must not be destroyed
+					if (xOldPrev->destroyed())
+						PWX_THROW("Illegal_Insert", "The prev element is destroyed",
+								"The prev element has been destroyed while waiting for the lock!")
 				}
 
 				// Set the neighborhood of the new prev
@@ -483,7 +484,8 @@ struct PWX_API TDoubleElement : public VElement
 				setPrev(new_prev);
 				if (xOldPrev) {
 					xOldPrev->setNext(new_prev);
-					PWX_UNLOCK(xOldPrev)
+					if (extraLock)
+						PWX_UNLOCK(xOldPrev)
 				}
 			} else if (destroyed())
 				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
@@ -516,21 +518,10 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do an acquiring test before the element is actually locked
 			if (next.load(memOrdLoad) || prev.load(memOrdLoad)) {
-				PWX_LOCK(this)
+				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, this->getPrev(), elem_t, this->getNext())
 				elem_t* xOldPrev = getPrev();
 				elem_t* xOldNext = getNext();
 
-				/* The challenge here is to do this without deadlocks.
-				 * Basically the neighbors need to be locked in turn.
-				 * But if another thread has a lock on one of those
-				 * waiting to get a lock on this, a deadlock will happen.
-				 * The solution is to go some try_lock() lengths until
-				 * everybody is happy.
-				 * Further more while we wait for the new lock, another thread
-				 * might have just removed our next or previous neighbor.
-				 * It is therefore necessary to always use getNext() and
-				 * getPrev() to have the real current neighbor.
-				 */
 
 				// 1: Handle previous neighbor
 				while ( xOldPrev
@@ -690,7 +681,7 @@ struct PWX_API TDoubleElement : public VElement
 	elem_t& operator= (const elem_t &src) noexcept
 	{
 		if ((this != &src) && !destroyed() && !src.destroyed()) {
-			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, const_cast<elem_t*>(&src))
+			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, &src)
 			if (!destroyed() && !src.destroyed())
 				data = src.data;
 				// note: destroy method wrapped in data!
