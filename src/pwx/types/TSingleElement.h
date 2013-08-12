@@ -199,7 +199,7 @@ struct PWX_API TSingleElement : public VElement
 	int32_t compare(const data_t &other) const noexcept
 	{
 		if (&other != this->data.get()) {
-			PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+			PWX_LOCK_GUARD(elem_t, this)
 
 			// A: Check destruction status
 			if (this->destroyed()) return -1;
@@ -237,8 +237,7 @@ struct PWX_API TSingleElement : public VElement
 	{
 		if (other) {
 			if (other != this) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this,
-								elem_t, const_cast<elem_t*>(other))
+				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, other)
 
 				// A: Check destruction status
 				bool thisDest = this->destroyed();
@@ -314,8 +313,6 @@ struct PWX_API TSingleElement : public VElement
 		if (!destroyed() && !new_next->destroyed()) {
 			if (beThreadSafe()) {
 				// Do locking and double checks if this has to be thread safe
-				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK_GUARD", this, this)
-				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK_GUARD", this, new_next)
 				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_next)
 
 				/* Now that we have the double lock, it is crucial to
@@ -370,8 +367,6 @@ struct PWX_API TSingleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
-				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK_GUARD", this, this)
-				DEBUG_LOCK_STATE("PWX_DOUBLE_LOCK_GUARD", this, new_next)
 				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_next)
 
 				/* Now that we have the double lock, it is crucial to
@@ -416,7 +411,6 @@ struct PWX_API TSingleElement : public VElement
 	void remove() noexcept
 	{
 		if (beThreadSafe()) {
-			DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
 			PWX_LOCK_GUARD(elem_t, this)
 			setNext(nullptr);
 			isRemoved.store(true, memOrdStore);
@@ -437,45 +431,37 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	void removeNext()
 	{
-		elem_t* toRemove = nullptr;
+		elem_t* toRemove = next.load(memOrdLoad);
 
 		// Exit at once if there is no next to remove:
-		if ( !(toRemove = this->getNext()) )
+		if (!toRemove)
 			return;
 
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe()) {
-			/* See notes in TDoubleElement::remove() */
-			DEBUG_LOCK_STATE("PWX_LOCK", this, toRemove)
-			PWX_LOCK(toRemove)
-			elem_t* xOldNext = toRemove->getNext();
+			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, toRemove)
 
-			// Do a lock cycle until this is locked
-			DEBUG_LOCK_STATE("PWX_TRY_LOCK", this, this)
-			while (  (this->getNext() == toRemove)
-				  && (toRemove != this)
-				  && !PWX_TRY_LOCK(this) ) {
-				// Can't lock this, so cycle until possible
-				PWX_UNLOCK(toRemove)
-				PWX_LOCK(toRemove)
+			// Do a reset cycle until toRemove is really this elements next
+			bool toRemoveIsNext = toRemove == next.load(memOrdLoad);
+			while (!toRemoveIsNext) {
+				toRemove = next.load(memOrdLoad);
+				PWX_DOUBLE_LOCK_GUARD_RESET(this, toRemove)
+				toRemoveIsNext = toRemove == next.load(memOrdLoad);
 			}
 
-			// Now if next still points to toRemove, this is locked or equals its next:
-			if ( (this->getNext() == toRemove)
-			  && (this != toRemove) ) {
-				this->setNext(xOldNext);
-				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
-				PWX_UNLOCK(this);
-				DEBUG_LOCK_STATE("PWX_UNLOCK", this, toRemove)
-			}
-			PWX_UNLOCK(toRemove)
+			// Continue if we actually have an element to remove now:
+			if (toRemove) {
+				this->setNext(toRemove->getNext());
+				toRemove->remove();
+			} // End of having a final element to remove
 
-		} else if (this != toRemove)
+		} else if (this != toRemove) {
 			// Without the thread safety needs, this is a lot simpler:
 			next.store(toRemove->next.load(memOrdLoad), memOrdStore);
 
-		// Remove neighborhood:
-		toRemove->remove();
+			// Remove neighborhood:
+			toRemove->remove();
+		}
 	}
 
 
@@ -551,7 +537,7 @@ struct PWX_API TSingleElement : public VElement
 	**/
 	const data_t &operator*() const
 	{
-		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr element data",
