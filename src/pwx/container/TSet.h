@@ -697,7 +697,7 @@ private:
 		 * 2: If tail is smaller, data can not be in the set
 		*/
 		if (size()) {
-			PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+			PWX_LOCK_GUARD(list_t, this)
 
 			// Quick exit if sorted set assumption 1 is correct:
 			if (isSorted && (1 == head()->compare(data)) )
@@ -751,7 +751,7 @@ private:
 
 				// Pre-Step: Find out whether and to where to adjust xCurr:
 				if (!reentered && (!start || !*start)) {
-					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+					PWX_LOCK_GUARD(list_t, this)
 					if (size())  {
 						data_t distHead = data - **head();
 						data_t distCurr = 1 == xCurr->compare(data) ? **xCurr - data : data - **xCurr;
@@ -898,7 +898,7 @@ private:
 						std::terminate();
 					} // is busted? Otherwise another thread simply interfered
 
-					PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+					PWX_LOCK_GUARD(list_t, this)
 
 					if (start && (*start == xCurr) )
 						*start = head();
@@ -910,7 +910,7 @@ private:
 				// End of having a sorted set
 			} else {
 				// Here we can do nothing but lock the set:
-				PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+				PWX_LOCK_GUARD(list_t, this)
 				if (!xCurr || !xCurr->inserted() || xCurr->destroyed())
 					xCurr = head();
 				elem_t* oldCurr = xCurr;
