@@ -532,7 +532,7 @@ public:
 	/// @brief return true if an element with @a key exists
 	virtual bool exists(const key_t &key) const noexcept
 	{
-		PWX_LOCK_GUARD(hash_t, const_cast<hash_t*>(this))
+		PWX_LOCK_GUARD(hash_t, this)
 		elem_t* elem = this->privGet(key);
 		if (elem && (elem != vacated) && (elem->key == key))
 			return true;
@@ -1108,7 +1108,7 @@ protected:
 	bool protIsVacated(const uint32_t index) const noexcept
 	{
 		if (index < this->sizeMax()) {
-			PWX_LOCK_GUARD(hash_t, const_cast<hash_t*>(this))
+			PWX_LOCK_GUARD(hash_t, this)
 			return hashTable[index] == vacated;
 		}
 		return false;
