@@ -131,13 +131,26 @@ void debug_err(const char* fmt, ...);
 	THREAD_LOG("LOCK", "Locked %s (has %d locks now)", #obj, obj->lock_count())
 # define LOG_UNLOCK(obj)     if (obj && obj->is_locking()) \
 	THREAD_LOG("UNLOCK", "Unlocked %s (has %d locks now)", #obj, obj->lock_count())
+
+// Lock guard one object
 # define LOG_LOCK_GUARD(obj) if (obj && obj->is_locking()) \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, obj->lock_count())
+# define LOG_UNLOCK_GUARD(obj) if (obj && obj->is_locking()) \
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #obj, obj->lock_count())
+
+// Lock guard two objects
 # define LOG_DOUBLE_LOCK_GUARD(objA, objB) \
 if (objA && objA->is_locking()) { \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objA, objA->lock_count()) \
 if (objB && objB->is_locking()) { \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objB, objB->lock_count()) }
+# define LOG_DOUBLE_UNLOCK_GUARD(objA, objB) \
+if (objA && objA->is_locking()) { \
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objA, objA->lock_count()) \
+if (objB && objB->is_locking()) { \
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objB, objB->lock_count()) }
+
+// Lock guard three objects
 # define LOG_TRIPLE_LOCK_GUARD(objA, objB, objC) \
 if (objA && objA->is_locking()) { \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objA, objA->lock_count()) \
@@ -145,6 +158,13 @@ if (objB && objB->is_locking()) { \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objB, objB->lock_count()) \
 if (objC && objC->is_locking()) { \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objC, objC->lock_count()) }
+# define LOG_TRIPLE_UNLOCK_GUARD(objA, objB, objC) \
+if (objA && objA->is_locking()) { \
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objA, objA->lock_count()) \
+if (objB && objB->is_locking()) { \
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objB, objB->lock_count()) \
+if (objC && objC->is_locking()) { \
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objC, objC->lock_count()) }
 #else
 # define THREAD_LOG(...) {}
 # define THREAD_ERR(...) {}
@@ -152,8 +172,11 @@ if (objC && objC->is_locking()) { \
 # define LOG_LOCK(...) {}
 # define LOG_UNLOCK(...) {}
 # define LOG_LOCK_GUARD(...) {}
+# define LOG_UNLOCK_GUARD(...) {}
 # define LOG_DOUBLE_LOCK_GUARD(...) {}
+# define LOG_DOUBLE_UNLOCK_GUARD(...) {}
 # define LOG_TRIPLE_LOCK_GUARD(...) {}
+# define LOG_TRIPLE_UNLOCK_GUARD(...) {}
 #endif // PWX_THREADDEBUG
 
 
