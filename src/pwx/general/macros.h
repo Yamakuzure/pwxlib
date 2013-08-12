@@ -241,6 +241,7 @@
   * @param object pointer to the object to lock
 **/
 #define PWX_NAMED_LOCK_GUARD(Name, T, object) \
+	DEBUG_LOCK_STATE("TLockGuard", this, object) \
 	pwx::TLockGuard<T> pwx_libpwx_lock_guard_##Name(object); \
 	LOG_LOCK_GUARD(object)
 
@@ -255,6 +256,28 @@
 #define PWX_LOCK_GUARD(T, object) PWX_NAMED_LOCK_GUARD(__FUNCTION__, T, object)
 
 
+/** @brief Reset a lock guard to a new value
+  *
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+  * @param object pointer to the object to reset the lock guard to
+**/
+#define PWX_NAMED_LOCK_GUARD_RESET(Name, object) \
+	LOG_UNLOCK_GUARD(object) \
+	pwx_libpwx_lock_guard_##Name.reset(object); \
+	LOG_LOCK_GUARD(object)
+
+
+/** @brief Reset a lock guard to a new value
+  *
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  *
+  * @param object pointer to the object to reset the lock guard to
+**/
+#define PWX_LOCK_GUARD_RESET(object) PWX_NAMED_LOCK_GUARD_RESET(__FUNCTION__, object)
+
+
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
   * <I>Prerequisites</I>: pwx/types/TLockGuards.h
@@ -266,7 +289,9 @@
   * @param objB pointer to the second object to lock
 **/
 #define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, Ta, objA, Tb, objB) \
-	pwx::TDoubleLockGuard<Ta, Tb> pwx_libpwx_lock_guard_##Name(objA, objB); \
+	DEBUG_LOCK_STATE("TDoubleLockGuard", this, objA) \
+	DEBUG_LOCK_STATE("TDoubleLockGuard", this, objB) \
+	pwx::TDoubleLockGuard<Ta, Tb> pwx_libpwx_double_lock_guard_##Name(objA, objB); \
 	LOG_DOUBLE_LOCK_GUARD(objA, objB)
 
 
@@ -283,6 +308,31 @@
 	PWX_NAMED_DOUBLE_LOCK_GUARD(__FUNCTION__, Ta, objA, Tb, objB)
 
 
+/** @brief Reset a double lock guard to two new values
+  *
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+  * @param objA pointer to the first object to reset the lock guard to
+  * @param objB pointer to the second object to reset the lock guard to
+**/
+#define PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(Name, objA, objB) \
+	LOG_DOUBLE_UNLOCK_GUARD(objA, objB) \
+	pwx_libpwx_double_lock_guard_##Name.reset(objA, objB); \
+	LOG_DOUBLE_LOCK_GUARD(objA, objB)
+
+
+/** @brief Reset a double lock guard to two new values
+  *
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  *
+  * @param objA pointer to the first object to reset the lock guard to
+  * @param objB pointer to the second object to reset the lock guard to
+**/
+#define PWX_DOUBLE_LOCK_GUARD_RESET(objA, objB) \
+	PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(__FUNCTION__, objA, objB)
+
+
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
   * <I>Prerequisites</I>: pwx/types/TLockGuards.h
@@ -296,7 +346,10 @@
   * @param objC pointer to the second object to lock
 **/
 #define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, Ta, objA, Tb, objB, Tc, objC) \
-	pwx::TTripleLockGuard<Ta, Tb, Tc> pwx_libpwx_lock_guard_##Name(objA, objB, objC); \
+	DEBUG_LOCK_STATE("TTripleLockGuard", this, objA) \
+	DEBUG_LOCK_STATE("TTripleLockGuard", this, objB) \
+	DEBUG_LOCK_STATE("TTripleLockGuard", this, objC) \
+	pwx::TTripleLockGuard<Ta, Tb, Tc> pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
 	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
 
 
@@ -313,6 +366,33 @@
 **/
 #define PWX_TRIPLE_LOCK_GUARD(Ta, objA, Tb, objB, Tc, objC) \
 	PWX_NAMED_TRIPLE_LOCK_GUARD(__FUNCTION__, Ta, objA, Tb, objB, Tc, objC)
+
+
+/** @brief Reset a triple lock guard to two new values
+  *
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+  * @param objA pointer to the first object to reset the lock guard to
+  * @param objB pointer to the second object to reset the lock guard to
+  * @param objC pointer to the third object to reset the lock guard to
+**/
+#define PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(Name, objA, objB, objC) \
+	LOG_TRIPLE_UNLOCK_GUARD(objA, objB, objC) \
+	pwx_libpwx_triple_lock_guard_##Name.reset(objA, objB, objC); \
+	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
+
+
+/** @brief Reset a triple lock guard to two new values
+  *
+  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  *
+  * @param objA pointer to the first object to reset the lock guard to
+  * @param objB pointer to the second object to reset the lock guard to
+  * @param objC pointer to the third object to reset the lock guard to
+**/
+#define PWX_TRIPLE_LOCK_GUARD_RESET(objA, objB, objC) \
+	PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(__FUNCTION__, objA, objB, objC)
 
 
 /** @brief return true if two C-Strings are equal ignoring case
