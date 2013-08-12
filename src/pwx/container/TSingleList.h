@@ -389,7 +389,7 @@ public:
 	**/
 	virtual const data_t &getData (const int32_t index) const
 	{
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+		PWX_LOCK_GUARD(list_t, this)
 		// Note: The guard is needed or another thread can
 		// delete the retrieved element between the retrieval
 		// and the delivery. A segfault would be the result.
@@ -1219,7 +1219,7 @@ protected:
 
 			// Do a big lock, so multiple threads calling this function
 			// won't renumber multiple times when once is enough.
-			PWX_LOCK_GUARD(list_t, const_cast<list_t*>(this))
+			PWX_LOCK_GUARD(list_t, this)
 
 			// Check again, maybe this does not need any renumbering any more:
 			if (!doRenumber.load(memOrdLoad))
