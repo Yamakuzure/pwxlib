@@ -255,14 +255,14 @@ TSet<data_t>* set_union(const TSet<data_t>* const lhs, const TSet<data_t>* const
 
 	// If lhs has elements, we can begin with adding them.
 	if (lhs->size()) {
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(lhs))
+		PWX_LOCK_GUARD(list_t, lhs)
 		newSet->reset(*lhs);
 		PWX_TRY_PWX_FURTHER(*newSet += *lhs)
 	}
 
 	// If rhs has elements, we can add them (, too)
 	if (rhs->size()) {
-		PWX_LOCK_GUARD(list_t, const_cast<list_t*>(rhs))
+		PWX_LOCK_GUARD(list_t, rhs)
 		if (newSet->empty())
 			// We still need isSorted and destroy!
 			newSet->reset(*rhs);
