@@ -198,7 +198,7 @@ struct PWX_API TDoubleElement : public VElement
 	int32_t compare(const data_t &other) const noexcept
 	{
 		if (&other != this->data.get()) {
-			PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+			PWX_LOCK_GUARD(elem_t, this)
 
 			// A: Check destruction status
 			if (this->destroyed()) return -1;
@@ -359,9 +359,24 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
-				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, this->getNext(), elem_t, new_next)
-				elem_t* xOldNext  = this->getNext();
-				bool    extraLock = false;
+				// Although it should not be necessary, a lock guard on
+				// the new element is in order.
+				PWX_LOCK_GUARD(elem_t, new_next)
+
+				elem_t* xOldNext = next.load(memOrdLoad);
+				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, xOldNext)
+
+				/* The main challenge here is, that another thread might have
+				 * changed the relationship between xOldNext and this element.
+				 * We have to reset the lock guard as often as it takes to have
+				 * both this and its true next to be locked.
+				 */
+				bool nextIsNext = xOldNext == next.load(memOrdLoad);
+				while (!nextIsNext) {
+					xOldNext = next.load(memOrdLoad);
+					PWX_DOUBLE_LOCK_GUARD_RESET(this, xOldNext)
+					nextIsNext = xOldNext == next.load(memOrdLoad);
+				}
 
 				// Check again to be sure not to handle destroyed elements
 				if (destroyed())
@@ -374,18 +389,9 @@ struct PWX_API TDoubleElement : public VElement
 
 				// Before we can go ahead it is important to check the old
 				// next , as it has to get its prev pointer manipulated
-				if (xOldNext) {
-					// The old next must be the right one:
-					if (!xOldNext->is_locked()) {
-						// It has changed, lock it now.
-						PWX_LOCK(xOldNext)
-						extraLock = true;
-					}
-					// It must not be destroyed
-					if (xOldNext->destroyed())
-						PWX_THROW("Illegal_Insert", "The next element is destroyed",
-								"The next element has been destroyed while waiting for the lock!")
-				}
+				if (xOldNext && xOldNext->destroyed())
+					PWX_THROW("Illegal_Insert", "The next element is destroyed",
+							"The next element has been destroyed while waiting for the lock!")
 
 				// Insert the new element
 				new_next->setNext(xOldNext);
@@ -394,11 +400,8 @@ struct PWX_API TDoubleElement : public VElement
 
 				// Store new next and prev neighbor
 				setNext(new_next);
-				if (xOldNext) {
+				if (xOldNext)
 					xOldNext->setPrev(new_next);
-					if (extraLock)
-						PWX_UNLOCK(xOldNext)
-				}
 			}
 			else if (destroyed())
 				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
@@ -447,9 +450,18 @@ struct PWX_API TDoubleElement : public VElement
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
-				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, this->getPrev(), elem_t, new_prev)
-				elem_t* xOldPrev  = this->getPrev();
-				bool    extraLock = false;
+				// The notes in insertNext() apply here as well
+				PWX_LOCK_GUARD(elem_t, new_prev)
+
+				elem_t* xOldPrev = prev.load(memOrdLoad);
+				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, xOldPrev)
+
+				bool prevIsPrev = xOldPrev == prev.load(memOrdLoad);
+				while (!prevIsPrev) {
+					xOldPrev = prev.load(memOrdLoad);
+					PWX_DOUBLE_LOCK_GUARD_RESET(this, xOldPrev)
+					prevIsPrev = xOldPrev == prev.load(memOrdLoad);
+				}
 
 				// Check again to be sure not to handle destroyed elements
 				if (destroyed())
@@ -461,19 +473,10 @@ struct PWX_API TDoubleElement : public VElement
 							"The element to insert has been destroyed while waiting for the lock!")
 
 				// Before we can go ahead it is important to check the old
-				// prev , as it has to get its next pointer manipulated
-				if (xOldPrev) {
-					// The old prev must be the right one:
-					if (!xOldPrev->is_locked()) {
-						// It has changed, lock it now.
-						PWX_LOCK(xOldPrev)
-						extraLock = true;
-					}
-					// It must not be destroyed
-					if (xOldPrev->destroyed())
-						PWX_THROW("Illegal_Insert", "The prev element is destroyed",
-								"The prev element has been destroyed while waiting for the lock!")
-				}
+				// prev , as it has to get its prev pointer manipulated
+				if (xOldPrev && xOldPrev->destroyed())
+					PWX_THROW("Illegal_Insert", "The prev element is destroyed",
+							"The prev element has been destroyed while waiting for the lock!")
 
 				// Set the neighborhood of the new prev
 				new_prev->setNext(this);
@@ -482,11 +485,8 @@ struct PWX_API TDoubleElement : public VElement
 
 				// Store new next and prev neighbor.
 				setPrev(new_prev);
-				if (xOldPrev) {
+				if (xOldPrev)
 					xOldPrev->setNext(new_prev);
-					if (extraLock)
-						PWX_UNLOCK(xOldPrev)
-				}
 			} else if (destroyed())
 				PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
 						"Tried to insert an element before an already destroyed element!")
@@ -517,64 +517,41 @@ struct PWX_API TDoubleElement : public VElement
 	{
 		if (beThreadSafe()) {
 			// Do an acquiring test before the element is actually locked
-			if (next.load(memOrdLoad) || prev.load(memOrdLoad)) {
-				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, this->getPrev(), elem_t, this->getNext())
-				elem_t* xOldPrev = getPrev();
-				elem_t* xOldNext = getNext();
+			elem_t* xOldPrev = prev.load(memOrdLoad);
+			elem_t* xOldNext = next.load(memOrdLoad);
+			if (xOldPrev || xOldNext) {
+				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, xOldPrev, elem_t, xOldNext)
 
-
-				// 1: Handle previous neighbor
-				while ( xOldPrev
-					&& (xOldPrev != this)
-					&& (xOldPrev == getPrev())
-					&& !PWX_TRY_LOCK(xOldPrev) ) {
-					// xOldPrev is valid, but we can not lock.
-					PWX_UNLOCK(this)
-					PWX_LOCK(this)
+				/* Here both the next and previous neighbor must be ensured
+				 * to be consistent, or the container order would be utterly
+				 * destroyed. A memory leak would be the result.
+				 */
+				bool prevIsPrev = xOldPrev == prev.load(memOrdLoad);
+				bool nextIsNext = xOldNext == next.load(memOrdLoad);
+				while (!prevIsPrev || !nextIsNext) {
+					xOldPrev = prev.load(memOrdLoad);
+					xOldNext = next.load(memOrdLoad);
+					PWX_TRIPLE_LOCK_GUARD_RESET(this, xOldPrev, xOldNext)
+					prevIsPrev = xOldPrev == prev.load(memOrdLoad);
+					nextIsNext = xOldNext == next.load(memOrdLoad);
 				}
 
-				// If xOldPrev is valid now, it is also locked or this:
-				if (xOldPrev && (xOldPrev != this)) {
-					if (xOldPrev->getNext() == this)
-						// Still points to this, so make it point to next instead
-						xOldPrev->setNext(this->getNext());
-					PWX_UNLOCK(xOldPrev);
-					xOldPrev = nullptr;
-				}
+
+				// 1: Handle previous neigbor
+				if (xOldPrev && (xOldPrev != this))
+					xOldPrev->setNext(xOldNext);
 
 				// 2: Handle next neighbor
-				while ( xOldNext
-					&& (xOldNext != this)
-					&& (xOldNext == getNext())
-					&& !PWX_TRY_LOCK(xOldNext)) {
-					// xOldNext is valid, but we can not lock.
-					PWX_UNLOCK(this)
-					PWX_LOCK(this)
-				}
+				if (xOldNext && (xOldNext != this))
+					xOldNext->setPrev(xOldPrev);
 
-				// If xOldNext is valid now, it is also locked or this element:
-				if (xOldNext && (xOldNext != this)) {
-					/// @todo : FIXME: This can lead to dead locks!
-					if (xOldNext->getPrev() == this)
-						// Still points to this, so make it point to prev instead
-						xOldNext->setPrev(this->getPrev());
-					PWX_UNLOCK(xOldNext);
-					xOldNext = nullptr;
-				}
 
-				// 3: Remove neighborhood:
-				this->setPrev(nullptr);
-				this->setNext(nullptr);
-				this->isRemoved.store(true, memOrdStore);
-				PWX_UNLOCK(this)
+			} // End of having at least one neighbor to handle
 
-				// End of having at least one neighbor to handle
-			} else {
-				// Just set the neighbors
-				this->setPrev(nullptr);
-				this->setNext(nullptr);
-				this->isRemoved.store(true, memOrdStore);
-			}
+			// 3: Remove neighborhood:
+			this->setPrev(nullptr);
+			this->setNext(nullptr);
+			this->isRemoved.store(true, memOrdStore);
 		} else {
 			// No thread safety? Then just kick it out:
 			elem_t* xOldNext = next.load(memOrdLoad);
@@ -716,7 +693,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	const data_t &operator*() const
 	{
-		PWX_LOCK_GUARD(elem_t, const_cast<elem_t*>(this))
+		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr TDoubleElement<T>->data",
