@@ -75,7 +75,7 @@ clean:
 # ------------------------------------
 depend: Makefile
 	@echo "Checking dependencies"
-	@$(CXX) -MM $(CFLAGS) $(CXXFLAGS) $(SOURCES_all) > Makefile.dep
+	@$(CXX) -MM $(INCDIR) $(CFLAGS) $(CXXFLAGS) $(SOURCES_all) > Makefile.dep
 
 # ------------------------------------
 # Include dependencies
