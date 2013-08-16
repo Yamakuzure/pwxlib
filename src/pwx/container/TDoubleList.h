@@ -120,25 +120,7 @@ public:
 	 * ===============================================
 	*/
 
-	/** @brief delete all elements
-	  *
-	  * This is a quick way to get rid of all elements
-	  * at once. If a destroy() function was set, it is
-	  * used for the data deletion. Otherwise it is
-	  * assumed that data_t responds to the delete
-	  * operator.
-	**/
-	virtual void clear() noexcept
-	{
-		elem_t* toDelete = nullptr;
-		while (tail()) {
-			toDelete = privRemoveBeforeElem(nullptr);
-			if (toDelete) {
-				PWX_TRY(protDelete(toDelete))
-				catch(...) { } // We can't do anything about that
-			}
-		} // end of while tail
-	}
+	using base_t::clear;
 
 
 	/** @brief delete the element holding the specified data
@@ -820,6 +802,25 @@ private:
 	 *            where appropriate.
 	*/
 
+	/// @brief clear this list
+	virtual void privClear() noexcept {
+		elem_t* xElem = nullptr;
+
+		// Those will all be invalidated anyway:
+		currStore.clear();
+
+		/// @todo : This is the ultra safe option.
+		///         Change once inspirations strikes.
+		while ( tail() ) {
+			this->lock();
+			xElem = this->privRemoveElem(tail());
+			this->unlock();
+			if (xElem && !xElem->destroyed())
+				delete xElem;
+		}
+	}
+
+
 	/// @brief Search until the next element contains the searched data
 	// Note: This method is only used by operator-=. But the implementation
 	//       is different in TSingleList, so both can use the same operator with
@@ -1144,7 +1145,6 @@ private:
 			tail(tail()->getPrev());
 		else
 			this->doRenumber.store(true, memOrdStore);
-		currStore.invalidate(elem);
 		elem->remove();
 
 		if (1 == eCount.fetch_sub(1)) {

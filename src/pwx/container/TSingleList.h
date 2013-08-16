@@ -541,7 +541,7 @@ public:
 		// Note: The guard is needed to ensure that no thread changes the
 		// number of elements beyond the border of eCount > 1
 		return (eCount.load(memOrdLoad) > 1
-				? privRemoveAfterElement(const_cast<elem_t* > (privGetElementByIndex (-2)), true)
+				? privRemoveAfterElement(const_cast<elem_t* > (privGetElementByIndex (-2)))
 				: privRemoveAfterData(nullptr));
 	}
 
@@ -688,7 +688,7 @@ public:
 	**/
 	virtual elem_t* remNextElem (elem_t* prev) noexcept
 	{
-		return privRemoveAfterElement(prev, true);
+		return privRemoveAfterElement(prev);
 	}
 
 
@@ -1214,45 +1214,21 @@ private:
 	*/
 
 	/// @brief clear this list
-	void privClear() noexcept {
-		elem_t* xCurr = curr();
-		elem_t* xNext = nullptr;
+	virtual void privClear() noexcept {
+		elem_t* xElem = nullptr;
 
+		// Those will all be invalidated anyway:
+		currStore.clear();
+
+		/// @todo : This is the ultra safe option.
+		///         Change once inspirations strikes.
 		while ( head() ) {
-			if (xCurr && xCurr->try_lock() ) {
-				if (xCurr->inserted() && !xCurr->destroyed()
-				  && (xNext = privRemoveAfterElement(xCurr, false)) ) {
-				  	// there is one special case to keep in mind:
-				  	// If this is a ring that had only one item left,
-				  	// xNext now equals xCurr.
-				  	if (xCurr == xNext)
-						xCurr = nullptr;
-					// And with one item left xNext is nullptr now
-					if (xNext && !xNext->destroyed())
-						delete xNext;
-				}
-				if (xCurr)
-					xCurr->unlock();
-			}
-
-			// Second half is only important if there is still a head
-			if (head()) {
-				// Advance once and check whether to remove head:
-				if (xCurr) xCurr = xCurr->getNext();
-				if ((nullptr == xCurr) || (xCurr == head()) ) {
-					// One round finished, remove head now (if we can)
-					xNext = privRemoveAfterElement(nullptr, false);
-					if (xNext)
-						delete xNext;
-					xCurr = head();
-				}
-
-				// Advance again and check xCurr
-				if (xCurr) xCurr = xCurr->getNext();
-				if (nullptr == xCurr)
-					xCurr = head();
-			}
-		} // end of staying while head is present
+			this->lock();
+			xElem = this->privRemoveAfterElement(nullptr);
+			this->unlock();
+			if (xElem && !xElem->destroyed())
+				delete xElem;
+		}
 	}
 
 	/// @brief Search until the next element contains the searched data
@@ -1537,20 +1513,19 @@ private:
 		if (prev) {
 			elem_t* xPrev = const_cast<elem_t*>(protFind (prev));
 			if (xPrev && xPrev->inserted() && !xPrev->destroyed())
-				return privRemoveAfterElement(xPrev, true);
+				return privRemoveAfterElement(xPrev);
 		} else
 			// possibility 1 is simple:
-			return privRemoveAfterElement(nullptr, true);
+			return privRemoveAfterElement(nullptr);
 		return nullptr;
 	}
 
 
 	/** @brief remove the element after the specified element
 	  * @param[in] prev pointer to the element after which to remove an element
-	  * @param[in] invalidate if set to yes, currStore will invalidate the removed element
 	  * @return the removed element or nullptr if prev->next is nullptr or the list is empty
 	**/
-	virtual elem_t* privRemoveAfterElement(elem_t* prev, bool invalidate) noexcept
+	virtual elem_t* privRemoveAfterElement(elem_t* prev) noexcept
 	{
 		elem_t* removed = nullptr;
 
@@ -1612,8 +1587,6 @@ private:
 				}
 				PWX_UNLOCK(this)
 			}
-			if (invalidate)
-				currStore.invalidate(removed);
 		}
 
 		return removed;
