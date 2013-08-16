@@ -340,9 +340,9 @@ public:
 	{
 		// Use double search to only lock if the key is
 		// not found in the first run
-		if (!this->exists(src.key)) {
+		if (!this->privGet(src.key)) {
 			PWX_LOCK_GUARD(hash_t, this)
-			if (!this->exists(src.key)) {
+			if (!this->privGet(src.key)) {
 
 				// 1: Check source:
 				PWX_LOCK(const_cast<elem_t*>(&src))
@@ -383,9 +383,9 @@ public:
 	{
 		// Use double search to only lock if the key is
 		// not found in the first run
-		if (!this->exists(key)) {
+		if (!this->privGet(key)) {
 			PWX_LOCK_GUARD(hash_t, this)
-			if (!this->exists(key)) {
+			if (!this->privGet(key)) {
 
 				// 1: Create a new element
 				elem_t* newElement = nullptr;
@@ -398,7 +398,6 @@ public:
 
 				// 2: Do the real insert
 				double newSize = privInsert(newElement);
-
 
 				// 3: Grow if needed
 				double maxSize = sizeMax();
@@ -421,27 +420,41 @@ public:
 	**/
 	virtual void clear() noexcept
 	{
-		elem_t* toDelete  = nullptr;
-		uint32_t  pos       = 0;
-		uint32_t  tabSize   = sizeMax();
+		elem_t*   toDel   = nullptr;
+		elem_t*   delNext = nullptr;
+		uint32_t  pos     = 0;
+		uint32_t  tabSize = sizeMax();
 
 		if (!hashTable) return; // Should never happen
 
-		while (pos < tabSize) {
-			PWX_LOCK(this)
-			if (hashTable[pos] && (hashTable[pos] != vacated)) {
-				do {
-					toDelete = privRemoveIdx(pos);
-					PWX_UNLOCK(this)
-					if (toDelete) {
-						PWX_TRY(protDelete(toDelete))
-						catch(...) { } // We can't do anything about that
+		while (eCount.load(PWX_MEMORDER_RELAXED)) {
+			toDel = hashTable[pos];
+			if ( toDel && (toDel != vacated) && toDel->try_lock() ) {
+			  	// This thread has exclusive access, but it
+			  	// must be ensured that no other thread is
+			  	// in the destructor unlock cycle:
+			  	if (toDel->inserted() && !toDel->destroyed()) {
+					hashTable[pos] = nullptr;
+
+					// remove a possible chain:
+					while ( (delNext = toDel->removeNext())
+						&& !delNext->destroyed() ) {
+						--eCount;
+						delete delNext;
 					}
-				} while (hashTable[pos] && (hashTable[pos] != vacated));
-			} else
-				PWX_UNLOCK(this)
-			++pos;
-		} // end of while pos < tabSize
+
+					// delete this element
+					if (!toDel->destroyed()) {
+						--eCount;
+						delete toDel; // Will unlock automatically
+					}
+			  	} // End of having found an element (chain) to delete
+			} // End of gaining lock on an element
+
+			// Advance and wrap:
+			if (++pos >= tabSize)
+				pos = 0;
+		} // end of looping the hash table
 	}
 
 
@@ -503,11 +516,18 @@ public:
 	  */
 	virtual void disable_thread_safety() noexcept
 	{
-		PWX_LOCK(this)
-		this->do_locking(false);
+		PWX_LOCK_GUARD(hash_t, this)
+
+		// Turn off first
+		this->beThreadSafe(false);
+
+		// Now reset the guard, so others waiting for
+		// the lock can finish their business first
+		PWX_LOCK_GUARD_RESET(this)
+
 		uint32_t  pos       = 0;
 		uint32_t  tabSize   = this->sizeMax();
-		elem_t* xCurr     = nullptr;
+		elem_t*   xCurr     = nullptr;
 		while (pos < tabSize) {
 			xCurr = hashTable[pos];
 			if (!protIsVacated(pos)) {
@@ -518,7 +538,6 @@ public:
 			}
 			++pos;
 		}
-		this->beThreadSafe(false);
 	}
 
 
@@ -528,16 +547,6 @@ public:
 		return !eCount.load(memOrdLoad);
 	}
 
-
-	/// @brief return true if an element with @a key exists
-	virtual bool exists(const key_t &key) const noexcept
-	{
-		PWX_LOCK_GUARD(hash_t, this)
-		elem_t* elem = this->privGet(key);
-		if (elem && (elem != vacated) && (elem->key == key))
-			return true;
-		return false;
-	}
 
 	/** @brief enable thread safety
 	  *
@@ -551,10 +560,13 @@ public:
 	  */
 	virtual void enable_thread_safety() noexcept
 	{
-		this->do_locking(true);
+		this->beThreadSafe(true);
+
+		PWX_LOCK_GUARD(hash_t, this)
+
 		uint32_t  pos       = 0;
 		uint32_t  tabSize   = this->sizeMax();
-		elem_t* xCurr     = nullptr;
+		elem_t*   xCurr     = nullptr;
 		while (pos < tabSize) {
 			xCurr = hashTable[pos];
 			if (!protIsVacated(pos)) {
@@ -565,7 +577,13 @@ public:
 			}
 			++pos;
 		}
-		this->beThreadSafe(true);
+	}
+
+
+	/// @brief return true if an element with @a key exists
+	virtual bool exists(const key_t &key) const noexcept
+	{
+		return this->privGet(key) ? true : false;
 	}
 
 
@@ -576,7 +594,7 @@ public:
 	**/
 	virtual elem_t* get(const key_t &key) const noexcept
 	{
-		return privGet(key);
+		return this->privGet(key);
 	}
 
 
@@ -587,7 +605,7 @@ public:
 	**/
 	virtual elem_t* get(const key_t &key) noexcept
 	{
-		return const_cast<elem_t*>(privGet(key));
+		return const_cast<elem_t*>(this->privGet(key));
 	}
 
 
@@ -724,13 +742,16 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		if (size() > 0) {
-			PWX_LOCK_GUARD(hash_t, this)
-			if (size() > 0) {
-				uint32_t maxPos = sizeMax();
-				for (uint32_t i = maxPos - 1; i > 0 ; --i) {
-					if (hashTable[i] && (hashTable[i] != vacated))
-						return privRemoveIdx(i);
+		if (eCount.load(memOrdLoad) > 0) {
+			uint32_t maxPos = sizeMax();
+			uint32_t pos    = maxPos;
+			elem_t*  elem   = nullptr;
+			while (pos && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
+				elem = hashTable[--pos];
+				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
+					PWX_LOCK_GUARD(elem_t, elem)
+					if (elem->inserted() && !elem->destroyed())
+						return privRemoveIdx(pos);
 				}
 			}
 		}
@@ -754,13 +775,16 @@ public:
 	**/
 	virtual elem_t* pop_front() noexcept
 	{
-		if (size() > 0) {
-			PWX_LOCK_GUARD(hash_t, this)
-			if (size() > 0) {
-				uint32_t maxPos = sizeMax();
-				for (uint32_t i = 0; i < maxPos ; ++i) {
-					if (hashTable[i] && (hashTable[i] != vacated))
-						return privRemoveIdx(i);
+		if (eCount.load(memOrdLoad) > 0) {
+			uint32_t maxPos = sizeMax();
+			uint32_t pos    = 0;
+			elem_t*  elem   = nullptr;
+			while ((pos < maxPos) && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
+				elem = hashTable[pos++];
+				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
+					PWX_LOCK_GUARD(elem_t, elem)
+					if (elem->inserted() && !elem->destroyed())
+						return privRemoveIdx(pos);
 				}
 			}
 		}
@@ -899,7 +923,7 @@ public:
 	virtual hash_t &operator= (const hash_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, &rhs)
 			clear();
 			destroy      = rhs.destroy;
 			hash_user    = rhs.hash_user;
@@ -931,7 +955,7 @@ public:
 	virtual hash_t &operator+= (const hash_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, &rhs)
 
 			// --- grow this table if needed ---
 			uint32_t rhsSize = rhs.sizeMax();
@@ -972,7 +996,7 @@ public:
 	virtual hash_t &operator-= (const hash_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, const_cast<hash_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, &rhs)
 
 			uint32_t rhsSize = rhs.sizeMax();
 			elem_t* lhsCurr = nullptr;
@@ -1150,10 +1174,10 @@ private:
 		uint32_t  keyIdx = privGetIndex(key);
 		elem_t* xCurr  = hashTable[keyIdx];
 
-		while (xCurr && (*xCurr != key))
+		while (xCurr && (xCurr != vacated) && (*xCurr != key))
 			xCurr = xCurr->getNext();
 
-		return xCurr;
+		return xCurr != vacated ? xCurr : nullptr;
 	}
 
 

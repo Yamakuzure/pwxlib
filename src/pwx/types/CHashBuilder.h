@@ -28,6 +28,7 @@
 
 #include <pwx/types/CException.h>
 #include <pwx/general/macros.h>
+#include <pwx/general/templates.h>
 
 namespace pwx {
 

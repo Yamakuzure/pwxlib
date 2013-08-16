@@ -326,8 +326,10 @@ private:
 				++elem->hops;
 			}
 			root->setNext(elem);
-		} else
+		} else {
 			this->hashTable[idx] = elem;
+			elem->insertAsFirst();
+		}
 
 		eCount.fetch_add(1, memOrdStore);
 		return this->size();

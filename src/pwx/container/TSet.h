@@ -593,16 +593,16 @@ protected:
 		if (locCnt && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
 			this->doRenumber.store(true, memOrdStore);
-			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
+			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 		} else {
 			if (!locCnt) {
 				// Case 1: The list is empty
-				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, &currStore))
 				head(insElem);
 				tail(insElem);
 			} else if (nullptr == insPrev) {
 				// Case 2: A new head is to be set
-				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem))
+				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem, &currStore))
 				head(insElem);
 				this->doRenumber.store(true, memOrdStore);
 			} else if (insPrev == tail() ) {
@@ -610,7 +610,7 @@ protected:
 				insElem->eNr.store(
 					tail()->eNr.load(memOrdLoad) + 1,
 					memOrdStore);
-				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
+				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, &currStore))
 				tail(insElem);
 			}
 		}
@@ -629,6 +629,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::currStore;
 	using base_t::eCount;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
@@ -911,7 +912,7 @@ private:
 			} else {
 				// Here we can do nothing but lock the set:
 				PWX_LOCK_GUARD(list_t, this)
-				if (!xCurr || !xCurr->inserted() || xCurr->destroyed())
+				if (!xCurr || xCurr->removed() || xCurr->destroyed())
 					xCurr = head();
 				elem_t* oldCurr = xCurr;
 

@@ -123,16 +123,17 @@ public:
 	 * ===============================================
 	*/
 
-	bool     beThreadSafe()            const noexcept; //!< true if thread safety is turned on
-	void     beThreadSafe(bool doLock)       noexcept; //!< set thread safety to @a doLock
-	bool     clear_locks ()                  noexcept; //!< remove all locks
-	void     do_locking  (bool doLock)       noexcept; //!< set thread safety to @a doLock
-	bool     is_locked   ()            const noexcept; //!< return true if this object is locked
-	bool     is_locking  ()            const noexcept; //!< true if thread safety is turned on
-	void     lock        ()                  noexcept; //!< lock this object
-	uint32_t lock_count  ()            const noexcept; //!< number of locks this thread holds on this object
-	bool     try_lock    ()                  noexcept; //!< try to lock and return at once
-	void     unlock      ()                  noexcept; //!< unlock this object
+	bool     beThreadSafe()      const noexcept PWX_WARNUNUSED; //!< true if thread safety is turned on
+	void     beThreadSafe(bool doLock) noexcept;                //!< set thread safety to @a doLock
+	bool     clear_locks ()            noexcept;                //!< remove all locks
+	bool     destroyed   ()      const noexcept PWX_WARNUNUSED; //!< if true the object will no longer lock
+	void     do_locking  (bool doLock) noexcept;                //!< set thread safety to @a doLock
+	bool     is_locked   ()      const noexcept PWX_WARNUNUSED; //!< return true if this object is locked
+	bool     is_locking  ()      const noexcept PWX_WARNUNUSED; //!< true if thread safety is turned on
+	void     lock        ()            noexcept;                //!< lock this object
+	uint32_t lock_count  ()      const noexcept PWX_WARNUNUSED; //!< number of locks this thread holds on this object
+	bool     try_lock    ()            noexcept PWX_WARNUNUSED; //!< try to lock and return at once
+	void     unlock      ()            noexcept;                //!< unlock this object
 
 
 	/* ===============================================
@@ -150,6 +151,8 @@ protected:
 	 * ===============================================
 	*/
 
+	mutable
+	abool_t isDestroyed  = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
 	mord_t  memOrdLoad   = PWX_MEMORDER_ACQUIRE;   //!< to be used with atomic::load()
 	mord_t  memOrdStore  = PWX_MEMORDER_RELEASE;   //!< to be used with atomic::store()
 
@@ -179,6 +182,20 @@ private:
 	aui32_t CL_Lock_Count = ATOMIC_VAR_INIT(0);      //!< How many times the current thread has locked.
 	asize_t CL_Thread_ID  = ATOMIC_VAR_INIT(0);      //!< The owning thread of a lock
 }; // class CLockable
+
+
+/* ===============================================================
+ * === Helper functions to work with CLockable derived objects ===
+ * ===============================================================
+ */
+
+bool PWX_API are_locked(const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
+bool PWX_API are_locked(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept PWX_WARNUNUSED;
+bool PWX_API try_locks (const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
+bool PWX_API try_locks (const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept PWX_WARNUNUSED;
+bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
+bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB, const CLockable* objC)  noexcept PWX_WARNUNUSED;
+
 
 } // namespace pwx
 

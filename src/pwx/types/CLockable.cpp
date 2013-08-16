@@ -56,9 +56,13 @@ CLockable::CLockable (const CLockable &src) noexcept
 CLockable::~CLockable() noexcept
 {
 	DEBUG_LOCK_STATE("~CLockable", this, this)
+	isDestroyed.store(true, memOrdStore);
 #ifdef PWX_USE_FLAGSPIN
 	// Simply move the id to this thread:
 	CL_Thread_ID.store(CURRENT_THREAD_ID, PWX_MEMORDER_RELAXED);
+#else
+	// Otherwise we have to wait for a real lock.
+	lock();
 #endif // PWX_USE_FLAGSPIN
 	clear_locks();
 	// the return value is unimportant, we can't do
@@ -129,6 +133,22 @@ bool CLockable::clear_locks() noexcept
 	} // End of having to care about locking
 
 	return true;
+}
+
+
+/** @brief returns true if the data was destroyed
+  *
+  * The destructor of TSingleElement and TDoubleElement
+  * will try to get a final lock on the element when it
+  * is destroyed. If another thread acquires a lock
+  * between the data destruction and this final dtor lock,
+  * destroyed() will return "true".
+  *
+  * @return true if the element is within its destruction process.
+**/
+bool CLockable::destroyed() const noexcept
+{
+	return isDestroyed.load(memOrdLoad);
 }
 
 
@@ -214,6 +234,10 @@ bool CLockable::is_locking() const noexcept
   */
 void CLockable::lock() noexcept
 {
+	// return at once if this object is in destruction
+	if (isDestroyed.load(memOrdLoad))
+		return;
+
 	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED) ) {
 		size_t ctid = CURRENT_THREAD_ID;
 		THREAD_LOG("base", "lock(), Owner id 0x%08lx, %u locks [%s]",
@@ -264,6 +288,10 @@ uint32_t CLockable::lock_count() const noexcept
   */
 bool CLockable::try_lock() noexcept
 {
+	// return at once if this object is in destruction
+	if (isDestroyed.load(memOrdLoad))
+		return false;
+
 	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED) ) {
 		size_t ctid = CURRENT_THREAD_ID;
 		THREAD_LOG("base", "try_lock(), Owner id 0x%08lx, %u locks [%s]",
@@ -319,6 +347,194 @@ void CLockable::unlock() noexcept
 #endif // PWX_USE_FLAGSPIN
 		} // end of reducing the lock count
 	}
+}
+
+
+/* ===============================================================
+ * === Helper functions to work with CLockable derived objects ===
+ * ===============================================================
+ */
+
+/** @brief return true if two given objects are both locked
+  *
+  * This function returns true if both given objects are currently
+  * locked by the calling thread. If at least one is not locked,
+  * the function returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA the first object to check
+  * @param[in] objB the second object to check
+  * @return true if both are locked, false if at least one is not locked
+**/
+bool are_locked(const CLockable* objA, const CLockable* objB) noexcept
+{
+	bool isLockedA = objA ? objA->is_locked() : true;
+	bool isLockedB = objB ? objB->is_locked() : true;
+	return isLockedA && isLockedB;
+}
+
+
+/** @brief return true if three given objects are both locked
+  *
+  * This function returns true if all three given objects are
+  * currently locked by the calling thread. If at least one is
+  * not locked, the function returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA the first object to check
+  * @param[in] objB the second object to check
+  * @param[in] objC the third object to check
+  * @return true if all three are locked, false if at least one is not locked
+**/
+bool are_locked(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
+{
+	bool isLockedA = objA ? objA->is_locked() : true;
+	bool isLockedB = objB ? objB->is_locked() : true;
+	bool isLockedC = objC ? objC->is_locked() : true;
+	return isLockedA && isLockedB && isLockedC;
+}
+
+
+/** @brief try to lock two objects at once
+  *
+  * This function tries to lock two objects at once, returning
+  * true if both could be locked. If any can not be locked, the
+  * other is unlocked again if neccessary and false is returned.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA the first object to lock
+  * @param[in] objB the second object to lock
+  * @return true if both could be locked, false if at least one lock failed
+**/
+bool try_locks(const CLockable* objA, const CLockable* objB) noexcept
+{
+    CLockable* xObjA = const_cast<CLockable*>(objA);
+    CLockable* xObjB = const_cast<CLockable*>(objB);
+
+	// Note the current state, nullptr is considered to be locked.
+	bool isLockedA   = objA ? objA->is_locked() : true;
+	bool isLockedB   = objB ? objB->is_locked() : true;
+
+	// try to lock where neccessary
+	bool hasLockedA  = isLockedA ? false : xObjA->try_lock();
+	bool hasLockedB  = isLockedB ? false : xObjB->try_lock();
+
+	// Assemble the result, isLocked or hasLocked are enough
+	bool result =	(isLockedA || hasLockedA)
+				&&	(isLockedB || hasLockedB);
+
+	// If the result is false, any performed locks must be undone
+	if (!result) {
+		if (hasLockedA) xObjA->unlock();
+		if (hasLockedB) xObjB->unlock();
+
+	}
+
+	return result;
+}
+
+
+/** @brief try to lock three objects at once
+  *
+  * This function tries to lock three objects at once, returning
+  * true if all three could be locked. If any can not be locked,
+  * the others are unlocked again if neccessary and false is
+  * returned.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA the first object to lock
+  * @param[in] objB the second object to lock
+  * @param[in] objC the third object to lock
+  * @return true if all three could be locked, false if at least one lock failed
+**/
+bool try_locks(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
+{
+    CLockable* xObjA = const_cast<CLockable*>(objA);
+    CLockable* xObjB = const_cast<CLockable*>(objB);
+    CLockable* xObjC = const_cast<CLockable*>(objC);
+
+	// Note the current state, nullptr is considered to be locked.
+	bool isLockedA   = objA ? objA->is_locked() : true;
+	bool isLockedB   = objB ? objB->is_locked() : true;
+	bool isLockedC   = objC ? objC->is_locked() : true;
+
+	// try to lock where neccessary
+	bool hasLockedA  = isLockedA ? false : xObjA->try_lock();
+	bool hasLockedB  = isLockedB ? false : xObjB->try_lock();
+	bool hasLockedC  = isLockedC ? false : xObjC->try_lock();
+
+	// Assemble the result, isLocked or hasLocked are enough
+	bool result =	(isLockedA || hasLockedA)
+				&&	(isLockedB || hasLockedB)
+				&&	(isLockedC || hasLockedC);
+
+	// If the result is false, any performed locks must be undone
+	if (!result) {
+		if (hasLockedA) xObjA->unlock();
+		if (hasLockedB) xObjB->unlock();
+		if (hasLockedC) xObjC->unlock();
+
+	}
+
+	return result;
+}
+
+
+/** @brief unlock two objects if both are currently locked.
+  *
+  * This function unlocks two objects if both are currently
+  * locked by the calling thread. If any is not locked, the
+  * function does nothing and returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be successfully unlocked; It can't be manipulated anyway.
+  *
+  * @param[in] objA the first object to unlock
+  * @param[in] objB the second object to unlock
+  * @return true if both could be unlocked, false if at least one was not locked
+**/
+bool unlock_all(const CLockable* objA, const CLockable* objB) noexcept
+{
+	if (are_locked(objA, objB)) {
+		if (objA) const_cast<CLockable*>(objA)->unlock();
+		if (objB) const_cast<CLockable*>(objB)->unlock();
+		return true;
+	}
+	return false;
+}
+
+
+/** @brief unlock three objects if all are currently locked.
+  *
+  * This function unlocks three objects if all are currently
+  * locked by the calling thread. If any is not locked, the
+  * function does nothing and returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be successfully unlocked; It can't be manipulated anyway.
+  *
+  * @param[in] objA the first object to unlock
+  * @param[in] objB the second object to unlock
+  * @param[in] objB the third object to unlock
+  * @return true if all three could be unlocked, false if at least one was not locked
+**/
+bool unlock_all(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
+{
+	if (are_locked(objA, objB, objC)) {
+		if (objA) const_cast<CLockable*>(objA)->unlock();
+		if (objB) const_cast<CLockable*>(objB)->unlock();
+		if (objC) const_cast<CLockable*>(objC)->unlock();
+		return true;
+	}
+	return false;
 }
 
 

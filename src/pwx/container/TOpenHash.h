@@ -355,6 +355,10 @@ private:
 		// Both must not be the same, even or odd
 		if ( (tabSize % 2) == (idxStep % 2) )
 			++idxStep;
+		// tabSize must neither be 4/3 nor 3/2 of idxStep
+		if ( ((idxStep * 4 / 3) == tabSize) || ((idxStep * 3 / 2) == tabSize))
+			idxStep += 2;
+
 		// tabSize must not be devidable by idxStep
 		while ( !(tabSize % idxStep) )
 			idxStep += 2;
@@ -492,6 +496,7 @@ private:
 			// This is situation a)
 			oldElem = this->privRemoveIdx(idx);
 		hashTable[idx] = elem; // Fulfills both situations
+		elem->insertAsFirst();
 		eCount.fetch_add(1, memOrdStore);
 
 		// Now solve situation a)
@@ -504,6 +509,7 @@ private:
 				// This is situation a) again
 				oldElem = this->privRemoveIdx(idx);
 			hashTable[idx] = elem; // Item is moved
+			elem->insertAsFirst();
 			eCount.fetch_add(1, memOrdStore);
 		}
 
