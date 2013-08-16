@@ -176,7 +176,7 @@ public:
 	  * @param[in] other reference to the data to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare(const data_t &other) const noexcept
+	int32_t compare(const data_t &other) const noexcept PWX_WARNUNUSED
 	{
 		if (&other != this->data.get()) {
 			PWX_LOCK_GUARD(elem_t, this)
@@ -211,7 +211,7 @@ public:
 	  * @param[in] other pointer to the element to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare(const elem_t* const other) const noexcept
+	int32_t compare(const elem_t* const other) const noexcept PWX_WARNUNUSED
 	{
 		if (other) {
 			if (other != this) {
@@ -249,16 +249,29 @@ public:
 	  *
 	  * @return the next pointer or nullptr if there is none.
 	**/
-	elem_t* getNext() const noexcept
+	elem_t* getNext() const noexcept PWX_WARNUNUSED
 	{
 		if (beThreadSafe()) {
 			elem_t* curNext = next.load(memOrdLoad);
-			if ( !curNext
-			  && isRemoved.load(memOrdLoad) )
+			if ( !curNext && removed() )
 				return oldNext.load(memOrdLoad);
 			return curNext;
 		}
 		return next.load(memOrdLoad);
+	}
+
+
+	/** @brief insert an element as the first
+	  *
+	  * This is a special insertion method that is to be used if
+	  * this element is to become the new head of a bucket chain, or
+	  * the one element in an open addressed hash location.
+	  * In this special case there is no element to use insertNext()
+	  * from, so this method does the handling.
+	**/
+	void insertAsFirst()
+	{
+		insert(nullptr); // Hash containers don't need CThreadElementStore
 	}
 
 
@@ -300,7 +313,7 @@ public:
 
 				// Insert the new element
 				new_next->setNext(this->getNext());
-				new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
+				new_next->insert(nullptr); // Hash containers don't need CThreadElementStore
 
 				// Store new next neighbor
 				setNext(new_next);
@@ -313,7 +326,7 @@ public:
 		} else {
 			// Otherwise do it directly
 			new_next->next.store(next.load(memOrdLoad), memOrdStore);
-			new_next->isRemoved.store(false, memOrdStore);
+			new_next->insert(nullptr); // Hash containers don't need CThreadElementStore
 			next.store(new_next, memOrdStore);
 		}
 	}
@@ -326,15 +339,15 @@ public:
 	  * The next pointer of the element will be set to nullptr
 	  * by this method.
 	**/
-	void remove() noexcept
+	virtual void remove() noexcept
 	{
 		if (beThreadSafe()) {
 			PWX_LOCK_GUARD(elem_t, this)
+			base_t::remove();
 			setNext(nullptr);
-			isRemoved.store(true, memOrdStore);
 		} else {
 			next.store(nullptr, memOrdStore);
-			isRemoved.store(true, memOrdStore);
+			base_t::remove();
 		}
 		hops = 0;
 	}
@@ -345,16 +358,15 @@ public:
 	  * This method removes the successor of this element
 	  * from a list in a thread safe way.
 	  *
-	  * If the next element gets moved or removed while this
-	  * thread waits for the lock, a pwx::CException is thrown.
+	  * @return the removed element or nullptr if there is no successor
 	**/
-	void removeNext()
+	elem_t* removeNext() noexcept
 	{
 		elem_t* toRemove = next.load(memOrdLoad);
 
 		// Exit at once if there is no next to remove:
 		if (!toRemove)
-			return;
+			return nullptr;
 
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe()) {
@@ -369,18 +381,19 @@ public:
 			}
 
 			// Continue if we actually have an element to remove now:
-			if (toRemove) {
+			if (toRemove && (toRemove != this))
 				this->setNext(toRemove->getNext());
-				toRemove->remove();
-			} // End of having a final element to remove
 
-		} else if (this != toRemove) {
+		} else if (this != toRemove)
 			// Without the thread safety needs, this is a lot simpler:
 			next.store(toRemove->next.load(memOrdLoad), memOrdStore);
 
-			// Remove neighborhood:
+		if (toRemove && (toRemove != this)) {
 			toRemove->remove();
+			return toRemove;
 		}
+
+		return nullptr;
 	}
 
 
@@ -437,7 +450,7 @@ public:
 	  *
 	  * @return a read/write reference to the stored data.
 	**/
-	data_t &operator*()
+	data_t &operator*() PWX_WARNUNUSED
 	{
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
@@ -455,7 +468,7 @@ public:
 	  *
 	  * @return a read only reference to the stored data.
 	**/
-	const data_t &operator*() const
+	const data_t &operator*() const PWX_WARNUNUSED
 	{
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
@@ -470,7 +483,7 @@ public:
 	  * @param[in] rhs const reference to the right hand side element
 	  * @return true if both elements have the same key, false otherwise
 	**/
-	bool operator==(const elem_t &rhs) const noexcept
+	bool operator==(const elem_t &rhs) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(key_t))
 			return areAlmostEqual(this->key, rhs.key);
@@ -482,7 +495,7 @@ public:
 	  * @param[in] key const reference of the key to check
 	  * @return true if this element has the same key
 	**/
-	bool operator==(const key_t &key_) const noexcept
+	bool operator==(const key_t &key_) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(key_t))
 			return areAlmostEqual(this->key, key_);
@@ -494,7 +507,7 @@ public:
 	  * @param[in] rhs const reference to the right hand side element
 	  * @return true if the elements have different keys, false otherwise
 	**/
-	bool operator!=(const elem_t &rhs) const noexcept
+	bool operator!=(const elem_t &rhs) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(key_t))
 			return !areAlmostEqual(this->key, rhs.key);
@@ -506,7 +519,7 @@ public:
 	  * @param[in] key const reference of the key to check
 	  * @return true if this element a different key
 	**/
-	bool operator!=(const key_t &key_) const noexcept
+	bool operator!=(const key_t &key_) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(key_t))
 			return !areAlmostEqual(this->key, key_);
@@ -533,7 +546,6 @@ protected:
 	 */
 
 	using base_t::isDestroyed;
-	using base_t::isRemoved;
 
 
 private:

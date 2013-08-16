@@ -123,6 +123,7 @@ struct PWX_API TSingleElement : public VElement
 	typedef TSingleElement<data_t>  elem_t;     //!< Type of this element
 	typedef std::shared_ptr<data_t> share_t;    //!< data_t wrapped in std::shared_ptr
 	typedef std::atomic<elem_t*>    neighbor_t; //!< elem_t* wrapped in std::atomic
+	typedef base_t::store_t         store_t;    //!< The element store type to register this element with
 
 
 	/* ===============================================
@@ -196,7 +197,7 @@ struct PWX_API TSingleElement : public VElement
 	  * @param[in] other reference to the data to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare(const data_t &other) const noexcept
+	int32_t compare(const data_t &other) const noexcept PWX_WARNUNUSED
 	{
 		if (&other != this->data.get()) {
 			PWX_LOCK_GUARD(elem_t, this)
@@ -233,7 +234,7 @@ struct PWX_API TSingleElement : public VElement
 	  * @param[in] other pointer to the element to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare(const elem_t* const other) const noexcept
+	int32_t compare(const elem_t* const other) const noexcept PWX_WARNUNUSED
 	{
 		if (other) {
 			if (other != this) {
@@ -274,12 +275,11 @@ struct PWX_API TSingleElement : public VElement
 	  *
 	  * @return the next pointer or nullptr if there is none.
 	**/
-	elem_t* getNext() const noexcept
+	elem_t* getNext() const noexcept PWX_WARNUNUSED
 	{
 		if (beThreadSafe()) {
 			elem_t* curNext = next.load(memOrdLoad);
-			if ( !curNext
-			  && isRemoved.load(memOrdLoad) )
+			if ( !curNext && removed() )
 				return oldNext.load(memOrdLoad);
 			return curNext;
 		}
@@ -302,11 +302,12 @@ struct PWX_API TSingleElement : public VElement
 	  * will only be marked as inserted.
 	  *
 	  * @param[in] new_next target where the next pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element
 	**/
-	void insertBefore(elem_t* new_next)
+	void insertBefore(elem_t* new_next, store_t* new_store)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, memOrdStore);
+			insert(new_store);
 			return;
 		}
 
@@ -329,13 +330,12 @@ struct PWX_API TSingleElement : public VElement
 				// Store new next neighbor
 				setNext(new_next);
 
-				// Mark as inserted
-				isRemoved.store(false, PWX_MEMORDER_RELAXED);
-			} else {
+			} else
 				// Otherwise do it directly
 				next.store(new_next, memOrdStore);
-				isRemoved.store(false, memOrdStore);
-			}
+
+			// Mark as inserted
+			insert(new_store);
 		} else if (destroyed())
 			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
 					"Tried to insert an element that has already been destroyed!")
@@ -343,6 +343,7 @@ struct PWX_API TSingleElement : public VElement
 			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
 					"Tried to insert an element after an already destroyed element!")
 	}
+
 
 	/** @brief insert an element after this element.
 	  *
@@ -358,8 +359,9 @@ struct PWX_API TSingleElement : public VElement
 	  * simply does nothing.
 	  *
 	  * @param[in] new_next target where the next pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element from now on
 	**/
-	void insertNext(elem_t* new_next)
+	void insertNext(elem_t* new_next, store_t* new_store)
 	{
 		if (!new_next || (new_next == this))
 			return;
@@ -382,7 +384,7 @@ struct PWX_API TSingleElement : public VElement
 
 				// Insert the new element
 				new_next->setNext(this->getNext());
-				new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
+				new_next->insert(new_store);
 
 				// Store new next neighbor
 				setNext(new_next);
@@ -395,7 +397,7 @@ struct PWX_API TSingleElement : public VElement
 		} else {
 			// Otherwise do it directly
 			new_next->next.store(next.load(memOrdLoad),memOrdStore);
-			new_next->isRemoved.store(false, memOrdStore);
+			new_next->insert(new_store);
 			next.store(new_next, memOrdStore);
 		}
 	}
@@ -408,15 +410,15 @@ struct PWX_API TSingleElement : public VElement
 	  * The next pointer of the element will be set to nullptr
 	  * by this method.
 	**/
-	void remove() noexcept
+	virtual void remove() noexcept
 	{
 		if (beThreadSafe()) {
 			PWX_LOCK_GUARD(elem_t, this)
+			base_t::remove();
 			setNext(nullptr);
-			isRemoved.store(true, memOrdStore);
 		} else {
 			next.store(nullptr, memOrdStore);
-			isRemoved.store(true, memOrdStore);
+			base_t::remove();
 		}
 	}
 
@@ -426,16 +428,15 @@ struct PWX_API TSingleElement : public VElement
 	  * This method removes the successor of this element
 	  * from a list in a thread safe way.
 	  *
-	  * If the next element gets moved or removed while this
-	  * thread waits for the lock, a pwx::CException is thrown.
+	  * @return the removed element
 	**/
-	void removeNext()
+	elem_t* removeNext() noexcept
 	{
 		elem_t* toRemove = next.load(memOrdLoad);
 
 		// Exit at once if there is no next to remove:
 		if (!toRemove)
-			return;
+			return nullptr;
 
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe()) {
@@ -449,19 +450,22 @@ struct PWX_API TSingleElement : public VElement
 				toRemoveIsNext = toRemove == next.load(memOrdLoad);
 			}
 
-			// Continue if we actually have an element to remove now:
-			if (toRemove) {
+			// Continue if we actually have an element to remove now,
+			// and the element is not this, like in ring containers
+			if (toRemove && (toRemove != this))
 				this->setNext(toRemove->getNext());
-				toRemove->remove();
-			} // End of having a final element to remove
 
-		} else if (this != toRemove) {
+		} else if (this != toRemove)
 			// Without the thread safety needs, this is a lot simpler:
 			next.store(toRemove->next.load(memOrdLoad), memOrdStore);
 
-			// Remove neighborhood:
+		// Remove neighborhood:
+		if (toRemove && (toRemove != this)) {
 			toRemove->remove();
+			return toRemove;
 		}
+
+		return nullptr;
 	}
 
 
@@ -517,7 +521,7 @@ struct PWX_API TSingleElement : public VElement
 	  *
 	  * @return a read/write reference to the stored data.
 	**/
-	data_t &operator*()
+	data_t &operator*() PWX_WARNUNUSED
 	{
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
@@ -535,7 +539,7 @@ struct PWX_API TSingleElement : public VElement
 	  *
 	  * @return a read only reference to the stored data.
 	**/
-	const data_t &operator*() const
+	const data_t &operator*() const PWX_WARNUNUSED
 	{
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
@@ -550,7 +554,7 @@ struct PWX_API TSingleElement : public VElement
 	  * @param[in] data_ const reference of the data to check
 	  * @return true if this element has the same data
 	**/
-	bool operator==(const data_t &data_) const noexcept
+	bool operator==(const data_t &data_) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(data_t))
 			return areAlmostEqual(*data, data_);
@@ -562,7 +566,7 @@ struct PWX_API TSingleElement : public VElement
 	  * @param[in] data_ const reference of the data to check
 	  * @return true if this element has different data
 	**/
-	bool operator!=(const data_t &data_) const noexcept
+	bool operator!=(const data_t &data_) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(data_t))
 			return !areAlmostEqual(*data, data_);
@@ -587,7 +591,6 @@ protected:
 	 */
 
 	using base_t::isDestroyed;
-	using base_t::isRemoved;
 
 
 private:

@@ -120,6 +120,7 @@ struct PWX_API TDoubleElement : public VElement
 	typedef TDoubleElement<data_t>  elem_t;     //!< Type of this element
 	typedef std::shared_ptr<data_t> share_t;    //!< data_t wrapped in std::shared_ptr
 	typedef std::atomic<elem_t*>    neighbor_t; //!< elem_t* wrapped in std::atomic
+	typedef base_t::store_t         store_t;    //!< The element store type to register this element with
 
 
 	/* ===============================================
@@ -195,7 +196,7 @@ struct PWX_API TDoubleElement : public VElement
 	  * @param[in] other reference to the data to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare(const data_t &other) const noexcept
+	int32_t compare(const data_t &other) const noexcept PWX_WARNUNUSED
 	{
 		if (&other != this->data.get()) {
 			PWX_LOCK_GUARD(elem_t, this)
@@ -232,7 +233,7 @@ struct PWX_API TDoubleElement : public VElement
 	  * @param[in] other pointer to the element to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare(const elem_t* const other) const noexcept
+	int32_t compare(const elem_t* const other) const noexcept PWX_WARNUNUSED
 	{
 		if (other) {
 			if (other != this) {
@@ -273,12 +274,11 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * @return the next pointer or nullptr if there is none.
 	**/
-	elem_t* getNext() const noexcept
+	elem_t* getNext() const noexcept PWX_WARNUNUSED
 	{
 		if (beThreadSafe()) {
 			elem_t* curNext = next.load(memOrdLoad);
-			if ( !curNext
-			  && isRemoved.load(memOrdLoad) )
+			if ( !curNext && removed() )
 				return oldNext.load(memOrdLoad);
 			return curNext;
 		}
@@ -293,12 +293,11 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * @return the prev pointer or nullptr if there is none.
 	**/
-	elem_t* getPrev() const noexcept
+	elem_t* getPrev() const noexcept PWX_WARNUNUSED
 	{
 		if (beThreadSafe()) {
 			elem_t* curPrev = prev.load(memOrdLoad);
-			if ( !curPrev
-			  && isRemoved.load(memOrdLoad) )
+			if ( !curPrev && removed() )
 				return oldPrev.load(memOrdLoad);
 			return curPrev;
 		}
@@ -319,15 +318,16 @@ struct PWX_API TDoubleElement : public VElement
 	  * there is something seriously wrong.
 	  *
 	  * @param[in] new_next target where the next pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element
 	**/
-	void insertBefore(elem_t* new_next)
+	void insertBefore(elem_t* new_next, store_t* store)
 	{
 		if (!new_next || (new_next == this)) {
-			isRemoved.store(false, memOrdStore);
+			insert(store);
 			return;
 		}
 
-		PWX_TRY_PWX_FURTHER(new_next->insertPrev(this))
+		PWX_TRY_PWX_FURTHER(new_next->insertPrev(this, store))
 	}
 
 
@@ -350,8 +350,9 @@ struct PWX_API TDoubleElement : public VElement
 	  * nullptr, the method simply does nothing.
 	  *
 	  * @param[in] new_next target where the next pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element
 	**/
-	void insertNext(elem_t* new_next)
+	void insertNext(elem_t* new_next, store_t* new_store)
 	{
 		if (!new_next || (new_next == this))
 			return;
@@ -396,7 +397,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Insert the new element
 				new_next->setNext(xOldNext);
 				new_next->setPrev(this);
-				new_next->isRemoved.store(false, PWX_MEMORDER_RELAXED);
+				new_next->insert(new_store);
 
 				// Store new next and prev neighbor
 				setNext(new_next);
@@ -414,7 +415,7 @@ struct PWX_API TDoubleElement : public VElement
 			elem_t* xOldNext = next.load(memOrdLoad);
 			new_next->next.store(xOldNext, memOrdStore);
 			new_next->prev.store(this, memOrdStore);
-			new_next->isRemoved.store(false, memOrdStore);
+			new_next->insert(new_store);
 			next.store(new_next, memOrdStore);
 			if (xOldNext)
 				xOldNext->prev.store(new_next, memOrdStore);
@@ -441,8 +442,9 @@ struct PWX_API TDoubleElement : public VElement
 	  * nullptr, the method simply does nothing.
 	  *
 	  * @param[in] new_prev target where the prev pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element
 	**/
-	void insertPrev(elem_t* new_prev)
+	void insertPrev(elem_t* new_prev, store_t* new_store)
 	{
 		if (!new_prev || (new_prev == this))
 			return;
@@ -481,7 +483,7 @@ struct PWX_API TDoubleElement : public VElement
 				// Set the neighborhood of the new prev
 				new_prev->setNext(this);
 				new_prev->setPrev(xOldPrev);
-				new_prev->isRemoved.store(false, PWX_MEMORDER_RELAXED);
+				new_prev->insert(new_store);
 
 				// Store new next and prev neighbor.
 				setPrev(new_prev);
@@ -498,7 +500,7 @@ struct PWX_API TDoubleElement : public VElement
 			elem_t* xOldPrev = prev.load(memOrdLoad);
 			new_prev->prev.store(xOldPrev, memOrdStore);
 			new_prev->next.store(this, memOrdStore);
-			new_prev->isRemoved.store(false, memOrdStore);
+			new_prev->insert(new_store);
 			prev.store(new_prev, memOrdStore);
 			if (xOldPrev)
 				xOldPrev->next.store(new_prev, memOrdStore);
@@ -513,9 +515,11 @@ struct PWX_API TDoubleElement : public VElement
 	  * Both the next and previous elements will be notified and
 	  * the pointers to them set to nullptr.
 	**/
-	void remove() noexcept
+	virtual void remove() noexcept
 	{
 		if (beThreadSafe()) {
+			base_t::remove();
+
 			// Do an acquiring test before the element is actually locked
 			elem_t* xOldPrev = prev.load(memOrdLoad);
 			elem_t* xOldNext = next.load(memOrdLoad);
@@ -551,7 +555,6 @@ struct PWX_API TDoubleElement : public VElement
 			// 3: Remove neighborhood:
 			this->setPrev(nullptr);
 			this->setNext(nullptr);
-			this->isRemoved.store(true, memOrdStore);
 		} else {
 			// No thread safety? Then just kick it out:
 			elem_t* xOldNext = next.load(memOrdLoad);
@@ -566,7 +569,7 @@ struct PWX_API TDoubleElement : public VElement
 			prev.store(nullptr, memOrdStore);
 			next.store(nullptr, memOrdStore);
 
-			isRemoved.store(true, memOrdStore);
+			base_t::remove();
 		}
 	}
 
@@ -575,12 +578,17 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * This method removes the successor of this element
 	  * from a list in a thread safe way.
+	  *
+	  * @return the removed element
 	**/
-	void removeNext() noexcept
+	elem_t* removeNext() noexcept
 	{
 		elem_t* toRemove = getNext();
-		if (toRemove)
+		if (toRemove && (toRemove != this)) {
 			toRemove->remove();
+			return toRemove;
+		}
+		return nullptr;
 	}
 
 
@@ -588,12 +596,17 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * This method removes the predecessor of this element
 	  * from a list in a thread safe way.
+	  *
+	  * @return the removed element
 	**/
-	void removePrev() noexcept
+	elem_t* removePrev() noexcept
 	{
 		elem_t* toRemove = getPrev();
-		if (toRemove)
+		if (toRemove && (toRemove != this)) {
 			toRemove->remove();
+			return toRemove;
+		}
+		return nullptr;
 	}
 
 
@@ -673,7 +686,7 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * @return a read/write reference to the stored data.
 	**/
-	data_t &operator*()
+	data_t &operator*() PWX_WARNUNUSED
 	{
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
@@ -691,7 +704,7 @@ struct PWX_API TDoubleElement : public VElement
 	  *
 	  * @return a read only reference to the stored data.
 	**/
-	const data_t &operator*() const
+	const data_t &operator*() const PWX_WARNUNUSED
 	{
 		PWX_LOCK_GUARD(elem_t, this)
 		if (nullptr == data.get())
@@ -706,7 +719,7 @@ struct PWX_API TDoubleElement : public VElement
 	  * @param[in] data_ const reference of the data to check
 	  * @return true if this element has the same data
 	**/
-	bool operator==(const data_t &data_) const noexcept
+	bool operator==(const data_t &data_) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(data_t))
 			return areAlmostEqual(*data, data_);
@@ -718,7 +731,7 @@ struct PWX_API TDoubleElement : public VElement
 	  * @param[in] data_ const reference of the data to check
 	  * @return true if this element has different data
 	**/
-	bool operator!=(const data_t &data_) const noexcept
+	bool operator!=(const data_t &data_) const noexcept PWX_WARNUNUSED
 	{
 		if (isFloatType(data_t))
 			return !areAlmostEqual(*data, data_);
@@ -744,7 +757,6 @@ protected:
 	 */
 
 	using base_t::isDestroyed;
-	using base_t::isRemoved;
 
 
 private:

@@ -27,6 +27,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+
 #include <pwx/general/macros.h>
 #include <pwx/types/CLockable.h>
 #include <pwx/types/TVarDeleter.h>
@@ -34,6 +35,12 @@
 
 namespace pwx
 {
+
+// Forward CThreadElementStore, there is a circular dependency.
+namespace private_ {
+class CThreadElementStore;
+}
+
 
 /** @class VElement
   *
@@ -56,8 +63,10 @@ public:
 	 * ===============================================
 	*/
 
-	typedef CLockable                 base_t;
-	typedef VElement                  elem_t;
+	typedef CLockable                     base_t;
+	typedef VElement                      elem_t;
+	typedef private_::CThreadElementStore store_t;
+
 
 	/* ===============================================
 	 * === Public constructors and destructors     ===
@@ -74,67 +83,21 @@ public:
 	 * ===============================================
 	*/
 
-	/** @brief returns true if the data was destroyed
-	  *
-	  * The destructor of TSingleElement and TDoubleElement
-	  * will try to get a final lock on the element when it
-	  * is destroyed. If another thread acquires a lock
-	  * between the data destruction and this final dtor lock,
-	  * destroyed() will return "true".
-	  *
-	  * @return true if the element is within its destruction process.
-	**/
-	bool destroyed() const noexcept
-	{
-		return isDestroyed.load(memOrdLoad);
-	}
+	virtual void     disable_thread_safety()    noexcept;                //!< turn off locking
+	virtual void     enable_thread_safety()     noexcept;                //!< turn on locking
+	virtual void     insert(store_t* new_store) noexcept;                //!< mark as inserted
+	        bool     inserted()           const noexcept PWX_WARNUNUSED; //!< return true if marked as inserted
+	        uint32_t nr()                 const noexcept PWX_WARNUNUSED; //!< return current number
+	virtual void     remove()                   noexcept;                //!< mark as removed
+	        bool     removed()            const noexcept PWX_WARNUNUSED; //!< return true if marked as removed
 
 
-	/** @brief disable thread safety
-	  *
-	  * This method disables all thread safety measures.
-	  *
-	  * <B>Warning</B>: It is completely unchecked whether the
-	  * element is used by more than one thread. If concurrent
-	  * threads work with this element while this method is
-	  * called, the outcome is unpredictable.
-	  */
-	virtual void disable_thread_safety() noexcept
-	{
-		this->do_locking(false);
-	}
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
 
-
-	/** @brief enable thread safety
-	  *
-	  * This method enables all thread safety measures.
-	  */
-	virtual void enable_thread_safety() noexcept
-	{
-		this->do_locking(true);
-	}
-
-
-	/** @brief return true if the element is a member of a container
-	  *
-	  * For this to work derived elements and containers using these
-	  * have to maintain isRemoved accordingly.
-	  *
-	  * @return true if the element is a member of any container
-	**/
-	bool inserted() const noexcept
-	{
-		return !isRemoved.load(memOrdLoad);
-	}
-
-
-	/** @brief return the current number of the element in a thread safe way
-	  * @return the current number of the element
-	**/
-	uint32_t nr() const noexcept
-	{
-		return eNr.load(memOrdLoad);
-	}
+	virtual VElement &operator=(const VElement &src) noexcept;
 
 
 	/* ===============================================
@@ -153,19 +116,30 @@ protected:
 	 * ===============================================
 	 */
 
-	mutable
-	abool_t isDestroyed = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
-	mutable
-	abool_t isRemoved   = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
-
+	using base_t::isDestroyed;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
+
+
+private:
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	 */
+
+	store_t* currStore = nullptr;                //!< If set by a container the element will invalidate itself upon removal.
+	mutable
+	abool_t  isRemoved = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
+
 }; // class VContainer
 
 #if defined(PWX_EXPORTS)
 /// @brief ~VElement default destructor.
 VElement::~VElement() noexcept
-{ }
+{
+	this->remove();
+}
 #endif
 
 } // namespace pwx

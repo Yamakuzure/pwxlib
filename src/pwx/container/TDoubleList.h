@@ -67,9 +67,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TSingleList<data_t, elem_t>           base_t;  //!< Base type of this list
-	typedef TDoubleList<data_t, elem_t>           list_t;  //!< Type of this list
-	typedef private_::TThreadElementStore<elem_t> store_t; //!< Storage for the thread id bound curr pointer
+	typedef TSingleList<data_t, elem_t>   base_t;  //!< Base type of this list
+	typedef TDoubleList<data_t, elem_t>   list_t;  //!< Type of this list
+	typedef private_::CThreadElementStore store_t; //!< Storage for the thread id bound curr pointer
 
 
 	/* ===============================================
@@ -765,18 +765,18 @@ protected:
 			// Case 4: A normal insert
 			this->doRenumber.store(true, memOrdStore);
 			PWX_UNLOCK(this)
-			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem))
+			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 		} else {
 			PWX_LOCK_GUARD(list_t, this)
 			PWX_UNLOCK(this)
 			if (!locCnt) {
 				// Case 1: The list is empty
-				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr))
+				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, &currStore))
 				head(insElem);
 				tail(insElem);
 			} else if (nullptr == insPrev) {
 				// Case 2: A new head is to be set
-				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem))
+				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem, &currStore))
 				head(insElem);
 				this->doRenumber.store(true, memOrdStore);
 			} else if (insPrev == tail() ) {
@@ -784,7 +784,7 @@ protected:
 				insElem->eNr.store(
 					tail()->eNr.load(memOrdLoad) + 1,
 					memOrdStore);
-				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem))
+				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, &currStore))
 				tail(insElem);
 			}
 		}
@@ -821,7 +821,9 @@ private:
 	*/
 
 	/// @brief Search until the next element contains the searched data
-	// Note: This method must be invoked with a lock in place! It does *NOT* lock!
+	// Note: This method is only used by operator-=. But the implementation
+	//       is different in TSingleList, so both can use the same operator with
+	//       only this detail being individual.
 	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
 		elem_t*  xPrev   = curr();
@@ -1142,7 +1144,7 @@ private:
 			tail(tail()->getPrev());
 		else
 			this->doRenumber.store(true, memOrdStore);
-		currStore.invalidateElement(elem);
+		currStore.invalidate(elem);
 		elem->remove();
 
 		if (1 == eCount.fetch_sub(1)) {

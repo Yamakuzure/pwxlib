@@ -10,6 +10,7 @@
 		<Build>
 			<Target title="library">
 				<Option output="../libpwx" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -22,6 +23,7 @@
 			</Target>
 			<Target title="clean">
 				<Option output="../libpwx" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -31,25 +33,28 @@
 			</Target>
 			<Target title="cleanlibrary">
 				<Option output="pwx" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 			</Target>
 			<Target title="cleantest">
 				<Option output="pwx" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 			</Target>
 			<Target title="test">
 				<Option output="pwx" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 			</Target>
 			<Target title="testlib">
 				<Option output="../testlib" prefix_auto="1" extension_auto="1" />
-				<Option working_dir=".." />
+				<Option working_dir="../" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters="-p" />
@@ -82,6 +87,7 @@
 			</Target>
 			<Target title="documentation">
 				<Option output="libpwx" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 			</Target>
@@ -230,7 +236,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
-		<Unit filename="../src/pwx/internal/TThreadElementStore.h" />
+		<Unit filename="../src/pwx/internal/CThreadElementStore.cpp" />
+		<Unit filename="../src/pwx/internal/CThreadElementStore.h" />
 		<Unit filename="../src/pwx/tools.h">
 			<Option target="clean" />
 			<Option target="library" />
