@@ -616,7 +616,7 @@ protected:
 			}
 
 			// Otherwise we have to search for it.
-			elem_t* oldCurr = curr();
+			elem_t* oldCurr = xCurr;
 			bool    isDone  = false;
 
 			xCurr   = oldCurr->getNext(); // curr is already checked.
@@ -764,24 +764,6 @@ private:
 	 *            work is done by the private methods which will lock
 	 *            where appropriate.
 	*/
-
-	/// @brief clear this list
-	virtual void privClear() noexcept {
-		elem_t* xElem = nullptr;
-
-		// Those will all be invalidated anyway:
-		currStore.clear();
-
-		/// @todo : This is the ultra safe option.
-		///         Change once inspirations strikes.
-		while ( tail() ) {
-			this->lock();
-			xElem = this->privRemoveElem(tail());
-			this->unlock();
-			if (xElem && !xElem->destroyed())
-				delete xElem;
-		}
-	}
 
 
 	/// @brief Search until the next element contains the searched data
