@@ -1216,20 +1216,35 @@ private:
 
 	/// @brief clear this list
 	virtual void privClear() noexcept {
-		elem_t* xElem = nullptr;
-
 		// Those will all be invalidated anyway:
 		currStore.clear();
 
-		/// @todo : This is the ultra safe option.
-		///         Change once inspirations strikes.
-		while ( head() ) {
-			this->lock();
-			xElem = this->privRemoveAfterElement(nullptr);
-			this->unlock();
-			if (xElem && !xElem->destroyed())
-				delete xElem;
-		}
+		/* The fastest way to clear a list based container is
+		 * to simply declare it as being empty. Of course the
+		 * formerly stored elements then must be deleted anyway
+		 */
+		if (size()) {
+			elem_t* xHead = nullptr;
+			PWX_LOCK(this)
+			if (size()) {
+				xHead = head();
+				head(nullptr);
+				curr(nullptr);
+				tail(nullptr);
+				eCount.store(0, memOrdStore);
+			}
+			PWX_UNLOCK(this)
+
+			// Now if this call found anything, it can be destroyed:
+			elem_t* xNext = nullptr;
+			while (xHead && (xNext = xHead->removeNext())) {
+				if (xNext && !xNext->destroyed())
+					delete xNext;
+			}
+			if (xHead && !xHead->destroyed())
+				delete xHead;
+
+		} // End of having something to do
 	}
 
 	/// @brief Search until the next element contains the searched data
