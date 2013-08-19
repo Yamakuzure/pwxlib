@@ -561,7 +561,7 @@ struct PWX_API TDoubleElement : public VElement
 			elem_t* xOldPrev = prev.load(memOrdLoad);
 
 			if (xOldNext && (xOldNext != this))
-				xOldNext->prev.store(xOldNext, memOrdStore);
+				xOldNext->prev.store(xOldPrev, memOrdStore);
 
 			if (xOldPrev && (xOldPrev != this))
 				xOldPrev->next.store(xOldNext, memOrdStore);
