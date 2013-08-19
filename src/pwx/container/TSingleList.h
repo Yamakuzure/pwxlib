@@ -868,7 +868,8 @@ protected:
 	/// @brief return curr according to thread safety setting
 	elem_t* curr() const
 	{
-		return static_cast<elem_t*>(currStore.curr());
+		elem_t* result = static_cast<elem_t*>(currStore.curr());
+		return result ? result : head();
 	}
 
 
@@ -974,7 +975,7 @@ protected:
 
 		// Quick exit if curr is already what we want:
 		elem_t* xCurr = curr();
-		if (xCurr->data.get() == data) {
+		if (xCurr && (xCurr->data.get() == data)) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
 			return xCurr;
 		}
@@ -1271,8 +1272,6 @@ private:
 
 		if (locCnt) {
 			elem_t* xCurr = curr();
-			if (nullptr == xCurr)
-				xCurr = head();
 			uint32_t xNr = xCurr->eNr.load(memOrdLoad);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
@@ -1292,13 +1291,6 @@ private:
 			if (xIdx == xNr)
 				return xCurr;
 
-			// Is xIdx the next member, like in a for loop?
-			if (xIdx == (xNr + 1)) {
-				xCurr = xCurr->getNext();
-				curr(xCurr);
-				return xCurr;
-			}
-
 			// Is it the head we want?
 			if (0 == xIdx)
 				return head();
@@ -1310,6 +1302,13 @@ private:
 				 * that any call to index -1 retrieves the current tail.
 				 */
 				return tail();
+
+			// Is xIdx the next member, like in a for loop?
+			if (xIdx == (xNr + 1)) {
+				xCurr = xCurr->getNext();
+				curr(xCurr);
+				return xCurr;
+			}
 
 			// Ok, let's go. But only start from head if we currently are beyond.
 			if (xIdx < xNr) {
@@ -1350,7 +1349,8 @@ private:
 			assert ( (xCurr || empty()) && "ERROR: xCurr is nullptr but the list is not empty!");
 			curr(xCurr);
 			return xCurr;
-		}
+		} else
+			PWX_UNLOCK(const_cast<list_t*>(this))
 
 		return nullptr;
 	}
