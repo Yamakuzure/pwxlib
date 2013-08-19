@@ -129,6 +129,10 @@ public:
 	  *
 	  * If you intent to work with the element, use remData instead.
 	  *
+	  * Nothing happens if there is no element holding @a data. If the
+	  * deletion of the data throws an exception, it will be turned
+	  * into a pwx CException and passed on.
+	  *
 	  * @param[in] data the data the element that is to be deleted holds
 	  * @return the number of elements remaining in the list after the deletion.
 	**/
@@ -171,8 +175,9 @@ public:
 	  *
 	  * If you intent to work with the element, use remPrev instead.
 	  *
-	  * If there is no element before the element holding @a next, a
-	  * pwx::CException with the name "OutOfRange" is thrown.
+	  * Nothing happens if there is no element before the element holding @a next.
+	  * If the deletion of the data throws an exception, it will be turned
+	  * into a pwx CException and passed on.
 	  *
 	  * @param[in] next the data the element that succeeds the element to delete holds
 	  * @return the number of elements remaining in the list after the deletion.
@@ -197,8 +202,9 @@ public:
 	  * and both element counts will be wrong then. So please make sure to
 	  * use the correct element on the correct list!
 	  *
-	  * If there is no element before the element @a next a
-	  * pwx::CException with the name "OutOfRange" is thrown.
+	  * Nothing happens if there is no element behind @a prev.
+	  * If the deletion of the data throws an exception, it will be turned
+	  * into a pwx CException and passed on.
 	  *
 	  * @param[in] next the element that succeeds the element to delete
 	  * @return the number of elements remaining in the list after the deletion.
@@ -464,7 +470,7 @@ protected:
 		 * following changes:
 		 * A) Start with curr, not with root()
 		 * B) When traversing backwards, do not skip head for
-		 *    the same reasons tail sn't skipped when traversing
+		 *    the same reasons tail isn't skipped when traversing
 		 *    forwards.
 		 */
 
@@ -482,98 +488,77 @@ protected:
 		}
 
 		// Quick exit if curr is already what we want:
-		if (curr()->data.get() == data) {
-			// Safe curr first, so it isn't changed before being returned
-			result = curr();
+		elem_t* xCurr = curr();
+		if (xCurr && (xCurr->data.get() == data)) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
-			return result;
+			return xCurr;
 		}
 
 		// The next does only make sense if we have more than one element
 		if (size() > 1) {
 
 			// Exit if head is wanted...
-			if (head()->data.get() == data) {
-				curr(head());
-				result = curr();
+			elem_t* xHead = head();
+			if ((xHead != xCurr) && (head()->data.get() == data)) {
+				curr(xHead);
 				PWX_UNLOCK(const_cast<list_t*>(this))
-				return result;
+				return xHead;
 			}
 
 			// ...or tail
-			if (tail()->data.get() == data) {
-				curr(tail());
-				result = curr();
+			elem_t* xTail = tail();
+			if ((xTail != xCurr) && (tail()->data.get() == data)) {
+				curr(xTail);
 				PWX_UNLOCK(const_cast<list_t*>(this))
-				return result;
+				return xTail;
 			}
 
 			// Otherwise we have to search for it.
-			elem_t* oldCurr = curr();
-			elem_t* xCurr   = oldCurr->getNext(); // curr is already checked.
+			elem_t* oldCurr = xCurr;
 			bool    isDone = false;
 
-			if (this->beThreadSafe()) {
-				// oldCurr must be locked, it must not be removed
-				// or deleted now!
-				PWX_LOCK(oldCurr)
+			xCurr   = oldCurr->getNext(); // curr is already checked.
 
-				// This is rule 2: Unlock for traversal
-				PWX_UNLOCK(const_cast<list_t*>(this))
+			// oldCurr must be locked, it must not be removed
+			// or deleted now!
+			PWX_LOCK(oldCurr)
 
-				// Move upwards first
+			// This is rule 2: Unlock for traversal
+			PWX_UNLOCK(const_cast<list_t*>(this))
+
+			// Move upwards first
+			while (!result && !isDone && xCurr) {
+				// Rule 3: Re-check tail. It might be
+				// different from what was checked above
+				// once xCurr gets there.
+				if (xCurr->data.get() == data) {
+					result = xCurr;
+					curr(xCurr);
+				} else if (xCurr == tail())
+					isDone = true;
+				else
+					xCurr = xCurr->getNext();
+			}
+
+			// Move downwards if there is no result, yet
+			if (!result) {
+				xCurr  = oldCurr->getPrev();
+				isDone = false;
+				PWX_UNLOCK(oldCurr)
+
 				while (!result && !isDone && xCurr) {
-					// Rule 3: Re-check tail. It might be
-					// different from what was checked above
-					// once xCurr gets there.
-					if (xCurr->data.get() == data)
+					// Again, do not spare head.
+					if (xCurr->data.get() == data) {
 						result = xCurr;
-					else if (xCurr == tail())
+						curr(xCurr);
+					} else if (xCurr == head())
 						isDone = true;
 					else
-						xCurr = xCurr->getNext();
+						xCurr = xCurr->getPrev();
 				}
-
-				// Move downwards if there is no result, yet
-				if (!result) {
-					xCurr  = oldCurr->getPrev();
-					isDone = false;
-					PWX_UNLOCK(oldCurr)
-
-					while (!result && !isDone && xCurr) {
-						// Again, do not spare head.
-						if (xCurr->data.get() == data)
-							result = xCurr;
-						else if (xCurr == head())
-							isDone = true;
-						else
-							xCurr = xCurr->getPrev();
-					}
-					// End of moving downwards
-				} else
-					PWX_UNLOCK(oldCurr)
-			} else {
-				// No need to unlock, PWX_LOCK hasn't done anything anyway.
-				// Further tail() is already checked and we don't assume
-				// it to change while the search is running.
-				while (!result && xCurr && (xCurr != tail() )) {
-					if (xCurr->data.get() == data)
-						result = xCurr;
-					else
-						xCurr = xCurr->next.load(memOrdLoad);
-				}
-
-				// And downwards if there was no result, yet:
-				xCurr = oldCurr->prev.load(memOrdLoad);
-				if (!result) {
-					while (!result && xCurr && (xCurr != head() )) {
-						if (xCurr->data.get() == data)
-							result = xCurr;
-						else
-							xCurr = xCurr->prev.load(memOrdLoad);
-					}
-				}
-			} // End of manual traversing the container
+				// End of moving downwards
+			} else
+				PWX_UNLOCK(oldCurr)
 
 		} // End of handling a search with more than one element
 		else
@@ -605,107 +590,86 @@ protected:
 		}
 
 		// Quick exit if curr is already what we want:
-		if (*curr() == data) {
-			// Safe curr first, so it isn't changed before being returned
-			result = curr();
+		elem_t* xCurr = curr();
+		if (*xCurr == data) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
-			return result;
+			return xCurr;
 		}
 
 		// The next does only make sense if we have more than one element
 		if (size() > 1) {
 
 			// Exit if head is wanted...
-			if (*head() == data) {
-				curr(head());
-				result = curr();
+			elem_t* xHead = head();
+			if ((xHead != xCurr) && (*xHead == data)) {
+				curr(xHead);
 				PWX_UNLOCK(const_cast<list_t*>(this))
-				return result;
+				return xHead;
 			}
 
 			// ...or tail
-			if (*tail() == data) {
-				curr(tail());
-				result = curr();
+			elem_t* xTail = tail();
+			if ((xTail != xCurr) && (*xTail == data)) {
+				curr(xTail);
 				PWX_UNLOCK(const_cast<list_t*>(this))
-				return result;
+				return xTail;
 			}
 
 			// Otherwise we have to search for it.
 			elem_t* oldCurr = curr();
-			elem_t* xCurr   = oldCurr->getNext(); // curr is already checked.
 			bool    isDone  = false;
 
-			if (this->beThreadSafe()) {
-				// oldCurr must be locked, it must not be removed
-				// or deleted now!
-				PWX_LOCK(oldCurr)
+			xCurr   = oldCurr->getNext(); // curr is already checked.
 
-				// This is rule 2: Unlock for traversal
-				PWX_UNLOCK(const_cast<list_t*>(this))
+			// oldCurr must be locked, it must not be removed
+			// or deleted now!
+			PWX_LOCK(oldCurr)
 
-				// Move upwards first, unless the search starts with tail
-				if (oldCurr != tail()) {
-					// Note: This distinction is necessary, because rings
-					//       connect tail to head and vice versa. If this
-					//       is a ring, oldcurr would point to tail and
-					//       xCurr to head, dead locking once more than
-					//       one thread does this.
-					while (!result && !isDone && xCurr) {
-						// Rule 3: Re-check tail.
-						// As the list is no longer locked,
-						// use compare() for element level
-						// locking.
-						if (0 == xCurr->compare(data))
-							result = xCurr;
-						else if (xCurr == tail())
-							isDone = true;
-						else
-							xCurr = xCurr->getNext();
-					}
-				}
+			// This is rule 2: Unlock for traversal
+			PWX_UNLOCK(const_cast<list_t*>(this))
 
-				// Move downwards if there is no result, yet
-				if (!result && (oldCurr != head())) {
-					xCurr  = oldCurr->getPrev();
-					isDone = false;
-					PWX_UNLOCK(oldCurr)
-
-					while (!result && !isDone && xCurr) {
-						// Again, do not spare head.
-						if (0 == xCurr->compare(data))
-							result = xCurr;
-						else if (xCurr == head())
-							isDone = true;
-						else
-							xCurr = xCurr->getPrev();
-					}
-					// End of moving downwards
-				} else
-					PWX_UNLOCK(oldCurr)
-			} else {
-				// No need to unlock, PWX_LOCK hasn't done anything anyway.
-				// Further tail() is already checked and we don't assume
-				// it to change while the search is running.
-				while (!result && xCurr && (xCurr != tail() )) {
-					if (*xCurr == data)
+			// Move upwards first, unless the search starts with tail
+			if (oldCurr != tail()) {
+				// Note: This distinction is necessary, because rings
+				//       connect tail to head and vice versa. If this
+				//       is a ring, oldcurr would point to tail and
+				//       xCurr to head, dead locking when more than
+				//       one thread do this.
+				while (!result && !isDone && xCurr) {
+					// Rule 3: Re-check tail.
+					// As the list is no longer locked,
+					// use compare() for element level
+					// locking.
+					if (0 == xCurr->compare(data)) {
+						curr(xCurr);
 						result = xCurr;
+					} else if (xCurr == tail())
+						isDone = true;
 					else
-						xCurr = xCurr->next.load(memOrdLoad);
+						xCurr = xCurr->getNext();
 				}
+			}
 
-				// And downwards if there was no result, yet:
-				if (!result) {
-					xCurr = oldCurr->prev.load(memOrdLoad);
-					while (!result && xCurr && (xCurr != head() )) {
-						if (*xCurr == data)
-							result = xCurr;
-						else
-							xCurr = xCurr->prev.load(memOrdLoad);
+			// Move downwards if there is no result, yet
+			if (!result && (oldCurr != head())) {
+				xCurr  = oldCurr->getPrev();
+				isDone = false;
+				PWX_UNLOCK(oldCurr)
+
+				while (!result && !isDone && xCurr) {
+					// Again, do not spare head.
+					if (0 == xCurr->compare(data)) {
+						result = xCurr;
+						curr(xCurr);
 					}
+					else if (xCurr == head())
+						isDone = true;
+					else
+						xCurr = xCurr->getPrev();
 				}
-			} // End of manual traversing the container
-
+				// End of moving downwards
+			} else
+				PWX_UNLOCK(oldCurr)
 		} // End of handling a search with more than one element
 		else
 			PWX_UNLOCK(const_cast<list_t*>(this))
@@ -737,21 +701,16 @@ protected:
 		 *    renumbering is needed then.
 		 * 4: Otherwise insPrev->insertNext() can do the insertion
 		*/
-		PWX_LOCK(this)
 
-		uint32_t locCnt = eCount.load(memOrdLoad);
+		curr(insElem); // always use the new element henceforth
 
-		curr(insElem);
-
-		if (locCnt && insPrev && (tail() != insPrev)) {
+		if (size() && insPrev && (tail() != insPrev)) {
 			// Case 4: A normal insert
 			this->doRenumber.store(true, memOrdStore);
-			PWX_UNLOCK(this)
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 		} else {
 			PWX_LOCK_GUARD(list_t, this)
-			PWX_UNLOCK(this)
-			if (!locCnt) {
+			if (!size()) {
 				// Case 1: The list is empty
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, &currStore))
 				head(insElem);
@@ -768,6 +727,10 @@ protected:
 					memOrdStore);
 				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, &currStore))
 				tail(insElem);
+			} else {
+				// Case 4, but only after acquiring the lock
+				this->doRenumber.store(true, memOrdStore);
+				PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 			}
 		}
 
@@ -857,20 +820,32 @@ private:
 	}
 
 
-	/// @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
+	/** @brief wrapping method to retrieve an element by any index or nullptr if the list is empty
+	  * Note: The difference to the TSingleList version is, that in this variant the list
+	  *       can be traversed backwards. This makes it possible to actually determine the
+	  *       shortest path:
+	  *              head     curr      tail
+	  *              | idx idx | idx | idx |
+	  * go up from head +   |     |     + go down from tail
+	  *   go down from curr +     + go up from curr.
+	**/
 	virtual const elem_t* privGetElementByIndex (int32_t index) const noexcept
 	{
+		// return at once if the list is empty
+		if (empty())
+			return nullptr;
+
 		protRenumber();
 
 		// It is necessary to lock briefly to ensure a consistent
 		// start of the search with a minimum of checks
 		PWX_LOCK(const_cast<list_t*>(this))
 
-		uint32_t locCnt = eCount.load(memOrdLoad);
+		uint32_t locCnt = size();
 
 		if (locCnt) {
-			elem_t*  xCurr = curr() ? curr() : head();
-			uint32_t xNr   = xCurr->eNr.load(memOrdLoad);
+			elem_t* xCurr = curr();
+			uint32_t xNr = xCurr->eNr.load(memOrdLoad);
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
 
@@ -889,24 +864,6 @@ private:
 			if (xIdx == xNr)
 				return xCurr;
 
-			// Is xIdx the next member, like in a for loop?
-			if (xIdx == (xNr + 1)) {
-				xCurr = xCurr->getNext();
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr(xCurr);
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return xCurr;
-			}
-
-			// Or the previous
-			if (xIdx == (xNr - 1)) {
-				xCurr = xCurr->getPrev();
-				PWX_LOCK(const_cast<list_t*>(this))
-				curr(xCurr);
-				PWX_UNLOCK(const_cast<list_t*>(this))
-				return xCurr;
-			}
-
 			// Is it the head we want?
 			if (0 == xIdx)
 				return head();
@@ -919,61 +876,79 @@ private:
 				 */
 				return tail();
 
-			// Ok, let's go. But xCurr is already checked
-			bool upwards = true;
-			if (xIdx < xNr) {
-				upwards = false;
-				xCurr = xCurr->getPrev();
-				--xNr;
-			} else {
+			// Is xIdx the next member, like in a for loop?
+			if (xIdx == (xNr + 1)) {
 				xCurr = xCurr->getNext();
-				++xNr;
+				curr(xCurr);
+				return xCurr;
 			}
 
-			// Now look into the rest
-			while ( xCurr && (xNr != xIdx)) {
+			// Is xIdx the prev member, like in a for loop?
+			if (xIdx == (xNr + 1)) {
+				xCurr = xCurr->getNext();
+				curr(xCurr);
+				return xCurr;
+			}
 
-				/* There is one critical possibility here:
-				 * If more than one element is removed while we traverse
-				 * the list, it might happen that xIdx is suddenly beyond
-				 * eCount or we reach head, first.
-				 * If this happens xCurr and xIdx have to be "warped"
-				 * around head and tail if xCurr reaches head or tail
-				 */
-				if (upwards && (tail() == xCurr)) {
-					PWX_LOCK(const_cast<list_t*>(this))
-					// Do a double check, maybe the warp is not needed any more
-					if (tail() == xCurr) {
-						xIdx -= eCount.load(memOrdLoad);
-						xCurr = head();
-						xNr   = 0;
-					}
-					PWX_UNLOCK(const_cast<list_t*>(this))
-				} else if (!upwards && (head() == xCurr)) {
-					PWX_LOCK(const_cast<list_t*>(this))
-					if (head() == xCurr) {
-						xIdx += eCount.load(memOrdLoad);
-						xCurr = tail();
-						xNr   = xCurr->eNr.load(memOrdLoad);
-					}
-					PWX_UNLOCK(const_cast<list_t*>(this))
-				} // End of consistency check
-				else {
-					if (upwards)
-						xCurr = xCurr->getNext();
-					else
-						xCurr = xCurr->getPrev();
-					xNr += upwards ? 1 : -1;
+			// Ok, let's go. Find a good start and direction:
+			int32_t  distCurr = xIdx - xNr; // positive: Move up, negative: move down
+			uint32_t distAbs  = std::abs(distCurr);
+			bool     moveUp   = true;
+
+			if (xIdx < distAbs) {
+				// Moving upwards from head is shortest:
+				xCurr = head();
+				xNr   = 0;
+			} else if ((locCnt - xIdx) < distAbs) {
+				// Moving downwards from tail is shortest
+				xCurr  = tail();
+				xNr    = locCnt - 1;
+				moveUp = false;
+			} else {
+				// xCurr is already nearest (But xCurr and its neighbors are already checked!)
+				if (SIGN(distCurr) < 0) {
+					moveUp = false;
+					xCurr = xCurr->getPrev();
+					--xNr;
+				} else {
+					xCurr = xCurr->getNext();
+					++xNr;
 				}
+			}
 
+
+			// Now look into the rest
+			while ( xCurr && (xNr != xIdx) ) {
+				/* If removals lead to an xIdx beyond eCount it doesn't
+				 * matter. xNr is a manual count and simply raised until
+				 * xIdx is met.
+				 * There are are only two special conditions:
+				 * a) if xCurr is tail(), xCurr must continue with head() and vice versa.
+				 * b) if the list is emptied before a result is found,
+				 *    nullptr must be returned. (handled by the loop
+				 *    condition!)
+				 */
+				// check special condition a)
+				if ( ( moveUp && (tail() == xCurr))
+				  || (!moveUp && (head() == xCurr)) )
+					xCurr = moveUp ? head() : tail();
+				else
+					xCurr = moveUp ? xCurr->getNext() : xCurr->getPrev();
+
+				// Be sure special condition b) doesn't creep on us:
+				if ((nullptr == xCurr) && size())
+					xCurr = moveUp ? head() : tail();
+
+				xNr += moveUp ? 1 : -1;
 			} // end of searching loop
 
-			// xCurr is sure to be pointing where it should now.
-			PWX_LOCK(const_cast<list_t*>(this))
+			// xCurr is sure to be pointing where it should now
+			// or is nullptr if the list has been emptied
+			assert ( (xCurr || empty()) && "ERROR: xCurr is nullptr but the list is not empty!");
 			curr(xCurr);
-			PWX_UNLOCK(const_cast<list_t*>(this))
 			return xCurr;
-		}
+		} else
+			PWX_UNLOCK(const_cast<list_t*>(this))
 
 		return nullptr;
 	}
@@ -1124,11 +1099,10 @@ private:
 
 
 	/// @brief simple method to remove an element from the list.
-	/// This method does *NOT* lock, a lock must be in place!
 	virtual void privRemove (elem_t* elem) noexcept
 	{
 		// return at once if there is no element to remove
-		if (!elem)
+		if (!elem || elem->removed() || elem->destroyed())
 			return;
 
 		/* The following scenarios are possible:
@@ -1138,20 +1112,35 @@ private:
 		*/
 		if (head() == elem) {
 			// Case 1
-			head(head()->getNext());
+			PWX_LOCK(this)
+			/* The reasons for the double check are the same as
+			 * with TsingleList::privRemoveNextElem()
+			 */
+			if (head() == elem)
+				head(head()->getNext());
 			this->doRenumber.store(true, memOrdStore);
-		} else if (tail() == elem)
+			PWX_UNLOCK(this)
+		} else if (tail() == elem) {
 			// Case 2:
-			tail(tail()->getPrev());
+			PWX_LOCK(this)
+			if (tail() == elem)
+				tail(tail()->getPrev());
+			PWX_UNLOCK(this)
+		}
 		else
 			this->doRenumber.store(true, memOrdStore);
 		elem->remove();
 
 		if (1 == eCount.fetch_sub(1)) {
 			// The list is empty!
-			curr(nullptr);
-			head(nullptr);
-			tail(nullptr);
+			PWX_LOCK(this)
+			// Is it really?
+			if (0 == eCount.load(memOrdLoad)) {
+				curr(nullptr);
+				head(nullptr);
+				tail(nullptr);
+			}
+			PWX_UNLOCK(this)
 		}
 	}
 
@@ -1159,32 +1148,24 @@ private:
 	/// @brief simple wrapper to prepare the direct removal of data
 	virtual elem_t* privRemoveData(data_t* data) noexcept
 	{
-		// Need a big lock, only one removal at a time!
-		PWX_LOCK_GUARD(list_t, this)
-
 		elem_t* toRemove = nullptr;
 
 		if ( (nullptr == data) || (nullptr == (toRemove = find (data))) )
 			return nullptr;
 
-		privRemove (toRemove);
+		if (toRemove) {
+			privRemove (toRemove);
+			return !toRemove->destroyed() ? toRemove : nullptr;
+		}
 
-		return toRemove;
+		return nullptr;
 	}
 
 
 	/// @brief simple wrapper to prepare the direct removal of an element
 	virtual elem_t* privRemoveElem(elem_t* elem) noexcept
 	{
-		if (nullptr == elem)
-			return nullptr;
-
-		// Need a big lock, only one removal at a time!
-		PWX_DOUBLE_LOCK_GUARD(list_t, this, elem_t, elem)
-
-		if (elem->destroyed())
-			// If it is deleted, it can not be removed as it is already detached.
-			// And more important: It will go away after the unlock!
+		if (!elem || elem->removed() || elem->destroyed())
 			return nullptr;
 
 		privRemove (elem);
@@ -1199,16 +1180,15 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeData(data_t* next) noexcept
 	{
-		// Need a big lock, only one removal at a time!
-		PWX_LOCK_GUARD(list_t, this)
-
 		elem_t* xNext = next ? find (next) : nullptr;
 		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : tail();
 
-		if (toRemove)
+		if (toRemove) {
 			privRemove (toRemove);
+			return !toRemove->destroyed() ? toRemove : nullptr;
+		}
 
-		return toRemove;
+		return nullptr;
 	}
 
 
@@ -1217,14 +1197,13 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeElem(elem_t* next) noexcept
 	{
-		// Need a big lock, only one removal at a time!
-		PWX_LOCK_GUARD(list_t, this)
-
 		elem_t* toRemove = next ? next->getPrev() : tail();
-		if (toRemove)
+		if (toRemove) {
 			privRemove (toRemove);
+			return !toRemove->destroyed() ? toRemove : nullptr;
+		}
 
-		return toRemove;
+		return nullptr;
 	}
 }; // class TDoubleList
 
