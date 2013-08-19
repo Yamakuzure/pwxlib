@@ -1216,35 +1216,45 @@ private:
 
 	/// @brief clear this list
 	virtual void privClear() noexcept {
-		// Those will all be invalidated anyway:
-		currStore.clear();
-
 		/* The fastest way to clear a list based container is
 		 * to simply declare it as being empty. Of course the
-		 * formerly stored elements then must be deleted anyway
+		 * formerly stored elements then must be deleted anyway.
+		 * However, if someone does anything stupid, like calling
+		 * clear() in one thread while other threads add and/or
+		 * remove elements (like torture does ;)), some
+		 * additional checks must be performed for such a
+		 * situation not to go haywire.
 		 */
+		elem_t* xHead = nullptr;
 		if (size()) {
-			elem_t* xHead = nullptr;
 			PWX_LOCK(this)
-			if (size()) {
+			xHead = head();
+			while (xHead && (xHead->removed() || xHead->destroyed())) {
+				PWX_UNLOCK(this)
+				PWX_LOCK(this)
 				xHead = head();
+			}
+			if (xHead && size()) {
+				eCount.store(0, memOrdStore);
 				head(nullptr);
 				curr(nullptr);
 				tail(nullptr);
-				eCount.store(0, memOrdStore);
 			}
 			PWX_UNLOCK(this)
+		} // End of catching head()
 
-			// Now if this call found anything, it can be destroyed:
+		// Now if this call found anything, it can be destroyed:
+		if (xHead) {
+			currStore.clear(); // will all be gone soon anyway
 			elem_t* xNext = nullptr;
+			xHead->beThreadSafe(false);
 			while (xHead && (xNext = xHead->removeNext())) {
 				if (xNext && !xNext->destroyed())
 					delete xNext;
 			}
 			if (xHead && !xHead->destroyed())
 				delete xHead;
-
-		} // End of having something to do
+		}
 	}
 
 	/// @brief Search until the next element contains the searched data
