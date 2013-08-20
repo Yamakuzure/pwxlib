@@ -58,6 +58,12 @@ namespace pwx
   * Set operations to build unions, differences and intersections are implemented
   * outside the class with functions prefixed with set_.
   *
+  * To maintain the order of elements as they are added the standard operations
+  * to add are push(), add an element to the end of the set, and pop(), take an
+  * element from the beginning of the set.
+  * The two reversal methods unshift() and shift() to add to the beginning and to
+  * take from the end are available for convenience.
+  *
   * It is recommended that you use the much more advanced std::set unless you need
   * to store a very large number of elements and can not live with the downside of
   * every element having to be copied into the std container.
@@ -114,9 +120,20 @@ public:
 	**/
 	TSet (const list_t &src) noexcept :
 		base_t (src),
-		lookup(src.lookup)
+		lookup(list_t::do_not_destroy)
 	{
 		// The copy ctor of base_t has already copied all elements.
+		// However, lookup is empty and needs to be filled:
+		elem_t* xCurr = head();
+		elem_t* xTail = tail();
+		bool    done  = false;
+		while (xCurr && !done) {
+			lookup.add(**xCurr, xCurr);
+			if (xCurr == xTail)
+				done = true;
+			else
+				xCurr = xCurr->getNext();
+		}
 	}
 
 
@@ -280,7 +297,7 @@ public:
 	**/
 	virtual elem_t* shift() noexcept
 	{
-		return privRemoveAfterData(nullptr);
+		return privRemove(tail());
 	}
 
 
@@ -302,7 +319,7 @@ public:
 	**/
 	virtual uint32_t unshift(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return privInsDataBehindElem (nullptr, data))
+		PWX_TRY_PWX_FURTHER(return privInsDataBeforeElem (head(), data))
 	}
 
 
@@ -321,7 +338,7 @@ public:
 	**/
 	virtual uint32_t unshift(const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER(return privInsElemBehindElem (nullptr, src))
+		PWX_TRY_PWX_FURTHER(return privInsElemBeforeElem (head(), src))
 	}
 
 
