@@ -1542,6 +1542,7 @@ private:
 		} else
 			// possibility 1 is simple:
 			return privRemoveAfterElement(nullptr);
+
 		return nullptr;
 	}
 

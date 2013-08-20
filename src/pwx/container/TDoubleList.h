@@ -331,7 +331,7 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		return privRemoveElem(tail());
+		return privRemove(tail());
 	}
 
 
@@ -375,7 +375,7 @@ public:
 	**/
 	virtual elem_t* remElem (elem_t* elem) noexcept
 	{
-		return privRemoveElem(elem);
+		return privRemove(elem);
 	}
 
 
@@ -1081,11 +1081,11 @@ private:
 
 
 	/// @brief simple method to remove an element from the list.
-	virtual void privRemove (elem_t* elem) noexcept
+	virtual elem_t* privRemove (elem_t* elem) noexcept
 	{
 		// return at once if there is no element to remove
 		if (!elem || elem->removed() || elem->destroyed())
-			return;
+			return nullptr;
 
 		/* The following scenarios are possible:
 		 * 1: elem is head
@@ -1124,35 +1124,41 @@ private:
 			}
 			PWX_UNLOCK(this)
 		}
+
+		return elem;
 	}
 
 
 	/// @brief simple wrapper to prepare the direct removal of data
 	virtual elem_t* privRemoveData(data_t* data) noexcept
 	{
-		elem_t* toRemove = nullptr;
+		return privRemove (data ? const_cast<elem_t*>(protFind(data)) : nullptr);
+	}
 
-		if ( (nullptr == data) || (nullptr == (toRemove = find (data))) )
-			return nullptr;
 
-		if (toRemove) {
-			privRemove (toRemove);
-			return !toRemove->destroyed() ? toRemove : nullptr;
-		}
+	/** @brief remove the element after the specified data
+	  * If @a prev data can not be found, nothing happens and nullptr is returned.
+	  * @return nullptr if the element holding @a prev is the last element or the list is empty.
+	**/
+	virtual elem_t* privRemoveAfterData(data_t* prev) noexcept
+	{
+		elem_t* xPrev = prev ? const_cast<elem_t*>(protFind (prev)) : nullptr;
+		elem_t* toRemove = xPrev ? xPrev->getNext() : prev ? nullptr : head();
+
+		if (toRemove)
+			return privRemove (toRemove);
 
 		return nullptr;
 	}
 
 
-	/// @brief simple wrapper to prepare the direct removal of an element
-	virtual elem_t* privRemoveElem(elem_t* elem) noexcept
+	/** @brief remove the element after the specified element
+	  * @param[in] prev pointer to the element after which to remove an element
+	  * @return the removed element or nullptr if prev->next is nullptr or the list is empty
+	**/
+	virtual elem_t* privRemoveAfterElement(elem_t* prev) noexcept
 	{
-		if (!elem || elem->removed() || elem->destroyed())
-			return nullptr;
-
-		privRemove (elem);
-
-		return elem;
+		return privRemove(prev ? prev->getNext() : head());
 	}
 
 
@@ -1162,13 +1168,11 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeData(data_t* next) noexcept
 	{
-		elem_t* xNext = next ? find (next) : nullptr;
+		elem_t* xNext = next ? const_cast<elem_t*>(protFind (next)) : nullptr;
 		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : tail();
 
-		if (toRemove) {
-			privRemove (toRemove);
-			return !toRemove->destroyed() ? toRemove : nullptr;
-		}
+		if (toRemove)
+			return privRemove (toRemove);
 
 		return nullptr;
 	}
@@ -1179,14 +1183,9 @@ private:
 	**/
 	virtual elem_t* privRemoveBeforeElem(elem_t* next) noexcept
 	{
-		elem_t* toRemove = next ? next->getPrev() : tail();
-		if (toRemove) {
-			privRemove (toRemove);
-			return !toRemove->destroyed() ? toRemove : nullptr;
-		}
-
-		return nullptr;
+		return privRemove(next ? next->getPrev() : tail());
 	}
+
 }; // class TDoubleList
 
 /** @brief default destructor

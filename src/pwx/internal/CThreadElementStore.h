@@ -126,6 +126,7 @@ private:
 	curr_t* oneCurr      = nullptr;                //!< Used when thread safety is disabled
 };
 
+
 } // namespace private
 
 } // namespace pwx
