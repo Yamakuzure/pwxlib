@@ -194,9 +194,9 @@ int32_t testSet (sEnv& env)
 		}
 
 		/***************************************************************************
-		**    Build union A+B, must be (1, 2, 3, 4, 5)                            **
+		**    Build union A+B, must be (1, 3, 5, 2, 4)                            **
 		***************************************************************************/
-		cout << adjRight (4, 0) << ++env.testCount << "    Union        (1, 2, 3, 4, 5) : ";
+		cout << adjRight (4, 0) << ++env.testCount << "    Union        (1, 3, 5, 2, 4) : ";
 		// Note: The (very costly) operator+ uses the reference version of set_union(),
 		//       which uses the pointer version of set_union(). Three tests in one.
 		testContC = testContA + testContB;
@@ -204,8 +204,8 @@ int32_t testSet (sEnv& env)
 		cout << **testContC[2] << ", " << **testContC[3] << ", ";
 		cout << **testContC[4];
 
-		if (	(5 == testContC.size()) && (1 == **testContC[0]) && (2 == **testContC[1])
-			&&	(3 == **testContC[2])   && (4 == **testContC[3]) && (5 == **testContC[4])) {
+		if (	(5 == testContC.size()) && (1 == **testContC[0]) && (3 == **testContC[1])
+			&&	(5 == **testContC[2])   && (2 == **testContC[3]) && (4 == **testContC[4])) {
 			cout << " - Success" << endl;
 			++env.testSuccess;
 		} else {
