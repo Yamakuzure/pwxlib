@@ -172,7 +172,7 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TChainHash(	uint32_t (*destroy_) (data_t* data)) noexcept :
+	TChainHash(	void (*destroy_) (data_t* data)) noexcept :
 		base_t(97, destroy_, 3.0, 1.25)
 	{ }
 

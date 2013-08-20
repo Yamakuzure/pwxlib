@@ -234,7 +234,7 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase(	uint32_t (*destroy_) (data_t* data),
+	VTHashBase(	void (*destroy_) (data_t* data),
 				double maxLoad_, double dynGrow_) noexcept :
 		hash_t((uint32_t)100, (uint32_t)0, maxLoad_, dynGrow_)
 	{

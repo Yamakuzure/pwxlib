@@ -175,7 +175,7 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TOpenHash(	uint32_t (*destroy_) (data_t* data)) noexcept :
+	TOpenHash(	void (*destroy_) (data_t* data)) noexcept :
 		base_t(destroy_, 0.8, 1.5)
 	{ }
 
