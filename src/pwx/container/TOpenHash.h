@@ -214,7 +214,9 @@ public:
 	**/
 	TOpenHash(	const hash_t &src) :
 		base_t (src)
-	{  }
+	{
+		operator+=(src);
+	}
 
 
 	virtual ~TOpenHash() noexcept;
