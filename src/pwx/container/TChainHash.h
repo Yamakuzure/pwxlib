@@ -307,7 +307,7 @@ private:
 			return xHash % this->sizeMax();
 		else {
 			double dHash = static_cast<double>(xHash) * 0.618;
-			return static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash) * this->sizeMax()) ));
+			return static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * this->sizeMax() ));
 		}
 	}
 

@@ -675,6 +675,11 @@ public:
 				elem_t** oldTab = hashTable;
 				try {
 					hashTable = new elem_t*[targetSize];
+
+					// --- reset eCount, it will be restored by the copying ---
+					eCount.store(0, memOrdStore);
+
+					// --- "nullify" the new table ---
 					for (uint32_t i = 0; i < targetSize; ++i)
 						hashTable[i] = nullptr;
 				}
@@ -683,23 +688,34 @@ public:
 				// --- Determine new hashing method ---
 				privSetHashMethod(targetSize);
 
-				// --- Copy all elements ---
-				elem_t* toMove  = nullptr;
-				uint32_t  pos       = 0;
-				uint32_t  tabSize   = sizeMax();
+				// --- store old size ---
+				uint32_t oldSize = sizeMax();
 
-				while (pos < tabSize) {
+				// --- Set new size ---
+				hashSize.store(targetSize, memOrdStore);
+
+				// --- Copy all elements ---
+				elem_t*   toMove    = nullptr;
+				elem_t*   xNext     = nullptr;
+				uint32_t  pos       = 0;
+
+				while (pos < oldSize) {
 					while (oldTab[pos] && (oldTab[pos] != vacated)) {
-						if ( ( toMove = privRemoveIdx(pos) ) )
-							PWX_TRY_PWX_FURTHER(this->add(*toMove))
-						// Note: eCount is not affected. privRemove() will reduce
-						// it while add() increases it.
+						toMove = oldTab[pos];
+						xNext  = toMove->getNext();
+
+						// Add the old element to the new table and delete the old one:
+						PWX_TRY_PWX_FURTHER(this->add(toMove->key, toMove->data.get()))
+
+						// Now maintain the old table:
+						oldTab[pos] = xNext != toMove ? xNext : nullptr;
+
+						// And delete the old element
+						PWX_TRY_STD_FURTHER(delete toMove, "delete_error", "deleting an element failed")
 					}
 					++pos;
 				}
 
-				// --- Set new size ---
-				hashSize.store(targetSize, memOrdStore);
 
 				// --- Delete old table ---
 				PWX_TRY_STD_FURTHER(delete [] oldTab, "Delete failed",
