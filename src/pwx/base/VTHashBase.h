@@ -295,11 +295,12 @@ public:
 		hash_user(src.hash_user),
 		hash_limited(src.hash_limited),
 		hashBuilder (src.hashBuilder.getKeyLen()),
-		hashSize (src.hashSize),
+		hashSize (src.hashSize.load(memOrdLoad)),
 		hashTable (nullptr),
 		maxLoadFactor(src.maxLoadFactor),
 		dynGrowFactor(src.dynGrowFactor)
 	{
+
 		// Generate the hash table
 		try {
 			hashTable = new elem_t*[hashSize];
