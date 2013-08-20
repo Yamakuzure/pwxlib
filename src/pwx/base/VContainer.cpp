@@ -12,8 +12,8 @@ VContainer::VContainer() noexcept
 /// @brief VContainer copy constructor.
 VContainer::VContainer(const VContainer& src) noexcept :
 	base_t(src),
-	doRenumber(src.doRenumber.load(memOrdLoad)),
-	eCount(src.eCount.load(memOrdLoad))
+	doRenumber(src.doRenumber.load(memOrdLoad))
+	// eCount is maintained when deriving copy ctors copy elements
 { }
 
 
