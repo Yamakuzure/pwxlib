@@ -63,7 +63,7 @@ TSet<data_t>* set_difference(const TSet<data_t>* const lhs, const TSet<data_t>* 
 
 	list_t *newSet = nullptr;
 
-	// Build an empty set and copy sorted switch and destroy method from lhs:
+	// Build an empty set and copy destroy method from lhs:
 	PWX_TRY(newSet = new list_t())
 	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_difference() could not create the difference set!")
 	newSet->reset(*lhs);
@@ -83,13 +83,18 @@ TSet<data_t>* set_difference(const TSet<data_t>* const lhs, const TSet<data_t>* 
 			*newSet = *lhs;
 		else {
 			// This is possibility 2
-			uint32_t lSize = lhs->size();
-			for (uint32_t idx = 0; idx < lSize; ++idx) {
-				auto* elem = lhs->get(idx);
-				if (!rhs->hasMember(*elem)) {
-					PWX_TRY_PWX_FURTHER(newSet->push(*elem))
-				}
-			} // End of traversing lhs
+			auto xHead  = lhs->get(0);
+			auto xTail  = lhs->get(-1);
+			auto xCurr  = xHead;
+			bool isDone = false;
+			while (xCurr && !isDone) {
+				if (!rhs->hasMember(*xCurr))
+					newSet->push(*xCurr);
+				if (xCurr == xTail)
+					isDone = true;
+				else
+					xCurr = xCurr->getNext();
+			} // end of traversing lhs
 		} // End of building possibility 2
 	} // End of having a combination requiring action
 
@@ -176,13 +181,18 @@ TSet<data_t>* set_intersection(const TSet<data_t>* const lhs, const TSet<data_t>
 			*newSet = *lhs;
 		else {
 			// This is possibility 2
-			uint32_t lSize = lhs->size();
-			for (uint32_t idx = 0; idx < lSize; ++idx) {
-				auto* elem = lhs->get(idx);
-				if (rhs->hasMember(*elem)) {
-					PWX_TRY_PWX_FURTHER(newSet->push(*elem))
-				}
-			} // End of traversing lhs
+			auto xHead  = lhs->get(0);
+			auto xTail  = lhs->get(-1);
+			auto xCurr  = xHead;
+			bool isDone = false;
+			while (xCurr && !isDone) {
+				if (rhs->hasMember(*xCurr))
+					newSet->push(*xCurr);
+				if (xCurr == xTail)
+					isDone = true;
+				else
+					xCurr = xCurr->getNext();
+			} // end of traversing lhs
 		} // End of building possibility 2
 	} // End of having a combination requiring action
 
