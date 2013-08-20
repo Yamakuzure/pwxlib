@@ -30,6 +30,7 @@
 #include <pwx/types/CLockable.h>
 #include <pwx/general/macros.h>
 #include <pwx/container/TDoubleList.h>
+#include <pwx/container/TChainHash.h>
 #include <pwx/functions/set_fwd.h>
 
 namespace pwx
@@ -41,23 +42,14 @@ namespace pwx
   *
   * A set is a group of elements, where each element exists exactly once. Two
   * sets are equal, if their members are equal. Therefore the sets {1, 2, 3} and
-  * {3, 2, 1} are equal. Although sets are unordered, the default constructor
-  * will build an ordered set to speed up the access and several operations.
-  *
-  * If the set is needed to be unordered, it must be constructed with "false" as
-  * an argument.
-  *
-  * Unsorted sets will generally be much closer to O(n) on any insertion and
-  * random access than sorted sets.
+  * {3, 2, 1} are equal. Although sets are explicitly unordered. To speed up
+  * access TSet uses a chained hash table to search and verify data.
   *
   * The set is derived from TDoubleList to manage its element. Every element is
   * checked for uniqueness before storing it in a set.
   *
   * This is done on the data level, not pointer level. This makes it necessary for
   * any data to support operator== and operator>.
-  *
-  * Further more to be able to insert data in a sorted manner, the data must
-  * support operator- and give valid data back.
   *
   * The constructor takes an optional destroy(data_t*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
@@ -84,6 +76,7 @@ public:
 	typedef TDoubleElement<data_t>      elem_t; //!< Type of the stored elements
 	typedef TDoubleList<data_t, elem_t> base_t; //!< Base type of the set
 	typedef TSet<data_t>                list_t; //!< Type of this set
+	typedef TChainHash<data_t, elem_t>  hash_t; //!< Chained hash for data lookup
 
 
 	/* ===============================================
@@ -96,22 +89,20 @@ public:
 	  * The default constructor initializes an empty set.
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-	  * @param[in] sorted defaults to true. Set to false to create an unordered set.
 	**/
-	TSet (void (*destroy_) (data_t* data), bool sorted = true) noexcept :
+	TSet (void (*destroy_) (data_t* data)) noexcept :
 		base_t(destroy_),
-		isSorted(sorted)
+		lookup(list_t::do_not_destroy)
 	{ }
 
 
 	/** @brief empty constructor
 	  *
 	  * The empty constructor sets the data destroy method to the null pointer.
-	  * @param[in] sorted defaults to true. Set to false to create an unordered set.
 	**/
-	TSet(bool sorted = true) noexcept :
+	TSet() noexcept :
 		base_t (nullptr),
-		isSorted(sorted)
+		lookup(list_t::do_not_destroy)
 	{ }
 
 
@@ -122,7 +113,8 @@ public:
 	  * @param[in] src reference of the list to copy.
 	**/
 	TSet (const list_t &src) noexcept :
-		base_t (src)
+		base_t (src),
+		lookup(src.lookup)
 	{
 		// The copy ctor of base_t has already copied all elements.
 	}
@@ -146,74 +138,7 @@ public:
 	using base_t::disable_thread_safety;
 	using base_t::empty;
 	using base_t::enable_thread_safety;
-
-
-	/** @brief find the element with the given @a data pointer
-	  *
-	  * This method searches through the set and returns a const pointer
-	  * to the element with the given @a data or nullptr if @a data is not stored
-	  * in this set.
-	  *
-	  * @param data pointer to find
-	  * @return return a pointer to the element storing @a data
-	**/
-	virtual elem_t* find (data_t* data) noexcept
-	{
-		return const_cast<elem_t* > (base_t::protFind (static_cast<const data_t* > (data)));
-	}
-
-
-	/** @brief find the element with the given @a data pointer
-	  *
-	  * This method searches through the set and returns a const pointer
-	  * to the element with the given @a data or nullptr if @a data is not stored
-	  * in this set.
-	  *
-	  * @param data pointer to find
-	  * @return return a const pointer to the element storing @a data
-	**/
-	virtual const elem_t* find (const data_t* data) const noexcept
-	{
-		return base_t::protFind(data);
-	}
-
-
-	/** @brief find the element with the given @a data content
-	  *
-	  * This method searches through the set and returns the element
-	  * with the given @a data or nullptr if @a data is not stored in this
-	  * set.
-	  *
-	  * This is a search for the data and not a pointer. Stored objects must
-	  * therefore support operator== and operator> in a suitable way.
-	  *
-	  * @param data reference of the data to find
-	  * @return return a pointer to the element storing @a data
-	**/
-	virtual elem_t* find (data_t &data) noexcept
-	{
-		return const_cast<elem_t* > (privFindData(static_cast<const data_t> (data), nullptr));
-	}
-
-
-	/** @brief find the element with the given @a data content
-	  *
-	  * This method searches through the set and returns a const pointer
-	  * to the element with the given @a data or nullptr if @a data is not
-	  * stored in this set.
-	  *
-	  * This is a search for the data and not a pointer. Stored objects must
-	  * therefore support operator== and operator> in a suitable way.
-	  *
-	  * @param data reference of the data to find
-	  * @return return a const pointer to the element storing @a data
-	**/
-	virtual const elem_t* find (const data_t &data) const noexcept
-	{
-		return privFindData(data, nullptr);
-	}
-
-
+	using base_t::find;
 	using base_t::get;
 	using base_t::getData;
 
@@ -225,7 +150,7 @@ public:
 	**/
 	virtual bool hasMember(const elem_t &elem) const noexcept
 	{
-		return (find(*elem) ? true : false);
+		return (protFindData(*elem) ? true : false);
 	}
 
 
@@ -236,7 +161,7 @@ public:
 	**/
 	virtual bool hasMember(const data_t &data) const noexcept
 	{
-		return (find(data) ? true : false);
+		return (protFindData(data) ? true : false);
 	}
 
 
@@ -266,9 +191,9 @@ public:
 				elem_t* xCurr  = head();
 				bool    isDone = false;
 
-				// A simple loop will do, because we can use privFindData directly.
+				// A simple loop will do, because we can use protFindData directly.
 				while (result && xCurr && xCurr->data.get() && !isDone) {
-					if (src.privFindData(**xCurr, nullptr)) {
+					if (src.protFindData(**xCurr)) {
 						if (xCurr == tail())
 							isDone = true;
 						else
@@ -328,10 +253,8 @@ public:
 
 		// Now do the work
 		clear();
-		if (&src != this) {
+		if (&src != this)
 			destroy  = src.destroy;
-			isSorted = src.isSorted;
-		}
 
 		// Unlock if needed
 		if (beThreadSafe()) {
@@ -351,14 +274,13 @@ public:
 	  * The element is removed from the set so you have to take
 	  * care of its deletion once you are finished with it.
 	  *
-	  * If there is no element in the set a pwx::CException with the
-	  * name "OutOfRange" is thrown.
+	  * If there is no element to shift, nullptr is returned.
 	  *
 	  * @return the top element on the set.
 	**/
-	virtual elem_t* shift()
+	virtual elem_t* shift() noexcept
 	{
-		PWX_TRY_PWX_FURTHER(return base_t::pop_back())
+		return privRemoveAfterData(nullptr);
 	}
 
 
@@ -380,7 +302,7 @@ public:
 	**/
 	virtual uint32_t unshift(data_t* data)
 	{
-		PWX_TRY_PWX_FURTHER(return base_t::push_front(data))
+		PWX_TRY_PWX_FURTHER(return privInsDataBehindElem (nullptr, data))
 	}
 
 
@@ -399,7 +321,7 @@ public:
 	**/
 	virtual uint32_t unshift(const elem_t &src)
 	{
-		PWX_TRY_PWX_FURTHER(return base_t::push_front(src))
+		PWX_TRY_PWX_FURTHER(return privInsElemBehindElem (nullptr, src))
 	}
 
 
@@ -440,11 +362,29 @@ protected:
 	*/
 
 	using base_t::beThreadSafe;
-	using base_t::curr;
 	using base_t::head;
 	using base_t::tail;
 	using base_t::destroy;
-	using base_t::protFind;
+
+
+	/// @brief Search until the current element contains the searched data
+	virtual const elem_t* protFind (const data_t* data) const noexcept
+	{
+		// Having a lookup hash this is simple,
+		if (!data) return nullptr;
+		elem_t* result = const_cast<elem_t*>(protFindData(*data));
+		// But the *pointer* must match and not only the data
+		return (result && result->data.get() == data) ? result : nullptr;
+	}
+
+
+	/// @brief Search until the current element contains the searched data content
+	virtual const elem_t* protFindData (const data_t &data) const noexcept
+	{
+		// Very simple with a lookup hash:
+		auto hashElem = lookup.get(data);
+		return (hashElem ? hashElem->data.get() : nullptr);
+	}
 
 
 	/** @brief simple method to insert an element into the list
@@ -453,11 +393,10 @@ protected:
 	  * a pwx::CException is thrown. Such a condition implies that
 	  * there is something seriously wrong.
 	  *
-	  * This is the protInsert() method from TDoubleList without locks. All
-	  * private insertion methods in TSet have to lock the set anyway, and
-	  * all removal methods do a big lock, too.
-	  * Further this variant of protInsert() does some extra checks to ensure
-	  * that the container consistency is ensured.
+	  * Note: As the private preparation methods that prepare the insert
+	  *       have to lock the set to ensure consistency, this variant
+	  *       is different from the one in TDoubleList as it does not
+	  *       need to lock by itself.
 	  *
 	  * @param[in] insPrev Element after which the new element is to be inserted
 	  * @param[in] insElem The element to insert.
@@ -476,147 +415,39 @@ protected:
 		 *    renumbering is needed then.
 		 * 4: Otherwise insPrev->insertNext() can do the insertion
 		*/
-		uint32_t locCnt = eCount.load(memOrdLoad);
 
-		curr(insElem);
-
-		// If this is a sorted set, check consistency.
-		// Note  : If we reach this point, the set is locked!
-		// Note2 : Otherwise we have a problem!
-
-		if (this->isSorted) {
-
-			/* In this case an extra check is in order
-			 * What can happen? Multiple threads might add elements.
-			 * Basically this is no problem, but if several threads
-			 * insert a new head AND there is bad luck with the
-			 * locking order AND there is a glitch with the atomic
-			 * access (OR there is a hidden bug I haven't found, yet)
-			 * insPrev might point to the wrong position.
-			 *
-			 * The following situations might occur:
-			 * 1) insPrev is nullptr, but head() is smaller than insElem
-			 * 2) insPrev is larger than insElem
-			 */
-
-			elem_t* xPrev = insPrev;
-			elem_t* xHead = head();
-			elem_t* xTail = tail();
-
-			// Check possibility 1
-			if ((nullptr == xPrev) && xHead && (1 == insElem->compare(xHead)) ) {
-				xPrev = xHead;
-				while (xPrev && (-1 == xPrev->compare(insElem)) )
-					xPrev = xPrev->getNext();
-				// Now we have either the next larger element (the
-				// new next to insElem) or nullptr meaning insElem
-				// will be the new tail.
-				if (nullptr == xPrev)
-					xPrev = xTail;
-				// Note: xPrev being larger is possibility 2 and checked below
-			}
-
-			// Check possibility 2
-			while (xPrev && xPrev->compare(insElem) > 0)
-				xPrev = xPrev->getPrev();
-
-			// If xPrev is now different from insPrev, fix
-			// it and get an optional message out:
-			if (xPrev != insPrev) {
-#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-				protRenumber();
-				DEBUG_ERR("TSet", "Illegal position for element \"%s\":",
-							to_string(**insElem).c_str())
-				DEBUG_ERR("TSet", "Previous: nr %d (\"%s\")",
-							insPrev ? insPrev->eNr.load() : -1,
-							insPrev ? to_string(**insPrev).c_str() : "before head")
-				DEBUG_ERR("TSet", "Next    : nr %d (\"%s\")",
-							insPrev
-							? (insPrev->getNext() ? insPrev->getNext()->eNr.load() : -1)
-							: 0,
-							insPrev
-							? (insPrev->getNext() ? to_string(**(insPrev->getNext())).c_str() : "after tail")
-							: to_string(**head()).c_str())
-				DEBUG_ERR("TSet", "Fixed insPrev from nr %d (\"%s\") to nr %d (\"%s\")",
-							insPrev ? insPrev->eNr.load() : -1,
-							insPrev ? to_string(**insPrev).c_str() : "before head",
-							xPrev ? xPrev->eNr.load() : -1,
-							xPrev ? to_string(**xPrev).c_str() : "before head")
-#endif
-				insPrev = xPrev;
-			}
-		} // End of sorted check
-
-#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-#  if defined(PWX_THREADDEBUG)
-#    define LOCAL_DEBUG_ERR THREAD_ERR
-#  else
-#    define LOCAL_DEBUG_ERR DEBUG_ERR
-#  endif
-#  define GET_OBJ_ENR(obj) obj ? obj->eNr.load() : -1
-#  define GET_OBJ_DAT(obj) obj ? to_string(**(obj)).c_str() : "nullptr"
-#  define GET_OBJ_ALL(obj) GET_OBJ_ENR(obj), GET_OBJ_DAT(obj)
-		if (this->beThreadSafe() && (0 == this->lock_count()) )
-			PWX_THROW("MissingLock", "TSet::protInsert() called without a lock in place!",
-						"This is evil and must be fixed NOW!")
-		elem_t* xNext = insPrev ? insPrev->getNext() : nullptr;
-		if (isSorted && insPrev && insElem && (insPrev->compare(insElem) >= 0)) {
-			protRenumber();
-			if (insPrev)
-				LOCAL_DEBUG_ERR("TSet", "prevPrev: % 5d - \"%s\"", GET_OBJ_ALL(insPrev->getPrev()))
-			LOCAL_DEBUG_ERR("TSet", "insPrev : % 5d - \"%s\"", GET_OBJ_ALL(insPrev))
-			LOCAL_DEBUG_ERR("TSet", "insElem : % 5d - \"%s\"", GET_OBJ_ALL(insElem))
-			LOCAL_DEBUG_ERR("TSet", "prevNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext))
-			if (xNext)
-				LOCAL_DEBUG_ERR("TSet", "nextNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext->getNext()))
-			PWX_THROW("BustedOrder", "insPrev is LARGER than insElem ? What the hell?",
-						"This is evil ans must be fixed NOW!")
-		}
-		if (isSorted && xNext && insElem && (insElem->compare(xNext) >= 0)) {
-			protRenumber();
-			if (insPrev)
-				LOCAL_DEBUG_ERR("TSet", "prevPrev: % 5d - \"%s\"", GET_OBJ_ALL(insPrev->getPrev()))
-			LOCAL_DEBUG_ERR("TSet", "insPrev : % 5d - \"%s\"", GET_OBJ_ALL(insPrev))
-			LOCAL_DEBUG_ERR("TSet", "insElem : % 5d - \"%s\"", GET_OBJ_ALL(insElem))
-			LOCAL_DEBUG_ERR("TSet", "prevNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext))
-			if (xNext)
-				LOCAL_DEBUG_ERR("TSet", "nextNext: % 5d - \"%s\"", GET_OBJ_ALL(xNext->getNext()))
-			PWX_THROW("BustedOrder", "insElem is LARGER than insP ? What the hell?",
-						"This is evil ans must be fixed NOW!")
-		}
-#  undef GET_OBJ_ALL
-#  undef GET_OBJ_DAT
-#  undef GET_OBJ_ENR
-#  undef LOCAL_DEBUG_ERR
-#endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-
-		if (locCnt && insPrev && (tail() != insPrev)) {
-			// Case 4: A normal insert
-			this->doRenumber.store(true, memOrdStore);
-			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
-		} else {
-			if (!locCnt) {
-				// Case 1: The list is empty
-				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, &currStore))
-				head(insElem);
-				tail(insElem);
-			} else if (nullptr == insPrev) {
+		if (size()) {
+			if (insPrev) {
+				if (tail() == insPrev) {
+					// Case 3: A new tail is to be set
+					insElem->eNr.store(
+						tail()->eNr.load(memOrdLoad) + 1,
+						memOrdStore);
+					PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, nullptr))
+					tail(insElem);
+				} else {
+					// Case 4: A normal insert
+					this->doRenumber.store(true, memOrdStore);
+					PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, nullptr))
+				}
+			} else {
 				// Case 2: A new head is to be set
-				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem, &currStore))
+				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem, nullptr))
 				head(insElem);
 				this->doRenumber.store(true, memOrdStore);
-			} else if (insPrev == tail() ) {
-				// Case 3: A new tail is to be set
-				insElem->eNr.store(
-					tail()->eNr.load(memOrdLoad) + 1,
-					memOrdStore);
-				PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, &currStore))
-				tail(insElem);
 			}
+		} else {
+			// Case 1: The list is empty
+			PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, nullptr))
+			head(insElem);
+			tail(insElem);
 		}
 
+		// Do this last or non-locking methods would
+		// find the element before it is really inserted.
+		lookup.add(**insElem, insElem);
+
 		eCount.fetch_add(1, memOrdStore);
-		curr(insElem);
 		return eCount.load(memOrdLoad);
 	}
 
@@ -629,12 +460,9 @@ protected:
 	 * ===============================================
 	*/
 
-	using base_t::currStore;
 	using base_t::eCount;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
-
-	bool isSorted; //!< determines whether the set is sorted or not.
 
 private:
 	/* ===============================================
@@ -642,368 +470,71 @@ private:
 	 * ===============================================
 	*/
 
+	/// @internal do nothing with the element. (lookup must not delete!)
+	static void do_not_destroy(elem_t*) { }
 
-	/** @brief find an element holding the specified @a data
-	  *
-	  * The protFind() method of the containers searches for pointers and
-	  * data using one simple search, while this special version does
-	  * set specific tests to be able to ensure set safety.
-	  *
-	  * If the set is sorted and @a data can not be found, then @a start is
-	  * pointed to the element which would precede an element holding @a data
-	  * if it where present. With this special outcome the inserting methods
-	  * can simply use insNextElem() with @a start to add data in a sorted way.
-	  * The only detail to look at is the situation when the new element
-	  * must become the new head. In this special case, <B>@a start is set to
-	  * nullptr</B>.
-	  *
-	  * If @a start is set to nullptr, it simply isn't used and the search
-	  * starts with <I>curr</I>.
-	  *
-	  * Important: Although this method uses <I>curr</I> if @a start points to
-	  * nullptr, <I>curr</I> is not set here.
-	  *
-	  * @param[in] data reference of the data to search.
-	  * @param[in,out] start pointer pointer from where to start, stores where to end.
-	  * @return pointer to the element or nullptr if @a data is not present in the set.
-	**/
-	const elem_t* privFindData (const data_t &data, elem_t** start,
-								bool reentered = false) const noexcept
+
+	/// @brief clear this list
+	/// Difference to TSingleList::privClear(): Here the lookup table
+	/// must be maintained instead of the currStroe. It is therefore
+	/// not possible to simply "declare" the Set as being empty.
+	virtual void privClear() noexcept {
+		elem_t* xTail = nullptr;
+		while (tail()) {
+			PWX_LOCK(this)
+			xTail = privRemove(tail());
+			PWX_UNLOCK(this)
+			if (xTail && !xTail->destroyed()) {
+				lookup.delKey(**xTail);
+				delete xTail;
+			}
+		}
+	}
+
+
+	/// @brief Search until the next element contains the searched data
+	virtual elem_t* privFindPrev (const data_t* data) const noexcept
 	{
-#define PFD_SET_START(new_start) { \
-			if (start) { \
-				*start = new_start; \
-			} \
-		}
-#define PFD_RETURN_EMPTY { \
-			PFD_SET_START(nullptr) \
-			return nullptr; \
-		}
-
-		// return at once if there are no elements
-		if (empty())
-			return nullptr;
-
-		// Note: Methods that call privFindData() to prepare an insertion should
-		//       search again after start is adjusted and a lock is acquired.
-		//       Here, only a brief lock to get started is used
-		PWX_LOCK(const_cast<list_t*>(this))
-		elem_t*  xCurr      = (start && *start) ? *start : curr() ? curr() : head();
-		elem_t*  xOld       = nullptr; // To fix thread concurrency
-		PWX_UNLOCK(const_cast<list_t*>(this))
-
-		/* Note:
-		 * When the set is sorted, we can make some quick exit assumptions:
-		 * 1: If head is larger, data can not be in the set
-		 * 2: If tail is smaller, data can not be in the set
-		*/
-		if (size()) {
-			PWX_LOCK_GUARD(list_t, this)
-
-			// Quick exit if sorted set assumption 1 is correct:
-			if (isSorted && (1 == head()->compare(data)) )
-				// note: use compare() to catch floating point data!
-				PFD_RETURN_EMPTY
-
-			// Quick exit if xCurr is correct:
-			if (*xCurr == data)
-				return xCurr;
-
-			// Quick exit if head is wanted:
-			if (0 == head()->compare(data))
-				return head();
-
-		} else
-			// return immediately if there are no elements
-			PFD_RETURN_EMPTY
-
-		// Checking tail does only make sense if we have at least 2 element
-		if (size() > 1) {
-			// Quick exit if sorted set assumption 2 is correct:
-			if (isSorted && (-1 == tail()->compare(data))) {
-				PFD_SET_START(tail())
-				return nullptr;
-			}
-
-			// Quick exit if tail is wanted:
-			if (0 == tail()->compare(data))
-				return tail();
-		} // End of having at least two elements
-
-		// The complete search is useless unless there are at least three elements:
-		if (size() > 2) {
-			/* The searching differs between sorted and unsorted sets:
-			 * A)   sorted : We can determine a direction to go to make
-			 *               the search as quick as possible
-			 * B) unsorted : We have to wander through the whole set
-			*/
-			if (isSorted) {
-				/* Here we know that data is definitely in the range of the set.
-				 * It is larger than head an smaller than tail. The good thing
-				 * about this is the absence of any need to check xCurr against
-				 * head or tail.
-				 * Pitfalls: If this is a multi-threaded environment there are some
-				 * nasty issues that can arise:
-				 * A) If data is larger than head but smaller than heads next
-				 *    element, and another thread removes head just now, xCurr
-				 *    will end up being nullptr when going down.
-				 * B) The same happens with tail vice versa.
-				*/
-
-				// Pre-Step: Find out whether and to where to adjust xCurr:
-				if (!reentered && (!start || !*start)) {
-					PWX_LOCK_GUARD(list_t, this)
-					if (size())  {
-						data_t distHead = data - **head();
-						data_t distCurr = 1 == xCurr->compare(data) ? **xCurr - data : data - **xCurr;
-						data_t distTail = **tail() - data;
-
-						/* Instead of using xCurr directly it might be
-						 * a good idea to change to either head or tail
-						 * depending on the position and distance there
-						 * are.
-						 */
-						if ( (distCurr > distHead) && (distTail > distHead) )
-							xCurr = head();
-						else if ( (distCurr > distTail) && (distHead > distTail) )
-							xCurr = tail();
-					}
-				}
-
-				// Step 1: Move up until data is no longer larger than **xCurr
-				bool doStop = false;
-				while (!doStop && xCurr && xCurr->data.get()
-						&& (-1 == xCurr->compare(data))) {
-					if (tail() == xCurr)
-						doStop = true;
-					else {
-						xOld  = xCurr;
-						xCurr = xCurr->getNext();
-						if (nullptr == xCurr) {
-							// Should not happen unless someone does something stupid
-							// with different threads. (like torture does ;))
-							PWX_LOCK(const_cast<list_t*>(this))
-							xCurr = xOld;
-							if ((xCurr && (tail() == xCurr)) || !size())
-								doStop = true;
-							else
-								// What a pity, we have to start over!
-								xCurr = head();
-							PWX_UNLOCK(const_cast<list_t*>(this))
-						}
-					}
-				} // End of wandering up
-
-				// Safety check against emptied sets:
-				if (empty())
-					PFD_RETURN_EMPTY
-
-				// Step 2: check whether we reached tail and assumption 2 is suddenly valid
-				if (doStop && (-1 == tail()->compare(data))) {
-					PFD_SET_START(tail())
-					return nullptr;
-				}
-
-				// Step 3: Check whether xCurr was busted
-				if (nullptr == xCurr) xCurr = tail(); // Might happen due to thread concurrency
-
-				// Step 4: Go down until data is no longer smaller than xCurr
-				doStop = false;
-				while (!doStop && xCurr && (1 == xCurr->compare(data))) {
-					if (head() == xCurr)
-						doStop = true;
-					else {
-						xOld  = xCurr;
-						xCurr = xCurr->getPrev();
-						if (nullptr == xCurr) {
-							// Should not happen unless someone does something stupid
-							// with different threads. (like torture does ;))
-							PWX_LOCK(const_cast<list_t*>(this))
-							xCurr = xOld;
-							if ((xCurr && (head() == xCurr)) || !size())
-								doStop = true;
-							else
-								// What a pity, we have to start over!
-								xCurr = tail();
-							PWX_UNLOCK(const_cast<list_t*>(this))
-						}
-					}
-				} // End of wandering down
-
-				// Safety check against emptied sets:
-				if (empty())
-					PFD_RETURN_EMPTY
-
-				// Step 5: check whether we reached head and assumption 1 is suddenly valid
-				if (doStop && (1 == head()->compare(data)))
-					PFD_RETURN_EMPTY
-
-				// Step 6: Check that we really really reached a valid end, or re-enter with a lock:
-				elem_t* xNext = xCurr ? xCurr->getNext() : nullptr;
-				elem_t* xPrev = xCurr ? xCurr->getPrev() : nullptr;
-				if (xCurr && (
-					  (xPrev && ( 1 == xPrev->compare(data)))
-					||(xNext && (-1 == xNext->compare(data))) ) ) {
-					// This is bad. Something busted the set!
-					if (reentered) {
-						// This is FUBAR! No exception can fix this!
-#ifndef LIBPWX_DEBUG
-						// I know that it says "noexcept". This is intentional
-						// to have at least some message and a possible std::terminate()
-						PWX_THROW("Broken_TSet",
-								"TSet is FUBAR! Please enable DEBUG in the Makefile",
-								"TSet is FUBAR! Please enable DEBUG in the Makefile")
-#else
-#  define GET_OBJ_ENR(obj) obj ? obj->eNr.load() : -1
-#  define GET_OBJ_DAT(obj) obj ? to_string(**(obj)).c_str() : "nullptr"
-#  define GET_OBJ_ALL(obj) GET_OBJ_ENR(obj), GET_OBJ_DAT(obj)
-
-						protRenumber();
-
-						DEBUG_LOG("TSet", "Double recursion detected with %d locks",
-										this->lock_count())
-						DEBUG_LOG("TSet", "Searching for data \"%s\"",
-										to_string(data).c_str())
-						DEBUG_LOG("TSet", "head : nr % 5d, data \"%s\"", GET_OBJ_ALL(head()))
-						DEBUG_LOG("TSet", "start: nr % 5d, data \"%s\"",
-									(start && *start) ? (*start)->eNr.load() : -1,
-									(start && *start) ? to_string(**(*start)).c_str() : "nullptr")
-						elem_t* xShowPrev = xPrev;
-						for (int32_t i = 1; i < 5 ; ++i)
-							xShowPrev = (xPrev && xPrev->getPrev()) ? xPrev->getPrev() : xPrev;
-						while (xShowPrev && (xShowPrev != xPrev)) {
-							DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"", GET_OBJ_ALL(xShowPrev))
-							xShowPrev = xShowPrev->getNext();
-						}
-						DEBUG_LOG("TSet", "xPrev: nr % 5d, data \"%s\"", GET_OBJ_ALL(xPrev))
-						DEBUG_LOG("TSet", "xCurr: nr % 5d, data \"%s\"", GET_OBJ_ALL(xCurr))
-						DEBUG_LOG("TSet", "xNext: nr % 5d, data \"%s\"", GET_OBJ_ALL(xNext))
-						elem_t* xShowNext = xNext;
-						for (int32_t i = 1; i < 5; ++i) {
-							if (xShowNext->getNext()) {
-								xShowNext = xShowNext->getNext();
-								DEBUG_LOG("TSet", "xNext: nr % 5d, data \"%s\"", GET_OBJ_ALL(xShowNext))
-							}
-						}
-						DEBUG_LOG("TSet", "tail : nr % 5d, data \"%s\"", GET_OBJ_ALL(tail()))
-
-#  undef GET_OBJ_ALL
-#  undef GET_OBJ_DAT
-#  undef GET_OBJ_ENR
-
-						PWX_THROW("Broken_TSet",
-								"The order is busted",
-								"Please investigate which of the above elements is wrong")
-#endif // LIBPWX_DEBUG
-						// The system *should* have terminated now, but make it sure to happen:
-						std::terminate();
-					} // is busted? Otherwise another thread simply interfered
-
-					PWX_LOCK_GUARD(list_t, this)
-
-					if (start && (*start == xCurr) )
-						*start = head();
-					else if (!start)
-						curr(head()); // Used if no start pointer given
-
-					return this->privFindData(data, start, true);
-				}
-				// End of having a sorted set
-			} else {
-				// Here we can do nothing but lock the set:
-				PWX_LOCK_GUARD(list_t, this)
-				if (!xCurr || xCurr->removed() || xCurr->destroyed())
-					xCurr = head();
-				elem_t* oldCurr = xCurr;
-
-				// Move up first:
-				while (xCurr && (xCurr != tail() ) && (xCurr->compare(data)))
-					xCurr = xCurr->getNext();
-
-				// If this wasn't enough, move down
-				if (!xCurr || xCurr->compare(data)) {
-					xCurr = oldCurr->getPrev();
-					while (xCurr && (xCurr != head() ) && (xCurr->compare(data)))
-						xCurr = xCurr->getPrev();
-				}
-
-				// A speciality in unsorted sets: If xCurr is now nullptr,
-				// it is set to tail.
-				// This (might) help speeding up insertions, because new
-				// elements are then added after tail.
-				if (nullptr == xCurr)
-					xCurr = tail();
-			}
-			/* Due to this order xCurr is now either pointing to an element
-			 * holding data, or the next smaller element. The latter detail
-			 * is important for the sorted insertion. If data is not found,
-			 * all inserting methods can now insert a new element holding
-			 * the searched data using insNextElem() on curr.
-			*/
-			if (xCurr && (!xCurr->compare(data)))
-				return xCurr;
-			else {
-				PFD_SET_START(xCurr)
-				return nullptr;
-			}
-		} // End of having at least 3 elements
-
-#undef PFD_RETURN_EMPTY
-#undef PFD_SET_START
-
-		return nullptr;
+		elem_t* xCurr = const_cast<elem_t*>(protFind(data));
+		return xCurr ? xCurr->getPrev() : nullptr;
 	}
 
 
 	/// @brief preparation method to insert data behind data
 	virtual uint32_t privInsDataBehindData(data_t* prev, data_t* data)
 	{
-		elem_t* xCurr = curr();
+		// Return at once if the data is already known:
+		if (!data || protFindData(*data))
+			return size();
 
-		if (privFindData(*data, &xCurr))
+		// To ensure set consistency, a big lock is required:
+		PWX_NAMED_LOCK_GUARD(the_set, list_t, this)
+
+		// Return at once if the data is now known the lock is in place:
+		if (protFindData(*data))
 			return size();
 
 		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? xCurr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
-		if (!isSorted && prev && (nullptr == prevElement))
+		elem_t* prevElement = prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
+		if (prev && (nullptr == prevElement)) {
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this set")
-
-
-		// 2: All preparation methods check twice and use big locks to ensure data consistency!
-		PWX_LOCK_GUARD(list_t, this)
-		// Now prevElement must not change any more
-		if (prevElement)
-			PWX_LOCK(prevElement)
-		// And search again
-		if (privFindData(*data, &xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			return size();
-		} else if (isSorted && (prevElement != xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			prevElement = xCurr;
-			if (prevElement)
-				PWX_LOCK(prevElement)
 		}
 
+		// Now prevElement must not change any more
+		PWX_NAMED_LOCK_GUARD(the_prev_element, elem_t, prevElement)
 
-		// 3: Create a new element
+		// 2: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (data, destroy))
 		catch(std::exception &e) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
-		// 4: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
+		// 3: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
@@ -1011,111 +542,74 @@ private:
 	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBehindElem(elem_t* prev, data_t* data)
 	{
-		elem_t* xCurr = curr();
-
-		if (privFindData(*data, &xCurr))
+		// Return at once if the data is already known:
+		if (!data || protFindData(*data))
 			return size();
 
-		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? xCurr : prev;
+		// To ensure set consistency, a big lock is required:
+		PWX_DOUBLE_LOCK_GUARD(list_t, this, elem_t, prev)
 
-		// 2: All preparation methods check twice and use big locks to ensure data consistency!
-		PWX_LOCK_GUARD(list_t, this)
-		// Now prevElement must not change any more
-		if (prevElement)
-			PWX_LOCK(prevElement)
-		// And search again
-		if (privFindData(*data, &xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
+		// Return at once if the data is now known the lock is in place:
+		if (protFindData(*data))
 			return size();
-		} else if (isSorted && (prevElement != xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			prevElement = xCurr;
-			if (prevElement)
-				PWX_LOCK(prevElement)
-		}
 
-		// 3: Create a new element
+		// 1: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (data, destroy))
 		catch(std::exception &e) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
 		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
-		// 4: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
 	}
 
 
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
-		elem_t* xCurr = curr();
+		// Return at once if the source data is already known:
+		if (protFindData(*src))
+			return size();
 
-		if (privFindData(*src, &xCurr))
+		// To ensure set consistency, a big lock is required:
+		PWX_NAMED_DOUBLE_LOCK_GUARD(set_and_source, list_t, this, elem_t, &src)
+
+		// Return at once if the source data is now known the lock is in place:
+		if (protFindData(*src))
 			return size();
 
 		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? xCurr : prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
-		if (!isSorted && prev && (nullptr == prevElement))
+		elem_t* prevElement = prev ? const_cast<elem_t*>(protFind(prev)) : nullptr;
+		if (prev && (nullptr == prevElement)) {
 			PWX_THROW ("ElementNotFound",
 					   "Element not found",
 					   "The searched element can not be found in this singly linked list")
+		}
+
+		// Now prevElement must not change any more
+		PWX_NAMED_LOCK_GUARD(the_prev_element, elem_t, prevElement)
 
 		// 2: Check source:
-		PWX_LOCK_GUARD(list_t, this)
-		// Now prevElement must not change any more
-		if (prevElement)
-			PWX_LOCK(prevElement)
-		PWX_LOCK(const_cast<elem_t*>(&src))
-
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: All preparation methods check twice and use big locks to ensure data consistency!
-		if (privFindData(*src, &xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			return size();
-		} else if (isSorted && (prevElement != xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			prevElement = xCurr;
-			if (prevElement)
-				PWX_LOCK(prevElement)
-		}
-
-		// 4: Create a new element
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+
 		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
-		// 5: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
+		// 4: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
@@ -1123,337 +617,302 @@ private:
 	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBehindElem(elem_t* prev, const elem_t &src)
 	{
-		elem_t* xCurr = curr();
-
-		if (privFindData(*src, &xCurr))
+		// Return at once if the source data is already known:
+		if (protFindData(*src))
 			return size();
 
-		// 1: Prepare the previous element
-		elem_t* prevElement = isSorted ? xCurr : prev;
-		if (prevElement)
-			PWX_LOCK(prevElement)
+		// To ensure set consistency, a big lock is required:
+		PWX_TRIPLE_LOCK_GUARD(list_t, this, elem_t, prev, elem_t, &src)
 
-		// 2: Check source:
-		PWX_LOCK_GUARD(list_t, this)
-		// Now prevElement must not change any more
-		if (prevElement)
-			PWX_LOCK(prevElement)
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		// Return at once if the source data is now known the lock is in place:
+		if (protFindData(*src))
+			return size();
 
+		// 1: Check source:
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: All preparation methods check twice and use big locks to ensure data consistency!
-		if (privFindData(*src, &xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			return size();
-		} else if (isSorted && (prevElement != xCurr)) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			prevElement = xCurr;
-			if (prevElement)
-				PWX_LOCK(prevElement)
-		}
-
-		// 4: Create a new element
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
-		PWX_UNLOCK(const_cast<elem_t*>(&src))
+
 		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
-		// 5: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
+		// 4: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
+	}
+
+
+	/// @brief preparation method to insert data behind data
+	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
+	{
+		// Return at once if the data is already known:
+		if (!data || protFindData(*data))
+			return size();
+
+		// To ensure set consistency, a big lock is required:
+		PWX_NAMED_LOCK_GUARD(the_set, list_t, this)
+
+		// Return at once if the data is now known the lock is in place:
+		if (protFindData(*data))
+			return size();
+
+		// 1: Prepare the nextious element
+		elem_t* nextElement = next ? const_cast<elem_t*>(protFind(next)) : nullptr;
+		if (next && (nullptr == nextElement)) {
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this set")
+		}
+		elem_t* prevElement = nextElement ? nextElement->getPrev() : nullptr;
+
+
+		// Now prevElement must not change any more
+		PWX_NAMED_LOCK_GUARD(the_prev_element, elem_t, prevElement)
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe())
+			newElement->disable_thread_safety();
+
+		// 3: Do the real insert
 		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
 
-	/// @brief preparation method to insert data before data
-	virtual uint32_t privInsDataBeforeData(data_t* next, data_t* data)
-	{
-		elem_t* xCurr = curr();
-
-		if (privFindData(*data, &xCurr))
-			return size();
-
-
-		// 1: Prepare the next element
-		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
-		elem_t* nextElement = !isSorted && next ? const_cast<elem_t*>(find(next)) : nullptr;
-		if (!isSorted && next && (nullptr == nextElement))
-			PWX_THROW ("ElementNotFound",
-					   "Element not found",
-					   "The searched element can not be found in this doubly linked list")
-
-		// 2: All preparation methods check twice and use big locks to ensure data consistency!
-		PWX_LOCK_GUARD(list_t, this)
-
-		if (!isSorted && nextElement)
-			PWX_LOCK(nextElement)
-		if (isSorted && prevElement)
-			PWX_LOCK(prevElement)
-
-		if (privFindData(*data, &xCurr)) {
-			if (!isSorted && nextElement)
-				PWX_UNLOCK(nextElement)
-			if (isSorted && prevElement)
-				PWX_UNLOCK(prevElement)
-			return size();
-		} else if (isSorted) {
-			if (xCurr != prevElement) {
-				if (prevElement)
-					PWX_UNLOCK(prevElement)
-				prevElement = xCurr;
-				if (prevElement)
-					PWX_LOCK(prevElement)
-			}
-		} else if (nextElement) {
-			PWX_UNLOCK(nextElement)
-			prevElement = nextElement->getPrev();
-			if (prevElement)
-				PWX_LOCK(prevElement)
-		}
-
-		// 3: Create a new element
-		elem_t* newElement = nullptr;
-		PWX_TRY(newElement = new elem_t (data, destroy))
-		catch(std::exception &e) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
-		}
-		if (!this->beThreadSafe())
-			newElement->disable_thread_safety();
-
-		// 4: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
-	}
-
-
-	/// @brief preparation method to insert data before an element
+	/// @brief preparation method to insert data behind an element
 	virtual uint32_t privInsDataBeforeElem(elem_t* next, data_t* data)
 	{
-		elem_t* xCurr = curr();
-
-		if (privFindData(*data, &xCurr))
+		// Return at once if the data is already known:
+		if (!data || protFindData(*data))
 			return size();
 
-		// 1: Prepare the next element
-		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
-		elem_t* nextElement = !isSorted && next ? next : nullptr;
+		// It is important to have the previous element, not the next:
+		elem_t* prevElement = next ? next->getPrev() : nullptr;
 
-		// 2: All preparation methods check twice and use big locks to ensure data consistency!
-		PWX_LOCK_GUARD(list_t, this)
+		// To ensure set consistency, a big lock is required:
+		PWX_DOUBLE_LOCK_GUARD(list_t, this, elem_t, prevElement)
 
-		if (!isSorted && nextElement)
-			PWX_LOCK(nextElement)
-		if (isSorted && prevElement)
-			PWX_LOCK(prevElement)
-
-		if (privFindData(*data, &xCurr)) {
-			if (!isSorted && nextElement)
-				PWX_UNLOCK(nextElement)
-			if (isSorted && prevElement)
-				PWX_UNLOCK(prevElement)
+		// Return at once if the data is now known the lock is in place:
+		if (protFindData(*data))
 			return size();
-		} else if (isSorted) {
-			if (xCurr != prevElement) {
-				if (prevElement)
-					PWX_UNLOCK(prevElement)
-				prevElement = xCurr;
-				if (prevElement)
-					PWX_LOCK(prevElement)
-			}
-		} else if (nextElement) {
-			PWX_UNLOCK(nextElement)
-			prevElement = nextElement->getPrev();
-			if (prevElement)
-				PWX_LOCK(prevElement)
+
+		// 1: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe())
+			newElement->disable_thread_safety();
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
+	}
+
+
+	/// @brief preparation method to insert an element copy behind data
+	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
+	{
+		// Return at once if the source data is already known:
+		if (protFindData(*src))
+			return size();
+
+		// To ensure set consistency, a big lock is required:
+		PWX_NAMED_DOUBLE_LOCK_GUARD(set_and_source, list_t, this, elem_t, &src)
+
+		// Return at once if the source data is now known the lock is in place:
+		if (protFindData(*src))
+			return size();
+
+		// 1: Prepare the nextious element
+		elem_t* nextElement = next ? const_cast<elem_t*>(protFind(next)) : nullptr;
+		if (next && (nullptr == nextElement)) {
+			PWX_THROW ("ElementNotFound",
+					   "Element not found",
+					   "The searched element can not be found in this singly linked list")
+		}
+		elem_t* prevElement = nextElement ? nextElement->getPrev() : nullptr;
+
+		// Now prevElement must not change any more
+		PWX_NAMED_LOCK_GUARD(the_next_element, elem_t, prevElement)
+
+		// 2: Check source:
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
 		}
 
 		// 3: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY(newElement = new elem_t (data, destroy))
+		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
+
 		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
 		// 4: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
 
 
-	/// @brief preparation method to insert an element copy before data
-	virtual uint32_t privInsElemBeforeData(data_t* next, const elem_t &src)
-	{
-		elem_t* xCurr = curr();
-
-		if (privFindData(*src, &xCurr))
-			return size();
-
-		// 1: Prepare the next element
-		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
-		elem_t* nextElement = !isSorted && next ? const_cast<elem_t*>(find(next)) : nullptr;
-		if (!isSorted && next && (nullptr == nextElement))
-			PWX_THROW ("ElementNotFound",
-					   "Element not found",
-					   "The searched element can not be found in this doubly linked list")
-
-		// 2: Check source:
-		PWX_LOCK_GUARD(list_t, this)
-		if (!isSorted && nextElement)
-			PWX_LOCK(nextElement)
-		if (isSorted && prevElement)
-			PWX_LOCK(prevElement)
-		PWX_LOCK(const_cast<elem_t*>(&src))
-
-		if (src.destroyed()) {
-			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (!isSorted && nextElement)
-				PWX_UNLOCK(nextElement)
-			if (isSorted && prevElement)
-				PWX_UNLOCK(prevElement)
-			PWX_THROW("Illegal Condition", "Source element destroyed",
-					  "An element used as source for insertion is destroyed.")
-		}
-
-		// 3: All preparation methods check twice and use big locks to ensure data consistency!
-		if (privFindData(*src, &xCurr)) {
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (!isSorted && nextElement)
-				PWX_UNLOCK(nextElement)
-			if (isSorted && prevElement)
-				PWX_UNLOCK(prevElement)
-			return size();
-		} else if (isSorted) {
-			if (xCurr != prevElement) {
-				if (prevElement)
-					PWX_UNLOCK(prevElement)
-				prevElement = xCurr;
-				if (prevElement)
-					PWX_LOCK(prevElement)
-			}
-		} else if (nextElement) {
-			PWX_UNLOCK(nextElement)
-			prevElement = nextElement->getPrev();
-			if (prevElement)
-				PWX_LOCK(prevElement)
-		}
-
-		// 4: Create a new element
-		elem_t* newElement = nullptr;
-		PWX_TRY(newElement = new elem_t (src))
-		catch(std::exception &e) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
-		}
-		if (!this->beThreadSafe())
-			newElement->disable_thread_safety();
-
-		// 5: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
-	}
-
-
-	/// @brief preparation method to insert an element copy before an element
+	/// @brief preparation method to insert an element copy behind an element
 	virtual uint32_t privInsElemBeforeElem(elem_t* next, const elem_t &src)
 	{
-		elem_t* xCurr = curr();
-
-		if (privFindData(*src, &xCurr))
+		// Return at once if the source data is already known:
+		if (protFindData(*src))
 			return size();
 
-		// 1: Prepare the next element
-		elem_t* prevElement = xCurr; // Will become the pointer for protInsert() if sorted
-		elem_t* nextElement = !isSorted && next ? next : nullptr;
+		// Use prev, not next:
+		elem_t* prevElement = next ? next->getPrev() : nullptr;
 
-		// 2: Check source:
-		PWX_LOCK_GUARD(list_t, this)
-		if (!isSorted && nextElement)
-			PWX_LOCK(nextElement)
-		if (isSorted && prevElement)
-			PWX_LOCK(prevElement)
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		// To ensure set consistency, a big lock is required:
+		PWX_TRIPLE_LOCK_GUARD(list_t, this, elem_t, prevElement, elem_t, &src)
 
+		// Return at once if the source data is now known the lock is in place:
+		if (protFindData(*src))
+			return size();
+
+		// 1: Check source:
 		if (src.destroyed()) {
 			// What on earth did the caller think?
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (!isSorted && nextElement)
-				PWX_UNLOCK(nextElement)
-			if (isSorted && prevElement)
-				PWX_UNLOCK(prevElement)
 			PWX_THROW("Illegal Condition", "Source element destroyed",
 					  "An element used as source for insertion is destroyed.")
 		}
 
-		// 3: All preparation methods check twice and use big locks to ensure data consistency!
-		if (privFindData(*src, &xCurr)) {
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
-			if (!isSorted && nextElement)
-				PWX_UNLOCK(nextElement)
-			if (isSorted && prevElement)
-				PWX_UNLOCK(prevElement)
-			return size();
-		} else if (isSorted) {
-			if (xCurr != prevElement) {
-				if (prevElement)
-					PWX_UNLOCK(prevElement)
-				prevElement = xCurr;
-				if (prevElement)
-					PWX_LOCK(prevElement)
-			}
-		} else if (nextElement) {
-			PWX_UNLOCK(nextElement)
-			prevElement = nextElement->getPrev();
-			if (prevElement)
-				PWX_LOCK(prevElement)
-		}
-
-		// 4: Create a new element
+		// 3: Create a new element
 		elem_t* newElement = nullptr;
 		PWX_TRY(newElement = new elem_t (src))
 		catch(std::exception &e) {
-			if (prevElement)
-				PWX_UNLOCK(prevElement)
-			PWX_UNLOCK(const_cast<elem_t*>(&src))
 			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
 		}
+
 		if (!this->beThreadSafe())
 			newElement->disable_thread_safety();
 
-		// 5: Do the real insert
-		if (prevElement)
-			PWX_UNLOCK(prevElement)
-		PWX_TRY_PWX_FURTHER(return protInsert(prevElement ? prevElement : tail(), newElement))
+		// 4: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(prevElement, newElement))
 	}
+
+
+	/// @brief simple method to remove an element from the list.
+	virtual elem_t* privRemove (elem_t* elem) noexcept
+	{
+		// return at once if there is no element to remove
+		if (!elem || elem->removed() || elem->destroyed())
+			return nullptr;
+
+		// Take out of lookup, so it isn't found any more:
+		lookup.delKey(**elem);
+
+		/* The following scenarios are possible:
+		 * 1: elem is head
+		 * 2: elem is tail
+		 * 3: elem is something else.
+		*/
+		if (head() == elem) {
+			// Case 1
+			PWX_LOCK(this)
+			/* The reasons for the double check are the same as
+			 * with TSingleList::privRemoveNextElem()
+			 */
+			if (head() == elem)
+				head(head()->getNext());
+			this->doRenumber.store(true, memOrdStore);
+			PWX_UNLOCK(this)
+		} else if (tail() == elem) {
+			// Case 2:
+			PWX_LOCK(this)
+			if (tail() == elem)
+				tail(tail()->getPrev());
+			PWX_UNLOCK(this)
+		}
+		else
+			this->doRenumber.store(true, memOrdStore);
+		elem->remove();
+
+		if (1 == eCount.fetch_sub(1)) {
+			// The list is empty!
+			PWX_LOCK(this)
+			// Is it really?
+			if (0 == eCount.load(memOrdLoad)) {
+				head(nullptr);
+				tail(nullptr);
+			}
+			PWX_UNLOCK(this)
+		}
+
+		return elem;
+	}
+
+
+	/// @brief simple wrapper to prepare the direct removal of data
+	virtual elem_t* privRemoveData(data_t* data) noexcept
+	{
+		return privRemove (data ? const_cast<elem_t*>(protFindData(*data)) : nullptr);
+	}
+
+
+	/** @brief remove the element after the specified data
+	  *
+	  * If @a prev data can not be found, nothing happens and nullptr is returned.
+	  *
+	  * Being a set this method searches for the data content and <U>not</U> the pointer!
+	  *
+	  * @return nullptr if the element holding @a prev is the last element or the list is empty.
+	**/
+	virtual elem_t* privRemoveAfterData(data_t* prev) noexcept
+	{
+		elem_t* xPrev = prev ? const_cast<elem_t*>(protFindData (*prev)) : nullptr;
+		elem_t* toRemove = xPrev ? xPrev->getNext() : prev ? nullptr : head();
+
+		if (toRemove)
+			return privRemove (toRemove);
+
+		return nullptr;
+	}
+
+
+	/** @brief simple wrapper to prepare the removal of an element before data
+	  *
+	  * If @a next data can not be found, nothing happens and nullptr is returned.
+	  *
+	  * Being a set this method searches for the data content and <U>not</U> the pointer!
+	  *
+	  * @return nullptr if @a next is held by the first element or the list is empty.
+	**/
+	virtual elem_t* privRemoveBeforeData(data_t* next) noexcept
+	{
+		elem_t* xNext = next ? const_cast<elem_t*>(protFindData(*next)) : nullptr;
+		elem_t* toRemove = xNext ? xNext->getPrev() : next ? nullptr : tail();
+
+		if (toRemove)
+			return privRemove (toRemove);
+
+		return nullptr;
+	}
+
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	*/
+
+	hash_t lookup; //!< Quick search for data without having to traverse (and lock) the whole set.
 
 }; // class TSet
 
