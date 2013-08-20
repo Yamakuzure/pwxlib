@@ -315,8 +315,6 @@ public:
 			vacated = reinterpret_cast<elem_t*>(vacChar);
 		}
 		PWX_THROW_STD_FURTHER("VTHashBase copy failure", "Vacated pointer could not be created")
-
-		operator+=(src);
 	}
 
 
