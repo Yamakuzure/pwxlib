@@ -522,7 +522,7 @@ public:
 	**/
 	virtual elem_t* pop() noexcept
 	{
-		return privRemoveAfterData(nullptr);
+		return privRemoveAfterElement(nullptr);
 	}
 
 
@@ -711,19 +711,17 @@ public:
 	  * the setting whether the container is using its thread
 	  * safety measures is copied as well.
 	  *
-	  * FIXME: An exclusive lock for [b]both[/b] lists is required?
-	  *
 	  * @param[in] rhs reference of the list to copy.
 	  * @return reference to this.
 	**/
 	virtual list_t &operator= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, &rhs)
 			clear();
 			destroy      = rhs.destroy;
 			beThreadSafe(rhs.beThreadSafe());
-			PWX_TRY_PWX_FURTHER (return operator+=(rhs))
+			PWX_TRY_PWX_FURTHER (return *this += rhs)
 		}
 		return *this;
 	}
@@ -733,21 +731,19 @@ public:
 	  *
 	  * Add all elements from @a rhs to this list.
 	  *
-	  * FIXME: An exclusive lock for [b]both[/b] lists is required?
-	  *
 	  * @param[in] rhs reference of the list to add.
 	  * @return reference to this.
 	**/
 	virtual list_t &operator+= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, &rhs)
 			elem_t* rhsCurr = rhs.head();
 			bool    isDone  = false;
 			bool    isTS    = this->beThreadSafe();
 
 			while (rhsCurr && !isDone) {
-				PWX_TRY_PWX_FURTHER (privInsElemBehindElem (tail(), *rhsCurr))
+				PWX_TRY_PWX_FURTHER (this->privInsElemBehindElem (tail(), *rhsCurr))
 				if (!isTS)
 					tail()->disable_thread_safety();
 				if (rhsCurr == rhs.tail())
@@ -764,15 +760,13 @@ public:
 	  *
 	  * Remove all elements from @a rhs from this list.
 	  *
-	  * FIXME: An exclusive lock for [b]both[/b] lists is required?
-	  *
 	  * @param[in] rhs reference of the list to substract.
 	  * @return reference to this.
 	**/
 	virtual list_t &operator-= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, &rhs)
 			elem_t* rhsCurr = rhs.head();
 			elem_t* lhsPrev = nullptr;
 			data_t* rhsData = nullptr;
@@ -783,11 +777,11 @@ public:
 
 				// Head must be treated first, privFindPrev won't help.
 				if (rhsData == head()->data.get())
-					PWX_TRY_PWX_FURTHER(protDelete(remNextElem(nullptr)))
+					PWX_TRY_PWX_FURTHER(protDelete(this->remNextElem(nullptr)))
 				else {
-					lhsPrev = privFindPrev(rhsData);
+					lhsPrev = this->privFindPrev(rhsData);
 					if (lhsPrev)
-						PWX_TRY_PWX_FURTHER(protDelete(remNextElem(lhsPrev)))
+						PWX_TRY_PWX_FURTHER(protDelete(this->remNextElem(lhsPrev)))
 				}
 
 				if (rhsCurr == rhs.tail())
@@ -851,7 +845,7 @@ public:
 	**/
 	virtual elem_t* operator[] (int32_t index) noexcept
 	{
-		return const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
+		return const_cast<elem_t* > (this->privGetElementByIndex (static_cast<const int32_t> (index)));
 	}
 
 
