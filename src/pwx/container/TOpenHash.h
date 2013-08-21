@@ -290,6 +290,7 @@ protected:
 
 	using base_t::CHMethod;
 	using base_t::eCount;
+	using base_t::growing;
 	using base_t::hashBuilder;
 	using base_t::hashTable;
 	using base_t::memOrdLoad;
@@ -339,6 +340,14 @@ private:
 		double   dHash   = static_cast<double>(priHash) * 0.618;
 		uint32_t idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
 
+		if (growing.load(memOrdLoad)) {
+			// The tabSize and idxBase are no longer valid!
+			PWX_LOCK(const_cast<hash_t*>(this))
+			tabSize = this->sizeMax();
+			idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
+			PWX_UNLOCK(const_cast<hash_t*>(this))
+		}
+
 		// Use the current hashing method for the stepping (secondary hash)
 		uint32_t secHash = this->protGetSecHash(&priHash);
 		uint32_t idxStep;
@@ -371,9 +380,17 @@ private:
 		bool     beRobinHood = allowVacated && hops;
 		uint32_t pos         = idxBase;
 		for (uint32_t i = 0; !isFound && (i < tabSize); ++i) {
+			// Unfortunately, while the search is in progress another
+			// thread might decide to grow the hash table.
+			if (growing.load(memOrdLoad)) {
+				// In this case add a lock guard and start over:
+				PWX_LOCK_GUARD(hash_t, this)
+				return privGetIndex(key, allowVacated, hops);
+			}
+
 			isVacated = hashTable[pos] == vacated;
 
-			// we are done
+			// we are done if ...
 			if (	// a) the hashTable has a nullptr at pos or
 					(nullptr == hashTable[pos])
 					// b) the hashTable has an element with the same key

@@ -274,6 +274,7 @@ protected:
 
 	using base_t::CHMethod;
 	using base_t::eCount;
+	using base_t::growing;
 	using base_t::hashTable;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
@@ -302,12 +303,20 @@ private:
 	virtual uint32_t privGetIndex(const key_t &key) const noexcept
 	{
 		uint32_t xHash = this->protGetHash(&key);
+		uint32_t tabSize = sizeMax();
+
+		if (growing.load(memOrdLoad)) {
+			// The table size is no longer valid!
+			PWX_LOCK(const_cast<hash_t*>(this))
+			tabSize = sizeMax();
+			PWX_UNLOCK(const_cast<hash_t*>(this))
+		}
 
 		if (CHM_Division == CHMethod)
-			return xHash % this->sizeMax();
+			return xHash % tabSize;
 		else {
 			double dHash = static_cast<double>(xHash) * 0.618;
-			return static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * this->sizeMax() ));
+			return static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * tabSize ));
 		}
 	}
 
