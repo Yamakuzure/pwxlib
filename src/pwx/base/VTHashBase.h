@@ -300,6 +300,12 @@ public:
 		maxLoadFactor(src.maxLoadFactor),
 		dynGrowFactor(src.dynGrowFactor)
 	{
+		if (src.growing.load(memOrdLoad)) {
+			PWX_LOCK(&src)
+			// Could have changed after the grow:
+			hashSize = src.hashSize;
+			PWX_UNLOCK(&src)
+		}
 
 		// Generate the hash table
 		try {
@@ -424,6 +430,11 @@ public:
 		uint32_t  pos     = 0;
 		uint32_t  tabSize = sizeMax();
 
+		if (growing.load(memOrdLoad)) {
+			PWX_LOCK(this)
+			tabSize = sizeMax();
+			PWX_UNLOCK(this)
+		}
 		if (!hashTable) return; // Should never happen
 
 		while (eCount.load(PWX_MEMORDER_RELAXED)) {
@@ -543,7 +554,13 @@ public:
 	/// @brief return true if this container is empty
 	virtual bool empty() const noexcept
 	{
-		return !eCount.load(memOrdLoad);
+		bool needLock = growing.load(memOrdLoad);
+		if (needLock)
+			PWX_LOCK(const_cast<hash_t*>(this))
+		bool result = !eCount.load(memOrdLoad);
+		if (needLock)
+			PWX_UNLOCK(const_cast<hash_t*>(this));
+		return result;
 	}
 
 
@@ -669,7 +686,11 @@ public:
 	virtual uint32_t grow(uint32_t targetSize)
 	{
 		if (targetSize > sizeMax()) {
+			// --- declare that this will grow early ---
+			growing.store(true, memOrdStore);
+
             PWX_LOCK_GUARD(hash_t, this)
+
 			if (targetSize > sizeMax()) {
 				// --- Create a new larger table ---
 				elem_t** oldTab = hashTable;
@@ -711,7 +732,8 @@ public:
 						oldTab[pos] = xNext != toMove ? xNext : nullptr;
 
 						// And delete the old element
-						PWX_TRY_STD_FURTHER(delete toMove, "delete_error", "deleting an element failed")
+						if (toMove && !toMove->destroyed())
+							PWX_TRY_STD_FURTHER(protDelete(toMove), "delete_error", "deleting an element failed")
 					}
 					++pos;
 				}
@@ -721,6 +743,10 @@ public:
 				PWX_TRY_STD_FURTHER(delete [] oldTab, "Delete failed",
 						"Deleting the old table after growing into a new table failed.")
 			} // End of inner size check
+
+			// --- Growing is finished: ---
+			growing.store(false, memOrdStore);
+
 		} // End of outer size check
 
 		return sizeMax();
@@ -761,6 +787,13 @@ public:
 			uint32_t maxPos = sizeMax();
 			uint32_t pos    = maxPos;
 			elem_t*  elem   = nullptr;
+
+			if (growing.load(memOrdLoad)) {
+				PWX_LOCK(this)
+				maxPos = sizeMax();
+				PWX_UNLOCK(this);
+			}
+
 			while (pos && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
 				elem = hashTable[--pos];
 				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
@@ -794,6 +827,13 @@ public:
 			uint32_t maxPos = sizeMax();
 			uint32_t pos    = 0;
 			elem_t*  elem   = nullptr;
+
+			if (growing.load(memOrdLoad)) {
+				PWX_LOCK(this)
+				maxPos = sizeMax();
+				PWX_UNLOCK(this);
+			}
+
 			while ((pos < maxPos) && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
 				elem = hashTable[pos++];
 				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
@@ -896,14 +936,26 @@ public:
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept
 	{
-		return this->eCount.load(memOrdLoad);
+		bool needLock = growing.load(memOrdLoad);
+		if (needLock)
+			PWX_LOCK(const_cast<hash_t*>(this))
+		uint32_t result = eCount.load(memOrdLoad);
+		if (needLock)
+			PWX_UNLOCK(const_cast<hash_t*>(this));
+		return result;
 	}
 
 
 	/// @brief return the maximum number of places (elements for open, buckets for chained hashes)
 	uint32_t sizeMax() const noexcept
 	{
-		return this->hashSize.load(memOrdLoad);
+		bool needLock = growing.load(memOrdLoad);
+		if (needLock)
+			PWX_LOCK(const_cast<hash_t*>(this))
+		uint32_t result = this->hashSize.load(memOrdLoad);
+		if (needLock)
+			PWX_UNLOCK(const_cast<hash_t*>(this));
+		return result;
 	}
 
 
@@ -1146,7 +1198,15 @@ protected:
 	**/
 	bool protIsVacated(const uint32_t index) const noexcept
 	{
-		if (index < this->sizeMax()) {
+		uint32_t tabSize = this->sizeMax();
+
+		if (growing.load(memOrdLoad)) {
+			PWX_LOCK(const_cast<hash_t*>(this))
+			tabSize = this->sizeMax();
+			PWX_UNLOCK(const_cast<hash_t*>(this))
+		}
+
+		if (index < tabSize) {
 			PWX_LOCK_GUARD(hash_t, this)
 			return hashTable[index] == vacated;
 		}
@@ -1160,6 +1220,7 @@ protected:
 	*/
 
 	eChainHashMethod CHMethod = CHM_Division; //!< Which Hashing method is used
+	abool_t          growing  = ATOMIC_VAR_INIT(false); //!< When set to true, otherwise non-locking methods must lock
 	CHashBuilder	 hashBuilder; //!< instance that will handle the key generation
 	aui32_t          hashSize;    //!< number of places to maintain
 	elem_t**		 hashTable;   //!< the central array that is our hash
@@ -1189,8 +1250,20 @@ private:
 		uint32_t  keyIdx = privGetIndex(key);
 		elem_t* xCurr  = hashTable[keyIdx];
 
-		while (xCurr && (xCurr != vacated) && (*xCurr != key))
+		while (xCurr && (xCurr != vacated) && (*xCurr != key)) {
+			// Unfortunately, while this is nicely lock free,
+			// another thread might just happen to start a grow.
+			if (growing.load(memOrdLoad)) {
+				// In this case lock to wait for it to finish
+				// and then start over as all we checked is
+				// futile now.
+				PWX_LOCK_GUARD(hash_t, this)
+				return this->privGet(key);
+				// Note: Only chained hash tables with a high
+				// load factor are really affected by this.
+			}
 			xCurr = xCurr->getNext();
+		}
 
 		return xCurr != vacated ? xCurr : nullptr;
 	}
@@ -1204,6 +1277,14 @@ private:
 	{
 		// Mod index into range
 		uint32_t xSize = sizeMax();
+
+		// Renew if the table is growing
+		if (growing.load(memOrdLoad)) {
+			PWX_LOCK(const_cast<hash_t*>(this))
+			xSize = sizeMax();
+			PWX_UNLOCK(const_cast<hash_t*>(this))
+		}
+
 		uint32_t xIdx  = static_cast<uint32_t> (index < 0
 											? xSize - (std::abs (index) % xSize)
 											: index % xSize);
@@ -1284,15 +1365,13 @@ private:
 						if (!(targetSize % divisor))
 							++divided;
 					}
-
-					// Now if divided is lower than 2, the division method can be used
-					if (divided < 2)
-						CHMethod = CHM_Division;
 				} // End of checking divisors
+
+				// Now if divided is lower than 2, the division method can be used
+				if (divided < 2)
+					CHMethod = CHM_Division;
 			} // End of valid Test 2
 		} // End of checking for an odd number
-		DEBUG_LOG("Hash base", "Hashing method set to \"%s\"",
-				CHMethod == CHM_Division ? "division" : "multiplication")
 	}
 
 
