@@ -349,30 +349,7 @@ private:
 		}
 
 		// Use the current hashing method for the stepping (secondary hash)
-		uint32_t secHash = this->protGetSecHash(&priHash);
-		uint32_t idxStep;
-		uint32_t secSize = tabSize - (tabSize % 2 ? 2 : 1);
-		if (CHM_Division == CHMethod)
-			idxStep = secHash % secSize;
-		else {
-			dHash   = static_cast<double>(secHash) * 0.618;
-			idxStep = static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * secSize) );
-		}
-
-		// Be sure idxStep is sane:
-		if (idxStep < 3)
-			// On odd sizes a step of 2 always traverses all positions.
-			idxStep = tabSize % 2 ? 2 : 3;
-		// Both must not be the same, even or odd
-		if ( (tabSize % 2) == (idxStep % 2) )
-			++idxStep;
-		// tabSize must neither be 4/3 nor 3/2 of idxStep
-		if ( ((idxStep * 4 / 3) == tabSize) || ((idxStep * 3 / 2) == tabSize))
-			idxStep += 2;
-
-		// tabSize must not be devidable by idxStep
-		while ( !(tabSize % idxStep) )
-			idxStep += 2;
+		uint32_t idxStep = this->privGetStepping(priHash);
 
 		// Now probe the table until we are done or have found the key
 		bool     isFound     = false;
@@ -430,7 +407,6 @@ private:
 			DEBUG_ERR("open hash", "  Initial Idx: %u", idxBase % tabSize)
 			DEBUG_ERR("open hash", "  Stepping   : %u", idxStep)
 			DEBUG_ERR("open hash", "  1st Hash   : %u\n---", priHash)
-			DEBUG_ERR("open hash", "  2nd Hash   : %u\n---", secHash)
 		}
 #endif // defined(LIBPWX_DEBUG)
 
@@ -459,6 +435,57 @@ private:
 	virtual uint32_t privGetIndex(const key_t &key) const noexcept
 	{
 		return privGetIndex(key, false, nullptr);
+	}
+
+
+	/// @brief small method to get the second hash stepping calculation out of privGetIndex()
+	virtual uint32_t privGetStepping(uint32_t primary_hash) const noexcept
+	{
+		uint32_t stepping = 0;
+		uint32_t secHash  = this->protGetSecHash(&primary_hash);
+		uint32_t tabSize  = sizeMax();
+		uint32_t secSize  = tabSize - (tabSize % 2 ? 2 : 1);
+
+		if (CHM_Division == CHMethod)
+			stepping = secHash % secSize;
+		else {
+			double dHash = static_cast<double>(secHash) * 0.618;
+			stepping     = static_cast<uint32_t>(std::floor( (dHash - std::floor(dHash)) * secSize) );
+		}
+
+		// Be sure stepping is sane:
+		if (stepping < 3)
+			// On odd sizes a step of 2 always traverses all positions.
+			stepping = tabSize % 2 ? 2 : 3;
+
+		// Both must not be the same, even or odd
+		if ( (tabSize % 2) == (stepping % 2) )
+			++stepping;
+
+		/* An important part is to make sure that the stepping
+		* must not be n/(n+1) of the table size, or the stepping
+		* will lead to unfull probing.
+		* However, experiments show that the range 2<n<9 is enough
+		* to test.
+		*/
+		bool isAdapted = true;
+		while (isAdapted) {
+			isAdapted = false;
+			for (uint32_t n = 3; !isAdapted && (n < 9); ++n) {
+				if ( (stepping * (n+1) / n) == tabSize) {
+					isAdapted = true;
+					stepping += 2;
+				}
+			}
+
+			// tabSize must not be devidable by stepping either
+			while ( !(tabSize % stepping) ) {
+				isAdapted = true;
+				stepping += 2;
+			}
+		} // end of detecting dangerous fractions of tabSize.
+
+		return stepping;
 	}
 
 
