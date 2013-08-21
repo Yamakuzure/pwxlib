@@ -185,32 +185,19 @@ template<
 
 	// Do the calculations
 	bool     isNextOK  = true;
-	bool     isOrderOK = true;
 	uint32_t currNr    = 1;
 	auto*    curr      = testCont[0]; // Is head and number 0
 	auto*    next      = curr;
-	value_t  cVal      = 0;
-	value_t  nVal      = 0;
-	value_t  pcVal     = 0; // prev from curr
-	value_t  nnVal     = 0; // next from next
 
 	// The consistency checks for the elements are only relevant for
 	// list type containers. Hash Tables can not be checked like that.
 	if (!isSameType(cont_t, chash_t) && !isSameType(cont_t, ohash_t)) {
-		while (isNextOK && isOrderOK && (currNr < contSize) ) {
+		while (isNextOK && (currNr < contSize) ) {
 			next = testCont[currNr];
 			if (next != curr->getNext())
 				isNextOK = false;
-			else if (isSameType(cont_t, set_t) && (**curr >= **next)) {
-				// Sets need a special test to check correct ordering
-				isOrderOK = false;
-				cVal  = curr ? **curr : 0;
-				nVal  = next ? **next : 0;
-				nnVal = (next && next->getNext()) ? **(next->getNext()) : 0;
-			} else {
+			else {
 				++currNr;
-				if (isSameType(cont_t, set_t))
-					pcVal = curr ? **curr : 0;
 				curr = next;
 			}
 		} // End of consistency checking
@@ -324,14 +311,6 @@ template<
 	// Is the ordering ok? (chain equals index)
 	else if (!isNextOK) {
 		cerr << "    FAIL! idx " << (currNr - 1) << " has a wrong next neighbor!" << endl;
-		++env.testFail;
-		result = EXIT_FAILURE;
-	}
-	// Is the set ordering ok? (next larger or equal)
-	else if (!isOrderOK) {
-		cerr << "    FAIL! TSet ordering broken at idx " << (currNr - 1) << ":" << endl;
-		cerr << " -> (prev) curr >= next (next->next)" << endl;
-		cerr << " -> (" << pcVal << ") " << cVal << " >= " << nVal << "(" << nnVal << ")!" << endl;
 		++env.testFail;
 		result = EXIT_FAILURE;
 	}
