@@ -264,6 +264,14 @@ protected:
 	 * ===============================================
 	*/
 
+	/* Important:
+	 * All protected and private methods must not lock the container!
+	 * Container locking is done by the public methods!
+	 * Further all protected and private
+	 * methods must not use public methods, or they might end up
+	 * freezing while waiting for themselves to end!
+	 */
+
 	using base_t::protGetHash;
 
 
@@ -274,7 +282,7 @@ protected:
 
 	using base_t::CHMethod;
 	using base_t::eCount;
-	using base_t::growing;
+	using base_t::hashSize;
 	using base_t::hashTable;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
@@ -286,6 +294,14 @@ private:
 	 * === Private methods                         ===
 	 * ===============================================
 	*/
+
+	/* Important:
+	 * All protected and private methods must not lock the container!
+	 * Container locking is done by the public methods!
+	 * Further all protected and private
+	 * methods must not use public methods, or they might end up
+	 * freezing while waiting for themselves to end!
+	 */
 
 	/** @brief get the index of a key
 	  *
@@ -303,14 +319,7 @@ private:
 	virtual uint32_t privGetIndex(const key_t &key) const noexcept
 	{
 		uint32_t xHash = this->protGetHash(&key);
-		uint32_t tabSize = sizeMax();
-
-		if (growing.load(memOrdLoad)) {
-			// The table size is no longer valid!
-			PWX_LOCK(const_cast<hash_t*>(this))
-			tabSize = sizeMax();
-			PWX_UNLOCK(const_cast<hash_t*>(this))
-		}
+		uint32_t tabSize = hashSize.load(memOrdLoad);
 
 		if (CHM_Division == CHMethod)
 			return xHash % tabSize;
@@ -324,8 +333,6 @@ private:
 	/// @brief private insertion doing bucket filling to resolve collisions
 	virtual uint32_t privInsert(elem_t* elem)
 	{
-		PWX_LOCK_GUARD(hash_t, this)
-
 		uint32_t idx  = privGetIndex(elem->key);
 		elem_t*  root = this->hashTable[idx];
 		if (root) {
@@ -343,7 +350,7 @@ private:
 		}
 
 		eCount.fetch_add(1, memOrdStore);
-		return this->size();
+		return this->eCount.load(memOrdLoad);
 	}
 
 
@@ -360,17 +367,14 @@ private:
 	virtual elem_t* privRemoveIdx (uint32_t index) noexcept
 	{
 		elem_t* result = nullptr;
-		if ((index < this->sizeMax()) && hashTable[index]) {
-
-			PWX_LOCK_GUARD(hash_t, this)
+		if ((index < this->hashSize.load(memOrdLoad)) && hashTable[index]) {
 
 			// Note: Chained Hashes do not use "vacated" sentries, no check needed.
-			if ((index < this->sizeMax()) && hashTable[index]) {
-				result = hashTable[index];
-				hashTable[index] = result->getNext();
-				result->remove();
-				eCount.fetch_sub(1, memOrdStore);
-			} // End of outer check
+			result = hashTable[index];
+			elem_t* xNext = result->getNext();
+			hashTable[index] = xNext != result ? xNext : nullptr;
+			result->remove();
+			--eCount;
 		} // End of outer check
 
 		return result;
@@ -384,30 +388,29 @@ private:
 	**/
 	virtual elem_t* privRemoveKey (const key_t &key) noexcept
 	{
-		PWX_LOCK_GUARD(hash_t, this)
-
 		uint32_t index   = privGetIndex(key);
 		elem_t* result = hashTable[index];
 		elem_t* prev   = nullptr;
 
-		while (result && (*result != key)) {
+		while (result && (*result != key) && (result != prev)) {
 			prev   = result;
 			result = result->getNext();
 		}
 
 		// Now if result is set, there is either a prev or
 		// result is the root of the bucket:
-		if (result) {
+		if (result && (*result == key) && result->inserted()) {
 			if (prev)
 				prev->removeNext();
 			else {
-				hashTable[index] = result->getNext();
+				elem_t* xNext = result->getNext();
+				hashTable[index] = xNext != result ? xNext : nullptr;
 				result->remove();
 			}
-			eCount.fetch_sub(1, memOrdStore);
+			--eCount;
+			return result;
 		}
-
-		return result;
+		return nullptr;
 	}
 
 
