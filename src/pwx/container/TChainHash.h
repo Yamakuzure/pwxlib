@@ -343,7 +343,7 @@ private:
 				next = root->getNext();
 				++elem->hops;
 			}
-			root->setNext(elem);
+			root->insertNext(elem);
 		} else {
 			this->hashTable[idx] = elem;
 			elem->insertAsFirst();
