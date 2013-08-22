@@ -267,6 +267,14 @@ protected:
 	 * ===============================================
 	*/
 
+	/* Important:
+	 * All protected and private methods must not lock the container!
+	 * Container locking is done by the public methods!
+	 * Further all protected and private
+	 * methods must not use public methods, or they might end up
+	 * freezing while waiting for themselves to end!
+	 */
+
 	using base_t::protGetHash;
 
 
@@ -290,8 +298,8 @@ protected:
 
 	using base_t::CHMethod;
 	using base_t::eCount;
-	using base_t::growing;
 	using base_t::hashBuilder;
+	using base_t::hashSize;
 	using base_t::hashTable;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
@@ -303,6 +311,14 @@ private:
 	 * === Private methods                         ===
 	 * ===============================================
 	*/
+
+	/* Important:
+	 * All protected and private methods must not lock the container!
+	 * Container locking is done by the public methods!
+	 * Further all protected and private
+	 * methods must not use public methods, or they might end up
+	 * freezing while waiting for themselves to end!
+	 */
 
 	/** @brief real index calculation
 	  *
@@ -336,17 +352,9 @@ private:
 		uint32_t priHash = this->protGetHash(&key);
 
 		// Use multiplication method for the base index
-		uint32_t tabSize = this->sizeMax();
+		uint32_t tabSize = this->hashSize.load(memOrdLoad);
 		double   dHash   = static_cast<double>(priHash) * 0.618;
 		uint32_t idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
-
-		if (growing.load(memOrdLoad)) {
-			// The tabSize and idxBase are no longer valid!
-			PWX_LOCK(const_cast<hash_t*>(this))
-			tabSize = this->sizeMax();
-			idxBase = static_cast<uint32_t>(std::floor((dHash - std::floor(dHash)) * tabSize));
-			PWX_UNLOCK(const_cast<hash_t*>(this))
-		}
 
 		// Use the current hashing method for the stepping (secondary hash)
 		uint32_t idxStep = this->privGetStepping(priHash);
@@ -357,14 +365,6 @@ private:
 		bool     beRobinHood = allowVacated && hops;
 		uint32_t pos         = idxBase;
 		for (uint32_t i = 0; !isFound && (i < tabSize); ++i) {
-			// Unfortunately, while the search is in progress another
-			// thread might decide to grow the hash table.
-			if (growing.load(memOrdLoad)) {
-				// In this case add a lock guard and start over:
-				PWX_LOCK_GUARD(hash_t, this)
-				return privGetIndex(key, allowVacated, hops);
-			}
-
 			isVacated = hashTable[pos] == vacated;
 
 			// we are done if ...
@@ -375,7 +375,8 @@ private:
 					// c) allowVacated is true and the position is vacated
 				||	(isVacated && allowVacated)
 					// d) beRobinHood is true and the position is taken, but the element has fewer hops
-				||  (beRobinHood && !isVacated && (hashTable[pos]->hops < *hops)) )
+					//    with hops being greater than 1 and the resident has at least two less.
+				||  (beRobinHood && !isVacated && (*hops > 1) && (hashTable[pos]->hops < (*hops - 1)) ) )
 				isFound = true;
 			else {
 				pos = (pos + idxStep) % tabSize;
@@ -390,7 +391,7 @@ private:
 							pos, idxBase, idxStep, tabSize)
 					idxStep += idxStep % 2 ? 2 : 3;
 					// Be sure idxStep does not end up being tabSize or we'll be here again next round.
-					if (idxStep == tabSize)
+					if (idxStep >= tabSize)
 						idxStep = 3;
 					pos = (pos + idxStep) % tabSize;
 				}
@@ -402,7 +403,7 @@ private:
 			// This is really bad!
 			DEBUG_ERR("open hash", "\n---\nHash table seems to be full or %s is screwed:", __FUNCTION__)
 			DEBUG_ERR("open hash", "  Table size : %u", tabSize)
-			DEBUG_ERR("open hash", "  Elements   : %u", this->size())
+			DEBUG_ERR("open hash", "  Elements   : %u", this->eCount.load(memOrdLoad))
 			DEBUG_ERR("open hash", "  Hops done  : %u", *hops) // Trivial, but the if() is not part of the output
 			DEBUG_ERR("open hash", "  Initial Idx: %u", idxBase % tabSize)
 			DEBUG_ERR("open hash", "  Stepping   : %u", idxStep)
@@ -443,7 +444,7 @@ private:
 	{
 		uint32_t stepping = 0;
 		uint32_t secHash  = this->protGetSecHash(&primary_hash);
-		uint32_t tabSize  = sizeMax();
+		uint32_t tabSize  = hashSize.load(memOrdLoad);
 		uint32_t secSize  = tabSize - (tabSize % 2 ? 2 : 1);
 
 		if (CHM_Division == CHMethod)
@@ -492,14 +493,12 @@ private:
 	/// @brief private insertion relying on privGetIndex() to resolve collisions
 	virtual uint32_t privInsert(elem_t* elem)
 	{
-		PWX_LOCK_GUARD(hash_t, this)
-
 		uint32_t  idx  = privGetIndex(elem->key, true, &(elem->hops));
 
 #if defined(LIBPWX_DEBUG)
 		// The position must not be occupied unless the hop count is smaller
 		// Note: This used to be an assert, but the checks are too flat then.
-		uint32_t tabSize  = this->sizeMax();
+		uint32_t tabSize  = this->hashSize.load(memOrdLoad);
 		if (idx >= tabSize) {
 			DEBUG_ERR("open hash",
 					"privGetIndex returned %u on table size %u (insert key: \"%s\")",
@@ -559,7 +558,7 @@ private:
 			eCount.fetch_add(1, memOrdStore);
 		}
 
-		return this->size();
+		return this->eCount.load(memOrdLoad);
 	}
 
 
@@ -575,17 +574,13 @@ private:
 	virtual elem_t* privRemoveIdx (uint32_t index) noexcept
 	{
 		elem_t* result = nullptr;
-		if ((index < this->sizeMax()) && hashTable[index] && !protIsVacated(index)) {
-
-			PWX_LOCK_GUARD(hash_t, this)
+		if ((index < this->hashSize.load(memOrdLoad)) && hashTable[index] && !protIsVacated(index)) {
 
 			// Note: Open Hashes mark empty positions with the "vacated" sentry
-			if ((index < this->sizeMax()) && hashTable[index] && (hashTable[index] != vacated)) {
-				result = hashTable[index];
-				hashTable[index] = vacated;
-				result->remove();
-				eCount.fetch_sub(1, memOrdStore);
-			} // End of outer check
+			result = hashTable[index];
+			hashTable[index] = vacated;
+			result->remove();
+			--eCount;
 		} // End of outer check
 
 		return result;
