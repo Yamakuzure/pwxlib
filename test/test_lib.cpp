@@ -148,8 +148,7 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Chained Hash Tables
 			if (EXIT_SUCCESS == result) {
-				chash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 2.873)),
-								 do_not_destroy, nullptr, 3.0, 1.5);
+				chash_t testCont(do_not_destroy);
 				do_testSpeed(chash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
 					do_testSpeed(chash_t,hashval_t,  keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
@@ -157,8 +156,7 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Open Hash Tables
 			if (EXIT_SUCCESS == result) {
-				ohash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 0.79)),
-								 do_not_destroy, nullptr, 0.81, 1.5);
+				ohash_t testCont(do_not_destroy);
 				do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
 					do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
