@@ -75,7 +75,8 @@ int32_t main(int argc, char* argv[])
 		// --- test the speed of the containers ---
 		if ((EXIT_SUCCESS == result) && env.doSpeed) {
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
-			cout << " (Inserting " << maxElements << " random elements and clear up)" << endl;
+			cout << " (Inserting " << maxElements << " random elements, search ";
+			cout << (maxElements / 1000) << " elements and clear up)" << endl;
 			cout << "                                               Add /   Search /   Clear" << endl;
 
 // Little evil shortcut
@@ -140,7 +141,8 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Sets
 			if (EXIT_SUCCESS == result) {
-				set_t testCont(do_not_destroy);
+				set_t testCont(do_not_destroy, static_cast<uint32_t>(std::ceil(maxElements / 2.873)),
+								nullptr, 0, 3.0, 1.5);
 				do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
 					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
@@ -148,7 +150,8 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Chained Hash Tables
 			if (EXIT_SUCCESS == result) {
-				chash_t testCont(do_not_destroy);
+				chash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 2.873)),
+								do_not_destroy, nullptr, 3.0, 1.5);
 				do_testSpeed(chash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
 					do_testSpeed(chash_t,hashval_t,  keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
@@ -156,7 +159,8 @@ result = testSpeed<container_type, key_type, value_type, \
 			}
 			// Open Hash Tables
 			if (EXIT_SUCCESS == result) {
-				ohash_t testCont(do_not_destroy);
+				ohash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 0.79)),
+								do_not_destroy, nullptr, 0.81, 1.5);
 				do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
 				if (EXIT_SUCCESS == result) {
 					do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)

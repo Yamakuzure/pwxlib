@@ -92,7 +92,39 @@ public:
 
 	/** @brief default constructor
 	  *
-	  * The default constructor initializes an empty set.
+	  * The default constructor not only initializes an empty set
+	  * and sets the desired destroy method, but also initializes
+	  * the lookup table to non-default values.
+	  *
+	  * You can use this ctor if you already know that you need
+	  * non-default values like a different maximum load factor
+	  * or a higher initial size.
+	  *
+	  * Note: You can not set an own destroy function for the lookup
+	  * table, as the data of the lookup hash elements is never
+	  * destroyed; they are the regular set elements.
+	  *
+	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data of the set elements
+	  * @param[in] initSize The initial size of the lookup table.
+	  * @param[in] hash_func A pointer to a function that can hash the data that is stored in the set elements
+	  * @param[in] keyLen optional limiting key length for C-Strings, std::string keys or @a hash_func
+	  * @param[in] maxLoad maximum load factor that triggers automatic growth of the lookup table.
+	  * @param[in] dynGrow growth rate applied when the maximum load factor is reached.
+	**/
+	TSet (	void (*destroy_) (data_t* data),
+			uint32_t initSize,
+			uint32_t (*hash_func) (const key_t* key, uint32_t keyLen),
+			uint32_t keyLen,
+			double maxLoad, double dynGrow) noexcept :
+		base_t(destroy_),
+		lookup(initSize, list_t::do_not_destroy, hash_func, keyLen, maxLoad, dynGrow)
+	{ }
+
+
+
+	/** @brief destroy constructor
+	  *
+	  * The destroy constructor initializes an empty set.
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
