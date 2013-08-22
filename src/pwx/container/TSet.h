@@ -493,7 +493,7 @@ private:
 
 	/// @brief clear this list
 	/// Difference to TSingleList::privClear(): Here the lookup table
-	/// must be maintained instead of the currStroe. It is therefore
+	/// must be maintained instead of the currStore. It is therefore
 	/// not possible to simply "declare" the Set as being empty.
 	virtual void privClear() noexcept {
 		elem_t* xTail = nullptr;
@@ -501,10 +501,8 @@ private:
 			PWX_LOCK(this)
 			xTail = privRemove(tail());
 			PWX_UNLOCK(this)
-			if (xTail && !xTail->destroyed()) {
-				lookup.delKey(**xTail);
+			if (xTail && !xTail->destroyed())
 				delete xTail;
-			}
 		}
 	}
 
