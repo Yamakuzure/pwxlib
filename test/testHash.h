@@ -67,7 +67,7 @@ int32_t testHash (sEnv& env)
 	** B) List three elements with keys 1, 3, 4 (1.1, 2.2, 4.4)               **
 	***************************************************************************/
 	if (EXIT_SUCCESS == result) {
-		cout << adjRight (4, 0) << ++env.testCount << " B) Elements 1->1.1, 3->3.3, 4.4 are : ";
+		cout << adjRight (4, 0) << ++env.testCount << " B) Elements 1->1.1, 3->3.3, 4->4.4 are : ";
         hashval_t a = ifHash.getData(1);
         hashval_t b = **(ifHash.get(3));
         hashval_t c = *(ifHash.get(4)->data.get());

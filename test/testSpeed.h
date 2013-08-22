@@ -71,7 +71,7 @@ template<
 	static const value_t lo = std::numeric_limits<value_t>::lowest() + static_cast<value_t>(1);
 	static const value_t hi = std::numeric_limits<value_t>::max()    - static_cast<value_t>(1);
 	uint32_t localMaxElem = maxElements;
-	uint32_t localMaxRet  = maxElements / 100;
+	uint32_t localMaxRet  = maxElements / 1000;
     int64_t  maxNeededMS  = 0;
 
 	/* --------------------------------------------------------------------
