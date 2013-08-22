@@ -11,11 +11,11 @@ THREADDEBUG := NO
 
 # If the following is set to YES, glibc is told to annotate inter thread
 # synchronization events. This is needed if you do not want to get
-# plenty of false results in Helgrind.
-# See
+# plenty of false positives in Helgrind.
+# See <where is the link gone?>
 # Note: You must have valgrind installed on your system and
 #       valgrind/helgrind.h somewhere it can be found (like /usr/include)
-ANNOTATIONS := NO
+ANNOTATIONS := YES
 
 # Set to YES to include profiling info
 PROFILE := NO
@@ -32,22 +32,19 @@ STATIC := NO
 # mutexes instead.
 # Using spinlocks is not only more lightweight (an atomic_flag instead
 # of a full scale mutex), but it has a bit better performance, too.
-# Examples: (50,000 random elements inserted/removed, 50 elements
-#            retireved, 8 threads)
+# Examples: (200,000 random elements inserted/removed, 200 elements retireved, 8 threads)
+# Note: The testmachine is a dual core i7, 1333MHz, HyperThreading, 8GiB RAM.
 #                              yielding spinlocks     |        mutextes
 #                            Add /   Search /   Clear |      Add /   Search /   Clear
-#  Singly linked lists    234 ms /   113 ms /  589 ms |   219 ms /    83 ms /  686 ms
-#  Doubly linked lists    239 ms /   190 ms /  655 ms |   217 ms /    86 ms /  687 ms
-#  Singly linked rings    243 ms /   105 ms /  605 ms |   224 ms /   116 ms /  681 ms
-#  Doubly linked rings    244 ms /    96 ms /  622 ms |   214 ms /   125 ms /  738 ms
-#  Stacks                 232 ms /    90 ms /  586 ms |   219 ms /   131 ms /  709 ms
-#  Queues                 241 ms /   124 ms /  644 ms |   209 ms /   131 ms /  730 ms
-#  Sets                 34320 ms /   199 ms /  621 ms | 38920 ms /   199 ms /  753 ms
-#  Chained Hash Tables     84 ms /     0 ms /   83 ms |   188 ms /     0 ms /  157 ms
-#  Open Hash Tables       131 ms /     0 ms /  143 ms |   207 ms /     0 ms /  442 ms
-# @todo: Update statistic and default decision once all containers use
-#        the new currStore correctly and once the memory fences are realxed
-#        where appropriate.
+#  Singly linked lists    756 ms /   821 ms /  126 ms |  1225 ms /  1207 ms /  147 ms
+#  Doubly linked lists    761 ms /  1448 ms /  163 ms |  1206 ms /  1359 ms /  189 ms
+#  Singly linked rings    783 ms /   777 ms /  129 ms |  1214 ms /  1634 ms /  187 ms
+#  Doubly linked rings    758 ms /  1472 ms /  170 ms |  1204 ms /  1926 ms /  244 ms
+#  Stacks                 715 ms /   817 ms /  130 ms |  1223 ms /  1759 ms /  204 ms
+#  Queues                 616 ms /  1440 ms /  177 ms |  1203 ms /  2010 ms /  258 ms
+#  Sets                   831 ms /     0 ms /  691 ms |   971 ms /     0 ms /  633 ms
+#  Chained Hash Tables    388 ms /     0 ms /  269 ms |   758 ms /     0 ms /  414 ms
+#  Open Hash Tables       497 ms /     0 ms /  155 ms |   807 ms /     0 ms /  181 ms
 USE_SPINLOCK := YES
 
 # The following settings lets threads do a yield() whenever
@@ -55,24 +52,21 @@ USE_SPINLOCK := YES
 # if USE_SPINLOCK is set to NO
 # By default threads do yield, as this results in a much better
 # performance when inserting or removing elements from containers.
-# The performance of retrievals, howerver, is slightly better
+# The performance of retrievals, howerver, is only slightly worse
 # without the yield.
-# Examples: (50,000 random elements inserted/removed, 50 elements
-#            retireved, 8 threads)
+# Examples: (200,000 random elements inserted/removed, 200 elements retireved, 8 threads)
+# Note: The testmachine is a dual core i7, 1333MHz, HyperThreading, 8GiB RAM.
 #                              yield() enabled        | yield() disabled
 #                            Add /   Search /   Clear |      Add /   Search /   Clear
-#  Singly linked lists    234 ms /   113 ms /  589 ms |   824 ms /   106 ms / 2613 ms
-#  Doubly linked lists    239 ms /   190 ms /  655 ms |   560 ms /   244 ms / 2080 ms
-#  Singly linked rings    243 ms /   105 ms /  605 ms |   800 ms /   169 ms / 2395 ms
-#  Doubly linked rings    244 ms /    96 ms /  622 ms |   714 ms /   176 ms / 2406 ms
-#  Stacks                 232 ms /    90 ms /  586 ms |   657 ms /   144 ms / 2865 ms
-#  Queues                 241 ms /   124 ms /  644 ms |   500 ms /   210 ms / 2145 ms
-#  Sets                 34320 ms /   199 ms /  621 ms | 54680 ms /   290 ms / 2556 ms
-#  Chained Hash Tables     84 ms /     0 ms /   83 ms |   346 ms /     0 ms /  226 ms
-#  Open Hash Tables       131 ms /     0 ms /  143 ms |   577 ms /     0 ms /  595 ms
-# @todo: Update statistic and default decision once all containers use
-#        the new currStore correctly and once the memory fences are realxed
-#        where appropriate.
+#  Singly linked lists    756 ms /   821 ms /  126 ms |  9649 ms /   786 ms /  121 ms
+#  Doubly linked lists    761 ms /  1448 ms /  163 ms | 35160 ms /  2248 ms /  171 ms
+#  Singly linked rings    783 ms /   777 ms /  129 ms |  6254 ms /   799 ms /  121 ms
+#  Doubly linked rings    758 ms /  1472 ms /  170 ms | 26490 ms /  2053 ms /  162 ms
+#  Stacks                 715 ms /   817 ms /  130 ms |  5975 ms /   833 ms /  122 ms
+#  Queues                 616 ms /  1440 ms /  177 ms | 36107 ms /  2161 ms /  172 ms
+#  Sets                   831 ms /     0 ms /  691 ms |   814 ms /     0 ms / 2299 ms
+#  Chained Hash Tables    388 ms /     0 ms /  269 ms |  1459 ms /     0 ms /  180 ms
+#  Open Hash Tables       497 ms /     0 ms /  155 ms |  1513 ms /     0 ms /  150 ms
 USE_SPINLOCK_YIELD := YES
 
 # ===================================================================
