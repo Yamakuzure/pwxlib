@@ -414,29 +414,23 @@ bool are_locked(const CLockable* objA, const CLockable* objB, const CLockable* o
 **/
 bool try_locks(const CLockable* objA, const CLockable* objB) noexcept
 {
-    CLockable* xObjA = const_cast<CLockable*>(objA);
-    CLockable* xObjB = const_cast<CLockable*>(objB);
+	CLockable* xObjA = const_cast<CLockable*>(objA);
+	CLockable* xObjB = const_cast<CLockable*>(objB);
 
-	// Note the current state, nullptr is considered to be locked.
-	bool isLockedA   = objA ? objA->is_locked() : true;
-	bool isLockedB   = objB ? objB->is_locked() : true;
+	bool lockedA = objA ? false : true;
+	bool lockedB = objB ? false : true;
 
-	// try to lock where neccessary
-	bool hasLockedA  = isLockedA ? false : xObjA->try_lock();
-	bool hasLockedB  = isLockedB ? false : xObjB->try_lock();
+	if (!lockedA || !lockedB) {
+		if (xObjA) lockedA = xObjA->try_lock();
+		if (xObjB) lockedB = xObjB->try_lock();
 
-	// Assemble the result, isLocked or hasLocked are enough
-	bool result =	(isLockedA || hasLockedA)
-				&&	(isLockedB || hasLockedB);
-
-	// If the result is false, any performed locks must be undone
-	if (!result) {
-		if (hasLockedA) xObjA->unlock();
-		if (hasLockedB) xObjB->unlock();
-
+		if (!lockedA || !lockedB) {
+			if (xObjA && lockedA) xObjA->unlock();
+			if (xObjB && lockedB) xObjB->unlock();
+		}
 	}
 
-	return result;
+	return lockedA && lockedB;
 }
 
 
@@ -457,34 +451,27 @@ bool try_locks(const CLockable* objA, const CLockable* objB) noexcept
 **/
 bool try_locks(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
 {
-    CLockable* xObjA = const_cast<CLockable*>(objA);
-    CLockable* xObjB = const_cast<CLockable*>(objB);
-    CLockable* xObjC = const_cast<CLockable*>(objC);
+	CLockable* xObjA = const_cast<CLockable*>(objA);
+	CLockable* xObjB = const_cast<CLockable*>(objB);
+	CLockable* xObjC = const_cast<CLockable*>(objC);
 
-	// Note the current state, nullptr is considered to be locked.
-	bool isLockedA   = objA ? objA->is_locked() : true;
-	bool isLockedB   = objB ? objB->is_locked() : true;
-	bool isLockedC   = objC ? objC->is_locked() : true;
+	bool lockedA = xObjA ? false : true;
+	bool lockedB = xObjB ? false : true;
+	bool lockedC = xObjC ? false : true;
 
-	// try to lock where neccessary
-	bool hasLockedA  = isLockedA ? false : xObjA->try_lock();
-	bool hasLockedB  = isLockedB ? false : xObjB->try_lock();
-	bool hasLockedC  = isLockedC ? false : xObjC->try_lock();
+	if (!lockedA || !lockedB || !lockedC) {
+		if (xObjA) lockedA = xObjA->try_lock();
+		if (xObjB) lockedB = xObjB->try_lock();
+		if (xObjC) lockedC = xObjC->try_lock();
 
-	// Assemble the result, isLocked or hasLocked are enough
-	bool result =	(isLockedA || hasLockedA)
-				&&	(isLockedB || hasLockedB)
-				&&	(isLockedC || hasLockedC);
-
-	// If the result is false, any performed locks must be undone
-	if (!result) {
-		if (hasLockedA) xObjA->unlock();
-		if (hasLockedB) xObjB->unlock();
-		if (hasLockedC) xObjC->unlock();
-
+		if (!lockedA || !lockedB || !lockedC) {
+			if (xObjA && lockedA) xObjA->unlock();
+			if (xObjB && lockedB) xObjB->unlock();
+			if (xObjC && lockedC) xObjC->unlock();
+		}
 	}
 
-	return result;
+	return lockedA && lockedB && lockedC;
 }
 
 

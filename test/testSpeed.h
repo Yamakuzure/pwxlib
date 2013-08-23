@@ -194,7 +194,7 @@ template<
 	if (!isSameType(cont_t, chash_t) && !isSameType(cont_t, ohash_t)) {
 		while (isNextOK && (currNr < contSize) ) {
 			next = testCont[currNr];
-			if (next != curr->getNext())
+			if (!curr || (next != curr->getNext()) )
 				isNextOK = false;
 			else {
 				++currNr;

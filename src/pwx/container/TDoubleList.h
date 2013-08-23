@@ -709,7 +709,7 @@ protected:
 			this->doRenumber.store(true, memOrdStore);
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 		} else {
-			PWX_LOCK_GUARD(list_t, this)
+			PWX_LOCK_GUARD(this)
 			if (!size()) {
 				// Case 1: The list is empty
 				PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, &currStore))
@@ -827,7 +827,9 @@ private:
 
 		if (locCnt) {
 			elem_t* xCurr = curr();
-			uint32_t xNr = xCurr->eNr.load(memOrdLoad);
+			uint32_t xNr  = xCurr ? xCurr->eNr.load(memOrdLoad) : 0;
+			if (nullptr == xCurr)
+				xCurr = head();
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
 

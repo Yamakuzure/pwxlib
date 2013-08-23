@@ -382,7 +382,7 @@ public:
 	**/
 	virtual const data_t &getData (const int32_t index) const
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(this)
 		// Note: The guard is needed or another thread can
 		// delete the retrieved element between the retrieval
 		// and the delivery. A segfault would be the result.
@@ -537,7 +537,7 @@ public:
 	**/
 	virtual elem_t* pop_back() noexcept
 	{
-		PWX_LOCK_GUARD(list_t, this)
+		PWX_LOCK_GUARD(this)
 		// Note: The guard is needed to ensure that no thread changes the
 		// number of elements beyond the border of eCount > 1
 		return (eCount.load(memOrdLoad) > 1
@@ -717,7 +717,7 @@ public:
 	virtual list_t &operator= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, &rhs)
+			PWX_DOUBLE_LOCK_GUARD(this, &rhs)
 			clear();
 			destroy      = rhs.destroy;
 			beThreadSafe(rhs.beThreadSafe());
@@ -737,7 +737,7 @@ public:
 	virtual list_t &operator+= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, &rhs)
+			PWX_DOUBLE_LOCK_GUARD(this, &rhs)
 			elem_t* rhsCurr = rhs.head();
 			bool    isDone  = false;
 			bool    isTS    = this->beThreadSafe();
@@ -766,7 +766,7 @@ public:
 	virtual list_t &operator-= (const list_t & rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, &rhs)
+			PWX_DOUBLE_LOCK_GUARD(this, &rhs)
 			elem_t* rhsCurr = rhs.head();
 			elem_t* lhsPrev = nullptr;
 			data_t* rhsData = nullptr;
@@ -791,7 +791,7 @@ public:
 			}
 
 		} else {
-			PWX_LOCK_GUARD(list_t, this)
+			PWX_LOCK_GUARD(this)
 			// Here we lock before calling clear, or the operator might
 			// end up removing elements other threads just inserted.
 			clear();
@@ -1126,7 +1126,7 @@ protected:
 			this->doRenumber.store(true, memOrdStore);
 			PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 		} else {
-			PWX_LOCK_GUARD(list_t, this)
+			PWX_LOCK_GUARD(this)
 			if (empty()) {
 				// Case 1: The list is empty
 				head(insElem);
@@ -1163,7 +1163,7 @@ protected:
 
 			// Do a big lock, so multiple threads calling this function
 			// won't renumber multiple times when once is enough.
-			PWX_LOCK_GUARD(list_t, this)
+			PWX_LOCK_GUARD(this)
 
 			// Check again, maybe this does not need any renumbering any more:
 			if (!doRenumber.load(memOrdLoad))
@@ -1291,7 +1291,9 @@ private:
 
 		if (locCnt) {
 			elem_t* xCurr = curr();
-			uint32_t xNr = xCurr->eNr.load(memOrdLoad);
+			uint32_t xNr = xCurr ? xCurr->eNr.load(memOrdLoad) : 0;
+			if (nullptr == xCurr)
+				xCurr = head();
 
 			PWX_UNLOCK(const_cast<list_t*>(this))
 

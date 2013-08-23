@@ -31,7 +31,7 @@
 #include <pwx/general/macros.h>
 #include <pwx/types/CLockable.h>
 #include <pwx/types/TVarDeleter.h>
-#include <pwx/types/TLockGuards.h>
+#include <pwx/types/CLockGuard.h>
 
 namespace pwx
 {

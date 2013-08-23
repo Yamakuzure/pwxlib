@@ -199,7 +199,7 @@ struct PWX_API TDoubleElement : public VElement
 	int32_t compare(const data_t &other) const noexcept PWX_WARNUNUSED
 	{
 		if (&other != this->data.get()) {
-			PWX_LOCK_GUARD(elem_t, this)
+			PWX_LOCK_GUARD(this)
 
 			// A: Check destruction status
 			if (this->destroyed()) return -1;
@@ -237,7 +237,7 @@ struct PWX_API TDoubleElement : public VElement
 	{
 		if (other) {
 			if (other != this) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, other)
+				PWX_DOUBLE_LOCK_GUARD(this, other)
 
 				// A: Check destruction status
 				bool thisDest = this->destroyed();
@@ -362,10 +362,10 @@ struct PWX_API TDoubleElement : public VElement
 			if (!destroyed() && !new_next->destroyed()) {
 				// Although it should not be necessary, a lock guard on
 				// the new element is in order.
-				PWX_LOCK_GUARD(elem_t, new_next)
+				PWX_LOCK_GUARD(new_next)
 
 				elem_t* xOldNext = next.load(memOrdLoad);
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, xOldNext)
+				PWX_DOUBLE_LOCK_GUARD(this, xOldNext)
 
 				/* The main challenge here is, that another thread might have
 				 * changed the relationship between xOldNext and this element.
@@ -453,10 +453,10 @@ struct PWX_API TDoubleElement : public VElement
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_prev->destroyed()) {
 				// The notes in insertNext() apply here as well
-				PWX_LOCK_GUARD(elem_t, new_prev)
+				PWX_LOCK_GUARD(new_prev)
 
 				elem_t* xOldPrev = prev.load(memOrdLoad);
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, xOldPrev)
+				PWX_DOUBLE_LOCK_GUARD(this, xOldPrev)
 
 				bool prevIsPrev = xOldPrev == prev.load(memOrdLoad);
 				while (!prevIsPrev) {
@@ -524,7 +524,7 @@ struct PWX_API TDoubleElement : public VElement
 			elem_t* xOldPrev = prev.load(memOrdLoad);
 			elem_t* xOldNext = next.load(memOrdLoad);
 			if (xOldPrev || xOldNext) {
-				PWX_TRIPLE_LOCK_GUARD(elem_t, this, elem_t, xOldPrev, elem_t, xOldNext)
+				PWX_TRIPLE_LOCK_GUARD(this, xOldPrev, xOldNext)
 
 				/* Here both the next and previous neighbor must be ensured
 				 * to be consistent, or the container order would be utterly
@@ -671,7 +671,7 @@ struct PWX_API TDoubleElement : public VElement
 	elem_t& operator= (const elem_t &src) noexcept
 	{
 		if ((this != &src) && !destroyed() && !src.destroyed()) {
-			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, &src)
+			PWX_DOUBLE_LOCK_GUARD(this, &src)
 			if (!destroyed() && !src.destroyed())
 				data = src.data;
 				// note: destroy method wrapped in data!
@@ -688,7 +688,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	data_t &operator*() PWX_WARNUNUSED
 	{
-		PWX_LOCK_GUARD(elem_t, this)
+		PWX_LOCK_GUARD(this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr TDoubleElement<T>->data",
@@ -706,7 +706,7 @@ struct PWX_API TDoubleElement : public VElement
 	**/
 	const data_t &operator*() const PWX_WARNUNUSED
 	{
-		PWX_LOCK_GUARD(elem_t, this)
+		PWX_LOCK_GUARD(this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr TDoubleElement<T>->data",
@@ -805,7 +805,7 @@ TDoubleElement<data_t>::~TDoubleElement() noexcept
 				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this)
 				DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
-				PWX_LOCK_GUARD (elem_t, this)
+				PWX_LOCK_GUARD(this)
 			} else {
 				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this)

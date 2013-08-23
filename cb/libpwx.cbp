@@ -57,6 +57,7 @@
 				<Option working_dir="../" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-p" />
 			</Target>
 			<Target title="torture">
 				<Option output="../torture" prefix_auto="1" extension_auto="1" />
@@ -265,6 +266,8 @@
 		</Unit>
 		<Unit filename="../src/pwx/types/CHashBuilder.cpp" />
 		<Unit filename="../src/pwx/types/CHashBuilder.h" />
+		<Unit filename="../src/pwx/types/CLockGuard.cpp" />
+		<Unit filename="../src/pwx/types/CLockGuard.h" />
 		<Unit filename="../src/pwx/types/CLockable.cpp">
 			<Option target="clean" />
 			<Option target="library" />
@@ -278,7 +281,6 @@
 			<Option target="library" />
 		</Unit>
 		<Unit filename="../src/pwx/types/THashElement.h" />
-		<Unit filename="../src/pwx/types/TLockGuards.h" />
 		<Unit filename="../src/pwx/types/TSingleElement.h">
 			<Option target="clean" />
 			<Option target="library" />

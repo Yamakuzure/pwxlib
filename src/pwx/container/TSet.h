@@ -236,7 +236,7 @@ public:
 		if ( eCount.load(memOrdLoad)
 		  && (this != &src)) {
 			if (src.eCount.load(memOrdLoad)) {
-				PWX_DOUBLE_LOCK_GUARD(list_t, this, list_t, &src)
+				PWX_DOUBLE_LOCK_GUARD(this, &src)
 				elem_t* xCurr  = head();
 				bool    isDone = false;
 
@@ -390,7 +390,7 @@ public:
 	virtual list_t &operator= (const list_t &rhs)
 	{
 		if (&rhs != this) {
-			PWX_DOUBLE_LOCK_GUARD (list_t, this, list_t, const_cast<list_t*> (&rhs))
+			PWX_DOUBLE_LOCK_GUARD (this, const_cast<list_t*> (&rhs))
 			clear();
 			destroy = rhs.destroy;
 			PWX_TRY_PWX_FURTHER (*this += rhs)
@@ -555,7 +555,7 @@ private:
 			return size();
 
 		// To ensure set consistency, a big lock is required:
-		PWX_NAMED_LOCK_GUARD(the_set, list_t, this)
+		PWX_NAMED_LOCK_GUARD(the_set, this)
 
 		// Return at once if the data is now known the lock is in place:
 		if (protFindData(*data))
@@ -570,7 +570,7 @@ private:
 		}
 
 		// Now prevElement must not change any more
-		PWX_NAMED_LOCK_GUARD(the_prev_element, elem_t, prevElement)
+		PWX_NAMED_LOCK_GUARD(the_prev_element, prevElement)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
@@ -594,7 +594,7 @@ private:
 			return size();
 
 		// To ensure set consistency, a big lock is required:
-		PWX_DOUBLE_LOCK_GUARD(list_t, this, elem_t, prev)
+		PWX_DOUBLE_LOCK_GUARD(this, prev)
 
 		// Return at once if the data is now known the lock is in place:
 		if (protFindData(*data))
@@ -622,7 +622,7 @@ private:
 			return size();
 
 		// To ensure set consistency, a big lock is required:
-		PWX_NAMED_DOUBLE_LOCK_GUARD(set_and_source, list_t, this, elem_t, &src)
+		PWX_NAMED_DOUBLE_LOCK_GUARD(set_and_source, this, &src)
 
 		// Return at once if the source data is now known the lock is in place:
 		if (protFindData(*src))
@@ -637,7 +637,7 @@ private:
 		}
 
 		// Now prevElement must not change any more
-		PWX_NAMED_LOCK_GUARD(the_prev_element, elem_t, prevElement)
+		PWX_NAMED_LOCK_GUARD(the_prev_element, prevElement)
 
 		// 2: Check source:
 		if (src.destroyed()) {
@@ -669,7 +669,7 @@ private:
 			return size();
 
 		// To ensure set consistency, a big lock is required:
-		PWX_TRIPLE_LOCK_GUARD(list_t, this, elem_t, prev, elem_t, &src)
+		PWX_TRIPLE_LOCK_GUARD(this, prev, &src)
 
 		// Return at once if the source data is now known the lock is in place:
 		if (protFindData(*src))
@@ -705,7 +705,7 @@ private:
 			return size();
 
 		// To ensure set consistency, a big lock is required:
-		PWX_NAMED_LOCK_GUARD(the_set, list_t, this)
+		PWX_NAMED_LOCK_GUARD(the_set, this)
 
 		// Return at once if the data is now known the lock is in place:
 		if (protFindData(*data))
@@ -722,7 +722,7 @@ private:
 
 
 		// Now prevElement must not change any more
-		PWX_NAMED_LOCK_GUARD(the_prev_element, elem_t, prevElement)
+		PWX_NAMED_LOCK_GUARD(the_prev_element, prevElement)
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
@@ -749,7 +749,7 @@ private:
 		elem_t* prevElement = next ? next->getPrev() : nullptr;
 
 		// To ensure set consistency, a big lock is required:
-		PWX_DOUBLE_LOCK_GUARD(list_t, this, elem_t, prevElement)
+		PWX_DOUBLE_LOCK_GUARD(this, prevElement)
 
 		// Return at once if the data is now known the lock is in place:
 		if (protFindData(*data))
@@ -777,7 +777,7 @@ private:
 			return size();
 
 		// To ensure set consistency, a big lock is required:
-		PWX_NAMED_DOUBLE_LOCK_GUARD(set_and_source, list_t, this, elem_t, &src)
+		PWX_NAMED_DOUBLE_LOCK_GUARD(set_and_source, this, &src)
 
 		// Return at once if the source data is now known the lock is in place:
 		if (protFindData(*src))
@@ -793,7 +793,7 @@ private:
 		elem_t* prevElement = nextElement ? nextElement->getPrev() : nullptr;
 
 		// Now prevElement must not change any more
-		PWX_NAMED_LOCK_GUARD(the_next_element, elem_t, prevElement)
+		PWX_NAMED_LOCK_GUARD(the_next_element, prevElement)
 
 		// 2: Check source:
 		if (src.destroyed()) {
@@ -828,7 +828,7 @@ private:
 		elem_t* prevElement = next ? next->getPrev() : nullptr;
 
 		// To ensure set consistency, a big lock is required:
-		PWX_TRIPLE_LOCK_GUARD(list_t, this, elem_t, prevElement, elem_t, &src)
+		PWX_TRIPLE_LOCK_GUARD(this, prevElement, &src)
 
 		// Return at once if the source data is now known the lock is in place:
 		if (protFindData(*src))

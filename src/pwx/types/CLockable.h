@@ -82,8 +82,8 @@ namespace pwx
 
   * <B>Important</B>: It is strongly recommended that you use std::lock_guard
   * or std::unique_lock to do the locking of any object derived from
-  * pwx::CLockable. You can use PWX_LOCK_GUARD(type, pointer) and
-  * PWX_DOUBLE_LOCK_GUARD(typeA, ptrA, typeB, ptrB) to do this rather simply. They
+  * pwx::CLockable. You can use PWX_LOCK_GUARD(pointer) and
+  * PWX_DOUBLE_LOCK_GUARD(ptrA, ptrB) to do this rather simply. They
   * are defined in pwx/general/macros.h.
   *
   * <I>atomic_flag spinlock</I> versus <I>mutex</I>:<BR/>
@@ -193,8 +193,10 @@ bool PWX_API are_locked(const CLockable* objA, const CLockable* objB)           
 bool PWX_API are_locked(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept PWX_WARNUNUSED;
 bool PWX_API try_locks (const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
 bool PWX_API try_locks (const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept PWX_WARNUNUSED;
-bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
-bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB, const CLockable* objC)  noexcept PWX_WARNUNUSED;
+bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB)                        noexcept;
+bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept;
+
+// Note: A RAII-based class that uses these helpers is pwx::CLockGuard in pwx/types/CLockGuard.h
 
 
 } // namespace pwx

@@ -179,7 +179,7 @@ public:
 	int32_t compare(const data_t &other) const noexcept PWX_WARNUNUSED
 	{
 		if (&other != this->data.get()) {
-			PWX_LOCK_GUARD(elem_t, this)
+			PWX_LOCK_GUARD(this)
 
 			// A: Check destruction status
 			if (this->destroyed()) return -1;
@@ -215,7 +215,7 @@ public:
 	{
 		if (other) {
 			if (other != this) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, other)
+				PWX_DOUBLE_LOCK_GUARD(this, other)
 
 				// A: Check destruction status
 				bool thisDest = this->destroyed();
@@ -298,7 +298,7 @@ public:
 		if (beThreadSafe()) {
 			// Do locking and double checks if this has to be thread safe
 			if (!destroyed() && !new_next->destroyed()) {
-				PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, new_next)
+				PWX_DOUBLE_LOCK_GUARD(this, new_next)
 
 				/* Now that we have the double lock, it is crucial to
 				 * check again. Otherwise we might just insert a destroyed element.
@@ -342,7 +342,7 @@ public:
 	virtual void remove() noexcept
 	{
 		if (beThreadSafe()) {
-			PWX_LOCK_GUARD(elem_t, this)
+			PWX_LOCK_GUARD(this)
 			base_t::remove();
 			setNext(nullptr);
 		} else {
@@ -370,7 +370,7 @@ public:
 
 		// Do an acquiring test before the element is actually locked
 		if (beThreadSafe()) {
-			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, toRemove)
+			PWX_DOUBLE_LOCK_GUARD(this, toRemove)
 
 			// Do a reset cycle until toRemove is really this elements next
 			bool toRemoveIsNext = toRemove == next.load(memOrdLoad);
@@ -433,7 +433,7 @@ public:
 	elem_t& operator= (const elem_t &src) noexcept
 	{
 		if ((this != &src) && !destroyed() && !src.destroyed()) {
-			PWX_DOUBLE_LOCK_GUARD(elem_t, this, elem_t, &src)
+			PWX_DOUBLE_LOCK_GUARD(this, &src)
 			if (!destroyed() && !src.destroyed()) {
 				data = src.data;
 				// note: destroy method wrapped in data!
@@ -452,7 +452,7 @@ public:
 	**/
 	data_t &operator*() PWX_WARNUNUSED
 	{
-		PWX_LOCK_GUARD(elem_t, this)
+		PWX_LOCK_GUARD(this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr element data",
@@ -470,7 +470,7 @@ public:
 	**/
 	const data_t &operator*() const PWX_WARNUNUSED
 	{
-		PWX_LOCK_GUARD(elem_t, this)
+		PWX_LOCK_GUARD(this)
 		if (nullptr == data.get())
 			PWX_THROW ( "NullDataException",
 						"nullptr element data",
@@ -593,7 +593,7 @@ THashElement<key_t, data_t>::~THashElement() noexcept
 				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this)
 				DEBUG_LOCK_STATE("PWX_LOCK_GUARD", this, this)
-				PWX_LOCK_GUARD (elem_t, this)
+				PWX_LOCK_GUARD(this)
 			} else {
 				DEBUG_LOCK_STATE("PWX_UNLOCK", this, this)
 				PWX_UNLOCK(this)

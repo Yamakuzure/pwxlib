@@ -53,7 +53,7 @@ namespace pwx {
 /// @brief Support macro to start growing a hastable only when it is save to do so
 #define HASH_START_GROW \
 ++growing; \
-PWX_LOCK_GUARD(hash_t, this) \
+PWX_LOCK_GUARD(this) \
 while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	std::this_thread::yield();
 
@@ -66,7 +66,7 @@ PWX_LOCK_GUARD_RESET(nullptr)
 
 /// @brief Support macro to start inserting an element only when it is save to do so
 #define HASH_START_INSERT \
-PWX_LOCK_GUARD(hash_t, this) \
+PWX_LOCK_GUARD(this) \
 while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
 ++inserting;
@@ -80,7 +80,7 @@ PWX_LOCK_GUARD_RESET(nullptr)
 
 /// @brief Support macro to start removing an element only when it is save to do so
 #define HASH_START_REMOVE \
-PWX_LOCK_GUARD(hash_t, this) \
+PWX_LOCK_GUARD(this) \
 while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
 ++removing;
@@ -94,7 +94,7 @@ PWX_LOCK_GUARD_RESET(nullptr)
 
 /// @brief Support macro to wait for possible growing actions to finish
 #define HASH_WAIT_FOR_CLEAR_AND_GROW \
-PWX_LOCK_GUARD(hash_t, nullptr) \
+PWX_LOCK_GUARD(nullptr) \
 while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
 PWX_LOCK_GUARD_RESET(nullptr)
@@ -102,7 +102,7 @@ PWX_LOCK_GUARD_RESET(nullptr)
 
 /// @brief Support macro to have the clear method wait until all actions ceased
 #define HASH_START_CLEAR \
-PWX_LOCK_GUARD(hash_t, this) \
+PWX_LOCK_GUARD(this) \
 while ( removing.load(memOrdLoad) \
 	||  growing.load(memOrdLoad) \
 	||  inserting.load(memOrdLoad) ) \
@@ -366,7 +366,7 @@ public:
 		maxLoadFactor(src.maxLoadFactor),
 		dynGrowFactor(src.dynGrowFactor)
 	{
-		PWX_LOCK_GUARD(hash_t, &src)
+		PWX_LOCK_GUARD(&src)
 		while (src.growing.load(memOrdLoad) > 0)
 			PWX_LOCK_GUARD_RESET(&src)
 
@@ -857,7 +857,7 @@ public:
 			while (pos && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
 				elem = hashTable[--pos];
 				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
-					PWX_LOCK_GUARD(elem_t, elem)
+					PWX_LOCK_GUARD(elem)
 					if (elem->inserted() && !elem->destroyed())
 						return privRemoveIdx(pos);
 				}
@@ -896,7 +896,7 @@ public:
 			while ((pos < maxPos) && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
 				elem = hashTable[pos++];
 				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
-					PWX_LOCK_GUARD(elem_t, elem)
+					PWX_LOCK_GUARD(elem)
 					if (elem->inserted() && !elem->destroyed())
 						return privRemoveIdx(pos);
 				}
@@ -1048,7 +1048,7 @@ public:
 	{
 		if (&rhs != this) {
 			HASH_WAIT_FOR_CLEAR_AND_GROW
-			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, &rhs)
+			PWX_DOUBLE_LOCK_GUARD(this, &rhs)
 			clear();
 			destroy      = rhs.destroy;
 			hash_user    = rhs.hash_user;
@@ -1081,7 +1081,7 @@ public:
 	{
 		if (&rhs != this) {
 			HASH_WAIT_FOR_CLEAR_AND_GROW
-			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, &rhs)
+			PWX_DOUBLE_LOCK_GUARD(this, &rhs)
 
 			// --- grow this table if needed ---
 			uint32_t rhsSize = rhs.sizeMax();
@@ -1123,7 +1123,7 @@ public:
 	{
 		if (&rhs != this) {
 			HASH_WAIT_FOR_CLEAR_AND_GROW
-			PWX_DOUBLE_LOCK_GUARD (hash_t, this, hash_t, &rhs)
+			PWX_DOUBLE_LOCK_GUARD(this, &rhs)
 
 			uint32_t rhsSize = rhs.sizeMax();
 			elem_t* lhsCurr = nullptr;
@@ -1143,7 +1143,7 @@ public:
 				++rhsPos;
 			}
 		} else {
-			PWX_LOCK_GUARD(hash_t, this)
+			PWX_LOCK_GUARD(this)
 			// Here we lock before calling clear, or the operator might
 			// end up removing elements other threads just inserted.
 			clear();
@@ -1496,7 +1496,7 @@ private:
 template<typename key_t, typename data_t, typename elem_t>
 VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept
 {
-	PWX_LOCK_GUARD(hash_t, this)
+	PWX_LOCK_GUARD(this)
 
 	// Wipe hash table
 	this->isDestroyed.store(true, memOrdStore);

@@ -62,7 +62,7 @@ void CThreadElementStore::clear() noexcept
 	if (beThreadSafe()) {
 		if (currs.size() && !invalidating.load(memOrdLoad)) {
 			invalidating.store(true, memOrdStore);
-			PWX_LOCK_GUARD(CThreadElementStore, this)
+			PWX_LOCK_GUARD(this)
 			// Is a clearing still needed?
 			if (currs.size())
 				currs.clear();
@@ -165,7 +165,7 @@ void CThreadElementStore::invalidate(const CThreadElementStore::curr_t* old_curr
 		// Only do anything if there are any elements stored:
 		if (currs.size() && !invalidating.load(memOrdLoad)) {
 			invalidating.store(true, memOrdLoad);
-			PWX_LOCK_GUARD(CThreadElementStore, this)
+			PWX_LOCK_GUARD(this)
 
 			// Do a double check, maybe the invalidating is no longer needed
 			if (currs.size()) {

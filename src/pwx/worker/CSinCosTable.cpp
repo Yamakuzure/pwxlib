@@ -10,7 +10,7 @@
 
 #include "../general/macros.h"
 #include "../tools/MathHelpers.h"
-#include "../types/TLockGuards.h"
+#include "../types/CLockGuard.h"
 #include "CSinCosTable.h"
 
 namespace pwx {
@@ -79,7 +79,7 @@ int32_t CSinCosTable::getPrecision() const noexcept
 void CSinCosTable::setPrecision(const int32_t newPrecision)
 {
 	if (newPrecision != precision) {
-		PWX_LOCK_GUARD(CSinCosTable, this)
+		PWX_LOCK_GUARD(this)
 
 		/* New tables are not needed when:
 		 * a) This is a switch to live calculation or

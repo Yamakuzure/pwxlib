@@ -32,7 +32,7 @@ STATIC := NO
 # mutexes instead.
 # Using spinlocks is not only more lightweight (an atomic_flag instead
 # of a full scale mutex), but it has a bit better performance, too.
-# Examples: (200,000 random elements inserted/removed, 200 elements retireved, 8 threads)
+# Examples: (200,000 random elements inserted/removed, 200 elements searched, 8 threads)
 # Note: The testmachine is a dual core i7, 1333MHz, HyperThreading, 8GiB RAM.
 #                              yielding spinlocks     |        mutextes
 #                            Add /   Search /   Clear |      Add /   Search /   Clear
@@ -54,7 +54,7 @@ USE_SPINLOCK := YES
 # performance when inserting or removing elements from containers.
 # The performance of retrievals, howerver, is only slightly worse
 # without the yield.
-# Examples: (200,000 random elements inserted/removed, 200 elements retireved, 8 threads)
+# Examples: (200,000 random elements inserted/removed, 200 elements searched, 8 threads)
 # Note: The testmachine is a dual core i7, 1333MHz, HyperThreading, 8GiB RAM.
 #                              yield() enabled        | yield() disabled
 #                            Add /   Search /   Clear |      Add /   Search /   Clear

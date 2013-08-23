@@ -234,31 +234,29 @@
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
-  * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
-#define PWX_NAMED_LOCK_GUARD(Name, T, object) \
+#define PWX_NAMED_LOCK_GUARD(Name, object) \
 	DEBUG_LOCK_STATE("TLockGuard", this, object) \
-	pwx::TLockGuard<T> pwx_libpwx_lock_guard_##Name(object); \
+	pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object); \
 	LOG_LOCK_GUARD(object)
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
-  * @param T the type of the object to lock
   * @param object pointer to the object to lock
 **/
-#define PWX_LOCK_GUARD(T, object) PWX_NAMED_LOCK_GUARD(__FUNCTION__, T, object)
-
+#define PWX_LOCK_GUARD(object) \
+	PWX_NAMED_LOCK_GUARD(__FUNCTION__, object)
 
 /** @brief Reset a lock guard to a new value
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to reset the lock guard to
@@ -271,46 +269,43 @@
 
 /** @brief Reset a lock guard to a new value
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param object pointer to the object to reset the lock guard to
 **/
-#define PWX_LOCK_GUARD_RESET(object) PWX_NAMED_LOCK_GUARD_RESET(__FUNCTION__, object)
+#define PWX_LOCK_GUARD_RESET(object) \
+	PWX_NAMED_LOCK_GUARD_RESET(__FUNCTION__, object)
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
-  * @param Ta the type of the first object to lock
   * @param objA pointer to the first object to lock
-  * @param Tb the type of the second object to lock
   * @param objB pointer to the second object to lock
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, Ta, objA, Tb, objB) \
-	DEBUG_LOCK_STATE("TDoubleLockGuard", this, objA) \
-	DEBUG_LOCK_STATE("TDoubleLockGuard", this, objB) \
-	pwx::TDoubleLockGuard<Ta, Tb> pwx_libpwx_double_lock_guard_##Name(objA, objB); \
+#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB) \
+	DEBUG_LOCK_STATE("CLockGuard A", this, objA) \
+	DEBUG_LOCK_STATE("CLockGuard B", this, objB) \
+	pwx::CLockGuard pwx_libpwx_double_lock_guard_##Name(objA, objB); \
 	LOG_DOUBLE_LOCK_GUARD(objA, objB)
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
-  * @param Ta the type of the first object to lock
   * @param objA pointer to the first object to lock
-  * @param Tb the type of the second object to lock
   * @param objB pointer to the second object to lock
 **/
-#define PWX_DOUBLE_LOCK_GUARD(Ta, objA, Tb, objB) \
-	PWX_NAMED_DOUBLE_LOCK_GUARD(__FUNCTION__, Ta, objA, Tb, objB)
+#define PWX_DOUBLE_LOCK_GUARD(objA, objB) \
+	PWX_NAMED_DOUBLE_LOCK_GUARD(__FUNCTION__, objA, objB)
 
 
 /** @brief Reset a double lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param objA pointer to the first object to reset the lock guard to
@@ -324,7 +319,7 @@
 
 /** @brief Reset a double lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param objA pointer to the first object to reset the lock guard to
   * @param objB pointer to the second object to reset the lock guard to
@@ -335,42 +330,36 @@
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
-  * @param Ta the type of the first object to lock
   * @param objA pointer to the first object to lock
-  * @param Tb the type of the second object to lock
   * @param objB pointer to the second object to lock
-  * @param Tc the type of the second object to lock
   * @param objC pointer to the second object to lock
 **/
-#define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, Ta, objA, Tb, objB, Tc, objC) \
-	DEBUG_LOCK_STATE("TTripleLockGuard", this, objA) \
-	DEBUG_LOCK_STATE("TTripleLockGuard", this, objB) \
-	DEBUG_LOCK_STATE("TTripleLockGuard", this, objC) \
-	pwx::TTripleLockGuard<Ta, Tb, Tc> pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
+#define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, objA, objB, objC) \
+	DEBUG_LOCK_STATE("CLockGuard A", this, objA) \
+	DEBUG_LOCK_STATE("CLockGuard B", this, objB) \
+	DEBUG_LOCK_STATE("CLockGuard C", this, objC) \
+	pwx::CLockGuard pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
 	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
 
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
-  * @param Ta the type of the first object to lock
   * @param objA pointer to the first object to lock
-  * @param Tb the type of the second object to lock
   * @param objB pointer to the second object to lock
-  * @param Tc the type of the second object to lock
   * @param objC pointer to the second object to lock
 **/
-#define PWX_TRIPLE_LOCK_GUARD(Ta, objA, Tb, objB, Tc, objC) \
-	PWX_NAMED_TRIPLE_LOCK_GUARD(__FUNCTION__, Ta, objA, Tb, objB, Tc, objC)
+#define PWX_TRIPLE_LOCK_GUARD(objA, objB, objC) \
+	PWX_NAMED_TRIPLE_LOCK_GUARD(__FUNCTION__, objA, objB, objC)
 
 
 /** @brief Reset a triple lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param objA pointer to the first object to reset the lock guard to
@@ -385,7 +374,7 @@
 
 /** @brief Reset a triple lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/TLockGuards.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param objA pointer to the first object to reset the lock guard to
   * @param objB pointer to the second object to reset the lock guard to
