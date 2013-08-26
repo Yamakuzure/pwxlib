@@ -24,11 +24,8 @@ using std::chrono::milliseconds;
 typedef int32_t keydata_t; //!< Type for the data to test with list containers, and type for the keys of hash containers
 typedef float   hashval_t; //!< Type for hash container values
 
-/// Number of elements to use with all mass and speed tests
-const uint32_t maxElements = 200000;
-
-/// Number of threads to launch for parallel testing
-const uint32_t maxThreads  = 8;
+extern uint32_t maxElements;
+extern uint32_t maxThreads;
 
 /// The types of tests to do
 const uint32_t doTestContainers = 1;

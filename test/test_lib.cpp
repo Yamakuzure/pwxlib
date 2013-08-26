@@ -1,5 +1,12 @@
 #include "test_lib.h"
 
+/// Default number of elements to use with all mass and speed tests
+uint32_t maxElements = 200000;
+
+/// Default number of threads to launch for parallel testing
+uint32_t maxThreads  = 8;
+
+
 int32_t main(int argc, char* argv[])
 {
 	int32_t result  = EXIT_SUCCESS;
@@ -11,20 +18,44 @@ int32_t main(int argc, char* argv[])
 	for (int i = 1; !showHelp && (i < argc); ++i) {
 		if (STRCEQ(argv[i], "--help") || STRCEQ(argv[i], "-h")) showHelp = true;
 		else if (STRCEQ(argv[i], "--cont")  || STRCEQ(argv[i], "-c")) doWhichTests |= doTestContainers;
+		else if (                              STRCEQ(argv[i], "-m")) {
+			int m = atoi(argv[++i]);
+			if (m > 9999)
+				maxElements = static_cast<uint32_t>(m);
+			else {
+				cerr << "Error: \"" << argv[i] << "\" is no valid number for\n";
+				cerr << "       the maximum number of elements. (Minimum 10000)" << endl;
+				showHelp = true;
+			}
+
+		}
 		else if (STRCEQ(argv[i], "--speed") || STRCEQ(argv[i], "-p")) doWhichTests |= doTestSpeed;
 		else if (STRCEQ(argv[i], "--rng")   || STRCEQ(argv[i], "-r")) doWhichTests |= doTestRNG;
 		else if (STRCEQ(argv[i], "--sct")   || STRCEQ(argv[i], "-s")) doWhichTests |= doTestSCT;
+		else if (                              STRCEQ(argv[i], "-t")) {
+			int t = atoi(argv[++i]);
+			if ((t > 1) && (t < 65))
+				maxThreads = static_cast<uint32_t>(t);
+			else {
+				cerr << "Error: \"" << argv[i] << "\" is no valid number for\n";
+				cerr << "       the maximum number of threads. (2 - 64)" << endl;
+				showHelp = true;
+			}
+
+		}
 	}
 
 	// Need help?
 	if (showHelp) {
 		cout << "Usage: " << argv[0] << " [options]\n" << endl;
 		cout << "Options:\n";
-		cout << "  -c  --cont   test containers\n";
+		cout << "  -c  --cont   Test containers\n";
 		cout << "  -h  --help   Show this help and exit\n";
-		cout << "  -p  --speed  test the speed of the containers\n";
-		cout << "  -r  --rng    test RNG\n";
-		cout << "  -s  --sct    test SCT\n";
+		cout << "  -m <10000+>  Maximum elements for speed tests (200,000)\n";
+		cout << "  -p  --speed  Test the speed of the containers\n";
+		cout << "  -r  --rng    Test RNG\n";
+		cout << "  -s  --sct    Test SCT\n";
+		cout << "  -t <2-64>    Number of threads for speed tests (8)\n";
 		cout << "All tests are done by default." << endl;
 		return EXIT_SUCCESS;
 	}
