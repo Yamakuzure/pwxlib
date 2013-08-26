@@ -472,22 +472,22 @@ protected:
 					insElem->eNr.store(
 						tail()->eNr.load(memOrdLoad) + 1,
 						memOrdStore);
-					PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, nullptr))
+					PWX_TRY_PWX_FURTHER(tail()->insertNext(insElem, &currStore))
 					tail(insElem);
 				} else {
 					// Case 4: A normal insert
 					this->doRenumber.store(true, memOrdStore);
-					PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, nullptr))
+					PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
 				}
 			} else {
 				// Case 2: A new head is to be set
-				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem, nullptr))
+				PWX_TRY_PWX_FURTHER(head()->insertPrev(insElem, &currStore))
 				head(insElem);
 				this->doRenumber.store(true, memOrdStore);
 			}
 		} else {
 			// Case 1: The list is empty
-			PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, nullptr))
+			PWX_TRY_PWX_FURTHER(insElem->insertBefore(nullptr, &currStore))
 			head(insElem);
 			tail(insElem);
 		}
@@ -509,6 +509,7 @@ protected:
 	 * ===============================================
 	*/
 
+	using base_t::currStore;
 	using base_t::eCount;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
@@ -532,9 +533,12 @@ private:
 		while (tail()) {
 			PWX_LOCK(this)
 			xTail = privRemove(tail());
+			PWX_LOCK(xTail)
 			PWX_UNLOCK(this)
-			if (xTail && !xTail->destroyed())
+			if (xTail && !xTail->destroyed()) {
+				PWX_UNLOCK(xTail)
 				delete xTail;
+			}
 		}
 	}
 
