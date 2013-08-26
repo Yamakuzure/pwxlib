@@ -81,11 +81,11 @@ void CException::addToTrace (const char* trace_) noexcept
   */
 CException::~CException() noexcept
 {
-	if (txtName)  delete const_cast<char*> (txtName);
-	if (txtWhat)  delete const_cast<char*> (txtWhat);
-	if (txtWhere) delete const_cast<char*> (txtWhere);
-	if (txtFunc)  delete const_cast<char*> (txtFunc);
-	if (txtDesc)  delete const_cast<char*> (txtDesc);
+	if (txtName)  free(const_cast<char*>(txtName));
+	if (txtWhat)  free(const_cast<char*>(txtWhat));
+	if (txtWhere) free(const_cast<char*>(txtWhere));
+	if (txtFunc)  free(const_cast<char*>(txtFunc));
+	if (txtDesc)  free(const_cast<char*>(txtDesc));
 }
 
 
