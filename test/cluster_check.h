@@ -28,10 +28,12 @@ using std::chrono::milliseconds;
 
 /// @internal build a numerical hash list
 template<typename T>
-int32_t build_cluster_num(string &outfile_chain, string &outfile_open, int32_t cnt_)
+int32_t build_cluster_num(string &outfile_chain, string &outfile_open, int32_t cnt_, bool useBigHash)
 {
 	typedef pwx::TChainHash<T, char> c_hash_t; //!< Type of the chained hash
 	typedef pwx::TOpenHash<T, char>  o_hash_t; //!< Type of the open hash
+
+	static char hopBuf[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	int32_t result = EXIT_SUCCESS;
 	T maxTval = std::numeric_limits<T>::max();
@@ -66,8 +68,8 @@ int32_t build_cluster_num(string &outfile_chain, string &outfile_open, int32_t c
 		cnt_ = maxTval;
 
 	T		 randVal; // This is the random key to use
-	c_hash_t hash_c(static_cast<uint32_t>(cnt_ / 3.0) + 3, 0, 3.0, 1.25);
-	o_hash_t hash_o(static_cast<uint32_t>(cnt_ / 0.8) + 3, 0, 0.8, 1.5 );
+	c_hash_t hash_c(static_cast<uint32_t>(cnt_ / (useBigHash ? 0.1 : 3.0)) + 3, 0, 3.0, 1.25);
+	o_hash_t hash_o(static_cast<uint32_t>(cnt_ / (useBigHash ? 0.1 : 0.8)) + 3, 0, 0.8, 1.5 );
 
 	cout << "Writing " << cnt_ << " values into \"" << outfile_chain;
 	cout << "\" and \"" << outfile_open << "\" ...";
@@ -76,21 +78,37 @@ int32_t build_cluster_num(string &outfile_chain, string &outfile_open, int32_t c
 	hrTime_t tStart = hrClock::now();
 
 	// Fill the hash containers
-	for (int32_t cnt = 0 ; out_c.good() && (cnt < cnt_); ++cnt) {
+	for (int32_t cnt = 0 ; cnt < cnt_; ++cnt) {
 		randVal = RNG.random(minTval, maxTval);
 
 		// Test and insert into the chained hash:
 		if (!hash_c.exists(randVal)) {
 			char* storeVal = new char(0x20);
 			hash_c.add(randVal, storeVal);
-			out_c << hash_c.getHops(randVal) << ";" << randVal << "\n";
 		}
 
 		// Test and insert into the open hash:
 		if (!hash_o.exists(randVal)) {
 			char* storeVal = new char(0x20);
 			hash_o.add(randVal, storeVal);
-			out_o << hash_o.getHops(randVal) << ";" << randVal << "\n";
+		}
+	}
+
+	// Print out results:
+	uint32_t size_c = hash_c.sizeMax();
+	uint32_t size_o = hash_o.sizeMax();
+	for (uint32_t idx = 0; out_c.good() && (idx < size_c); ++idx) {
+		auto elem = hash_c[idx];
+		if (elem) {
+			snprintf(hopBuf, 9, "%08u", elem->hops);
+			out_c << hopBuf << ";" << elem->key << "\n";
+		}
+	}
+	for (uint32_t idx = 0; out_o.good() && (idx < size_o); ++idx) {
+		auto elem = hash_o[idx];
+		if (elem) {
+			snprintf(hopBuf, 9, "%08u", elem->hops);
+			out_o << hopBuf << ";" << elem->key << "\n";
 		}
 	}
 
@@ -114,10 +132,12 @@ int32_t build_cluster_num(string &outfile_chain, string &outfile_open, int32_t c
 
 
 /// @internal build a string based cluster list
-int32_t build_cluster_string(string &outfile_chain, string &outfile_open, int32_t cnt_)
+int32_t build_cluster_string(string &outfile_chain, string &outfile_open, int32_t cnt_, bool useBigHash)
 {
 	typedef pwx::TChainHash<string, char> c_hash_t; //!< Type of the chained hash
 	typedef pwx::TOpenHash<string, char>  o_hash_t; //!< Type of the open hash
+
+	static char hopBuf[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	int32_t result = EXIT_SUCCESS;
 
@@ -136,8 +156,8 @@ int32_t build_cluster_string(string &outfile_chain, string &outfile_open, int32_
 	}
 
 	char     randVal[17];
-	c_hash_t hash_c(static_cast<uint32_t>(cnt_ / 3.0) + 3, 0, 3.0, 1.25);
-	o_hash_t hash_o(static_cast<uint32_t>(cnt_ / 0.8) + 3, 0, 0.8, 1.5 );
+	c_hash_t hash_c(static_cast<uint32_t>(cnt_ / (useBigHash ? 0.1 : 3.0)) + 3, 0, 3.0, 1.25);
+	o_hash_t hash_o(static_cast<uint32_t>(cnt_ / (useBigHash ? 0.1 : 0.8)) + 3, 0, 0.8, 1.5 );
 
 	cout << "Writing " << cnt_ << " values into \"" << outfile_chain;
 	cout << "\" and \"" << outfile_open << "\" ...";
@@ -153,14 +173,16 @@ int32_t build_cluster_string(string &outfile_chain, string &outfile_open, int32_
 		if (!hash_c.exists(randVal)) {
 			char* storeVal = new char(0x20);
 			hash_c.add(string(randVal), storeVal);
-			out_c << hash_c.getHops(randVal) << ";" << randVal << "\n";
+			snprintf(hopBuf, 9, "%08u", hash_c.getHops(randVal));
+			out_c << hopBuf << ";" << randVal << "\n";
 		}
 
 		// Test and insert into the open hash:
 		if (!hash_o.exists(randVal)) {
 			char* storeVal = new char(0x20);
 			hash_o.add(string(randVal), storeVal);
-			out_o << hash_o.getHops(randVal) << ";" << randVal << "\n";
+			snprintf(hopBuf, 9, "%08u", hash_o.getHops(randVal));
+			out_o << hopBuf << ";" << randVal << "\n";
 		}
 	}
 
