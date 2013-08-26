@@ -868,8 +868,8 @@ private:
 			}
 
 			// Is xIdx the prev member, like in a for loop?
-			if (xIdx == (xNr + 1)) {
-				xCurr = xCurr->getNext();
+			if (xIdx == (xNr - 1)) {
+				xCurr = xCurr->getPrev();
 				curr(xCurr);
 				return xCurr;
 			}
