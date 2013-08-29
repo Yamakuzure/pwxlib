@@ -26,7 +26,6 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
 #include <pwx/types/CLockable.h>
 
 
@@ -82,15 +81,9 @@ class PWX_API CSinCosTable: public CLockable
 public:
 
 	/* ===============================================
-	* === Public types							===
-	* ===============================================
-	*/
-
-
-	/* ===============================================
-	* === Public Constructors and destructors	 ===
-	* ===============================================
-	*/
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	 */
 
 	explicit CSinCosTable(const int32_t newPrecision);
 	virtual ~CSinCosTable() noexcept;
@@ -98,9 +91,9 @@ public:
 	CSinCosTable() PWX_DELETE;
 
 	/* ===============================================
-	* === Public methods						  ===
-	* ===============================================
-	*/
+	 * === Public methods                          ===
+	 * ===============================================
+	 */
 
 	int32_t getPrecision() const noexcept;
 	void    setPrecision(const int32_t newPrecision);
@@ -150,35 +143,19 @@ public:
 
 
 	/* ===============================================
-	 * === Public operators						===
+	 * === Public operators                        ===
 	 * ===============================================
-	*/
+	 */
 
 	CSinCosTable &operator=(CSinCosTable&) PWX_DELETE;
-
-
-	/* ===============================================
-	 * === Public members						  ===
-	 * ===============================================
-	*/
 
 
 private:
 
 	/* ===============================================
-	 * === Private types						   ===
+	 * === Private methods                         ===
 	 * ===============================================
-	*/
-
-	/* ===============================================
-	 * === Private Constructors and destructor	 ===
-	 * ===============================================
-	*/
-
-	/* ===============================================
-	 * === Private methods						 ===
-	 * ===============================================
-	*/
+	 */
 
 	double      privGetCos(const double degree) const noexcept;
 	template<typename T>
@@ -208,15 +185,11 @@ private:
 		sinDest = static_cast<T>(xSinDest);
 	}
 
-	/* ===============================================
-	 * === Private operators					   ===
-	 * ===============================================
-	*/
 
 	/* ===============================================
-	 * === Private members						 ===
+	 * === Private members                         ===
 	 * ===============================================
-	*/
+	 */
 
 	int32_t precision;
 	int32_t precision_last;

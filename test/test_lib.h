@@ -28,25 +28,20 @@ extern uint32_t maxElements;
 extern uint32_t maxThreads;
 
 /// The types of tests to do
-const uint32_t doTestContainers = 1;
-const uint32_t doTestSpeed      = 2;
-const uint32_t doTestRNG        = 4;
-const uint32_t doTestSCT        = 8;
+const uint32_t doTestContainers =  1;
+const uint32_t doTestSpeed      =  2;
+const uint32_t doTestRNG        =  4;
+const uint32_t doTestSCT        =  8;
+const uint32_t doTestCWaveColor = 16;
 
 const uint32_t doTestAll        = doTestContainers
                                 | doTestSpeed
                                 | doTestRNG
-                                | doTestSCT;
+                                | doTestSCT
+                                | doTestCWaveColor;
 
 
 #include "env.h"
 #include "destroy.h"
-#include "testListRing.h"
-#include "testStackQueue.h"
-#include "testHash.h"
-#include "testSet.h"
-#include "testSpeed.h"
-#include "testRNG.h"
-#include "testSCT.h"
 
 #endif // PWX_LIBPWX_TEST_MAIN_H_INCLUDED

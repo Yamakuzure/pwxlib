@@ -1,5 +1,14 @@
 #include "test_lib.h"
 
+#include "testListRing.h"
+#include "testStackQueue.h"
+#include "testHash.h"
+#include "testSet.h"
+#include "testSpeed.h"
+#include "testRNG.h"
+#include "testSCT.h"
+#include "testColor.h"
+
 /// Default number of elements to use with all mass and speed tests
 uint32_t maxElements = 200000;
 
@@ -32,6 +41,7 @@ int32_t main(int argc, char* argv[])
 		else if (STRCEQ(argv[i], "--speed") || STRCEQ(argv[i], "-p")) doWhichTests |= doTestSpeed;
 		else if (STRCEQ(argv[i], "--rng")   || STRCEQ(argv[i], "-r")) doWhichTests |= doTestRNG;
 		else if (STRCEQ(argv[i], "--sct")   || STRCEQ(argv[i], "-s")) doWhichTests |= doTestSCT;
+		else if (                              STRCEQ(argv[i], "-w")) doWhichTests |= doTestCWaveColor;
 		else if (                              STRCEQ(argv[i], "-t")) {
 			int t = atoi(argv[++i]);
 			if ((t > 1) && (t < 65))
@@ -56,6 +66,7 @@ int32_t main(int argc, char* argv[])
 		cout << "  -r  --rng    Test RNG\n";
 		cout << "  -s  --sct    Test SCT\n";
 		cout << "  -t <2-64>    Number of threads for speed tests (8)\n";
+		cout << "  -w           Test CWaveColor\n";
 		cout << "All tests are done by default." << endl;
 		return EXIT_SUCCESS;
 	}
@@ -69,6 +80,7 @@ int32_t main(int argc, char* argv[])
 	if (doWhichTests & doTestSpeed)      env.doSpeed = true;
 	if (doWhichTests & doTestRNG)        env.doRNG   = true;
 	if (doWhichTests & doTestSCT)        env.doSCT   = true;
+	if (doWhichTests & doTestCWaveColor) env.doCWC   = true;
 
 	// Wrap a giant try/catch around just everything to trace immediately
 	try {
@@ -212,6 +224,11 @@ result = testSpeed<container_type, key_type, value_type, \
 	// --- Test SCT worker ---
 	if ((EXIT_SUCCESS == result) && env.doSCT) {
 		PWX_TRY_PWX_FURTHER (result = testSCT (env))
+	}
+
+	// --- Test CWavecolor type ---
+	if ((EXIT_SUCCESS == result) && env.doCWC) {
+		PWX_TRY_PWX_FURTHER (result = testColor (env))
 	}
 
 		// End of giant try

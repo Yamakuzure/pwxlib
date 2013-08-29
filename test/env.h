@@ -12,6 +12,7 @@ struct sEnv
 	bool    doSpeed     = false;
 	bool    doRNG       = false;
 	bool    doSCT       = false;
+	bool    doCWC       = false;
 };
 
 #endif // PWX_LIBPWX_TEST_ENV_H_INCLUDED
