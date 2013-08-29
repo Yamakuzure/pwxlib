@@ -35,6 +35,8 @@
 #include <pwx/types/THashElement.h>
 #include <pwx/types/CHashBuilder.h>
 #include <pwx/types/eNameSourceType.h>
+#include <pwx/types/CWaveColor.h>
+
 
 #endif // PWX_LIBPWX_PWX_TYPES_H_INCLUDED
 

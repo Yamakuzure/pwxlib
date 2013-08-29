@@ -57,7 +57,7 @@
 				<Option working_dir="../" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-p" />
+				<Option parameters="-w" />
 			</Target>
 			<Target title="torture">
 				<Option output="../torture" prefix_auto="1" extension_auto="1" />
@@ -276,6 +276,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/CWaveColor.cpp" />
+		<Unit filename="../src/pwx/types/CWaveColor.h" />
 		<Unit filename="../src/pwx/types/TDoubleElement.h">
 			<Option target="clean" />
 			<Option target="library" />
@@ -332,6 +334,8 @@
 			<Option target="library" />
 		</Unit>
 		<Unit filename="../test/namegen.cpp" />
+		<Unit filename="../test/testColor.cpp" />
+		<Unit filename="../test/testColor.h" />
 		<Unit filename="../test/testHash.h" />
 		<Unit filename="../test/testListRing.h">
 			<Option target="clean" />
