@@ -91,6 +91,13 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 			</Target>
+			<Target title="drawwave">
+				<Option output="../drawwave" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="/tmp/clout 1000000" />
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
@@ -385,6 +392,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../tools/drawwave/Makefile" />
+		<Unit filename="../tools/drawwave/main.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

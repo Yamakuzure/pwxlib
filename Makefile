@@ -172,7 +172,8 @@ endif
 # ------------------------------------
 .PHONY: clean cleanlibrary cleantools testlib documentation docinstall \
 		clustercheck hashbuilder install namegen userinstall \
-		test tools torture all library help
+		test tools torture all library help \
+		drawwave
 .SUFFIXES: .cpp
 
 %.o: %.cpp
@@ -191,6 +192,8 @@ help: Makefile
 	@echo "  documentation - use $(DOXYGEN) to build"
 	@echo "                  documentation in ./doc/html"
 	@echo "  docinstall    - install documentation into $(DOCDIR)"
+	@echo "  drawwave      - compile $(TOOLDIR)/drawwave using SFML 1.6"
+	@echo "                  This is only useful to debug pwx::CWaveColor."
 	@echo "  clean         - remove object files, test programs and tools"
 	@echo "  help          - this help"
 	@echo "  hashbuilder   - build hashbuilder test program (*)"
@@ -205,6 +208,10 @@ help: Makefile
 	@echo "     of the gcc graphite extension by editing this Makefile."
 	@echo ""
 
+clustercheck: depend library
+	@echo "Making clustercheck in $(TESTDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) clustercheck)
+
 documentation: Makefile Doxyfile
 	@echo "generating documentation"
 	@$(DOXYGEN) ./Doxyfile
@@ -216,9 +223,9 @@ docinstall: documentation
 	@echo "Installing information files into $(DOCDIR)"
 	@$(INSTALL) $(DOCFILES) $(DOCDIR)
 
-clustercheck: depend library
-	@echo "Making clustercheck in $(TESTDIR)"
-	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -j8 -C $(TESTDIR) clustercheck)
+drawwave: depend library
+	@echo "Making drawwave in $(TOOLDIR)"
+	@(CXXFLAGS="$(CXXFLAGS)" LDFLAGS="$(LDFLAGS)" make -C $(TOOLDIR)/drawwave drawwave)
 
 hashbuilder: depend library
 	@echo "Making hash_builder in $(TESTDIR)"
