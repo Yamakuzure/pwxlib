@@ -28,7 +28,6 @@
 
 #include <pwx/container/TSingleList.h>
 
-
 namespace pwx {
 
 
@@ -84,7 +83,7 @@ public:
 
 	explicit
 	CWaveColor(uint8_t r, uint8_t g, uint8_t b, double gamma_ = 1.0);
-	CWaveColor()  PWX_DEFAULT;
+	CWaveColor()  noexcept;
 	CWaveColor(const CWaveColor &src);
 	~CWaveColor() noexcept;
 
@@ -126,7 +125,7 @@ private:
 	*/
 
 	double gamma = 1.0; //!< General gamma value, applied to the resulting RGB value
-	list_t waves;  //!< Storage of wavelength
+	list_t waves;       //!< Storage of wavelength
 };
 
 

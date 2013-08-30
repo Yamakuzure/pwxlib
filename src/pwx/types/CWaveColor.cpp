@@ -245,10 +245,10 @@ static void wavelengthToRGB(double wavelength, uint8_t &r, uint8_t &g, uint8_t &
 		// Step 2: Let the intensity fall off near the vision limits
 		if (wavelength < 420.0)
 			factor = 0.3 + (0.7 * (wavelength - 380.) / 40.);
-		else if (wavelength < 701.0)
+		else if (wavelength < 645.0)
 			factor = 1.0;
 		else
-			factor = 0.3 + (0.7 * (780. - wavelength) / 80.);
+			factor = 0.3 + (0.7 * (780. - wavelength) / 135.);
 
 	} // End of having a wavelength and gamma suitable for visible light
 
@@ -355,6 +355,16 @@ CWaveColor::CWaveColor(uint8_t r, uint8_t g, uint8_t b, double gamma_) :
 {
 	PWX_TRY_PWX_FURTHER(setRGB(r, g, b))
 }
+
+
+/** @brief empty constructor
+  *
+  * add Wavelength later...
+**/
+CWaveColor::CWaveColor() noexcept :
+	gamma(1.0),
+	waves({})
+{  }
 
 
 /** @brief Copy constructor
