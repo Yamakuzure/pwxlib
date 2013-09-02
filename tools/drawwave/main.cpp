@@ -17,7 +17,8 @@ double nm_step = 400.0 / static_cast<double>(maxX);
 int main()
 {
     sf::RenderWindow App(sf::VideoMode(maxX, maxY), "PrydeWorX WaveDraw");
-	sf::Image screenshot(maxX, maxY);
+	sf::Image screenshot;
+	sf::Texture texture;
 	pwx::CWaveColor wc;
 	int32_t x = 0;
 	uint8_t r,g,b;
@@ -25,48 +26,54 @@ int main()
     double wavelength = 380.0;
 	bool drawing = true;
 
+	// create the image and the texture
+	screenshot.create(maxX, maxY);
+	texture.create(maxX, maxY);
+
 	// Set initial Wavelength
 	wc.setWavelength(0, wavelength);
 	wc.getRGB(r, g, b);
 
 	// event loop to be able to break at any time
-    while (App.IsOpened()) {
+    while (App.isOpen()) {
 
 		if (drawing) {
 			// Get color and draw Line
 			for (int32_t y = 0; y < maxY; ++y) {
 				wc.setWavelength(0, wavelength);
-				wc.doppler(100.0 * ( x - halfX), 100.0 * ( y - halfY), 100.0 * ((halfX - x) + (halfY - y)),
-						  -500.0 *   x,         -500.0 *   y,         -500.0 * ((x - halfX) * (y - halfY)) );
+				wc.doppler(0.0, 0.0, 666.0 * (halfY - y) * (y - halfY));
 				wc.getRGB(r, g, b);
-				screenshot.SetPixel(x, y, sf::Color(r, g, b));
+				screenshot.setPixel(x, y, sf::Color(r, g, b));
 				if (0 == y)
 					fprintf(stdout, "% 4d: 0x%02x, 0x%02x, 0x%02x - %4.1f\n", x, r, g, b, wavelength);
 			}
 
-			App.Draw(sf::Sprite(screenshot));
+			texture.loadFromImage(screenshot);
+			App.draw(sf::Sprite(texture));
+
 			// Move forward:
 			if (++x == maxX)
 				drawing = false;
 			else
 				wavelength += nm_step;
 		} else
-			sf::Sleep(0.25f);
+			sf::sleep(sf::milliseconds(250));
 
         // Process events
-        while (App.GetEvent(Event)) {
+        while (App.pollEvent(Event)) {
             // Close window : exit
-            if (Event.Type == sf::Event::Closed)
-                App.Close();
-			else if (drawing && (Event.Type == sf::Event::LostFocus))
-				screenshot = App.Capture();
-			else if (Event.Type == sf::Event::GainedFocus) {
-				App.Clear();
-				App.Draw(sf::Sprite(screenshot));
+            if (Event.type == sf::Event::Closed)
+                App.close();
+			else if (drawing && (Event.type == sf::Event::LostFocus))
+				screenshot = App.capture();
+			else if (Event.type == sf::Event::GainedFocus) {
+				App.clear();
+				texture.loadFromImage(screenshot);
+				App.draw(sf::Sprite(texture));
 			}
         }
 
-		App.Display();
+		App.display();
     }
 
     return EXIT_SUCCESS;
