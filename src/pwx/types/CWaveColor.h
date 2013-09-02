@@ -96,6 +96,12 @@ public:
 	void     clear        ()                                         noexcept;
 	uint32_t count        ()                                   const noexcept;
 	uint32_t delRGB       (uint8_t r, uint8_t g, uint8_t b);
+	void     doppler      (double camX, double camY, double camZ,
+						   double objX, double objY, double objZ,
+						   double movX, double movY, double movZ)    noexcept;
+	void     doppler      (double objX, double objY, double objZ,
+						   double movX, double movY, double movZ)    noexcept;
+	void     doppler      (double movX, double movY, double movZ)    noexcept;
 	double   getFrequency (int32_t index)                      const noexcept;
 	double   getGamma     ()                                   const noexcept;
 	uint32_t getRGB       (uint8_t &r, uint8_t &g, uint8_t &b) const noexcept;

@@ -503,6 +503,160 @@ uint32_t CWaveColor::delRGB(uint8_t r, uint8_t g, uint8_t b)
 }
 
 
+/** @brief apply a doppler effect according to movement relative to position
+  *
+  * This method applies a simple doppler effect to all stored
+  * wavelengths of this color.
+  *
+  * Calculated is the movement of the object (@a objX, @a objY, @a objZ)
+  * relative to the camera (@a camX, @a camY, @a camZ) using the objects
+  * absolute movement (@a movX, @a movY, @a movZ).
+  *
+  * <I>Important</I>: This can shift a perfectly visible color out of
+  * the visible range if the movement is extreme enough!
+  *
+  * <I>Even more important</I>: It does <B>not</B> matter in which units
+  * the paramters for the camera and object positions are, as long as they
+  * fit together. The movement parameters are always assumed to be in m/s.
+  *
+  * Please note that a negative movement vector is considered to be a
+  * movement towards the camera, while a positive movement vector is
+  * considered to be a movement away from the camera.
+  *
+  * @param[in] camX the X-Coordinate of the camera
+  * @param[in] camY the Y-Coordinate of the camera
+  * @param[in] camZ the Z-Coordinate of the camera
+  * @param[in] objX the X-Coordinate of the colored object
+  * @param[in] objY the Y-Coordinate of the colored object
+  * @param[in] objZ the Z-Coordinate of the colored object
+  * @param[in] movX the absolute X-movement of the colored object in m/s
+  * @param[in] movY the absolute Y-movement of the colored object in m/s
+  * @param[in] movZ the absolute Z-movement of the colored object in m/s
+**/
+void CWaveColor::doppler(double camX, double camY, double camZ,
+						 double objX, double objY, double objZ,
+						 double movX, double movY, double movZ) noexcept
+{
+	// Return at once if there is nothing to do:
+	if (waves.empty())
+		return;
+
+	// First the relative movement vector must be determined:
+	double dist   = absDistance(camX, camY, camZ, objX, objY, objZ);
+	double distXY = absDistance(camX, camY, objX, objY);
+	/* There is nothing wrong with distXY being 0.0, but dist must
+	 * at least be one.
+	 */
+	if (dist < 1.0)
+		dist = 1.0;
+
+	/* Basically the camera is the center of a sphere the object is a point on.
+	 * To find out how the movement effect is to be applied, the position
+	 * relative to the camera is needed, but luckily it is already known.
+	 * However, although the angles (alpha, beta) are neither known nor needed,
+	 * the distances are, so the movement effect can be modified.
+	 * Or in other words: As the position on the "sphere" is already known,
+	 * only the relations have to be calculated back. distXY is therefore
+	 * sin(beta), which is the the flat distance, meaning the point on a
+	 * (virtual) circle around the camera, with the radius of distXY.
+	 */
+	double modXY = distXY / dist; // sin(beta)  (unsigned)
+	double modX  = (objX - camX)  / dist  // cos(alpha) (signed)
+				 * modXY;
+	double modY  = (objY - camY)  / dist  // sin(alpha) (signed)
+				 * modXY;
+	double modZ  = (objZ - camZ)  / dist; // cos(beta)  (signed)
+	/* Sphere Coordinates:
+	 * X = cos(alpha) * sin(beta) == modX * modXY
+	 * Y = sin(alpha) * sin(beta) == modY * modXY
+	 * Z =              cos(beta) == modZ
+	 */
+
+	double v = (modX * movX) + (modY * movY) + (modZ * movZ);
+
+	/* Simple Doppler effect:
+     * fE = fS / (1 - (v / c))
+     * fE : resulting frequency
+     * fS : original frequency
+     * c  : speed of light in m/s
+     * v  : relative movement vector of the object
+     * Thus a modifier to use with modFrequency would be:
+     * 1 / (1 - (v / c))
+     */
+	double modifier = 1.0 / (1.0 - (v / 299792458.0));
+
+	lock();
+	int32_t wSize = waves.size();
+	for (int32_t i = 0; i < wSize; ++i) {
+		modFrequency(i, modifier);
+	}
+	unlock();
+}
+
+
+/** @brief apply a doppler effect according to movement relative to position
+  *
+  * This method applies a simple doppler effect to all stored
+  * wavelengths of this color.
+  *
+  * Calculated is the movement of the object (@a objX, @a objY, @a objZ)
+  * relative to a neutral positioned camera (0, 0, 0) using the objects
+  * absolute movement (@a movX, @a movY, @a movZ).
+  *
+  * <I>Important</I>: This can shift a perfectly visible color out of
+  * the visible range if the movement is extreme enough!
+  *
+  * <I>Even more important</I>: It does <B>not</B> matter in which units
+  * the paramters for the object positions are. The movement parameters
+  * are always assumed to be in m/s.
+  *
+  * Please note that a negative movement vector is considered to be a
+  * movement towards the camera, while a positive movement vector is
+  * considered to be a movement away from the camera.
+  *
+  * @param[in] objX the X-Coordinate of the colored object
+  * @param[in] objY the Y-Coordinate of the colored object
+  * @param[in] objZ the Z-Coordinate of the colored object
+  * @param[in] movX the absolute X-movement of the colored object in m/s
+  * @param[in] movY the absolute Y-movement of the colored object in m/s
+  * @param[in] movZ the absolute Z-movement of the colored object in m/s
+**/
+void CWaveColor::doppler(double objX, double objY, double objZ,
+						 double movX, double movY, double movZ) noexcept
+{
+	this->doppler(0.0, 0.0, 0.0, objX, objY, objZ, movX, movY, movZ);
+}
+
+
+/** @brief apply a doppler effect according to absolute movement
+  *
+  * This method applies a simple doppler effect to all stored
+  * wavelengths of this color.
+  *
+  * Calculated is the absolute movement of the object (@a objX, @a objY,
+  * @a objZ) as if both the object and the camera where in the same
+  * position, but the z-coordinate being 1.0 distance.
+  *
+  * <I>Important</I>: This can shift a perfectly visible color out of
+  * the visible range if the movement is extreme enough!
+  *
+  * <I>Even more important</I>: The movement parameters
+  * are always assumed to be in m/s.
+  *
+  * Please note that a negative movement vector is considered to be a
+  * movement towards the camera, while a positive movement vector is
+  * considered to be a movement away from the camera.
+  *
+  * @param[in] movX the absolute X-movement of the colored object in m/s
+  * @param[in] movY the absolute Y-movement of the colored object in m/s
+  * @param[in] movZ the absolute Z-movement of the colored object in m/s
+**/
+void CWaveColor::doppler(double movX, double movY, double movZ) noexcept
+{
+	this->doppler(0.0, 0.0, 0.0, 0.0, 0.0, 1.0, movX, movY, movZ);
+}
+
+
 /** @brief return the frequency of the wavelength with the given @a index.
   *
   * This method can be used to retrieve a specific frequency
