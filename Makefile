@@ -285,7 +285,11 @@ cleantest:
 	@echo "Cleaning all in $(TESTDIR)"
 	@make -C $(TESTDIR) clean
 
-clean: cleanlibrary cleantest
+cleantools:
+	@echo "Cleaning all in $(TOOLDIR)"
+	@make -C $(TOOLDIR)/drawwave clean
+
+clean: cleanlibrary cleantest cleantools
 #	@echo "Cleaning all in $(TOOLDIR)"
 #	@make -C $(TOOLDIR) clean
 
