@@ -179,6 +179,72 @@ bool areAlmostEqual(T lhs, T rhs) noexcept
  * === General functions to help with degrees ===
  * ==============================================
 */
+
+/**@brief return the normalized distance of two points in 2D space
+ *
+ * @param[in]  x1  X-Coordinate of the first point
+ * @param[in]  y1  Y-Coordinate of the first point
+ * @param[in]  x2  X-Coordinate of the second point
+ * @param[in]  y2  Y-Coordinate of the second point
+ * @return   The distance between both points, type is the same as arguments.
+ *
+ * This method returns the distance between two points.
+**/
+template<typename T>
+inline T absDistance(const T x1, const T y1, const T x2, const T y2)
+{
+  if (isIntType(T) || isFloatType(T))
+    // Do nothing if this isn't a type we can calculate with
+    return (static_cast<T>(std::sqrt(std::pow(x2 - x1, 2.0) + std::pow(y2 - y1, 2.0))));
+  else
+    return ((T)0);
+}
+
+
+/**@brief return the normalized distance of two points in 3D space
+ *
+ * @param[in]  x1  X-Coordinate of the first point
+ * @param[in]  y1  Y-Coordinate of the first point
+ * @param[in]  z1  Z-Coordinate of the first point
+ * @param[in]  x2  X-Coordinate of the second point
+ * @param[in]  y2  Y-Coordinate of the second point
+ * @param[in]  z2  Z-Coordinate of the second point
+ * @return   The distance between both points, type is the same as the arguments.
+ *
+ * This method returns the distance between two points.
+**/
+template<typename T>
+inline T absDistance(const T x1, const T y1, const T z1,
+                     const T x2, const T y2, const T z2)
+{
+  if (isIntType(T) || isFloatType(T))
+    // Do nothing if this isn't a type we can calculate with
+    return (static_cast<T>(std::sqrt(std::pow(x2 - x1, 2.0) + std::pow(y2 - y1, 2.0) + std::pow(z2 - z1, 2.0))));
+  else
+    return ((T)0);
+}
+
+
+/** @brief degToRad
+  *
+  * Recalculate a @a degree into a radiant.
+  *
+  * Warning: Although this is a template, it is your responsibility to use
+  * it with a sensible type! Type checking would have too much impact, so
+  * if you receive weird/wrong results because of the type you use, then
+  * you have been warned. ;-) (But of course the transformation to double is
+  * done here, too. @see double getNormalizedDegree(const T degree))
+  *
+  * @param[in]  degree the value to re-calculate
+  * @return the resulting radiant as a double
+  *
+**/
+template<typename T> double degToRad(T degree)
+{
+	return (static_cast<double>(degree) * M_PIl / 180.);
+}
+
+
 /** @brief getNormalizedDegree (neutral version)
   *
   * This helper method makes sure, that the provided @a degree is in a range of
@@ -219,26 +285,6 @@ template<typename T> double getNormalizedDegree(const T degree)
 	assert ((result >= 0.) && (result < 360.) && "getNormalizedDegree() double mod failed!");
 
 	return (result);
-}
-
-
-/** @brief degToRad
-  *
-  * Recalculate a @a degree into a radiant.
-  *
-  * Warning: Although this is a template, it is your responsibility to use
-  * it with a sensible type! Type checking would have too much impact, so
-  * if you receive weird/wrong results because of the type you use, then
-  * you have been warned. ;-) (But of course the transformation to double is
-  * done here, too. @see double getNormalizedDegree(const T degree))
-  *
-  * @param[in]  degree the value to re-calculate
-  * @return the resulting radiant as a double
-  *
-**/
-template<typename T> double degToRad(T degree)
-{
-	return (static_cast<double>(degree) * M_PIl / 180.);
 }
 
 
