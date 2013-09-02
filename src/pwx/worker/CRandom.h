@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PWX_LIBPWX_PWX_TOOLS_CRANDOM_H_INCLUDED
-#define PWX_LIBPWX_PWX_TOOLS_CRANDOM_H_INCLUDED 1
+#ifndef PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED
+#define PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED 1
 
 /** @file CRandom.h
   *
@@ -234,5 +234,5 @@ extern CRandom RNG; //!< External instance of CRandom to be used
 
 } // namespace pwx
 
-#endif // PWX_LIBPWX_PWX_TOOLS_CRANDOM_H_INCLUDED
+#endif // PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED
 
