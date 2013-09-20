@@ -4,7 +4,7 @@
 
 /** @file CRandom.h
   *
-  * @brief Declaration of CRandom tool class
+  * @brief Declaration of CRandom worker class
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
