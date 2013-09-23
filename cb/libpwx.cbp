@@ -304,6 +304,7 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/worker/CArgHandler.h" />
 		<Unit filename="../src/pwx/worker/CRandom.cpp">
 			<Option target="clean" />
 			<Option target="library" />
