@@ -513,6 +513,16 @@
 #define isFloatType(a) (std::is_floating_point<a>::value)
 
 
+/** @brief true if @a is either int or float type
+  *
+  * <I>Prerequisites</I>: type_traits
+  *
+  * @param a type to check
+  * @return true if @a is either an integer or a floating point type
+**/
+#define isNumericType(a) (isIntType(a) || isFloatType(a))
+
+
 /** @brief true if @a a is an array
   *
   * <I>Prerequisites</I>: type_traits
