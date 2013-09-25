@@ -139,6 +139,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/base/VArgTargetBase.cpp" />
+		<Unit filename="../src/pwx/base/VArgTargetBase.h" />
 		<Unit filename="../src/pwx/base/VContainer.cpp">
 			<Option target="clean" />
 			<Option target="library" />
@@ -285,6 +287,7 @@
 		</Unit>
 		<Unit filename="../src/pwx/types/CWaveColor.cpp" />
 		<Unit filename="../src/pwx/types/CWaveColor.h" />
+		<Unit filename="../src/pwx/types/TArgTarget.h" />
 		<Unit filename="../src/pwx/types/TDoubleElement.h">
 			<Option target="clean" />
 			<Option target="library" />
@@ -298,12 +301,14 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/eArgTargetType.h" />
 		<Unit filename="../src/pwx/types/eNameSourceType.cpp" />
 		<Unit filename="../src/pwx/types/eNameSourceType.h" />
 		<Unit filename="../src/pwx/worker.h">
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/worker/CArgHandler.cpp" />
 		<Unit filename="../src/pwx/worker/CArgHandler.h" />
 		<Unit filename="../src/pwx/worker/CRandom.cpp">
 			<Option target="clean" />
