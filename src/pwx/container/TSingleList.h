@@ -292,7 +292,7 @@ public:
 	**/
 	virtual elem_t* find (data_t &data) noexcept
 	{
-		return const_cast<elem_t* > (protFindData (static_cast<const data_t> (data)));
+		return const_cast<elem_t* > (protFindData (static_cast<const data_t&> (data)));
 	}
 
 
