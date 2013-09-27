@@ -10,7 +10,9 @@ namespace private_ {
 
 /// @internal check floating point values using Ulps and abs diff
 template<typename Tf, typename Ti>
-bool private_areAlmostEqualUlpsAndAbs(Tf lhs, Tf rhs, Tf maxDiff, Ti maxUlpsDiff) noexcept
+bool private_areAlmostEqualUlpsAndAbs(
+		const Tf &lhs, const Tf &rhs,
+		Tf maxDiff, Ti maxUlpsDiff) noexcept
 {
 	// Check if the numbers are really close -- needed
 	// when comparing numbers near zero.
@@ -35,7 +37,9 @@ bool private_areAlmostEqualUlpsAndAbs(Tf lhs, Tf rhs, Tf maxDiff, Ti maxUlpsDiff
 
 /// @internal check floating point values using relative and diff
 template<typename Tf>
-bool private_areAlmostEqualRelativeAndAbs(Tf lhs, Tf rhs, Tf maxDiff, Tf maxRelDiff) noexcept
+bool private_areAlmostEqualRelativeAndAbs(
+		const Tf &lhs, const Tf &rhs,
+		Tf maxDiff, Tf maxRelDiff) noexcept
 {
 	// Check if the numbers are really close -- needed
 	// when comparing numbers near zero.
@@ -43,9 +47,9 @@ bool private_areAlmostEqualRelativeAndAbs(Tf lhs, Tf rhs, Tf maxDiff, Tf maxRelD
 	if (diff <= maxDiff)
 		return true;
 
-	lhs = fabs(lhs);
-	rhs = fabs(rhs);
-	Tf largest = (rhs > lhs) ? rhs : lhs;
+	Tf flhs = fabs(lhs);
+	Tf frhs = fabs(rhs);
+	Tf largest = (frhs > flhs) ? frhs : flhs;
 
 	if (diff <= largest * maxRelDiff)
 		return true;
@@ -54,7 +58,7 @@ bool private_areAlmostEqualRelativeAndAbs(Tf lhs, Tf rhs, Tf maxDiff, Tf maxRelD
 
 /// @internal template to dispatch to the correct AlmostEqual function
 template<typename Tf>
-bool private_dispatchAlmostEqual(Tf lhs, Tf rhs) noexcept
+bool private_dispatchAlmostEqual(const Tf &lhs, const Tf &rhs) noexcept
 {
 	typedef typename pwx::sFloatPoint<Tf>::Ti Ti;
 
@@ -100,7 +104,7 @@ bool private_dispatchAlmostEqual(Tf lhs, Tf rhs) noexcept
   * @param[in] rhs right hand side value
   * @return true if bot values can be considered equal although their representation might differ
 **/
-bool areAlmostEqual(float lhs, float rhs) noexcept
+bool areAlmostEqual(const float lhs, const float rhs) noexcept
 {
 	return private_::private_dispatchAlmostEqual<float>(lhs, rhs);
 }
@@ -116,7 +120,7 @@ bool areAlmostEqual(float lhs, float rhs) noexcept
   * @param[in] rhs right hand side value
   * @return true if bot values can be considered equal although their representation might differ
 **/
-bool areAlmostEqual(double lhs, double rhs) noexcept
+bool areAlmostEqual(const double lhs, const double rhs) noexcept
 {
 	return private_::private_dispatchAlmostEqual<double>(lhs, rhs);
 }
@@ -132,7 +136,7 @@ bool areAlmostEqual(double lhs, double rhs) noexcept
   * @param[in] rhs right hand side value
   * @return true if bot values can be considered equal although their representation might differ
 **/
-bool areAlmostEqual(long double lhs, long double rhs) noexcept
+bool areAlmostEqual(const long double lhs, const long double rhs) noexcept
 {
 	return private_::private_dispatchAlmostEqual<long double>(lhs, rhs);
 }

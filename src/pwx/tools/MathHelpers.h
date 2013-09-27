@@ -164,12 +164,12 @@ struct sFloatPoint<long double>
  * === Functions that compare floating type values ===
  * ===================================================
 */
-bool areAlmostEqual(float lhs, float rhs) noexcept;
-bool areAlmostEqual(double lhs, double rhs) noexcept;
-bool areAlmostEqual(long double lhs, long double rhs) noexcept;
+bool areAlmostEqual(const float lhs, const float rhs) noexcept;
+bool areAlmostEqual(const double lhs, const double rhs) noexcept;
+bool areAlmostEqual(const long double lhs, const long double rhs) noexcept;
 // template dummy to enable areAlmostEqual() to be used with type_traits conditions
 template<typename T>
-bool areAlmostEqual(T lhs, T rhs) noexcept
+bool areAlmostEqual(const T &lhs, const T &rhs) noexcept
 {
 	return lhs == rhs;
 }
