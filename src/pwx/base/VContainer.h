@@ -96,10 +96,13 @@ protected:
 }; // class VContainer
 
 #if defined(PWX_EXPORTS)
+# if !defined(PWX_HAS_VCONTAINER_DTOR)
+# define PWX_HAS_VCONTAINER_DTOR 1
 /// @brief ~VContainer default destructor.
 VContainer::~VContainer() noexcept
 { }
-#endif
+# endif // PWX_HAS_VCONTAINER_DTOR
+#endif // PWX_EXPORTS
 
 } // namespace pwx
 #endif // PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED

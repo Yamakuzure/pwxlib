@@ -228,10 +228,13 @@ private:
 }; // class CHashBuilder
 
 #if defined(PWX_EXPORTS)
+# if !defined(PWX_HAS_CHASHBUILDER_DTOR)
+# define PWX_HAS_CHASHBUILDER_DTOR 1
 /// @brief ~CHashBuilder default destructor.
 CHashBuilder::~CHashBuilder() noexcept
 { }
-#endif
+# endif // PWX_HAS_CHASHBUILDER_DTOR
+#endif // PWX_EXPORTS
 
 } // namespace pwx
 
