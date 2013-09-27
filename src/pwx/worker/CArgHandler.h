@@ -28,8 +28,21 @@
 
 
 #include <pwx/types/TArgTarget.h>
+#include <pwx/types/sArgError.h>
 #include <pwx/types/CException.h>
+
+#if defined(PWX_EXPORTS)
+#  undef PWX_EXPORTS
+#  define PWX_REDEF_EXPORTS 1
+# endif
+
+#include <pwx/container/TQueue.h>
 #include <pwx/container/TChainHash.h>
+
+#if defined(PWX_REDEF_EXPORTS)
+#  define PWX_EXPORTS 1
+#  undef PWX_REDEF_EXPORTS
+# endif
 
 
 namespace pwx {
@@ -67,17 +80,18 @@ public:
 	 * ===============================================
 	 */
 
-	typedef std::string               key_t;
 	typedef VArgTargetBase            data_t;
+	typedef std::string               key_t;
 	typedef TChainHash<key_t, data_t> hash_t;
-
+	typedef sArgError                 error_t;
+	typedef TQueue<error_t>           errlist_t;
 
 	/* ===============================================
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	 */
 
-	explicit CArgHandler();
+	explicit CArgHandler() noexcept;
 	~CArgHandler() noexcept;
 
 
@@ -116,6 +130,12 @@ public:
 	  * the method does <B>nothing</B>! This condition is
 	  * tested with an assert.
 	  *
+	  * If the creation of an argument target instance fails, a
+	  * pwx::CException with the name "ArgTargetCreationFailed" is
+	  * thrown. Argument targets are organized using pwx::TChainHash,
+	  * if the creation of a hash element fails, the thrown
+	  * exception has the name "ElementCreationFailed".
+	  *
 	  * If you need to pass arguments to a called process,
 	  * add the marker separating the command line arguments
 	  * from the called process arguments with the method
@@ -136,11 +156,12 @@ public:
 				const char* arg_desc, const char* param_name)
 	{
 		// === Check arguments against double nullptr ===
-		assert( (arg_short || arg_long)
-			&&  ((arg_short && strlen(arg_short))
-			  || (arg_long  && strlen(arg_long)))
+		bool hasArgLong  = arg_long  && strlen(arg_long);
+		bool hasArgShort = arg_short && strlen(arg_short);
+
+		assert( (hasArgLong || hasArgShort)
 			&& "ERROR: At least one of arg_short and arg_long *MUST* be a string of length>0!");
-		if ( (!arg_short || !strlen(arg_short)) && (!arg_long || !strlen(arg_long)) )
+		if ( !hasArgLong && !hasArgShort )
 			return;
 
 		// === Check target and cb against double nullptr ===
@@ -177,17 +198,63 @@ public:
 		// No break in release version.
 
 		// === Check argument against uniqueness ===
+		std::string key_long (hasArgLong  ? arg_long  : "");
+		std::string key_short(hasArgShort ? arg_short : "");
+		bool isLongNew  = hasArgLong  ? !longArgs.exists(key_long)   : true;
+		bool isShortNew = hasArgShort ? !shortArgs.exists(key_short) : true;
+		assert( isShortNew && isLongNew && "ERROR: long or short argument already known!");
+		if ( !isLongNew || !isShortNew )
+			return;
 
+		// === Now create a new target and add it to the hashes ===
+		data_t* new_target = nullptr;
+		try {
+			new_target = new TArgTarget<T>(arg_short, arg_long, arg_type,
+										arg_target, arg_cb, arg_desc,
+										param_name);
+		} catch(std::bad_alloc &e) {
+			PWX_THROW("ArgTargetCreationFailed", e.what(),
+					"The creation of a new argument target failed!")
+		}
+		if (hasArgLong)
+			PWX_TRY_PWX_FURTHER(longArgs.add(key_long, new_target))
+		if (hasArgShort)
+			PWX_TRY_PWX_FURTHER(shortArgs.add(key_short, new_target))
 
 	}
 
 
-	void        addPassthrough(const char init_arg, int* pass_argc, char** pass_argv);
+	void        addPassthrough(const char* init_arg, int32_t* pass_argc, char*** pass_argv);
 	void        clearArgs     () noexcept;
-	int         getError      (const int nr) noexcept;
-	int         getErrorCount () noexcept;
-	const char* getErrorStr   (const int nr) noexcept;
-	int         parseArgs     (const int argc, const char** argv) noexcept;
+	int32_t     getError      (const int32_t nr) const noexcept;
+	int32_t     getErrorCount () const noexcept;
+	const char* getErrorStr   (const int32_t nr) const noexcept;
+	int32_t     parseArgs     (const int32_t argc, const char** argv) noexcept;
+
+
+private:
+
+	/* ===============================================
+	 * === Private methods                         ===
+	 * ===============================================
+	 */
+
+	/// @internal do nothing with the element.
+	/// (or cleaning short args, destroys targets of long args!)
+	static void do_not_destroy(data_t*) { }
+
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	 */
+
+	errlist_t errlist;   //!< stores generated error messages
+	hash_t    longArgs;  //!< stores targets using their long argument as key
+	char***   pass_args; //!< The target to store arguments to pass through
+	char*     pass_init; //!< The character sequence starting the pass through distribution
+	int32_t*  pass_cnt;  //!< The target to store the number of passed through arguments
+	hash_t    shortArgs; //!< stores targets using their short argument as key
 
 };
 

@@ -301,9 +301,12 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/eArgErrorNumber.h" />
 		<Unit filename="../src/pwx/types/eArgTargetType.h" />
 		<Unit filename="../src/pwx/types/eNameSourceType.cpp" />
 		<Unit filename="../src/pwx/types/eNameSourceType.h" />
+		<Unit filename="../src/pwx/types/sArgError.cpp" />
+		<Unit filename="../src/pwx/types/sArgError.h" />
 		<Unit filename="../src/pwx/worker.h">
 			<Option target="clean" />
 			<Option target="library" />
