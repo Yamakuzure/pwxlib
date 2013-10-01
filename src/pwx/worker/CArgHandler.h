@@ -110,7 +110,7 @@ public:
 	 * ===============================================
 	 */
 
-	/** @brief add one command line argument to the handler
+	/** @brief add one command line argument to the handler using a simple target
 	  *
 	  * This method adds knowledge about one command line argument
 	  * to the handler.
@@ -131,15 +131,6 @@ public:
 	  * nullptr, the method does <B>nothing</B>! This condition
 	  * is tested with an assert.
 	  *
-	  * Set either @a arg_target or @a arg_cb. If both are set,
-	  * the callback function is called <I>after</I> the
-	  * @a arg_target is handled according to @a arg_type. If
-	  * the @a arg_type is <I>ATT_CB</I>, the @a arg_target is
-	  * ignored and only @a arg_cb is called.
-	  * If both @a arg_target and @a arg_cb are set to nullptr,
-	  * the method does <B>nothing</B>! This condition is
-	  * tested with an assert.
-	  *
 	  * If the creation of an argument target instance fails, a
 	  * pwx::CException with the name "ArgTargetCreationFailed" is
 	  * thrown. Argument targets are organized using pwx::TChainHash,
@@ -155,14 +146,13 @@ public:
 	  * @param[in] arg_long Long argument like "--foo" or "-bar".
 	  * @param[in] arg_type Determines what to do with the target.
 	  * @param[out] arg_target Pointer to the value to handle.
-	  * @param[out] arg_cb Callback function to handle argument parameters.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> int the help text.
+	  * @return true if an argument was added, false otherwise.
 	**/
 	template<typename T>
-	void addArg(const char* arg_short, const char* arg_long,
+	bool addArg(const char* arg_short, const char* arg_long,
 				eArgTargetType arg_type, T* arg_target,
-				void (*arg_cb)(const char*, T*),
 				const char* arg_desc, const char* param_name)
 	{
 		// === Check arguments against double nullptr ===
@@ -172,13 +162,13 @@ public:
 		assert( (hasArgLong || hasArgShort)
 			&& "ERROR: At least one of arg_short and arg_long *MUST* be a string of length>0!");
 		if ( !hasArgLong && !hasArgShort )
-			return;
+			return false;
 
-		// === Check target and cb against double nullptr ===
-		assert( (arg_target || arg_cb)
+		// === Check target  ===
+		assert( arg_target
 			&& "ERROR: At least one of arg_target and arg_cb must be set!");
-		if (!arg_type && !arg_cb)
-			return;
+		if (!arg_type)
+			return false;
 
 		// === Check target type against arg_type ===
 		/* The following combinations are valid:
@@ -214,14 +204,13 @@ public:
 		bool isShortNew = hasArgShort ? !shortArgs.exists(key_short) : true;
 		assert( isShortNew && isLongNew && "ERROR: long or short argument already known!");
 		if ( !isLongNew || !isShortNew )
-			return;
+			return false;
 
 		// === Now create a new target and add it to the hashes ===
 		data_t* new_target = nullptr;
 		try {
 			new_target = new TArgTarget<T>(arg_short, arg_long, arg_type,
-										arg_target, arg_cb, arg_desc,
-										param_name);
+										arg_target, arg_desc, param_name);
 		} catch(std::bad_alloc &e) {
 			PWX_THROW("ArgTargetCreationFailed", e.what(),
 					"The creation of a new argument target failed!")
@@ -238,6 +227,67 @@ public:
 			maxParamLen = strlen(param_name);
 		if (key_short.size() > maxShortLen)
 			maxShortLen = key_short.size();
+
+		return true;
+	}
+
+
+	/** @brief add one command line argument to the handler using a callback function
+	  *
+	  * This method adds knowledge about one command line argument
+	  * to the handler.
+	  *
+	  * Both the short argument and the long argument must be
+	  * unique. If a given argument is already known to the
+	  * handler, it will be <B>ignored</B>! This condition is
+	  * tested with an assert.
+	  *
+	  * Either of the arguments @a arg_short or @a arg_long
+	  * can be nullptr, but not both. If both are set to
+	  * nullptr, the method does <B>nothing</B>! This condition
+	  * is tested with an assert.
+	  *
+	  * If the creation of an argument target instance fails, a
+	  * pwx::CException with the name "ArgTargetCreationFailed" is
+	  * thrown. Argument targets are organized using pwx::TChainHash,
+	  * if the creation of a hash element fails, the thrown
+	  * exception has the name "ElementCreationFailed".
+	  *
+	  * If you need to pass arguments to a called process,
+	  * add the marker separating the command line arguments
+	  * from the called process arguments with the method
+	  * addPassthrough() and not this one!.
+	  *
+	  * @param[in] arg_short Short argument like "-a" or "x".
+	  * @param[in] arg_long Long argument like "--foo" or "-bar".
+	  * @param[out] arg_cb Callback function to handle argument parameters.
+	  * @param[in] arg_desc Help text for this argument.
+	  * @param[in] param_name Name shown in <> int the help text.
+	  * @return true if an argument was added, false otherwise.
+	**/
+	template<typename T>
+	bool addArg(const char* arg_short, const char* arg_long,
+				void (*arg_cb)(const char*, T*),
+				const char* arg_desc, const char* param_name)
+	{
+		// === Use nullptr target for basic addition ===
+		bool result = false;
+		PWX_TRY_PWX_FURTHER(result = this->addArg<T>(arg_short, arg_long,
+													ATT_CB, (T*)nullptr,
+													arg_desc, param_name))
+
+		// == If this argument was added, add callback function. ===
+		if (result) {
+			std::string key_long ((arg_long  && strlen(arg_long))  ? arg_long  : "");
+			std::string key_short((arg_short && strlen(arg_short)) ? arg_short : "");
+
+			if (key_long.length() && longArgs.exists(arg_short))
+				static_cast<TArgTarget<T>&>(longArgs.getData(key_long)).setCb(arg_cb);
+			else
+				static_cast<TArgTarget<T>&>(shortArgs.getData(key_short)).setCb(arg_cb);
+		}
+
+		return result;
 	}
 
 

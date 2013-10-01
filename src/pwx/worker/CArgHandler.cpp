@@ -6,6 +6,7 @@
 
 namespace pwx {
 
+CArgHandler PAH;
 
 /** @brief default empty ctor
   */
