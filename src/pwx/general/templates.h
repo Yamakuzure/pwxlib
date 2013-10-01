@@ -43,11 +43,10 @@
   * central worker <I>RNG</I> that is used for thread safe random number, random
   * names and hash generation. <I>SCT</I> is a simple object providing sine/cosine
   * tables of variable precision. <I>DCF</I> is used to generate and manage data
-  * containers of variable types. <I>WCH</I> is the wave color handler that can
-  * transform wavelengths to RGB and vice versa. <I>PAP</I> is the program argument
-  * parser that can be used to handle arguments to, and help texts from a program.
-  * Finally <I>CFH</I> is a handler for configuration files of various styles like
-  * 'shell' or 'ini'.</LI>
+  * containers of variable types. <I>PAH</I> is the program argument handler that
+  * can be used to handle arguments to, and help texts from a program. Finally
+  * <I>CFH</I> is a handler for configuration files of various styles like 'shell'
+  * or 'ini'.</LI>
   * <LI>Thread safety<br />
   * Basically there are three basic principles on how to handle multi threaded
   * environments:
@@ -61,9 +60,9 @@
   *     <LI>Best performance in single threaded environment</LI>
   *     <LI>No overhead</LI>
   *   </UL></TD><TD><UL>
-  *     <LI>User has to know when to lock</LI>
-  *     <LI>User has to debug all issues from multi threaded usage</LI>
-  *     <LI>All locks are external, blocking all parallel work</LI>
+  *     <LI>User has to know when to lock.</LI>
+  *     <LI>User has to debug all issues from multi threaded usage.</LI>
+  *     <LI>All locks are external, blocking all parallel work.</LI>
   *     <LI>Multi threading can become useless if the work done outside of
   * locks is too minimal.</LI>
   *   </UL></TD>
@@ -71,31 +70,31 @@
   *   <TD>API big locks</TD>
   *   <TD><UL>
   *     <LI>Interface stays being simple, but relies on accessors.</LI>
-  *     <LI>Interface methods simply lock on all accesses</LI>
+  *     <LI>Interface methods simply lock on all accesses.</LI>
   *     <LI>User does not need to care about anything, everything is
   * automatically thread safe.</LI>
   *   </UL></TD><TD><UL>
-  *     <LI>All parallel work is automatically blocked</LI>
-  *     <LI>Same impact (and overhead) on single threaded usage</LI>
+  *     <LI>All parallel work is automatically blocked.</LI>
+  *     <LI>Same impact (and overhead) on single threaded usage.</LI>
   *     <LI>Multi threading can become useless if the work done outside of
   * locks is too minimal.</LI>
   *   </UL></TD>
   * </TR><TR>
   *   <TD>Internal locking on demand</TD>
   *   <TD><UL>
-  *     <LI>Memory barriers/fences can be used instead of locks where appropriate</LI>
-  *     <LI>No user intervention needed</LI>
-  *     <LI>A lot more parallel work can be done</LI>
+  *     <LI>Memory barriers/fences can be used instead of locks where appropriate.</LI>
+  *     <LI>No user intervention needed.</LI>
+  *     <LI>A lot more parallel work can be done.</LI>
   *   </UL></TD><TD><UL>
-  *     <LI>More complex interface</LI>
-  *     <LI>Most complex implementation</LI>
-  *     <LI>Additional memory overhead to catch &quot;unfortunate&quot; locking order</LI>
+  *     <LI>More complex interface.</LI>
+  *     <LI>Most complex implementation.</LI>
+  *     <LI>Additional memory overhead to catch &quot;unfortunate&quot; locking order.</LI>
   *   </UL></TD>
   * </TR>
   * </TABLE>
   * Most libraries offering functionality like the pwxLib use the first principle.
   * It helps greatly to focus on functionality instead of tiny implementation details.
-  * However it is a principle where single threaded usage is often better (and faster)
+  * However, it is a principle where single threaded usage is often better (and faster)
   * than multi threaded. An example would be a container that has to be filled with
   * a lot items which are simply gathered. Only if the generation of those items is
   * very costly, a multi threaded design can be used to gain more performance.
@@ -109,9 +108,12 @@
   * <UL><LI>All classes derived from pwx::CLockable inherit the method do_locking(bool)
   * which can be used to turn off (and later on) the locking mechanisms.</LI>
   * <LI>As the basic calls are still present, all containers defined in pwx/container
-  * allow their members to be used directly. So if you just want to &quot;march&quot;
+  * allow their members to be used directly. So if you just want to traverse
   * a container, you can just get the head element and then walk through the container
-  * using each elements next pointer.</LI></UL>
+  * using each elements next pointer.</LI>
+  * <LI>Even if the traversing of a container is needed to be thread save, all element
+  * types contain a method <I>getNext()</I>, and <I>getPrev()</I> where appropriate,
+  * that is thread safe.</LI></UL>
   * </OL>
 **/
 namespace pwx
