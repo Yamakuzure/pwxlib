@@ -253,7 +253,7 @@ std::string CArgHandler::getHelpDesc(const char* argument) const noexcept
 std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 									char argSep, char paramSep, char descSep) const noexcept
 {
-	std::string result = "";
+	std::string result;
 
 	assert (argument && strlen(argument)
 		&& "ERROR: getHelpArg called with nullptr/empty argument!");
@@ -272,11 +272,12 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 		size_t shortSize = target->aShort.size();
 		size_t longSize  = target->aLong.size();
 		size_t paramSize = target->pName.size();
+		size_t paramNeed = paramSize ? paramSize + 2 : 0;
 		size_t descSize  = target->desc.size();
 
 		// Add short argument, aligend right
 		if (shortSize < maxShortLen)
-			result.append(' ', maxShortLen - shortSize);
+			result.append(maxShortLen - shortSize, ' ');
 		if (shortSize)
 			result += target->aShort;
 
@@ -287,22 +288,24 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 		// Add long argument, aligned left
 		if (longSize)
 			result += target->aLong;
-		if (longSize < maxShortLen)
-			result.append(' ', maxShortLen - longSize);
+		if (longSize < maxLongLen)
+			result.append(maxLongLen - longSize, ' ');
 
 		// Optional separator
 		if (paramSep)
 			result += paramSep;
 
 		// Add parameter, aligned left
-		if (paramSize)
-			result += "<" + target->pName + ">";
-		if (paramSize < maxShortLen)
-			result.append(' ', maxShortLen - paramSize);
+		if (maxParamLen) {
+			if (paramSize)
+				result += "<" + target->pName + ">";
+			if (paramNeed < (maxParamLen + 2))
+				result.append(maxParamLen + 2 - paramNeed, ' ');
 
-		// Optional separator
-		if (descSep)
-			result += descSep;
+			// Optional separator
+			if (descSep)
+				result += descSep;
+		}
 
 		// Now possibly distribute the description
 		if (descSize) {
@@ -314,7 +317,7 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 				pos += rightLen;
 				if (pos < descSize) {
 					result += '\n';
-					result.append(' ', leftLen);
+					result.append(leftLen, ' ');
 					if (descSep)
 						result += descSep;
 				}
