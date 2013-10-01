@@ -4,7 +4,12 @@
 
 /** @file general.h
   *
-  * @brief Main include file to add everything from folder "general"
+  * @brief Main include file to add general files from folder "general".
+  *
+  * This include file is meant to provide general definitions
+  * and helpers that are usable outside pwxLib from folder
+  * "general". Files that declare internal helpers and tools
+  * are not included here.
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
