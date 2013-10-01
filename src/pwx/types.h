@@ -4,7 +4,11 @@
 
 /** @file types.h
   *
-  * @brief Main include file to add everything from folder "types"
+  * @brief Main include file to add general files "types"
+  *
+  * This include file is meant to provide all types that are
+  * usable outside pwxLib from folder "types". Files that declare
+  * types that are of internal use are not included here.
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -29,14 +33,13 @@
 
 #include <pwx/types/CException.h>
 #include <pwx/types/CLockable.h>
+#include <pwx/types/CLockGuard.h>
 #include <pwx/types/TVarDeleter.h>
 #include <pwx/types/TSingleElement.h>
 #include <pwx/types/TDoubleElement.h>
 #include <pwx/types/THashElement.h>
 #include <pwx/types/CHashBuilder.h>
-#include <pwx/types/eNameSourceType.h>
 #include <pwx/types/CWaveColor.h>
-
 
 #endif // PWX_LIBPWX_PWX_TYPES_H_INCLUDED
 
