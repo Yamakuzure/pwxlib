@@ -68,6 +68,16 @@ namespace pwx {
   * <LI><I>getError(nr)</I> returns the error number for error
   * number <I>nr</I>, <I>getErrorStr(nr)</I> returns a string
   * with an error text.</LI>
+  * <LI><I>getHelpArg(arg)</I> returns a string with the short
+  * and/or long argument and parameter if needed.</LI>
+  * <LI><I>getHelpDesc(arg)</I> returns a string with the
+  * argument descriptions.</LI>
+  * <LI><I>getHelpStr(arg, length)</LI> returns a string with
+  * both the short and/or long argument plus parameter and
+  * description. This string is formatted using the found
+  * maximum lengths of short arguments, long argumens and
+  * parameter neames according to the given line length. If the
+  * resulting string is too long, it will line break.</LI>
   * <LI>Finally <I>clearArgs()</I> frees all allocated memory.
   * </LI></LIST>
 **/
@@ -221,6 +231,13 @@ public:
 		if (hasArgShort)
 			PWX_TRY_PWX_FURTHER(shortArgs.add(key_short, new_target))
 
+		// === Finally record length if a new maximum is found ===
+		if (key_long.size() > maxLongLen)
+			maxLongLen = key_long.size();
+		if (param_name && (strlen(param_name) > maxParamLen))
+			maxParamLen = strlen(param_name);
+		if (key_short.size() > maxShortLen)
+			maxShortLen = key_short.size();
 	}
 
 
@@ -229,6 +246,11 @@ public:
 	int32_t     getError      (const int32_t nr) const noexcept;
 	int32_t     getErrorCount () const noexcept;
 	const char* getErrorStr   (const int32_t nr) const noexcept;
+	std::string getHelpArg    (const char* argument) const noexcept;
+	std::string getHelpDesc   (const char* argument) const noexcept;
+	std::string getHelpStr    (const char* argument, size_t length,
+							   char argSep = 0x20, char paramSep = 0x20,
+							   char descSep = 0x20) const noexcept;
 	int32_t     parseArgs     (const int32_t argc, const char** argv) noexcept;
 
 
@@ -249,12 +271,15 @@ private:
 	 * ===============================================
 	 */
 
-	errlist_t errlist;   //!< stores generated error messages
-	hash_t    longArgs;  //!< stores targets using their long argument as key
-	char***   pass_args; //!< The target to store arguments to pass through
-	char*     pass_init; //!< The character sequence starting the pass through distribution
-	int32_t*  pass_cnt;  //!< The target to store the number of passed through arguments
-	hash_t    shortArgs; //!< stores targets using their short argument as key
+	errlist_t errlist;     //!< stores generated error messages
+	hash_t    longArgs;    //!< stores targets using their long argument as key
+	size_t    maxLongLen;  //!< longest "long" argument size
+	size_t    maxParamLen; //!< longest parameter name size
+	size_t    maxShortLen; //!< longest "short" argument size
+	char***   pass_args;   //!< The target to store arguments to pass through
+	char*     pass_init;   //!< The character sequence starting the pass through distribution
+	int32_t*  pass_cnt;    //!< The target to store the number of passed through arguments
+	hash_t    shortArgs;   //!< stores targets using their short argument as key
 
 };
 
