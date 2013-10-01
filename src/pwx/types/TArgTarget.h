@@ -51,18 +51,16 @@ struct TArgTarget : public VArgTargetBase
 	  * @param[in] arg_long Long argument like "--foo" or "-bar".
 	  * @param[in] arg_type Determines what to do with the target.
 	  * @param[out] arg_target Pointer to the value to handle.
-	  * @param[out] arg_cb Callback function to handle argument parameters.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> int the help text.
 	**/
 	explicit TArgTarget(const char* arg_short, const char* arg_long,
 				eArgTargetType arg_type, T* arg_target,
-				void (*arg_cb)(const char*, T*),
 				const char* arg_desc, const char* param_name)
 			noexcept :
 		VArgTargetBase(arg_short, arg_long, arg_type, arg_desc, param_name),
 		target(arg_target),
-		cb    (arg_cb)
+		cb    (nullptr)
 	{ /* nothing to do here */ }
 
 	/** @brief destructor
@@ -74,6 +72,12 @@ struct TArgTarget : public VArgTargetBase
 	void process(const char* param)
 	{
         /// @todo implement
+	}
+
+	// set callback function
+	void setCb(void (*arg_cb)(const char*, T*))
+	{
+		cb = arg_cb;
 	}
 
 private:
