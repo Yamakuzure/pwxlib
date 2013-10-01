@@ -357,6 +357,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../test/testPAH.cpp" />
+		<Unit filename="../test/testPAH.h" />
 		<Unit filename="../test/testRNG.cpp">
 			<Option target="clean" />
 			<Option target="library" />

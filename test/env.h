@@ -13,6 +13,7 @@ struct sEnv
 	bool    doRNG       = false;
 	bool    doSCT       = false;
 	bool    doCWC       = false;
+	bool    doPAH       = false;
 };
 
 #endif // PWX_LIBPWX_TEST_ENV_H_INCLUDED

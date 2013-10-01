@@ -3,6 +3,7 @@
 #include "testListRing.h"
 #include "testStackQueue.h"
 #include "testHash.h"
+#include "testPAH.h"
 #include "testSet.h"
 #include "testSpeed.h"
 #include "testRNG.h"
@@ -26,6 +27,7 @@ int32_t main(int argc, char* argv[])
 	bool     showHelp     = false;
 	for (int i = 1; !showHelp && (i < argc); ++i) {
 		if (STRCEQ(argv[i], "--help") || STRCEQ(argv[i], "-h")) showHelp = true;
+		else if (STRCEQ(argv[i], "--args")  || STRCEQ(argv[i], "-a")) doWhichTests |= doTestPAH;
 		else if (STRCEQ(argv[i], "--cont")  || STRCEQ(argv[i], "-c")) doWhichTests |= doTestContainers;
 		else if (                              STRCEQ(argv[i], "-m")) {
 			int m = atoi(argv[++i]);
@@ -52,6 +54,9 @@ int32_t main(int argc, char* argv[])
 				showHelp = true;
 			}
 
+		} else {
+			cerr << "Error: \"" << argv[i] << "\" unknown!" << endl;
+			showHelp = true;
 		}
 	}
 
@@ -59,6 +64,7 @@ int32_t main(int argc, char* argv[])
 	if (showHelp) {
 		cout << "Usage: " << argv[0] << " [options]\n" << endl;
 		cout << "Options:\n";
+		cout << "  -a  --args   Test PAH\n";
 		cout << "  -c  --cont   Test containers\n";
 		cout << "  -h  --help   Show this help and exit\n";
 		cout << "  -m <10000+>  Maximum elements for speed tests (200,000)\n";
@@ -81,6 +87,7 @@ int32_t main(int argc, char* argv[])
 	if (doWhichTests & doTestRNG)        env.doRNG   = true;
 	if (doWhichTests & doTestSCT)        env.doSCT   = true;
 	if (doWhichTests & doTestCWaveColor) env.doCWC   = true;
+	if (doWhichTests & doTestPAH)        env.doPAH   = true;
 
 	// Wrap a giant try/catch around just everything to trace immediately
 	try {
@@ -224,6 +231,11 @@ result = testSpeed<container_type, key_type, value_type, \
 	// --- Test SCT worker ---
 	if ((EXIT_SUCCESS == result) && env.doSCT) {
 		PWX_TRY_PWX_FURTHER (result = testSCT (env))
+	}
+
+	// --- Test PAH worker ---
+	if ((EXIT_SUCCESS == result) && env.doPAH) {
+		PWX_TRY_PWX_FURTHER (result = testPAH (env))
 	}
 
 	// --- Test CWavecolor type ---
