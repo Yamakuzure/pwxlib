@@ -56,9 +56,9 @@ int32_t testPAH (sEnv &env)
 	** B) Print Help text using automatic text generation.                 **
 	************************************************************************/
 	cout << adjRight (4, 0) << ++env.testCount << " Print auto help text : " << endl;
-	cout << PAH.getHelpStr("add", 60) << endl;
-	cout << PAH.getHelpStr("-h", 60) << endl;
-	cout << PAH.getHelpStr("i", 60) << endl;
+	cout << PAH.getHelpStr("add", 38, '|', '=', ':') << endl;
+	cout << PAH.getHelpStr("-h", 38, '|', '=', ':') << endl;
+	cout << PAH.getHelpStr("i", 38, '|', '=', ':') << endl;
 	++env.testSuccess;
 
 	/************************************************************************
