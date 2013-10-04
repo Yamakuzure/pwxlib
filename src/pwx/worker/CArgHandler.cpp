@@ -225,7 +225,7 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 					result += ' ';
 			}
 		} else {
-			result.assign(maxShortLen + (argSep && autoSep ? 1 : 0), ' ');
+			result.append(maxShortLen + (argSep && autoSep ? 1 : 0), ' ');
 			if (argSep && !autoSep)
 				result += argSep;
 		} // end of handling short argument
