@@ -144,10 +144,40 @@ const char* CArgHandler::getErrorStr(const int32_t nr) const noexcept
   * If @a argument is nullptr or an empty string, an error message will
   * be returned. This condition is tested with an assert, too.
   *
+  * In the default configuration the returned string is simply both
+  * arguments and the possible parameter concatenated together.
+  * Several optional parameters can be used to configure the output:
+  * <BR />
+  * The optional parameter @a length can be used to set a minimum
+  * length. If this is set to a value different than 0, the string
+  * returned will be filled with preceeding spaces.<BR />
+  * The parameter @a argSep defines a separator character, defaulting
+  * to ' ', that is placed between the short and long argument.<BR />
+  * The parameter @a paramSep defines a separator character, defaulting
+  * to ' ', that is placed between the argument(s) and the parameter.
+  * <BR />
+  * If @a emptyLine is set to true, the string will consist of spaces
+  * and possibly the separators, according to @a autoSep, only.<BR />
+  * Finally the parameter @a autoSep, that defaults to true, can be
+  * changed to false to have @a argSep added in any way. By default
+  * separators are only added if @a emptyLine is false. But even if
+  * @a emptyLine is false, @a argSep is only added if there are both
+  * a short and long version of the argument, and @a paramSep if there
+  * is a parameter. If @a autoSep is false, @a argSep is placed in
+  * any way and @a paramSep if there is at least one argument known
+  * that has a parameter.
+  *
   * @param[in] argument Either short or long argument to search for.
+  * @param[in] length Maximum length of each line.
+  * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
+  * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
+  * @param[in] emptyLine If set to true, a blank line with possible separators is returned.
+  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
   * @return a string with the help text or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpArg(const char* argument) const noexcept
+std::string CArgHandler::getHelpArg(const char* argument, size_t length,
+									char argSep, char paramSep,
+									bool emptyLine, bool autoSep) const noexcept
 {
 	std::string result = "";
 
@@ -167,15 +197,75 @@ std::string CArgHandler::getHelpArg(const char* argument) const noexcept
 	if (target) {
 		size_t shortSize = target->aShort.size();
 		size_t longSize  = target->aLong.size();
-		if (shortSize)
-			result += target->aShort;
+		size_t paramSize = target->pName.size();
+		size_t paramNeed = paramSize ? paramSize + 2 : 0;
+
+		// === First: short argument ===
+		if (shortSize) {
+			// a) insert spaces to right align the short arg
+			if (shortSize < maxShortLen)
+				result.append(maxShortLen - shortSize, ' ');
+
+			// b) Add short arg or blanks
+			if (emptyLine)
+				result.append(shortSize, ' ');
+			else
+				result.append(target->aShort);
+
+			// c) Add possible separator
+			if (argSep) {
+				if (!autoSep || (!emptyLine && longSize))
+					result += argSep;
+				else
+					result += ' ';
+			}
+		} else {
+			result.assign(maxShortLen + (argSep && autoSep ? 1 : 0), ' ');
+			if (argSep && !autoSep)
+				result += argSep;
+		} // end of handling short argument
+
+		// === Second: long argument ===
 		if (longSize) {
-			if (shortSize)
-				result += " ";
-			result += target->aLong;
-		}
-		if (target->pName.size())
-			result += " <" + target->pName + ">";
+			// a) Add long arg or blanks
+			if (emptyLine)
+				result.append(longSize, ' ');
+			else
+				result.append(target->aLong);
+
+			// b) insert spaces to left align the long arg
+			if (longSize < maxLongLen)
+				result.append(maxLongLen - longSize, ' ');
+		} else {
+			result.append(maxLongLen + (paramSep && autoSep && maxParamLen ? 1 : 0), ' ');
+			if (paramSep && !autoSep && maxParamLen)
+				result += paramSep;
+		} // end of handling long argument
+
+		// === Third: argument parameter ===
+		if (maxParamLen) {
+			// a) Add possible separator
+			if (paramSep) {
+				if (!autoSep || (!emptyLine && paramSize))
+					result += paramSep;
+				else
+					result += ' ';
+			}
+
+			// b) Add parameter or blanks
+			if (emptyLine || !paramSize)
+				result.append(paramNeed, ' ');
+			else
+				result += "<" + target->pName + ">";
+
+			// c) insert spaces to left align the parameter
+			if (paramNeed < (maxParamLen + 2))
+				result.append(maxParamLen + 2 - paramNeed, ' ');
+		} // End of handling parameters
+
+		// Fourth: Before the result can be returned, it might need to be indented:
+		if (result.size() < length)
+			result.insert(0, length - result.size(), ' ');
 	} else
 		result = "Unknown argument: " + key;
 
@@ -195,10 +285,35 @@ std::string CArgHandler::getHelpArg(const char* argument) const noexcept
   * If @a argument is nullptr or an empty string, an error message will
   * be returned. This condition is tested with an assert, too.
   *
+  * In the default configuration the description string is simply
+  * returned in whole. Several optional parameters can be used to
+  * configure the output:<BR />
+  * The optional parameter @a pos can be used to define a different
+  * starting position. If @a pos is larger than the size of the
+  * description, an empty string is returned.<BR />
+  * The optional parameter @a length can be used to set a maximum
+  * length. If this is set to a value different than 0, the string
+  * returned will be constructed from @a pos forward to the last
+  * space character found before @a length is reached, or up to
+  * @a length if either the next character is a space, or no space
+  * could be found before @a length was reached.<BR />
+  * With @a descSep a separator character, that defaults to ' ',
+  * can be set to be added in front of the description returned.<BR />
+  * Finally the parameter @a autoSep, that defaults to true, can be
+  * changed to false to have @a descSep added in any way. By default
+  * the separator character is only added as is on the first line,
+  * that is @a pos is set to 0, and is substituted with a space
+  * character on all other lines.
+  *
   * @param[in] argument Either short or long argument to search for.
+  * @param[in] pos Starting position of the description, default 0.
+  * @param[in] length Maximum length of the description, default all.
+  * @param[in] descSep Optional separator before the description. Default: ' '
+  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
   * @return a string with the description or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpDesc(const char* argument) const noexcept
+std::string CArgHandler::getHelpDesc(const char* argument, size_t pos,
+									 size_t length, char descSep, bool autoSep) const noexcept
 {
 	assert (argument && strlen(argument)
 		&& "ERROR: getHelpArg called with nullptr/empty argument!");
@@ -213,8 +328,45 @@ std::string CArgHandler::getHelpDesc(const char* argument) const noexcept
 
 	assert(target && "ERROR: Couldn't find given argument!");
 
-	if (target)
-		return target->desc;
+	if (target) {
+		size_t descSize = target->desc.size();
+
+		// Exit now if length is zero, it means the
+		// whole (or remainder) of the description
+		// is to be returned.
+		if (!length)
+			return pos < descSize ? target->desc.substr(pos) : "";
+
+		// If pos is too large, the method can return now, too
+		if (pos >= descSize)
+			return "";
+
+		// The result is a substring, possibly trimmed at a space
+		// character, preceded by either descSep or a ' ' according
+		// to the autoSep setting.
+		std::string result;
+		if (descSep) {
+			if (pos && autoSep)
+				result.assign(1, ' ');
+			else
+				result.assign(1, descSep);
+		}
+
+		// If the next character at pos+length is not a space,
+		// the last space before pos+length must be found to
+		// build the substring to return.
+		if ( (pos + length) <= descSize ) {
+			size_t endpos = target->desc.find_last_of(' ' , pos + length);
+
+			if (endpos > pos)
+				result += target->desc.substr(pos, endpos - pos);
+			else
+				result += target->desc.substr(pos, length - 1);
+		} else
+			result += target->desc.substr(pos);
+
+		return result;
+	}
 	return std::string("Unknown argument: " + key);
 }
 
@@ -248,10 +400,12 @@ std::string CArgHandler::getHelpDesc(const char* argument) const noexcept
   * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
   * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
   * @param[in] descSep Optional separator before the description. Default: ' '
+  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
   * @return a string with the description or an error message if @a argument could not be found.
   */
 std::string CArgHandler::getHelpStr(const char* argument, size_t length,
-									char argSep, char paramSep, char descSep) const noexcept
+									char argSep, char paramSep, char descSep,
+									bool autoSep) const noexcept
 {
 	std::string result;
 
@@ -269,60 +423,35 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 	assert(target && "ERROR: Couldn't find given argument!");
 
 	if (target) {
-		size_t shortSize = target->aShort.size();
-		size_t longSize  = target->aLong.size();
-		size_t paramSize = target->pName.size();
-		size_t paramNeed = paramSize ? paramSize + 2 : 0;
+		/** @todo : The three methods do the checking all the time.
+		  * This should be done differently, with private non-checking
+		  * methods doing the work, and the public versions only check
+		  * and delegate.
+		  * Priority: Low.
+		**/
+		size_t leftSize  = maxShortLen + maxLongLen + maxParamLen
+						 + (argSep   ? 1 : 0)
+						 + (paramSep ? 1 : 0);
+		size_t rightSize = length > (leftSize + 8) ? length - leftSize : 8;
 		size_t descSize  = target->desc.size();
+		size_t pos       = 0;
+		std::string desc;
 
-		// Add short argument, aligend right
-		if (shortSize < maxShortLen)
-			result.append(maxShortLen - shortSize, ' ');
-		if (shortSize)
-			result += target->aShort;
+		while (pos < descSize) {
+			// Add left side:
+			result.append(getHelpArg(argument, leftSize, argSep, paramSep,
+									 pos ? true : false, autoSep));
 
-		// Optional separator
-		if (argSep)
-			result += argSep;
+			// Add right side
+			desc.assign(getHelpDesc(argument, pos, rightSize, descSep, autoSep));
+			pos += desc.size() ? desc.size() : 1;
+			result.append(desc);
 
-		// Add long argument, aligned left
-		if (longSize)
-			result += target->aLong;
-		if (longSize < maxLongLen)
-			result.append(maxLongLen - longSize, ' ');
-
-		// Optional separator
-		if (paramSep)
-			result += paramSep;
-
-		// Add parameter, aligned left
-		if (maxParamLen) {
-			if (paramSize)
-				result += "<" + target->pName + ">";
-			if (paramNeed < (maxParamLen + 2))
-				result.append(maxParamLen + 2 - paramNeed, ' ');
-
-			// Optional separator
-			if (descSep)
-				result += descSep;
+			// Any characters left, then add a line break:
+			if (pos < descSize)
+				result += '\n';
 		}
 
-		// Now possibly distribute the description
-		if (descSize) {
-			size_t leftLen  = result.size() - (descSep ? 1 : 0);
-			size_t rightLen = (leftLen + 8) > length ? 8 : length - leftLen;
-			size_t pos      = 0;
-			while (pos < descSize) {
-				result += target->desc.substr(pos, rightLen);
-				pos += rightLen;
-				if (pos < descSize) {
-					result += '\n';
-					result.append(leftLen, ' ');
-					if (descSep)
-						result += descSep;
-				}
-			}
-		}
 	} else
 		result = "Unknown argument: " + key;
 
