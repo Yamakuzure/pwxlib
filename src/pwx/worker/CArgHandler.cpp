@@ -250,7 +250,7 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 		// === Third: argument parameter ===
 		if (maxParamLen) {
 			// a) Add possible separator
-			if (paramSep) {
+			if (paramSep && longSize) {
 				if (!autoSep || (!emptyLine && paramSize))
 					result += paramSep;
 				else
