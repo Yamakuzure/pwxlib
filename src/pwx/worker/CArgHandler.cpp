@@ -158,14 +158,17 @@ const char* CArgHandler::getErrorStr(const int32_t nr) const noexcept
   * <BR />
   * If @a emptyLine is set to true, the string will consist of spaces
   * and possibly the separators, according to @a autoSep, only.<BR />
-  * Finally the parameter @a autoSep, that defaults to true, can be
-  * changed to false to have @a argSep added in any way. By default
-  * separators are only added if @a emptyLine is false. But even if
-  * @a emptyLine is false, @a argSep is only added if there are both
-  * a short and long version of the argument, and @a paramSep if there
-  * is a parameter. If @a autoSep is false, @a argSep is placed in
-  * any way and @a paramSep if there is at least one argument known
-  * that has a parameter.
+  * This parameter @a autoSep, that defaults to true, can be changed
+  * to false to have @a argSep added in any way. By default separators
+  * are only added if @a emptyLine is false. But even if @a emptyLine
+  * is false, @a argSep is only added if there are both a short and
+  * long version of the argument, and @a paramSep if there is a
+  * parameter. If @a autoSep is false, @a argSep is placed in any way
+  * and @a paramSep if there is at least one argument known that has
+  * a parameter.<BR />
+  * The last parameter @a autoSpace defaults to false and causes, if
+  * changed to true, that extra space characters are placed around the
+  * separators if they are something else than a space character.
   *
   * @param[in] argument Either short or long argument to search for.
   * @param[in] length Minimum length of each line.
@@ -174,11 +177,12 @@ const char* CArgHandler::getErrorStr(const int32_t nr) const noexcept
   * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
   * @param[in] emptyLine If set to true, a blank line with possible separators is returned.
   * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
+  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
   * @return a string with the help text or an error message if @a argument could not be found.
   */
 std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t indent,
 									char argSep, char paramSep,
-									bool emptyLine, bool autoSep) const noexcept
+									bool emptyLine, bool autoSep, bool autoSpace) const noexcept
 {
 	std::string result = "";
 
@@ -200,6 +204,8 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 		size_t longSize  = target->aLong.size();
 		size_t paramSize = target->pName.size();
 		size_t paramNeed = paramSize ? paramSize + 2 : 0;
+		bool   addArgSpc = autoSpace && argSep && (0x20 != argSep);
+		bool   addParSpc = autoSpace && paramSep && (0x20 != paramSep);
 
 		// Start with indentation if set
 		if (indent)
@@ -219,15 +225,22 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 
 			// c) Add possible separator
 			if (argSep) {
+				if (addArgSpc) result += ' ';
+
 				if (!autoSep || (!emptyLine && longSize))
 					result += argSep;
 				else
 					result += ' ';
+
+				if (addArgSpc) result += ' ';
 			}
 		} else {
-			result.append(maxShortLen + (argSep && autoSep ? 1 : 0), ' ');
-			if (argSep && !autoSep)
+			result.append(maxShortLen + (argSep && autoSep ? addArgSpc ? 3 : 1 : 0), ' ');
+			if (argSep && !autoSep) {
+				if (addArgSpc) result += ' ';
 				result += argSep;
+				if (addArgSpc) result += ' ';
+			}
 		} // end of handling short argument
 
 		// === Second: long argument ===
@@ -242,19 +255,26 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 			if (longSize < maxLongLen)
 				result.append(maxLongLen - longSize, ' ');
 		} else {
-			result.append(maxLongLen + (paramSep && autoSep && maxParamLen ? 1 : 0), ' ');
-			if (paramSep && !autoSep && maxParamLen)
+			result.append(maxLongLen + (paramSep && autoSep && maxParamLen ? addParSpc ? 3 : 1 : 0), ' ');
+			if (paramSep && !autoSep && maxParamLen) {
+				if (addParSpc) result += ' ';
 				result += paramSep;
+				if (addParSpc) result += ' ';
+			}
 		} // end of handling long argument
 
 		// === Third: argument parameter ===
 		if (maxParamLen) {
 			// a) Add possible separator
 			if (paramSep && longSize) {
+				if (addParSpc) result += ' ';
+
 				if (!autoSep || (!emptyLine && paramSize))
 					result += paramSep;
 				else
 					result += ' ';
+
+				if (addParSpc) result += ' ';
 			}
 
 			// b) Add parameter or blanks
@@ -303,22 +323,29 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
   * @a length if either the next character is a space, or no space
   * could be found before @a length was reached.<BR />
   * With @a descSep a separator character, that defaults to ' ',
-  * can be set to be added in front of the description returned.<BR />
-  * Finally the parameter @a autoSep, that defaults to true, can be
-  * changed to false to have @a descSep added in any way. By default
-  * the separator character is only added as is on the first line,
-  * that is @a pos is set to 0, and is substituted with a space
-  * character on all other lines.
+  * can be set to be added in front of the description returned.
+  * <BR />
+  * The parameter @a autoSep, that defaults to true, can be changed
+  * to false to have @a descSep added in any way. By default the
+  * separator character is only added as is on the first line, that
+  * is @a pos is set to 0, and is substituted with a space character
+  * on all other lines.<BR />
+  * The last parameter @a autoSpace defaults to false and causes, if
+  * changed to true, that extra space characters are placed around the
+  * @a descSep separator if it is set to something else than a space
+  * character.
   *
   * @param[in] argument Either short or long argument to search for.
-  * @param[in] pos Starting position of the description, default 0.
+  * @param[in,out] pos Pointer to the starting position of the description, receives end position, default nullptr.
   * @param[in] length Maximum length of the description, default all.
   * @param[in] descSep Optional separator before the description. Default: ' '
   * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
+  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
   * @return a string with the description or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpDesc(const char* argument, size_t pos,
-									 size_t length, char descSep, bool autoSep) const noexcept
+std::string CArgHandler::getHelpDesc(const char* argument, size_t* pos,
+									 size_t length, char descSep,
+									 bool autoSep, bool autoSpace) const noexcept
 {
 	assert (argument && strlen(argument)
 		&& "ERROR: getHelpArg called with nullptr/empty argument!");
@@ -335,40 +362,51 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t pos,
 
 	if (target) {
 		size_t descSize = target->desc.size();
+		size_t xPos     = pos ? *pos : 0;
 
 		// Exit now if length is zero, it means the
 		// whole (or remainder) of the description
 		// is to be returned.
 		if (!length)
-			return pos < descSize ? target->desc.substr(pos) : "";
+			return xPos < descSize ? target->desc.substr(xPos) : "";
 
-		// If pos is too large, the method can return now, too
-		if (pos >= descSize)
+		// If xPos is too large, the method can return now, too
+		if (xPos >= descSize)
 			return "";
+
+		// Are extra spaces needed ?
+		bool addDescSpc = autoSpace && descSep && (0x20 != descSep);
 
 		// The result is a substring, possibly trimmed at a space
 		// character, preceded by either descSep or a ' ' according
 		// to the autoSep setting.
 		std::string result;
 		if (descSep) {
-			if (pos && autoSep)
-				result.assign(1, ' ');
+			if (addDescSpc) result.append(1, ' ');
+			if (xPos && autoSep)
+				result.append(1, ' ');
 			else
-				result.assign(1, descSep);
+				result.append(1, descSep);
+			if (addDescSpc) result.append(1, ' ');
 		}
 
-		// If the next character at pos+length is not a space,
-		// the last space before pos+length must be found to
+		// If the next character at xPos+length is not a space,
+		// the last space before xPos+length must be found to
 		// build the substring to return.
-		if ( (pos + length) <= descSize ) {
-			size_t endpos = target->desc.find_last_of(' ' , pos + length);
+		if ( (xPos + length) <= descSize ) {
+			size_t endpos = target->desc.find_last_of(' ' , xPos + length);
 
-			if (endpos > pos)
-				result += target->desc.substr(pos, endpos - pos);
-			else
-				result += target->desc.substr(pos, length - 1);
-		} else
-			result += target->desc.substr(pos);
+			if (endpos > xPos) {
+				result += target->desc.substr(xPos, endpos - xPos);
+				if (pos) *pos += endpos + 1;
+			} else {
+				result += target->desc.substr(xPos, length - 1);
+				if (pos) *pos += length;
+			}
+		} else {
+			result += target->desc.substr(xPos);
+			if (pos) *pos = target->desc.size();
+		}
 
 		return result;
 	}
@@ -400,6 +438,15 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t pos,
   * the argument(s) and the parameter, and between the argument
   * string and the description can be set.
   *
+  * If a description is long enough to cause line breakse, the set
+  * separators are not displayed and substituted by a space
+  * character. If the separators shall be displayed on every line,
+  * @a autoSep can be set to false.
+  *
+  * The last parameter @a autoSpace defaults to false and causes, if
+  * changed to true, that extra space characters are placed around the
+  * separators if they are something else than a space character.
+  *
   * @param[in] argument Either short or long argument to search for.
   * @param[in] length Maximum length of each line.
   * @param[in] indent Prefix these number of spaces. Default: 0
@@ -407,11 +454,12 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t pos,
   * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
   * @param[in] descSep Optional separator before the description. Default: ' '
   * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
+  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
   * @return a string with the description or an error message if @a argument could not be found.
   */
 std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t indent,
 									char argSep, char paramSep, char descSep,
-									bool autoSep) const noexcept
+									bool autoSep, bool autoSpace) const noexcept
 {
 	std::string result;
 
@@ -445,11 +493,10 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t 
 			// Add left side:
 			result.append(getHelpArg(argument, leftSize, indent,
 									 argSep, paramSep,
-									 pos ? true : false, autoSep));
+									 pos ? true : false, autoSep, autoSpace));
 
 			// Add right side
-			desc.assign(getHelpDesc(argument, pos, rightSize, descSep, autoSep));
-			pos += desc.size() ? desc.size() : 1;
+			desc.assign(getHelpDesc(argument, &pos, rightSize, descSep, autoSep, autoSpace));
 			result.append(desc);
 
 			// Any characters left, then add a line break:
