@@ -296,12 +296,12 @@ public:
 	int32_t     getError      (const int32_t nr) const noexcept;
 	int32_t     getErrorCount () const noexcept;
 	const char* getErrorStr   (const int32_t nr) const noexcept;
-	std::string getHelpArg    (const char* argument, size_t length = 0,
+	std::string getHelpArg    (const char* argument, size_t length = 0, size_t indent = 0,
 							   char argSep = 0x20, char paramSep = 0x20,
 							   bool emptyLine = false, bool autoSep = true) const noexcept;
 	std::string getHelpDesc   (const char* argument, size_t pos = 0, size_t length = 0,
 							   char descSep = 0x20, bool autoSep = true) const noexcept;
-	std::string getHelpStr    (const char* argument, size_t length,
+	std::string getHelpStr    (const char* argument, size_t length, size_t indent = 0,
 							   char argSep = 0x20, char paramSep = 0x20,
 							   char descSep = 0x20, bool autoSep = true) const noexcept;
 	int32_t     parseArgs     (const int32_t argc, const char** argv) noexcept;

@@ -168,14 +168,15 @@ const char* CArgHandler::getErrorStr(const int32_t nr) const noexcept
   * that has a parameter.
   *
   * @param[in] argument Either short or long argument to search for.
-  * @param[in] length Maximum length of each line.
+  * @param[in] length Minimum length of each line.
+  * @param[in] indent Prefix these number of spaces. Default: 0
   * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
   * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
   * @param[in] emptyLine If set to true, a blank line with possible separators is returned.
   * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
   * @return a string with the help text or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpArg(const char* argument, size_t length,
+std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t indent,
 									char argSep, char paramSep,
 									bool emptyLine, bool autoSep) const noexcept
 {
@@ -199,6 +200,10 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length,
 		size_t longSize  = target->aLong.size();
 		size_t paramSize = target->pName.size();
 		size_t paramNeed = paramSize ? paramSize + 2 : 0;
+
+		// Start with indentation if set
+		if (indent)
+			result.assign(indent, ' ');
 
 		// === First: short argument ===
 		if (shortSize) {
@@ -397,13 +402,14 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t pos,
   *
   * @param[in] argument Either short or long argument to search for.
   * @param[in] length Maximum length of each line.
+  * @param[in] indent Prefix these number of spaces. Default: 0
   * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
   * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
   * @param[in] descSep Optional separator before the description. Default: ' '
   * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
   * @return a string with the description or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpStr(const char* argument, size_t length,
+std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t indent,
 									char argSep, char paramSep, char descSep,
 									bool autoSep) const noexcept
 {
@@ -429,9 +435,7 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 		  * and delegate.
 		  * Priority: Low.
 		**/
-		size_t leftSize  = maxShortLen + maxLongLen + maxParamLen
-						 + (argSep   ? 1 : 0)
-						 + (paramSep ? 1 : 0);
+		size_t leftSize  = maxShortLen + maxLongLen + maxParamLen + 2 + indent;
 		size_t rightSize = length > (leftSize + 8) ? length - leftSize : 8;
 		size_t descSize  = target->desc.size();
 		size_t pos       = 0;
@@ -439,7 +443,8 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length,
 
 		while (pos < descSize) {
 			// Add left side:
-			result.append(getHelpArg(argument, leftSize, argSep, paramSep,
+			result.append(getHelpArg(argument, leftSize, indent,
+									 argSep, paramSep,
 									 pos ? true : false, autoSep));
 
 			// Add right side
