@@ -388,88 +388,112 @@
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being false.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if both C-Strings are equal ignoring case
 **/
-#define STRCEQ(a,b) (strcasecmp(a,b) == 0)
+#define STRCEQ(a,b) (a && b && (strcasecmp(a,b) == 0))
 
 
 /** @brief return true if two C-Strings are not equal ignoring case
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being true.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if both C-Strings are not equal ignoring case
 **/
-#define STRCNE(a,b) (strcasecmp(a,b) != 0)
+#define STRCNE(a,b) ((nullptr == a) || (nullptr == b) || (strcasecmp(a,b) != 0))
 
 
 /** @brief true if @a a is "lower" than @a b ignoring case
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being true if @a a is nullptr or false if @a b is nullptr.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if @a a is "lower" than @a b ignoring case
 **/
-#define STRCLT(a,b) (strcasecmp(a,b) < 0)
+#define STRCLT(a,b) ((nullptr == a) ? true : (nullptr == b) ? false : (strcasecmp(a,b) < 0))
 
 
 /** @brief true if @a a is "greater" than @a b ignoring case
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being false if @a a is nullptr and true if @a b is nullptr.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if @a a is "greater" than @a b ignoring case
 **/
-#define STRCGT(a,b) (strcasecmp(a,b) > 0)
+#define STRCGT(a,b) ((nullptr == a) ? false : (nullptr == b) ? true : (strcasecmp(a,b) > 0))
 
 
 /** @brief return true if two C-Strings are equal
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being false.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if both C-Strings are equal
 **/
-#define STREQ(a,b) (std::strcmp(a,b) == 0)
+#define STREQ(a,b) (a && b && (std::strcmp(a,b) == 0))
 
 
 /** @brief return true if two C-Strings are not equal
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being true.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if both C-Strings are not equal
 **/
-#define STRNE(a,b) (std::strcmp(a,b) != 0)
+#define STRNE(a,b) ((nullptr == a) || (nullptr == b) || (std::strcmp(a,b) != 0))
 
 
 /** @brief true if @a a is "lower" than @a b
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being true if @a a is nullptr or false if @a b is nullptr.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if @a a is "lower" than @a b
 **/
-#define STRLT(a,b) (std::strcmp(a,b) < 0)
+#define STRLT(a,b) ((nullptr == a) ? true : (nullptr == b) ? false : (std::strcmp(a,b) < 0))
 
 
 /** @brief true if @a a is "greater" than @a b
   *
   * <I>Prerequisites</I>: cstring
   *
+  * Note: nullptr @a a and/or nullptr @a b are handled and cause
+  * the result being false if @a a is nullptr and true if @a b is nullptr.
+  *
   * @param a left hand C-String
   * @param b right hand C-String
   * @return true if @a a is "greater" than @a b
 **/
-#define STRGT(a,b) (std::strcmp(a,b) > 0)
+#define STRGT(a,b) ((nullptr == a) ? false : (nullptr == b) ? true : (std::strcmp(a,b) > 0))
 
 
 /** @brief true if @a a is of the same type as @a b
