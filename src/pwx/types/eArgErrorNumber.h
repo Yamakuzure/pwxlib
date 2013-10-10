@@ -37,7 +37,9 @@ namespace pwx {
 enum eArgErrorNumber
 {
 	AEN_ARGUMENT_UNKNOWN    = 0x00000001, //!< The found argument is not known
-	AEN_PARAM_TYPE_MISMATCH = 0x00000002  //!< The type of the parameter doesn't match the target
+	AEN_PARAM_TYPE_MISMATCH = 0x00000002, //!< The type of the parameter doesn't match the target
+	AEN_PARAMETER_MISSING   = 0x00000004, //!< An argument that needs a parameter got none to process
+	AEN_PROCESSING_ERROR    = 0x00000008  //!< Set when target->process() threw an exception.
 };
 
 
