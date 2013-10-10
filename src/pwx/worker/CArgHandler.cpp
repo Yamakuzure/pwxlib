@@ -46,6 +46,13 @@ CArgHandler::~CArgHandler() noexcept
   * If @a init_arg points to an empty string, <B>all</B>
   * parameters are passed through.
   *
+  * @a pass_argc will receive the number of entries in @a pass_argv
+  * received, when the real processing is done. Therefore *pass_argv
+  * will result in an array of *pass_argc malloc'd C-Strings, that
+  * you'll have to free yourself.<BR />
+  * Please note, that this implies that *pass_argv must be nullptr when
+  * the arguments are processed, as a new array will be malloc'd.
+  *
   * @param[in] init_arg the character sequence identifying the passthrough start
   * @param[out] pass_argc pointer receiving the number of passed arguments
   * @param[out] pass_argv pointer receiving the passed through arguments
@@ -189,13 +196,7 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 	assert (argument && strlen(argument)
 		&& "ERROR: getHelpArg called with nullptr/empty argument!");
 
-	std::string key    = argument;
-	data_t*     target = nullptr;
-
-	if (shortArgs.exists(key))
-		target = shortArgs.get(key)->data.get();
-	else if (longArgs.exists(key))
-		target = longArgs.get(key)->data.get();
+	data_t* target = getTarget(argument);
 
 	assert(target && "ERROR: Couldn't find given argument!");
 
@@ -291,8 +292,10 @@ std::string CArgHandler::getHelpArg(const char* argument, size_t length, size_t 
 		// Fourth: Before the result can be returned, it might need to be indented:
 		if (result.size() < length)
 			result.insert(0, length - result.size(), ' ');
-	} else
-		result = "Unknown argument: " + key;
+	} else {
+		result = "Unknown argument: ";
+		result += argument;
+	}
 
 	return result;
 }
@@ -350,13 +353,7 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t* pos,
 	assert (argument && strlen(argument)
 		&& "ERROR: getHelpArg called with nullptr/empty argument!");
 
-	std::string key    = argument;
-	data_t*     target = nullptr;
-
-	if (shortArgs.exists(key))
-		target = shortArgs.get(key)->data.get();
-	else if (longArgs.exists(key))
-		target = longArgs.get(key)->data.get();
+	data_t* target = getTarget(argument);
 
 	assert(target && "ERROR: Couldn't find given argument!");
 
@@ -407,10 +404,12 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t* pos,
 			result += target->desc.substr(xPos);
 			if (pos) *pos = target->desc.size();
 		}
-
-		return result;
+	} else {
+		result = "Unknown argument: ";
+		result += argument;
 	}
-	return std::string("Unknown argument: " + key);
+
+	return result;
 }
 
 
@@ -466,13 +465,7 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t 
 	assert (argument && strlen(argument)
 		&& "ERROR: getHelpArg called with nullptr/empty argument!");
 
-	std::string key    = argument;
-	data_t*     target = nullptr;
-
-	if (shortArgs.exists(key))
-		target = shortArgs.get(key)->data.get();
-	else if (longArgs.exists(key))
-		target = longArgs.get(key)->data.get();
+	data_t* target = getTarget(argument);
 
 	assert(target && "ERROR: Couldn't find given argument!");
 
@@ -504,25 +497,133 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t 
 				result += '\n';
 		}
 
-	} else
-		result = "Unknown argument: " + key;
+	} else {
+		result = "Unknown argument: ";
+		result += argument;
+	}
 
 	return result;
 }
 
 
-/** @brief parseArgs
+/** @brief parse given arguments
   *
-  * @todo: document this function
+  * This method parses the given array @a argv of C-Strings
+  * with @a argc expected entries.
+  *
+  * @param[in] argc The number of strings in @a argv.
+  * @param[in] argv array of C-Strings.
+  * @return Number of errors encountered.
   */
 int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 {
-	int32_t result = 0;
+	if (argc > 0) {
 
+		/* Catch special condition: Everything is passed through. */
+		if (pass_init && !strlen(pass_init)) {
+			passThrough(argc, argv);
+			return 0;
+		}
 
-	return result;
+		/* Move through argv until
+		 * a) argc is reached or
+		 * b) pass_init is reached.
+		 */
+		data_t* lastTarget = nullptr; // holds the last target expecting a parameter
+		int32_t idx        = 0;
+		for ( ; (idx < argc) && argv[idx] && STRNE(argv[idx], pass_init); ++idx) {
+			data_t* target      = getTarget(argv[idx]);
+			bool    callProcess = false;
+
+			if (target) {
+				/* There are three possible conditions here:
+				 * a) The target does not need a parameter:
+				 *    -> call process(nullptr)
+				 * b) The target needs an argument:
+				 *    -> substitute lastTarget after it has been checked for c)
+				 * c) lastTarget did not get a parameter
+				 *    -> Add error message about that
+				*/
+				if (target->needsParameter()) {
+					if (lastTarget && (false == lastTarget->hasParameter())) {
+						// This is situation c)
+						std::string param_error = "Argument "
+							+ (lastTarget->aLong.size() ? lastTarget->aLong : lastTarget.aShort)
+							+ " needs a parameter \""
+							+ lastTarget->pName
+							+ "\"";
+						sArgError* argError = new sArgError(AEN_PARAMETER_MISSING, param_error.c_str());
+						errlist.push(argError);
+					}
+					// Situation b) after checking c)
+					lastTarget = target;
+				} else
+					// Situation a)
+					callProcess = true;
+			} else if (lastTarget && lastTarget->needsParameter())
+				// Process with this value, the target knows what to do
+				callProcess = true;
+			else {
+				std::string parse_error = "Unknown argument ";
+				parse_error += argv[idx];
+				sArgError* argError = new sArgError(AEN_ARGUMENT_UNKNOWN, parse_error.c_str());
+				errlist.push(argError);
+			} // End of argv tests
+
+			// Final Step: Call process
+			if (callProcess) {
+				PWX_TRY(target->process(argv[idx]))
+				catch(CException &e) {
+					std::string process_error = e.name();
+					process_error += ": ";
+					process_error += e.what();
+					sArgError* argError = new sArgError(AEN_PARAMETER_MISSING, param_error.c_str());
+					errlist.push(argError);
+				}
+			}
+		} // End of looping argv
+
+		// At this point idx might be smaller than argc, which
+		// only means we have reached a passthrough condition.
+		if (idx < argc)
+			// idx still points to the found pass_init, which is not passed.
+			passThrough(argc - idx - 1, &argv[idx + 1]);
+
+		return errlist.size();
+	} // End of having arguments to parse.
+
+	return 0;
 }
 
+
+/** @brief get target for short/long arg @arg or return nullptr if not found
+**/
+data_t* CArgHandler::getTarget(const char* arg) const noexcept
+{
+	data_t* target = nullptr;
+
+	if (arg && strlen(arg)) {
+		std::string key = arg;
+
+		if (shortArgs.exists(key))
+			target = shortArgs.get(key)->data.get();
+		else if (longArgs.exists(key))
+			target = longArgs.get(key)->data.get();
+	}
+
+	return target;
+}
+
+/** @brief store argc/argv in pass_cnt/pass_args values
+**/
+void CArgHandler::passThrough(const int32_t argc, const char** argv) noexcept
+{
+	if (argc > 0) {
+		*pass_args = (char**)calloc(argc, sizeof(char*));
+		for (int32_t i = 0; *pass_args && (i < argc); ++i)
+			(*pass_args)[i] = strdup(argv[i]);
+	}
+}
 
 
 } // namespace pwx

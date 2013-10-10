@@ -321,6 +321,9 @@ private:
 	/// (or cleaning short args, destroys targets of long args!)
 	static void do_not_destroy(data_t*) { }
 
+	data_t* getTarget  (const char* arg)                       const noexcept;
+	void    passThrough(const int32_t argc, const char** argv)       noexcept;
+
 
 	/* ===============================================
 	 * === Private members                         ===
