@@ -30,6 +30,7 @@
 #include <pwx/general/compiler.h>
 #include <pwx/general/macros.h>
 #include <pwx/types/eArgTargetType.h>
+#include <pwx/types/eSetType.h>
 #include <string>
 
 
@@ -47,9 +48,14 @@ struct VArgTargetBase
 	std::string    desc;
 	std::string    pName;
 	eArgTargetType type;
+	eArgSetType    setType;
 
 	explicit VArgTargetBase(const char* arg_short, const char* arg_long,
 				eArgTargetType arg_type,
+				const char* arg_desc, const char* param_name)
+			noexcept;
+	VArgTargetBase(const char* arg_short, const char* arg_long,
+				eArgSetType set_type,
 				const char* arg_desc, const char* param_name)
 			noexcept;
 	virtual ~VArgTargetBase() noexcept;
@@ -57,6 +63,13 @@ struct VArgTargetBase
 	// Must be defined by TArgTarget:
 	virtual void process(const char*) PWX_VIRTUAL_PURE;
 
+	// Public methods that do not need a templated value:
+	bool hasParameter  () const noexcept;
+	bool needsParameter() const noexcept;
+
+protected:
+
+	bool gotParameter = false; //!< Must be set to true by process() if a parameter was processed
 };
 
 
