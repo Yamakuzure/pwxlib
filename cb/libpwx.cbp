@@ -302,6 +302,7 @@
 			<Option target="library" />
 		</Unit>
 		<Unit filename="../src/pwx/types/eArgErrorNumber.h" />
+		<Unit filename="../src/pwx/types/eArgSetType.h" />
 		<Unit filename="../src/pwx/types/eArgTargetType.h" />
 		<Unit filename="../src/pwx/types/eNameSourceType.cpp" />
 		<Unit filename="../src/pwx/types/eNameSourceType.h" />
