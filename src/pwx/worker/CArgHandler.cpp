@@ -575,8 +575,28 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 
 			// Final Step: Call process
 			if (callProcess && lastTarget) {
-				PWX_TRY(lastTarget->process(argv[idx]))
-				catch(CException &e) {
+				eArgErrorNumber argErrno = AEN_OK;
+				try {
+					argErrno = lastTarget->process(argv[idx]);
+					if (AEN_OK != argErrno) {
+						std::string process_error = "Parameter \"";
+						process_error += argv[idx];
+						process_error += "\" error: \"";
+						switch (argErrno) {
+							case AEN_PARAM_TYPE_MISMATCH:
+								process_error += "Wrong type for argument ";
+								break;
+							case AEN_PROCESSING_ERROR:
+								process_error += "Processing error for argument ";
+								break;
+							default:
+								process_error += "Unhandled errno " + to_string((int)argErrno);
+						}
+						process_error += "\"";
+						sArgError* argError = new sArgError(AEN_PROCESSING_ERROR, process_error.c_str());
+						errlist.push(argError);
+					}
+				} catch(CException &e) {
 					std::string process_error = e.name();
 					process_error += ": ";
 					process_error += e.what();
