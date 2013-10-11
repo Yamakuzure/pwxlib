@@ -31,6 +31,7 @@
 #include <pwx/general/macros.h>
 #include <pwx/types/eArgTargetType.h>
 #include <pwx/types/eArgSetType.h>
+#include <pwx/types/eArgErrorNumber.h>
 #include <string>
 
 
@@ -61,7 +62,7 @@ struct VArgTargetBase
 	virtual ~VArgTargetBase() noexcept;
 
 	// Must be defined by TArgTarget:
-	virtual void process(const char*) PWX_VIRTUAL_PURE;
+	virtual eArgErrorNumber process(const char*) PWX_VIRTUAL_PURE;
 
 	// Public methods that do not need a templated value:
 	bool hasParameter  () const noexcept;

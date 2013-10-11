@@ -69,9 +69,13 @@ struct TArgTarget : public VArgTargetBase
 	virtual ~TArgTarget() noexcept { /* nothing to do here */ }
 
 	// processor
-	void process(const char* param)
+	eArgErrorNumber process(const char* param)
 	{
-        /// @todo implement
+		eArgErrorNumber argErrno = AEN_OK;
+
+
+
+		return argErrno;
 	}
 
 	// set callback function
