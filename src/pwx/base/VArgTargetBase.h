@@ -30,7 +30,7 @@
 #include <pwx/general/compiler.h>
 #include <pwx/general/macros.h>
 #include <pwx/types/eArgTargetType.h>
-#include <pwx/types/eSetType.h>
+#include <pwx/types/eArgSetType.h>
 #include <string>
 
 
