@@ -357,6 +357,8 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t* pos,
 
 	assert(target && "ERROR: Couldn't find given argument!");
 
+	std::string result;
+
 	if (target) {
 		size_t descSize = target->desc.size();
 		size_t xPos     = pos ? *pos : 0;
@@ -377,7 +379,6 @@ std::string CArgHandler::getHelpDesc(const char* argument, size_t* pos,
 		// The result is a substring, possibly trimmed at a space
 		// character, preceded by either descSep or a ' ' according
 		// to the autoSep setting.
-		std::string result;
 		if (descSep) {
 			if (addDescSpc) result.append(1, ' ');
 			if (xPos && autoSep)
@@ -548,18 +549,20 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 					if (lastTarget && (false == lastTarget->hasParameter())) {
 						// This is situation c)
 						std::string param_error = "Argument "
-							+ (lastTarget->aLong.size() ? lastTarget->aLong : lastTarget.aShort)
+							+ (lastTarget->aLong.size() ? lastTarget->aLong : lastTarget->aShort)
 							+ " needs a parameter \""
 							+ lastTarget->pName
 							+ "\"";
 						sArgError* argError = new sArgError(AEN_PARAMETER_MISSING, param_error.c_str());
 						errlist.push(argError);
 					}
-					// Situation b) after checking c)
-					lastTarget = target;
 				} else
 					// Situation a)
 					callProcess = true;
+
+				// Situation a) and b) after checking c)
+				lastTarget = target;
+
 			} else if (lastTarget && lastTarget->needsParameter())
 				// Process with this value, the target knows what to do
 				callProcess = true;
@@ -571,13 +574,13 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 			} // End of argv tests
 
 			// Final Step: Call process
-			if (callProcess) {
-				PWX_TRY(target->process(argv[idx]))
+			if (callProcess && lastTarget) {
+				PWX_TRY(lastTarget->process(argv[idx]))
 				catch(CException &e) {
 					std::string process_error = e.name();
 					process_error += ": ";
 					process_error += e.what();
-					sArgError* argError = new sArgError(AEN_PARAMETER_MISSING, param_error.c_str());
+					sArgError* argError = new sArgError(AEN_PROCESSING_ERROR, process_error.c_str());
 					errlist.push(argError);
 				}
 			}
@@ -585,7 +588,7 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 
 		// At this point idx might be smaller than argc, which
 		// only means we have reached a passthrough condition.
-		if (idx < argc)
+		if (idx < (argc - 1) )
 			// idx still points to the found pass_init, which is not passed.
 			passThrough(argc - idx - 1, &argv[idx + 1]);
 
@@ -598,7 +601,7 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 
 /** @brief get target for short/long arg @arg or return nullptr if not found
 **/
-data_t* CArgHandler::getTarget(const char* arg) const noexcept
+CArgHandler::data_t* CArgHandler::getTarget(const char* arg) const noexcept
 {
 	data_t* target = nullptr;
 
