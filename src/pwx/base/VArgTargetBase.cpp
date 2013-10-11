@@ -59,9 +59,10 @@ VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
 			eArgSetType set_type,
 			const char* arg_desc, const char* param_name)
 		noexcept :
-	VArgTargetBase(arg_short, arg_long, ATT_SET, arg_desc, param_name),
-	setType(set_type)
-{ /* nothing to do here */ }
+	VArgTargetBase(arg_short, arg_long, ATT_SET, arg_desc, param_name)
+{
+		setType = set_type;
+}
 
 
 /** @brief destructor
