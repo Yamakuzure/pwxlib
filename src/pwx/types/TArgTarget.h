@@ -3,7 +3,7 @@
 
 /** @file TArgTarget.h
   *
-  * @brief Declaration of the TArgTarget struct template
+  * @brief Declaration of the TArgTarget class template
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -28,19 +28,21 @@
 
 #include <pwx/base/VArgTargetBase.h>
 #include <pwx/types/CException.h>
-#include <pwx/tools/StreamHelpers.h>
 
 namespace pwx {
 
 
 /** @struct TArgTarget
-  * @brief data collection to define one command line argument
+  * @brief Definition of one command line argument using a templated member
+  *
+  * This is meant to be used with a target pointer. If a callback function
+  * is to be used, use CArgCallback instead.
 **/
 template<typename T>
-struct TArgTarget : public VArgTargetBase
+class TArgTarget : public VArgTargetBase
 {
-	// Members
-	T* target;
+
+public:
 
 	/** brief default ctor
 	  *
@@ -61,8 +63,7 @@ struct TArgTarget : public VArgTargetBase
 				const char* arg_desc, const char* param_name)
 			noexcept :
 		VArgTargetBase(arg_short, arg_long, arg_type, arg_desc, param_name),
-		target(arg_target),
-		cb    (nullptr)
+		target(arg_target)
 	{ /* nothing to do here */ }
 
 	/** @brief destructor
@@ -106,8 +107,7 @@ struct TArgTarget : public VArgTargetBase
 				// Last possibility is STT_IGNORE, which is, well, ignored. ;)
 				break;
 			case ATT_CB:
-				if (cb)
-					cb(aLong.size() ? aLong.c_str() : aShort.c_str(), &val);
+				PWX_THROW("UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "")
 				break;
 			default:
 				PWX_THROW("UnhandledTargetType", "The given target type is not implemented, yet!", "")
@@ -116,16 +116,11 @@ struct TArgTarget : public VArgTargetBase
 		return argErrno;
 	}
 
-	// set callback function
-	void setCb(void (*arg_cb)(const char*, const T*))
-	{
-		cb = arg_cb;
-	}
 
 private:
 
-	// callback
-	void (*cb)(const char*, const T*);
+	// Members
+	T* target;
 
 };
 

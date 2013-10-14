@@ -265,6 +265,8 @@
 			<Option target="clean" />
 			<Option target="library" />
 		</Unit>
+		<Unit filename="../src/pwx/types/CArgCallback.cpp" />
+		<Unit filename="../src/pwx/types/CArgCallback.h" />
 		<Unit filename="../src/pwx/types/CException.cpp">
 			<Option target="clean" />
 			<Option target="library" />
