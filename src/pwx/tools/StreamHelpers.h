@@ -272,6 +272,90 @@ long double PWX_API to_long_double (const T val) noexcept
 }
 
 
+/** @brief convert a value to int8_t
+  *
+  * This function uses a stringstream to convert @a val to a int8_t.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting int8_t
+**/
+template <typename T>
+int8_t PWX_API to_int8 (const T val) noexcept
+{
+	int8_t result = 0;
+	std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
+/** @brief convert a value to uint8_t
+  *
+  * This function uses a stringstream to convert @a val to a uint8_t.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting uint8_t
+**/
+template <typename T>
+uint8_t PWX_API to_uint8 (const T val) noexcept
+{
+	uint8_t result = 0;
+	std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
+/** @brief convert a value to int16_t
+  *
+  * This function uses a stringstream to convert @a val to a int16_t.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting int16_t
+**/
+template <typename T>
+int16_t PWX_API to_int16 (const T val) noexcept
+{
+	int16_t result = 0;
+	std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
+/** @brief convert a value to uint16_t
+  *
+  * This function uses a stringstream to convert @a val to a uint16_t.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting uint16_t
+**/
+template <typename T>
+uint16_t PWX_API to_uint16 (const T val) noexcept
+{
+	uint16_t result = 0;
+	std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
 /** @brief convert a value to int32_t
   *
   * This function uses a stringstream to convert @a val to a int32_t.

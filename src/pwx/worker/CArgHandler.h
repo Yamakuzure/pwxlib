@@ -164,11 +164,13 @@ public:
 		if ( !hasArgLong && !hasArgShort )
 			return false;
 
+
 		// === Check target  ===
-		assert( arg_target
+		assert( (arg_target || (ATT_CB == arg_type))
 			&& "ERROR: At least one of arg_target and arg_cb must be set!");
-		if (!arg_type)
+		if (!arg_target && (ATT_CB != arg_type))
 			return false;
+
 
 		// === Check target type against arg_type ===
 		/* The following combinations are valid:
@@ -237,6 +239,10 @@ public:
 	  * This method adds knowledge about one command line argument
 	  * to the handler.
 	  *
+	  * The callback function will receive the long argument, if
+	  * set, otherwise the short argument as a first parameter.
+	  * The second parameter will be the found value as a const.
+	  *
 	  * Both the short argument and the long argument must be
 	  * unique. If a given argument is already known to the
 	  * handler, it will be <B>ignored</B>! This condition is
@@ -267,14 +273,13 @@ public:
 	**/
 	template<typename T>
 	bool addArg(const char* arg_short, const char* arg_long,
-				void (*arg_cb)(const char*, T*),
+				void (*arg_cb)(const char*, const T*),
 				const char* arg_desc, const char* param_name)
 	{
 		// === Use nullptr target for basic addition ===
 		bool result = false;
-		PWX_TRY_PWX_FURTHER(result = this->addArg<T>(arg_short, arg_long,
-													ATT_CB, (T*)nullptr,
-													arg_desc, param_name))
+		PWX_TRY_PWX_FURTHER(result = this->addArg<void>(arg_short, arg_long,
+										ATT_CB, (void*)nullptr, arg_desc, param_name))
 
 		// == If this argument was added, add callback function. ===
 		if (result) {
@@ -282,9 +287,9 @@ public:
 			std::string key_short((arg_short && strlen(arg_short)) ? arg_short : "");
 
 			if (key_long.length() && longArgs.exists(arg_short))
-				static_cast<TArgTarget<T>&>(longArgs.getData(key_long)).setCb(arg_cb);
+				static_cast<TArgTarget<void>&>(longArgs.getData(key_long)).setCb(arg_cb);
 			else
-				static_cast<TArgTarget<T>&>(shortArgs.getData(key_short)).setCb(arg_cb);
+				static_cast<TArgTarget<void>&>(shortArgs.getData(key_short)).setCb(arg_cb);
 		}
 
 		return result;

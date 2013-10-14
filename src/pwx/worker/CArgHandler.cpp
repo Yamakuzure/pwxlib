@@ -8,6 +8,53 @@ namespace pwx {
 
 CArgHandler PAH;
 
+
+/// par_to_val conversion chain
+
+// --- integers ---
+static void par_to_val(int8_t*   target, const char* param) noexcept { if (target) *target = to_int8  (param); }
+static void par_to_val(int16_t*  target, const char* param) noexcept{ if (target) *target = to_int16 (param); }
+static void par_to_val(int32_t*  target, const char* param) noexcept{ if (target) *target = to_int32 (param); }
+static void par_to_val(int64_t*  target, const char* param) noexcept { if (target) *target = to_int64 (param); }
+static void par_to_val(uint8_t*  target, const char* param) noexcept { if (target) *target = to_uint8 (param); }
+static void par_to_val(uint16_t* target, const char* param) noexcept { if (target) *target = to_uint16(param); }
+static void par_to_val(uint32_t* target, const char* param) noexcept { if (target) *target = to_uint32(param); }
+static void par_to_val(uint64_t* target, const char* param) noexcept { if (target) *target = to_uint64(param); }
+
+// --- floats ---
+static void par_to_val(float*       target, const char* param) noexcept { if (target) *target = to_float      (param); }
+static void par_to_val(double*      target, const char* param) noexcept { if (target) *target = to_double     (param); }
+static void par_to_val(long double* target, const char* param) noexcept { if (target) *target = to_long_double(param); }
+
+// --- strings ---
+static void par_to_val(char*        target, const char* param) noexcept { if (target) target = strdup(param); }
+static void par_to_val(std::string* target, const char* param) noexcept { if (target) target->assign(param); }
+
+// --- special "do nothing" for void ---
+static void par_to_val(void*, const char*) noexcept { /* yes, do nothing. */ }
+
+// --- template for any other types ---
+template<typename T>
+static void par_to_val(T* target, const char* param) noexcept
+{
+	if (target) {
+		PWX_TRY(target = param)
+		catch(...) { }
+	}
+}
+
+// --- processing dispatcher ---
+template<typename T>
+static eArgErrorNumber process_dispatch(TArgTarget<T>* tgt, const char* param)
+{
+	T val = (T)0;
+	par_to_val(&val, param);
+	return tgt->process(val);
+}
+
+
+// === CArgHandler implementation ===
+
 /** @brief default empty ctor
   */
 CArgHandler::CArgHandler() noexcept :
@@ -589,9 +636,13 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 							case AEN_PROCESSING_ERROR:
 								process_error += "Processing error for argument ";
 								break;
+							case AEN_MULTIPLE_SET_PARAM:
+								process_error += "More than one parameter for set argument ";
+								break;
 							default:
-								process_error += "Unhandled errno " + to_string((int)argErrno);
+								process_error += "Unhandled errno " + to_string((int)argErrno) + " for argument ";
 						}
+						process_error += (lastTarget->aLong.size() ? lastTarget->aLong : lastTarget->aShort);
 						process_error += "\"";
 						sArgError* argError = new sArgError(AEN_PROCESSING_ERROR, process_error.c_str());
 						errlist.push(argError);

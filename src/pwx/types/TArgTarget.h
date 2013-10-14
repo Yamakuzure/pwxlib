@@ -27,6 +27,8 @@
 **/
 
 #include <pwx/base/VArgTargetBase.h>
+#include <pwx/types/CException.h>
+#include <pwx/tools/StreamHelpers.h>
 
 namespace pwx {
 
@@ -38,7 +40,7 @@ template<typename T>
 struct TArgTarget : public VArgTargetBase
 {
 	// Members
-	T*             target;
+	T* target;
 
 	/** brief default ctor
 	  *
@@ -68,18 +70,54 @@ struct TArgTarget : public VArgTargetBase
 	**/
 	virtual ~TArgTarget() noexcept { /* nothing to do here */ }
 
-	// processor
-	eArgErrorNumber process(const char* param)
+	// processor (Very simple, the type conversion is done in
+	// CArgHandler.cpp's par_to_val chain, param is for callback calls)
+	eArgErrorNumber process(T &val)
 	{
 		eArgErrorNumber argErrno = AEN_OK;
 
-
+		switch(this->type) {
+			case ATT_FALSE:
+				*target = (T)false;
+				break;
+			case ATT_TRUE:
+				*target = (T)true;
+				break;
+			case ATT_INC:
+				*target += (T)1;
+				break;
+			case ATT_DEC:
+				*target -= (T)1;
+				break;
+			case ATT_ADD:
+				*target  += val;
+				break;
+			case ATT_SUB:
+				*target  -= val;
+				break;
+			case ATT_SET:
+				// This needs handling for all three set types:
+				if ( (STT_OVERWRITE == this->setType)
+				  || (!this->gotParameter) ) {
+					*target = val;
+					this->gotParameter = true;
+				} else if (STT_ERROR == this->setType)
+					argErrno = AEN_MULTIPLE_SET_PARAM;
+				// Last possibility is STT_IGNORE, which is, well, ignored. ;)
+				break;
+			case ATT_CB:
+				if (cb)
+					cb(aLong.size() ? aLong.c_str() : aShort.c_str(), &val);
+				break;
+			default:
+				PWX_THROW("UnhandledTargetType", "The given target type is not implemented, yet!", "")
+		}
 
 		return argErrno;
 	}
 
 	// set callback function
-	void setCb(void (*arg_cb)(const char*, T*))
+	void setCb(void (*arg_cb)(const char*, const T*))
 	{
 		cb = arg_cb;
 	}
@@ -87,7 +125,8 @@ struct TArgTarget : public VArgTargetBase
 private:
 
 	// callback
-	void (*cb)(const char*, T*);
+	void (*cb)(const char*, const T*);
+
 };
 
 
