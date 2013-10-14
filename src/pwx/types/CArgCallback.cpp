@@ -19,7 +19,7 @@
   * @param[in] param_name Name shown in <> int the help text.
 **/
 explicit CArgCallback::CArgCallback(const char* arg_short, const char* arg_long,
-			void (*arg_cb)(const char*, const const char*),
+			void (*arg_cb)(const char*, const char*),
 			const char* arg_desc, const char* param_name)
 		noexcept :
 	VArgTargetBase(arg_short, arg_long, ATT_CB, arg_desc, param_name),
