@@ -66,55 +66,21 @@ public:
 		target(arg_target)
 	{ /* nothing to do here */ }
 
+
 	/** @brief destructor
 	  * has nothing to do.
 	**/
 	virtual ~TArgTarget() noexcept { /* nothing to do here */ }
 
-	// processor (Very simple, the type conversion is done in
-	// CArgHandler.cpp's par_to_val chain, param is for callback calls)
-	eArgErrorNumber process(T &val)
-	{
-		eArgErrorNumber argErrno = AEN_OK;
 
-		switch(this->type) {
-			case ATT_FALSE:
-				*target = (T)false;
-				break;
-			case ATT_TRUE:
-				*target = (T)true;
-				break;
-			case ATT_INC:
-				*target += (T)1;
-				break;
-			case ATT_DEC:
-				*target -= (T)1;
-				break;
-			case ATT_ADD:
-				*target  += val;
-				break;
-			case ATT_SUB:
-				*target  -= val;
-				break;
-			case ATT_SET:
-				// This needs handling for all three set types:
-				if ( (STT_OVERWRITE == this->setType)
-				  || (!this->gotParameter) ) {
-					*target = val;
-					this->gotParameter = true;
-				} else if (STT_ERROR == this->setType)
-					argErrno = AEN_MULTIPLE_SET_PARAM;
-				// Last possibility is STT_IGNORE, which is, well, ignored. ;)
-				break;
-			case ATT_CB:
-				PWX_THROW("UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "")
-				break;
-			default:
-				PWX_THROW("UnhandledTargetType", "The given target type is not implemented, yet!", "")
-		}
-
-		return argErrno;
-	}
+	/** @brief process one command line parameter or argument occurence
+	  *
+	  * This method is called whenever the type of an argument needs
+	  * direct action, or a parameter to that argument is met.
+	  *
+	  * @param[in] param The parameter found or nullptr if no parameter is needed.
+	**/
+	virtual eArgErrorNumber process(const char* param);
 
 
 private:
@@ -122,8 +88,91 @@ private:
 	// Members
 	T* target;
 
+	// === par_to_val conversion chain prototype ===
+	void par_to_val(T* tgt, const char* param) noexcept;
 };
 
+
+// === Processing specializations prototypes ===
+template<>
+eArgErrorNumber TArgTarget<std::string>::process(const char* param);
+
+
+// === Generic non-specialized handler ===
+template<typename T>
+eArgErrorNumber TArgTarget<T>::process(const char* param)
+{
+	eArgErrorNumber argErrno = AEN_OK;
+
+	T val = (T)0;
+	if (param && strlen(param))
+		this->par_to_val(&val, param);
+
+	switch(this->type) {
+		case ATT_FALSE:
+			*target = (T)false;
+			break;
+		case ATT_TRUE:
+			*target = (T)true;
+			break;
+		case ATT_INC:
+			*target += (T)1;
+			break;
+		case ATT_DEC:
+			*target -= (T)1;
+			break;
+		case ATT_ADD:
+			*target  += val;
+			break;
+		case ATT_SUB:
+			*target  -= val;
+			break;
+		case ATT_SET:
+			// This needs handling for all three set types:
+			if ( (STT_OVERWRITE == this->setType)
+			  || (!this->gotParameter) ) {
+				*target = val;
+				this->gotParameter = true;
+			} else if (STT_ERROR == this->setType)
+				argErrno = AEN_MULTIPLE_SET_PARAM;
+			// Last possibility is STT_IGNORE, which is, well, ignored. ;)
+			break;
+		case ATT_CB:
+			PWX_THROW("UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "")
+			break;
+		default:
+			PWX_THROW("UnhandledTargetType", "The given target type is not implemented, yet!", "")
+	}
+
+	return argErrno;
+}
+
+
+// === par_to_val specializations prototypes ===
+template<>
+void TArgTarget<bool>::par_to_val(bool* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<int8_t>::par_to_val(int8_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<int16_t>::par_to_val(int16_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<int32_t>::par_to_val(int32_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<int64_t>::par_to_val(int64_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<uint8_t>::par_to_val(uint8_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<uint16_t>::par_to_val(uint16_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<uint32_t>::par_to_val(uint32_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<uint64_t>::par_to_val(uint64_t* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<float>::par_to_val(float* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<double>::par_to_val(double* tgt, const char* param) noexcept;
+template<>
+void TArgTarget<long double>::par_to_val(long double* tgt, const char* param) noexcept;
 
 } // namespace pwx
 

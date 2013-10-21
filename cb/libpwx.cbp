@@ -289,6 +289,7 @@
 		</Unit>
 		<Unit filename="../src/pwx/types/CWaveColor.cpp" />
 		<Unit filename="../src/pwx/types/CWaveColor.h" />
+		<Unit filename="../src/pwx/types/TArgTarget.cpp" />
 		<Unit filename="../src/pwx/types/TArgTarget.h" />
 		<Unit filename="../src/pwx/types/TDoubleElement.h">
 			<Option target="clean" />
