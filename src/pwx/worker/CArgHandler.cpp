@@ -8,52 +8,113 @@ namespace pwx {
 
 CArgHandler PAH;
 
-
-/// par_to_val conversion chain
-
-// --- integers ---
-static void par_to_val(int8_t*   target, const char* param) noexcept { if (target) *target = to_int8  (param); }
-static void par_to_val(int16_t*  target, const char* param) noexcept{ if (target) *target = to_int16 (param); }
-static void par_to_val(int32_t*  target, const char* param) noexcept{ if (target) *target = to_int32 (param); }
-static void par_to_val(int64_t*  target, const char* param) noexcept { if (target) *target = to_int64 (param); }
-static void par_to_val(uint8_t*  target, const char* param) noexcept { if (target) *target = to_uint8 (param); }
-static void par_to_val(uint16_t* target, const char* param) noexcept { if (target) *target = to_uint16(param); }
-static void par_to_val(uint32_t* target, const char* param) noexcept { if (target) *target = to_uint32(param); }
-static void par_to_val(uint64_t* target, const char* param) noexcept { if (target) *target = to_uint64(param); }
-
-// --- floats ---
-static void par_to_val(float*       target, const char* param) noexcept { if (target) *target = to_float      (param); }
-static void par_to_val(double*      target, const char* param) noexcept { if (target) *target = to_double     (param); }
-static void par_to_val(long double* target, const char* param) noexcept { if (target) *target = to_long_double(param); }
-
-// --- strings ---
-static void par_to_val(char*        target, const char* param) noexcept { if (target) target = strdup(param); }
-static void par_to_val(std::string* target, const char* param) noexcept { if (target) target->assign(param); }
-
-// --- special "do nothing" for void ---
-static void par_to_val(void*, const char*) noexcept { /* yes, do nothing. */ }
-
-// --- template for any other types ---
+/** @internal
+  * @brief Template to add targets and callbacks in one place.
+  *
+  * does all the checking, creation and everything.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[out] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> int the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 template<typename T>
-static void par_to_val(T* target, const char* param) noexcept
+static bool internalAddArg (
+	const char* arg_short, const char* arg_long,
+	eArgTargetType arg_type, T* arg_target,
+	void (*arg_cb)(const char*, const char*),
+	const char* arg_desc, const char* param_name,
+	CArgHandler::hash_t &tgtShort, CArgHandler::hash_t &tgtLong,
+	size_t &maxLongLen, size_t &maxParamLen, size_t &maxShortLen )
 {
-	if (target) {
-		PWX_TRY(target = param)
-		catch(...) { }
+	typedef VArgTargetBase data_t;
+
+	// === Check arguments against double nullptr ===
+	bool hasArgLong  = arg_long  && strlen(arg_long);
+	bool hasArgShort = arg_short && strlen(arg_short);
+
+	assert( (hasArgLong || hasArgShort)
+		&& "ERROR: At least one of arg_short and arg_long *MUST* be a string of length>0!");
+	if ( !hasArgLong && !hasArgShort )
+		return false;
+
+
+	// === Check target  ===
+	assert( (arg_target || (ATT_CB == arg_type))
+		&& "ERROR: At least one of arg_target and arg_cb must be set!");
+	if (!arg_target && (ATT_CB != arg_type))
+		return false;
+
+
+	// === Check target type against arg_type ===
+	/* The following combinations are valid:
+	 *  ATT_FALSE : bool and any numeric
+	 *  ATT_TRUE  : bool and any numeric
+	 *  ATT_ADD   : any numeric
+	 *  ATT_INC   : any numeric
+	 *  ATT_SUB   : any numeric
+	 *  ATT_DEC   : any numery
+	 *  ATT_SET   : everything that supports operator=
+	 *  ATT_CB    : everything
+	 */
+	assert( ( (
+				// ATT_FALSE and ATT_TRUE accept bool and numeric
+				( (ATT_TRUE == arg_type) || (ATT_FALSE == arg_type) )
+			  && isSameType(bool, T)
+			) ||
+				// All accept numerics
+				// Note: This includes ATT_TRUE/ATT_FALSE, so only
+				//       one check is needed
+				isNumericType(T)
+			  ||
+				// ATT_SET and ATT_CB accept everything
+				( ATT_SET == arg_type )
+			  ||( ATT_CB  == arg_type )
+		) && "ERROR: The combination of type and arg_type is illegal!" );
+	// No break in release version.
+
+	// === Check argument against uniqueness ===
+	std::string key_long (hasArgLong  ? arg_long  : "");
+	std::string key_short(hasArgShort ? arg_short : "");
+	bool isLongNew  = hasArgLong  ? !tgtLong.exists(key_long)   : true;
+	bool isShortNew = hasArgShort ? !tgtShort.exists(key_short) : true;
+	assert( isShortNew && isLongNew && "ERROR: long or short argument already known!");
+	if ( !isLongNew || !isShortNew )
+		return false;
+
+	// === Now create a new target and add it to the hashes ===
+	data_t* new_target = nullptr;
+	try {
+		if (ATT_CB == arg_type)
+			new_target = new CArgCallback(arg_short, arg_long, arg_cb, arg_desc, param_name);
+		else
+			new_target = new TArgTarget<T>(arg_short, arg_long, arg_type, arg_target, arg_desc, param_name);
+	} catch(std::bad_alloc &e) {
+		PWX_THROW("ArgTargetCreationFailed", e.what(),
+				"The creation of a new argument target failed!")
 	}
-}
+	if (hasArgLong)
+		PWX_TRY_PWX_FURTHER(tgtLong.add(key_long, new_target))
+	if (hasArgShort)
+		PWX_TRY_PWX_FURTHER(tgtShort.add(key_short, new_target))
 
-// --- processing dispatcher ---
-template<typename T>
-static eArgErrorNumber process_dispatch(TArgTarget<T>* tgt, const char* param)
-{
-	T val = (T)0;
-	par_to_val(&val, param);
-	return tgt->process(val);
+	// === Finally record length if a new maximum is found ===
+	if (key_long.size() > maxLongLen)
+		maxLongLen = key_long.size();
+	if (param_name && (strlen(param_name) > maxParamLen))
+		maxParamLen = strlen(param_name);
+	if (key_short.size() > maxShortLen)
+		maxShortLen = key_short.size();
+
+	return true;
 }
 
 
 // === CArgHandler implementation ===
+
 
 /** @brief default empty ctor
   */
@@ -67,7 +128,10 @@ CArgHandler::CArgHandler() noexcept :
     pass_cnt(nullptr),
     shortArgs(7, do_not_destroy, nullptr, 256, 4.0, 1.733)
 {
-	/* nothing to do here */
+	/* Turn of thread safety for the hashes.
+	 * Multithreading does not make any sense, here! */
+	 longArgs.disable_thread_safety();
+	 shortArgs.disable_thread_safety();
 }
 
 
@@ -77,6 +141,158 @@ CArgHandler::~CArgHandler() noexcept
 {
 	this->clearArgs();
 }
+
+
+// === The bitter evil addArg() legion === ( ;-) )
+
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, bool* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, int8_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, uint8_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, int16_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, uint16_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, int32_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, uint32_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, int64_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, uint64_t* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, float* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, double* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, long double* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			eArgTargetType arg_type, std::string* arg_target,
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
+											nullptr, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+// callback!
+bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
+			void (*arg_cb)(const char*, const char*),
+			const char* arg_desc, const char* param_name)
+{
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, ATT_CB, (uint8_t*)nullptr,
+											arg_cb, arg_desc, param_name,
+											this->shortArgs, this->longArgs,
+											this->maxLongLen, this->maxParamLen, this->maxShortLen))
+}
+
+
+
+
+// === Other more harmless methods ===
 
 
 /** @brief add a pass through system
@@ -624,7 +840,9 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 			if (callProcess && lastTarget) {
 				eArgErrorNumber argErrno = AEN_OK;
 				try {
-					argErrno = lastTarget->process(argv[idx]);
+
+					lastTarget->process(argv[idx]);
+
 					if (AEN_OK != argErrno) {
 						std::string process_error = "Parameter \"";
 						process_error += argv[idx];

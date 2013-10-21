@@ -28,6 +28,7 @@
 
 
 #include <pwx/types/TArgTarget.h>
+#include <pwx/types/CArgCallback.h>
 #include <pwx/types/sArgError.h>
 #include <pwx/types/CException.h>
 
@@ -80,6 +81,54 @@ namespace pwx {
   * resulting string is too long, it will line break.</LI>
   * <LI>Finally <I>clearArgs()</I> frees all allocated memory.
   * </LI></LIST>
+  *
+  * Supported types:<BR />
+  * The system directly supports [u]int{8,16,32,64}_t, float,
+  * [long] double and std::string targets.<BR />
+  * If a different type is to be handled, a callback function
+  * must be installed that converts a const char* parameter
+  * into the target type and handles the processing.<BR />
+  * Further it is advised to use a callback function if an
+  * argument should be able to receive and store more than
+  * one parameter.<BR />
+  * For this reason there are two different kinds of the
+  * addArg() function. One to set a target type and a target
+  * pointer, the other to install a callback function.
+  *
+  * Adding a target pointer using <I>addArg()</I><BR />
+  * There are some basic tests to ensure that the
+  * <I>arg_target</I> and the <I>arg_type</I> make sense.
+  * If they do not, bad things may happen, at least the
+  * argument might not do what you expect. This condition
+  * is tested with an assert.
+  *
+  * Both the short argument and the long argument must be
+  * unique. If a given argument is already known to the
+  * handler, it will be <B>ignored</B>! This condition is
+  * tested with an assert.
+  *
+  * Either of the arguments <I>arg_short</I> or <I>arg_long</I>
+  * can be nullptr, but not both. If both are set to
+  * nullptr, the method does <B>nothing</B>! This condition
+  * is tested with an assert.
+  *
+  * If the creation of an argument target instance fails, a
+  * pwx::CException with the name "ArgTargetCreationFailed" is
+  * thrown. Argument targets are organized using pwx::TChainHash,
+  * if the creation of a hash element fails, the thrown
+  * exception has the name "ElementCreationFailed".
+  *
+  * If you need to pass arguments to a called process,
+  * add the marker separating the command line arguments
+  * from the called process arguments with the method
+  * addPassthrough() and not this one!.
+  *
+  * Adding a callback function using <I>addArg()</I><BR />
+  * Here the same rules apply. The callback function is
+  * supposed to work as follows:<BR />
+  * The callback function will receive the long argument, if
+  * set, otherwise the short argument as a first parameter.
+  * The second parameter will be the parameter as a const char*.
 **/
 class PWX_API CArgHandler
 {
@@ -110,192 +159,48 @@ public:
 	 * ===============================================
 	 */
 
-	/** @brief add one command line argument to the handler using a simple target
-	  *
-	  * This method adds knowledge about one command line argument
-	  * to the handler.
-	  *
-	  * There are some basic tests to ensure that the
-	  * @a arg_target and the @a arg_type make sense.
-	  * If they do not, bad things may happen, at least the
-	  * argument might not do what you expect. This condition
-	  * is tested with an assert.
-	  *
-	  * Both the short argument and the long argument must be
-	  * unique. If a given argument is already known to the
-	  * handler, it will be <B>ignored</B>! This condition is
-	  * tested with an assert.
-	  *
-	  * Either of the arguments @a arg_short or @a arg_long
-	  * can be nullptr, but not both. If both are set to
-	  * nullptr, the method does <B>nothing</B>! This condition
-	  * is tested with an assert.
-	  *
-	  * If the creation of an argument target instance fails, a
-	  * pwx::CException with the name "ArgTargetCreationFailed" is
-	  * thrown. Argument targets are organized using pwx::TChainHash,
-	  * if the creation of a hash element fails, the thrown
-	  * exception has the name "ElementCreationFailed".
-	  *
-	  * If you need to pass arguments to a called process,
-	  * add the marker separating the command line arguments
-	  * from the called process arguments with the method
-	  * addPassthrough() and not this one!.
-	  *
-	  * @param[in] arg_short Short argument like "-a" or "x".
-	  * @param[in] arg_long Long argument like "--foo" or "-bar".
-	  * @param[in] arg_type Determines what to do with the target.
-	  * @param[out] arg_target Pointer to the value to handle.
-	  * @param[in] arg_desc Help text for this argument.
-	  * @param[in] param_name Name shown in <> int the help text.
-	  * @return true if an argument was added, false otherwise.
-	**/
-	template<typename T>
-	bool addArg(const char* arg_short, const char* arg_long,
-				eArgTargetType arg_type, T* arg_target,
-				const char* arg_desc, const char* param_name)
-	{
-		// === Check arguments against double nullptr ===
-		bool hasArgLong  = arg_long  && strlen(arg_long);
-		bool hasArgShort = arg_short && strlen(arg_short);
-
-		assert( (hasArgLong || hasArgShort)
-			&& "ERROR: At least one of arg_short and arg_long *MUST* be a string of length>0!");
-		if ( !hasArgLong && !hasArgShort )
-			return false;
-
-
-		// === Check target  ===
-		assert( (arg_target || (ATT_CB == arg_type))
-			&& "ERROR: At least one of arg_target and arg_cb must be set!");
-		if (!arg_target && (ATT_CB != arg_type))
-			return false;
-
-
-		// === Check target type against arg_type ===
-		/* The following combinations are valid:
-		 *  ATT_FALSE : bool and any numeric
-		 *  ATT_TRUE  : bool and any numeric
-		 *  ATT_ADD   : any numeric
-		 *  ATT_INC   : any numeric
-		 *  ATT_SUB   : any numeric
-		 *  ATT_DEC   : any numery
-		 *  ATT_SET   : everything that supports operator=
-		 *  ATT_CB    : everything
-		 */
-		assert( ( (
-					// ATT_FALSE and ATT_TRUE accept bool and numeric
-					( (ATT_TRUE == arg_type) || (ATT_FALSE == arg_type) )
-				  && isSameType(bool, T)
-				) ||
-					// All accept numerics
-					// Note: This includes ATT_TRUE/ATT_FALSE, so only
-					//       one check is needed
-					isNumericType(T)
-				  ||
-					// ATT_SET and ATT_CB accept everything
-					( ATT_SET == arg_type )
-				  ||( ATT_CB  == arg_type )
-			) && "ERROR: The combination of type and arg_type is illegal!" );
-		// No break in release version.
-
-		// === Check argument against uniqueness ===
-		std::string key_long (hasArgLong  ? arg_long  : "");
-		std::string key_short(hasArgShort ? arg_short : "");
-		bool isLongNew  = hasArgLong  ? !longArgs.exists(key_long)   : true;
-		bool isShortNew = hasArgShort ? !shortArgs.exists(key_short) : true;
-		assert( isShortNew && isLongNew && "ERROR: long or short argument already known!");
-		if ( !isLongNew || !isShortNew )
-			return false;
-
-		// === Now create a new target and add it to the hashes ===
-		data_t* new_target = nullptr;
-		try {
-			new_target = new TArgTarget<T>(arg_short, arg_long, arg_type,
-										arg_target, arg_desc, param_name);
-		} catch(std::bad_alloc &e) {
-			PWX_THROW("ArgTargetCreationFailed", e.what(),
-					"The creation of a new argument target failed!")
-		}
-		if (hasArgLong)
-			PWX_TRY_PWX_FURTHER(longArgs.add(key_long, new_target))
-		if (hasArgShort)
-			PWX_TRY_PWX_FURTHER(shortArgs.add(key_short, new_target))
-
-		// === Finally record length if a new maximum is found ===
-		if (key_long.size() > maxLongLen)
-			maxLongLen = key_long.size();
-		if (param_name && (strlen(param_name) > maxParamLen))
-			maxParamLen = strlen(param_name);
-		if (key_short.size() > maxShortLen)
-			maxShortLen = key_short.size();
-
-		return true;
-	}
-
-
-	/** @brief add one command line argument to the handler using a callback function
-	  *
-	  * This method adds knowledge about one command line argument
-	  * to the handler.
-	  *
-	  * The callback function will receive the long argument, if
-	  * set, otherwise the short argument as a first parameter.
-	  * The second parameter will be the found value as a const.
-	  *
-	  * Both the short argument and the long argument must be
-	  * unique. If a given argument is already known to the
-	  * handler, it will be <B>ignored</B>! This condition is
-	  * tested with an assert.
-	  *
-	  * Either of the arguments @a arg_short or @a arg_long
-	  * can be nullptr, but not both. If both are set to
-	  * nullptr, the method does <B>nothing</B>! This condition
-	  * is tested with an assert.
-	  *
-	  * If the creation of an argument target instance fails, a
-	  * pwx::CException with the name "ArgTargetCreationFailed" is
-	  * thrown. Argument targets are organized using pwx::TChainHash,
-	  * if the creation of a hash element fails, the thrown
-	  * exception has the name "ElementCreationFailed".
-	  *
-	  * If you need to pass arguments to a called process,
-	  * add the marker separating the command line arguments
-	  * from the called process arguments with the method
-	  * addPassthrough() and not this one!.
-	  *
-	  * @param[in] arg_short Short argument like "-a" or "x".
-	  * @param[in] arg_long Long argument like "--foo" or "-bar".
-	  * @param[out] arg_cb Callback function to handle argument parameters.
-	  * @param[in] arg_desc Help text for this argument.
-	  * @param[in] param_name Name shown in <> int the help text.
-	  * @return true if an argument was added, false otherwise.
-	**/
-	template<typename T>
-	bool addArg(const char* arg_short, const char* arg_long,
-				void (*arg_cb)(const char*, const T*),
-				const char* arg_desc, const char* param_name)
-	{
-		// === Use nullptr target for basic addition ===
-		bool result = false;
-		PWX_TRY_PWX_FURTHER(result = this->addArg<void>(arg_short, arg_long,
-										ATT_CB, (void*)nullptr, arg_desc, param_name))
-
-		// == If this argument was added, add callback function. ===
-		if (result) {
-			std::string key_long ((arg_long  && strlen(arg_long))  ? arg_long  : "");
-			std::string key_short((arg_short && strlen(arg_short)) ? arg_short : "");
-
-			if (key_long.length() && longArgs.exists(arg_short))
-				static_cast<TArgTarget<void>&>(longArgs.getData(key_long)).setCb(arg_cb);
-			else
-				static_cast<TArgTarget<void>&>(shortArgs.getData(key_short)).setCb(arg_cb);
-		}
-
-		return result;
-	}
-
-
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, bool* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, int8_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, uint8_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, int16_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, uint16_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, int32_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, uint32_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, int64_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, uint64_t* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, float* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, double* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, long double* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   eArgTargetType arg_type, std::string* arg_target,
+							   const char* arg_desc, const char* param_name);
+	bool		addArg		  (const char* arg_short, const char* arg_long,
+							   void (*arg_cb)(const char*, const char*),
+							   const char* arg_desc, const char* param_name);
 	void        addPassthrough(const char* init_arg, int32_t* pass_argc, char*** pass_argv);
 	void        clearArgs     () noexcept;
 	int32_t     getError      (const int32_t nr) const noexcept;
