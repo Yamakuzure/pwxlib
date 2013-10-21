@@ -5,6 +5,9 @@
 #include "CException.h"
 
 
+namespace pwx {
+
+
 /** brief default ctor
   *
   * No parameter check, the caller must ensure consistent
@@ -18,7 +21,7 @@
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-explicit CArgCallback::CArgCallback(const char* arg_short, const char* arg_long,
+CArgCallback::CArgCallback(const char* arg_short, const char* arg_long,
 			void (*arg_cb)(const char*, const char*),
 			const char* arg_desc, const char* param_name)
 		noexcept :
@@ -32,7 +35,7 @@ explicit CArgCallback::CArgCallback(const char* arg_short, const char* arg_long,
 /** @brief destructor
   * has nothing to do.
 **/
-virtual CArgCallback::~CArgCallback() noexcept
+CArgCallback::~CArgCallback() noexcept
 {
 	/* nothing to do here */
 }
@@ -47,9 +50,19 @@ virtual CArgCallback::~CArgCallback() noexcept
   *
   * @return AEN_OK if the callback function was set.
 **/
-eArgErrorNumber CArgCallback::process(const char *param) const noexcept
+eArgErrorNumber CArgCallback::process(const char *param)
 {
-	if (cb) cb(aLong.size() ? aLong.c_str() : aShort.c_str(), param);
+	if (cb) {
+		try {
+			cb(aLong.size() ? aLong.c_str() : aShort.c_str(), param);
+		}
+		PWX_THROW_STD_FURTHER("ArgCbException","")
+		catch (...) {
+			PWX_THROW("ArgCbException", "Unknown exception", "")
+		}
+	}
 
 	return AEN_OK;
 }
+
+} // namespace pwx

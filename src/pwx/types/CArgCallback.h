@@ -39,18 +39,19 @@ namespace pwx {
 **/
 class CArgCallback : public VArgTargetBase
 {
+public:
 	explicit CArgCallback(const char* arg_short, const char* arg_long,
-				void (*arg_cb)(const char*, const T*),
+				void (*arg_cb)(const char*, const char*),
 				const char* arg_desc, const char* param_name) noexcept;
 
-	virtual ~CArgCallback() noexcept { /* nothing to do here */ }
+	virtual ~CArgCallback() noexcept;
 
-	eArgErrorNumber process(const char* param) const noexcept;
+	virtual eArgErrorNumber process(const char* param);
 
 private:
 
 	// callback
-	void (*cb)(const char*, const const char*);
+	void (*cb)(const char*, const char*);
 
 };
 
