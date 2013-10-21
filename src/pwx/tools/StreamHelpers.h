@@ -209,6 +209,27 @@ bool PWX_API readNextValue (Tval &value, std::ifstream &is, char separator,
 }
 
 
+/** @brief convert a value to bool
+  *
+  * This function uses a stringstream to convert @a val to a bool.
+  * The value will not be type-checked, so it is the users responsibility
+  * to use a type that is compatible with stringstream. Of course the
+  * compiler will error out if the type is incompatible.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting bool
+**/
+template <typename T>
+bool PWX_API to_bool (const T val) noexcept
+{
+	bool result = false;
+	std::stringstream ss;
+	ss << val;
+	ss >> result;
+	return result;
+}
+
+
 /** @brief convert a value to float
   *
   * This function uses a stringstream to convert @a val to a float.
