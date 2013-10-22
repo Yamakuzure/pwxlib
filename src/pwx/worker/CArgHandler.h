@@ -83,8 +83,8 @@ namespace pwx {
   * </LI></LIST>
   *
   * Supported types:<BR />
-  * The system directly supports [u]int{8,16,32,64}_t, float,
-  * [long] double and std::string targets.<BR />
+  * The system directly supports bool, [u]int{8,16,32,64}_t,
+  * float, [long] double and std::string targets.<BR />
   * If a different type is to be handled, a callback function
   * must be installed that converts a const char* parameter
   * into the target type and handles the processing.<BR />
@@ -121,14 +121,15 @@ namespace pwx {
   * If you need to pass arguments to a called process,
   * add the marker separating the command line arguments
   * from the called process arguments with the method
-  * addPassthrough() and not this one!.
+  * <I>addPassthrough()</I> and not <I>addArg()</I>.
   *
   * Adding a callback function using <I>addArg()</I><BR />
   * Here the same rules apply. The callback function is
   * supposed to work as follows:<BR />
   * The callback function will receive the long argument, if
   * set, otherwise the short argument as a first parameter.
-  * The second parameter will be the parameter as a const char*.
+  * The second parameter will be the command line parameter(s)
+  * that follow(s) the argument as a const char*.
 **/
 class PWX_API CArgHandler
 {
