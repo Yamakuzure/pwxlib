@@ -218,6 +218,7 @@ public:
 							   char argSep = 0x20, char paramSep = 0x20,
 							   char descSep = 0x20, bool autoSep = true,
 							   bool autoSpace = false) const noexcept;
+	const char* getPrgCall    () const noexcept;
 	int32_t     parseArgs     (const int32_t argc, const char** argv) noexcept;
 
 
@@ -249,6 +250,7 @@ private:
 	char***   pass_args;   //!< The target to store arguments to pass through
 	char*     pass_init;   //!< The character sequence starting the pass through distribution
 	int32_t*  pass_cnt;    //!< The target to store the number of passed through arguments
+	char*     prgCall;     //!< If set, argv[0] containing the program call is stored in here.
 	hash_t    shortArgs;   //!< stores targets using their short argument as key
 
 };

@@ -132,11 +132,12 @@ CArgHandler::CArgHandler() noexcept :
     pass_args(nullptr),
     pass_init(nullptr),
     pass_cnt(nullptr),
+    prgCall(nullptr),
     shortArgs(7, do_not_destroy, nullptr, 256, 4.0, 1.733)
 {
 	/* Turn of thread safety for the hashes and the error list.
 	 * Multithreading does not make any sense, here! */
-	 errlist.disable_thread_saftey();
+	 errlist.disable_thread_safety();
 	 longArgs.disable_thread_safety();
 	 shortArgs.disable_thread_safety();
 }
@@ -147,6 +148,8 @@ CArgHandler::CArgHandler() noexcept :
 CArgHandler::~CArgHandler() noexcept
 {
 	this->clearArgs();
+	if (prgCall)
+		free(prgCall);
 }
 
 
@@ -957,26 +960,28 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t 
   * This method parses the given array @a argv of C-Strings
   * with @a argc expected entries.
   *
+  * <B>Important</B>: It is assumed that argv[0] contains the program
+  * call. This can be retrieved using the method <I>getPrgCall()</I>
+  * after the arguments have been parsed.
+  *
   * @param[in] argc The number of strings in @a argv.
   * @param[in] argv array of C-Strings.
   * @return Number of errors encountered.
   */
 int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
 {
-	if (argc > 0) {
+	if ((argc > 0) && argv && argv[0])
+		/* Store argv[0] in prgCall */
+		prgCall = strdup(argv[0]);
 
-		/* Catch special condition: Everything is passed through. */
-		if (pass_init && !strlen(pass_init)) {
-			passThrough(argc, argv);
-			return 0;
-		}
+	if ((argc > 1) && argv && argv[1]) {
 
 		/* Move through argv until
 		 * a) argc is reached or
 		 * b) pass_init is reached.
 		 */
 		data_t* lastTarget = nullptr; // holds the last target expecting a parameter
-		int32_t idx        = 0;
+		int32_t idx        = 1;
 		for ( ; (idx < argc) && argv[idx] && STRNE(argv[idx], pass_init); ++idx) {
 			data_t* target      = getTarget(argv[idx]);
 			bool    callProcess = false;
@@ -1087,6 +1092,15 @@ CArgHandler::data_t* CArgHandler::getTarget(const char* arg) const noexcept
 
 	return target;
 }
+
+
+/** @return the program call, if <I>parseArgs()</I> has found one, nullptr otherwise.
+**/
+const char* CArgHandler::getPrgCall() const noexcept
+{
+	return prgCall;
+}
+
 
 /** @brief store argc/argv in pass_cnt/pass_args values
 **/
