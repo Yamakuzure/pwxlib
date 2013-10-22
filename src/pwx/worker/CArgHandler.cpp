@@ -16,9 +16,15 @@ CArgHandler PAH;
   * @param[in] arg_short Short argument like "-a" or "x".
   * @param[in] arg_long Long argument like "--foo" or "-bar".
   * @param[in] arg_type Determines what to do with the target.
-  * @param[out] arg_target Pointer to the value to handle.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_cb Callback function to install
   * @param[in] arg_desc Help text for this argument.
-  * @param[in] param_name Name shown in <> int the help text.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @param[out] tgtShort The CArgHandler::hash_t to store short arguments in
+  * @param[out] tgtLong The CArgHandler::hash_t to store long arguments in
+  * @param[out] maxLongLen Receives the length of @a arg_long if greater than @a maxLongLen
+  * @param[out] maxParamLen Receives the length of @a param_name if greater than @a maxParamLen
+  * @param[out] maxShortLen Receives the length of @a arg_short if greater than @a maxShortLen
   * @return true if an argument was added, false otherwise.
 **/
 template<typename T>
@@ -128,8 +134,9 @@ CArgHandler::CArgHandler() noexcept :
     pass_cnt(nullptr),
     shortArgs(7, do_not_destroy, nullptr, 256, 4.0, 1.733)
 {
-	/* Turn of thread safety for the hashes.
+	/* Turn of thread safety for the hashes and the error list.
 	 * Multithreading does not make any sense, here! */
+	 errlist.disable_thread_saftey();
 	 longArgs.disable_thread_safety();
 	 shortArgs.disable_thread_safety();
 }
@@ -146,6 +153,18 @@ CArgHandler::~CArgHandler() noexcept
 // === The bitter evil addArg() legion === ( ;-) )
 
 
+/** @brief Add an argument for a bool target
+  *
+  * This is the wrapper for target type bool.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, bool* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -157,6 +176,18 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 }
 
 
+/** @brief Add an argument for an int8_t target
+  *
+  * This is the wrapper for target type int8_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int8_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -168,6 +199,18 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 }
 
 
+/** @brief Add an argument for an uint8_t target
+  *
+  * This is the wrapper for target type uint8_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint8_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -178,6 +221,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an int16_t target
+  *
+  * This is the wrapper for target type int16_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int16_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -188,6 +244,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an uint16_t target
+  *
+  * This is the wrapper for target type uint16_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint16_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -198,6 +267,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an int32_t target
+  *
+  * This is the wrapper for target type int32_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int32_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -208,6 +290,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an uint32_t target
+  *
+  * This is the wrapper for target type uint32_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint32_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -218,6 +313,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an int64_t target
+  *
+  * This is the wrapper for target type int64_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int64_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -228,6 +336,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an uint64_t target
+  *
+  * This is the wrapper for target type uint64_t.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint64_t* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -238,6 +359,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for a float target
+  *
+  * This is the wrapper for target type float.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, float* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -248,6 +382,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for a double target
+  *
+  * This is the wrapper for target type double.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, double* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -258,6 +405,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for a long double target
+  *
+  * This is the wrapper for target type long double.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, long double* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -268,6 +428,19 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
+
+/** @brief Add an argument for an std::string target
+  *
+  * This is the wrapper for target type std::string.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_type Determines what to do with the target.
+  * @param[in] arg_target Pointer to the value to handle.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, std::string* arg_target,
 			const char* arg_desc, const char* param_name)
@@ -278,7 +451,18 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
 
-// callback!
+
+/** @brief Add an argument that uses a callback function
+  *
+  * This is the wrapper for installing a callback function.
+  *
+  * @param[in] arg_short Short argument like "-a" or "x".
+  * @param[in] arg_long Long argument like "--foo" or "-bar".
+  * @param[in] arg_cb Pointer to the callback function to install.
+  * @param[in] arg_desc Help text for this argument.
+  * @param[in] param_name Name shown in <> in the help text.
+  * @return true if an argument was added, false otherwise.
+**/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			void (*arg_cb)(const char*, const char*),
 			const char* arg_desc, const char* param_name)
@@ -288,8 +472,6 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
-
-
 
 
 // === Other more harmless methods ===
