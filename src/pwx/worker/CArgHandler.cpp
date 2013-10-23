@@ -968,7 +968,7 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t 
   * @param[in] argv array of C-Strings.
   * @return Number of errors encountered.
   */
-int32_t CArgHandler::parseArgs(const int32_t argc, const char** argv) noexcept
+int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 {
 	if ((argc > 0) && argv && argv[0])
 		/* Store argv[0] in prgCall */
