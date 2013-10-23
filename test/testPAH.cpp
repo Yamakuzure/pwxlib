@@ -73,11 +73,11 @@ int32_t testPAH (sEnv &env)
 	** B) Print Help text using automatic text generation.                 **
 	************************************************************************/
 	cout << adjRight (4, 0) << ++env.testCount << " Print auto help text : " << endl;
-	cout << "--- help text begin (40, 2, '|', ' ', ':', true, true) ---" << endl;
+	cout << "\n--- help text begin (40, 2, '|', ' ', ':', true, true) ---" << endl;
 	cout << PAH.getHelpStr("add", 40, 2, '|', ' ', ':', true, true) << endl;
 	cout << PAH.getHelpStr("-h", 40, 2, '|', ' ', ':', true, true) << endl;
 	cout << PAH.getHelpStr("i", 40, 2, '|', ' ', ':', true, true) << endl;
-	cout << "--- help text end ---" << endl;
+	cout << "--- help text end ---\n" << endl;
 	++env.testSuccess;
 
 	/************************************************************************
@@ -88,7 +88,7 @@ int32_t testPAH (sEnv &env)
 	addFakeArg(1, "--hwlp");    // typo
 	addFakeArg(2, "--add");     // wrong, must be without --
 	addFakeArg(3, "42");        // Should have been added.
-	int errCount = PAH.parseArgs(xArgc, const_cast<const char**>(xArgv));
+	int errCount = PAH.parseArgs(xArgc, xArgv);
 	cout << "  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3] << endl;
 	cout << "  -> Errors (must be 3) : " << errCount;
 	if (3 == errCount) {
@@ -108,10 +108,48 @@ int32_t testPAH (sEnv &env)
 	}
 
 
-
 	/************************************************************************
 	** D) Parse fake argc/argv with valid values and print result.         **
 	************************************************************************/
+	cout << "\n" << adjRight (4, 0) << ++env.testCount << " Parse valid argv : " << endl;
+	addFakeArg(1, "i");    // increase tgt_inc by 1
+	addFakeArg(2, "add");  // add next value to tgt_add
+	addFakeArg(3, "2");    // So the result is 1 and 2
+	errCount = PAH.parseArgs(xArgc, xArgv);
+	cout << "  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3] << endl;
+	cout << "  -> Errors (must be 0) : " << errCount;
+	if (0 == errCount) {
+		cout << " => SUCCESS" << endl;
+
+		// tgt_inc must be 1 now
+		cout << "  -> tgt_inc (must be 1) : " << tgt_inc;
+		if (1 << tgt_inc) cout << " => SUCCESS" << endl;
+		else              cout << " => FAILURE" << endl;
+
+		// tgt_add must be 2 now
+		cout << "  -> tgt_add (must be 2) : " << tgt_add;
+		if (2 << tgt_inc) cout << " => SUCCESS" << endl;
+		else              cout << " => FAILURE" << endl;
+
+		if ((1 == tgt_inc) && (2 == tgt_add))
+			++env.testSuccess;
+		else
+			++env.testFail;
+	} else {
+		cout << " => FAILURE" << endl;
+		++env.testFail;
+	}
+	if (errCount) {
+		cout << "  -> Errors found: " << endl;
+		for (int i = 1; i <= errCount; ++i) {
+			cout << adjRight(7, 0) << i << ": ";
+			cout << PAH.getErrorStr(i) << " [";
+			cout << PAH.getError(i) << "]" << endl;
+		}
+	}
+
+
+
 	/************************************************************************
 	** E) Clear all resources.                                             **
 	************************************************************************/
@@ -170,6 +208,8 @@ static void addFakeArg(int32_t nr, const char* arg)
 	if (arg && strlen(arg)) {
 		if (nr >= xArgc)
 			setFakeArg(nr + 1);
+		if (xArgv[nr])
+			delete xArgv[nr];
 		xArgv[nr] = new char[strlen(arg) + 1];
 		strncpy(xArgv[nr], arg, strlen(arg));
 	}
