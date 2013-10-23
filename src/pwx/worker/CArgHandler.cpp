@@ -1019,7 +1019,8 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 				 *    -> Add error message about that
 				*/
 				if (target->needsParameter()) {
-					if (lastTarget && (false == lastTarget->hasParameter())) {
+					if ( lastTarget && lastTarget->needsParameter()
+					  && (false == lastTarget->hasParameter())) {
 						// This is situation c)
 						std::string param_error = "Argument "
 							+ (lastTarget->aLong.size() ? lastTarget->aLong : lastTarget->aShort)
