@@ -968,6 +968,25 @@ std::string CArgHandler::getHelpStr(const char* argument, size_t length, size_t 
   * @param[in] argv array of C-Strings.
   * @return Number of errors encountered.
   */
+int32_t CArgHandler::parseArgs(const int32_t argc, char* argv[]) noexcept
+{
+	return parseArgs(argc, const_cast<const char**>(argv));
+}
+
+
+/** @brief parse given arguments
+  *
+  * This method parses the given array @a argv of C-Strings
+  * with @a argc expected entries.
+  *
+  * <B>Important</B>: It is assumed that argv[0] contains the program
+  * call. This can be retrieved using the method <I>getPrgCall()</I>
+  * after the arguments have been parsed.
+  *
+  * @param[in] argc The number of strings in @a argv.
+  * @param[in] argv array of C-Strings.
+  * @return Number of errors encountered.
+  */
 int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 {
 	if ((argc > 0) && argv && argv[0])

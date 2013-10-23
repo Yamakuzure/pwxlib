@@ -219,6 +219,7 @@ public:
 							   char descSep = 0x20, bool autoSep = true,
 							   bool autoSpace = false) const noexcept;
 	const char* getPrgCall    () const noexcept;
+	int32_t     parseArgs     (const int32_t argc, char* argv[]) noexcept;
 	int32_t     parseArgs     (const int32_t argc, const char* argv[]) noexcept;
 
 
