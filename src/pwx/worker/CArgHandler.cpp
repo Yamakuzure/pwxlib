@@ -989,7 +989,11 @@ int32_t CArgHandler::parseArgs(const int32_t argc, char* argv[]) noexcept
   */
 int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 {
-	if ((argc > 0) && argv && argv[0])
+	// New round, new errors:
+	if (errlist.size())
+		errlist.clear();
+
+	if ((argc > 0) && argv && argv[0] && (!prgCall || !strlen(prgCall)))
 		/* Store argv[0] in prgCall */
 		prgCall = strdup(argv[0]);
 
