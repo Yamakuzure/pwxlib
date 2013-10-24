@@ -62,10 +62,6 @@ VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
 	VArgTargetBase(arg_short, arg_long, ATT_SET, arg_desc, param_name)
 {
 	setType = set_type;
-	aShort.clear();
-	aLong.clear();
-	desc.clear();
-	pName.clear();
 }
 
 
@@ -74,7 +70,10 @@ VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
 **/
 VArgTargetBase::~VArgTargetBase() noexcept
 {
-	/* nothing to do here */
+	aShort.clear();
+	aLong.clear();
+	desc.clear();
+	pName.clear();
 }
 
 
