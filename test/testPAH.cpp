@@ -281,13 +281,15 @@ static void cb_clrstr()
 /// @internal Set arg number nr to arg
 static void addFakeArg(int32_t nr, const char* arg)
 {
-	if (arg && strlen(arg)) {
+	size_t argSize = arg ? strlen(arg) : 0;
+	if (argSize) {
 		if (nr >= xArgc)
 			setFakeArg(nr + 1);
 		if (xArgv[nr])
-			delete xArgv[nr];
-		xArgv[nr] = new char[strlen(arg) + 1];
-		strncpy(xArgv[nr], arg, strlen(arg));
+			delete [] xArgv[nr];
+		xArgv[nr] = new char[argSize + 1];
+		memset(xArgv[nr], 0, argSize + 1);
+		strncpy(xArgv[nr], arg, argSize);
 	}
 }
 
@@ -298,7 +300,7 @@ static void clrFakeArg()
 	if (xArgv) {
 		for (int32_t i = 0; i < xArgc; ++i) {
 			if (xArgv[i]) {
-				delete xArgv[i];
+				delete [] xArgv[i];
 				xArgv[i] = nullptr;
 			}
 		}
