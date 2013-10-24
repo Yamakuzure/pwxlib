@@ -29,9 +29,9 @@ static void setFakeArg(int32_t aSize);                // (re)alloc to size aSize
   ** B) Print Help text using automatic text generation.                 **
   ** C) Parse fake argc/argv with invalid values and print errors.       **
   ** D) Parse fake argc/argv with valid values and print result.         **
-  ** E) Clear all resources.                                             **
-  ** F) Add new arguments for all target types and a passthrough         **
-  ** G) Parse fake argc/argv with valid values and print result.         **
+  ** E) Clear all resources and add args for everything                  **
+  ** F) Parse fake argc/argv with valid values and print result.         **
+  ** G) Test combinated arguments with shifted parameters                **
   *************************************************************************
 **/
 int32_t testPAH (sEnv &env)
@@ -151,14 +151,16 @@ int32_t testPAH (sEnv &env)
 
 
 	/************************************************************************
-	** E) Clear all resources.                                             **
+	** E) Clear all resources and add args for everything                  **
 	************************************************************************/
 	/************************************************************************
-	** F) Add new arguments for all target types and a passthrough         **
+	** F) Parse fake argc/argv with valid values and print result.         **
 	************************************************************************/
 	/************************************************************************
-	** G) Parse fake argc/argv with valid values and print result.         **
+	** G) Test combinated arguments with shifted parameters                **
 	************************************************************************/
+
+
 
 	// clean up before returning
 	clrFakeArg();
