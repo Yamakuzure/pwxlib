@@ -40,7 +40,9 @@ static bool internalAddArg (
 	CArgHandler::hash_t &tgtShort, CArgHandler::hash_t &tgtLong,
 	size_t &maxLongLen, size_t &maxParamLen, size_t &maxShortLen )
 {
-	typedef VArgTargetBase data_t;
+	typedef VArgTargetBase              data_t;
+	typedef std::string                 key_t;
+	typedef THashElement<key_t, data_t> elem_t;
 
 	// === Check arguments against double nullptr ===
 	bool hasArgLong  = arg_long  && strlen(arg_long);
@@ -108,10 +110,23 @@ static bool internalAddArg (
 		PWX_THROW("ArgTargetCreationFailed", e.what(),
 				"The creation of a new argument target failed!")
 	}
+
+	// Before adding the new_target, a simple fact:
+	// If the pointer is added twice, the first clear() will delete
+	// it so the second crashes. We therefore must be sure to actually
+	// *copy* the hash element into tgtShort if tgtLong has been
+	// filled with a target.
 	if (hasArgLong)
 		PWX_TRY_PWX_FURTHER(tgtLong.add(key_long, new_target))
-	if (hasArgShort)
-		PWX_TRY_PWX_FURTHER(tgtShort.add(key_short, new_target))
+	if (hasArgShort) {
+		if (hasArgLong) {
+			elem_t new_element(*(tgtLong.get(key_long)));
+			new_element.key = key_short;
+			PWX_TRY_PWX_FURTHER(tgtShort.add(new_element))
+		}
+		else
+			PWX_TRY_PWX_FURTHER(tgtShort.add(key_short, new_target))
+	}
 
 	// === Finally record length if a new maximum is found ===
 	if (key_long.size() > maxLongLen)
@@ -131,7 +146,7 @@ static bool internalAddArg (
 /** @brief default empty ctor
   */
 CArgHandler::CArgHandler() noexcept :
-    longArgs (7, do_not_destroy, nullptr, 256, 4.0, 1.733),
+    longArgs (7, nullptr, nullptr, 256, 4.0, 1.733),
     maxLongLen(0),
     maxParamLen(0),
     maxShortLen(0),
@@ -139,7 +154,7 @@ CArgHandler::CArgHandler() noexcept :
     pass_init(nullptr),
     pass_cnt(nullptr),
     prgCall(nullptr),
-    shortArgs(7, do_not_destroy, nullptr, 256, 4.0, 1.733)
+    shortArgs(7, nullptr, nullptr, 256, 4.0, 1.733)
 {
 	/* Turn of thread safety for the hashes and the error list.
 	 * Multithreading does not make any sense, here! */
