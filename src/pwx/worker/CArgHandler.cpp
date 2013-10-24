@@ -21,6 +21,7 @@ CArgHandler PAH;
   * @param[in] arg_cb Callback function to install
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @param[out] tgtShort The CArgHandler::hash_t to store short arguments in
   * @param[out] tgtLong The CArgHandler::hash_t to store long arguments in
   * @param[out] maxLongLen Receives the length of @a arg_long if greater than @a maxLongLen
@@ -171,14 +172,16 @@ CArgHandler::~CArgHandler() noexcept
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, bool* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -194,14 +197,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int8_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -217,14 +222,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint8_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -240,14 +247,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int16_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -263,14 +272,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint16_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -286,14 +297,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int32_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -309,14 +322,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint32_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -332,14 +347,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, int64_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -355,14 +372,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, uint64_t* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -378,14 +397,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, float* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -401,14 +422,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, double* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -424,14 +447,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, long double* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -447,14 +472,16 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
+  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
 bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			eArgTargetType arg_type, std::string* arg_target,
-			const char* arg_desc, const char* param_name)
+			const char* arg_desc, const char* param_name,
+			eArgSetType set_type)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, arg_target,
-											nullptr, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, arg_type, set_type,
+											arg_target, nullptr, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }
@@ -475,8 +502,8 @@ bool CArgHandler::addArg(const char* arg_short, const char* arg_long,
 			void (*arg_cb)(const char*, const char*),
 			const char* arg_desc, const char* param_name)
 {
-	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, ATT_CB, (uint8_t*)nullptr,
-											arg_cb, arg_desc, param_name,
+	PWX_TRY_PWX_FURTHER(return internalAddArg(arg_short, arg_long, ATT_CB, STT_OVERWRITE,
+											(uint8_t*)nullptr, arg_cb, arg_desc, param_name,
 											this->shortArgs, this->longArgs,
 											this->maxLongLen, this->maxParamLen, this->maxShortLen))
 }

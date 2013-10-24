@@ -162,43 +162,56 @@ public:
 
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, bool* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, int8_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, uint8_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, int16_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, uint16_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, int32_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, uint32_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, int64_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, uint64_t* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, float* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, double* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, long double* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   eArgTargetType arg_type, std::string* arg_target,
-							   const char* arg_desc, const char* param_name);
+							   const char* arg_desc, const char* param_name,
+							   eArgSetType set_type = STT_OVERWRITE);
 	bool		addArg		  (const char* arg_short, const char* arg_long,
 							   void (*arg_cb)(const char*, const char*),
 							   const char* arg_desc, const char* param_name);
