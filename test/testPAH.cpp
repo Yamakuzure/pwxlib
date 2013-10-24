@@ -30,8 +30,9 @@ static void setFakeArg(int32_t aSize);                // (re)alloc to size aSize
   ** C) Parse fake argc/argv with invalid values and print errors.       **
   ** D) Parse fake argc/argv with valid values and print result.         **
   ** E) Clear all resources and add args for everything                  **
-  ** F) Parse fake argc/argv with valid values and print result.         **
-  ** G) Test combinated arguments with shifted parameters                **
+  ** F) Print Help text using automatic text generation.                 **
+  ** G) Parse fake argc/argv with valid values and print result.         **
+  ** H) Test combinated arguments with shifted parameters                **
   *************************************************************************
 **/
 int32_t testPAH (sEnv &env)
@@ -153,17 +154,90 @@ int32_t testPAH (sEnv &env)
 	/************************************************************************
 	** E) Clear all resources and add args for everything                  **
 	************************************************************************/
+	cout << "\n" << adjRight (4, 0) << ++env.testCount << " Create new argument set : ";
+	PAH.clearArgs();
+
+	// reset old targets and add new ones:
+	tgt_bool = true; // Will be used to test ATT_FALSE now.
+	tgt_inc  = 0;
+	tgt_add  = 0;
+	float       tgt_dec     = 0.f;
+	double      tgt_sub     = 0.0;
+	uint32_t    tgt_set_err = 0; // set type STT_ERROR
+	long double tgt_set_ign = 0.0; // set type STT_IGNORE
+	int64_t     tgt_set_ovw = 0; // set type STT_OVERWRITE
+
+	// Pass through targets:
+	// const char* init_arg, int32_t* pass_argc, char*** pass_argv
+	int32_t pass_argc = 0;
+	char**  pass_argv = nullptr;
+
+	try {
+		PAH.addArg("-a", "--add", pwx::eArgTargetType::ATT_ADD, &tgt_add,
+					"Add num to tgt_add", "num");
+		PAH.addArg("-d", "--dec", pwx::eArgTargetType::ATT_DEC, &tgt_dec,
+					"Decrease tgt_dec by 1.0", nullptr);
+		PAH.addArg("-f", "--false", pwx::eArgTargetType::ATT_FALSE, &tgt_bool,
+					"Set tgt_bool to false", nullptr);
+		PAH.addArg("-i", "--inc", pwx::eArgTargetType::ATT_INC, &tgt_inc,
+					"Increase tgt_inc by 1", nullptr);
+		PAH.addArg("-E", "--set_err", pwx::eArgTargetType::ATT_SET, &tgt_set_err,
+					"Set tgt_set_err to num", "num", STT_ERROR);
+		PAH.addArg("-I", "--set_ign", pwx::eArgTargetType::ATT_SET, &tgt_set_ign,
+					"Set tgt_set_ign to num", "num", STT_IGNORE);
+		PAH.addArg("-O", "--set_ovw", pwx::eArgTargetType::ATT_SET, &tgt_set_ovw,
+					"Set tgt_set_ovw to num", nullptr); // STT_OVERWRITE is default!
+		PAH.addArg("-s", "--sub", pwx::eArgTargetType::ATT_SUB, &tgt_sub,
+					"Substract num from tgt_sub", nullptr);
+		// add callbacks
+		PAH.addArg(nullptr, "push",    cb_addstr, "Add word to end of cbtarget", "word");
+		PAH.addArg(nullptr, "unshift", cb_addstr, "Add word to start of cbtarget", "word");
+
+		// add passthrough system:
+		PAH.addPassthrough("--", &pass_argc, &pass_argv);
+
+		// As none has thrown, this is a success.
+		++env.testSuccess;
+		cout << "SUCCESS" << endl;
+	} catch (pwx::CException &e) {
+		cout << "FAILURE" << endl;
+		cout << "   exception name()/what(): \"" <<e.name();
+		cout << "\" / \"" << e.what() << "\"" << endl;
+		++env.testFail;
+		return EXIT_FAILURE;
+	}
+
 	/************************************************************************
-	** F) Parse fake argc/argv with valid values and print result.         **
+	** F) Print Help text using automatic text generation.                 **
+	************************************************************************/
+	cout << adjRight (4, 0) << ++env.testCount << " Print auto help text : " << endl;
+	cout << "\n--- help text begin (50, 2, '|', ' ', ':', true, true) ---" << endl;
+	cout << PAH.getHelpStr("-a", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-d", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-f", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-i", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-E", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-I", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-O", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("-s", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("push", 50, 2, '|', ' ', ':', true, true) << endl;
+	cout << PAH.getHelpStr("unshift", 50, 2, '|', ' ', ':', true, true) << endl;
+
+	cout << "--- help text end ---\n" << endl;
+	++env.testSuccess;
+
+	/************************************************************************
+	** G) Parse fake argc/argv with valid values and print result.         **
 	************************************************************************/
 	/************************************************************************
-	** G) Test combinated arguments with shifted parameters                **
+	** H) Test combinated arguments with shifted parameters                **
 	************************************************************************/
 
 
 
 	// clean up before returning
 	clrFakeArg();
+	cb_clrstr();
 
 	return result;
 }
