@@ -97,7 +97,10 @@ public:
 	/** @brief destructor
 	  * has nothing to do.
 	**/
-	virtual ~TArgTarget() noexcept { /* nothing to do here */ }
+	virtual ~TArgTarget() noexcept
+	{
+		target = nullptr;
+	}
 
 
 	/** @brief process one command line parameter or argument occurence

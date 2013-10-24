@@ -61,7 +61,11 @@ VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
 		noexcept :
 	VArgTargetBase(arg_short, arg_long, ATT_SET, arg_desc, param_name)
 {
-		setType = set_type;
+	setType = set_type;
+	aShort.clear();
+	aLong.clear();
+	desc.clear();
+	pName.clear();
 }
 
 
