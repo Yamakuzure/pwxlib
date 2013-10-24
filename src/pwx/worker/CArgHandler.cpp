@@ -523,11 +523,17 @@ void CArgHandler::clearArgs() noexcept
 	errlist.clear();
 	longArgs.clear();
 	shortArgs.clear();
+
 	if (pass_init)
 		free(pass_init);
+
 	pass_args = nullptr;
 	pass_init = nullptr;
 	pass_cnt  = nullptr;
+
+	if (prgCall)
+		free(prgCall);
+	prgCall = nullptr;
 }
 
 
