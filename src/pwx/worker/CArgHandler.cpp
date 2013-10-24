@@ -16,6 +16,7 @@ CArgHandler PAH;
   * @param[in] arg_short Short argument like "-a" or "x".
   * @param[in] arg_long Long argument like "--foo" or "-bar".
   * @param[in] arg_type Determines what to do with the target.
+  * @param[in] set_type Determines the type of a set target.
   * @param[in] arg_target Pointer to the value to handle.
   * @param[in] arg_cb Callback function to install
   * @param[in] arg_desc Help text for this argument.
@@ -30,7 +31,9 @@ CArgHandler PAH;
 template<typename T>
 static bool internalAddArg (
 	const char* arg_short, const char* arg_long,
-	eArgTargetType arg_type, T* arg_target,
+	eArgTargetType arg_type,
+	eArgSetType set_type,
+	T* arg_target,
 	void (*arg_cb)(const char*, const char*),
 	const char* arg_desc, const char* param_name,
 	CArgHandler::hash_t &tgtShort, CArgHandler::hash_t &tgtLong,
@@ -96,6 +99,8 @@ static bool internalAddArg (
 	try {
 		if (ATT_CB == arg_type)
 			new_target = new CArgCallback(arg_short, arg_long, arg_cb, arg_desc, param_name);
+		else if (ATT_SET == arg_type)
+			new_target = new TArgTarget<T>(arg_short, arg_long, set_type, arg_target, arg_desc, param_name);
 		else
 			new_target = new TArgTarget<T>(arg_short, arg_long, arg_type, arg_target, arg_desc, param_name);
 	} catch(std::bad_alloc &e) {
