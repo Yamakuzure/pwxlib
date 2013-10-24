@@ -59,10 +59,37 @@ public:
 	  * @param[in] param_name Name shown in <> int the help text.
 	**/
 	explicit TArgTarget(const char* arg_short, const char* arg_long,
-				eArgTargetType arg_type, T* arg_target,
+				eArgTargetType arg_type,T* arg_target,
 				const char* arg_desc, const char* param_name)
 			noexcept :
 		VArgTargetBase(arg_short, arg_long, arg_type, arg_desc, param_name),
+		target(arg_target)
+	{ /* nothing to do here */ }
+
+
+	/** brief ATT_SET ctor
+	  *
+	  * No parameter check, the caller must ensure consistent
+	  * values that make the instance usable.
+	  *
+	  * This is a constructor variant for ATT_SET targets.
+	  * Use this constructor if the set target type is
+	  * STT_IGNORE or STT_ERROR, STT_OVERWRITE is the default.
+	  *
+	  * @see pwx::CArgHandler::addArg()
+	  *
+	  * @param[in] arg_short Short argument like "-a" or "x".
+	  * @param[in] arg_long Long argument like "--foo" or "-bar".
+	  * @param[in] set_type Determines the set target type.
+	  * @param[out] arg_target Pointer to the value to handle.
+	  * @param[in] arg_desc Help text for this argument.
+	  * @param[in] param_name Name shown in <> int the help text.
+	**/
+	TArgTarget(const char* arg_short, const char* arg_long,
+				eArgSetType set_type,T* arg_target,
+				const char* arg_desc, const char* param_name)
+			noexcept :
+		VArgTargetBase(arg_short, arg_long, set_type, arg_desc, param_name),
 		target(arg_target)
 	{ /* nothing to do here */ }
 
