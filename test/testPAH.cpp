@@ -33,7 +33,8 @@ static void setFakeArg(int32_t aSize);                // (re)alloc to size aSize
   ** E) Clear all resources and add args for everything                  **
   ** F) Print Help text using automatic text generation.                 **
   ** G) Parse fake argc/argv with valid values and print result.         **
-  ** H) Test combinated arguments with shifted parameters                **
+  ** H) Test three more params for the three set targets.                **
+  ** I) Test combinated arguments with shifted parameters                **
   *************************************************************************
 **/
 int32_t testPAH (sEnv &env)
@@ -61,7 +62,7 @@ int32_t testPAH (sEnv &env)
 
 		// As none has thrown, this is a success.
 		++env.testSuccess;
-		cout << "SUCCESS" << endl;
+		cout << "Success" << endl;
 	} catch (pwx::CException &e) {
 		cout << "FAILURE" << endl;
 		cout << "   exception name()/what(): \"" <<e.name();
@@ -94,7 +95,7 @@ int32_t testPAH (sEnv &env)
 	cout << "  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3] << endl;
 	cout << "  -> Errors (must be 3) : " << errCount;
 	if (3 == errCount) {
-		cout << " => SUCCESS" << endl;
+		cout << " => Success" << endl;
 		++env.testSuccess;
 	} else {
 		cout << " => FAILURE" << endl;
@@ -121,16 +122,16 @@ int32_t testPAH (sEnv &env)
 	cout << "  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3] << endl;
 	cout << "  -> Errors (must be 0) : " << errCount;
 	if (0 == errCount) {
-		cout << " => SUCCESS" << endl;
+		cout << " => Success" << endl;
 
 		// tgt_inc must be 1 now
 		cout << "  -> tgt_inc (must be 1) : " << tgt_inc;
-		if (1 << tgt_inc) cout << " => SUCCESS" << endl;
+		if (1 << tgt_inc) cout << " => Success" << endl;
 		else              cout << " => FAILURE" << endl;
 
 		// tgt_add must be 2 now
 		cout << "  -> tgt_add (must be 2) : " << tgt_add;
-		if (2 << tgt_inc) cout << " => SUCCESS" << endl;
+		if (2 << tgt_inc) cout << " => Success" << endl;
 		else              cout << " => FAILURE" << endl;
 
 		if ((1 == tgt_inc) && (2 == tgt_add))
@@ -199,7 +200,7 @@ int32_t testPAH (sEnv &env)
 
 		// As none has thrown, this is a success.
 		++env.testSuccess;
-		cout << "SUCCESS" << endl;
+		cout << "Success" << endl;
 	} catch (pwx::CException &e) {
 		cout << "FAILURE" << endl;
 		cout << "   exception name()/what(): \"" <<e.name();
@@ -257,40 +258,69 @@ int32_t testPAH (sEnv &env)
 	errCount = PAH.parseArgs(xArgc, xArgv);
 	cout << "  -> Errors (must be 0) : " << errCount;
 	if (0 == errCount) {
-		cout << " => SUCCESS" << endl;
+		cout << " => Success" << endl;
 
-		cout << "  -> tgt_bool (must be false) : " << (tgt_bool ? "true" : "false");
-		cout << " => " << (tgt_bool ? "FAILURE" : "SUCCESS") << endl;
+		cout << "  -> tgt_bool (must be false)   : " << (tgt_bool ? "true" : "false");
+		cout << " => " << (tgt_bool ? "FAILURE" : "Success") << endl;
 
-		cout << "  -> tgt_add (must be 1)      : " << tgt_add;
-		cout << " => " << (1 == tgt_add ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> tgt_add (must be 1)        : " << tgt_add;
+		cout << " => " << (1 == tgt_add ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> tgt_inc (must be 1)      : " << tgt_inc;
-		cout << " => " << (1 == tgt_inc ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> tgt_inc (must be 1)        : " << tgt_inc;
+		cout << " => " << (1 == tgt_inc ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> tgt_dec (must be -1.0)   : " << tgt_dec;
-		cout << " => " << (pwx::areAlmostEqual(-1.f, tgt_dec) ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> tgt_dec (must be -1.0)     : " << tgt_dec;
+		cout << " => " << (pwx::areAlmostEqual(-1.f, tgt_dec) ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> tgt_sub (must be -5.0)   : " << tgt_sub;
-		cout << " => " << (pwx::areAlmostEqual(-5.0, tgt_sub) ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> tgt_sub (must be -5.0)     : " << tgt_sub;
+		cout << " => " << (pwx::areAlmostEqual(-5.0, tgt_sub) ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> set_err (must be 2)      : " << tgt_set_err;
-		cout << " => " << (2 == tgt_set_err ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> set_err (must be 2)        : " << tgt_set_err;
+		cout << " => " << (2 == tgt_set_err ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> tgt_ign (must be 3.0) : " << tgt_set_ign;
-		cout << " => " << (pwx::areAlmostEqual(3.L, tgt_set_ign) ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> set_ign (must be 3.0)      : " << tgt_set_ign;
+		cout << " => " << (pwx::areAlmostEqual(3.L, tgt_set_ign) ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> tgt_ovw (must be 4) : " << tgt_set_ovw;
-		cout << " => " << (4 == tgt_set_ovw ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> set_ovw (must be 4)        : " << tgt_set_ovw;
+		cout << " => " << (4 == tgt_set_ovw ? "Success" : "FAILURE") << endl;
 
-		cout << "  -> tgt_inc (must be 1) : " << tgt_inc;
-		cout << " => " << (1 == tgt_inc ? "SUCCESS" : "FAILURE") << endl;
+		cout << "  -> passed through argc (2)    : " << pass_argc;
+		cout << " => " << (2 == pass_argc ? "Success" : "FAILURE") << endl;
 
+		std::string passed = "";
+		if (pass_argv) {
+			if (pass_argc > 0) {
+				passed += pass_argv[0] ? pass_argv[0] : "";
+				passed += " ";
+			}
+			if (pass_argc > 1)
+				passed += pass_argv[1] ? pass_argv[1] : "";
+		}
+		cout << "  -> passed argv (Hello World!) : " << passed;
+		cout << " => " << (STREQ("Hello World!", passed.c_str()) ? "Success" : "FAILURE") << endl;
 
-//		if ((1 == tgt_inc) && (2 == tgt_add))
-//			++env.testSuccess;
-//		else
-//			++env.testFail;
+		// Dump pass_argv if pass_Argc is not 2:
+		if (2 != pass_argc) {
+			cout << " => received faulty passed argv:" << endl;
+			cout << " \"";
+			for (int32_t i = 0; i < pass_argc; ++i)
+				cout << (i ? " " : "") << pass_argv[i];
+			cout << "\"" << endl;
+		}
+
+		if (!tgt_bool
+		  && (1 == tgt_add)
+		  && (1 == tgt_inc)
+		  && pwx::areAlmostEqual(-1.f, tgt_dec)
+		  && pwx::areAlmostEqual(-5.0, tgt_sub)
+		  && (2 == tgt_set_err)
+		  && pwx::areAlmostEqual(3.L, tgt_set_ign)
+		  && (4 == tgt_set_ovw)
+		  && (2 == pass_argc)
+		  && STREQ("Hello World!", passed.c_str()) )
+			++env.testSuccess;
+		else
+			++env.testFail;
 	} else {
 		cout << " => FAILURE" << endl;
 		++env.testFail;
@@ -304,8 +334,58 @@ int32_t testPAH (sEnv &env)
 		}
 	}
 
+
 	/************************************************************************
-	** H) Test combinated arguments with shifted parameters                **
+	** H) Test three more params for the three set targets.                **
+	************************************************************************/
+	cout << "\n" << adjRight (4, 0) << ++env.testCount << " test set target types : " << endl;
+	clrFakeArg();
+	setFakeArg(7);
+	addFakePar( 1, "-I", "6"); // should be ignored
+	addFakePar( 3, "-O", "7"); // should be overwritten
+	addFakePar( 5, "-E", "5"); // should result in an error
+
+	cout << " =>\"";
+	for (int32_t i = 0; i < xArgc; ++i)
+		cout << (i > 0 ? " " : "") << xArgv[i];
+	cout << "\"<=" << endl;
+
+	errCount = PAH.parseArgs(xArgc, xArgv);
+	int32_t errNum = errCount ? PAH.getError(1) : 0 ;
+	cout << "  -> Errors (must be 1)    : " << errCount;
+	cout << " => " << (1 == errCount ? "Success" : "FAILURE") << endl;
+	cout << "  -> Error (must be 16)    : " << errNum;
+	cout << " => " << (16 == errNum ? "Success" : "FAILURE") << endl;
+
+	cout << "  -> set_err (must be 2)   : " << tgt_set_err;
+	cout << " => " << (2 == tgt_set_err ? "Success" : "FAILURE") << endl;
+
+	cout << "  -> set_ign (must be 3.0) : " << tgt_set_ign;
+	cout << " => " << (pwx::areAlmostEqual(3.L, tgt_set_ign) ? "Success" : "FAILURE") << endl;
+
+	cout << "  -> set_ovw (must be 7)   : " << tgt_set_ovw;
+	cout << " => " << (7 == tgt_set_ovw ? "Success" : "FAILURE") << endl;
+
+	if ( (1 == errCount)
+	  && (16 == errNum)
+	  && (2 == tgt_set_err)
+	  && pwx::areAlmostEqual(3.L, tgt_set_ign)
+	  && (7 == tgt_set_ovw) )
+		++env.testSuccess;
+	else
+		++env.testFail;
+
+	if (errCount) {
+		cout << "  -> Errors found: " << endl;
+		for (int i = 1; i <= errCount; ++i) {
+			cout << adjRight(7, 0) << i << ": ";
+			cout << PAH.getErrorStr(i) << " [";
+			cout << PAH.getError(i) << "]" << endl;
+		}
+	}
+
+	/************************************************************************
+	** I) Test combinated arguments with shifted parameters                **
 	************************************************************************/
 
 
@@ -313,6 +393,13 @@ int32_t testPAH (sEnv &env)
 	// clean up before returning
 	clrFakeArg();
 	cb_clrstr();
+	if (pass_argv) {
+		for (int32_t i = 0; i < pass_argc; ++i) {
+			if (pass_argv[i])
+				free(pass_argv[i]);
+		}
+		free(pass_argv);
+	}
 
 	return result;
 }
