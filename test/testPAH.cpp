@@ -18,6 +18,7 @@ static char**  xArgv = nullptr;
 // Helper to add/set/free the fake argc/argv
 // index 0 is always "./testlib" !
 static void addFakeArg(int32_t nr, const char* arg); // Set arg number nr to arg
+static void addFakePar(int32_t nr, const char* arg, const char* param); // Quickly set both
 static void clrFakeArg();                            // free xArgv
 static void setFakeArg(int32_t aSize);                // (re)alloc to size aSize
 
@@ -186,9 +187,9 @@ int32_t testPAH (sEnv &env)
 		PAH.addArg("-I", "--set_ign", pwx::eArgTargetType::ATT_SET, &tgt_set_ign,
 					"Set tgt_set_ign to num", "num", STT_IGNORE);
 		PAH.addArg("-O", "--set_ovw", pwx::eArgTargetType::ATT_SET, &tgt_set_ovw,
-					"Set tgt_set_ovw to num", nullptr); // STT_OVERWRITE is default!
+					"Set tgt_set_ovw to num", "num"); // STT_OVERWRITE is default!
 		PAH.addArg("-s", "--sub", pwx::eArgTargetType::ATT_SUB, &tgt_sub,
-					"Substract num from tgt_sub", nullptr);
+					"Substract num from tgt_sub", "num");
 		// add callbacks
 		PAH.addArg(nullptr, "push",    cb_addstr, "Add word to end of cbtarget", "word");
 		PAH.addArg(nullptr, "unshift", cb_addstr, "Add word to start of cbtarget", "word");
@@ -229,6 +230,80 @@ int32_t testPAH (sEnv &env)
 	/************************************************************************
 	** G) Parse fake argc/argv with valid values and print result.         **
 	************************************************************************/
+	cout << "\n" << adjRight (4, 0) << ++env.testCount << " Parse big argv : " << endl;
+
+	setFakeArg(22);
+
+	addFakePar( 1, "-a", "1");
+	addFakeArg( 3, "-d");
+	addFakeArg( 4, "-f");
+	addFakeArg( 5, "-i");
+	addFakePar( 6, "-E", "2");
+	addFakePar( 8, "-I", "3");
+	addFakePar(10, "-O", "4");
+	addFakePar(12, "-s", "5");
+	addFakePar(14, "push", "push_first");
+	addFakeArg(16, "push_second");
+	addFakePar(17, "unshift", "unshift_first");
+	addFakeArg(19, "unshift_second");
+	addFakeArg(20, "--"); // Next are passed through
+	addFakePar(21, "Hello", "World!");
+
+	cout << " =>\"";
+	for (int32_t i = 0; i < xArgc; ++i)
+		cout << (i > 0 ? " " : "") << xArgv[i];
+	cout << "\"<=" << endl;
+
+	errCount = PAH.parseArgs(xArgc, xArgv);
+	cout << "  -> Errors (must be 0) : " << errCount;
+	if (0 == errCount) {
+		cout << " => SUCCESS" << endl;
+
+		cout << "  -> tgt_bool (must be false) : " << (tgt_bool ? "true" : "false");
+		cout << " => " << (tgt_bool ? "FAILURE" : "SUCCESS") << endl;
+
+		cout << "  -> tgt_add (must be 1)      : " << tgt_add;
+		cout << " => " << (1 == tgt_add ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> tgt_inc (must be 1)      : " << tgt_inc;
+		cout << " => " << (1 == tgt_inc ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> tgt_dec (must be -1.0)   : " << tgt_dec;
+		cout << " => " << (pwx::areAlmostEqual(-1.f, tgt_dec) ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> tgt_sub (must be -5.0)   : " << tgt_sub;
+		cout << " => " << (pwx::areAlmostEqual(-5.0, tgt_sub) ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> set_err (must be 2)      : " << tgt_set_err;
+		cout << " => " << (2 == tgt_set_err ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> tgt_ign (must be 3.0) : " << tgt_set_ign;
+		cout << " => " << (pwx::areAlmostEqual(3.L, tgt_set_ign) ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> tgt_ovw (must be 4) : " << tgt_set_ovw;
+		cout << " => " << (4 == tgt_set_ovw ? "SUCCESS" : "FAILURE") << endl;
+
+		cout << "  -> tgt_inc (must be 1) : " << tgt_inc;
+		cout << " => " << (1 == tgt_inc ? "SUCCESS" : "FAILURE") << endl;
+
+
+//		if ((1 == tgt_inc) && (2 == tgt_add))
+//			++env.testSuccess;
+//		else
+//			++env.testFail;
+	} else {
+		cout << " => FAILURE" << endl;
+		++env.testFail;
+	}
+	if (errCount) {
+		cout << "  -> Errors found: " << endl;
+		for (int i = 1; i <= errCount; ++i) {
+			cout << adjRight(7, 0) << i << ": ";
+			cout << PAH.getErrorStr(i) << " [";
+			cout << PAH.getError(i) << "]" << endl;
+		}
+	}
+
 	/************************************************************************
 	** H) Test combinated arguments with shifted parameters                **
 	************************************************************************/
@@ -290,6 +365,20 @@ static void addFakeArg(int32_t nr, const char* arg)
 		xArgv[nr] = new char[argSize + 1];
 		memset(xArgv[nr], 0, argSize + 1);
 		strncpy(xArgv[nr], arg, argSize);
+	}
+}
+
+
+/// @internal Set arg number nr to arg and nr+1 to param
+static void addFakePar(int32_t nr, const char* arg, const char* param)
+{
+	size_t argSize = arg ? strlen(arg) : 0;
+	size_t parSize = param ? strlen(param) : 0;
+	if (argSize && parSize) {
+		if ( (nr + 1) >= xArgc)
+			setFakeArg(nr + 2);
+		addFakeArg(nr, arg);
+		addFakeArg(nr + 1, param);
 	}
 }
 
