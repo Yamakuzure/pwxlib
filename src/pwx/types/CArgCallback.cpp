@@ -55,6 +55,7 @@ eArgErrorNumber CArgCallback::process(const char *param)
 	if (cb) {
 		try {
 			cb(aLong.size() ? aLong.c_str() : aShort.c_str(), param);
+			this->gotParameter = true;
 		}
 		PWX_THROW_STD_FURTHER("ArgCbException","")
 		catch (...) {

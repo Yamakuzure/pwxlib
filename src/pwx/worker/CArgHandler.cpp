@@ -1063,6 +1063,7 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 			bool    callProcess = false;
 
 			if (target) {
+
 				/* There are three possible conditions here:
 				 * a) The target does not need a parameter:
 				 *    -> call process(nullptr)
@@ -1104,7 +1105,6 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 			if (callProcess && lastTarget) {
 				eArgErrorNumber argErrno = AEN_OK;
 				try {
-
 					lastTarget->process(argv[idx]);
 
 					if (AEN_OK != argErrno) {

@@ -160,10 +160,9 @@ eArgErrorNumber TArgTarget<T>::process(const char* param)
 		case ATT_SET:
 			// This needs handling for all three set types:
 			if ( (STT_OVERWRITE == this->setType)
-			  || (!this->gotParameter) ) {
+			  || (!this->gotParameter) )
 				*target = val;
-				this->gotParameter = true;
-			} else if (STT_ERROR == this->setType)
+			else if (STT_ERROR == this->setType)
 				argErrno = AEN_MULTIPLE_SET_PARAM;
 			// Last possibility is STT_IGNORE, which is, well, ignored. ;)
 			break;
@@ -173,6 +172,10 @@ eArgErrorNumber TArgTarget<T>::process(const char* param)
 		default:
 			PWX_THROW("UnhandledTargetType", "The given target type is not implemented, yet!", "")
 	}
+
+	// if a parameter was given, it must be noted now:
+	if (param && strlen(param))
+		this->gotParameter = true;
 
 	return argErrno;
 }
