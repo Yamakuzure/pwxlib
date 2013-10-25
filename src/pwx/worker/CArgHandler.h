@@ -61,7 +61,9 @@ namespace pwx {
   * should support.</LI>
   * <LI>Use <I>addPassthrough()</I> if command line arguments
   * must be preserved for later distribution to another
-  * program.</LI>
+  * program.<BR />
+  * Be aware, though, that passed arguments are malloc'd
+  * C-Strings that you have to free yourself.</LI>
   * <LI>Call <I>parseArgs(argc, argv)</I> to have them applied
   * to your arguments.</LI>
   * <LI>With <I>getErrorCount()</I> the number of errors

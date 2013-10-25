@@ -1105,7 +1105,7 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 			if (callProcess && lastTarget) {
 				eArgErrorNumber argErrno = AEN_OK;
 				try {
-					lastTarget->process(argv[idx]);
+					argErrno = lastTarget->process(argv[idx]);
 
 					if (AEN_OK != argErrno) {
 						std::string process_error = "Parameter \"";
@@ -1126,7 +1126,7 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 						}
 						process_error += (lastTarget->aLong.size() ? lastTarget->aLong : lastTarget->aShort);
 						process_error += "\"";
-						sArgError* argError = new sArgError(AEN_PROCESSING_ERROR, process_error.c_str());
+						sArgError* argError = new sArgError(argErrno, process_error.c_str());
 						errlist.push(argError);
 					}
 				} catch(CException &e) {
@@ -1187,6 +1187,7 @@ void CArgHandler::passThrough(const int32_t argc, const char** argv) noexcept
 		*pass_args = (char**)calloc(argc, sizeof(char*));
 		for (int32_t i = 0; *pass_args && (i < argc); ++i)
 			(*pass_args)[i] = strdup(argv[i]);
+		*pass_cnt = argc;
 	}
 }
 
