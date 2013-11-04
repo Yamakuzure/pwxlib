@@ -1081,8 +1081,14 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 			}
 
 
+			/* Now there are four possibilities:
+			 * 1.: target is set and will be processed.
+			 * 2.: target is not set, but a parameter is waited for.
+			 * 3.: argv[idx] is a combination of short args.
+			 * 4.: This argv[idx] is unknown.
+			*/
 			if (target) {
-
+				// === 1.: target is set and will be processed. ===
 				/* There are three possible conditions here:
 				 * a) The target does not need a parameter:
 				 *    -> call process(nullptr)
@@ -1102,29 +1108,53 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 							+ "\"";
 						sArgError* argError = new sArgError(AEN_PARAMETER_MISSING, param_error.c_str());
 						errlist.push(argError);
-					}
+					} else
+						// Situation b) after checking c)
+						lastTarget = target;
 				} else
 					// Situation a)
 					callProcess = true;
 
-				// Situation a) and b) after checking c)
-				lastTarget = target;
-
-			} else if (lastTarget && lastTarget->needsParameter())
-				// Process with this value, the target knows what to do
+			} else if (lastTarget && lastTarget->needsParameter()) {
+				// === 2.: target is not set, but a parameter is waited for. ===
 				callProcess = true;
-			else {
-				std::string parse_error = "Unknown argument ";
-				parse_error += argv[idx];
-				sArgError* argError = new sArgError(AEN_ARGUMENT_UNKNOWN, parse_error.c_str());
-				errlist.push(argError);
+			} else {
+				// === 3.: argv[idx] is a combination of short args. ? ===
+				bool isCombined = false;
+				try {
+					isCombined = uncombine(argv[idx], arg_list);
+
+					if (!isCombined) {
+						// === 4.: This argv[idx] is unknown. ===
+						std::string parse_error = "Unknown argument ";
+						parse_error += argv[idx];
+						sArgError* argError = new sArgError(AEN_ARGUMENT_UNKNOWN, parse_error.c_str());
+						errlist.push(argError);
+					}
+				} catch (CException &e) {
+					// This must be noted, too!
+					std::string parse_error = "Exception \"";
+					parse_error += e.name();
+					parse_error += "\" occurred while parsing \"";
+					parse_error += argv[idx];
+					parse_error += "\"\nWhat : \""; parse_error += e.what();
+					parse_error += "\"\nWhere: \""; parse_error += e.where();
+					parse_error += "\"\npFunc: \""; parse_error += e.pfunc();
+					parse_error += "\"\nTrace: "; parse_error += e.trace();
+					parse_error += "\n--------";
+					sArgError* argError = new sArgError(AEN_PROCESSING_ERROR, parse_error.c_str());
+					errlist.push(argError);
+					arg_list.clear();
+				}
 			} // End of argv tests
 
 			// Final Step: Call process
-			if (callProcess && lastTarget) {
+			if (callProcess) {
 				eArgErrorNumber argErrno = AEN_OK;
 				try {
-					argErrno = lastTarget->process(argv[idx]);
+					argErrno = target ? target->process(nullptr) :
+						       lastTarget ? lastTarget->process(argv[idx]) :
+							   AEN_PROCESSING_ERROR;
 
 					if (AEN_OK != argErrno) {
 						std::string process_error = "Parameter \"";
@@ -1218,6 +1248,39 @@ void CArgHandler::passThrough(const int32_t argc, const char** argv) noexcept
 			(*pass_args)[i] = strdup(argv[i]);
 		*pass_cnt = argc;
 	}
+}
+
+
+/** @brief try to split @a arg into short arguments and push on @a arg_list.
+  * arg_list will be empty if false is returned.
+  * @return true if all characters could be found, false otherwise.
+**/
+bool CArgHandler::uncombine(const char* arg, arg_list_t &arg_list)
+{
+	bool        allFound = true;
+	std::string dashes   = "";
+	const char* pChr     = arg;
+	data_t*     target   = nullptr;
+
+	// Step one: Get number of dashes
+	while (pChr && (*pChr == '-')) {
+		dashes += '-';
+		++pChr;
+	}
+
+	// Step two, loop through the remaining characters:
+	while (allFound && pChr && *pChr) {
+		std::string to_find = dashes + *pChr;
+		if (to_find.size() && (target = getTarget(to_find.c_str()))) {
+			arg_list.push(target);
+			++pChr;
+		} else {
+			allFound = false;
+			arg_list.clear();
+		}
+	}
+
+	return allFound;
 }
 
 

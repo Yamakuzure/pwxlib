@@ -254,6 +254,7 @@ private:
 
 	data_t* getTarget  (const char* arg)                       const noexcept;
 	void    passThrough(const int32_t argc, const char** argv)       noexcept;
+	bool    uncombine  (const char* arg, arg_list_t &arg_list);
 
 
 	/* ===============================================
