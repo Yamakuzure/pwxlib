@@ -387,7 +387,54 @@ int32_t testPAH (sEnv &env)
 	/************************************************************************
 	** I) Test combinated arguments with shifted parameters                **
 	************************************************************************/
+	cout << "\n" << adjRight (4, 0) << ++env.testCount << " Test combined arguments : " << endl;
 
+	clrFakeArg();
+	setFakeArg(2);
+
+	addFakePar(1, "-dsfi", "5");
+
+	cout << " =>\"";
+	for (int32_t i = 0; i < xArgc; ++i)
+		cout << (i > 0 ? " " : "") << xArgv[i];
+	cout << "\"<=" << endl;
+
+	errCount = PAH.parseArgs(xArgc, xArgv);
+	cout << "  -> Errors (must be 0) : " << errCount;
+	if (0 == errCount) {
+		cout << " => Success" << endl;
+
+		cout << "  -> tgt_bool (must be false)   : " << (tgt_bool ? "true" : "false");
+		cout << " => " << (tgt_bool ? "FAILURE" : "Success") << endl;
+
+		cout << "  -> tgt_inc (must be 2)        : " << tgt_inc;
+		cout << " => " << (2 == tgt_inc ? "Success" : "FAILURE") << endl;
+
+		cout << "  -> tgt_dec (must be -2.0)     : " << tgt_dec;
+		cout << " => " << (pwx::areAlmostEqual(-2.f, tgt_dec) ? "Success" : "FAILURE") << endl;
+
+		cout << "  -> tgt_sub (must be -10.0)     : " << tgt_sub;
+		cout << " => " << (pwx::areAlmostEqual(-10.0, tgt_sub) ? "Success" : "FAILURE") << endl;
+
+		if (!tgt_bool
+		  && (2 == tgt_inc)
+		  && pwx::areAlmostEqual(-2.f, tgt_dec)
+		  && pwx::areAlmostEqual(-10.0, tgt_sub) )
+			++env.testSuccess;
+		else
+			++env.testFail;
+	} else {
+		cout << " => FAILURE" << endl;
+		++env.testFail;
+	}
+	if (errCount) {
+		cout << "  -> Errors found: " << endl;
+		for (int i = 1; i <= errCount; ++i) {
+			cout << adjRight(7, 0) << i << ": ";
+			cout << PAH.getErrorStr(i) << " [";
+			cout << PAH.getError(i) << "]" << endl;
+		}
+	}
 
 
 	// clean up before returning
