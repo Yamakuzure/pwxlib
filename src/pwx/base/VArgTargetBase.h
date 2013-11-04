@@ -74,6 +74,11 @@ protected:
 };
 
 
+// Operators needed for pwx container storage:
+bool operator==(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept;
+bool operator>(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept;
+
+
 } // namespace pwx
 
 

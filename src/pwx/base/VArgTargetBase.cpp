@@ -99,5 +99,32 @@ bool VArgTargetBase::needsParameter() const noexcept
 	return false;
 }
 
+
+/** @brief return true if @a lhs and @a rhs are the same arguments.
+  * @param[in] lhs left hand side instance.
+  * @param[in] rhs rhs hand side instance.
+  * @return true if the short/long args are equal, false otherwise.
+**/
+bool operator==(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept
+{
+	return ( ( lhs.aShort.size() == rhs.aShort.size() )
+		  && ( lhs.aLong.size()  == rhs.aLong.size() )
+		  && ( !lhs.aShort.size() || (lhs.aShort == rhs.aShort) )
+		  && ( !lhs.aLong.size()  || (lhs.aLong == rhs.aLong) ) ) ;
+}
+
+
+/** @brief return true if @a lhs is "greater" than @a rhs according to the arguments.
+  * @param[in] lhs left hand side instance.
+  * @param[in] rhs rhs hand side instance.
+  * @return true if the short/long args of lhs are greater than the args of rhs.
+**/
+bool operator>(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept
+{
+	return ( ( lhs.aShort.size() && (!rhs.aShort.size() || (lhs.aShort > rhs.aShort) ) )
+		  || ( lhs.aLong.size()  && (!rhs.aLong.size()  || (lhs.aLong  > rhs.aLong ) ) ) );
+}
+
+
 } // namespace pwx
 
