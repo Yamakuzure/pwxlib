@@ -147,6 +147,9 @@ public:
 	typedef TChainHash<key_t, data_t> hash_t;
 	typedef sArgError                 error_t;
 	typedef TQueue<error_t>           errlist_t;
+	typedef TQueue<data_t>            arg_list_t;
+	typedef arg_list_t::elem_t        arg_elem_t;
+
 
 	/* ===============================================
 	 * === Public Constructors and destructors     ===

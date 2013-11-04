@@ -4,9 +4,12 @@
 
 #include "CArgHandler.h"
 
+
 namespace pwx {
 
+
 CArgHandler PAH;
+
 
 /** @internal
   * @brief Template to add targets and callbacks in one place.
@@ -1052,15 +1055,31 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 
 	if ((argc > 1) && argv && argv[1]) {
 
+		data_t*    lastTarget = nullptr; // holds the last target expecting a parameter
+		int32_t    idx        = 1;
+		arg_list_t arg_list(do_not_destroy);
+
+		// The argument list does not need thread saftey:
+		arg_list.disable_thread_safety();
+
 		/* Move through argv until
 		 * a) argc is reached or
 		 * b) pass_init is reached.
 		 */
-		data_t* lastTarget = nullptr; // holds the last target expecting a parameter
-		int32_t idx        = 1;
-		for ( ; (idx < argc) && argv[idx] && STRNE(argv[idx], pass_init); ++idx) {
-			data_t* target      = getTarget(argv[idx]);
-			bool    callProcess = false;
+		while ( (idx < argc) && argv[idx] && STRNE(argv[idx], pass_init) ) {
+			data_t*     target      = nullptr;
+			arg_elem_t* arg_elem    = nullptr;
+			bool        callProcess = false;
+
+			// The target is either the current argv[idx] or
+			// the oldest queued argument.
+			if (arg_list.empty())
+				target = getTarget(argv[idx]);
+			else {
+				arg_elem = arg_list.pop();
+				target   = arg_elem->data.get();
+			}
+
 
 			if (target) {
 
@@ -1137,6 +1156,16 @@ int32_t CArgHandler::parseArgs(const int32_t argc, const char* argv[]) noexcept
 					errlist.push(argError);
 				}
 			}
+
+			// Clean up queued and processed element
+			if (arg_elem) {
+				delete arg_elem;
+				arg_elem = nullptr;
+			}
+
+			// Advance the index if nothing is queued
+			if (arg_list.empty())
+				++idx;
 		} // End of looping argv
 
 		// At this point idx might be smaller than argc, which
