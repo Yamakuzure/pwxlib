@@ -45,9 +45,11 @@
  * --- gcc prior 4.7.3 / 4.8.1 have problems with std::atomic. ---
  * ---------------------------------------------------------------
 */
-#if (__GNUC_MINOR__ < 7) \
-	|| ((__GNUC_MINOR__ == 7) && (__GNUC_PATCHLEVEL__ < 3)) \
-	|| ((__GNUC_MINOR__ == 8) && (__GNUC_PATCHLEVEL__ < 1))
+#if (__GNUC__ < 4) \
+ || ( (__GNUC__ == 4) \
+   && ( (__GNUC_MINOR__ < 7) \
+     || ((__GNUC_MINOR__ == 7) && (__GNUC_PATCHLEVEL__ < 3)) \
+     || ((__GNUC_MINOR__ == 8) && (__GNUC_PATCHLEVEL__ < 1)) ) )
 #  error "gcc versions before gcc-4.7.3 / gcc-4.8.1 are not supported. Please upgrade to a newer version."
 #elif (!defined(__cplusplus) || (__cplusplus < 201103L)) && !defined(__GXX_EXPERIMENTAL_CXX0X__)
 #  error "C++11 features must be enabled to compile and use libpwx."
