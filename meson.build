@@ -44,10 +44,8 @@ foreach arg : ['-Wextra',
                '-Wundef',
                '-Wlogical-op',
                '-Wmissing-include-dirs',
-               '-Wold-style-definition',
                '-Wpointer-arith',
                '-Winit-self',
-               '-Wdeclaration-after-statement',
                '-Wfloat-equal',
                '-Wsuggest-attribute=noreturn',
                '-Werror=missing-prototypes',
@@ -56,7 +54,6 @@ foreach arg : ['-Wextra',
                '-Werror=return-type',
                '-Werror=incompatible-pointer-types',
                '-Werror=format=2',
-               '-Wstrict-prototypes',
                '-Wredundant-decls',
                '-Wmissing-noreturn',
                '-Wshadow',
@@ -65,7 +62,6 @@ foreach arg : ['-Wextra',
                '-Wwrite-strings',
                '-Werror=overflow',
                '-Wdate-time',
-               '-Wnested-externs',
                '-fno-common',
                '-fdiagnostics-show-option',
                '-fvisibility=hidden',
@@ -121,7 +117,7 @@ foreach arg : ['-Wl,-z,relro',
         endif
 endforeach
 
-if get_option('debug') != 'true'
+if get_option('buildtype') != 'debug'
         foreach arg : ['-ffunction-sections',
                        '-fdata-sections']
                 if cpp.has_argument(arg,
@@ -144,8 +140,8 @@ endif
 #####################################################################
 # compilation result tests
 
-conf.set('_GNU_SOURCE', true)
-conf.set('__SANE_USERSPACE_TYPES__', true)
+#conf.set('_GNU_SOURCE', true)
+#conf.set('__SANE_USERSPACE_TYPES__', true)
 
 decl_headers = '''
 #include <cuchar>
@@ -203,11 +199,21 @@ endif
 
 if debug
         conf.set('LIBPWX_DEBUG', true)
-        add_project_arguments('-ggdb3 -Og', language : 'cpp')
-        add_project_link_arguments('-ggdb3 -Og', language : 'cpp')
-else
-        add_project_arguments('-O2', language : 'cpp')
-        add_project_link_arguments('-O2', language : 'cpp')
+        foreach arg : ['-ggdb3',
+                       '-Og']
+                if cpp.has_argument(arg,
+                                   name : '@0@ is supported'.format(arg))
+                        add_project_arguments(arg, language : 'cpp')
+                endif
+
+                have = run_command(check_compilation_sh,
+                                   cpp.cmd_array(), '-x', 'c', arg,
+                                   '-include', link_test_cpp).returncode() == 0
+                message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
+                if have
+                        add_project_link_arguments(arg, language : 'cpp')
+                endif
+        endforeach
 endif
 
 #####################################################################
@@ -255,8 +261,14 @@ libpwx = shared_library(
         version : meson.project_version(),
         include_directories : includes,
         link_args : ['-shared'],
-        link_with : [],
-        dependencies : [threads],
+        link_with : [
+                librandom,
+                libarg,
+                libcontainer,
+                libfuncs,
+                libmath_helpers,
+                libbasic
+        ],
         install : true,
         install_dir : libdir)
 
@@ -276,9 +288,6 @@ install_data('README',
              'LICENSE.GPL2',
              'LICENSE.LGPL2.1',
              install_dir : docdir)
-
-meson.add_install_script('sh', '-c', mkdir_p.format(systemdstatedir))
-meson.add_install_script('sh', '-c', 'touch $DESTDIR@0@'.format(prefixdir))
 
 ############################################################
 
