@@ -27,9 +27,10 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
-#include <pwx/types/CException.h>
-#include <pwx/general/macros.h>
+#include "compiler.h"
+#include "CException.h"
+#include "macros.h"
+
 #include <mutex>
 #include <thread>
 #include <cstring>

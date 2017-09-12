@@ -32,7 +32,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
+#include "compiler.h"
+
 #include <string>
 #include <exception>
 

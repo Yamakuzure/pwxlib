@@ -28,7 +28,8 @@
 **/
 
 // Debug? (Ensure it is loaded if compiler.h isn't needed)
-#include <pwx/functions/debug.h>
+#include "debug.h"
+
 
 /** @brief Return the sign as -1 or +1 of an expression
   *

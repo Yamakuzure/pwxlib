@@ -102,13 +102,11 @@
 
 
 // Debug? (Ensure it is loaded if macros.h isn't needed)
-#include <pwx/functions/debug.h>
-
+#include "debug.h"
 
 /* ------------------------------------------------------------------
  * --- Include needed types and typedefs now                      ---
  * ------------------------------------------------------------------
 */
-#include <pwx/general/types.h>
-
+#include "types.h"
 #endif // PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED

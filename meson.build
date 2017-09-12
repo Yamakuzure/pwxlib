@@ -250,9 +250,10 @@ add_project_arguments('-include', 'config.h', language : 'cpp')
 subdir('src/basic')
 subdir('src/functions')
 subdir('src/math_helpers')
+subdir('src/random')
 subdir('src/container')
 subdir('src/arg_handler')
-subdir('src/random')
+subdir('src/wavecolor')
 subdir('src/libpwx')
 
 libpwx = shared_library(
@@ -264,10 +265,8 @@ libpwx = shared_library(
         link_with : [
                 librandom,
                 libarg,
-                libcontainer,
-                libfuncs,
-                libmath_helpers,
-                libbasic
+                libwavecolor,
+                libcontainer
         ],
         install : true,
         install_dir : libdir)

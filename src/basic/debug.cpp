@@ -1,5 +1,5 @@
 #include "debug.h"
-#include "../general/compiler.h"
+#include "compiler.h"
 #include <cstdarg>
 #include <thread>
 
@@ -10,7 +10,7 @@ namespace pwx {
 // The central log needs a log lock:
 std::atomic_flag _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
 
-void debug_log_out(_IO_FILE* target, const char* fmt, va_list ap)
+static void debug_log_out(_IO_FILE* target, const char* fmt, va_list ap)
 {
 	while (_pwx_internal_LOG_output_lock.test_and_set(PWX_MEMORDER_ACQUIRE))
 		std::this_thread::yield();
