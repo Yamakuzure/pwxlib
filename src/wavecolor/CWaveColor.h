@@ -26,8 +26,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/container/TSingleList.h>
-
+#include "TSingleList.h"
 namespace pwx {
 
 

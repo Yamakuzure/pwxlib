@@ -1,6 +1,6 @@
 #include "CWaveColor.h"
 
-namespace pwx{
+namespace pwx {
 
 
 /* =========================================
