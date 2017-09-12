@@ -31,8 +31,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
-#include <pwx/general/macros.h>
+#include "compiler.h"
+#include "macros.h"
 
 #include <cmath>
 #include <cstdlib>

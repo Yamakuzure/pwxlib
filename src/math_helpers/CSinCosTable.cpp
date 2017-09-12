@@ -8,9 +8,9 @@
 #endif // defined(PWX_INITIAL_SCT_PRECISION)
 
 
-#include "../general/macros.h"
-#include "../tools/MathHelpers.h"
-#include "../types/CLockGuard.h"
+#include "macros.h"
+#include "MathHelpers.h"
+#include "CLockGuard.h"
 #include "CSinCosTable.h"
 
 namespace pwx {
