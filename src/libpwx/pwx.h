@@ -67,16 +67,7 @@
   @endverbatim
 **/
 
-#define LIBPWX_MAJOR 0
-#define LIBPWX_MINOR 8
-#define LIBPWX_REVIS 7
-#define LIBPWX_PATCH 4
-#define LIBPWX_VERSION "0.8.7.4"
-
-#include <pwx/general.h>
-#include <pwx/tools.h>
-#include <pwx/types.h>
-#include <pwx/container.h>
-#include <pwx/worker.h>
+#include "CArgHandler.h"
+#include "CRandom.h"
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED
