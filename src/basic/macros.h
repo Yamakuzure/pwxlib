@@ -31,6 +31,10 @@
 #include "debug.h"
 
 
+// Needed for basename()
+#include <cstring>
+
+
 /** @brief Return the sign as -1 or +1 of an expression
   *
   * <I>Prerequisites</I>: none
@@ -202,10 +206,9 @@
   * @param object pointer to the object to lock.
 **/
 #define PWX_LOCK(object) { \
-	if (nullptr != object) {\
-		(object)->lock(); \
-		LOG_LOCK(object) \
-	} \
+	assert(object); \
+	(object)->lock(); \
+	LOG_LOCK(object) \
 }
 
 
@@ -226,10 +229,9 @@
   * @param object pointer to the object to unlock.
 **/
 #define PWX_UNLOCK(object) { \
-	if (nullptr != object) { \
-		(object)->unlock(); \
-		LOG_UNLOCK(object) \
-	} \
+	assert(object); \
+	(object)->unlock(); \
+	LOG_UNLOCK(object) \
 }
 
 

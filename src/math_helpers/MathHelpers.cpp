@@ -56,6 +56,16 @@ bool private_areAlmostEqualRelativeAndAbs(
 	return false;
 }
 
+
+/* Ignore -Wfloat-equal for this method. The warning is useless here,
+ * because the operator== is only used to catch signed zeros.
+ * All other cases, meaning all cases where this warning is indeed very
+ * valuable, are already excluded by the sign test.
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+
+
 /// @internal template to dispatch to the correct AlmostEqual function
 template<typename Tf>
 bool private_dispatchAlmostEqual(const Tf &lhs, const Tf &rhs) noexcept
@@ -91,6 +101,10 @@ bool private_dispatchAlmostEqual(const Tf &lhs, const Tf &rhs) noexcept
 	// If none of these valid, the numbers are simply different.
 	return false;
 }
+
+
+#pragma GCC diagnostic pop
+
 
 } // namespace private_
 

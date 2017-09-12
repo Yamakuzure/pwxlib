@@ -60,6 +60,8 @@
 		<Unit filename="../src/basic/StreamHelpers.cpp" />
 		<Unit filename="../src/basic/StreamHelpers.h" />
 		<Unit filename="../src/basic/compiler.h" />
+		<Unit filename="../src/basic/debug.cpp" />
+		<Unit filename="../src/basic/debug.h" />
 		<Unit filename="../src/basic/macros.h" />
 		<Unit filename="../src/basic/meson.build" />
 		<Unit filename="../src/basic/templates.h" />
@@ -87,16 +89,12 @@
 		<Unit filename="../src/container/VElement.h" />
 		<Unit filename="../src/container/VTHashBase.h" />
 		<Unit filename="../src/container/meson.build" />
-		<Unit filename="../src/functions/debug.cpp" />
-		<Unit filename="../src/functions/debug.h" />
 		<Unit filename="../src/functions/meson.build" />
 		<Unit filename="../src/functions/set_func.h" />
 		<Unit filename="../src/functions/set_fwd.h" />
 		<Unit filename="../src/libpwx/pwx.h" />
 		<Unit filename="../src/math_helpers/CSinCosTable.cpp" />
 		<Unit filename="../src/math_helpers/CSinCosTable.h" />
-		<Unit filename="../src/math_helpers/CWaveColor.cpp" />
-		<Unit filename="../src/math_helpers/CWaveColor.h" />
 		<Unit filename="../src/math_helpers/MathHelpers.cpp" />
 		<Unit filename="../src/math_helpers/MathHelpers.h" />
 		<Unit filename="../src/math_helpers/meson.build" />
@@ -111,6 +109,8 @@
 		<Unit filename="../src/random/eNameSourceType.cpp" />
 		<Unit filename="../src/random/eNameSourceType.h" />
 		<Unit filename="../src/random/meson.build" />
+		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
+		<Unit filename="../src/wavecolor/CWaveColor.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
