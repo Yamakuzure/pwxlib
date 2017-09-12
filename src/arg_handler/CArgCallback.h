@@ -1,9 +1,9 @@
-#ifndef PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
+#ifndef PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
 
-/** @file eArgErrorNumber.h
+/** @file CArgCallback.h
   *
-  * @brief enum describing all valid error numbers for argument parsing
+  * @brief Declaration of the CArgCallback class
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -26,26 +26,36 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
-
+#include "VArgTargetBase.h"
 namespace pwx {
 
 
-/** @enum eArgErrorNumber
-  * @brief defines valid error numbers for argument parsing
+/** @struct CArgCallback
+  * @brief Definition of one command line argument using a callback function
+  *
+  * This is meant to be used with a callback function. If a target pointer
+  * is to be used, use TArgTarget instead.
 **/
-enum eArgErrorNumber
+class CArgCallback : public VArgTargetBase
 {
-	AEN_OK                  = 0,          //!< Everything in order
-	AEN_ARGUMENT_UNKNOWN    = 0x00000001, //!< The found argument is not known
-	AEN_PARAM_TYPE_MISMATCH = 0x00000002, //!< The type of the parameter doesn't match the target
-	AEN_PARAMETER_MISSING   = 0x00000004, //!< An argument that needs a parameter got none to process
-	AEN_PROCESSING_ERROR    = 0x00000008, //!< Set when target->process() threw an exception.
-	AEN_MULTIPLE_SET_PARAM  = 0x00000010  //!< More than one parameter provided for a STT_ERROR set target
+public:
+	explicit CArgCallback(const char* arg_short, const char* arg_long,
+				void (*arg_cb)(const char*, const char*),
+				const char* arg_desc, const char* param_name) noexcept;
+
+	virtual ~CArgCallback() noexcept;
+
+	virtual eArgErrorNumber process(const char* param);
+
+private:
+
+	// callback
+	void (*cb)(const char*, const char*);
+
 };
 
 
 } // namespace pwx
 
-#endif // PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
+#endif // PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
 

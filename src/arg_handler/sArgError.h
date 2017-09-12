@@ -27,8 +27,7 @@
 **/
 
 
-#include <pwx/types/eArgErrorNumber.h>
-
+#include "eArgErrorNumber.h"
 
 namespace pwx {
 

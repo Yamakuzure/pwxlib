@@ -27,11 +27,11 @@
 **/
 
 
-#include <pwx/general/compiler.h>
-#include <pwx/general/macros.h>
-#include <pwx/types/eArgTargetType.h>
-#include <pwx/types/eArgSetType.h>
-#include <pwx/types/eArgErrorNumber.h>
+#include "compiler.h"
+#include "macros.h"
+#include "eArgTargetType.h"
+#include "eArgSetType.h"
+#include "eArgErrorNumber.h"
 #include <string>
 
 

@@ -4,8 +4,7 @@
 
 #include "TArgTarget.h"
 
-#include <pwx/tools/StreamHelpers.h>
-
+#include "StreamHelpers.h"
 namespace pwx
 {
 

@@ -4,6 +4,7 @@
 #include "sArgError.h"
 
 #include <cstdlib>
+#include <cstring>
 
 namespace pwx {
 

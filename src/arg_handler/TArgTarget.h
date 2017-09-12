@@ -26,8 +26,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/base/VArgTargetBase.h>
-#include <pwx/types/CException.h>
+#include "VArgTargetBase.h"
+#include "CException.h"
 
 namespace pwx {
 

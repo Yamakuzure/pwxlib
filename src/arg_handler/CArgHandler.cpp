@@ -3,6 +3,7 @@
 #endif
 
 #include "CArgHandler.h"
+#include "StreamHelpers.h"
 
 
 namespace pwx {
