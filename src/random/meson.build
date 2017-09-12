@@ -11,6 +11,13 @@ random_sources = files('''
         eNameSourceType.h
 '''.split())
 
+random_headers = '''
+        CRandom.h
+        eNameSourceType.h
+'''.split()
+
+libpwx_headers += files(random_headers)
+
 librandom = static_library(
 	'random',
 	random_sources,

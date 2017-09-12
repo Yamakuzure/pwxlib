@@ -36,6 +36,16 @@ docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
 
 #####################################################################
 
+substs = configuration_data()
+substs.set('PACKAGE_URL',     'https://github.com/elogind/elogind')
+substs.set('PACKAGE_VERSION', meson.project_version())
+substs.set('prefix',          prefixdir)
+substs.set('exec_prefix',     prefixdir)
+substs.set('libdir',          libdir)
+substs.set('includedir',      includedir)
+
+#####################################################################
+
 cpp = meson.get_compiler('cpp')
 pkgconfig = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
@@ -247,6 +257,8 @@ includes = include_directories('src/arg_handler',
 
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
+libpwx_headers = []
+
 subdir('src/basic')
 subdir('src/functions')
 subdir('src/math_helpers')
@@ -258,7 +270,7 @@ subdir('src/libpwx')
 
 libpwx = shared_library(
         'pwx',
-        libpwx_internal_sources,
+        libpwx_internal_sources + libpwx_headers,
         version : meson.project_version(),
         include_directories : includes,
         link_args : ['-shared'],
@@ -268,8 +280,13 @@ libpwx = shared_library(
                 libwavecolor,
                 libcontainer
         ],
+        dependencies : [threads],
         install : true,
         install_dir : libdir)
+
+install_headers(
+        libpwx_headers,
+        subdir : 'pwx')
 
 ############################################################
 

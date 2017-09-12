@@ -15,6 +15,15 @@ basic_sources = files('''
         types.h
 '''.split())
 
+_basic_headers = '''
+        CException.h
+        CLockable.h
+        CLockGuard.h
+        StreamHelpers.h
+'''.split()
+
+libpwx_headers += files(_basic_headers)
+
 libbasic = static_library(
 	'basic',
 	basic_sources,

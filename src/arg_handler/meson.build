@@ -14,6 +14,15 @@ arg_sources = files('''
         VArgTargetBase.h
 '''.split())
 
+arg_headers = '''
+        CArgCallback.h
+        CArgHandler.h
+        sArgError.h
+        TArgTarget.h
+'''.split()
+
+libpwx_headers += files(arg_headers)
+
 libarg = static_library(
 	'arg',
 	arg_sources,

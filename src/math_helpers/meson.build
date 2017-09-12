@@ -5,6 +5,13 @@ math_helpers_sources = files('''
         MathHelpers.h
 '''.split())
 
+math_helpers_headers = '''
+        CSinCosTable.h
+        MathHelpers.h
+'''.split()
+
+libpwx_headers += files(math_helpers_headers)
+
 libmath_helpers = static_library(
 	'math_helpers',
 	math_helpers_sources,
