@@ -28,7 +28,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/types.h>
+#include "types.h"
+
 #include <limits>
 
 namespace pwx {

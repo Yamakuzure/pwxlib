@@ -28,10 +28,11 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
-#include <pwx/general/macros.h>
-#include <pwx/internal/CRandomConstants.h>
-#include <pwx/tools/MathHelpers.h>
+#include "compiler.h"
+#include "macros.h"
+#include "CRandomConstants.h"
+#include "MathHelpers.h"
+
 #include <cstdlib>
 #include <type_traits>
 #include <cmath>

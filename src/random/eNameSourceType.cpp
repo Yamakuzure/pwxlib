@@ -2,8 +2,7 @@
 #  define PWX_EXPORTS 1
 #endif
 #include "eNameSourceType.h"
-#include <pwx/general/types.h>
-
+#include "types.h"
 namespace pwx {
 
 /// @brief pre-increment for the source type

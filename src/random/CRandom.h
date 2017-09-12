@@ -27,9 +27,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/general/compiler.h>
-#include <pwx/types/CLockable.h>
-#include <pwx/types/eNameSourceType.h>
+#include "compiler.h"
+#include "CLockable.h"
+#include "eNameSourceType.h"
 
 namespace pwx {
 

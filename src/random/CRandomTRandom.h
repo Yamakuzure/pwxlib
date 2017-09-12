@@ -30,6 +30,8 @@
 
 #include <random>
 
+#include "MathHelpers.h"
+
 namespace pwx {
 
 /** @internal
@@ -48,15 +50,8 @@ static std::random_device  privRandDev_;
 static std::atomic<rand_t> lastRndValue = ATOMIC_VAR_INIT(0);
 
 
-/// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-rand_t private_get_random() noexcept
-{
-	rand_t randVal = privRandDev_();
-	while (randVal == lastRndValue.load(PWX_MEMORDER_ACQUIRE))
-		randVal = privRandDev_();
-	lastRndValue.store(randVal, PWX_MEMORDER_RELEASE);
-	return randVal;
-}
+rand_t private_get_random() noexcept;
+size_t private_random_str(char* dest, size_t min_, size_t max_) noexcept;
 
 
 /// @internal random number handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
@@ -70,7 +65,7 @@ Tval private_random(Tval min_, Tval max_) noexcept
 	static const long double xMinVal = static_cast<long double>(realMinVal);
 
 	// Quick exit when no calculation can be done
-	if (max_ == min_)
+	if (areAlmostEqual(max_, min_))
 		return (max_);
 	else {
 		// Step 1: Get a new random value
@@ -92,39 +87,6 @@ Tval private_random(Tval min_, Tval max_) noexcept
 
 }
 
-/// @internal random character handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-size_t private_random_str(char* dest, size_t min_, size_t max_) noexcept
-{
-	static const uint8_t lowA = 'a';
-	static const uint8_t uppA = 'A';
-
-	size_t pos = 0;
-
-	if (min_ || max_ ) {
-		size_t xMin   = std::min(min_, max_);
-		size_t xMax   = std::max(min_, max_);
-		size_t finishRange = xMax - xMin;
-		size_t finishDone  = finishRange;
-
-		while ( (pos < (xMax - 1))
-			 && ( (pos < xMin)
-			   || (private_random(static_cast<size_t>(0), finishRange) <= finishDone))
-			  ) {
-			// Set up next character
-			dest[pos] =  static_cast<uint8_t>(0x000000ff & ((private_::private_get_random()) % 26))
-			          + (static_cast<uint8_t>(0x000000ff & ((private_::private_get_random()) %  2)) ? lowA : uppA);
-
-			// Advance pos and reduce finishDone if xMin is already met
-			if (++pos >= xMin)
-				--finishDone;
-		} // end of building string
-
-		// Set the final zero byte as well:
-		dest[pos++] = 0x0;
-	}
-
-	return pos;
-}
 
 } // namespace private_
 } // namespace pwx
