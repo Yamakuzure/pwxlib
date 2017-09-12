@@ -28,10 +28,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/base/VTHashBase.h>
-
+#include "VTHashBase.h"
 #if defined(LIBPWX_DEBUG)
-#  include <pwx/tools/StreamHelpers.h>
+#  include "StreamHelpers.h"
 #endif // LIBPWX_DEBUG
 
 namespace pwx {
@@ -134,7 +133,7 @@ public:
 	TOpenHash(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key),
-				double maxLoad_, double dynGrow_) noexcept :
+				double maxLoad_, double dynGrow_) :
 		base_t(initSize, destroy_, hash_, maxLoad_, dynGrow_)
 	{ }
 
@@ -282,7 +281,7 @@ protected:
 	  * @param priHash pointer to the primary hash to hash again
 	  * @return uint32_t hash of @a priHash
 	**/
-	virtual uint32_t protGetSecHash(const uint32_t* priHash) const noexcept
+	virtual uint32_t protGetSecHash(const uint32_t* priHash) const
 	{
 		return hashBuilder(priHash);
 	}

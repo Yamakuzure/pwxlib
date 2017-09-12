@@ -26,9 +26,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/types/CException.h>
-#include <pwx/general/macros.h>
-#include <pwx/general/templates.h>
+#include "CException.h"
+#include "macros.h"
+#include "templates.h"
 
 namespace pwx {
 
@@ -140,7 +140,7 @@ public:
 	uint32_t operator()(const key_t* key,
 			uint32_t (*hash_user)    (const key_t* key)                  = nullptr,
 			uint32_t (*hash_limited) (const key_t* key, uint32_t keyLen) = nullptr
-		) const noexcept
+		) const
 	{
 		if (hash_user)
 			return hash_user(key);
@@ -171,7 +171,7 @@ protected:
 	  * @return the hash modded to the hash size
 	**/
 	template<typename key_t>
-	uint32_t hash_pwx(const key_t* key) const noexcept
+	uint32_t hash_pwx(const key_t* key) const
 	{
 		compAssert( (
 				isIntType(key_t)

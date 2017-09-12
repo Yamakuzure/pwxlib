@@ -2,8 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED 1
 
-#include <pwx/container/TDoubleList.h>
-
+#include "TDoubleList.h"
 /** @file TQueue.h
   *
   * @brief Declaration of a basic template for queues based on doubly linked lists
@@ -29,9 +28,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/types/CLockable.h>
-#include <pwx/general/macros.h>
-#include <pwx/container/TDoubleList.h>
+#include "CLockable.h"
+#include "macros.h"
+#include "TDoubleList.h"
 
 namespace pwx
 {
@@ -149,7 +148,7 @@ public:
 	  *
 	  * @return the first element on the queue.
 	**/
-	virtual elem_t* pop() noexcept
+	virtual elem_t* pop()
 	{
 		PWX_TRY_PWX_FURTHER (return base_t::pop_front())
 	}

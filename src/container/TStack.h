@@ -2,8 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TSTACK_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TSTACK_H_INCLUDED 1
 
-#include <pwx/container/TSingleList.h>
-
+#include "TSingleList.h"
 /** @file TStack.h
   *
   * @brief Declaration of a basic template for stacks based on singly linked lists
@@ -29,9 +28,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/types/CLockable.h>
-#include <pwx/general/macros.h>
-#include <pwx/container/TSingleList.h>
+#include "CLockable.h"
+#include "macros.h"
+#include "TSingleList.h"
 
 namespace pwx
 {

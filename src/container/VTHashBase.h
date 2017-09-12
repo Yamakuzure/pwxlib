@@ -36,9 +36,9 @@
 #  define PWX_REDEF_EXPORTS 1
 # endif
 
-#include <pwx/base/VContainer.h>
-#include <pwx/types/THashElement.h>
-#include <pwx/types/CHashBuilder.h>
+#include "VContainer.h"
+#include "THashElement.h"
+#include "CHashBuilder.h"
 
 #if defined(PWX_REDEF_EXPORTS)
 #  define PWX_EXPORTS 1
@@ -179,7 +179,7 @@ public:
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
 	VTHashBase(	uint32_t initSize, uint32_t keyLen_,
-				double maxLoad_, double dynGrow_) noexcept:
+				double maxLoad_, double dynGrow_):
 		hashBuilder (keyLen_),
 		hashSize (initSize),
 		hashTable (nullptr),
@@ -242,7 +242,7 @@ public:
 	VTHashBase(	uint32_t initSize,
 				void (*destroy_) (data_t* data),
 				uint32_t (*hash_) (const key_t* key),
-				double maxLoad_, double dynGrow_) noexcept :
+				double maxLoad_, double dynGrow_) :
 		hash_t(initSize, (uint32_t)0, maxLoad_, dynGrow_)
 	{
 		destroy = destroy_;
@@ -857,7 +857,7 @@ public:
 			while (pos && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
 				elem = hashTable[--pos];
 				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
-					PWX_LOCK_GUARD(elem)
+					PWX_NAMED_LOCK_GUARD(ElemRemover, elem)
 					if (elem->inserted() && !elem->destroyed())
 						return privRemoveIdx(pos);
 				}
@@ -896,7 +896,7 @@ public:
 			while ((pos < maxPos) && (eCount.load(PWX_MEMORDER_RELAXED) > 0)) {
 				elem = hashTable[pos++];
 				if (elem && (elem != vacated) && elem->inserted() && !elem->destroyed()) {
-					PWX_LOCK_GUARD(elem)
+					PWX_NAMED_LOCK_GUARD(ElemRemover, elem)
 					if (elem->inserted() && !elem->destroyed())
 						return privRemoveIdx(pos);
 				}
@@ -1253,7 +1253,7 @@ protected:
 	  * @param key pointer to the key to hash
 	  * @return uint32_t hash of @a key
 	**/
-	virtual uint32_t protGetHash(const key_t* key) const noexcept
+	virtual uint32_t protGetHash(const key_t* key) const
 	{
 		return hashBuilder(key, hash_user, hash_limited);
 	}

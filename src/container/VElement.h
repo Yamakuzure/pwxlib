@@ -28,10 +28,10 @@
 **/
 
 
-#include <pwx/general/macros.h>
-#include <pwx/types/CLockable.h>
-#include <pwx/types/TVarDeleter.h>
-#include <pwx/types/CLockGuard.h>
+#include "macros.h"
+#include "CLockable.h"
+#include "TVarDeleter.h"
+#include "CLockGuard.h"
 
 namespace pwx
 {
@@ -134,17 +134,8 @@ private:
 
 }; // class VContainer
 
-#if defined(PWX_EXPORTS)
-# if !defined(PWX_HAS_VELEMENT_DTOR)
-# define PWX_HAS_VELEMENT_DTOR 1
-/// @brief ~VElement default destructor.
-VElement::~VElement() noexcept
-{
-	this->remove();
-}
-# endif // PWX_HAS_ELEMENT_DTOR
-#endif // PWX_EXPORTS
 
 } // namespace pwx
-#endif // PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED
 
+
+#endif // PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED

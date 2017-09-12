@@ -15,7 +15,7 @@ namespace private_ {
   * that is used by the CThreadElementStore below as
   * a deleter for shared_ptr.
 **/
-void do_not_destroy (CThreadElementStore::curr_t*)
+static void do_not_destroy (CThreadElementStore::curr_t*)
 	{ /* Don't you dare! */ }
 
 
@@ -36,7 +36,7 @@ void do_not_destroy (CThreadElementStore::curr_t*)
   *
   * @param[in] initial_size the size to use for the hash table
 **/
-CThreadElementStore::CThreadElementStore(uint32_t initial_size) noexcept :
+CThreadElementStore::CThreadElementStore(uint32_t initial_size) :
 	currs(initial_size, do_not_destroy, nullptr, 0.6667, 2.063829787234043)
 { }
 
@@ -89,7 +89,7 @@ CThreadElementStore::curr_t* CThreadElementStore::curr() const noexcept
 
 /// @brief return the calling threads current element
 /// Note: Copied, not called, as these two lines are
-///       too less of a burdon to add a const_cast
+///       too less of a burden to add a const_cast
 ///       calling layer
 CThreadElementStore::curr_t* CThreadElementStore::curr() noexcept
 {

@@ -27,9 +27,9 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/base/VContainer.h>
-#include <pwx/types/TSingleElement.h>
-#include <pwx/internal/CThreadElementStore.h>
+#include "VContainer.h"
+#include "TSingleElement.h"
+#include "CThreadElementStore.h"
 
 namespace pwx
 {
@@ -520,7 +520,7 @@ public:
 	  *
 	  * @return a pointer to the removed element or nullptr if the list is empty
 	**/
-	virtual elem_t* pop() noexcept
+	virtual elem_t* pop()
 	{
 		return privRemoveAfterElement(nullptr);
 	}

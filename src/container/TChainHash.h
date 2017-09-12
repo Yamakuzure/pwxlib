@@ -28,8 +28,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/base/VTHashBase.h>
-
+#include "VTHashBase.h"
 namespace pwx {
 
 

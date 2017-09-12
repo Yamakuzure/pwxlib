@@ -27,8 +27,8 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/container/TSingleList.h>
-#include <pwx/types/TDoubleElement.h>
+#include "TSingleList.h"
+#include "TDoubleElement.h"
 
 namespace pwx
 {

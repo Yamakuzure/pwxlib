@@ -1,5 +1,4 @@
-#include <pwx/worker/CRandom.h>
-
+#include "CRandom.h"
 #ifndef PWX_EXPORTS
 #  define PWX_EXPORTS 1
 #endif

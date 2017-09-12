@@ -1,16 +1,15 @@
-#ifndef PWX_LIBPWX_PWX_TYPES_THASHELEMENT_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_THASHELEMENT_H_INCLUDED
+#pragma once
+#ifndef PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED
+#define PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED 1
 
-/** @file THashElement.h
+/** @file TSingleElement.h
   *
-  * @brief @todo add brief description
-  *
-  * @todo add extensive description
+  * @brief Declaration of a basic template for singly linked list elements
   *
   * (c) 2007 - 2013 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
-  *		 yamakuzure@users.sourceforge.net
-  *		 http://pwxlib.sourceforge.net
+  *         yamakuzure@users.sourceforge.net
+  *         http://pwxlib.sourceforge.net
   *
   *  This program is free software: you can redistribute it and/or modify
   *  it under the terms of the GNU General Public License as published by
@@ -28,53 +27,49 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/base/VElement.h>
-#include <pwx/tools/MathHelpers.h>
+#include "VElement.h"
+#include "MathHelpers.h"
 
 namespace pwx
 {
 
-/** @struct THashElement
+/** @struct TSingleElement
   *
-  * @brief Template for an element of a hash table of variable types
+  * @brief Template for an element of a singly linked list or ring of variable types
   *
-  * This is a very simple and basic type to wrap a pointer of variable type
-  * identified by a key of variable type in an object that is used with
-  * pwx::TChainHash and pwx::TOpenHash.
+  * This is a very simple and basic type to wrap a pointer of variable type into
+  * an object that is used with pwx::TSingleList and pwx::TSingleRing.
   *
   * The constructor takes an optional destroy(T*) function pointer that is used
   * to destroy the data when the element is deleted. If no such function was set,
   * the standard delete operator is used instead.
   *
   * The data pointer itself is wrapped into an std::shared_ptr. It is therefore
-  * completely safe to copy THashElement instances.
+  * completely safe to copy TSingleElement instances.
   *
   * The data pointer itself is public. You can use foo->data.get() to access it.
   * Further the operator* is overloaded and **foo will result in a reference to the
   * data.
   *
-  * operator== on two THashElement instances will compare the keys, not the data.
-  *
-  * The next element in the bucked of a TChainHash can be retrieved using the public
-  * next pointer.
+  * The next element in the list can be retrieved using the public foo->next pointer.
   *
   * If you plan to use this type in a multi-threaded environment, you can use the
   * getNext() and setNext() functions to manipulate the next pointer. See below for
   * more on multi threaded usage.
   *
-  * To insert any element into a bucket you can use insertNext() to have it inserted
-  * after the called element safely. If you just added an element to a bucket
+  * To insert any element into a list you can use insertNext() to have it inserted
+  * after the called element safely. If you just added an element to a container
   * you can use insert() to tell the element that it has been inserted into a
-  * bucket.
+  * container.
   *
-  * To remove an element from a bucket, you can use removeNext() to have the element
+  * To remove an element from a list, you can use removeNext() to have the element
   * after this to be removed safely. If there is no other element to call removeNext()
   * from, you can use an elements remove() function to tell it that it has been
-  * removed from its bucket. This will set the next pointer to nullptr as well.
+  * removed from its container. This will set the next pointer to nullptr as well.
   *
-  * It is recommended that you use the much more advanced std::map unless you
+  * It is recommended that you use the much more advanced std::list unless you
   * need to store a very large number of elements and can not live with the
-  * downside of every element having to be copied into the std::map.
+  * downside of every element having to be copied into the std::list.
   *
   * <B>Notes on multi threaded environments</B>
   *
@@ -84,21 +79,51 @@ namespace pwx
   * You can then use insertNext() / removeNext() without the locking overhead.
   * However, as the locking is enabled by default, it might be more convenient
   * to simply use the next pointers directly.<BR />
+  *
+  * <I>Critical work flows</I>
+  *
+  * The following work flows can be troublesome if multiple threads perform
+  * concurrent tasks on an element:
+  * <TABLE border="1">
+  * <TR>
+  *   <TH>Task</TH><TH>Problematic action</TH><TH>Solution</TH>
+  * </TR><TR>
+  *   <TD>Retrieve next element</TD><TD>Remove this element</TD>
+  *   <TD>Elements know when they are removed. getNext() then delivers the
+  * previously stored pointer, if any.</TD>
+  * </TR><TR>
+  *   <TD>Retrieve next element</TD><TD>Move element to different container</TD>
+  *   <TD>This is not detectable, so never move an element. Remove and copy insert it!</TD>
+  * </TR><TR>
+  *   <TD>Insert an element after this</TD><TD>Either element destroyed by another thread</TD>
+  *   <TD>insertNext() will lock both this and the new next element. Further it checks
+  * whether any is destroyed and only inserts the element if both are not marked as destroyed.<BR />
+  * If either is marked as destroyed, a pwx::CException is thrown, as those conditions imply
+  * serious bugs.</TD>
+  * </TR><TR>
+  *   <TD>Remove the next element</TD><TD>The next element gets removed or another element is
+  * inserted between the two elements by another thread</TD>
+  *   <TD>removeNext() will try to lock both elements after one another in a Release->Yield->Lock
+  * cycle until both are locked or the next element changes. In the latter event the method does
+  * not remove the element, as it is gone.<BR />
+  * If the next element goes away before it can be removed, a pwx::CException is thrown.</TD>
+  * </TR>
+  * </TABLE>
 **/
-template<typename key_t, typename data_t>
-class PWX_API THashElement : public VElement
+template<typename data_t>
+struct PWX_API TSingleElement : public VElement
 {
-public:
 
 	/* ===============================================
 	 * === Public types                            ===
 	 * ===============================================
 	*/
 
-	typedef VElement                    base_t;     //!< Base type of this element
-	typedef THashElement<key_t, data_t> elem_t;     //!< Type of this element
-	typedef std::shared_ptr<data_t>     share_t;    //!< data_t wrapped in std::shared_ptr
-	typedef std::atomic<elem_t*>        neighbor_t; //!< elem_t* wrapped in std::atomic
+	typedef VElement                base_t;     //!< Base type of this element
+	typedef TSingleElement<data_t>  elem_t;     //!< Type of this element
+	typedef std::shared_ptr<data_t> share_t;    //!< data_t wrapped in std::shared_ptr
+	typedef std::atomic<elem_t*>    neighbor_t; //!< elem_t* wrapped in std::atomic
+	typedef base_t::store_t         store_t;    //!< The element store type to register this element with
 
 
 	/* ===============================================
@@ -108,14 +133,13 @@ public:
 
 	/** @brief default constructor
 	  *
-	  * The default constructor sets the key, the data pointer and the destroy method.
+	  * The default constructor sets both the data pointer and the destroy method.
 	  *
-	  * @param[in] key_ the key that identifies this element
-	  * @param[in] data_ A pointer to the data this element is to hold.
+	  * @param[in] data_ A pointer to the data this list element is to hold.
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	THashElement (const key_t &key_, data_t* data_, void (*destroy_) (data_t* data_)) noexcept
-	: key(key_), data (data_, TVarDeleter<data_t> (destroy_))
+	TSingleElement (data_t* data_, void (*destroy_) (data_t* data_)) noexcept
+	: data (data_, TVarDeleter<data_t> (destroy_))
 	{ }
 
 
@@ -123,23 +147,21 @@ public:
 	  *
 	  * Delegating ctor that calls the default ctor with destroy_ being the nullptr
 	  *
-	  * @param[in] key_ the key that identifies this element
 	  * @param[in] data_ A pointer to the data this list element is to hold.
 	**/
 	explicit
-	THashElement (const key_t &key_, data_t* data_) noexcept
-	: elem_t (key_, data_, nullptr)
+	TSingleElement (data_t* data_) noexcept
+	: elem_t (data_, nullptr)
 	{ }
 
 
-	THashElement() PWX_DELETE; // nullptr data is not allowed
+	TSingleElement() PWX_DELETE; // nullptr data is not allowed
 
 
 	/** @brief copy ctor
 	  *
 	  * The copy ctor creates a stand-alone element without neighbors
-	  * copying the key, the data pointer and the destroy method from
-	  * @a src.
+	  * copying the data pointer and destroy method from @a src.
 	  * As the data is wrapped in a shared_ptr, data will not get
 	  * deleted unless the last reference is gone.
 	  *
@@ -148,14 +170,13 @@ public:
 	  *
 	  * @param[in] src reference to the element to copy.
 	**/
-	THashElement (const elem_t &src) noexcept
+	TSingleElement (const elem_t &src) noexcept
 	: base_t (src),
-	  key  (src.key),
 	  data (src.data)
 	{ }
 
 
-	virtual ~THashElement() noexcept;
+	virtual ~TSingleElement() noexcept;
 
 
 	/* ===============================================
@@ -187,10 +208,12 @@ public:
 			// B: check Data status
 			data_t* thisData = this->data.get();
 
-			if (thisData)
+			if (thisData) {
+				if (isFloatType(data_t) && areAlmostEqual(*thisData, other))
+					return 0;
 				return *thisData > other ?  1
 					 : other > *thisData ? -1 : 0;
-			else
+			} else
 				return -1;
 		} // No else. compare(this->data.get()) always returns 0
 
@@ -229,9 +252,12 @@ public:
 				data_t* thisData = this->data.get();
 				data_t* otheData = other->data.get();
 
-				if (thisData && otheData)
+				if (thisData && otheData) {
+					if (isFloatType(data_t) && areAlmostEqual(*thisData, *otheData))
+						return 0;
 					return *thisData > *otheData ?  1
 						 : *otheData > *thisData ? -1 : 0;
+				}
 				if (thisData)	return  1;
 				if (otheData)	return -1;
 			} // No else. compare(this) always returns 0
@@ -261,17 +287,61 @@ public:
 	}
 
 
-	/** @brief insert an element as the first
+	/** @brief insert an element before another
 	  *
 	  * This is a special insertion method that is to be used if
-	  * this element is to become the new head of a bucket chain, or
-	  * the one element in an open addressed hash location.
+	  * this element is to become the new head of a container.
 	  * In this special case there is no element to use insertNext()
 	  * from, so this method does the handling.
+	  *
+	  * If either this or the @a new_next element is marked as destroyed,
+	  * a pwx::CException is thrown. Such a condition implies that
+	  * there is something seriously wrong.
+	  *
+	  * if @a new_next is either nullptr or this element, the element
+	  * will only be marked as inserted.
+	  *
+	  * @param[in] new_next target where the next pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element
 	**/
-	void insertAsFirst()
+	void insertBefore(elem_t* new_next, store_t* new_store)
 	{
-		insert(nullptr); // Hash containers don't need CThreadElementStore
+		if (!new_next || (new_next == this)) {
+			insert(new_store);
+			return;
+		}
+
+		if (!destroyed() && !new_next->destroyed()) {
+			if (beThreadSafe()) {
+				// Do locking and double checks if this has to be thread safe
+				PWX_DOUBLE_LOCK_GUARD(this, new_next)
+
+				/* Now that we have the double lock, it is crucial to
+				 * check again. Otherwise we might just insert a destroyed element.
+				*/
+				if (destroyed())
+					PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+							"The element to insert has been destroyed while waiting for the lock!")
+
+				if (new_next->destroyed())
+					PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+							"The inserting element has been destroyed while waiting for the lock!")
+
+				// Store new next neighbor
+				setNext(new_next);
+
+			} else
+				// Otherwise do it directly
+				next.store(new_next, memOrdStore);
+
+			// Mark as inserted
+			insert(new_store);
+		} else if (destroyed())
+			PWX_THROW("Illegal_Insert", "Can't insert a destroyed element",
+					"Tried to insert an element that has already been destroyed!")
+		else
+			PWX_THROW("Illegal_Insert", "Destroyed elements can't insert",
+					"Tried to insert an element after an already destroyed element!")
 	}
 
 
@@ -289,8 +359,9 @@ public:
 	  * simply does nothing.
 	  *
 	  * @param[in] new_next target where the next pointer should point at.
+	  * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element from now on
 	**/
-	void insertNext(elem_t* new_next)
+	void insertNext(elem_t* new_next, store_t* new_store)
 	{
 		if (!new_next || (new_next == this))
 			return;
@@ -313,7 +384,7 @@ public:
 
 				// Insert the new element
 				new_next->setNext(this->getNext());
-				new_next->insert(nullptr); // Hash containers don't need CThreadElementStore
+				new_next->insert(new_store);
 
 				// Store new next neighbor
 				setNext(new_next);
@@ -325,8 +396,8 @@ public:
 						"Tried to insert an element that has already been destroyed!")
 		} else {
 			// Otherwise do it directly
-			new_next->next.store(next.load(memOrdLoad), memOrdStore);
-			new_next->insert(nullptr); // Hash containers don't need CThreadElementStore
+			new_next->next.store(next.load(memOrdLoad),memOrdStore);
+			new_next->insert(new_store);
 			next.store(new_next, memOrdStore);
 		}
 	}
@@ -349,7 +420,6 @@ public:
 			next.store(nullptr, memOrdStore);
 			base_t::remove();
 		}
-		hops = 0;
 	}
 
 
@@ -358,7 +428,7 @@ public:
 	  * This method removes the successor of this element
 	  * from a list in a thread safe way.
 	  *
-	  * @return the removed element or nullptr if there is no successor
+	  * @return the removed element
 	**/
 	elem_t* removeNext() noexcept
 	{
@@ -380,7 +450,8 @@ public:
 				toRemoveIsNext = toRemove == next.load(memOrdLoad);
 			}
 
-			// Continue if we actually have an element to remove now:
+			// Continue if we actually have an element to remove now,
+			// and the element is not this, like in ring containers
 			if (toRemove && (toRemove != this))
 				this->setNext(toRemove->getNext());
 
@@ -388,6 +459,7 @@ public:
 			// Without the thread safety needs, this is a lot simpler:
 			next.store(toRemove->next.load(memOrdLoad), memOrdStore);
 
+		// Remove neighborhood:
 		if (toRemove && (toRemove != this)) {
 			toRemove->remove();
 			return toRemove;
@@ -423,9 +495,9 @@ public:
 
 	/** @brief assignment operator
 	  *
-	  * The assignment operator copies over the data and
-	  * the destroy method. This element will keep its key
-	  * and stay where it is.
+	  * The assignment operator copies over the element and
+	  * the destroy method. This element will stay where it
+	  * is, and not change its position.
 	  *
 	  * @param[in] src const reference of the element to copy
 	  * @return reference to this element
@@ -434,10 +506,9 @@ public:
 	{
 		if ((this != &src) && !destroyed() && !src.destroyed()) {
 			PWX_DOUBLE_LOCK_GUARD(this, &src)
-			if (!destroyed() && !src.destroyed()) {
+			if (!destroyed() && !src.destroyed())
 				data = src.data;
 				// note: destroy method wrapped in data!
-			}
 		}
 		return *this;
 	}
@@ -479,51 +550,27 @@ public:
 	}
 
 
-	/** @brief return true if another element has the same key
-	  * @param[in] rhs const reference to the right hand side element
-	  * @return true if both elements have the same key, false otherwise
+	/** @brief return true if this element has the data @a data
+	  * @param[in] data_ const reference of the data to check
+	  * @return true if this element has the same data
 	**/
-	bool operator==(const elem_t &rhs) const noexcept PWX_WARNUNUSED
+	bool operator==(const data_t &data_) const noexcept PWX_WARNUNUSED
 	{
-		if (isFloatType(key_t))
-			return areAlmostEqual(this->key, rhs.key);
-		return this->key == rhs.key;
+		if (isFloatType(data_t))
+			return areAlmostEqual(*data, data_);
+		return *data == data_;
 	}
 
 
-	/** @brief return true if this element has the key @a key
-	  * @param[in] key const reference of the key to check
-	  * @return true if this element has the same key
+	/** @brief return true if this element has differne data than @a data
+	  * @param[in] data_ const reference of the data to check
+	  * @return true if this element has different data
 	**/
-	bool operator==(const key_t &key_) const noexcept PWX_WARNUNUSED
+	bool operator!=(const data_t &data_) const noexcept PWX_WARNUNUSED
 	{
-		if (isFloatType(key_t))
-			return areAlmostEqual(this->key, key_);
-		return this->key == key_;
-	}
-
-
-	/** @brief return true if another element has a different key
-	  * @param[in] rhs const reference to the right hand side element
-	  * @return true if the elements have different keys, false otherwise
-	**/
-	bool operator!=(const elem_t &rhs) const noexcept PWX_WARNUNUSED
-	{
-		if (isFloatType(key_t))
-			return !areAlmostEqual(this->key, rhs.key);
-		return !(this->key == rhs.key);
-	}
-
-
-	/** @brief return true if this element has a differnet key than @a key
-	  * @param[in] key const reference of the key to check
-	  * @return true if this element a different key
-	**/
-	bool operator!=(const key_t &key_) const noexcept PWX_WARNUNUSED
-	{
-		if (isFloatType(key_t))
-			return !areAlmostEqual(this->key, key_);
-		return !(this->key == key_);
+		if (isFloatType(data_t))
+			return !areAlmostEqual(*data, data_);
+		return !(*data == data_);
 	}
 
 
@@ -532,10 +579,8 @@ public:
 	 * ===============================================
 	*/
 
-	key_t      key;                             //!< The key that identifies this element
 	share_t    data; 							//!< The data this list element points to, wrapped in a shared_ptr.
 	neighbor_t next = ATOMIC_VAR_INIT(nullptr); //!< The next element in the list or nullptr if this is the tail.
-	uint32_t   hops = 0; // to track hops when inserting an element
 
 
 protected:
@@ -557,7 +602,7 @@ private:
 
 	neighbor_t oldNext = ATOMIC_VAR_INIT(nullptr);
 
-}; // struct THashElement
+}; // struct TSingleElement
 
 
 /** @brief destructor
@@ -569,8 +614,8 @@ private:
   * is only deleted if, and only if, this is the very last
   * element referencing this data.
 **/
-template<typename key_t, typename data_t>
-THashElement<key_t, data_t>::~THashElement() noexcept
+template<typename data_t>
+TSingleElement<data_t>::~TSingleElement() noexcept
 {
 	if (beThreadSafe())
 		isDestroyed.store(true);
@@ -608,6 +653,4 @@ THashElement<key_t, data_t>::~THashElement() noexcept
 
 } // namespace pwx
 
-
-#endif // PWX_LIBPWX_PWX_TYPES_THASHELEMENT_H_INCLUDED
-
+#endif // PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED

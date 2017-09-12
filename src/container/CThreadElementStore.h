@@ -26,7 +26,7 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <pwx/container/TOpenHash.h>
+#include "TOpenHash.h"
 
 namespace pwx {
 
@@ -79,7 +79,7 @@ public:
 	 * ===============================================
 	*/
 
-	explicit CThreadElementStore(uint32_t initial_size) noexcept;
+	explicit CThreadElementStore(uint32_t initial_size);
 	CThreadElementStore() noexcept;
 	virtual ~CThreadElementStore() noexcept;
 

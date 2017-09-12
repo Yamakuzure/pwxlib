@@ -3,7 +3,7 @@
 #endif
 #include "VElement.h"
 
-#include <pwx/internal/CThreadElementStore.h>
+#include "CThreadElementStore.h"
 
 namespace pwx {
 
@@ -15,6 +15,13 @@ VElement::VElement() noexcept
 VElement::VElement(const VElement& src) noexcept
  :	base_t(src)
 { }
+
+
+/// @brief ~VElement default destructor.
+VElement::~VElement() noexcept
+{
+	this->remove();
+}
 
 
 /** @brief disable thread safety
