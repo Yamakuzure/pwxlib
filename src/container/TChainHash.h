@@ -39,7 +39,7 @@ namespace pwx {
   * @todo describe properly
 **/
 template<typename key_t, typename data_t, typename elem_t = THashElement<key_t, data_t> >
-class TChainHash : public VTHashBase<key_t, data_t, elem_t>
+class PWX_API TChainHash : public VTHashBase<key_t, data_t, elem_t>
 {
 public:
 	/* ===============================================

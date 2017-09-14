@@ -12,14 +12,14 @@
 namespace pwx
 {
 
-/** @brief operator<< for moving an adjLeft object upon a stream
+/** @brief operator<< for moving an CAdjLeft object upon a stream
   *
   * @param[in] os an open and valid output stream to format
-  * @param[in] l an instance of adjLeft
+  * @param[in] l an instance of CAdjLeft
   * @return the stream object
   *
 **/
-std::ostream &operator<< (std::ostream& os, const adjLeft& l) noexcept
+std::ostream &operator<< (std::ostream& os, const CAdjLeft& l) noexcept
 {
 	if (os.good()) {
 		os.setf (std::ios_base::left, std::ios_base::adjustfield | std::ios_base::floatfield);
@@ -29,14 +29,14 @@ std::ostream &operator<< (std::ostream& os, const adjLeft& l) noexcept
 }
 
 
-/** @brief operator<< for moving an adjRight object upon a stream
+/** @brief operator<< for moving an CAdjRight object upon a stream
   *
   * @param[in] os an open and valid output stream to format
-  * @param[in] r an instance of adjRight
+  * @param[in] r an instance of CAdjRight
   * @return the stream object
   *
 **/
-std::ostream &operator<< (std::ostream& os, const adjRight& r) noexcept
+std::ostream &operator<< (std::ostream& os, const CAdjRight& r) noexcept
 {
 	if (os.good()) {
 		os.setf (std::ios_base::right, std::ios_base::adjustfield | std::ios_base::floatfield);
@@ -279,7 +279,7 @@ void trim (std::string &text, char extra) noexcept
   * @param[in] left_ set left number of digits to this value
   * @param[in] right_ set right number of digits to this value
   */
-format::format (int32_t left_, int32_t right_) noexcept :
+CFormat::CFormat (int32_t left_, int32_t right_) noexcept :
 	left (left_),
 	right (right_)
 { }
@@ -289,7 +289,7 @@ format::format (int32_t left_, int32_t right_) noexcept :
   *
   * Default values for left and right are both zero.
   */
-format::format() noexcept
+CFormat::CFormat() noexcept
 { }
 
 
@@ -305,7 +305,7 @@ format::format() noexcept
   *
   * @param[in,out] os an open and valid output stream to format
 **/
-void format::setFields (std::ostream& os) const noexcept
+void CFormat::setFields (std::ostream& os) const noexcept
 {
 	if (os.good() && (left || right)) {
 		if (left)
@@ -322,8 +322,8 @@ void format::setFields (std::ostream& os) const noexcept
   * @param[in] left_ set left number of digits to this value
   * @param[in] right_ set right number of digits to this value
   */
-adjLeft::adjLeft (int32_t left_, int32_t right_) noexcept :
-	format (left_, right_)
+CAdjLeft::CAdjLeft (int32_t left_, int32_t right_) noexcept :
+	CFormat (left_, right_)
 { }
 
 
@@ -331,7 +331,7 @@ adjLeft::adjLeft (int32_t left_, int32_t right_) noexcept :
   *
   * Default values for left and right are both zero.
   */
-adjLeft::adjLeft() noexcept
+CAdjLeft::CAdjLeft() noexcept
 { }
 
 
@@ -339,8 +339,8 @@ adjLeft::adjLeft() noexcept
   * @param[in] left_ set left number of digits to this value
   * @param[in] right_ set right number of digits to this value
   */
-adjRight::adjRight (int32_t left_, int32_t right_) noexcept :
-	format (left_, right_)
+CAdjRight::CAdjRight (int32_t left_, int32_t right_) noexcept :
+	CFormat (left_, right_)
 { }
 
 
@@ -348,7 +348,7 @@ adjRight::adjRight (int32_t left_, int32_t right_) noexcept :
   *
   * Default values for left and right are both zero.
   */
-adjRight::adjRight() noexcept
+CAdjRight::CAdjRight() noexcept
 { }
 
 } // namespace pwx

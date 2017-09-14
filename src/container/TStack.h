@@ -147,7 +147,7 @@ public:
 	  *
 	  * @return the top element on the stack.
 	**/
-	virtual elem_t* pop() noexcept
+	virtual elem_t* pop()
 	{
 		PWX_TRY_PWX_FURTHER (return base_t::pop_back())
 	}

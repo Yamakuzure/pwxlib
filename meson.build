@@ -37,7 +37,7 @@ docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
 #####################################################################
 
 substs = configuration_data()
-substs.set('PACKAGE_URL',     'https://github.com/elogind/elogind')
+substs.set('PACKAGE_URL',     'https://github.com/pwx/pwx')
 substs.set('PACKAGE_VERSION', meson.project_version())
 substs.set('prefix',          prefixdir)
 substs.set('exec_prefix',     prefixdir)
@@ -74,7 +74,7 @@ foreach arg : ['-Wextra',
                '-Wdate-time',
                '-fno-common',
                '-fdiagnostics-show-option',
-               '-fvisibility=hidden',
+#               '-fvisibility=hidden',
                '-fstack-protector',
                '-fstack-protector-strong',
                '-fPIE',
@@ -253,7 +253,8 @@ includes = include_directories('src/arg_handler',
                                'src/functions',
                                'src/libpwx',
                                'src/math_helpers',
-                               'src/random')
+                               'src/random',
+                               'src/wavecolor')
 
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
@@ -268,12 +269,14 @@ subdir('src/arg_handler')
 subdir('src/wavecolor')
 subdir('src/libpwx')
 
+libpwx_sym_path = '@0@/@1@'.format(meson.current_source_dir(), libpwx_sym)
 libpwx = shared_library(
         'pwx',
         libpwx_internal_sources + libpwx_headers,
         version : meson.project_version(),
         include_directories : includes,
-        link_args : ['-shared'],
+        link_args : ['-shared',
+                     '-Wl,--version-script=' + libpwx_sym_path],
         link_with : [
                 librandom,
                 libarg,
@@ -281,6 +284,7 @@ libpwx = shared_library(
                 libcontainer
         ],
         dependencies : [threads],
+        link_depends : libpwx_sym,
         install : true,
         install_dir : libdir)
 
@@ -293,9 +297,20 @@ install_headers(
 # binaries that have --help and are intended for use by humans.
 public_programs = []
 
-#subdir('test')
+subdir('test')
 #subdir('tools/drawwave')
 #subdir('doc')
+
+############################################################
+
+test_libpwx_sym = executable(
+        'test-libpwx-sym',
+        test_libpwx_sym_cpp,
+        include_directories : includes,
+        link_with : [libpwx],
+        install : false)
+test('test-libpwx-sym',
+     test_libpwx_sym)
 
 ############################################################
 

@@ -51,7 +51,7 @@ void           PWX_API trim (std::string &text, char extra = 0x0) noexcept;
 
 // --- Classes for stream manipulation ---
 
-/** @brief format a numerical stream output
+/** @brief CFormat a numerical stream output
   *
   * This is a base class for other stream formatters, allowing to set
   * the numerical width and floating point precision.
@@ -64,17 +64,17 @@ void           PWX_API trim (std::string &text, char extra = 0x0) noexcept;
   * class for formatters which do not deal with output width and
   * precision.
 **/
-class PWX_API format
+class PWX_API CFormat
 {
 public:
 	/* ===============================================
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	*/
-	format (int32_t left_, int32_t right_) noexcept;
-	format() noexcept;
+	CFormat (int32_t left_, int32_t right_) noexcept;
+	CFormat() noexcept;
 
-	virtual ~format() noexcept PWX_DEFAULT;
+	virtual ~CFormat() noexcept PWX_DEFAULT;
 
 	/* ===============================================
 	 * === Public methods                          ===
@@ -88,52 +88,52 @@ protected:
 	*/
 	int32_t left  = 0; //!< The number of digits left of the floating point
 	int32_t right = 0; //!< The number of digits right of the floating point
-}; // class format
+}; // class CFormat
 
-/** @brief adjLeft
+/** @brief CAdjLeft
   *
   * Simple class to set an output stream to left adjustment
   * with optional width and precision.
   *
-  * @see format ctor for argument description
+  * @see CFormat ctor for argument description
 **/
-class PWX_API adjLeft: public format
+class PWX_API CAdjLeft: public CFormat
 {
 public:
 	/* ===============================================
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	*/
-	adjLeft (int32_t left_, int32_t right_) noexcept;
-	adjLeft() noexcept;
+	CAdjLeft (int32_t left_, int32_t right_) noexcept;
+	CAdjLeft() noexcept;
 
-	~adjLeft() noexcept PWX_DEFAULT;
+	~CAdjLeft() noexcept PWX_DEFAULT;
 };
 
 
-/** @brief adjRight
+/** @brief CAdjRight
   *
   * Simple class to set an output stream to right adjustment
   * with optional width and precision.
   *
-  * @see format ctor for argument description
+  * @see CFormat ctor for argument description
 **/
-class PWX_API adjRight: public format
+class PWX_API CAdjRight: public CFormat
 {
 public:
 	/* ===============================================
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	*/
-	adjRight (int32_t left_, int32_t right_) noexcept;
-	adjRight() noexcept;
+	CAdjRight (int32_t left_, int32_t right_) noexcept;
+	CAdjRight() noexcept;
 
-	~adjRight() noexcept PWX_DEFAULT;
+	~CAdjRight() noexcept PWX_DEFAULT;
 };
 
 
-std::ostream PWX_API &operator<< (std::ostream& os, const adjLeft& l) noexcept;
-std::ostream PWX_API &operator<< (std::ostream& os, const adjRight& r) noexcept;
+std::ostream PWX_API &operator<< (std::ostream& os, const CAdjLeft& l) noexcept;
+std::ostream PWX_API &operator<< (std::ostream& os, const CAdjRight& r) noexcept;
 
 
 /** @brief get the next seperated value

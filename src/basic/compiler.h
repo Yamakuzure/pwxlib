@@ -6,7 +6,7 @@
   *
   * @brief General preprocessor macros and defines that are compiler dependent.
   *
-  * (c) 2007 - 2013 PrydeWorX
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         yamakuzure@users.sourceforge.net
   *         http://pwxlib.sourceforge.net

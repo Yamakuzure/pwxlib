@@ -8,6 +8,8 @@ _libpwx_headers = '''
 
 libpwx_headers += files(_libpwx_headers)
 
+libpwx_sym = 'src/libpwx/libpwx.sym'
+
 libpwx_pc = configure_file(
         input : 'libpwx.pc.in',
         output : 'libpwx.pc',

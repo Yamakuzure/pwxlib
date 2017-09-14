@@ -58,7 +58,7 @@ namespace private_ {
   * use the internal hash table but simply change/retrieve on general
   * curr pointer. This can be reversed using beThreadSafe(true).
 **/
-class PWX_API CThreadElementStore : public CLockable
+class CThreadElementStore : public CLockable
 {
 public:
 

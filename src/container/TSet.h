@@ -438,7 +438,7 @@ protected:
 
 	/** @brief simple method to insert an element into the list
 	  *
-	  * If either @a insPrev or @a insElem is marked as destroyed,
+	  * If either @a insPre or @a insElem is marked as destroyed,
 	  * a pwx::CException is thrown. Such a condition implies that
 	  * there is something seriously wrong.
 	  *
@@ -447,27 +447,27 @@ protected:
 	  *       is different from the one in TDoubleList as it does not
 	  *       need to lock by itself.
 	  *
-	  * @param[in] insPrev Element after which the new element is to be inserted
+	  * @param[in] insPre Element after which the new element is to be inserted
 	  * @param[in] insElem The element to insert.
 	  * @return The number of elements in the list after the insertion
 	**/
-	virtual uint32_t protInsert (elem_t* insPrev, elem_t* insElem)
+	virtual uint32_t protInsert (elem_t* insPre, elem_t* insElem)
 	{
 		/* There are four possibilities:
 		 * 1: The list is empty
 		 *    head, tail and curr have to be set to the new
 		 *    element, no full renumbering is needed then.
-		 * 2: insPrev is nullptr
+		 * 2: insPre is nullptr
 		 *    head has to be changed to be the new element
-		 * 3: insPrev is tail
+		 * 3: insPre is tail
 		 *    tail has to be set to the new element, no full
 		 *    renumbering is needed then.
-		 * 4: Otherwise insPrev->insertNext() can do the insertion
+		 * 4: Otherwise insPre->insertNext() can do the insertion
 		*/
 
 		if (size()) {
-			if (insPrev) {
-				if (tail() == insPrev) {
+			if (insPre) {
+				if (tail() == insPre) {
 					// Case 3: A new tail is to be set
 					insElem->eNr.store(
 						tail()->eNr.load(memOrdLoad) + 1,
@@ -477,7 +477,7 @@ protected:
 				} else {
 					// Case 4: A normal insert
 					this->doRenumber.store(true, memOrdStore);
-					PWX_TRY_PWX_FURTHER(insPrev->insertNext(insElem, &currStore))
+					PWX_TRY_PWX_FURTHER(insPre->insertNext(insElem, &currStore))
 				}
 			} else {
 				// Case 2: A new head is to be set
