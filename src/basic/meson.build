@@ -19,7 +19,12 @@ _basic_headers = '''
         CException.h
         CLockable.h
         CLockGuard.h
+        compiler.h
+        debug.h
+        macros.h
         StreamHelpers.h
+        templates.h
+        types.h
 '''.split()
 
 libpwx_headers += files(_basic_headers)

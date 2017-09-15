@@ -13,6 +13,7 @@ libpwx*.so*
 *.layout
 build/
 *.obj
+rebuild.sh
 
 # Precompiled Headers
 #------------------------------
