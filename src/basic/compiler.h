@@ -68,7 +68,7 @@
  * -------------------------------------------------------------------
 */
 #ifdef PWX_EXPORTS
-#  define PWX_API __attribute__ ((visibility("default")))
+#  define PWX_API __attribute__((visibility("default")))
 #else
 #  define PWX_API
 #endif

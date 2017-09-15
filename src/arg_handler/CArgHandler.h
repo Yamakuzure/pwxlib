@@ -31,20 +31,8 @@
 #include "CArgCallback.h"
 #include "sArgError.h"
 #include "CException.h"
-
-#if defined(PWX_EXPORTS)
-#  undef PWX_EXPORTS
-#  define PWX_REDEF_EXPORTS 1
-# endif
-
 #include "TQueue.h"
 #include "TChainHash.h"
-
-#if defined(PWX_REDEF_EXPORTS)
-#  define PWX_EXPORTS 1
-#  undef PWX_REDEF_EXPORTS
-# endif
-
 
 namespace pwx {
 
@@ -274,12 +262,6 @@ private:
 	hash_t    shortArgs;   //!< stores targets using their short argument as key
 
 };
-
-
-#ifndef PWX_EXPORTS
-extern CArgHandler PAH; //!< External instance of CArgHandler to be used
-#endif // PWX_EXPORTS
-
 
 } // namespace pwx
 

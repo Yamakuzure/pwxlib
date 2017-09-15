@@ -1,7 +1,3 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
-
 #include "macros.h"
 #include "StreamHelpers.h"
 #include "CRandom.h"
@@ -15,8 +11,6 @@
 #include <cmath>
 
 namespace pwx {
-
-CRandom RNG;
 
 /* --------------------------------------- *
  * --- Private Methods Implementations --- *

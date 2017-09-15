@@ -1,6 +1,3 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
 #include "eNameSourceType.h"
 #include "types.h"
 namespace pwx {

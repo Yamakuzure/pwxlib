@@ -1,12 +1,7 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif // PWX_EXPORTS
-
 #include "TArgTarget.h"
-
 #include "StreamHelpers.h"
-namespace pwx
-{
+
+namespace pwx {
 
 
 // === Specialized processing handlers ===

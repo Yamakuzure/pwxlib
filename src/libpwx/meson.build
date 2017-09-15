@@ -1,5 +1,6 @@
 libpwx_internal_sources = files('''
         pwx.h
+        pwx.cpp
 '''.split())
 
 _libpwx_headers = '''

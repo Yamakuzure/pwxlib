@@ -22,11 +22,3 @@ arg_headers = '''
 '''.split()
 
 libpwx_headers += files(arg_headers)
-
-libarg = static_library(
-	'arg',
-	arg_sources,
-        include_directories : includes,
-        dependencies : [threads],
-        link_with : [libcontainer],
-        install : false)

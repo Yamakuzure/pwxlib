@@ -62,7 +62,7 @@ global:
         pwx::trim;
         pwx::try_locks;
         pwx::unlock_all;
-        
+
         /* Templated functions */
         pwx::set_difference;
         pwx::set_intersection;

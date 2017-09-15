@@ -31,22 +31,12 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#if defined(PWX_EXPORTS)
-#  undef PWX_EXPORTS
-#  define PWX_REDEF_EXPORTS 1
-# endif
+#include <cmath>
+#include <cassert>
 
 #include "VContainer.h"
 #include "THashElement.h"
 #include "CHashBuilder.h"
-
-#if defined(PWX_REDEF_EXPORTS)
-#  define PWX_EXPORTS 1
-#  undef PWX_REDEF_EXPORTS
-# endif
-
-#include <cmath>
-#include <cassert>
 
 namespace pwx {
 

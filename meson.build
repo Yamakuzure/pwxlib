@@ -46,7 +46,8 @@ substs.set('includedir',      includedir)
 
 #####################################################################
 
-cpp = meson.get_compiler('cpp')
+cxx = meson.get_compiler('cpp')
+cxx_id = cxx.get_id()
 pkgconfig = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
 
@@ -74,18 +75,18 @@ foreach arg : ['-Wextra',
                '-Wdate-time',
                '-fno-common',
                '-fdiagnostics-show-option',
-#               '-fvisibility=hidden',
+               '-fvisibility=hidden',
                '-fstack-protector',
                '-fstack-protector-strong',
                '-fPIE',
                '--param=ssp-buffer-size=4',
               ]
-        if cpp.has_argument(arg)
+        if cxx.has_argument(arg)
                 add_project_arguments(arg, language : 'cpp')
         endif
 endforeach
 
-if cpp.compiles('
+if cxx.compiles('
    #include <ctime>
    #include <cinttypes>
    typedef uint64_t usec_t;
@@ -98,18 +99,18 @@ if cpp.compiles('
         add_project_arguments('-Werror=shadow', language : 'cpp')
 endif
 
-if cpp.get_id() == 'clang'
+if cxx_id == 'clang'
         foreach arg : ['-Wno-typedef-redefinition',
                        '-Wno-gnu-variable-sized-type-not-at-end',
                       ]
-                if cpp.has_argument(arg,
+                if cxx.has_argument(arg,
                                    name : '@0@ is supported'.format(arg))
                         add_project_arguments(arg, language : 'cpp')
                 endif
         endforeach
 endif
 
-link_test_cpp = files('meson/link_test.cpp')
+link_test_cxx = files('meson/link_test.cpp')
 
 # --as-needed and --no-undefined are provided by meson by default,
 # run mesonconf to see what is enabled
@@ -119,8 +120,8 @@ foreach arg : ['-Wl,-z,relro',
               ]
 
         have = run_command(check_compilation_sh,
-                           cpp.cmd_array(), '-x', 'cpp', arg,
-                           '-include', link_test_cpp).returncode() == 0
+                           cxx.cmd_array(), '-x', 'cpp', arg,
+                           '-include', link_test_cxx).returncode() == 0
         message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
         if have
                 add_project_link_arguments(arg, language : 'cpp')
@@ -129,8 +130,9 @@ endforeach
 
 if get_option('buildtype') != 'debug'
         foreach arg : ['-ffunction-sections',
-                       '-fdata-sections']
-                if cpp.has_argument(arg,
+                       '-fdata-sections',
+                       '-fexceptions']
+                if cxx.has_argument(arg,
                                    name : '@0@ is supported'.format(arg))
                         add_project_arguments(arg, language : 'cpp')
                 endif
@@ -138,8 +140,8 @@ if get_option('buildtype') != 'debug'
 
         foreach arg : ['-Wl,--gc-sections']
                 have = run_command(check_compilation_sh,
-                                   cpp.cmd_array(), '-x', 'cpp', arg,
-                                   '-include', link_test_cpp).returncode() == 0
+                                   cxx.cmd_array(), '-x', 'cpp', arg,
+                                   '-include', link_test_cxx).returncode() == 0
                 message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
                 if have
                         add_project_link_arguments(arg, language : 'cpp')
@@ -161,7 +163,7 @@ foreach decl : ['char16_t',
                ]
 
         # We get -1 if the size cannot be determined
-        have = cpp.sizeof(decl, prefix : decl_headers) > 0
+        have = cxx.sizeof(decl, prefix : decl_headers) > 0
         conf.set('HAVE_' + decl.underscorify().to_upper(), have)
 endforeach
 
@@ -211,14 +213,14 @@ if debug
         conf.set('LIBPWX_DEBUG', true)
         foreach arg : ['-ggdb3',
                        '-Og']
-                if cpp.has_argument(arg,
+                if cxx.has_argument(arg,
                                    name : '@0@ is supported'.format(arg))
                         add_project_arguments(arg, language : 'cpp')
                 endif
 
                 have = run_command(check_compilation_sh,
-                                   cpp.cmd_array(), '-x', 'c', arg,
-                                   '-include', link_test_cpp).returncode() == 0
+                                   cxx.cmd_array(), '-x', 'c', arg,
+                                   '-include', link_test_cxx).returncode() == 0
                 message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
                 if have
                         add_project_link_arguments(arg, language : 'cpp')
@@ -272,17 +274,20 @@ subdir('src/libpwx')
 libpwx_sym_path = '@0@/@1@'.format(meson.current_source_dir(), libpwx_sym)
 libpwx = shared_library(
         'pwx',
-        libpwx_internal_sources + libpwx_headers,
+        basic_sources,
+        funcs_sources,
+        math_helpers_sources,
+        random_sources,
+        container_sources,
+        arg_sources,
+        wavecolor_sources,
+        libpwx_internal_sources,
         version : meson.project_version(),
         include_directories : includes,
-        link_args : ['-shared',
-                     '-Wl,--version-script=' + libpwx_sym_path],
-        link_with : [
-                librandom,
-                libarg,
-                libwavecolor,
-                libcontainer
-        ],
+        cpp_args : ['-DPWX_EXPORTS'],
+        link_args : ['-shared'],
+#        link_args : ['-shared',
+#                     '-Wl,--version-script=' + libpwx_sym_path],
         dependencies : [threads],
         link_depends : libpwx_sym,
         install : true,

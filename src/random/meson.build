@@ -17,10 +17,3 @@ random_headers = '''
 '''.split()
 
 libpwx_headers += files(random_headers)
-
-librandom = static_library(
-	'random',
-	random_sources,
-        include_directories : includes,
-        link_with : [libmath_helpers],
-        install : false)

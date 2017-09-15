@@ -199,9 +199,6 @@ private:
 
 };
 
-
-extern CSinCosTable SCT; //!< External instance of CSinCosTable to be used
-
 } // namespace pwx
 
 #endif // PWX_LIBPWX_PWX_WORKER_CSINCOSTABLE_H_INCLUDED

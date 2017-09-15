@@ -1,10 +1,7 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
-#include "sArgError.h"
-
 #include <cstdlib>
 #include <cstring>
+
+#include "sArgError.h"
 
 namespace pwx {
 

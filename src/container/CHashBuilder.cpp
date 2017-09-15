@@ -1,10 +1,17 @@
 #include "CRandom.h"
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
 #include "CHashBuilder.h"
 
 namespace pwx {
+
+
+/// From pwx.cpp
+extern CRandom RNG; // [R]andom [N]-Value [G]enerator
+
+
+/// @brief default dtor
+CHashBuilder::~CHashBuilder() noexcept
+{ }
+
 
 /** @brief get the current key length
   *

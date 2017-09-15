@@ -1,15 +1,8 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
-
 #include "CArgHandler.h"
 #include "StreamHelpers.h"
 
 
 namespace pwx {
-
-
-CArgHandler PAH;
 
 
 /** @internal

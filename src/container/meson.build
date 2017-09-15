@@ -39,10 +39,3 @@ container_headers = '''
 '''.split()
 
 libpwx_headers += files(container_headers)
-
-libcontainer = static_library(
-	'container',
-	container_sources, funcs_sources,
-        include_directories : includes,
-        link_with : [librandom],
-        install : false)

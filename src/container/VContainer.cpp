@@ -1,6 +1,3 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
 #include "VContainer.h"
 
 namespace pwx {
@@ -16,5 +13,8 @@ VContainer::VContainer(const VContainer& src) noexcept :
 	// eCount is maintained when deriving copy ctors copy elements
 { }
 
+/// @brief ~VContainer default destructor.
+VContainer::~VContainer() noexcept
+{ }
 
 } // namespace pwx

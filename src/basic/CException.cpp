@@ -1,9 +1,7 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
+#include <cstring>
+
 #include "CException.h"
 #include "macros.h"
-#include <cstring>
 
 namespace pwx {
 

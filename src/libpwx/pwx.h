@@ -67,7 +67,35 @@
   @endverbatim
 **/
 
-#include "CArgHandler.h"
+
+#include "CSinCosTable.h"
 #include "CRandom.h"
+#include "TChainHash.h"
+#include "TDoubleList.h"
+#include "TDoubleRing.h"
+#include "TOpenHash.h"
+#include "TSet.h"
+#include "TSingleList.h"
+#include "TSingleRing.h"
+#include "TStack.h"
+#include "CArgHandler.h"
+#include "CWaveColor.h"
+
+
+namespace pwx {
+
+
+/// @brief Global argument handler that can be used centrally in any project
+extern PWX_API CArgHandler  PAH; // [P]wxlib [A]rgument [H]andler
+
+/// @brief Global random value generator that can be used centrally in any project
+extern PWX_API CRandom      RNG; // [R]andom [N]-Value [G]enerator
+
+/// @brief Global sine-/cosine-table that can be used centrally in any project
+extern PWX_API CSinCosTable SCT; // [S]ine-/[C]osine-[T]able
+
+
+}
+
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED

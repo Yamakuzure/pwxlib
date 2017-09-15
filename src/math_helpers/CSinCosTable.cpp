@@ -1,22 +1,9 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
-
-
-#if !defined(PWX_INITIAL_SCT_PRECISION)
-#  define PWX_INITIAL_SCT_PRECISION -1
-#endif // defined(PWX_INITIAL_SCT_PRECISION)
-
-
 #include "macros.h"
 #include "MathHelpers.h"
 #include "CLockGuard.h"
 #include "CSinCosTable.h"
 
 namespace pwx {
-
-
-CSinCosTable SCT(PWX_INITIAL_SCT_PRECISION);
 
 
 /** @brief CSinCosTable default ctor

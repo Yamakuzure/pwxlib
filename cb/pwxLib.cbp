@@ -92,6 +92,10 @@
 		<Unit filename="../src/functions/meson.build" />
 		<Unit filename="../src/functions/set_func.h" />
 		<Unit filename="../src/functions/set_fwd.h" />
+		<Unit filename="../src/libpwx/libpwx.pc.in" />
+		<Unit filename="../src/libpwx/libpwx.sym" />
+		<Unit filename="../src/libpwx/meson.build" />
+		<Unit filename="../src/libpwx/pwx.cpp" />
 		<Unit filename="../src/libpwx/pwx.h" />
 		<Unit filename="../src/math_helpers/CSinCosTable.cpp" />
 		<Unit filename="../src/math_helpers/CSinCosTable.h" />

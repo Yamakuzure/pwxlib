@@ -1,9 +1,6 @@
-#ifndef PWX_EXPORTS
-#  define PWX_EXPORTS 1
-#endif
-#include "CLockGuard.h"
-
 #include <thread>
+
+#include "CLockGuard.h"
 
 
 namespace pwx {

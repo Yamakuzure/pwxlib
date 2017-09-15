@@ -230,8 +230,6 @@ private:
 	int32_t         spxTab[512];   //!< A permutation table for simplex noise
 };
 
-extern CRandom RNG; //!< External instance of CRandom to be used
-
 } // namespace pwx
 
 #endif // PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED

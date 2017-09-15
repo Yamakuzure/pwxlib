@@ -23,10 +23,3 @@ _basic_headers = '''
 '''.split()
 
 libpwx_headers += files(_basic_headers)
-
-libbasic = static_library(
-	'basic',
-	basic_sources,
-        include_directories : includes,
-        dependencies : [threads],
-        install : false)
