@@ -39,7 +39,7 @@ namespace private_ {
   * the currently handled element for each thread.
   *
   * For this to work there is an important rule:
-  * any container methods that remove an element from the container
+  * any container methods that removes an element from the container
   * using this storage <B>must</B> report this to their element
   * store instance using its invalidate() method.
   * The default elements already handle this if their insert() and
@@ -79,9 +79,10 @@ public:
 	 * ===============================================
 	*/
 
-	explicit CThreadElementStore(uint32_t initial_size);
-	CThreadElementStore() noexcept;
-	virtual ~CThreadElementStore() noexcept;
+	explicit
+	CThreadElementStore(uint32_t initial_size) PWX_API;
+	CThreadElementStore()             noexcept PWX_API;
+	virtual ~CThreadElementStore()    noexcept PWX_API;
 
 
 	// No copying:
@@ -94,15 +95,15 @@ public:
 	 * ===============================================
 	*/
 
-	void    clear()                                  noexcept;
-	curr_t* curr()                             const noexcept;
-	curr_t* curr()                                   noexcept;
-	void    curr(const curr_t* new_curr)       const noexcept;
-	void    curr(curr_t* new_curr)                   noexcept;
-	void    disable_thread_safety()                  noexcept;
-	void    enable_thread_safety()                   noexcept;
-	void    invalidate(const curr_t* old_curr) const noexcept;
-	void    invalidate(curr_t* old_curr)             noexcept;
+	void    clear()                                  noexcept PWX_API;
+	curr_t* curr()                             const noexcept PWX_API;
+	curr_t* curr()                                   noexcept PWX_API;
+	void    curr(const curr_t* new_curr)       const noexcept PWX_API;
+	void    curr(curr_t* new_curr)                   noexcept PWX_API;
+	void    disable_thread_safety()                  noexcept PWX_API;
+	void    enable_thread_safety()                   noexcept PWX_API;
+	void    invalidate(const curr_t* old_curr) const noexcept PWX_API;
+	void    invalidate(curr_t* old_curr)             noexcept PWX_API;
 
 
 protected:

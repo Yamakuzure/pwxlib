@@ -15,6 +15,7 @@ global:
         pwx::CArgHandler;
         pwx::CException;
         pwx::CFormat;
+        pwx::CHashBuilder;
         pwx::CLockable;
         pwx::CLockGuard;
         pwx::CRandom;
@@ -67,6 +68,15 @@ global:
         pwx::set_difference;
         pwx::set_intersection;
         pwx::set_union;
+
+        /* Global workers */
+        pwx::PAH;
+        pwx::SCT;
+        pwx::RNG;
+
+        /* Virtual Base Classes - will be skipped by test_libpwx_sym */
+        pwx::VContainer;
+        pwx::VElement;
 local:
        *;
 };

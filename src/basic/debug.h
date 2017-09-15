@@ -31,6 +31,10 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+
+#include "compiler.h"
+
+
 #if defined(PWX_ANNOTATIONS)
 // In short: If LIBPWX_DEBUG is defined, the annotations are re-defined so the
 // compiler gives information about the include chain that is wrong. Otherwise
@@ -68,8 +72,8 @@ namespace pwx {
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
 // The main logging function:
-void debug_log(const char* fmt, ...);
-void debug_err(const char* fmt, ...);
+void PWX_API debug_log(const char* fmt, ...);
+void PWX_API debug_err(const char* fmt, ...);
 
 // And the main wrapper:
 # define DEBUG_LOG(part, fmt, ...) { \

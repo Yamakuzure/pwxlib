@@ -50,7 +50,7 @@ namespace pwx {
   * or std::string with RNG.hash().
   *
 **/
-class CHashBuilder
+class PWX_API CHashBuilder
 {
 public:
 	/* ===============================================

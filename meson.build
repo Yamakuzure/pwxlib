@@ -52,34 +52,20 @@ pkgconfig = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
 
 foreach arg : ['-Wextra',
-               '-Wundef',
-               '-Wlogical-op',
-               '-Wmissing-include-dirs',
-               '-Wpointer-arith',
-               '-Winit-self',
-               '-Wfloat-equal',
-               '-Wsuggest-attribute=noreturn',
+               '-pedantic',
+               '-Wpedantic',
                '-Werror=missing-prototypes',
                '-Werror=implicit-function-declaration',
                '-Werror=missing-declarations',
                '-Werror=return-type',
                '-Werror=incompatible-pointer-types',
                '-Werror=format=2',
-               '-Wredundant-decls',
-               '-Wmissing-noreturn',
-               '-Wshadow',
-               '-Wendif-labels',
-               '-Wstrict-aliasing=2',
-               '-Wwrite-strings',
-               '-Werror=overflow',
-               '-Wdate-time',
-               '-fno-common',
                '-fdiagnostics-show-option',
                '-fvisibility=hidden',
                '-fstack-protector',
                '-fstack-protector-strong',
+               '-fPIC',
                '-fPIE',
-               '--param=ssp-buffer-size=4',
               ]
         if cxx.has_argument(arg)
                 add_project_arguments(arg, language : 'cpp')
@@ -152,8 +138,7 @@ endif
 #####################################################################
 # compilation result tests
 
-#conf.set('_GNU_SOURCE', true)
-#conf.set('__SANE_USERSPACE_TYPES__', true)
+conf.set('__SANE_USERSPACE_TYPES__', true)
 
 decl_headers = '''
 #include <cuchar>

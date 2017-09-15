@@ -115,6 +115,7 @@
 		<Unit filename="../src/random/meson.build" />
 		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
 		<Unit filename="../src/wavecolor/CWaveColor.h" />
+		<Unit filename="../test/generate-sym-test.py" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -45,7 +45,7 @@ namespace pwx
   * <LI>Both doRenumber and eCount are mutable and need no const_cast</LI>
   * </UL>
 **/
-class VContainer : public CLockable
+class PWX_API VContainer : public CLockable
 {
 public:
 	/* ===============================================

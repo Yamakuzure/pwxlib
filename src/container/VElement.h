@@ -54,7 +54,7 @@ class CThreadElementStore;
   * <LI>eNr needs no const_cast, it is mutable.</LI>
   * </UL>
 **/
-class VElement : public CLockable
+class PWX_API VElement : public CLockable
 {
 public:
 
