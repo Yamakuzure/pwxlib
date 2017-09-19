@@ -4,29 +4,66 @@
 
 /** @file pwx.h
   *
-	* @brief Main include file for the complete pwx library
-	*
-	* This is a "catch-all" include file that simply adds everything there
-	* is. It is not necessary to include anything else for the library to
-	* be fully usable.
-	*
-  * (c) 2007 - 2013 PrydeWorX
+  * @brief Main include file for the PrydeWorX library
+  *
+  * This include file adds all necessary includes to make the pwxLib workers
+  * available. These workers are:
+  * <TABLE border='1'>
+  * <TR><TH>Worker</TH><TH>Task</TH><TH>Include file</TH></TR>
+  * <TR><TD>PAH</TD><TD>Handle arguments to, and help texts from a program.</TD>
+  *   <TD>CArgHandler.h</TD></TR>
+  * <TR><TD>RNG</TD><TD>Thread safe random number, random names, noise, simplex
+  *   noise and hash generation.</TD><TD>CRandom.h</TD></TR>
+  * <TR><TD>SCT</TD><TD>Provides sine/cosine tables of variable precision</TD>
+  *   <TD>CSinCosTable.h</TD></TR>
+  * </TABLE>
+  *
+  * Further include files you might be interested in and the respective classes
+  * and templates they provide, are:
+  *
+  * <TABLE border='1'>
+  * <TR><TH>Class/Template</TH><TH>Task</TH><TH>Include file</TH></TR>
+  * <TR><TD>CHashBuilder</TD><TD>Class to get the hash of a value of variable
+  *   type, available as a functor. </TD><TD>CHashBuilder.h</TD></TR>
+  * <TR><TD>CWaveColor</TD><TD>Convert light waves in RGB values and vice versa.
+  *   </TD><TD>CWaveColor.h</TD></TR>
+  * <TR><TD>TChainHash</TD><TD>Thread safe chained hash table.</TD>
+  *   <TD>TChainHash.h</TD></TR>
+  * <TR><TD>TDoubleList</TD><TD>Thread safe doubly linked list.</TD>
+  *   <TD>TDoubleList.h</TD></TR>
+  * <TR><TD>TDoubleRing</TD><TD>Thread safe doubly linked ring.</TD>
+  *   <TD>TDoubleRing.h</TD></TR>
+  * <TR><TD>TOpenHash</TD><TD>Thread safe open hash with optional robin hood
+  *    insertion.</TD><TD>TOpenHash.h</TD></TR>
+  * <TR><TD>TQueue</TD><TD>Thread safe 'queue' container (FiFo).</TD>
+  *    <TD>TQueue.h</TD></TR>
+  * <TR><TD>TSet</TD><TD>Thread safe 'set' container (unique items).</TD>
+  *    <TD>TSet.h</TD></TR>
+  * <TR><TD>TSingleList</TD><TD>Thread safe singly linked list.</TD>
+  *   <TD>TSingleList.h</TD></TR>
+  * <TR><TD>TSingleRing</TD><TD>Thread safe singly linked ring.</TD>
+  *   <TD>TSingleRing.h</TD></TR>
+  * <TR><TD>TStack</TD><TD>Thread safe 'stack' container (FiLo).</TD>
+  *    <TD>TStack.h</TD></TR>
+  * </TABLE>
+  *
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
-  *         yamakuzure@users.sourceforge.net
-  *         http://pwxlib.sourceforge.net
+  *		 yamakuzure@users.sourceforge.net
+  *		 http://pwxlib.sourceforge.net
   *
-  *  This program is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  * The PrydeWorX Library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of the
+  * License, or (at your option) any later version.
   *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  * The PrydeWorX Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * You should have received a copy of the GNU Lesser General Public License
+  * along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
   *
   @verbatim
   * History and Changelog:
@@ -68,25 +105,16 @@
 **/
 
 
-#include "CSinCosTable.h"
-#include "CRandom.h"
-#include "TChainHash.h"
-#include "TDoubleList.h"
-#include "TDoubleRing.h"
-#include "TOpenHash.h"
-#include "TSet.h"
-#include "TSingleList.h"
-#include "TSingleRing.h"
-#include "TStack.h"
 #include "CArgHandler.h"
-#include "CWaveColor.h"
+#include "CRandom.h"
+#include "CSinCosTable.h"
 
 
 namespace pwx {
 
 
 /// @brief Global argument handler that can be used centrally in any project
-extern PWX_API CArgHandler  PAH; // [P]wxlib [A]rgument [H]andler
+extern PWX_API CArgHandler  PAH; // [P]rogram [A]rgument [H]andler
 
 /// @brief Global random value generator that can be used centrally in any project
 extern PWX_API CRandom      RNG; // [R]andom [N]-Value [G]enerator
