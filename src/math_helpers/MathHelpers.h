@@ -10,23 +10,23 @@
   * that can be read here:
   * http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
   *
-  * (c) 2007 - 2013 PrydeWorX
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net
   *
-  *  This program is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  * The PrydeWorX Library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of the
+  * License, or (at your option) any later version.
   *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  * The PrydeWorX Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * You should have received a copy of the GNU Lesser General Public License
+  * along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
   *
   * History and Changelog are maintained in pwx.h
 **/
@@ -42,8 +42,7 @@
 #include "macros.h"
 
 
-namespace pwx
-{
+namespace pwx {
 
 
 /* floating types unions
@@ -167,12 +166,12 @@ struct sFloatPoint<long double>
  * === Functions that compare floating type values ===
  * ===================================================
 */
-bool areAlmostEqual(const float lhs, const float rhs) noexcept;
-bool areAlmostEqual(const double lhs, const double rhs) noexcept;
-bool areAlmostEqual(const long double lhs, const long double rhs) noexcept;
+bool PWX_API areAlmostEqual(const float lhs, const float rhs) noexcept;
+bool PWX_API areAlmostEqual(const double lhs, const double rhs) noexcept;
+bool PWX_API areAlmostEqual(const long double lhs, const long double rhs) noexcept;
 // template dummy to enable areAlmostEqual() to be used with type_traits conditions
 template<typename T>
-bool areAlmostEqual(const T &lhs, const T &rhs) noexcept
+bool PWX_API areAlmostEqual(const T &lhs, const T &rhs) noexcept
 {
 	return lhs == rhs;
 }
@@ -194,7 +193,7 @@ bool areAlmostEqual(const T &lhs, const T &rhs) noexcept
  * This method returns the distance between two points.
 **/
 template<typename T>
-inline T absDistance(const T x1, const T y1, const T x2, const T y2)
+inline T PWX_API absDistance(const T x1, const T y1, const T x2, const T y2)
 {
   if (isIntType(T) || isFloatType(T))
     // Do nothing if this isn't a type we can calculate with
@@ -217,8 +216,8 @@ inline T absDistance(const T x1, const T y1, const T x2, const T y2)
  * This method returns the distance between two points.
 **/
 template<typename T>
-inline T absDistance(const T x1, const T y1, const T z1,
-                     const T x2, const T y2, const T z2)
+inline T PWX_API absDistance(const T x1, const T y1, const T z1,
+                             const T x2, const T y2, const T z2)
 {
   if (isIntType(T) || isFloatType(T))
     // Do nothing if this isn't a type we can calculate with
@@ -242,7 +241,7 @@ inline T absDistance(const T x1, const T y1, const T z1,
   * @return the resulting radiant as a double
   *
 **/
-template<typename T> double degToRad(T degree)
+template<typename T> double PWX_API degToRad(T degree)
 {
 	return (static_cast<double>(degree) * M_PIl / 180.);
 }
@@ -265,7 +264,7 @@ template<typename T> double degToRad(T degree)
   * @return the equivalent degree in a range between 0 and 360 as a double
   *
 **/
-template<typename T> double getNormalizedDegree(const T degree)
+template<typename T> double PWX_API getNormalizedDegree(const T degree)
 {
 	double result = static_cast<double>(degree);
 

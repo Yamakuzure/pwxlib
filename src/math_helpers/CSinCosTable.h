@@ -5,23 +5,23 @@
   *
   * @brief Declaration of CSinCosTables
   *
-  * (c) 2007 - 2013 PrydeWorX
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net
   *
-  *  This program is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  * The PrydeWorX Library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of the
+  * License, or (at your option) any later version.
   *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  * The PrydeWorX Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * You should have received a copy of the GNU Lesser General Public License
+  * along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
   *
   * History and Changelog are maintained in pwx.h
 **/
@@ -39,7 +39,7 @@ namespace pwx {
   *
   * <I>Note</I>: If you want the initial precision to be anything
   * else than the default of -1, define PWX_INITIAL_SCT_PRECISION
-  * to the desired value before compiling pwxlib.
+  * to the desired value when compiling pwxlib.
   *
   * Calculating sine and cosine values does not take much time
   * nowadays as FPUs get stronger every other day. On the other
@@ -58,14 +58,14 @@ namespace pwx {
   * The default precision, however, is -1. There will be no
   * pre-defined tables, but all sine and cosine values calculated
   * on-the-fly. You still do not have to care about the range of
-  * your angles, and do not need to transform angles to radiants
+  * your angles, and do not need to transform angles to radians
   * though.
   *
   * Usage:
   *
   * sin() - return the sine of a given angle.
   * cos() - return the cosine of a given angle.
-  * sincos() - get bot at once.
+  * sincos() - get both at once.
   * setPrecision() - set a new precision. (Default is 3)
   *                  set this to -1 to enable life calculation.
   * getPrecision() - get the current precision.
