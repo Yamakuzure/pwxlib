@@ -1,4 +1,27 @@
+/***
+  This file is part of the PrydeWorX Library (pwxLib).
+
+  Copyright 2007 - 2017 Sven Eden
+
+  The PrydeWorX Library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of the
+  License, or (at your option) any later version.
+
+  The PrydeWorX Library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
+
+  History and Changelog are maintained in pwx.h
+***/
+
+
 #include "CWaveColor.h"
+
 
 namespace pwx {
 
@@ -789,7 +812,7 @@ void CWaveColor::modFrequency(int32_t index, double modifier) noexcept
 
 	if (elem)
 		(**elem).wavelength /= modifier;
-		/* Note to self: It is not neccessary to really modify the frequency,
+		/* Note to self: It is not necessary to really modify the frequency,
 		 *               As it is just a reversal of a wavelength modification:
 		 * f = l/w, w = l/f
 		 * be f*m = (l*m)/w then
