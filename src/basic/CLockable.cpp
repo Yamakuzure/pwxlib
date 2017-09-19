@@ -1,7 +1,34 @@
-#include "CLockable.h"
+/***
+  This file is part of the PrydeWorX Library (pwxLib).
 
-namespace pwx
-{
+  Copyright 2007 - 2017 Sven Eden
+
+  The PrydeWorX Library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of the
+  License, or (at your option) any later version.
+
+  The PrydeWorX Library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
+
+  History and Changelog are maintained in pwx.h
+***/
+
+
+#include <thread>
+
+#include "CLockable.h"
+#include "debug.h"
+#include "macros.h"
+
+
+namespace pwx {
+
 
 /* -----------------------------------------------------------------------------------------------------
  * --- Some notes about the private members:                                                         ---
@@ -11,15 +38,15 @@ namespace pwx
  * ---                 so any change must be in release memory order.                                ---
  * --- CL_Is_Locked    This is set by lock() and try_lock() to true, and false by unlock(). This is  ---
  * ---                 of no interest to the internal methods. But any thread might check this value ---
- * ---                 from anywhere anytime. It is therefore inevitable to store in relase and to   ---
+ * ---                 from anywhere anytime. It is therefore inevitable to store in release and to  ---
  * ---                 load in acquire memory order.                                                 ---
- * --- CL_Lock         The lock, if using a spinlock, mut be cleared in relase memory order to be    ---
+ * --- CL_Lock         The lock, if using a spinlock, must be cleared in release memory order to be  ---
  * ---                 sure that a waiting thread does not waste a cycle by a superfluous yield().   ---
  * --- CL_Lock_Count   This is a value that is only used by the currently owning thread. There is no ---
- * ---                 reason why any acces shouldn't be in relaxed memory order.                    ---
+ * ---                 reason why any access shouldn't be in relaxed memory order.                   ---
  * --- CL_Thread_ID    The same applies for the stored thread id. Whether a thread sets it to its own---
  * ---                 id during locking, or sets it to 0x0 during unlocking, it will always be      ---
- * ---                 different to not woning threads.                                              ---
+ * ---                 different to not owning threads.                                              ---
  * --- About memOrdLoad and memOrdStore:                                                             ---
  * --- As the memory order is an enum, that can be used directly, both should not be used inside the ---
  * --- implementation, unless it would require to question CL_Do_Locking otherwise. It does mean     ---

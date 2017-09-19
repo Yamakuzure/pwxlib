@@ -26,9 +26,13 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+
+#include <cstring>
+
 #include "CException.h"
 #include "macros.h"
 #include "templates.h"
+
 
 namespace pwx {
 

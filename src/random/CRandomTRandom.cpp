@@ -1,3 +1,6 @@
+
+#include <atomic>
+
 #include "CRandomTRandom.h"
 
 

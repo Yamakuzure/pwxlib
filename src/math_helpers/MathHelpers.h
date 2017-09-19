@@ -31,13 +31,16 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "compiler.h"
-#include "macros.h"
 
+#include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
-#include <cassert>
+#include <type_traits>
+
+#include "compiler.h"
+#include "macros.h"
+
 
 namespace pwx
 {

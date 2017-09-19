@@ -28,9 +28,12 @@
   * History and Changelog are maintained in pwx.h
 **/
 
+
+#include <atomic>
 #include <random>
 
 #include "MathHelpers.h"
+
 
 namespace pwx {
 

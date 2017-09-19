@@ -27,6 +27,8 @@
 **/
 
 
+#include <cstring>
+
 #include "CException.h"
 #include "macros.h"
 #include "VArgTargetBase.h"

@@ -20,9 +20,11 @@
 ***/
 
 
-#include "macros.h"
+#include <cstring>
+
 #include "CArgCallback.h"
 #include "CException.h"
+#include "macros.h"
 
 
 namespace pwx {

@@ -27,8 +27,12 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "VElement.h"
+
+#include "CException.h"
+#include "debug.h"
 #include "MathHelpers.h"
+#include "VElement.h"
+
 
 namespace pwx
 {

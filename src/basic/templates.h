@@ -6,28 +6,30 @@
   *
   * @brief Helper templates and macros for various little issues
   *
-  * (c) 2007 - 2013 PrydeWorX
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
-  *         yamakuzure@users.sourceforge.net
-  *         http://pwxlib.sourceforge.net
+  *		 yamakuzure@users.sourceforge.net
+  *		 http://pwxlib.sourceforge.net
   *
-  *  This program is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  * The PrydeWorX Library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of the
+  * License, or (at your option) any later version.
   *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  * The PrydeWorX Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * You should have received a copy of the GNU Lesser General Public License
+  * along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
   *
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <type_traits>
+
+#include "compiler.h"
+
 
 /** @namespace pwx
   *
@@ -42,11 +44,10 @@
   * The library instantiates standard 'workers' for various tasks. There is a
   * central worker <I>RNG</I> that is used for thread safe random number, random
   * names and hash generation. <I>SCT</I> is a simple object providing sine/cosine
-  * tables of variable precision. <I>DCF</I> is used to generate and manage data
-  * containers of variable types. <I>PAH</I> is the program argument handler that
+  * tables of variable precision.<I>PAH</I> is the program argument handler that
   * can be used to handle arguments to, and help texts from a program. Finally
   * <I>CFH</I> is a handler for configuration files of various styles like 'shell'
-  * or 'ini'.</LI>
+  * or 'ini'.<BR /><I>Note</I>: <I>CFH</I> has not been imported, yet!</LI>
   * <LI>Thread safety<br />
   * Basically there are three basic principles on how to handle multi threaded
   * environments:
@@ -116,8 +117,10 @@
   * that is thread safe.</LI></UL>
   * </OL>
 **/
-namespace pwx
-{
+
+
+namespace pwx {
+
 
 /** @brief compile time assertion
   *

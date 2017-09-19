@@ -1,3 +1,11 @@
+
+#include <cassert>
+#include <cmath>
+#include <cstring>
+#include <string>
+
+#include "compiler.h"
+#include "debug.h"
 #include "macros.h"
 #include "StreamHelpers.h"
 #include "CRandom.h"
@@ -5,10 +13,6 @@
 #include "CRandomTHash.h"
 #include "CRandomWordConstants.h"
 
-#include <string>
-#include <cstring>
-#include <cassert>
-#include <cmath>
 
 namespace pwx {
 

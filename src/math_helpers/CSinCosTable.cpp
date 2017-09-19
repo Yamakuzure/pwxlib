@@ -1,7 +1,10 @@
-#include "macros.h"
-#include "MathHelpers.h"
+#include "compiler.h"
+#include "debug.h"
+#include "CException.h"
 #include "CLockGuard.h"
 #include "CSinCosTable.h"
+#include "macros.h"
+#include "MathHelpers.h"
 
 namespace pwx {
 

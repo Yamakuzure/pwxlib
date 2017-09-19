@@ -33,6 +33,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <thread>
 
 #include "VContainer.h"
 #include "THashElement.h"

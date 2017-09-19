@@ -28,11 +28,16 @@
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "VElement.h"
-#include "MathHelpers.h"
 
-namespace pwx
-{
+#include <cstring>
+
+#include "CException.h"
+#include "debug.h"
+#include "MathHelpers.h"
+#include "VElement.h"
+
+
+namespace pwx {
 
 /** @struct THashElement
   *
