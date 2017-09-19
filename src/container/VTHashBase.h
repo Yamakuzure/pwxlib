@@ -6,44 +6,48 @@
   * @brief Virtual base class for hash containers
   *
   * This file consists of a base class template for the hash containers.
-  * It is not intended to be used singularily and is therefore virtual.
+  * It is not intended to be used singularly and is therefore virtual.
   * The common hash template does not include any collision resolving,
   * this is implemented in the respective hash table container.
   *
-  * (c) 2007 - 2013 PrydeWorX
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net
   *
-  *  This program is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  * The PrydeWorX Library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of the
+  * License, or (at your option) any later version.
   *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  * The PrydeWorX Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * You should have received a copy of the GNU Lesser General Public License
+  * along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
   *
   * History and Changelog are maintained in pwx.h
 **/
 
-#include <cmath>
+
 #include <cassert>
+#include <cmath>
 #include <thread>
 
-#include "VContainer.h"
-#include "THashElement.h"
+
 #include "CHashBuilder.h"
+#include "THashElement.h"
+#include "VContainer.h"
+
 
 namespace pwx {
 
+
 /// @brief Support macro to start growing a hastable only when it is save to do so
 #define HASH_START_GROW \
-++growing; \
+growing.fetch_add(1, memOrdStore); \
 PWX_LOCK_GUARD(this) \
 while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	std::this_thread::yield();
@@ -51,7 +55,7 @@ while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load
 
 /// @brief Support macro to stop growing a hastable
 #define HASH_STOP_GROW \
---growing; \
+growing.fetch_sub(1, memOrdStore); \
 PWX_LOCK_GUARD_RESET(nullptr)
 
 
@@ -60,12 +64,12 @@ PWX_LOCK_GUARD_RESET(nullptr)
 PWX_LOCK_GUARD(this) \
 while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
-++inserting;
+inserting.fetch_add(1, memOrdStore);
 
 
 /// @brief Support macro to stop inserting an element
 #define HASH_STOP_INSERT \
---inserting; \
+inserting.fetch_sub(1, memOrdStore); \
 PWX_LOCK_GUARD_RESET(nullptr)
 
 
@@ -74,12 +78,12 @@ PWX_LOCK_GUARD_RESET(nullptr)
 PWX_LOCK_GUARD(this) \
 while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
-++removing;
+removing.fetch_add(1, memOrdStore);
 
 
 /// @brief Support macro to stop removing an element
 #define HASH_STOP_REMOVE \
---removing; \
+removing.fetch_sub(1, memOrdStore); \
 PWX_LOCK_GUARD_RESET(nullptr)
 
 
@@ -98,13 +102,13 @@ while ( removing.load(memOrdLoad) \
 	||  growing.load(memOrdLoad) \
 	||  inserting.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
-++clearing; \
+clearing.fetch_add(1, memOrdStore); \
 PWX_LOCK_GUARD_RESET(nullptr)
 
 
 /// @brief Support macro to notifiy other threads that the container is cleared
 #define HASH_STOP_CLEAR \
---clearing;
+clearing.fetch_sub(1, memOrdStore);
 
 
 /** @brief two-type enum determining the hashing type
@@ -116,6 +120,7 @@ enum eChainHashMethod {
 	CHM_Division = 1,  //!< Use the division method
 	CHM_Multiplication //!< Use the multiplication method
 };
+
 
 /** @class VTHashBase
   *
@@ -1270,16 +1275,16 @@ protected:
 
 	using base_t::isDestroyed;
 
-	aui32_t          clearing = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
-	eChainHashMethod CHMethod = CHM_Division; //!< Which Hashing method is used
-	aui32_t          growing  = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
-	CHashBuilder	 hashBuilder; //!< instance that will handle the key generation
-	aui32_t          hashSize;    //!< number of places to maintain
-	elem_t**		 hashTable;   //!< the central array that is our hash
+	aui32_t          clearing  = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
+	eChainHashMethod CHMethod  = CHM_Division;       //!< Which Hashing method is used
+	aui32_t          growing   = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
+	CHashBuilder	 hashBuilder;                    //!< instance that will handle the key generation
+	aui32_t          hashSize;                       //!< number of places to maintain
+	elem_t**		 hashTable;                      //!< the central array that is our hash
 	aui32_t          inserting = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
-	aui32_t          removing = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
-	char*			 vacChar;     //!< alias pointer to get around the empty elem_t ctor restriction
-	elem_t*			 vacated;     //!< The Open Hash sets empty places to point at this.
+	aui32_t          removing  = ATOMIC_VAR_INIT(0); //!< Needed by the control macros
+	char*			 vacChar;                        //!< alias pointer to get around the empty elem_t ctor restriction
+	elem_t*			 vacated;                        //!< The Open Hash sets empty places to point at this.
 	// Note: vacated is placed here, so clear(), disable_thread_safety() and
 	//       enable_thread_safety() can be unified here as well. Otherwise
 	//       the hashes would need individual functions that only differ
@@ -1478,6 +1483,7 @@ private:
 	const double maxLoadFactor; //!< When the load factor reaches this, the table is grown.
 	const double dynGrowFactor; //!< When the table is automatically grown, it is grown by this factor.
 }; // class VTHashBase
+
 
 /** @brief default destructor
   *
