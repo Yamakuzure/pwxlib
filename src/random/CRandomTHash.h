@@ -7,39 +7,39 @@
   *
   * @brief definition of three little templates that do all the hash() handling
   *
-  * (c) 2007 - 2013 PrydeWorX
+  * (c) 2007 - 2017 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *		 yamakuzure@users.sourceforge.net
   *		 http://pwxlib.sourceforge.net
   *
-  *  This program is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  * The PrydeWorX Library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of the
+  * License, or (at your option) any later version.
   *
-  *  This program is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  * The PrydeWorX Library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * You should have received a copy of the GNU Lesser General Public License
+  * along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
   *
   * History and Changelog are maintained in pwx.h
 **/
 
-#include "compiler.h"
-#include "macros.h"
+
+#include <type_traits>
+
 #include "CRandomConstants.h"
+#include "macros.h"
 #include "MathHelpers.h"
 
-#include <cstdlib>
-#include <type_traits>
-#include <cmath>
 
 namespace pwx {
 
 namespace private_ {
+
 
 /* ================================================================================================
 Statistics with 10M Hashes (65535 for (u)int16_t) :
@@ -145,7 +145,7 @@ that to get integer representations.
    ------------+-------------+----------+-------------+----------+--------------------------------------
   Result: There wasn't much space above the previous results anyway. However, the new algorithm
           is slightly faster. And hopefully it will solve the massive secondary clustering  of
-          the open adressed hash container when using floating point keys.
+          the open addressed hash container when using floating point keys.
           (Although, why would anyone use floating point types for hash keys anyway?)
 
    ================================================================================================ */

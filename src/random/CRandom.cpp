@@ -1,3 +1,24 @@
+/***
+  This file is part of the PrydeWorX Library (pwxLib).
+
+  Copyright 2007 - 2017 Sven Eden
+
+  The PrydeWorX Library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation; either version 2.1 of the
+  License, or (at your option) any later version.
+
+  The PrydeWorX Library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with pwxLib; If not, see <http://www.gnu.org/licenses/>.
+
+  History and Changelog are maintained in pwx.h
+***/
+
 
 #include <cassert>
 #include <cmath>
@@ -5,16 +26,17 @@
 #include <string>
 
 #include "compiler.h"
+#include "CRandom.h"
+#include "CRandomTHash.h"
+#include "CRandomTRandom.h"
+#include "CRandomWordConstants.h"
 #include "debug.h"
 #include "macros.h"
 #include "StreamHelpers.h"
-#include "CRandom.h"
-#include "CRandomTRandom.h"
-#include "CRandomTHash.h"
-#include "CRandomWordConstants.h"
 
 
 namespace pwx {
+
 
 /* --------------------------------------- *
  * --- Private Methods Implementations --- *
@@ -32,7 +54,7 @@ void CRandom::checkRule (uint32_t &state, const char first, const char second, c
 	assert ( (one > -1) && (two > -1) && (three > -1)
 		&& "ERROR: checkRule() with at least one illegal character called!");
 
-	if ( ( (one == two) && (two == three)) // eleminate tripple threats
+	if ( ( (one == two) && (two == three)) // eliminate triple threats
 	  || (0 == (FUM_IDX_RULE(nst, one, two) & (1 << three)) ) ) {
 		// The desired character is not allowed to follow the set two chars
 		if (state & NameConstants::genNextIsCon)
@@ -293,7 +315,7 @@ int32_t CRandom::genSyllable (double &idx, double step, char * syll, uint32_t &s
 		genTries = 0;
 
 
-	// Finally cary on if we have genTries left, no tries left indicate failure.
+	// Finally carry on if we have genTries left, no tries left indicate failure.
 	if (genTries) {
 		// great!
 		state ^= NameConstants::genSyllEnd;
@@ -410,7 +432,7 @@ double CRandom::getSpx1D (double x) noexcept
 	spxDist[0][0] = x   - spxNorms[0];
 	spxDist[1][0] = 1.0 - spxDist[0][0];
 
-	// Permutated numbers, normalized to a range of 0 to 3
+	// Permuted numbers, normalized to a range of 0 to 3
 	spxGrads[0] = spxTab[spxPerms[0]]     % 4;
 	spxGrads[1] = spxTab[spxPerms[0] + 1] % 4;
 
@@ -464,7 +486,7 @@ double CRandom::getSpx2D (double x, double y) noexcept
 	spxDist[2][0] = spxDist[0][0] - 1.0 + (2.0 * constants::spxSkew[0][1]);
 	spxDist[2][1] = spxDist[0][1] - 1.0 + (2.0 * constants::spxSkew[0][1]);
 
-	// Permutated numbers, normalized to a range of 0 to 7
+	// Permuted numbers, normalized to a range of 0 to 7
 	spxGrads[0] = spxTab[spxPerms[0] + spxTab[spxPerms[1]]] % 8;
 	spxGrads[1] = spxTab[spxPerms[0] + spxOffs[0][0] + spxTab[spxPerms[1] + spxOffs[0][1]]] % 8;
 	spxGrads[2] = spxTab[spxPerms[0] + 1 + spxTab[spxPerms[1] + 1]] % 8;
@@ -588,7 +610,7 @@ double CRandom::getSpx3D (double x, double y, double z) noexcept
 	spxDist[3][1] = spxDist[0][1] - 1.0 + (3.0 * constants::spxSkew[1][1]);
 	spxDist[3][2] = spxDist[0][2] - 1.0 + (3.0 * constants::spxSkew[1][1]);
 
-	// Permutated numbers, normalized to a range of 0 to 11
+	// Permuted numbers, normalized to a range of 0 to 11
 	spxGrads[0] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2]]]] % 12;
 	spxGrads[1] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxOffs[0][2]] + spxOffs[0][1]] + spxOffs[0][0]] % 12;
 	spxGrads[2] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxOffs[1][2]] + spxOffs[1][1]] + spxOffs[1][0]] % 12;
@@ -650,7 +672,7 @@ double CRandom::getSpx4D (double x, double y, double z, double w) noexcept
 
 	// For the 4D case, the simplex is a 4D shape.
 	// The method below is a good way of finding the ordering of x,y,z,w and
-	// then find the correct traversal order for the simplex we’re in.
+	// then find the correct traversal order for the simplex we are in.
 	// First, six pair-wise comparisons are performed between each possible pair
 	// of the four coordinates, and the results are used to add up binary bits
 	// for an integer index.
@@ -703,7 +725,7 @@ double CRandom::getSpx4D (double x, double y, double z, double w) noexcept
 	spxDist[4][2] = spxDist[0][2] - 1.0 + (4.0 * constants::spxSkew[2][1]);
 	spxDist[4][3] = spxDist[0][3] - 1.0 + (4.0 * constants::spxSkew[2][1]);
 
-	// Permutated numbers, normalized to a range of 0 to 32
+	// Permuted numbers, normalized to a range of 0 to 32
 	spxGrads[0] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3]]]]] % 32;
 	spxGrads[1] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + spxOffs[0][3]] + spxOffs[0][2]] + spxOffs[0][1]] + spxOffs[0][0]] % 32;
 	spxGrads[2] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + spxOffs[1][3]] + spxOffs[1][2]] + spxOffs[1][1]] + spxOffs[1][0]] % 32;
