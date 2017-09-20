@@ -78,8 +78,8 @@ for line in open(sys.argv[1]):
 
         print("\t" + '''{''' + " (void*)\"{}\", ".format(fname), end='')
 
-        # Here we have the problem, that some functions are overloaded, and
-        # some others are templates.
+        # Here we have the problem, that some functions are overloaded,
+        # templated or both.
         # We want all overloads to get checked. But further, the compiler
         # needs to know which of the overload/template to use.
         if fname == "are_locked":
@@ -88,6 +88,25 @@ for line in open(sys.argv[1]):
             print("\t" + '''{''' + " (void*)\"{}\", ".format(fname), end='')
             print("(void*)static_cast<{0}(*)({1},{1},{1})>(&pwx::{2})".format(
                 "bool", "const pwx::CLockable*", fname) + ''' },''')
+        elif fname == "absDistance":
+            print("(void*)static_cast<{0}(*)({0},{0},{0},{0})>(&pwx::{1})".format(
+                "double", fname) + ''' },''')
+            print("\t" + '''{''' + " (void*)\"{}\", ".format(fname), end='')
+            print("(void*)static_cast<{0}(*)({0},{0},{0},{0},{0},{0})>(&pwx::{1})".format(
+                "double", fname) + ''' },''')
+        elif fname == "areAlmostEqual":
+            print("(void*)static_cast<{0}(*)({1},{1})>(&pwx::{2})".format(
+                "bool", "float", fname) + ''' },''')
+            print("\t" + '''{''' + " (void*)\"{}\", ".format(fname), end='')
+            print("(void*)static_cast<{0}(*)({1},{1})>(&pwx::{2})".format(
+                "bool", "double", fname) + ''' },''')
+            print("\t" + '''{''' + " (void*)\"{}\", ".format(fname), end='')
+            print("(void*)static_cast<{0}(*)({1},{1})>(&pwx::{2})".format(
+                "bool", "long double", fname) + ''' },''')
+        elif fname == "degToRad":
+            print("(void*)pwx::{}<double>,".format(fname) + ''' },''')
+        elif fname == "getNormalizedDegree":
+            print("(void*)pwx::{}<double>,".format(fname) + ''' },''')
         elif fname == "try_locks":
             print("(void*)static_cast<{0}(*)({1},{1})>(&pwx::{2})".format(
                 "bool", "const pwx::CLockable*", fname) + ''' },''')

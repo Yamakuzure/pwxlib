@@ -65,6 +65,10 @@ global:
         pwx::unlock_all;
 
         /* Templated functions */
+        pwx::absDistance;
+        pwx::areAlmostEqual;
+        pwx::degToRad;
+        pwx::getNormalizedDegree;
         pwx::set_difference;
         pwx::set_intersection;
         pwx::set_union;

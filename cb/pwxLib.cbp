@@ -34,6 +34,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../Makefile" />
+		<Unit filename="../build/test/test-libpwx-sym.cpp" />
 		<Unit filename="../configure" />
 		<Unit filename="../meson.build" />
 		<Unit filename="../meson_options.txt" />
