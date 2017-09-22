@@ -9,69 +9,72 @@
 
 LIBPWX_0_8_99 {
 global:
+    extern "C++" {
         /* Classes */
-        pwx::CAdjLeft;
-        pwx::CAdjRight;
-        pwx::CArgHandler;
-        pwx::CException;
-        pwx::CFormat;
-        pwx::CHashBuilder;
-        pwx::CLockable;
-        pwx::CLockGuard;
-        pwx::CRandom;
-        pwx::CSinCosTable;
-        pwx::CWaveColor;
+        pwx::CAdjLeft::*;
+        pwx::CAdjRight::*;
+        pwx::CArgHandler::*;
+        pwx::CException::*;
+        pwx::CFormat::*;
+        pwx::CHashBuilder::*;
+        pwx::CLockable::*;
+        pwx::CLockGuard::*;
+        pwx::CRandom::*;
+        pwx::CSinCosTable::*;
+        pwx::CWaveColor::*;
 
         /* Templates */
-        pwx::TChainHash;
-        pwx::TDoubleElement;
-        pwx::TDoubleList;
-        pwx::TDoubleRing;
-        pwx::THashElement;
-        pwx::TOpenHash;
-        pwx::TQueue;
-        pwx::TSet;
-        pwx::TSingleElement;
-        pwx::TSingleList;
-        pwx::TSingleRing;
-        pwx::TStack;
-        pwx::TVarDeleter;
+        pwx::TChainHash::*;
+        pwx::TDoubleElement::*;
+        pwx::TDoubleList::*;
+        pwx::TDoubleRing::*;
+        pwx::THashElement::*;
+        pwx::TOpenHash::*;
+        pwx::TQueue::*;
+        pwx::TSet::*;
+        pwx::TSingleElement::*;
+        pwx::TSingleList::*;
+        pwx::TSingleRing::*;
+        pwx::TStack::*;
+        pwx::TVarDeleter::*;
 
         /* Functions */
-        pwx::are_locked;
-        pwx::cropShell;
-        pwx::forwardTo;
-        pwx::ltrim;
-        pwx::makeTemp;
-        pwx::readNextValue;
-        pwx::rtrim;
-        pwx::skipLineBreak;
-        pwx::tabToSpace;
-        pwx::to_bool;
-        pwx::to_double;
-        pwx::to_int8;
-        pwx::to_int16;
-        pwx::to_int32;
-        pwx::to_int64;
-        pwx::to_float;
-        pwx::to_long_double;
-        pwx::to_string;
-        pwx::to_uint8;
-        pwx::to_uint16;
-        pwx::to_uint32;
-        pwx::to_uint64;
-        pwx::trim;
-        pwx::try_locks;
-        pwx::unlock_all;
+        pwx::are_locked*;
+        pwx::cropShell*;
+        pwx::debug_log*;
+        pwx::debug_err*;
+        pwx::forwardTo*;
+        pwx::ltrim*;
+        pwx::makeTemp*;
+        pwx::readNextValue*;
+        pwx::rtrim*;
+        pwx::skipLineBreak*;
+        pwx::tabToSpace*;
+        pwx::to_bool*;
+        pwx::to_double*;
+        pwx::to_int8*;
+        pwx::to_int16*;
+        pwx::to_int32*;
+        pwx::to_int64*;
+        pwx::to_float*;
+        pwx::to_long_double*;
+        pwx::to_string*;
+        pwx::to_uint8*;
+        pwx::to_uint16*;
+        pwx::to_uint32*;
+        pwx::to_uint64*;
+        pwx::trim*;
+        pwx::try_locks*;
+        pwx::unlock_all*;
 
         /* Templated functions */
-        pwx::absDistance;
-        pwx::areAlmostEqual;
-        pwx::degToRad;
-        pwx::getNormalizedDegree;
-        pwx::set_difference;
-        pwx::set_intersection;
-        pwx::set_union;
+        pwx::absDistance*;
+        pwx::areAlmostEqual*;
+        pwx::degToRad*;
+        pwx::getNormalizedDegree*;
+        pwx::set_difference*;
+        pwx::set_intersection*;
+        pwx::set_union*;
 
         /* Global workers */
         pwx::PAH;
@@ -79,8 +82,19 @@ global:
         pwx::RNG;
 
         /* Virtual Base Classes - will be skipped by test_libpwx_sym */
-        pwx::VContainer;
-        pwx::VElement;
+        pwx::VContainer::*;
+        pwx::VElement::*;
+
+        /* Private symbols, (visibility=hidden) that the other symbols */
+        /* might depend upon. Will be skipped by test_libpwx_sym */
+        pwx::private_::CThreadElementStore::*;
+
+        /* Type information and virtual tables - will be skipped by test_libpwx_sym */
+        typeinfo*for?pwx::*;
+        vtable*for?pwx::*;
+    };
 local:
+    extern "C++" {
        *;
+    };
 };

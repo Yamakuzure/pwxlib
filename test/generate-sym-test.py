@@ -10,7 +10,7 @@ for header in sys.argv[2:]:
 for line in open(sys.argv[1]):
 
     # Classes
-    match = re.search('^ +pwx::(C[a-zA-Z0-9_]+);', line)
+    match = re.search('^ +pwx::(C[a-zA-Z0-9_]+)[:;]', line)
     if match:
         cstr = match.group(1)
         print("\nstatic void test_{}(void) {}".format(cstr, "{"))
@@ -35,7 +35,7 @@ for line in open(sys.argv[1]):
         continue
 
     # Templates
-    match = re.search('^ +pwx::(T[a-zA-Z0-9_]+);', line)
+    match = re.search('^ +pwx::(T[a-zA-Z0-9_]+)[:;]', line)
     if match:
         tstr  = match.group(1)
         check = re.search('Hash', line)
@@ -69,10 +69,15 @@ void* functions[][2] = {''')
 
 for line in open(sys.argv[1]):
     # Functions
-    match = re.search('^ +pwx::([a-z][a-zA-Z0-9_]+);', line)
+    match = re.search('^ +pwx::([a-z][a-zA-Z0-9_]+)[*:;]', line)
 
     if match:
         fname = match.group(1)
+
+        # Skip members of the private_ sub namespace
+        if fname == "private_":
+            continue
+
         tofn  = re.search('^to_[a-z_0-9]+$', fname)
         setfn = re.search('^set_[a-z]+$', fname)
 
@@ -136,7 +141,7 @@ for line in open(sys.argv[1]):
 
 # Step three: Add global workers last to the array:
 for line in open(sys.argv[1]):
-    match = re.search('^ +pwx::(PAH|RNG|SCT);', line)
+    match = re.search('^ +pwx::(PAH|RNG|SCT)[:;]', line)
     if match:
         wname = match.group(1)
         print("\t" + '''{''' + " (void*)\"{}\", ".format(wname), end='')
@@ -146,7 +151,7 @@ for line in open(sys.argv[1]):
 # Step four : Call the test functions
 print("{};\n\nint main(void) {}".format("}", "{"))
 for line in open(sys.argv[1]):
-    match = re.search('^ +pwx::([CT][a-zA-Z0-9_]+);', line)
+    match = re.search('^ +pwx::([CT][a-zA-Z0-9_]+)[*:;]', line)
     if match:
         print("\ttest_{}();".format(match.group(1)))
 

@@ -102,7 +102,9 @@ public:
 	{ }
 
 
-	virtual ~CHashBuilder() noexcept;
+	/// @brief default dtor
+	virtual ~CHashBuilder() noexcept
+	{ }
 
 
 	/* ===============================================

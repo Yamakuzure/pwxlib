@@ -31,11 +31,6 @@ namespace pwx {
 extern CRandom RNG; // [R]andom [N]-Value [G]enerator
 
 
-/// @brief default dtor
-CHashBuilder::~CHashBuilder() noexcept
-{ }
-
-
 /** @brief get the current key length
   *
   * @return the currently set key length
