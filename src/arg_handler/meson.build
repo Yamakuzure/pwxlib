@@ -22,3 +22,10 @@ arg_headers = '''
 '''.split()
 
 libpwx_headers += files(arg_headers)
+
+libarghandler = static_library(
+        'arghandler',
+        arg_sources,
+        cpp_args : ['-DPWX_EXPORTS', '-fvisibility=default'],
+        include_directories : includes,
+        install : false)

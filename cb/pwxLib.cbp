@@ -58,8 +58,6 @@
 		<Unit filename="../src/basic/CLockGuard.h" />
 		<Unit filename="../src/basic/CLockable.cpp" />
 		<Unit filename="../src/basic/CLockable.h" />
-		<Unit filename="../src/basic/StreamHelpers.cpp" />
-		<Unit filename="../src/basic/StreamHelpers.h" />
 		<Unit filename="../src/basic/compiler.h" />
 		<Unit filename="../src/basic/debug.cpp" />
 		<Unit filename="../src/basic/debug.h" />
@@ -114,8 +112,12 @@
 		<Unit filename="../src/random/eNameSourceType.cpp" />
 		<Unit filename="../src/random/eNameSourceType.h" />
 		<Unit filename="../src/random/meson.build" />
+		<Unit filename="../src/stream_helpers/StreamHelpers.cpp" />
+		<Unit filename="../src/stream_helpers/StreamHelpers.h" />
+		<Unit filename="../src/stream_helpers/meson.build" />
 		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
 		<Unit filename="../src/wavecolor/CWaveColor.h" />
+		<Unit filename="../src/wavecolor/meson.build" />
 		<Unit filename="../test/generate-sym-test.py" />
 		<Extensions>
 			<code_completion />

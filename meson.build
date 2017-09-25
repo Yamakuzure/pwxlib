@@ -61,7 +61,6 @@ foreach arg : ['-Wextra',
                '-Werror=incompatible-pointer-types',
                '-Werror=format=2',
                '-fdiagnostics-show-option',
-               '-fvisibility=hidden',
                '-fstack-protector',
                '-fstack-protector-strong',
                '-fPIC',
@@ -180,13 +179,13 @@ if annotations
         debug = true
         conf.set('PWX_ANNOTATIONS', true)
 else
-	if yielding
-	        conf.set('PWX_USE_FLAGSPIN_YIELD', true)
-	        spinlocks = true
-	endif
+        if yielding
+                conf.set('PWX_USE_FLAGSPIN_YIELD', true)
+                spinlocks = true
+        endif
         if spinlocks
                 conf.set('PWX_USE_FLAGSPIN', true)
-	endif
+        endif
 endif
 
 if threaddebug
@@ -241,16 +240,20 @@ includes = include_directories('src/arg_handler',
                                'src/libpwx',
                                'src/math_helpers',
                                'src/random',
+                               'src/stream_helpers',
                                'src/wavecolor')
 
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
 libpwx_headers = []
+libpwx_internal_sources = []
+libpwx_external_sources = []
 
 subdir('src/basic')
 subdir('src/functions')
 subdir('src/math_helpers')
 subdir('src/random')
+subdir('src/stream_helpers')
 subdir('src/container')
 subdir('src/arg_handler')
 subdir('src/wavecolor')
@@ -259,21 +262,22 @@ subdir('src/libpwx')
 libpwx_sym_path = '@0@/@1@'.format(meson.current_source_dir(), libpwx_sym)
 libpwx = shared_library(
         'pwx',
-        basic_sources,
-        funcs_sources,
-        math_helpers_sources,
-        random_sources,
-        container_sources,
-        arg_sources,
-        wavecolor_sources,
         libpwx_internal_sources,
+        libpwx_external_sources,
         version : meson.project_version(),
         include_directories : includes,
-        cpp_args : ['-DPWX_EXPORTS'],
+        cpp_args : ['-DPWX_EXPORTS', '-fvisibility=hidden'],
         link_args : ['-shared',
                      '-Wl,--version-script=' + libpwx_sym_path],
         dependencies : [threads],
-        link_depends : libpwx_sym,
+        link_with : [
+                libarghandler,
+                libbasic,
+                libcontainer,
+                libmathhelpers,
+                librandom
+        ],
+        link_depends : [ libpwx_sym ],
         install : true,
         install_dir : libdir)
 
@@ -287,7 +291,7 @@ install_headers(
 public_programs = []
 
 subdir('test')
-#subdir('tools/drawwave')
+#subdir('tools')
 #subdir('doc')
 
 ############################################################

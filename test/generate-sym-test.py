@@ -2,9 +2,13 @@
 import sys, re
 
 print('#include <cstdio>')
-print('#include <functional>')
 for header in sys.argv[2:]:
-    print('#include "{}"'.format(header.split('/')[-1]))
+    match = re.search('^.*/([^/]+)', header)
+    if match:
+        hfile = match.group(1)
+        check = re.search('fwd', hfile)
+        if not check:
+            print('#include "{}"'.format(header.split('/')[-1]))
 
 # Step one : Generate test functions
 for line in open(sys.argv[1]):

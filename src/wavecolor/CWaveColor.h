@@ -36,7 +36,7 @@ namespace pwx {
 /** @struct sWave
   * @brief tiny and simple struct to store wavelengths and their gamma
 **/
-struct sWave
+struct PWX_API sWave
 {
 	double gamma      = 0.0; //!< Specific gamma value derived out of the source RGB
 	double wavelength = 0.0; //!< The wavelength in nanometers
