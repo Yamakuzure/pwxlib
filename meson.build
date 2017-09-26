@@ -66,6 +66,7 @@ foreach arg : ['-Wextra',
                '-fstack-protector-strong',
                '-fPIC',
                '-fPIE',
+               '-fexceptions'
               ]
         if cxx.has_argument(arg)
                 add_project_arguments(arg, language : 'cpp')
@@ -106,18 +107,19 @@ foreach arg : ['-Wl,-z,relro',
               ]
 
         have = run_command(check_compilation_sh,
-                           cxx.cmd_array(), '-x', 'cpp', arg,
-                           '-include', link_test_cxx).returncode() == 0
+                           cxx.cmd_array(), '-x', 'c++', arg,
+                           link_test_cxx).returncode() == 0
         message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
         if have
                 add_project_link_arguments(arg, language : 'cpp')
         endif
 endforeach
 
-if get_option('buildtype') != 'debug'
+buildtype = get_option('buildtype')
+
+if buildtype != 'debug' and buildtype != 'debugoptimized'
         foreach arg : ['-ffunction-sections',
-                       '-fdata-sections',
-                       '-fexceptions']
+                       '-fdata-sections']
                 if cxx.has_argument(arg,
                                    name : '@0@ is supported'.format(arg))
                         add_project_arguments(arg, language : 'cpp')
@@ -126,8 +128,8 @@ if get_option('buildtype') != 'debug'
 
         foreach arg : ['-Wl,--gc-sections']
                 have = run_command(check_compilation_sh,
-                                   cxx.cmd_array(), '-x', 'cpp', arg,
-                                   '-include', link_test_cxx).returncode() == 0
+                                   cxx.cmd_array(), '-x', 'c++', arg,
+                                   link_test_cxx).returncode() == 0
                 message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
                 if have
                         add_project_link_arguments(arg, language : 'cpp')
@@ -169,6 +171,12 @@ spinlocks   = get_option('spinlocks')
 threaddebug = get_option('threaddebug')
 yielding    = get_option('yielding')
 
+if buildtype != 'debug'
+        annotations = false
+        debug       = false
+        threaddebug = false
+endif
+
 if profile
         annotations = false
         debug       = false
@@ -205,8 +213,8 @@ if debug
                 endif
 
                 have = run_command(check_compilation_sh,
-                                   cxx.cmd_array(), '-x', 'c', arg,
-                                   '-include', link_test_cxx).returncode() == 0
+                                   cxx.cmd_array(), '-x', 'c++', arg,
+                                   link_test_cxx).returncode() == 0
                 message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
                 if have
                         add_project_link_arguments(arg, language : 'cpp')
