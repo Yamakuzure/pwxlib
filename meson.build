@@ -37,7 +37,8 @@ docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
 #####################################################################
 
 substs = configuration_data()
-substs.set('PACKAGE_URL',     'https://github.com/pwx/pwx')
+substs.set('PACKAGE_NAME',    meson.project_name())
+substs.set('PACKAGE_URL',     'https://pwxlib.sourceforge.net/')
 substs.set('PACKAGE_VERSION', meson.project_version())
 substs.set('prefix',          prefixdir)
 substs.set('exec_prefix',     prefixdir)
@@ -153,8 +154,9 @@ endforeach
 
 #####################################################################
 
-doxygen = find_program('doxygen', required : false)
-mkdir_p = 'mkdir -p $DESTDIR/@0@'
+doxygen     = find_program('doxygen', required : false)
+find_src_sh = find_program('meson/find_source.sh')
+mkdir_p     = 'mkdir -p $DESTDIR/@0@'
 
 ############################################################
 
@@ -233,15 +235,18 @@ config_h = configure_file(
         output : 'config.h',
         configuration : conf)
 
-includes = include_directories('src/arg_handler',
-                               'src/basic',
-                               'src/container',
-                               'src/functions',
-                               'src/libpwx',
-                               'src/math_helpers',
-                               'src/random',
-                               'src/stream_helpers',
-                               'src/wavecolor')
+include_paths = '''
+        src/arg_handler
+        src/basic
+        src/container
+        src/functions
+        src/libpwx
+        src/math_helpers
+        src/random
+        src/stream_helpers
+        src/wavecolor
+'''.split()
+includes = include_directories(include_paths)
 
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
@@ -292,7 +297,10 @@ public_programs = []
 
 subdir('test')
 #subdir('tools')
-#subdir('doc')
+
+if doxygen.found()
+        subdir('doc')
+endif
 
 ############################################################
 

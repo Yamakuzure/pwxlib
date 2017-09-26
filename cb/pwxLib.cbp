@@ -36,6 +36,8 @@
 		<Unit filename="../Makefile" />
 		<Unit filename="../build/test/test-libpwx-sym.cpp" />
 		<Unit filename="../configure" />
+		<Unit filename="../doc/doxyfile.in" />
+		<Unit filename="../doc/meson.build" />
 		<Unit filename="../meson.build" />
 		<Unit filename="../meson_options.txt" />
 		<Unit filename="../src/arg_handler/CArgCallback.cpp" />
