@@ -64,8 +64,12 @@ option('spinlocks', type : 'boolean', value : true,
 option('yielding', type : 'boolean', value : true,
        description : 'Let spinlocks yield when they can not lock. (Default: true, implies spinlocks=true)')
 
-option('doc', type : 'boolean', value : false,
-       description : 'Use doxygen to build HTML documentation (Default: false)')
+option('html', type : 'boolean', value : true,
+       description : 'Use doxygen to build HTML documentation (Default: true)')
+option('latex', type : 'boolean', value : false,
+       description : 'Use doxygen to build LaTeX documentation (Default: false)')
+option('man', type : 'boolean', value : false,
+       description : 'Use doxygen to build man pages (Default: false)')
 
 option('tools', type : 'boolean', value : true,
        description : 'Build tools utilizing pwxLib (Default: true)')
