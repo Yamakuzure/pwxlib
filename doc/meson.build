@@ -1,6 +1,5 @@
 want_html  = get_option('html')
 doxygen    = find_program('doxygen', required : want_html)
-finddox_sh = find_program('find_docs.sh')
 
 result  = run_command(find_src_sh)
 sources = result.stdout().strip().split('\n')
