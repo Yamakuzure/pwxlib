@@ -29,7 +29,7 @@ libpwx_headers += files(_basic_headers)
 libbasic = static_library(
         'basic',
         basic_sources,
-        cpp_args : ['-DPWX_EXPORTS', '-fvisibility=default'],
+        cpp_args : ['-DPWX_EXPORTS'],
         include_directories : includes,
         dependencies : [ threads ],
         install : false)

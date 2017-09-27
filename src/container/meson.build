@@ -44,6 +44,6 @@ libcontainer = static_library(
         'container',
         container_sources,
 	funcs_sources,
-        cpp_args : ['-DPWX_EXPORTS', '-fvisibility=default'],
+        cpp_args : ['-DPWX_EXPORTS'],
         include_directories : includes,
         install : false)

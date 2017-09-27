@@ -66,7 +66,8 @@ foreach arg : ['-Wextra',
                '-fstack-protector-strong',
                '-fPIC',
                '-fPIE',
-               '-fexceptions'
+               '-fexceptions',
+	       '-fvisibility=hidden'
               ]
         if cxx.has_argument(arg)
                 add_project_arguments(arg, language : 'cpp')
@@ -156,7 +157,6 @@ endforeach
 
 #####################################################################
 
-doxygen     = find_program('doxygen', required : false)
 find_src_sh = find_program('meson/find_source.sh')
 mkdir_p     = 'mkdir -p $DESTDIR/@0@'
 
@@ -279,7 +279,7 @@ libpwx = shared_library(
         libpwx_external_sources,
         version : meson.project_version(),
         include_directories : includes,
-        cpp_args : ['-DPWX_EXPORTS', '-fvisibility=hidden'],
+        cpp_args : ['-DPWX_EXPORTS'],
         link_args : ['-shared',
                      '-Wl,--version-script=' + libpwx_sym_path],
         dependencies : [threads],
@@ -305,10 +305,7 @@ public_programs = []
 
 subdir('test')
 #subdir('tools')
-
-if doxygen.found()
-        subdir('doc')
-endif
+subdir('doc')
 
 ############################################################
 

@@ -21,6 +21,6 @@ libpwx_headers += files(random_headers)
 librandom = static_library(
         'random',
         random_sources,
-        cpp_args : ['-DPWX_EXPORTS', '-fvisibility=default'],
+        cpp_args : ['-DPWX_EXPORTS'],
         include_directories : includes,
         install : false)

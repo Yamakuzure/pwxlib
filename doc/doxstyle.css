@@ -1,0 +1,75 @@
+/* Overrides for [section] titles. */
+
+body, table, div, p, dl {
+	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+	font-size: medium;
+}
+
+/* Ensure that <CODE> and <TT> text is as big as the <BODY> text and use a nicer font */
+code, tt {
+    font-family: Consolas, Courier, monospace;
+    font-size: medium;
+}
+
+/* Need this as <PRE> makes the text look smaller due to different font */
+pre {
+    font-size: 105%;
+}
+/* @group Heading Levels */
+
+h1 {
+	font-size: 160%;
+	font-weight: bold;
+	margin-top: 2.00em;
+	padding-left: 0.50em;
+	padding-top: 12px;
+	padding-bottom: 6px;
+	width: 100%;
+}
+
+h2 {
+	font-size: 140%;
+	font-weight: bold;
+	margin-top: 1.75em;
+	padding-left: 1.25em;
+	padding-top: 8px;
+	padding-bottom: 4px;
+	width: 100%;
+}
+
+h3 {
+	font-size: 133%;
+	font-weight: normal;
+	margin-top: 1.00em;
+	padding-left: 2.00em;
+	padding-top: 6px;
+	padding-bottom: 2px;
+	width: 100%;
+}
+
+.title {
+	font-size: 150%;
+	font-weight: bold;
+	margin: 10px 2px;
+}
+
+#projectname
+{
+	font: 220% Tahoma, Arial,sans-serif;
+	margin: 0px;
+	padding: 2px 0px;
+}
+
+#projectbrief
+{
+	font: 175% Tahoma, Arial,sans-serif;
+	margin: 0px;
+	padding: 0px;
+}
+
+#projectnumber
+{
+	font: 75% Tahoma, Arial,sans-serif;
+	margin: 0px;
+	padding: 0px;
+}
