@@ -66,7 +66,7 @@ if want_test
 			testSpeed.h
 			testStackQueue.h
 			testThreads.h'''.split())],
-		['manual'],
+		['automatic'],
 		[threads]]
 	]
 endif
@@ -77,7 +77,7 @@ if want_torture
 		[files('''
 			torture.cpp
 			torture.h'''.split())],
-		['manual'],
+		['automatic'],
 		[threads]]
 	]
 endif
