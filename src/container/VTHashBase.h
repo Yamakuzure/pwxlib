@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_BASE_VHASH_H_INCLUDED
 #define PWX_LIBPWX_PWX_BASE_VHASH_H_INCLUDED
 
-/** @file VHash.h
+/** @file VTHashBase.h
   *
   * @brief Virtual base class for hash containers
   *

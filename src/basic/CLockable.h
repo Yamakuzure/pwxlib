@@ -105,7 +105,7 @@ public:
 	*/
 
 #ifndef PWX_USE_FLAGSPIN
-	typedef std::mutex lock_t;
+	typedef std::mutex lock_t; //!< Use standard mutex if no spinlocks are used.
 #endif // !PWX_USE_FLAGSPIN
 
 

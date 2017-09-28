@@ -76,5 +76,5 @@ option('tests', type : 'boolean', value : false,
 option('install-tests', type : 'boolean', value : false,
        description : 'Install the pwxLib test programs (Default: false)')
 
-option('torture', type : 'boolean',
+option('torture', type : 'boolean', value : false,
        description : 'Build "torture", a multi threading container burner (Default: false)')

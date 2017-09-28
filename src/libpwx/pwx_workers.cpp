@@ -20,7 +20,7 @@
 ***/
 
 
-#include "pwx.h"
+#include "pwx_workers.h"
 
 
 #if !defined(PWX_INITIAL_SCT_PRECISION)

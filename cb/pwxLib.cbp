@@ -96,8 +96,13 @@
 		<Unit filename="../src/libpwx/libpwx.pc.in" />
 		<Unit filename="../src/libpwx/libpwx.sym" />
 		<Unit filename="../src/libpwx/meson.build" />
-		<Unit filename="../src/libpwx/pwx.cpp" />
 		<Unit filename="../src/libpwx/pwx.h" />
+		<Unit filename="../src/libpwx/pwx_basic.h" />
+		<Unit filename="../src/libpwx/pwx_containers.h" />
+		<Unit filename="../src/libpwx/pwx_helpers.h" />
+		<Unit filename="../src/libpwx/pwx_utils.h" />
+		<Unit filename="../src/libpwx/pwx_workers.cpp" />
+		<Unit filename="../src/libpwx/pwx_workers.h" />
 		<Unit filename="../src/math_helpers/CSinCosTable.cpp" />
 		<Unit filename="../src/math_helpers/CSinCosTable.h" />
 		<Unit filename="../src/math_helpers/MathHelpers.cpp" />
@@ -120,7 +125,36 @@
 		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
 		<Unit filename="../src/wavecolor/CWaveColor.h" />
 		<Unit filename="../src/wavecolor/meson.build" />
+		<Unit filename="../test/cluster_check.cpp" />
+		<Unit filename="../test/cluster_check.h" />
+		<Unit filename="../test/destroy.cpp" />
+		<Unit filename="../test/destroy.h" />
+		<Unit filename="../test/env.h" />
 		<Unit filename="../test/generate-sym-test.py" />
+		<Unit filename="../test/hash_builder.cpp" />
+		<Unit filename="../test/hash_builder.h" />
+		<Unit filename="../test/meson.build" />
+		<Unit filename="../test/namegen.cpp" />
+		<Unit filename="../test/testColor.cpp" />
+		<Unit filename="../test/testColor.h" />
+		<Unit filename="../test/testHash.h" />
+		<Unit filename="../test/testListRing.h" />
+		<Unit filename="../test/testPAH.cpp" />
+		<Unit filename="../test/testPAH.h" />
+		<Unit filename="../test/testRNG.cpp" />
+		<Unit filename="../test/testRNG.h" />
+		<Unit filename="../test/testRNG_func.cpp" />
+		<Unit filename="../test/testRNG_func.h" />
+		<Unit filename="../test/testSCT.cpp" />
+		<Unit filename="../test/testSCT.h" />
+		<Unit filename="../test/testSet.h" />
+		<Unit filename="../test/testSpeed.h" />
+		<Unit filename="../test/testStackQueue.h" />
+		<Unit filename="../test/testThreads.h" />
+		<Unit filename="../test/test_lib.cpp" />
+		<Unit filename="../test/test_lib.h" />
+		<Unit filename="../test/torture.cpp" />
+		<Unit filename="../test/torture.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -4,7 +4,7 @@
 
 /** @file macros.h
   *
-  * @brief preprocessor macros for general usage.
+  * @brief Preprocessor macros for general usage.
   *
   * Note: You have to include the appropriate (system) headers yourself
   *       when using any of these macros.

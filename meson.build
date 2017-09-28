@@ -23,6 +23,8 @@ if not prefixdir.startswith('/')
 endif
 bindir = join_paths(prefixdir, get_option('bindir'))
 libdir = join_paths(prefixdir, get_option('libdir'))
+testsdir = join_paths(libdir, 'pwx')
+
 sysconfdir = join_paths(prefixdir, get_option('sysconfdir'))
 includedir = join_paths(prefixdir, get_option('includedir'))
 datadir = join_paths(prefixdir, get_option('datadir'))
@@ -228,13 +230,6 @@ threads = dependency('threads')
 
 #####################################################################
 
-want_tests    = get_option('tests')
-install_tests = get_option('install-tests')
-
-if want_tests != 'true'
-        install_tests = 'false'
-endif
-
 tests = []
 
 #####################################################################
@@ -258,9 +253,11 @@ includes = include_directories(include_paths)
 
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
-libpwx_headers = []
-libpwx_internal_sources = []
-libpwx_external_sources = []
+libpwx_headers           = []
+libpwx_main_headers      = []
+libpwx_all_in_one_header = []
+libpwx_internal_sources  = []
+libpwx_external_sources  = []
 
 subdir('src/basic')
 subdir('src/functions')
@@ -295,6 +292,8 @@ libpwx = shared_library(
         install_dir : libdir)
 
 install_headers(
+        libpwx_main_headers)
+install_headers(
         libpwx_headers,
         subdir : 'pwx')
 
@@ -317,6 +316,32 @@ test_libpwx_sym = executable(
         install : false)
 test('test-libpwx-sym',
      test_libpwx_sym)
+
+############################################################
+
+foreach tuple : tests
+        name    = tuple[0]
+        sources = tuple[1]
+        type    = tuple[2]
+
+        exe = executable(
+                name,
+                sources,
+                include_directories : includes,
+                link_with : libpwx,
+                install_rpath : libdir,
+                install : install_tests,
+                install_dir : testsdir)
+
+        if type == 'manual'
+                message('@0@ is a manual test'.format(name))
+        else
+                test(name, exe,
+                        env : test_env,
+                        timeout : 30)
+        endif
+endforeach
+
 
 ############################################################
 

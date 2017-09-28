@@ -6,45 +6,53 @@
   *
   * @brief Main include file for the PrydeWorX library
   *
-  * This include file adds all necessary includes to make the pwxLib workers
-  * available. These workers are:
+  * This include file makes everything in the pwxLib available.
+  *
+  * As you most probably do not need everything, you might be better off
+  * including only the files you really need.
+  *
+  * The individual components of the library can be added by including:
+  *
   * <TABLE border='1'>
-  * <TR><TH>Worker</TH><TH>Task</TH><TH>Include file</TH></TR>
-  * <TR><TD>PAH</TD><TD>Handle arguments to, and help texts from a program.</TD>
+  * <TR><TH>Class/Template/Tools</TH><TH>Task</TH><TH>Include file</TH></TR>
+  * <TR><TD>Basics</TD><TD>Add basic functionality most parts use.</TD>
+  *   <TD>pwx_basic.h</TD></TR>
+  * <TR><TD>Containers</TD><TD>Add all container definitions currently provided.</TD>
+  *   <TD>pwx_containers.h</TD></TR>
+  * <TR><TD>Helpers</TD><TD>Add all helper classes and functions currently provided.</TD>
+  *   <TD>pwx_helpers.h</TD></TR>
+  * <TR><TD>Utilities</TD><TD>Add all utility classes and templates currently provided.</TD>
+  *   <TD>pwx_utils.h</TD></TR>
+  * <TR><TD>PAH, RNG, SCT</TD><TD>Make the worker instances available</TD>
+  *   <TD>pwx_workers.h</TD></TR>
+  * <TR><TD>CArgHandler</TD><TD>Make CArgHandler available, without instantiating PAH</TD>
   *   <TD>CArgHandler.h</TD></TR>
-  * <TR><TD>RNG</TD><TD>Thread safe random number, random names, noise, simplex
-  *   noise and hash generation.</TD><TD>CRandom.h</TD></TR>
-  * <TR><TD>SCT</TD><TD>Provides sine/cosine tables of variable precision</TD>
+  * <TR><TD>CRandom</TD><TD>Make CRandom available, without instantiating RNG</TD>
+  *   <TD>CRandom.h</TD></TR>
+  * <TR><TD>CSinCosTable</TD><TD>Make CSinCosTable available, without instantiating SCT</TD>
   *   <TD>CSinCosTable.h</TD></TR>
-  * </TABLE>
-  *
-  * Further include files you might be interested in and the respective classes
-  * and templates they provide, are:
-  *
-  * <TABLE border='1'>
-  * <TR><TH>Class/Template</TH><TH>Task</TH><TH>Include file</TH></TR>
   * <TR><TD>CHashBuilder</TD><TD>Class to get the hash of a value of variable
-  *   type, available as a functor. </TD><TD>CHashBuilder.h</TD></TR>
+  *   type, available as a functor. </TD><TD>pwx/CHashBuilder.h</TD></TR>
   * <TR><TD>CWaveColor</TD><TD>Convert light waves in RGB values and vice versa.
-  *   </TD><TD>CWaveColor.h</TD></TR>
+  *   </TD><TD>pwx/CWaveColor.h</TD></TR>
   * <TR><TD>TChainHash</TD><TD>Thread safe chained hash table.</TD>
-  *   <TD>TChainHash.h</TD></TR>
+  *   <TD>pwx/TChainHash.h</TD></TR>
   * <TR><TD>TDoubleList</TD><TD>Thread safe doubly linked list.</TD>
-  *   <TD>TDoubleList.h</TD></TR>
+  *   <TD>pwx/TDoubleList.h</TD></TR>
   * <TR><TD>TDoubleRing</TD><TD>Thread safe doubly linked ring.</TD>
-  *   <TD>TDoubleRing.h</TD></TR>
+  *   <TD>pwx/TDoubleRing.h</TD></TR>
   * <TR><TD>TOpenHash</TD><TD>Thread safe open hash with optional robin hood
-  *    insertion.</TD><TD>TOpenHash.h</TD></TR>
+  *    insertion.</TD><TD>pwx/TOpenHash.h</TD></TR>
   * <TR><TD>TQueue</TD><TD>Thread safe 'queue' container (FiFo).</TD>
-  *    <TD>TQueue.h</TD></TR>
+  *    <TD>pwx/TQueue.h</TD></TR>
   * <TR><TD>TSet</TD><TD>Thread safe 'set' container (unique items).</TD>
-  *    <TD>TSet.h</TD></TR>
+  *    <TD>pwx/TSet.h</TD></TR>
   * <TR><TD>TSingleList</TD><TD>Thread safe singly linked list.</TD>
-  *   <TD>TSingleList.h</TD></TR>
+  *   <TD>pwx/TSingleList.h</TD></TR>
   * <TR><TD>TSingleRing</TD><TD>Thread safe singly linked ring.</TD>
-  *   <TD>TSingleRing.h</TD></TR>
+  *   <TD>pwx/TSingleRing.h</TD></TR>
   * <TR><TD>TStack</TD><TD>Thread safe 'stack' container (FiLo).</TD>
-  *    <TD>TStack.h</TD></TR>
+  *    <TD>pwx/TStack.h</TD></TR>
   * </TABLE>
   *
   * (c) 2007 - 2017 PrydeWorX
@@ -105,25 +113,11 @@
 **/
 
 
-#include "CArgHandler.h"
-#include "CRandom.h"
-#include "CSinCosTable.h"
-
-
-namespace pwx {
-
-
-/// @brief Global argument handler that can be used centrally in any project
-extern PWX_API CArgHandler  PAH; // [P]rogram [A]rgument [H]andler
-
-/// @brief Global random value generator that can be used centrally in any project
-extern PWX_API CRandom      RNG; // [R]andom [N]-Value [G]enerator
-
-/// @brief Global sine-/cosine-table that can be used centrally in any project
-extern PWX_API CSinCosTable SCT; // [S]ine-/[C]osine-[T]able
-
-
-}
+#include "pwx_basic.h"
+#include "pwx_containers.h"
+#include "pwx_helpers.h"
+#include "pwx_utils.h"
+#include "pwx_workers.h"
 
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED

@@ -37,17 +37,18 @@
 namespace pwx {
 
 
-bool           PWX_API cropShell (const char *key, std::string &data)  noexcept;
-void           PWX_API forwardTo (std::ifstream &is, char value)       noexcept;
-void           PWX_API ltrim (std::string &text, char extra = 0x0) noexcept;
-const char     PWX_API *makeTemp (const char *aPath, const char *aTemplate,
-											const char *aSuffix, std::ofstream &ofs,
-											std::ios_base::openmode mode = std::ios_base::out |std::ios_base::trunc)
-											noexcept PWX_WARNUNUSED;
-void           PWX_API rtrim (std::string &text, char extra = 0x0)	noexcept;
-bool           PWX_API skipLineBreak (std::ifstream &is) noexcept PWX_WARNUNUSED;
-void           PWX_API tabToSpace (std::string &text, size_t spacePerTab = 1) noexcept;
-void           PWX_API trim (std::string &text, char extra = 0x0) noexcept;
+bool        PWX_API cropShell    (const char *key, std::string &data)  noexcept;
+void        PWX_API forwardTo    (std::ifstream &is, char value)       noexcept;
+void        PWX_API ltrim        (std::string &text, char extra = 0x0) noexcept;
+const char  PWX_API *makeTemp    (const char *aPath, const char *aTemplate,
+                                  const char *aSuffix, std::ofstream &ofs,
+                                  std::ios_base::openmode mode
+                                     = std::ios_base::out |std::ios_base::trunc)
+                                  noexcept PWX_WARNUNUSED;
+void        PWX_API rtrim        (std::string &text, char extra = 0x0)	noexcept;
+bool        PWX_API skipLineBreak(std::ifstream &is) noexcept PWX_WARNUNUSED;
+void        PWX_API tabToSpace   (std::string &text, size_t spacePerTab = 1) noexcept;
+void        PWX_API trim         (std::string &text, char extra = 0x0) noexcept;
 
 // --- Classes for stream manipulation ---
 
