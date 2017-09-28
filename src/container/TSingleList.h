@@ -203,7 +203,7 @@ public:
 	  */
 	void disable_thread_safety() noexcept
 	{
-		PWX_LOCK(this)
+		PWX_LOCK_OBJ(this)
 		this->do_locking(false);
 		this->currStore.disable_thread_safety();
 		elem_t* xCurr = head();
@@ -961,7 +961,7 @@ protected:
 			return nullptr;
 
 		// Rule 1: Lock for the basic tests.
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
 
 		// Exit if the list has been emptied while we waited for the lock
 		if (empty()) {
@@ -1037,7 +1037,7 @@ protected:
 			return nullptr;
 
 		// Rule 1
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
 
 		if (empty()) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
@@ -1223,11 +1223,11 @@ private:
 		 */
 		elem_t* xHead = nullptr;
 		if (size()) {
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			xHead = head();
 			while (xHead && (xHead->removed() || xHead->destroyed())) {
 				PWX_UNLOCK(this)
-				PWX_LOCK(this)
+				PWX_LOCK_OBJ(this)
 				xHead = head();
 			}
 			if (xHead && size()) {
@@ -1287,7 +1287,7 @@ private:
 
 		// It is necessary to lock briefly to ensure a consistent
 		// start of the search with a minimum of checks
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
 
 		uint32_t locCnt = size();
 
@@ -1453,7 +1453,7 @@ private:
 			PWX_LOCK(prevElement)
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK_OBJ(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
@@ -1492,7 +1492,7 @@ private:
 			PWX_LOCK(prev)
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK_OBJ(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
@@ -1561,7 +1561,7 @@ private:
 		if (prev) {
 			if (tail() == prev->getNext()) {
 				// This is possibility 2
-				PWX_LOCK(this)
+				PWX_LOCK_OBJ(this)
 				removed = prev->removeNext();
 				if (tail() == removed)
 					/* Reason for the lock and the double check:
@@ -1588,7 +1588,7 @@ private:
 			}
 		} else {
 			// This is possibility 1
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			// Same reason for the lock as above
 			removed = head();
 			if (removed) {
@@ -1602,7 +1602,7 @@ private:
 		// If something was removed, the count must be decreased:
 		if (removed) {
 			if (1 == eCount.fetch_sub(1, memOrdStore)) {
-				PWX_LOCK(this)
+				PWX_LOCK_OBJ(this)
 				// The list is empty. Or is it?
 				if (0 == eCount.load(memOrdLoad)) {
 					head(nullptr);

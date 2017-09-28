@@ -1314,7 +1314,7 @@ private:
 	virtual uint32_t privAdd(const elem_t &src)
 	{
 		// 1: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK_OBJ(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?

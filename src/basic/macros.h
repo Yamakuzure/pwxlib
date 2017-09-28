@@ -195,14 +195,36 @@
 #define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
 
 
-/** @brief Use object->lock if @a object is defined
+/** @brief Use object->lock if @a object is not nullptr
   *
   * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
 #define PWX_LOCK(object) { \
-	assert(object); \
+	if (nullptr != object) { \
+		(object)->lock(); \
+		LOG_LOCK(object) \
+	} \
+}
+
+
+/** @brief Use object->lock, @a object will be asserted
+  *
+  * The background for this slightly changed macro is gcc-7
+  * throwing out warnings if the address of a local value or
+  * the 'this'-pointer is used in a nonnull-comparison.
+  *
+  * If your compiler freaks out with PWX_LOCK(foo), and you
+  * are very certain that 'foo' can never be nullptr, then
+  * just use PWX_LOCK_OBJ(foo) instead.
+  *
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to lock.
+**/
+#define PWX_LOCK_OBJ(object) { \
+	assert (object); \
 	(object)->lock(); \
 	LOG_LOCK(object) \
 }

@@ -76,6 +76,15 @@ foreach arg : ['-Wextra',
         endif
 endforeach
 
+# "negative" arguments: gcc on purpose does not return an error for "-Wno-"
+# arguments, just emits a warnings. So test for the "positive" version instead.
+foreach arg : ['error=nonnull', # work-around for gcc 7.1 turning this on on its own
+              ]
+        if cxx.has_argument('-W' + arg)
+                add_project_arguments('-Wno-' + arg, language : 'cpp')
+        endif
+endforeach
+
 if cxx.compiles('
    #include <ctime>
    #include <cinttypes>

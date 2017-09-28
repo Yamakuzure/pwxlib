@@ -481,7 +481,7 @@ protected:
 			return nullptr;
 
 		// Rule 1: Lock for the basic tests.
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
 
 		// Exit if the list has been emptied while we waited for the lock
 		if (empty()) {
@@ -584,7 +584,7 @@ protected:
 			return nullptr;
 
 		// Rule 1
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
 
 		if (empty()) {
 			PWX_UNLOCK(const_cast<list_t*>(this))
@@ -823,7 +823,7 @@ private:
 
 		// It is necessary to lock briefly to ensure a consistent
 		// start of the search with a minimum of checks
-		PWX_LOCK(const_cast<list_t*>(this))
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
 
 		uint32_t locCnt = size();
 
@@ -1016,7 +1016,7 @@ private:
 			PWX_LOCK(nextElement)
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK_OBJ(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
@@ -1054,7 +1054,7 @@ private:
 			PWX_LOCK(next)
 
 		// 2: Check source:
-		PWX_LOCK(const_cast<elem_t*>(&src))
+		PWX_LOCK_OBJ(const_cast<elem_t*>(&src))
 
 		if (src.destroyed()) {
 			// What on earth did the caller think?
@@ -1098,7 +1098,7 @@ private:
 		*/
 		if (head() == elem) {
 			// Case 1
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			/* The reasons for the double check are the same as
 			 * with TsingleList::privRemoveNextElem()
 			 */
@@ -1108,7 +1108,7 @@ private:
 			PWX_UNLOCK(this)
 		} else if (tail() == elem) {
 			// Case 2:
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			if (tail() == elem)
 				tail(tail()->getPrev());
 			PWX_UNLOCK(this)
@@ -1119,7 +1119,7 @@ private:
 
 		if (1 == eCount.fetch_sub(1)) {
 			// The list is empty!
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			// Is it really?
 			if (0 == eCount.load(memOrdLoad)) {
 				curr(nullptr);

@@ -793,7 +793,7 @@ TDoubleElement<data_t>::~TDoubleElement() noexcept
 		if (beThreadSafe()) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE("PWX_LOCK", this, this)
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			// So the lock is only generated if there is a possibility
 			// that we have to delete data, but another thread might
 			// have made a copy in the mean time before "isDestroyed"

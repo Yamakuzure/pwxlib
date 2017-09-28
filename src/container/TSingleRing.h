@@ -563,10 +563,10 @@ private:
 		if (this->beThreadSafe()) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
-			PWX_LOCK(this)
+			PWX_LOCK_OBJ(this)
 			while (tail() && tail()->destroyed()) {
 				PWX_UNLOCK(this)
-				PWX_LOCK(this)
+				PWX_LOCK_OBJ(this)
 			}
 			// Now tail is either nullptr (ring is empty) or valid and locked.
 			if (tail() && (head() != tail()->getNext()))
