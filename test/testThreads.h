@@ -3,9 +3,8 @@
 #define PWX_LIBPWX_TEST_TESTTHREADS_H_INCLUDED
 
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
-#include <pwx/types/CLockable.h>
-#include <pwx/types/CException.h>
-#include <pwx/general/macros.h>
+#include "CLockable.h"
+#include "CException.h"
 
 
 using pwx::abool_t;

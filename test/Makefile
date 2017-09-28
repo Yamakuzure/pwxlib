@@ -36,6 +36,13 @@ INCDIR   = -I../src
 
 all: $(TARGET_hb) $(TARGET_tl)
 
+list:
+	@echo "SOURCES_cc: $(SOURCES_cc)"
+	@echo "SOURCES_hb: $(SOURCES_hb)"
+	@echo "SOURCES_ng: $(SOURCES_ng)"
+	@echo "SOURCES_tl: $(SOURCES_tl)"
+	@echo "SOURCES_to: $(SOURCES_to)"
+
 clustercheck: depend $(TARGET_cc)
 
 hashbuilder: depend $(TARGET_hb)

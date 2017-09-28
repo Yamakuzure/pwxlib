@@ -323,10 +323,12 @@ foreach tuple : tests
         name    = tuple[0]
         sources = tuple[1]
         type    = tuple[2]
+        deps    = tuple[3]
 
         exe = executable(
                 name,
                 sources,
+                dependencies : deps,
                 include_directories : includes,
                 link_with : libpwx,
                 install_rpath : libdir,

@@ -204,10 +204,11 @@ int32_t testHash (sEnv& env)
 			result = EXIT_FAILURE;
 		}
 
-	/***************************************************************************
-	** F) Remove elements 2,4 from the second, substract remaining from first **
-	**    (2->2.2, 4->4.4)                                                    **
-	***************************************************************************/
+		/***************************************************************************
+		** F) Remove elements 2,4 from the second, substract remaining from first **
+		**    (2->2.2, 4->4.4)                                                    **
+		** Note: This is the second part to E), so it is "in there".              **
+		***************************************************************************/
 		if (EXIT_SUCCESS == result) {
 			cout << adjRight (4, 0) << ++env.testCount << " F) Remove 2 elements from 2nd hash and substract : \n        ";
 
@@ -217,10 +218,8 @@ int32_t testHash (sEnv& env)
 			ifHash -= ifSecond;
 
 			// Now loop again, we should find the just removed elements 2 and 4
-			size_t maxCnt = ifHash.sizeMax();
-			size_t found  = 0;
-			bool   hasElem[5] = { false, false, false, false, false };
-			elem_t* curr;
+			found   = 0;
+			memset(hasElem, 0, sizeof(hasElem));
 
 			for (size_t i = 0; i < maxCnt; ++i) {
 				curr = ifHash[i];
@@ -252,7 +251,7 @@ int32_t testHash (sEnv& env)
 				result = EXIT_FAILURE;
 			}
 		}
-	} // Outer result check for second hash instance
+	} // End of outer guard at E)
 
 	cout << endl;
 	return result;

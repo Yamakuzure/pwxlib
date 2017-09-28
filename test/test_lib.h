@@ -2,17 +2,16 @@
 #ifndef PWX_LIBPWX_TEST_MAIN_H_INCLUDED
 #define PWX_LIBPWX_TEST_MAIN_H_INCLUDED 1
 
-#include <pwx.h>
-using pwx::adjLeft;
-using pwx::adjRight;
-
-
 #include <thread>
 #include <chrono>
 #include <iostream>
 using std::cout;
 using std::cerr;
 using std::endl;
+
+#include <pwx.h>
+typedef pwx::CAdjLeft  adjLeft;
+typedef pwx::CAdjRight adjRight;
 
 // The names are long, make them shorter:
 typedef std::chrono::high_resolution_clock hrClock;

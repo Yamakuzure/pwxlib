@@ -76,6 +76,14 @@ global:
         pwx::set_intersection*;
         pwx::set_union*;
 
+        /* Operators */
+        "pwx::operator<<(std::ostream&, pwx::CAdjLeft const&)";
+        "pwx::operator<<(std::ostream&, pwx::CAdjRight const&)";
+        "pwx::operator++(pwx::eNameSourceType&)";
+        "pwx::operator++(pwx::eNameSourceType&, int)";
+        "pwx::operator--(pwx::eNameSourceType&)";
+        "pwx::operator--(pwx::eNameSourceType&, int)";
+
         /* Global workers */
         pwx::PAH;
         pwx::SCT;

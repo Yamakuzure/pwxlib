@@ -114,10 +114,14 @@ public:
 	uint32_t    hash     (long double key) const noexcept;
 	uint32_t    hash     (const char* key, size_t keyLen = 0) const noexcept;
 	uint32_t    hash     (std::string &key) const noexcept;
+	eNameSourceType
+	            nextNST  (void) noexcept;
 	double      noise    (int32_t x) const noexcept;
 	double      noise    (int32_t x, int32_t y) const noexcept;
 	double      noise    (int32_t x, int32_t y, int32_t z) const noexcept;
 	double      noise    (int32_t x, int32_t y, int32_t z, int32_t w) const noexcept;
+	eNameSourceType
+	            prevNST  (void) noexcept;
 	int16_t     random   (int16_t max) noexcept;
 	int16_t     random   (int16_t min, int16_t max) noexcept;
 	uint16_t    random   (uint16_t max) noexcept;

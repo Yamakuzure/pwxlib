@@ -1,16 +1,16 @@
-#include <pwx.h>
-using pwx::RNG;
-using pwx::adjLeft;
-using pwx::adjRight;
-using pwx::to_int32;
-using pwx::to_string;
-
-typedef pwx::eNameSourceType nst_t;
-
 #include <iostream>
 using std::cout;
 using std::cerr;
 using std::endl;
+
+#include <pwx.h>
+using pwx::RNG;
+using pwx::to_int32;
+using pwx::to_string;
+
+typedef pwx::CAdjLeft  adjLeft;
+typedef pwx::CAdjRight adjRight;
+typedef pwx::eNameSourceType nst_t;
 
 static const int32_t ss_len = 14;
 static const int32_t sl_len = 21;
@@ -200,7 +200,7 @@ static void print_arg_err(const char* prog, const char* arg)
 
 static void print_help(const char* prog)
 {
-	cout << "Name Generator for libpwx-" << LIBPWX_VERSION << endl;
+	cout << "Name Generator for " << PACKAGE_STRING << endl;
 	cout << "----------------------------------" << endl;
 	cout << "Usage: " << prog << " <options>\n" << endl;
 	cout << "Options:" << endl;

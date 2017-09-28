@@ -2,10 +2,16 @@
 #ifndef PWX_LIBPWX_TEST_TORTURE_H_INCLUDED
 #define PWX_LIBPWX_TEST_TORTURE_H_INCLUDED 1
 
-#include <pwx.h>
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <limits>
+#include <thread>
+
+#include "CException.h"
+#include "CLockable.h"
+#include "macros.h"
+#include "pwx.h"
+#include "VContainer.h"
 
 using std::cout;
 using std::cerr;

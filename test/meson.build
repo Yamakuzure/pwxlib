@@ -27,18 +27,21 @@ if want_test
 		[files('''
 			cluster_check.cpp
 			cluster_check.h'''.split())],
-		['manual']],
+		['manual'],
+		[]],
 
 		[['test_hash'],
 		[files('''
 			hash_builder.cpp
 			hash_builder.h'''.split())],
-		['manual']],
+		['manual'],
+		[]],
 
 		[['test_name'],
 		[files('''
 			namegen.cpp'''.split())],
-		['manual']],
+		['manual'],
+		[]],
 
 		[['test_lib'],
 		[files('''
@@ -55,6 +58,7 @@ if want_test
 			testPAH.h
 			testRNG.cpp
 			testRNG.h
+			testRNG_func.cpp
 			testRNG_func.h
 			testSCT.cpp
 			testSCT.h
@@ -62,7 +66,8 @@ if want_test
 			testSpeed.h
 			testStackQueue.h
 			testThreads.h'''.split())],
-		['manual']]
+		['manual'],
+		[threads]]
 	]
 endif
 
@@ -72,6 +77,7 @@ if want_torture
 		[files('''
 			torture.cpp
 			torture.h'''.split())],
-		['manual']]
+		['manual'],
+		[threads]]
 	]
 endif

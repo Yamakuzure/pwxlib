@@ -966,6 +966,16 @@ uint32_t CRandom::hash (std::string &key) const noexcept
 }
 
 
+/** @brief Switches to the next [N]ame[S]ource[T]ype and returns that
+  *
+  * @return The next NST or the first, if the last was already set.
+**/
+eNameSourceType CRandom::nextNST(void) noexcept
+{
+	return ++nst;
+}
+
+
 /** @brief noise with one dimension
   *
   * This method calculates a noise value between -1.0 and 1.0 out of one integer
@@ -1033,6 +1043,16 @@ double CRandom::noise (int32_t x, int32_t y, int32_t z, int32_t w) const noexcep
 					+ (hash(z) & constants::halfMaxInt)
 					+ (hash(w) & constants::halfMaxInt)
 				   ) / constants::noiseMod));
+}
+
+
+/** @brief Switches to the previous [N]ame[S]ource[T]ype and returns that
+  *
+  * @return The previous NST or the last, if the first was already set.
+**/
+eNameSourceType CRandom::prevNST(void) noexcept
+{
+	return --nst;
 }
 
 

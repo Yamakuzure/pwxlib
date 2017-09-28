@@ -30,6 +30,9 @@
 **/
 
 
+#include "compiler.h"
+
+
 namespace pwx {
 
 
@@ -47,10 +50,10 @@ enum eNameSourceType {
 	NST_NUM_TYPES = 6  // End-of-list marker! No valid source type!
 };
 
-eNameSourceType &operator++(eNameSourceType &type);
-eNameSourceType operator++ (eNameSourceType &type, int);
-eNameSourceType &operator--(eNameSourceType &type);
-eNameSourceType operator-- (eNameSourceType &type, int);
+eNameSourceType PWX_API &operator++(eNameSourceType &type);
+eNameSourceType PWX_API  operator++(eNameSourceType &type, int);
+eNameSourceType PWX_API &operator--(eNameSourceType &type);
+eNameSourceType PWX_API  operator--(eNameSourceType &type, int);
 
 } // namespace pwx
 
