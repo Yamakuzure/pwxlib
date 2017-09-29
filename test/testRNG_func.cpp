@@ -16,7 +16,7 @@ void testRNG_hash_char(sEnv &env)
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < maxElements; ++i) {
+	for (size_t i = 0; i < maxHashVals; ++i) {
 		strLen = RNG.random(buf, 8, 17);
 		tStart = hrClock::now();
 		curHash = RNG.hash(buf, strLen);
@@ -52,7 +52,7 @@ void testRNG_hash_str(sEnv &env)
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < maxElements; ++i) {
+	for (size_t i = 0; i < maxHashVals; ++i) {
 		RNG.random(buf, 8, 17);
 		str.assign(buf);
 		tStart = hrClock::now();

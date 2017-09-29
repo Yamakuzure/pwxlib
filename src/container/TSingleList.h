@@ -421,6 +421,46 @@ public:
 	}
 
 
+	/** @brief insert a new data pointer at its sorted position
+	  *
+	  * This method inserts a new element in the list before the
+	  * first greater element.
+	  *
+	  * If you insert all elements using this method, the list will
+	  * be fully sorted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insert_sorted (data_t* data)
+	{
+		PWX_TRY_PWX_FURTHER(return privInsDataSorted(data))
+	}
+
+
+	/** @brief insert an element copy at its sorted position
+	  *
+	  * This method inserts a new element in the list before the
+	  * first greater element.
+	  *
+	  * If you insert all elements using this method, the list will
+	  * be fully sorted.
+	  *
+	  * If the new element can not be created, a pwx::CException with
+	  * the name "ElementCreationFailed" is thrown.
+	  *
+	  * @param[in] data the pointer that is to be added.
+	  * @return the number of elements in this list after the insertion
+	**/
+	virtual uint32_t insert_sorted (const elem_t &src)
+	{
+		PWX_TRY_PWX_FURTHER(return privInsElemSorted(src))
+	}
+
+
 	/** @brief insert a new data pointer after the specified data
 	  *
 	  * This method inserts a new element in the list after the element
@@ -1098,6 +1138,82 @@ protected:
 	}
 
 
+	/// @brief Search until the next element after curr has greater data content
+	virtual const elem_t* protFindGreaterNext (const data_t &data) const noexcept
+	{
+		elem_t* result = nullptr;
+
+		/* The same three rules as when searching for an
+		 * element via its pointer apply here, too.
+		 */
+
+		// Return at once if the list is empty
+		if (empty())
+			return nullptr;
+
+		// Rule 1
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
+
+		if (empty()) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr;
+		}
+
+		// Quick exit if curr->next is already what we want:
+		elem_t* xCurr = curr();
+		elem_t* xNext = xCurr->getNext(); // Note: xCurr can not be nullptr at this point.
+		int32_t comp  = xCurr->compare(data);
+		if ( (comp < 0)
+		  && ( (nullptr == xNext) || (xNext->compare(data) > -1) ) ) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return xNext ? xNext : nullptr;
+		}
+
+		// Quick exit if head is already greater...
+		elem_t* xHead = head();
+		if (xHead && (xHead->compare(data) > -1)) {
+			curr(xHead);
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return xHead;
+		}
+
+		// ...or tail is lower
+		elem_t* xTail = tail();
+		if (xTail && (xTail->compare(data) < 0)) {
+			curr(xTail);
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr; // tail is prev of nullptr by definition.
+		}
+
+		// Otherwise we have to search for it.
+		bool isDone = false;
+		if (comp > -1)
+			xCurr = xHead->getNext(); // head is already checked.
+
+		// Rule 2:
+		PWX_UNLOCK(const_cast<list_t*>(this))
+
+		while (!result && !isDone && xCurr && xNext) {
+			// Note: The container is not locked any more,
+			// locking and checks are done on element level
+			// by compare() then.
+			xNext = xCurr->getNext();
+			xTail = tail();
+			if (xNext->compare(data) > -1) {
+				result = xNext;
+				curr(xCurr);
+			} else if (xCurr == xTail) {
+				isDone = true; // result stays being nullptr
+				curr(xTail);
+			} else
+				// Be safe and use getNext() again.
+				xCurr = xCurr->getNext();
+		}
+
+		return result;
+	}
+
+
 	/** @brief simple method to insert an element into the list
 	  *
 	  * If either @a insPrev or @a insElem is marked as destroyed,
@@ -1437,6 +1553,26 @@ private:
 	}
 
 
+	/// @brief preparation method to insert data before the first greater element
+	virtual uint32_t privInsDataSorted(data_t* data)
+	{
+		// 1: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY(newElement = new elem_t (data, destroy))
+		catch(std::exception &e) {
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		if (!this->beThreadSafe())
+			newElement->disable_thread_safety();
+
+		// 2: Find the previous element the new one will become next of
+		const elem_t* prev = protFindGreaterNext(*data);
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(const_cast<elem_t*>(prev), newElement))
+	}
+
+
 	/// @brief preparation method to insert an element copy behind data
 	virtual uint32_t privInsElemBehindData(data_t* prev, const elem_t &src)
 	{
@@ -1520,6 +1656,37 @@ private:
 		if (prev)
 			PWX_UNLOCK(prev)
 		PWX_TRY_PWX_FURTHER(return protInsert(prev, newElement))
+	}
+
+
+	/// @brief preparation method to insert data before the first greater element
+	virtual uint32_t privInsElemSorted(const elem_t &src)
+	{
+		// 1: Check source:
+		PWX_LOCK_OBJ(const_cast<elem_t*>(&src))
+
+		if (src.destroyed()) {
+			// What on earth did the caller think?
+			PWX_UNLOCK(const_cast<elem_t*>(&src))
+			PWX_THROW("Illegal Condition", "Source element destroyed",
+					  "An element used as source for insertion is destroyed.")
+		}
+
+		// 2: Create a new element
+		elem_t* newElement = nullptr;
+		PWX_TRY(newElement = new elem_t (src))
+		catch(std::exception &e) {
+			PWX_THROW("ElementCreationFailed", e.what(), "The Creation of a new list element failed.")
+		}
+		PWX_UNLOCK(const_cast<elem_t*>(&src))
+		if (!this->beThreadSafe())
+			newElement->disable_thread_safety();
+
+		// 2: Find the previous element the new one will become next of
+		const elem_t* prev = protFindGreaterNext(*src);
+
+		// 3: Do the real insert
+		PWX_TRY_PWX_FURTHER(return protInsert(const_cast<elem_t*>(prev), newElement))
 	}
 
 

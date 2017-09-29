@@ -7,7 +7,7 @@
 
 /// @brief simple template to print the test description
 template<typename cont_t>
-int32_t printDescription(sEnv &env, uint32_t threadCount)
+int32_t printDescription(sEnv &env, uint32_t threadCount, bool sorted)
 {
 	cout << adjRight (4, 0) << ++env.testCount;
 	if (isSameType (cont_t, single_list_t))
@@ -35,9 +35,14 @@ int32_t printDescription(sEnv &env, uint32_t threadCount)
 
 	cout << "(" << adjRight(2,0) << threadCount << " thread";
 	if (threadCount > 1)
-		cout << "s)  ";
+		cout << "s; ";
 	else
-		cout << " )  ";
+		cout << " ; ";
+
+	if (sorted)
+		cout << "sorted) ";
+	else
+		cout << "pushed) ";
 
 	cout.flush();
 
@@ -56,6 +61,7 @@ int32_t printDescription(sEnv &env, uint32_t threadCount)
   * @param[in,out] values pointer to the values array to add. If *values is nullptr, the array will be created
   * @param[in,out] retrieves pointer to the array holding the values to search. If *retrieves is nullptr,
   * the array will be created
+  * @param[in] sorted tell the function that thAdd_t uses insert_sorted() instead of push()
   * @return EXIT_SUCCESS or EXIT_FAILURE.
 **/
 template<
@@ -65,7 +71,7 @@ template<
 	typename thAdd_t, //!< Type of the thread class that adds elements
 	typename thSrc_t, //!< Type of the thread class that searches for the retrieve values
 	typename thClr_t  //!< Type of the thread class that clears the container
-> int32_t testSpeed (sEnv &env, cont_t &testCont, uint32_t threadCount, value_t** values, value_t** retrieves)
+> int32_t testSpeed (sEnv &env, cont_t &testCont, uint32_t threadCount, value_t** values, value_t** retrieves, bool sorted)
 {
 	// Needed anyway:
 	static const value_t lo = std::numeric_limits<value_t>::lowest() + static_cast<value_t>(1);
@@ -73,6 +79,14 @@ template<
 	uint32_t localMaxElem = maxElements;
 	uint32_t localMaxRet  = maxElements / 1000;
     int64_t  maxNeededMS  = 0;
+
+    // Hashes search for more elements:
+    if ( isSameType (cont_t, chash_t)
+	  || isSameType (cont_t, ohash_t)
+	  || isSameType (cont_t, set_t) ) {
+		localMaxElem = maxHashVals;
+		localMaxRet = maxHashVals / 10;
+	  }
 
 	/* --------------------------------------------------------------------
 	 * --- Pre-Step: Create values/retrieves arrays if not done already ---
@@ -103,7 +117,7 @@ template<
 	 * --- Get a description out ---
 	 * -----------------------------
 	 */
-	int32_t result = printDescription<cont_t>(env, threadCount);
+	int32_t result = printDescription<cont_t>(env, threadCount, sorted);
 	if (EXIT_SUCCESS != result)
 		return result; // printDescription() doesn't like cont_t
 

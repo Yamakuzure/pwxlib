@@ -24,6 +24,7 @@ typedef int32_t keydata_t; //!< Type for the data to test with list containers, 
 typedef float   hashval_t; //!< Type for hash container values
 
 extern uint32_t maxElements;
+extern uint32_t maxHashVals;
 extern uint32_t maxThreads;
 
 /// The types of tests to do

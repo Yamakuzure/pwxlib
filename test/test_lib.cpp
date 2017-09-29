@@ -10,8 +10,10 @@
 #include "testSCT.h"
 #include "testColor.h"
 
-/// Default number of elements to use with all mass and speed tests
-uint32_t maxElements = 200000;
+/// Default number of elements to use with all mass and speed tests (but hashes and sets)
+uint32_t maxElements = 250000;
+/// Default number of elements to use with all mass and speed tests (hashes and sets ONLY)
+uint32_t maxHashVals = 741839;
 
 /// Default number of threads to launch for parallel testing
 uint32_t maxThreads  = 8;
@@ -31,9 +33,10 @@ int32_t main(int argc, char* argv[])
 		else if (STRCEQ(argv[i], "--cont")  || STRCEQ(argv[i], "-c")) doWhichTests |= doTestContainers;
 		else if (                              STRCEQ(argv[i], "-m")) {
 			int m = atoi(argv[++i]);
-			if (m > 9999)
+			if (m > 9999) {
 				maxElements = static_cast<uint32_t>(m);
-			else {
+				maxHashVals = std::floor(maxElements / 0.337);
+			} else {
 				cerr << "Error: \"" << argv[i] << "\" is no valid number for\n";
 				cerr << "       the maximum number of elements. (Minimum 10000)" << endl;
 				showHelp = true;
@@ -127,15 +130,18 @@ int32_t main(int argc, char* argv[])
 			cout << "Testing the speed of the containers\n-----------------------------------" << endl;
 			cout << " (Inserting " << maxElements << " random elements, search ";
 			cout << (maxElements / 1000) << " elements and clear up)" << endl;
-			cout << "                                               Add /   Search /   Clear" << endl;
+			cout << " (Note: Hashes and sets use ";
+			cout << maxHashVals << "/" << (maxHashVals / 10) << " elements.)" << endl;
+			cout << "                                                      ";
+			cout << "Add /   Search /   Clear" << endl;
 
 // Little evil shortcut
-#define do_testSpeed(container_type, key_type, value_type, adder_type, searcher_type, thread_count, values, retrieves) \
+#define do_testSpeed(container_type, key_type, value_type, adder_type, searcher_type, thread_count, values, retrieves, sorted) \
 try { \
 result = testSpeed<container_type, key_type, value_type, \
 	adder_type<container_type, key_type, value_type>, \
 	searcher_type<container_type, key_type, value_type>, \
-	thClearer<container_type>>(env, testCont, thread_count, values, retrieves); \
+	thClearer<container_type>>(env, testCont, thread_count, values, retrieves, sorted); \
 } PWX_THROW_PWX_FURTHER
 
 			keydata_t* values    = nullptr;
@@ -144,76 +150,112 @@ result = testSpeed<container_type, key_type, value_type, \
 			// Singly Linked Lists
 			if (EXIT_SUCCESS == result) {
 				single_list_t testCont(do_not_destroy);
-				do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, 1, &values, &retrieves, true)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(single_list_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, maxThreads, &values, &retrieves, true)
 				}
 			}
 			// Doubly Linked Lists
 			if (EXIT_SUCCESS == result) {
 				double_list_t testCont(do_not_destroy);
-				do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, 1, &values, &retrieves, true)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(double_list_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, maxThreads, &values, &retrieves, true)
 				}
 			}
 			// Singly Linked rings
 			if (EXIT_SUCCESS == result) {
 				single_ring_t testCont(do_not_destroy);
-				do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, 1, &values, &retrieves, true)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(single_ring_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, maxThreads, &values, &retrieves, true)
 				}
 			}
 			// Doubly Linked Rings
 			if (EXIT_SUCCESS == result) {
 				double_ring_t testCont(do_not_destroy);
-				do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, 1, &values, &retrieves, true)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
+				}
+				if (EXIT_SUCCESS == result) {
+					do_testSpeed(double_ring_t, keydata_t, keydata_t, thAdderSorted, thSearcherList, maxThreads, &values, &retrieves, true)
 				}
 			}
 			// Stacks
 			if (EXIT_SUCCESS == result) {
 				stack_t testCont(do_not_destroy);
-				do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
 				}
 			}
 			// Queues
 			if (EXIT_SUCCESS == result) {
 				queue_t testCont(do_not_destroy);
-				do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
 				}
 			}
+
+			// Delete the values, as hashes search for more. Otherwise the
+			// enormous speed of sets and hashes results in ~0ms results.
+			if (values) {
+					delete [] values;
+					values = nullptr;
+			}
+			if (retrieves) {
+					delete [] retrieves;
+					retrieves = nullptr;
+			}
+
 			// Sets
 			if (EXIT_SUCCESS == result) {
-				set_t testCont(do_not_destroy, static_cast<uint32_t>(std::ceil(maxElements / 2.873)),
+				set_t testCont(do_not_destroy, static_cast<uint32_t>(std::ceil(maxHashVals / 2.873)),
 								nullptr, 0, 3.0, 1.5);
-				do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves)
+				do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves)
+					do_testSpeed(set_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false)
 				}
 			}
 			// Chained Hash Tables
 			if (EXIT_SUCCESS == result) {
-				chash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 2.873)),
+				chash_t testCont(static_cast<uint32_t>(std::ceil(maxHashVals / 2.873)),
 								do_not_destroy, nullptr, 3.0, 1.5);
-				do_testSpeed(chash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
+				do_testSpeed(chash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(chash_t,hashval_t,  keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
+					do_testSpeed(chash_t,hashval_t,  keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves, false)
 				}
 			}
 			// Open Hash Tables
 			if (EXIT_SUCCESS == result) {
-				ohash_t testCont(static_cast<uint32_t>(std::ceil(maxElements / 0.79)),
+				ohash_t testCont(static_cast<uint32_t>(std::ceil(maxHashVals / 0.79)),
 								do_not_destroy, nullptr, 0.81, 1.5);
-				do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves)
+				do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, 1, &values, &retrieves, false)
 				if (EXIT_SUCCESS == result) {
-					do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves)
+					do_testSpeed(ohash_t, hashval_t, keydata_t, thAdderHash, thSearcherHash, maxThreads, &values, &retrieves, false)
 				}
 			}
 			// === Clear up values ===

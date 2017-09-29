@@ -118,6 +118,49 @@ private:
 	 }
 };
 
+///@brief simple class to sort values into list based containers
+/// IMPORTANT: Single threaded calls _MUST_ set autostart on creation !
+template<typename cont_t, typename key_t, typename value_t>
+class thAdderSorted : thAdderBase<cont_t, key_t, value_t>
+{
+public:
+	typedef thAdderBase<cont_t, key_t, value_t> base_t;
+
+	/* =================================
+	 * === constructors / destructor ===
+	 * =================================
+	 */
+	explicit thAdderSorted(bool autostart) : base_t(autostart) {}
+	         thAdderSorted()               : base_t(false)     {}
+	virtual ~thAdderSorted() {}
+
+	/* =================================
+	 * === thread execution operator ===
+	 * =================================
+	 */
+	using base_t::operator();
+
+	/* ======================
+	 * === Public members ===
+	 * ======================
+	 */
+	using base_t::cont;
+	using base_t::isRunning;
+	using base_t::timeMS;
+
+private:
+	/* ==================================================================
+	 * === private method to create and add elements to the container ===
+	 * ==================================================================
+	 */
+	virtual void privAddToCont(key_t, value_t* value)
+	{
+		PWX_TRY_PWXSTD_FURTHER(cont->insert_sorted(value),
+				"Element creation failed",
+				"Creating and pushing an element to the list based container threw an exception" )
+	}
+};
+
 ///@brief simple class to add values to hash table containers
 /// IMPORTANT: Single threaded calls _MUST_ set autostart on creation !
 template<typename cont_t, typename key_t, typename value_t>

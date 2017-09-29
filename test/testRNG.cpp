@@ -92,7 +92,7 @@ int32_t testRNG (sEnv &env)
 	/************************************************************************
 	** B) Hash functions                                                   **
 	************************************************************************/
-	cout << " B) Hash functions with " << maxElements;
+	cout << " B) Hash functions with " << maxHashVals;
 	cout << " keys (min/max (hash / loop ms))" << endl;
 	cout << adjRight (4, 0) << ++env.testCount << " int16_t    : "; cout.flush();
 	testRNG_hash<int16_t>(env);

@@ -164,7 +164,7 @@ TSet<data_t>* set_intersection(const TSet<data_t>* const lhs, const TSet<data_t>
 
 	// Build an empty set and copy sorted switch and destroy method from lhs:
 	PWX_TRY(newSet = new list_t())
-	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_difference() could not create the difference set!")
+	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_intersection() could not create the intersection set!")
 	newSet->reset(*lhs);
 
 	// Action is only needed if neither is the empty set
@@ -261,7 +261,7 @@ TSet<data_t>* set_union(const TSet<data_t>* const lhs, const TSet<data_t>* const
 
 	// Build an empty set:
 	PWX_TRY(newSet = new list_t())
-	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_difference() could not create the difference set!")
+	PWX_THROW_STD_FURTHER("SetCreationFailed", "set_union() could not create the union set!")
 
 	// If lhs has elements, we can begin with adding them.
 	if (lhs->size()) {

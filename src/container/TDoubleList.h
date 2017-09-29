@@ -680,6 +680,118 @@ protected:
 	}
 
 
+	/// @brief Search until the next element after curr has greater data content
+	virtual const elem_t* protFindGreaterNext (const data_t &data) const noexcept
+	{
+		elem_t* result = nullptr;
+
+		/* The same three rules as when searching for an
+		 * element via its pointer apply here, too.
+		 */
+
+		// Return at once if the list is empty
+		if (empty())
+			return nullptr;
+
+		// Rule 1
+		PWX_LOCK_OBJ(const_cast<list_t*>(this))
+
+		if (empty()) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr;
+		}
+
+		// Quick exit if curr->next is already what we want:
+		elem_t* xCurr = curr();
+		elem_t* xNext = xCurr->getNext(); // Note: xCurr can not be nullptr at this point.
+		int32_t comp  = xCurr->compare(data);
+		if ( (comp < 0)
+		  && ( (nullptr == xNext) || (xNext->compare(data) > -1) ) ) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return xNext ? xNext : nullptr;
+		}
+
+		// Quick exit if curr itself is already what we want:
+		elem_t* xPrev = xCurr->getPrev();
+		if ( (comp > -1)
+		  && ( (nullptr == xPrev) || (xPrev->compare(data) < 0) ) ) {
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return xCurr;
+		}
+
+		// Quick exit if head is already greater...
+		elem_t* xHead = head();
+		if (xHead && (xHead->compare(data) > -1)) {
+			curr(xHead);
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return xHead;
+		}
+
+		// ...or tail is lower
+		elem_t* xTail = tail();
+		if (xTail && (xTail->compare(data) < 0)) {
+			curr(xTail);
+			PWX_UNLOCK(const_cast<list_t*>(this))
+			return nullptr; // tail is prev of nullptr by definition.
+		}
+
+		// Otherwise we have to search for it.
+		bool isDone = false;
+		bool goUp   = true;
+		if (xCurr->compare(data) > -1) {
+			goUp = false;
+			// xCurr is already checked and xPrev can not be nullptr at this point.
+			xCurr = xPrev;
+			xPrev = xCurr->getPrev();
+		}
+
+		// Rule 2:
+		PWX_UNLOCK(const_cast<list_t*>(this))
+
+		while (!result && !isDone && xCurr && (xNext || xPrev)) {
+			// Note: The container is not locked any more,
+			// locking and checks are done on element level
+			// by compare() then.
+
+			// Here we can do a two way search.
+			if (goUp) {
+				xNext = xCurr->getNext();
+				xTail = tail();
+			} else {
+				xPrev = xCurr->getPrev();
+				xHead = head();
+			}
+
+			// Search upwards:
+			if (goUp && (xNext->compare(data) > -1) ) {
+				result = xNext;
+				curr(xCurr);
+			}
+			// Search downwards:
+			else if (!goUp && (xPrev->compare(data) < 0) ) {
+				result = xCurr;
+				curr(xPrev);
+			}
+			// Up might end in tail (although already checked, but another
+			// thread might have changed the rules.)
+			else if (goUp && (xCurr == xTail) ) {
+				isDone = true; // result stays being nullptr
+				curr(xTail);
+			}
+			// Down might end in head (although already checked, but another
+			// thread might have changed the rules.)
+			else if (!goUp && (xCurr == xHead) ) {
+				result = xHead;
+				curr(xHead);
+			} else
+				// Be safe and use getNext() again.
+				xCurr = xCurr->getNext();
+		}
+
+		return result;
+	}
+
+
 	/** @brief simple method to insert an element into the list
 	  *
 	  * If either @a insPrev or @a insElem is marked as destroyed,

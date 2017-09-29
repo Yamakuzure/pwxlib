@@ -26,7 +26,7 @@ void testRNG_hash(sEnv &env)
 
 	hrTime_t tStart, tUsed;
 	hrTime_t tFull = hrClock::now();
-	for (size_t i = 0; i < maxElements; ++i) {
+	for (size_t i = 0; i < maxHashVals; ++i) {
 		tStart = hrClock::now();
 		curHash = RNG.hash(start);
 		tUsed += hrClock::now() - tStart;
