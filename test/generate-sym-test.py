@@ -2,13 +2,15 @@
 import sys, re
 
 print('#include <cstdio>')
-for header in sys.argv[2:]:
+for header in sys.argv[3:]:
     match = re.search('^.*/([^/]+)', header)
     if match:
         hfile = match.group(1)
         check = re.search('fwd', hfile)
         if not check:
             print('#include "{}"'.format(header.split('/')[-1]))
+
+has_debug = sys.argv[2];
 
 # Step one : Generate test functions
 for line in open(sys.argv[1]):
@@ -80,6 +82,10 @@ for line in open(sys.argv[1]):
 
         # Skip members of the private_ sub namespace
         if fname == "private_":
+            continue
+
+        # Skip debug_* if debugging was disabled
+        if has_debug != 'true' and re.search('debug', fname):
             continue
 
         tofn  = re.search('^to_[a-z_0-9]+$', fname)

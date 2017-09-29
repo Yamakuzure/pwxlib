@@ -134,7 +134,7 @@ int32_t testPAH (sEnv &env)
 
 		// tgt_add must be 2 now
 		cout << "  -> tgt_add (must be 2) : " << tgt_add;
-		if (2 == tgt_inc) cout << " => Success" << endl;
+		if (2 == tgt_add) cout << " => Success" << endl;
 		else              cout << " => FAILURE" << endl;
 
 		if ((1 == tgt_inc) && (2 == tgt_add))

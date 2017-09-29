@@ -20,6 +20,8 @@
 ***/
 
 
+#include <cstring>
+
 #include "compiler.h"
 #include "CException.h"
 #include "CLockGuard.h"
