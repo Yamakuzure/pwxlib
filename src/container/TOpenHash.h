@@ -475,16 +475,22 @@ private:
 		while (isAdapted) {
 			isAdapted = false;
 			for (uint32_t n = 3; !isAdapted && (n < 9); ++n) {
-				if ( (stepping * (n+1) / n) == tabSize) {
+				if ( stepping == (tabSize * n / (n + 1)) ) {
 					isAdapted = true;
 					stepping += 2;
 				}
 			}
 
 			// tabSize must not be devidable by stepping either
-			while ( !(tabSize % stepping) ) {
+			if ( !(tabSize % stepping) ) {
 				isAdapted = true;
 				stepping += 2;
+			}
+
+			// And the stepping must not grow larger than tabSize
+			if (stepping > tabSize) {
+				isAdapted = true;
+				stepping = stepping % tabSize;
 			}
 		} // end of detecting dangerous fractions of tabSize.
 
