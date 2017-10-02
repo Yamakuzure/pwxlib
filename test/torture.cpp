@@ -1,5 +1,12 @@
 #include "torture.h"
 
+
+// --- Prototypes, the implementations are below main() ---
+static int32_t setNumThreads(const char* chNum, uint32_t &numThreads);
+static int32_t setTestType(const char* chType, eTestType &testType);
+static int32_t startTest(uint32_t numThreads, eTestType testType);
+
+
 int32_t main(int32_t argc, char** argv)
 {
 	int32_t result = EXIT_SUCCESS;
@@ -60,7 +67,7 @@ int32_t main(int32_t argc, char** argv)
 			cerr << "== Thread " << std::this_thread::get_id();
 			cerr << " ==\n-----\npwx exception \"" << e.name() << "\" caught!" << endl;
 			cerr << "What : \"" << e.what() << "\"" << endl;
-			cerr << "What : \"" << e.desc() << "\"" << endl;
+			cerr << "Desc : \"" << e.desc() << "\"" << endl;
 			cerr << "Where: \"" << e.where() << "\"" << endl;
 			cerr << "pFunc: \"" << e.pfunc() << "\"" << endl;
 			cerr << "\nTrace:\n" << e.trace() << "\n-----" << endl;
@@ -75,7 +82,7 @@ int32_t main(int32_t argc, char** argv)
 
 
 // Small helper to get the number out of an argument and check it
-int32_t setNumThreads(const char* chNum, uint32_t &numThreads)
+static int32_t setNumThreads(const char* chNum, uint32_t &numThreads)
 {
 	int32_t result = EXIT_SUCCESS;
 
@@ -92,7 +99,7 @@ int32_t setNumThreads(const char* chNum, uint32_t &numThreads)
 
 
 // Small helper to get the test type out of an argument and check it
-int32_t setTestType(const char* chType, eTestType &testType)
+static int32_t setTestType(const char* chType, eTestType &testType)
 {
 	int32_t result = EXIT_SUCCESS;
 
@@ -126,7 +133,7 @@ int32_t setTestType(const char* chType, eTestType &testType)
 
 
 /// @brief main test starting function
-int32_t startTest(uint32_t numThreads, eTestType testType)
+static int32_t startTest(uint32_t numThreads, eTestType testType)
 {
 	int32_t result = EXIT_SUCCESS;
 

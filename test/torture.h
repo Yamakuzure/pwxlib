@@ -78,10 +78,12 @@ catch (pwx::CException &e) { \
 	cerr << " ==\n"; \
 	cerr << "pwx exception \"" << e.name() << "\" caught!" << endl; \
 	cerr << "What : \"" << e.what() << "\"" << endl; \
-	cerr << "What : \"" << e.desc() << "\"" << endl; \
+	cerr << "Desc : \"" << e.desc() << "\"" << endl; \
 	cerr << "Where: \"" << e.where() << "\"" << endl; \
 	cerr << "pFunc: \"" << e.pfunc() << "\"" << endl; \
 	cerr << "\nTrace:\n" << e.trace() << "\n-----" << endl; \
+	fprintf(stderr, "Caught at %s:%d %s\n", basename(__FILE__), __LINE__, __FUNCTION__); \
+	cerr.flush(); \
 	outLock.unlock(); \
 	isKilled = true; \
 } catch (std::exception &e) { \
@@ -162,11 +164,6 @@ enum eThreadType
 };
 int32_t maxThreadType = 11; //!< Largest number from eThreadType to create randomly
 
-
-// --- Prototypes, the implementations are in torture.cpp below main() ---
-int32_t setNumThreads(const char* chNum, uint32_t &numThreads);
-int32_t setTestType(const char* chType, eTestType &testType);
-int32_t startTest(uint32_t numThreads, eTestType testType);
 
 // --- Thread class hierarchy ---
 
@@ -843,7 +840,7 @@ int32_t do_test(uint32_t numThreads)
 	PWX_TRY_STD_FURTHER(worker[numThreads - 1] = new thrdOpSub<list_t>,   "new_failed", "Couldn't create thrdOpSub")
 
 	// Before we can fire away, the container needs to be filled with the
-	// first x random values, with x equaling ten times the maximum iterations.
+	// first x random values, with x equalling ten times the maximum iterations.
 	// Otherwise we run into problems if more threads pull something out than
 	// putting in.
 	for (size_t i = 0; i < (10 * maxIterations); ++i) {
