@@ -783,9 +783,13 @@ protected:
 			else if (!goUp && (xCurr == xHead) ) {
 				result = xHead;
 				curr(xHead);
-			} else
-				// Be safe and use getNext() again.
-				xCurr = xCurr->getNext();
+			} else {
+				// Be safe and use getPrev()/getNext() again.
+				if (goUp)
+					xCurr = xCurr->getNext();
+				else
+					xCurr = xCurr->getPrev();
+			}
 		}
 
 		return result;
