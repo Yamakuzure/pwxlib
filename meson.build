@@ -2,12 +2,12 @@ project('pwxLib', 'cpp',
         version : '0.8.99',
         license : 'LGPLv2+',
         default_options: [
-                'cpp_std=c++14',
+                'cpp_std=c++17',
                 'prefix=/usr',
                 'sysconfdir=/etc',
                 'localstatedir=/var',
         ],
-        meson_version : '>= 0.40',
+        meson_version : '>= 0.48',
        )
 
 conf = configuration_data()
@@ -49,43 +49,127 @@ substs.set('includedir',      includedir)
 
 #####################################################################
 
-cxx = meson.get_compiler('cpp')
-cxx_id = cxx.get_id()
-pkgconfig = import('pkgconfig')
+cxx                  = meson.get_compiler('cpp')
+cxx_id               = cxx.get_id()
+pkgconfig            = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
+buildtype            = get_option('buildtype')
 
-foreach arg : ['-Wextra',
-               '-pedantic',
-               '-Wpedantic',
-               '-Werror=missing-prototypes',
-               '-Werror=implicit-function-declaration',
-               '-Werror=missing-declarations',
-               '-Werror=return-type',
-               '-Werror=incompatible-pointer-types',
-               '-Werror=format=2',
-               '-fdiagnostics-show-option',
-               '-fstack-protector',
-               '-fstack-protector-strong',
-               '-fPIC',
-               '-fPIE',
-               '-fexceptions',
-	       '-fvisibility=hidden'
-              ]
-        if cxx.has_argument(arg)
-                add_project_arguments(arg, language : 'cpp')
+############################################################
+
+# Set debug options
+annotations = get_option('annotations')
+debugextra  = get_option('debug-extra')
+debugthread = get_option('debug-thread')
+graphite    = get_option('graphite')
+profile     = get_option('profile')
+spinlocks   = get_option('spinlocks')
+yielding    = get_option('yielding')
+
+if buildtype != 'debug'
+        annotations = false
+        debugextra  = false
+        debugthread = false
+endif
+
+if profile
+        annotations = false
+        debugextra  = false
+        debugthread = false
+        add_project_arguments('-pg', language : 'cpp')
+        add_project_link_arguments('-pg', language : 'cpp')
+endif
+
+if annotations
+        debugextra = true
+        conf.set('PWX_ANNOTATIONS', true)
+else
+        if yielding
+                conf.set('PWX_USE_FLAGSPIN_YIELD', true)
+                spinlocks = true
         endif
-endforeach
+        if spinlocks
+                conf.set('PWX_USE_FLAGSPIN', true)
+        endif
+endif
+
+if debugthread
+        debugextra = true
+        conf.set('PWX_THREADDEBUG', true)
+endif
+
+#####################################################################
+
+possible_cxx_flags = [
+        '-Wextra',
+        '-pedantic',
+        '-Wpedantic',
+        '-Werror=missing-prototypes',
+        '-Werror=implicit-function-declaration',
+        '-Werror=missing-declarations',
+        '-Werror=return-type',
+        '-Werror=incompatible-pointer-types',
+        '-Werror=format=2',
+        '-fdiagnostics-show-option',
+        '-fstack-protector',
+        '-fstack-protector-strong',
+        '-fPIC',
+        '-fPIE',
+        '-fexceptions',
+	    '-fvisibility=hidden'
+]
+
+# --as-needed and --no-undefined are provided by meson by default,
+# run mesonconf to see what is enabled
+possible_link_flags = [
+        '-Wl,-z,relro',
+        '-Wl,-z,now',
+]
+
+if cxx.get_id() == 'clang'
+        possible_cxx_flags += [
+                '-Wno-typedef-redefinition',
+                '-Wno-gnu-variable-sized-type-not-at-end',
+        ]
+endif
+
+if get_option('buildtype') != 'debug'
+        possible_cxx_flags += [
+                '-ffunction-sections',
+                '-fdata-sections',
+        ]
+
+        possible_link_flags += '-Wl,--gc-sections'
+endif
+
+if debugextra
+        conf.set('LIBPWX_DEBUG', true)
+        possible_cxx_flags += [
+                '-ggdb3',
+                '-Og'
+        ]
+        possible_link_flags += [
+                '-ggdb3',
+                '-Og'
+        ]
+endif
+
+add_project_arguments(cxx.get_supported_arguments(possible_cxx_flags), language : 'cpp')
 
 # "negative" arguments: gcc on purpose does not return an error for "-Wno-"
 # arguments, just emits a warnings. So test for the "positive" version instead.
 foreach arg : ['error=nonnull', # work-around for gcc 7.1 turning this on on its own
+
+               # Disable -Wmaybe-uninitialized, since it's noisy on gcc 8 with
+               # optimizations enabled, producing essentially false positives.
+               'maybe-uninitialized',
               ]
         if cxx.has_argument('-W' + arg)
                 add_project_arguments('-Wno-' + arg, language : 'cpp')
         endif
 endforeach
 
-if cxx.compiles('
+if cxx.compiles('''
    #include <ctime>
    #include <cinttypes>
    typedef uint64_t usec_t;
@@ -94,60 +178,21 @@ if cxx.compiles('
            struct timespec now;
            return 0;
    }
-', name : '-Werror=shadow with local shadowing')
+''', name : '-Werror=shadow with local shadowing')
         add_project_arguments('-Werror=shadow', language : 'cpp')
-endif
-
-if cxx_id == 'clang'
-        foreach arg : ['-Wno-typedef-redefinition',
-                       '-Wno-gnu-variable-sized-type-not-at-end',
-                      ]
-                if cxx.has_argument(arg,
-                                   name : '@0@ is supported'.format(arg))
-                        add_project_arguments(arg, language : 'cpp')
-                endif
-        endforeach
 endif
 
 link_test_cxx = files('meson/link_test.cpp')
 
-# --as-needed and --no-undefined are provided by meson by default,
-# run mesonconf to see what is enabled
-foreach arg : ['-Wl,-z,relro',
-               '-Wl,-z,now',
-               '-pie',
-              ]
-
+foreach arg : possible_link_flags
         have = run_command(check_compilation_sh,
                            cxx.cmd_array(), '-x', 'c++', arg,
-                           link_test_cxx).returncode() == 0
+                           '-include', link_test_cxx).returncode() == 0
         message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
         if have
                 add_project_link_arguments(arg, language : 'cpp')
         endif
 endforeach
-
-buildtype = get_option('buildtype')
-
-if buildtype != 'debug' and buildtype != 'debugoptimized'
-        foreach arg : ['-ffunction-sections',
-                       '-fdata-sections']
-                if cxx.has_argument(arg,
-                                   name : '@0@ is supported'.format(arg))
-                        add_project_arguments(arg, language : 'cpp')
-                endif
-        endforeach
-
-        foreach arg : ['-Wl,--gc-sections']
-                have = run_command(check_compilation_sh,
-                                   cxx.cmd_array(), '-x', 'c++', arg,
-                                   link_test_cxx).returncode() == 0
-                message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
-                if have
-                        add_project_link_arguments(arg, language : 'cpp')
-                endif
-        endforeach
-endif
 
 #####################################################################
 # compilation result tests
@@ -172,68 +217,6 @@ find_src_sh = find_program('meson/find_source.sh')
 mkdir_p     = 'mkdir -p $DESTDIR/@0@'
 
 ############################################################
-
-# Set debug options
-annotations = get_option('annotations')
-debug       = get_option('debug')
-graphite    = get_option('graphite')
-profile     = get_option('profile')
-spinlocks   = get_option('spinlocks')
-threaddebug = get_option('threaddebug')
-yielding    = get_option('yielding')
-
-if buildtype != 'debug'
-        annotations = false
-        debug       = false
-        threaddebug = false
-endif
-
-if profile
-        annotations = false
-        debug       = false
-        threaddebug = false
-        add_project_arguments('-pg', language : 'cpp')
-        add_project_link_arguments('-pg', language : 'cpp')
-endif
-
-if annotations
-        debug = true
-        conf.set('PWX_ANNOTATIONS', true)
-else
-        if yielding
-                conf.set('PWX_USE_FLAGSPIN_YIELD', true)
-                spinlocks = true
-        endif
-        if spinlocks
-                conf.set('PWX_USE_FLAGSPIN', true)
-        endif
-endif
-
-if threaddebug
-        debug = true
-        conf.set('PWX_THREADDEBUG', true)
-endif
-
-if debug
-        conf.set('LIBPWX_DEBUG', true)
-        foreach arg : ['-ggdb3',
-                       '-Og']
-                if cxx.has_argument(arg,
-                                   name : '@0@ is supported'.format(arg))
-                        add_project_arguments(arg, language : 'cpp')
-                endif
-
-                have = run_command(check_compilation_sh,
-                                   cxx.cmd_array(), '-x', 'c++', arg,
-                                   link_test_cxx).returncode() == 0
-                message('Linking with @0@ supported: @1@'.format(arg, have ? 'yes' : 'no'))
-                if have
-                        add_project_link_arguments(arg, language : 'cpp')
-                endif
-        endforeach
-endif
-
-#####################################################################
 
 threads = dependency('threads')
 
@@ -312,7 +295,6 @@ install_headers(
 public_programs = []
 
 subdir('test')
-#subdir('tools')
 subdir('doc')
 
 ############################################################
@@ -344,7 +326,7 @@ foreach tuple : tests
                 install : install_tests,
                 install_dir : testsdir)
 
-        if type == 'manual'
+        if type == ['manual']
                 message('@0@ is a manual test'.format(name))
         else
                 test(name, exe,
@@ -356,10 +338,10 @@ endforeach
 
 ############################################################
 
-install_data('README',
-             'NEWS',
-             'LICENSE.GPL2',
-             'LICENSE.LGPL2.1',
+install_data('AUTHORS',
+             'ChangeLog',
+             'LICENSE',
+             'README.md',
              install_dir : docdir)
 
 ############################################################
