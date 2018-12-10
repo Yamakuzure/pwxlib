@@ -1,6 +1,6 @@
-project('pwxLib', 'cpp',
-        version : '0.8.99',
-        license : 'LGPLv2+',
+project('pwxlib', 'cpp',
+        version : '0.8.8',
+        license : 'MIT',
         default_options: [
                 'cpp_std=c++17',
                 'prefix=/usr',
@@ -13,7 +13,7 @@ project('pwxLib', 'cpp',
 conf = configuration_data()
 conf.set_quoted('PACKAGE_STRING',  meson.project_name() + ' ' + meson.project_version())
 conf.set_quoted('PACKAGE_VERSION', meson.project_version())
-conf.set_quoted('PACKAGE_URL',     'https://pwxlib.sourceforge.net/')
+conf.set_quoted('PACKAGE_URL',     'https://github.com/Yamakuzure/pwxlib')
 m4_defines = []
 
 # Set general directories
@@ -31,7 +31,7 @@ datadir = join_paths(prefixdir, get_option('datadir'))
 
 pkgconfigdatadir = join_paths(datadir, 'pkgconfig')
 pkgconfiglibdir = join_paths(libdir, 'pkgconfig')
-pkgincludedir = join_paths(includedir, 'pwx')
+pkgincludedir = join_paths(includedir, 'pwxlib')
 
 docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
                              meson.project_version()])
@@ -40,7 +40,7 @@ docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
 
 substs = configuration_data()
 substs.set('PACKAGE_NAME',    meson.project_name())
-substs.set('PACKAGE_URL',     'https://pwxlib.sourceforge.net/')
+substs.set('PACKAGE_URL',     'https://prydeworx.com/pwxlib')
 substs.set('PACKAGE_VERSION', meson.project_version())
 substs.set('prefix',          prefixdir)
 substs.set('exec_prefix',     prefixdir)
@@ -246,7 +246,6 @@ includes = include_directories(include_paths)
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
 libpwx_headers           = []
-libpwx_main_headers      = []
 libpwx_all_in_one_header = []
 libpwx_internal_sources  = []
 libpwx_external_sources  = []
@@ -284,10 +283,10 @@ libpwx = shared_library(
         install_dir : libdir)
 
 install_headers(
-        libpwx_main_headers)
+        libpwx_all_in_one_header)
 install_headers(
         libpwx_headers,
-        subdir : 'pwx')
+        subdir : 'pwxlib')
 
 ############################################################
 

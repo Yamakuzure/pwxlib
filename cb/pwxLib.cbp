@@ -93,10 +93,10 @@
 		<Unit filename="../src/functions/meson.build" />
 		<Unit filename="../src/functions/set_func.h" />
 		<Unit filename="../src/functions/set_fwd.h" />
-		<Unit filename="../src/libpwx/libpwx.pc.in" />
-		<Unit filename="../src/libpwx/libpwx.sym" />
+		<Unit filename="../src/libpwx/pwxlib.pc.in" />
+		<Unit filename="../src/libpwx/pwxlib.sym" />
 		<Unit filename="../src/libpwx/meson.build" />
-		<Unit filename="../src/libpwx/pwx.h" />
+		<Unit filename="../src/libpwx/pwxlib.h" />
 		<Unit filename="../src/libpwx/pwx_basic.h" />
 		<Unit filename="../src/libpwx/pwx_containers.h" />
 		<Unit filename="../src/libpwx/pwx_helpers.h" />
