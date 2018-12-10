@@ -1,7 +1,6 @@
 random_sources = files('''
         CRandomConstants.h
         CRandom.cpp
-        CRandom.h
         CRandomTHash.cpp
         CRandomTHash.h
         CRandomTRandom.cpp

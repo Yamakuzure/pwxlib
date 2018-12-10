@@ -1,6 +1,5 @@
 stream_helpers_sources = '''
         StreamHelpers.cpp
-        StreamHelpers.h
 '''.split()
 
 stream_helpers_headers = '''

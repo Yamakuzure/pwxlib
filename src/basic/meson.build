@@ -1,16 +1,8 @@
 basic_sources = files('''
         CException.cpp
-        CException.h
         CLockable.cpp
-        CLockable.h
         CLockGuard.cpp
-        CLockGuard.h
-        compiler.h
         debug.cpp
-        debug.h
-        macros.h
-        templates.h
-        types.h
 '''.split())
 
 _basic_headers = '''

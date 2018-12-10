@@ -1,6 +1,5 @@
 wavecolor_sources = '''
         CWaveColor.cpp
-        CWaveColor.h
 '''.split()
 
 wavecolor_headers = '''
