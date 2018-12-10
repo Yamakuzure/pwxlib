@@ -69,9 +69,6 @@ option('yielding', type : 'boolean', value : true,
 option('html', type : 'boolean', value : true,
        description : 'Use doxygen to build HTML documentation (Default: true)')
 
-option('tools', type : 'boolean', value : true,
-       description : 'Build tools utilizing pwxLib (Default: true)')
-
 option('tests', type : 'boolean', value : false,
        description : 'Build the pwxLib test programs (Default: false)')
 
