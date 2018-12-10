@@ -9,7 +9,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#include <pwx.h>
+#include <pwxlib.h>
 typedef pwx::CAdjLeft  adjLeft;
 typedef pwx::CAdjRight adjRight;
 

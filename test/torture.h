@@ -7,11 +7,7 @@
 #include <limits>
 #include <thread>
 
-#include "CException.h"
-#include "CLockable.h"
-#include "macros.h"
-#include "pwx.h"
-#include "VContainer.h"
+#include <pwxlib.h>
 
 using std::cout;
 using std::cerr;

@@ -3,7 +3,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#include <pwx.h>
+#include <pwxlib.h>
 using pwx::RNG;
 using pwx::to_int32;
 using pwx::to_string;
