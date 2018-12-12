@@ -5,7 +5,7 @@
   *
   * @brief This file defines some general mathematical helper functions
   *
-  * The code handling floating point comparison is taken from
+  * The code handling floating point comparison is inspired by
   * Bruce Dawson's article "Comparing Floating Point Numbers, 2012 Edition"
   * that can be read here:
   * http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/

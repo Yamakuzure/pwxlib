@@ -54,8 +54,8 @@ namespace pwx {
   *
   * This class is meant to provide a tracing exception to get as much information as possible.
   *
-  * To make the most out of this system, the file "pwx/general/macros.h" provides many macros
-  * to try, catch and throw further exceptions with tracing informations
+  * To make the most out of this system, the file "pwxlib/macros.h" provides many macros
+  * to try, catch and throw further exceptions with tracing information.
   *
   * name() : Return the name of the thrown exception.
   * what() : Return information about what went wrong
