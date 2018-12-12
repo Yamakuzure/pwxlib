@@ -2,11 +2,11 @@
 #ifndef PWX_HELPERS_H_INCLUDED
 #define PWX_HELPERS_H_INCLUDED
 
-/** @file pwx_helpers.h
+/** @file pwx_tools.h
   *
-  * @brief This file adds all helper classes and functions.
+  * @brief This file adds all tool classes and functions.
   *
-  * This include file adds helper classes and functions for various tasks that
+  * This include file adds tool classes and functions for various tasks that
   * are currently included in pwxLib. In detail these are:
   *
   * <TABLE border='1'>
