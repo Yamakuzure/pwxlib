@@ -1,5 +1,20 @@
 #!/bin/bash -e
 
+isNew=0
+if [[ ! -d "./build" ]]; then
+    mkdir build || exit 1
+    isNew=1
+fi
+
+if [[ "x--help" == "x${1}" ]]; then
+    if [[ $isNew -eq 1 ]]; then
+	meson build
+    fi
+    exec meson configure build
+    exit 0
+fi
+
+
 cflags=CFLAGS="$CFLAGS"
 cxxflags=CXXFLAGS="$CXXFLAGS"
 declare -a args
