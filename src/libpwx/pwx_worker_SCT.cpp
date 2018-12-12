@@ -30,7 +30,7 @@
 **/
 
 
-#include "pwx_workers.h"
+#include "pwx_worker_SCT.h"
 
 
 #if !defined(PWX_INITIAL_SCT_PRECISION)
@@ -40,7 +40,4 @@
 
 /* --- Instantiations of global workers --- */
 
-
-pwx::CArgHandler  pwx::PAH;    // [P]rogram [A]rgument [H]andler
-pwx::CRandom      pwx::RNG;    // [R]andom [N]-Value [G]enerator
 pwx::CSinCosTable pwx::SCT(PWX_INITIAL_SCT_PRECISION); // [S]ine-/[C]osine-[T]able
