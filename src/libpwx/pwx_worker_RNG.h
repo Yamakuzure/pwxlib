@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PWX_PWX_WORKERS_H_INCLUDED
-#define PWX_PWX_WORKERS_H_INCLUDED
+#ifndef PWX_PWX_WORKERS_RNG_H_INCLUDED
+#define PWX_PWX_WORKERS_RNG_H_INCLUDED
 
 /** @file pwx_worker_RNG.h
   *
@@ -49,5 +49,5 @@ extern PWX_API CRandom RNG; // [R]andom [N]-Value [G]enerator
 }
 
 
-#endif // PWX_PWX_WORKERS_H_INCLUDED
+#endif // PWX_PWX_WORKERS_RNG_H_INCLUDED
 

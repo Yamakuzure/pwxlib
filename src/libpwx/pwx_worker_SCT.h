@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PWX_PWX_WORKERS_H_INCLUDED
-#define PWX_PWX_WORKERS_H_INCLUDED
+#ifndef PWX_PWX_WORKERS_SCT_H_INCLUDED
+#define PWX_PWX_WORKERS_SCT_H_INCLUDED
 
 /** @file pwx_worker_SCT.h
   *
@@ -48,5 +48,5 @@ extern PWX_API CSinCosTable SCT; // [S]ine-/[C]osine-[T]able
 }
 
 
-#endif // PWX_PWX_WORKERS_H_INCLUDED
+#endif // PWX_PWX_WORKERS_SCT_H_INCLUDED
 

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PWX_PWX_WORKERS_H_INCLUDED
-#define PWX_PWX_WORKERS_H_INCLUDED
+#ifndef PWX_PWX_WORKERS_PAH_H_INCLUDED
+#define PWX_PWX_WORKERS_PAH_H_INCLUDED
 
 /** @file pwx_worker_PAH.h
   *
@@ -48,5 +48,5 @@ extern PWX_API CArgHandler  PAH; // [P]rogram [A]rgument [H]andler
 }
 
 
-#endif // PWX_PWX_WORKERS_H_INCLUDED
+#endif // PWX_PWX_WORKERS_PAH_H_INCLUDED
 
