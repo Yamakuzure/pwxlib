@@ -1,6 +1,13 @@
 pwxLib Revision History
 -----------------------
 
+0.8.9 - 2018-12-13
+The library is a real library now, utilizes the meson+ninja build system, and has been moved to GitHub.
+Most of the old stuff has been ported and moderniced. The CCnfFileHandler is still missing, though.
+
+0.8.7 - 0.8.8 
+The exact history is sadly lost due to lack of time and a lot of refactoring, reordering and rewriting.
+
 0.8.6 - 2012-04-??
 * CCnfFileHandler.h: Fixed a memory leak - CCnfFileHandler::contInterface was not deleted.
                      Fixed a bug that caused the removal of data flags from a file to remove all flags.

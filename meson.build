@@ -1,5 +1,5 @@
 project('pwxlib', 'cpp',
-        version : '0.8.8',
+        version : '0.8.9',
         license : 'MIT',
         default_options: [
                 'cpp_std=c++17',
@@ -336,8 +336,13 @@ endforeach
 
 install_data('AUTHORS',
              'ChangeLog',
+	     'code_of_conduct.md',
+	     'CONTRIBUTING.md',
+	     'INSTALL.md',
              'LICENSE',
+	     'NEWS.md',
              'README.md',
+	     'TODO.md',
              install_dir : docdir)
 
 ############################################################
