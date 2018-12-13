@@ -118,6 +118,7 @@
   * 0.8.7.4   2013-08-27  sed, PrydeWorX  Imported pwxLib CWaveColor.
   * 0.8.7.5   2013-11-04  sed, PrydeWorX  Imported pwxLib CArgHandler
   * 0.8.8.0   2015-08-13  sed, PrydeWorX  Reordered and modernized
+  * 0.8.9     2018-12-13  sed, PrydeWorX  First release on GitHub.
   @endverbatim
 **/
 
