@@ -4,8 +4,6 @@ project('pwxlib', 'cpp',
         default_options: [
                 'cpp_std=c++17',
                 'prefix=/usr',
-                'sysconfdir=/etc',
-                'localstatedir=/var',
         ],
         meson_version : '>= 0.48',
        )
@@ -25,7 +23,6 @@ bindir = join_paths(prefixdir, get_option('bindir'))
 libdir = join_paths(prefixdir, get_option('libdir'))
 testsdir = join_paths(libdir, 'pwx')
 
-sysconfdir = join_paths(prefixdir, get_option('sysconfdir'))
 includedir = join_paths(prefixdir, get_option('includedir'))
 datadir = join_paths(prefixdir, get_option('datadir'))
 
@@ -349,7 +346,6 @@ status = [
         '@0@ @1@'.format(meson.project_name(), meson.project_version()),
 
         'prefix:                            @0@'.format(prefixdir),
-        'sysconf dir:                       @0@'.format(sysconfdir),
         'includedir:                        @0@'.format(pkgincludedir),
         'lib dir:                           @0@'.format(libdir),
         'bin dir:                           @0@'.format(bindir),
