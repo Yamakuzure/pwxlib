@@ -146,7 +146,7 @@ std::ostream PWX_API &operator<< (std::ostream& os, const CAdjRight& r) noexcept
 
 /** @brief get the next seperated value
   *
-  * This method extracts a value from an ifstream into @a value.
+  * This function extracts a value from an ifstream into @a value.
   * If a @a separator is given, the method fails if the next value
   * in the stream is something else if @a search is false. But if
   * @a search is set to true, the method will forward to the next

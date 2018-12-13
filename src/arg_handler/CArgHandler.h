@@ -55,7 +55,7 @@ namespace pwx {
   *
   * Usage is quite simple.
   * <LIST>
-  * <LI>Call <I>addArg()</>I for each argument your program
+  * <LI>Call <I>addArg()</I> for each argument your program
   * should support.</LI>
   * <LI>Use <I>addPassthrough()</I> if command line arguments
   * must be preserved for later distribution to another
@@ -76,8 +76,8 @@ namespace pwx {
   * <LI><I>getHelpStr(arg, length)</LI> returns a string with
   * both the short and/or long argument plus parameter and
   * description. This string is formatted using the found
-  * maximum lengths of short arguments, long argumens and
-  * parameter neames according to the given line length. If the
+  * maximum lengths of short arguments, long arguments and
+  * parameter names according to the given line length. If the
   * resulting string is too long, it will line break.</LI>
   * <LI>Finally <I>clearArgs()</I> frees all allocated memory.
   * </LI></LIST>
@@ -100,12 +100,12 @@ namespace pwx {
   * <I>arg_target</I> and the <I>arg_type</I> make sense.
   * If they do not, bad things may happen, at least the
   * argument might not do what you expect. This condition
-  * is tested with an assert.
+  * is tested with an assertion.
   *
   * Both the short argument and the long argument must be
   * unique. If a given argument is already known to the
   * handler, it will be <B>ignored</B>! This condition is
-  * tested with an assert.
+  * tested with an assertion.
   *
   * Either of the arguments <I>arg_short</I> or <I>arg_long</I>
   * can be nullptr, but not both. If both are set to
@@ -114,8 +114,8 @@ namespace pwx {
   *
   * If the creation of an argument target instance fails, a
   * pwx::CException with the name "ArgTargetCreationFailed" is
-  * thrown. Argument targets are organized using pwx::TChainHash,
-  * if the creation of a hash element fails, the thrown
+  * thrown. Argument targets are organized using pwx::TChainHash.
+  * If the creation of a hash element fails, the thrown
   * exception has the name "ElementCreationFailed".
   *
   * If you need to pass arguments to a called process,

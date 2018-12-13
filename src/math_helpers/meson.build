@@ -1,8 +1,6 @@
 mathhelpers_sources = files('''
         CSinCosTable.cpp
-        CSinCosTable.h
         MathHelpers.cpp
-        MathHelpers.h
 '''.split())
 
 mathhelpers_headers = '''

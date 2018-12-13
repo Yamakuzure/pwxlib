@@ -15,8 +15,7 @@ using std::string;
 #include <fstream>
 using std::ofstream;
 
-#include "pwx.h"
-#include "StreamHelpers.h"
+#include <pwxlib.h>
 using   pwx::RNG;
 typedef pwx::CAdjRight adjRight;
 

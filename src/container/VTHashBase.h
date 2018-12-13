@@ -1199,7 +1199,7 @@ public:
 	virtual elem_t* operator[] (int64_t index) noexcept
 	{
 		HASH_WAIT_FOR_CLEAR_AND_GROW
-		return const_cast<elem_t* > (privGetByIndex(static_cast<const int64_t> (index)));
+		return const_cast<elem_t* > (privGetByIndex(index));
 	}
 
 

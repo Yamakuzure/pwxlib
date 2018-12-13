@@ -1,21 +1,5 @@
-#pragma once
-#ifndef PWX_HELPERS_H_INCLUDED
-#define PWX_HELPERS_H_INCLUDED
-
-/** @file pwx_helpers.h
-  *
-  * @brief This file adds all helper classes and functions.
-  *
-  * This include file adds helper classes and functions for various tasks that
-  * are currently included in pwxLib. In detail these are:
-  *
-  * <TABLE border='1'>
-  * <TR><TH>Tasks</TH><TH>Include file</TH></TR>
-  * <TR><TD>Tools to work with float comparison, distances and degrees.</TD>
-  *   <TD>MathHelpers.h.h</TD></TR>
-  * <TR>Tools to help with stream formatting and handling.<TD>
-  *   </TD><TD>StreamHelpers.h.h</TD></TR>
-  * </TABLE>
+/**
+  * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -46,9 +30,14 @@
 **/
 
 
-#include "MathHelpers.h"
-#include "StreamHelpers.h"
+#include "pwx_worker_SCT.h"
 
 
-#endif // PWX_HELPERS_H_INCLUDED
+#if !defined(PWX_INITIAL_SCT_PRECISION)
+#  define PWX_INITIAL_SCT_PRECISION -1
+#endif // defined(PWX_INITIAL_SCT_PRECISION)
 
+
+/* --- Instantiations of global workers --- */
+
+pwx::CSinCosTable pwx::SCT(PWX_INITIAL_SCT_PRECISION); // [S]ine-/[C]osine-[T]able

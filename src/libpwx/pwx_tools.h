@@ -1,5 +1,21 @@
-/**
-  * This file is part of the PrydeWorX Library (pwxLib).
+#pragma once
+#ifndef PWX_HELPERS_H_INCLUDED
+#define PWX_HELPERS_H_INCLUDED
+
+/** @file pwx_tools.h
+  *
+  * @brief This file adds all tool classes and functions.
+  *
+  * This include file adds tool classes and functions for various tasks that
+  * are currently included in pwxLib. In detail these are:
+  *
+  * <TABLE border='1'>
+  * <TR><TH>Tasks</TH><TH>Include file</TH></TR>
+  * <TR><TD>Tools to work with float comparison, distances and degrees.</TD>
+  *   <TD>MathHelpers.h.h</TD></TR>
+  * <TR>Tools to help with stream formatting and handling.<TD>
+  *   </TD><TD>StreamHelpers.h.h</TD></TR>
+  * </TABLE>
   *
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -30,17 +46,9 @@
 **/
 
 
-#include "pwx_workers.h"
+#include "MathHelpers.h"
+#include "StreamHelpers.h"
 
 
-#if !defined(PWX_INITIAL_SCT_PRECISION)
-#  define PWX_INITIAL_SCT_PRECISION -1
-#endif // defined(PWX_INITIAL_SCT_PRECISION)
+#endif // PWX_HELPERS_H_INCLUDED
 
-
-/* --- Instantiations of global workers --- */
-
-
-pwx::CArgHandler  pwx::PAH;    // [P]rogram [A]rgument [H]andler
-pwx::CRandom      pwx::RNG;    // [R]andom [N]-Value [G]enerator
-pwx::CSinCosTable pwx::SCT(PWX_INITIAL_SCT_PRECISION); // [S]ine-/[C]osine-[T]able

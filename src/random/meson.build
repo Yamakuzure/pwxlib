@@ -1,14 +1,12 @@
 random_sources = files('''
         CRandomConstants.h
         CRandom.cpp
-        CRandom.h
         CRandomTHash.cpp
         CRandomTHash.h
         CRandomTRandom.cpp
         CRandomTRandom.h
         CRandomWordConstants.h
         eNameSourceType.cpp
-        eNameSourceType.h
 '''.split())
 
 random_headers = '''

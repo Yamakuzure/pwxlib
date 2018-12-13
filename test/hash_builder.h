@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TEST_HASH_BUILDER_H_INCLUDED
 #define PWX_LIBPWX_TEST_HASH_BUILDER_H_INCLUDED 1
 
-#include <pwx.h>
+#include <pwxlib.h>
 using pwx::RNG;
 typedef pwx::CAdjRight adjRight;
 

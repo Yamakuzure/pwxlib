@@ -366,7 +366,7 @@ public:
 	**/
 	virtual elem_t* get (int32_t index) noexcept
 	{
-		return const_cast<elem_t* > (privGetElementByIndex (static_cast<const int32_t> (index)));
+		return const_cast<elem_t* > (privGetElementByIndex (index));
 	}
 
 
@@ -424,7 +424,7 @@ public:
 	**/
 	virtual data_t &getData (int32_t index)
 	{
-		PWX_TRY_PWX_FURTHER(return const_cast<data_t&>(getData(static_cast<const int32_t>(index))))
+		PWX_TRY_PWX_FURTHER(return const_cast<data_t&>(getData(index)))
 	}
 
 
@@ -894,7 +894,7 @@ public:
 	**/
 	virtual elem_t* operator[] (int32_t index) noexcept
 	{
-		return const_cast<elem_t* > (this->privGetElementByIndex (static_cast<const int32_t> (index)));
+		return const_cast<elem_t* > (this->privGetElementByIndex (index));
 	}
 
 

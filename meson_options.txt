@@ -1,21 +1,25 @@
-option('debug', type : 'boolean', value : false,
+option('debug-extra', type : 'boolean', value : false,
        description : 'Enable extra debugging output. (Default: false)')
 
-option('threaddebug', type : 'boolean', value : false,
-       description : 'Enabling this produces massive output and should not be
-enabled lightly.
-Make sure to disable it before running tools like helgrind
-or DRD on any program that uses pwxLib! (Default: false, Implies debug=true)')
+option('debug-thread', type : 'boolean', value : false,
+       description : '''Enabling this produces massive output and should not be
+                                              enabled lightly.
+                                              Make sure to disable it before running tools like
+                                              helgrind or DRD on any program that uses pwxLib!
+                                              (Default: false, Implies debug-extra=true)''')
 
 option('annotations', type : 'boolean', value : false,
-       description : 'If this is enabled, glibc is told to annotate inter thread
-synchronization events. This is needed if you do not want to get plenty of false
-positives in Helgrind.
-You must have valgrind installed on your system and valgrind/helgrind.h
-somewhere it can be found (like /usr/include) (Default: false, Implies debug=true)')
+       description : '''If this is enabled, glibc is told to annotate inter
+                                              thread synchronization events. This is needed if you do
+                                              not want to get plenty of false positives in Helgrind.
+                                              You must have valgrind installed on your system and
+                                              valgrind/helgrind.h somewhere it can be found (like
+                                              /usr/include) (Default: false, Implies
+                                              debug-extra=true)''')
 
 option('profile', type : 'boolean', value : false,
-       description : 'Enable profiling output. (Default: false, Implies debug=false)')
+       description : '''Enable profiling output.
+                                              (Default: false, Implies debug=false)''')
 
 option('graphite', type : 'boolean', value : false,
        description : 'Enable gcc graphite extensions. (Default: false)')
@@ -39,7 +43,8 @@ option('graphite', type : 'boolean', value : false,
 #  Chained Hash Tables    388 ms /     0 ms /  269 ms |   758 ms /     0 ms /  414 ms
 #  Open Hash Tables       497 ms /     0 ms /  155 ms |   807 ms /     0 ms /  181 ms
 option('spinlocks', type : 'boolean', value : true,
-       description : 'Use atomic_flag spinlocks instead of mutexes. (Default: true)')
+       description : '''Use atomic_flag spinlocks instead of mutexes.
+                                              (Default: true)''')
 
 # The following settings lets threads do a yield() whenever
 # they wait to get the spinlock. This setting is ignored
@@ -62,13 +67,11 @@ option('spinlocks', type : 'boolean', value : true,
 #  Chained Hash Tables    388 ms /     0 ms /  269 ms |  1459 ms /     0 ms /  180 ms
 #  Open Hash Tables       497 ms /     0 ms /  155 ms |  1513 ms /     0 ms /  150 ms
 option('yielding', type : 'boolean', value : true,
-       description : 'Let spinlocks yield when they can not lock. (Default: true, implies spinlocks=true)')
+       description : '''Let spinlocks yield when they can not lock.
+                                              (Default: true, implies spinlocks=true)''')
 
 option('html', type : 'boolean', value : true,
        description : 'Use doxygen to build HTML documentation (Default: true)')
-
-option('tools', type : 'boolean', value : true,
-       description : 'Build tools utilizing pwxLib (Default: true)')
 
 option('tests', type : 'boolean', value : false,
        description : 'Build the pwxLib test programs (Default: false)')
@@ -77,4 +80,5 @@ option('install-tests', type : 'boolean', value : false,
        description : 'Install the pwxLib test programs (Default: false)')
 
 option('torture', type : 'boolean', value : false,
-       description : 'Build "torture", a multi threading container burner (Default: false)')
+       description : '''Build "torture", a multi threading container burner
+                                              (Default: false)''')

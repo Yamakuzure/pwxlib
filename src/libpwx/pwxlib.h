@@ -116,15 +116,17 @@
   * 0.8.7.3   2013-08-25  sed, PrydeWorX  Changed TSet to use a TChainHash for lookup and optimized all containers.
   *                                       pwxLibNG now supports Spinlocks without yield() and using mutexes via Makefile.
   * 0.8.7.4   2013-08-27  sed, PrydeWorX  Imported pwxLib CWaveColor.
+  * 0.8.7.5   2013-11-04  sed, PrydeWorX  Imported pwxLib CArgHandler
+  * 0.8.8.0   2015-08-13  sed, PrydeWorX  Reordered and modernized
   @endverbatim
 **/
 
 
-#include "pwx_basic.h"
-#include "pwx_containers.h"
-#include "pwx_helpers.h"
-#include "pwx_utils.h"
-#include "pwx_workers.h"
+#include <pwx_basic.h>
+#include <pwx_containers.h>
+#include <pwx_tools.h>
+#include <pwx_utils.h>
+#include <pwx_workers.h>
 
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED

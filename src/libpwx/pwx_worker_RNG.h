@@ -1,22 +1,13 @@
 #pragma once
-#ifndef PWX_PWX_WORKERS_H_INCLUDED
-#define PWX_PWX_WORKERS_H_INCLUDED
+#ifndef PWX_PWX_WORKERS_RNG_H_INCLUDED
+#define PWX_PWX_WORKERS_RNG_H_INCLUDED
 
-/** @file pwx_workers.h
+/** @file pwx_worker_RNG.h
   *
-  * @brief This file makes the workers (PAH, RNG, SCT) available.
+  * @brief This file makes the worker RNG available.
   *
-  * This include file adds all necessary includes to make the pwxLib workers
-  * available. These workers are:
-  * <TABLE border='1'>
-  * <TR><TH>Worker</TH><TH>Task</TH><TH>Include file</TH></TR>
-  * <TR><TD>PAH</TD><TD>Handle arguments to, and help texts from a program.</TD>
-  *   <TD>CArgHandler.h</TD></TR>
-  * <TR><TD>RNG</TD><TD>Thread safe random number, random names, noise, simplex
-  *   noise and hash generation.</TD><TD>CRandom.h</TD></TR>
-  * <TR><TD>SCT</TD><TD>Provides sine/cosine tables of variable precision</TD>
-  *   <TD>CSinCosTable.h</TD></TR>
-  * </TABLE>
+  * The RNG worker is a thread safe random number, random name, noise, simplex
+  *   noise and hash generator.
   *
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -47,10 +38,16 @@
 **/
 
 
-#include <pwx_worker_PAH.h>
-#include <pwx_worker_RNG.h>
-#include <pwx_worker_SCT.h>
+#include "CRandom.h"
 
 
-#endif // PWX_PWX_WORKERS_H_INCLUDED
+namespace pwx {
+
+/// @brief Global random value generator that can be used centrally in any project
+extern PWX_API CRandom RNG; // [R]andom [N]-Value [G]enerator
+
+}
+
+
+#endif // PWX_PWX_WORKERS_RNG_H_INCLUDED
 
