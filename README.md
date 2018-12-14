@@ -217,45 +217,45 @@ The containers are, in alphabetical order:
 
 A chained hash container for variable types.
 
-### pwxTDoubleList.h
+### TDoubleList
 > `#include  "pwxTDoubleList.h"`
 
 A simple doubly linked list for variable types.
 
-### pwxTDoubleRing.h
+### TDoubleRing
 > `#include  "pwxTDoubleRing.h"`
 
 A simple doubly linked ring (head and tail are connected) for variable types.
 
-### pwxTOpenHash.h
+### TOpenHash
 > `#include  "pwxTOpenHash.h"`
 
 An open hash container for variable types. This container features "Robin Hood
 Hashing", which greatly reduces secondary clustering.
 
-### pwxTQueue.h
+### TQueue
 > `#include  "pwxTQueue.h"`
 
 A queue container, pushes to tail, pops from head.
 
-### pwxTSet.h
+### TSet
 > `#include  "pwxTSet.h"`
 
 A set is a group of elements, where each element exists exactly once. Common set
 arithmetics like detecting subsets, building intersections, differences and
 unions are supported.
 
-### pwxTSingleList.h
+### TSingleList
 > `#include  "pwxTSingleList.h"`
 
 A simple singly linked list for variable types.
 
-### pwxTSingleRing.h
+### TSingleRing
 > `#include  "pwxTSingleRing.h"`
 
 A simple singly linked ring (head and tail are connected) for variable types.
 
-### pwxTStack.h
+### TStack
 > `#include  "pwxTStack.h"`
 
 A stack container, pushes to tail, pops from tail.
