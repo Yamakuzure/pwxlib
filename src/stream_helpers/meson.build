@@ -3,7 +3,7 @@ stream_helpers_sources = '''
 '''.split()
 
 stream_helpers_headers = '''
-        StreamHelpers.h
+        pwxStreamHelpers.h
 '''.split()
 
 libpwx_headers += files(stream_helpers_headers)

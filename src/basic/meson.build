@@ -6,14 +6,14 @@ basic_sources = files('''
 '''.split())
 
 _basic_headers = '''
-        CException.h
-        CLockable.h
-        CLockGuard.h
-        compiler.h
-        debug.h
-        macros.h
-        templates.h
-        types.h
+        pwxCException.h
+        pwxCLockable.h
+        pwxCLockGuard.h
+        pwx_compiler.h
+        pwx_debug.h
+        pwx_macros.h
+        pwx_templates.h
+        pwx_types.h
 '''.split()
 
 libpwx_headers += files(_basic_headers)

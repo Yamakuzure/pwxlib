@@ -4,7 +4,7 @@
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
-  *         https://github.com/Yamakuzure/pwxlib ; https://prydeworx.com/pwxlib/
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
   * 
@@ -32,13 +32,13 @@
 
 #include <cstring>
 
-#include "compiler.h"
-#include "CException.h"
-#include "CLockGuard.h"
-#include "CSinCosTable.h"
-#include "debug.h"
-#include "macros.h"
-#include "MathHelpers.h"
+#include "pwx_compiler.h"
+#include "pwxCException.h"
+#include "pwxCLockGuard.h"
+#include "pwxCSinCosTable.h"
+#include "pwx_debug.h"
+#include "pwx_macros.h"
+#include "pwxMathHelpers.h"
 
 
 namespace pwx {

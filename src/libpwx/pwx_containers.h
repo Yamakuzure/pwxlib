@@ -25,7 +25,7 @@
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
-  *         https://github.com/Yamakuzure/pwxlib ; https://prydeworx.com/pwxlib/
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
   * 
@@ -51,15 +51,15 @@
 **/
 
 
-#include "TChainHash.h"
-#include "TDoubleList.h"
-#include "TDoubleRing.h"
-#include "TOpenHash.h"
-#include "TQueue.h"
-#include "TSet.h"
-#include "TSingleList.h"
-#include "TSingleRing.h"
-#include "TStack.h"
+#include "pwxTChainHash.h"
+#include "pwxTDoubleList.h"
+#include "pwxTDoubleRing.h"
+#include "pwxTOpenHash.h"
+#include "pwxTQueue.h"
+#include "pwxTSet.h"
+#include "pwxTSingleList.h"
+#include "pwxTSingleRing.h"
+#include "pwxTStack.h"
 
 
 #endif // PWX_CONTAINERS_H_INCLUDED

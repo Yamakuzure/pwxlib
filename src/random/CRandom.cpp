@@ -4,7 +4,7 @@
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
-  *         https://github.com/Yamakuzure/pwxlib ; https://prydeworx.com/pwxlib/
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
   * 
@@ -35,14 +35,14 @@
 #include <cstring>
 #include <string>
 
-#include "compiler.h"
-#include "CRandom.h"
+#include "pwx_compiler.h"
+#include "pwxCRandom.h"
 #include "CRandomTHash.h"
 #include "CRandomTRandom.h"
 #include "CRandomWordConstants.h"
-#include "debug.h"
-#include "macros.h"
-#include "StreamHelpers.h"
+#include "pwx_debug.h"
+#include "pwx_macros.h"
+#include "pwxStreamHelpers.h"
 
 
 namespace pwx {

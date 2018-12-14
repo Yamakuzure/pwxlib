@@ -105,16 +105,16 @@ This file adds all basic types, classes and functions that are used throughout
 the library. The following few might be useful for you, too.
 
 ### CException
-> `#include <CException.h>`
+> `#include <pwxCException.h>`
 
 This is a basic exception class with tracing functionality. It is meant to
 provide a tracing exception to get as much information as possible.
 
-To make the most out of this system, the file `pwxlib/macros.h` provides many
+To make the most out of this system, the file `pwxlib/pwx_macros.h` provides many
 macros to try, catch and throw further exceptions with tracing information.
 
 ### CLockable
-> `#include <CLockable.h>`
+> `#include <pwxCLockable.h>`
 
 This is a base class to make objects lockable via atomic_flag and lock counting.  
 `CLockable` implements a recursive behavior. Every call to `lock()` by the
@@ -133,7 +133,7 @@ Please keep in mind, that your design might be flawed if you find yourself in a
 situation in which you really need either method.
 
 ### CLockGuard
-> `#include <CLockGuard.h>`
+> `#include <pwxCLockGuard.h>`
 
 This is a RAII lock guard to lock/unlock one, two or three objects within its
 constructor/destructor.  
@@ -147,7 +147,7 @@ directly:
    by resetting to nullptr.
 
 ### Debug logging
-> `#include <debug.h>`
+> `#include <pwx_debug.h>`
 
 Besides many useful macros for debugging possible multi-threading issues, this
 header also declares the `debug_log()` and `debug_err()` functions.
@@ -157,7 +157,7 @@ defined, so they can be used everywhere and stay out of the way in release
 builds.
 
 ### General purpose macros
-> `#include <macros.h>`
+> `#include <pwx_macros.h>`
 
 In here are a lot useful macros for various tasks. All of these are prefixed
 with "`PWX_`". The four most prominent groups are the following:
@@ -215,50 +215,50 @@ miss the extra features the standard containers offer; more so since C++14.
 The containers are, in alphabetical order:
 
 ### TChainHash
-> `#include <TChainHash.h>`
+> `#include <pwxTChainHash.h>`
 
 A chained hash container for variable types.
 
-### TDoubleList.h
-> `#include  "TDoubleList.h"`
+### pwxTDoubleList.h
+> `#include  "pwxTDoubleList.h"`
 
 A simple doubly linked list for variable types.
 
-### TDoubleRing.h
-> `#include  "TDoubleRing.h"`
+### pwxTDoubleRing.h
+> `#include  "pwxTDoubleRing.h"`
 
 A simple doubly linked ring (head and tail are connected) for variable types.
 
-### TOpenHash.h
-> `#include  "TOpenHash.h"`
+### pwxTOpenHash.h
+> `#include  "pwxTOpenHash.h"`
 
 An open hash container for variable types. This container features "Robin Hood
 Hashing", which greatly reduces secondary clustering.
 
-### TQueue.h
-> `#include  "TQueue.h"`
+### pwxTQueue.h
+> `#include  "pwxTQueue.h"`
 
 A queue container, pushes to tail, pops from head.
 
-### TSet.h
-> `#include  "TSet.h"`
+### pwxTSet.h
+> `#include  "pwxTSet.h"`
 
 A set is a group of elements, where each element exists exactly once. Common set
 arithmetics like detecting subsets, building intersections, differences and
 unions are supported.
 
-### TSingleList.h
-> `#include  "TSingleList.h"`
+### pwxTSingleList.h
+> `#include  "pwxTSingleList.h"`
 
 A simple singly linked list for variable types.
 
-### TSingleRing.h
-> `#include  "TSingleRing.h"`
+### pwxTSingleRing.h
+> `#include  "pwxTSingleRing.h"`
 
 A simple singly linked ring (head and tail are connected) for variable types.
 
-### TStack.h
-> `#include  "TStack.h"`
+### pwxTStack.h
+> `#include  "pwxTStack.h"`
 
 A stack container, pushes to tail, pops from tail.
 
@@ -270,7 +270,7 @@ Tools
 Here you can find various tools helping with small tasks.
 
 ### Math Helpers
-> `#include <pwxlib/MathHelpers.h>`
+> `#include <pwxlib/pwxMathHelpers.h>`
 
 This file adds some tools for various mathematical tasks like handling floating
 point comparison, calculating distances and working with degrees.
@@ -299,7 +299,7 @@ Bruce Dawson's article
    Simple function to normalize any degree into 0 <= result < 360.
 
 ### Stream Helpers
-> `#include <pwxlib/StreamHelpers.h>`
+> `#include <pwxlib/pwxStreamHelpers.h>`
 
 This file adds some tools to make working with streams easier.
 
@@ -350,7 +350,7 @@ Utilities
 Currently only one utility class exists, but more are planned.
 
 ### CWaveColor
-> `#include <pwxlib/CWaveColor.h>`
+> `#include <pwxlib/pwxCWaveColor.h>`
 
 This is a utility class to work with the frequencies any RGB color is made of.
 
@@ -379,7 +379,7 @@ This is a handler for command line arguments.
 The usage is quite simple.
 
 You can instantiate your own instance using the `CArgHandler` class yourself.
-> `#include <pwxLib/CArgHandler.h>`
+> `#include <pwxLib/pwxCArgHandler.h>`
 
 #### PAH usage overview
 Call `addArg()` for each argument your program should support. Use
@@ -456,7 +456,7 @@ This worker can be used to produce unique or pseudo random numbers, hashes and
 names.
 
 You can instantiate your own instance using the `CRandom` class yourself.
-> `#include <pwxLib/CRandom.h>`
+> `#include <pwxLib/pwxCRandom.h>`
 
 The following sets of functions are available.
 
@@ -500,7 +500,7 @@ of -1, define `PWX_INITIAL_SCT_PRECISION` to the desired value when compiling
 pwxlib.
 
 You can instantiate your own instance using the `CSinCosTable` class yourself.
-> `#include <pwxLib/CSinCosTable.h>`
+> `#include <pwxLib/pwxCSinCosTable.h>`
 
 Calculating sine and cosine values does not take much time nowadays as FPUs get
 stronger every other day. On the other hand, if you need these values for

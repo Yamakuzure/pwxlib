@@ -6,24 +6,24 @@ container_sources = files('''
 '''.split())
 
 container_headers = '''
-        CHashBuilder.h
-        CThreadElementStore.h
-        TChainHash.h
-        TDoubleElement.h
-        TDoubleList.h
-        TDoubleRing.h
-        THashElement.h
-        TOpenHash.h
-        TQueue.h
-        TSet.h
-        TSingleElement.h
-        TSingleList.h
-        TSingleRing.h
-        TStack.h
-        TVarDeleter.h
-        VContainer.h
-        VElement.h
-        VTHashBase.h
+        pwxCHashBuilder.h
+        pwxCThreadElementStore.h
+        pwxTChainHash.h
+        pwxTDoubleElement.h
+        pwxTDoubleList.h
+        pwxTDoubleRing.h
+        pwxTHashElement.h
+        pwxTOpenHash.h
+        pwxTQueue.h
+        pwxTSet.h
+        pwxTSingleElement.h
+        pwxTSingleList.h
+        pwxTSingleRing.h
+        pwxTStack.h
+        pwxTVarDeleter.h
+        pwxVContainer.h
+        pwxVElement.h
+        pwxVTHashBase.h
 '''.split()
 
 libpwx_headers += files(container_headers)

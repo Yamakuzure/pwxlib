@@ -4,7 +4,7 @@
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
-  *         https://github.com/Yamakuzure/pwxlib ; https://prydeworx.com/pwxlib/
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
   * 
@@ -32,8 +32,8 @@
 
 #include <cstring>
 
-#include "CException.h"
-#include "macros.h"
+#include "pwxCException.h"
+#include "pwx_macros.h"
 
 
 namespace pwx {
@@ -44,7 +44,7 @@ namespace pwx {
   * is set exactly once with this constructor and must not be changed apart from
   * the trace.
   *
-  * You can use the macro PWX_THROW() from pwx/general/macros.h to throw this
+  * You can use the macro PWX_THROW() from pwx/general/pwx_macros.h to throw this
   * kind of exceptions in a very convenient way. It'll fill in the positional
   * information for you. The macro PWX_THROW_STD_FURTHER from the same file
   * can be used to convert an std::exception into a pwx::CException with tracing

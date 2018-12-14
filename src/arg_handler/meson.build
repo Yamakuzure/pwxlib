@@ -7,14 +7,14 @@ arg_sources = files('''
 '''.split())
 
 arg_headers = '''
-        CArgCallback.h
-        CArgHandler.h
-        TArgTarget.h
-        VArgTargetBase.h
-        eArgErrorNumber.h
-        eArgSetType.h
-        eArgTargetType.h
-        sArgError.h
+        pwxCArgCallback.h
+        pwxCArgHandler.h
+        pwxTArgTarget.h
+        pwxVArgTargetBase.h
+        pwx_eArgErrorNumber.h
+        pwx_eArgSetType.h
+        pwx_eArgTargetType.h
+        pwx_sArgError.h
 '''.split()
 
 libpwx_headers += files(arg_headers)

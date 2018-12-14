@@ -4,7 +4,7 @@
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
-  *         https://github.com/Yamakuzure/pwxlib ; https://prydeworx.com/pwxlib/
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
   * 
@@ -34,9 +34,9 @@
 #  include <cstdarg>
 #  include <thread>
 
-#  include "compiler.h"
+#  include "pwx_compiler.h"
 #endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-#include "debug.h"
+#include "pwx_debug.h"
 
 
 namespace pwx {

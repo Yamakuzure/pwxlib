@@ -10,7 +10,7 @@
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
-  *         https://github.com/Yamakuzure/pwxlib ; https://prydeworx.com/pwxlib/
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
   * 
@@ -39,8 +39,8 @@
 #include <type_traits>
 
 #include "CRandomConstants.h"
-#include "macros.h"
-#include "MathHelpers.h"
+#include "pwx_macros.h"
+#include "pwxMathHelpers.h"
 
 
 namespace pwx {
