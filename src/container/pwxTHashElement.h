@@ -596,7 +596,7 @@ THashElement<key_t, data_t>::~THashElement() noexcept
 			// have made a copy in the mean time before "isDestroyed"
 			// was finished setting to true.
 			if (1 == data.use_count()) {
-				PWX_TRY(data.reset()) // the shared_ptr will delete the data now
+				PWX_TRY(if (data) { data.reset(); }) // the shared_ptr will delete the data now
 				catch(...) { }
 
 				// Do a lock cycle, so that threads having had to wait while the data
@@ -611,7 +611,7 @@ THashElement<key_t, data_t>::~THashElement() noexcept
 			}
 		} else {
 			// No thread safety? Then just do it!
-			PWX_TRY(data.reset())
+                        PWX_TRY(if (data) { data.reset(); })
 			catch(...) { }
 		}
 	}
