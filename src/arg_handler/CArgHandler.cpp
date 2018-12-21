@@ -177,7 +177,7 @@ static bool internalAddArg (
 /** @brief default empty ctor
   */
 CArgHandler::CArgHandler() noexcept :
-    longArgs (7, nullptr, nullptr, 256, 4.0, 1.733),
+    longArgs (37, 64, 4.0, 1.733),
     maxLongLen(0),
     maxParamLen(0),
     maxShortLen(0),
@@ -185,7 +185,7 @@ CArgHandler::CArgHandler() noexcept :
     pass_init(nullptr),
     pass_cnt(nullptr),
     prgCall(nullptr),
-    shortArgs(7, nullptr, nullptr, 256, 4.0, 1.733)
+    shortArgs(37, 64, 4.0, 1.733)
 {
 	/* Turn of thread safety for the hashes and the error list.
 	 * Multithreading does not make any sense, here! */
