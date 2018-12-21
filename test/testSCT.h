@@ -4,7 +4,7 @@
 
 #include "test_lib.h"
 
-int32_t testSCT (sEnv &env);
+int32_t testSCT ( sEnv& env );
 
 
 #endif // PWX_LIBPWX_TESTLIB_TESTSCT_H_INCLUDED

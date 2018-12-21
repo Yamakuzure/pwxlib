@@ -9,8 +9,8 @@ if [[ "x" == "x$xType" ]]; then
 	echo "  release - Release build"
 	echo "  debug   - Debug build"
 	echo "  dbgthread - thread-debug build (many messages about)"
-	echo "  asan      - Use address sanitizer (enables debug)"
-	echo "  lsan      - Use leak sanitizer    (enables debug)"
+	echo "  asan      - Use address sanitizer (enables debug) (disables lsan)"
+	echo "  lsan      - Use leak sanitizer    (enables debug) (also enables asan)"
 	echo "  tsan      - Use thread sanitizer  (enables debug)"
 	exit 0
 fi
@@ -23,9 +23,11 @@ elif [[ "debug" == "$xType" ]]; then
 elif [[ "dbgthread" == "$xType" ]]; then
 	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=true"
 elif [[ "asan" == "$xType" ]]; then
+	export ASAN_OPTIONS=detect_leaks=0
 	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address"
 elif [[ "lsan" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=memory"
+	export ASAN_OPTIONS=detect_leaks=1
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address"
 elif [[ "tsan" == "$xType" ]]; then
 	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread"
 else

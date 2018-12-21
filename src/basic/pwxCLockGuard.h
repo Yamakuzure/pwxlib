@@ -15,17 +15,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -55,53 +55,52 @@ namespace pwx {
   * <li>If it is not possible to wait for the destructor, the lock(s) can be unlocked
   * by resetting to nullptr.</li></list>
 **/
-class PWX_API CLockGuard
-{
-public:
+class PWX_API CLockGuard {
+  public:
 
-	/* ===============================================
-	 * === Public constructors and destructors     ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public constructors and destructors     ===
+     * ===============================================
+    */
 
-	CLockGuard(const CLockable* objA) noexcept;
-	CLockGuard(const CLockable* objA, const CLockable* objB) noexcept;
-	CLockGuard(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept;
-	CLockGuard(const CLockGuard &src) noexcept;
-	~CLockGuard() noexcept;
+    CLockGuard( const CLockable* objA ) noexcept;
+    CLockGuard( const CLockable* objA, const CLockable* objB ) noexcept;
+    CLockGuard( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept;
+    CLockGuard( const CLockGuard& src ) noexcept;
+    ~CLockGuard() noexcept;
 
-	// No empty ctor
-	CLockGuard() PWX_DELETE;
-
-
-	/* ===============================================
-	 * === Public operators                        ===
-	 * ===============================================
-	*/
-
-	CLockGuard &operator=(const CLockGuard &src) noexcept;
+    // No empty ctor
+    CLockGuard() PWX_DELETE;
 
 
-	/* ===============================================
-	 * === Public Methods                          ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public operators                        ===
+     * ===============================================
+    */
 
-	void reset(const CLockable* objA) noexcept;
-	void reset(const CLockable* objA, const CLockable* objB) noexcept;
-	void reset(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept;
+    CLockGuard& operator=( const CLockGuard& src ) noexcept;
 
 
-private:
+    /* ===============================================
+     * === Public Methods                          ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Private Members                         ===
-	 * ===============================================
-	*/
+    void reset( const CLockable* objA ) noexcept;
+    void reset( const CLockable* objA, const CLockable* objB ) noexcept;
+    void reset( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept;
 
-	CLockable* l_a = nullptr;
-	CLockable* l_b = nullptr;
-	CLockable* l_c = nullptr;
+
+  private:
+
+    /* ===============================================
+     * === Private Members                         ===
+     * ===============================================
+    */
+
+    CLockable* l_a = nullptr;
+    CLockable* l_b = nullptr;
+    CLockable* l_c = nullptr;
 };
 
 

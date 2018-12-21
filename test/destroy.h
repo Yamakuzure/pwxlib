@@ -7,9 +7,8 @@
 */
 
 template<typename T>
-void do_not_destroy (T*)
-{
-	/* Don't you dare! */
+void do_not_destroy ( T* ) {
+    /* Don't you dare! */
 }
 
 

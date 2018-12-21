@@ -15,17 +15,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -79,10 +79,10 @@ const uint32_t genMiddleAllow = 0x40000000; //!< A 2-character-combination is al
 const uint32_t genEndAllow    = 0x80000000; //!< A 2-character-combination is allowed to end a part
 
 /* --- constants for character to index offsets --- */
-const uint32_t chrOffsetLowStart = static_cast<uint32_t>('a');            // 0x61
-const uint32_t chrOffsetLowEnd   = static_cast<uint32_t>('z');            // 0x7a
-const uint32_t chrOffsetUppStart = static_cast<uint32_t>('A');            // 0x41
-const uint32_t chrOffsetUppEnd   = static_cast<uint32_t>('Z');            // 0x5a
+const uint32_t chrOffsetLowStart = static_cast<uint32_t>( 'a' );          // 0x61
+const uint32_t chrOffsetLowEnd   = static_cast<uint32_t>( 'z' );          // 0x7a
+const uint32_t chrOffsetUppStart = static_cast<uint32_t>( 'A' );          // 0x41
+const uint32_t chrOffsetUppEnd   = static_cast<uint32_t>( 'Z' );          // 0x5a
 const uint32_t chrOffsetDown     = chrOffsetLowStart - chrOffsetUppStart; // 0x20
 
 /* --- constants for the umlaut indexes --- */
@@ -127,7 +127,7 @@ const int32_t chrIndexUmlautU = 28;
 
 // Return true if the combination does not allow a following character, false otherwise
 #define FUM_MUST_FINISH(type, chOne, chTwo) \
-	(0 == (NameConstants::genCharMask & FUM_CHR_RULE(type, chOne, chTwo))) 
+	(0 == (NameConstants::genCharMask & FUM_CHR_RULE(type, chOne, chTwo)))
 
 // Return typed length of the consonant array
 #define CL_LEN(type) NameConstants::conListLen[(int)type]
@@ -782,77 +782,77 @@ const int32_t chrIndexUmlautU = 28;
 const uint32_t conListLen[6] = { 791, 458, 587, 792, 345, 637 };
 
 const char     conList[6][793] = {
-  "zmhrczcbdbgrnbrbnrtrnmhbhlhmgbmbcfcdzljnchckcsrdcsclmczcwcsdrdtdrtkdrdndjdnd"
-  "lspdgdrdjdsdhdcdcdrdndldsdlhldrjrfndglrfknhfkftfdfrftfsmlhclbkspgrntgkvngmrl"
-  "mnrhzsdgsmlhnfvhrhphthnhstngclbwfhdhsmkhsrhfhdkrhshghlmnhnlmdjrnsmrjrthmkjkn"
-  "rktkfkcbndntkhkhdktlhkhkdkfkrnrbntslflnrlndmnldlrlhldlslslnpglhlglnlkldlclnl"
-  "slsmlblglsgrlnrslrlmlhlgrtljlrlrlzlfmtmntbmjmsmbncmjsmpvtsjmnmgmrmnmgmlmdmnm"
-  "smrbfmhwtmnmhnlnbmrsmndkmnlnhctrznslntplncntngntnrthnsjnmdnsnlnknvgnlrknlnsn"
-  "cnhnvsdtlntvskmlnsdcnrnrncnjnmnstwnrnmnsbtdrnpnpfgpqrldrnkrlrtrnrlslrbrsrzrk"
-  "rmlrnrzrbrsrsrtnrprzrbldrmrtrmrltrstrdlrdjrnwrtnrhrlrnrsnrsrdrbrthrhrbdrfwrp"
-  "nrlrsrntklstnshsmsrslrmstbshsgsndslsmszskststshsdlsnsnlsrsmtcsnsrgldsdnsnslc"
-  "hgsjsrftstrtrtrbtkntgtntstjrnmtntrtgtnrtrtctntlzfhtnthtkftltrntrltmtmnrgvnvg"
-  "vhvgvrvnvzvwrtwvwhrnwxzkzdrzlnb",
-  "twlmzjlhfwbdhclmbdbrkjdclctnscnmctclchcbcnsrcfldtdgdnldrbdwrtdbdbrndrnldsdlh"
-  "nmdrdlclntnrlfgtgrfjnrdhlgnhbchrhmhnhjnhlhshghtdnkhfrlvhsnbgnsknhdtkhlnfkblr"
-  "lnlclglrlrdctklscnslmlsmdljnlslgnlrlbtlnlbnlslnklrlrlxglhlsftrnmrmrnwnltswxm"
-  "lmndnhnrnrnlnrnsnlnlrnkntnrnkwcrmnclntlhrgdndnbndnrnmndnktnsdhtrnfwnglnpmpbl"
-  "pqrsrlrnrmrkbrlnrtrmrwrcdnrdrgrlrnrcjrslrpkdlwnrnzrlcvpnrtrnrhrcdrstslnslsls"
-  "nlscsrkdstsplscmsrjmrstdtlntsrtkctntntrthstgdrtmtvtdblvmtftvbvrvtvjrwrwnsrhw"
-  "tw",
-  "znznbdncbzrnshskctbtbgmbcwlrcrcrcfltcsbcghscbrtcdrdkdrdltgknsdtdhrbdcdndrfnd"
-  "rdshpdvdhrndnftrbflflndnrldmdgsgrgnjsnrngsgngfhbkhnhkhmhlhshchmnhnhdrhlhghtd"
-  "rhmhmjrdmljgjpjnmrsnkhklthtsknldtbkrbklflrvlslclnlrhldlmltlrlnsnlgrdlkjvhlnl"
-  "cldlnlcdsnrcnrlvrdrklklrswlfrjmrndhmldrmnmlmtmhmnmtnplmtmnmtmnmscnhnfndnbhns"
-  "nsnmnmhnsnrzmlnrnljndnkrnvnwnknjnznsnrdlnlnjdfrlnrnhntnvnmnhnlnsnrnlpjmpdprp"
-  "qrltlrnfrlrblrlrtprbkrnmrmrlrnbrsrdrwbrflrlrlmclrdrsrwrtrkrtmbhtlrfrlrlrcrdn"
-  "crtgrgsfrkslnsvtsgskbsnrsmsvsnslshsnsnskcslswsrtslsnsgstltltntntcrtstmgtrtzt"
-  "hrtrtkdtkhtstwtzdtngtwtrtrtvgdmvlrdvslcrwlsnwmwltxbztzc",
-  "znzbzbtrbhstbwhndhbtntlfrlbtbdbnlbmclkvntpncdcncrhncvcrcrcgncscncfcsclctcdgd"
-  "tzrdrldksrdsdndsgbdndbdrdrfhftflhsflfnfhthftrfrfsrtmgngsgsghgsrbgtgdwgkrgmgs"
-  "gfnvgrgwnrbglgtgmgcgngrhngnvnhlmchmhplhsnghbkchntrbthlhtnhrhnhshththshlnfbsh"
-  "dhchlhmjkrlkrmtkpkrkhkbgrthksrtmnkckmkflbdpsflclflkdlklslnhlplnlhrptsfrnlcld"
-  "rtnrsrlrlrzlsrldtntnlnrmkmhmtskmtmnmhmskstfmpmnbmsgmpmfmnrgtgnwnbnfntnrwntst"
-  "sncltsdnbncnsnstnbghnlnlhnpnslndntcsprntngmzhnrhndkncnhntsnmnrnlhwtclnrnznhn"
-  "rnlnlsnmnphprpmzrplmrszpklpspcqsrsrtnsrsrhrnrhrlrhbrgrlgsfrflrvsgrpnrvrtrzrl"
-  "rscrlrsnkrltkrbtkrsrgntcnrlrswrndnrhrhrfrhrhrlrnrdrgrkpsnsrldshmsrshsnrncskz"
-  "trshgsrhjsnkrcsdsntbsrsnsksnsnsnmszbshslsftsnsgsmslspshstcsnrsgtrlhtltntzrtr"
-  "btntntltltltscthtbmtfmtvtdtnrgtntctrtrthtktktngrnctgtgtfstsgtrtrtrntstltcgvl"
-  "htvncnwgwgbwgwstzxszpznzrznzdnzw",
-  "xnztbrslrqbtblbdcpchcltwtgcnctcvnscmslmdstnfnbdpdcdndnsdrhtjslftfdfgndtngkgs"
-  "gcglgsrnhrhrhghshmhkmdsklhskclmlhlrlrlrmwlrblblvltlplnspldnlcgnrmcmnmdlmpmrt"
-  "cmnrncntnrtngngrnlnlnlnlnpntndnsnlnstxnsnrmnprplrdpspcptdpgrbrgshrsrtbrsrfrl"
-  "rtnhrnhrtlrsprhrprsdrnhrvrdstsgdsjsnsdtsctstrcrscstksksrsnsfnsbscslsrcrctctl"
-  "ptztgtbmldtntndftstntctrstmtwvlvmvbwrwnws",
-  "bhztzbwbtbnbrbrbsrbrbrbzbpbwcncncgczcsnctcgcgcrmctcncsctbscshsdndhstdbfhdlbl"
-  "rdldndrngsldcdmphtfhfsmsfrnmftfrfgnrgmglwrgtgsfgtpkgsgmglncgngrtchnhthchlhgh"
-  "ghfhrhfrnhtsgkghnsdvldmnhzhrhdhchgjnknkdksknksksklmgklktkldscltlnthlplhscsrl"
-  "nltrslnlzklplslrdlhsnglclwlrlnhvmtgmlmcmtmtmrmhmfnfmgmtmnmhknsnsmrtdnrplntpk"
-  "npthnrncfknslnrsdnltndknznsnsnsnblhrnlnsnpcrdnmnvnsgnrntnsnknrlnlnpdpnpfpfps"
-  "prnptpgpnpqrdshrprfrsrlrcnbnrhrdrshnblrsrsrtrgrtvrlrnrnrdrwtlrtrntgrnrnrlrtr"
-  "hrwrtrhrmrlrnrsgctxsnsctlbkrsmrhsmsdslcsflrdmsvsnkthcsrstbtsrhslbscstslslslr"
-  "stgshncntcstnrtshntztsrtntntsdthtnrsgtltrmtctdsthtgtstnftrtmtzrtnrtnlntntjnt"
-  "vrdfvsvlvwlwgrwbwrbsxzgzgztsz",
+    "zmhrczcbdbgrnbrbnrtrnmhbhlhmgbmbcfcdzljnchckcsrdcsclmczcwcsdrdtdrtkdrdndjdnd"
+    "lspdgdrdjdsdhdcdcdrdndldsdlhldrjrfndglrfknhfkftfdfrftfsmlhclbkspgrntgkvngmrl"
+    "mnrhzsdgsmlhnfvhrhphthnhstngclbwfhdhsmkhsrhfhdkrhshghlmnhnlmdjrnsmrjrthmkjkn"
+    "rktkfkcbndntkhkhdktlhkhkdkfkrnrbntslflnrlndmnldlrlhldlslslnpglhlglnlkldlclnl"
+    "slsmlblglsgrlnrslrlmlhlgrtljlrlrlzlfmtmntbmjmsmbncmjsmpvtsjmnmgmrmnmgmlmdmnm"
+    "smrbfmhwtmnmhnlnbmrsmndkmnlnhctrznslntplncntngntnrthnsjnmdnsnlnknvgnlrknlnsn"
+    "cnhnvsdtlntvskmlnsdcnrnrncnjnmnstwnrnmnsbtdrnpnpfgpqrldrnkrlrtrnrlslrbrsrzrk"
+    "rmlrnrzrbrsrsrtnrprzrbldrmrtrmrltrstrdlrdjrnwrtnrhrlrnrsnrsrdrbrthrhrbdrfwrp"
+    "nrlrsrntklstnshsmsrslrmstbshsgsndslsmszskststshsdlsnsnlsrsmtcsnsrgldsdnsnslc"
+    "hgsjsrftstrtrtrbtkntgtntstjrnmtntrtgtnrtrtctntlzfhtnthtkftltrntrltmtmnrgvnvg"
+    "vhvgvrvnvzvwrtwvwhrnwxzkzdrzlnb",
+    "twlmzjlhfwbdhclmbdbrkjdclctnscnmctclchcbcnsrcfldtdgdnldrbdwrtdbdbrndrnldsdlh"
+    "nmdrdlclntnrlfgtgrfjnrdhlgnhbchrhmhnhjnhlhshghtdnkhfrlvhsnbgnsknhdtkhlnfkblr"
+    "lnlclglrlrdctklscnslmlsmdljnlslgnlrlbtlnlbnlslnklrlrlxglhlsftrnmrmrnwnltswxm"
+    "lmndnhnrnrnlnrnsnlnlrnkntnrnkwcrmnclntlhrgdndnbndnrnmndnktnsdhtrnfwnglnpmpbl"
+    "pqrsrlrnrmrkbrlnrtrmrwrcdnrdrgrlrnrcjrslrpkdlwnrnzrlcvpnrtrnrhrcdrstslnslsls"
+    "nlscsrkdstsplscmsrjmrstdtlntsrtkctntntrthstgdrtmtvtdblvmtftvbvrvtvjrwrwnsrhw"
+    "tw",
+    "znznbdncbzrnshskctbtbgmbcwlrcrcrcfltcsbcghscbrtcdrdkdrdltgknsdtdhrbdcdndrfnd"
+    "rdshpdvdhrndnftrbflflndnrldmdgsgrgnjsnrngsgngfhbkhnhkhmhlhshchmnhnhdrhlhghtd"
+    "rhmhmjrdmljgjpjnmrsnkhklthtsknldtbkrbklflrvlslclnlrhldlmltlrlnsnlgrdlkjvhlnl"
+    "cldlnlcdsnrcnrlvrdrklklrswlfrjmrndhmldrmnmlmtmhmnmtnplmtmnmtmnmscnhnfndnbhns"
+    "nsnmnmhnsnrzmlnrnljndnkrnvnwnknjnznsnrdlnlnjdfrlnrnhntnvnmnhnlnsnrnlpjmpdprp"
+    "qrltlrnfrlrblrlrtprbkrnmrmrlrnbrsrdrwbrflrlrlmclrdrsrwrtrkrtmbhtlrfrlrlrcrdn"
+    "crtgrgsfrkslnsvtsgskbsnrsmsvsnslshsnsnskcslswsrtslsnsgstltltntntcrtstmgtrtzt"
+    "hrtrtkdtkhtstwtzdtngtwtrtrtvgdmvlrdvslcrwlsnwmwltxbztzc",
+    "znzbzbtrbhstbwhndhbtntlfrlbtbdbnlbmclkvntpncdcncrhncvcrcrcgncscncfcsclctcdgd"
+    "tzrdrldksrdsdndsgbdndbdrdrfhftflhsflfnfhthftrfrfsrtmgngsgsghgsrbgtgdwgkrgmgs"
+    "gfnvgrgwnrbglgtgmgcgngrhngnvnhlmchmhplhsnghbkchntrbthlhtnhrhnhshththshlnfbsh"
+    "dhchlhmjkrlkrmtkpkrkhkbgrthksrtmnkckmkflbdpsflclflkdlklslnhlplnlhrptsfrnlcld"
+    "rtnrsrlrlrzlsrldtntnlnrmkmhmtskmtmnmhmskstfmpmnbmsgmpmfmnrgtgnwnbnfntnrwntst"
+    "sncltsdnbncnsnstnbghnlnlhnpnslndntcsprntngmzhnrhndkncnhntsnmnrnlhwtclnrnznhn"
+    "rnlnlsnmnphprpmzrplmrszpklpspcqsrsrtnsrsrhrnrhrlrhbrgrlgsfrflrvsgrpnrvrtrzrl"
+    "rscrlrsnkrltkrbtkrsrgntcnrlrswrndnrhrhrfrhrhrlrnrdrgrkpsnsrldshmsrshsnrncskz"
+    "trshgsrhjsnkrcsdsntbsrsnsksnsnsnmszbshslsftsnsgsmslspshstcsnrsgtrlhtltntzrtr"
+    "btntntltltltscthtbmtfmtvtdtnrgtntctrtrthtktktngrnctgtgtfstsgtrtrtrntstltcgvl"
+    "htvncnwgwgbwgwstzxszpznzrznzdnzw",
+    "xnztbrslrqbtblbdcpchcltwtgcnctcvnscmslmdstnfnbdpdcdndnsdrhtjslftfdfgndtngkgs"
+    "gcglgsrnhrhrhghshmhkmdsklhskclmlhlrlrlrmwlrblblvltlplnspldnlcgnrmcmnmdlmpmrt"
+    "cmnrncntnrtngngrnlnlnlnlnpntndnsnlnstxnsnrmnprplrdpspcptdpgrbrgshrsrtbrsrfrl"
+    "rtnhrnhrtlrsprhrprsdrnhrvrdstsgdsjsnsdtsctstrcrscstksksrsnsfnsbscslsrcrctctl"
+    "ptztgtbmldtntndftstntctrstmtwvlvmvbwrwnws",
+    "bhztzbwbtbnbrbrbsrbrbrbzbpbwcncncgczcsnctcgcgcrmctcncsctbscshsdndhstdbfhdlbl"
+    "rdldndrngsldcdmphtfhfsmsfrnmftfrfgnrgmglwrgtgsfgtpkgsgmglncgngrtchnhthchlhgh"
+    "ghfhrhfrnhtsgkghnsdvldmnhzhrhdhchgjnknkdksknksksklmgklktkldscltlnthlplhscsrl"
+    "nltrslnlzklplslrdlhsnglclwlrlnhvmtgmlmcmtmtmrmhmfnfmgmtmnmhknsnsmrtdnrplntpk"
+    "npthnrncfknslnrsdnltndknznsnsnsnblhrnlnsnpcrdnmnvnsgnrntnsnknrlnlnpdpnpfpfps"
+    "prnptpgpnpqrdshrprfrsrlrcnbnrhrdrshnblrsrsrtrgrtvrlrnrnrdrwtlrtrntgrnrnrlrtr"
+    "hrwrtrhrmrlrnrsgctxsnsctlbkrsmrhsmsdslcsflrdmsvsnkthcsrstbtsrhslbscstslslslr"
+    "stgshncntcstnrtshntztsrtntntsdthtnrsgtltrmtctdsthtgtstnftrtmtzrtnrtnlntntjnt"
+    "vrdfvsvlvwlwgrwbwrbsxzgzgztsz",
 };
 
 /* --- resulting vowel array --- */
 const uint32_t vowListLen[6] = { 599, 21, 19, 120, 20, 46 };
 
 const char     vowList[6][600] = {
-  "yeaeoyaeiuiyueayeaiuaeiyeaoyiaiaiaeaoaeaiaiaeaeioaoeuieaoaiaeuiauieaeaoaeaoi"
-  "eaoeiaieyaieuaoeaeaieaeaeiaiuauaeaeaeaieaiauaieieoaeoaiaoiaeauieyeaeaeaeiaie"
-  "aiaeaeoiaeaeaoeaoeuaiayaeaieuaeieieoaieoöueieiaoeuieoeieaieauaiaeaeaiayaeaea"
-  "uaäiaoeieieoioaiaeieaoeiaoiaiaiaieoauiaeiaiaeauiyeieiaeoaeaeieauayaeieaiaoea"
-  "iaeaeaeiaeaieayieuiaieaeauoueoeoaeaiaoaieaieiaeiaoiaiaoeieoiueiueoiaiaieaiao"
-  "aueuieiaioeoaeaieoeaeaeaieieaieaeoeiayiayeaieauaoaiaiuaeioeoieoiaieaeaoauiei"
-  "auieaeiaiaoioiaioaoaiyeiaiueiaoieaieaiyiaiuoaioeuiyoioaeauoeaiayeoaeoeueaiai"
-  "oeoieoaeoaoiaeioaiaieiaeuoiuaieiaeaeiaeauaieiuaeieiueiaueiaeaioeyai",
-  "eouyiaiaeoaeaeaeayieo",
-  "eaioiaeaeuaieoaeyia",
-  "oiueiöeiaeieueieauoeoueaeuiaeaeaeüeäiaeuioeaeyeäeäeioeaeaueiüiaeueieaieuaiea"
-  "eieieaiueoeueaeuieiaeueiaeaieoaieoeoeoeoiaei",
-  "aeoeioaeaieauyeuieio",
-  "ueuoyieieaieieaeueuaeaeaoaoeaeieieiaieiaeoieuo",
+    "yeaeoyaeiuiyueayeaiuaeiyeaoyiaiaiaeaoaeaiaiaeaeioaoeuieaoaiaeuiauieaeaoaeaoi"
+    "eaoeiaieyaieuaoeaeaieaeaeiaiuauaeaeaeaieaiauaieieoaeoaiaoiaeauieyeaeaeaeiaie"
+    "aiaeaeoiaeaeaoeaoeuaiayaeaieuaeieieoaieoöueieiaoeuieoeieaieauaiaeaeaiayaeaea"
+    "uaäiaoeieieoioaiaeieaoeiaoiaiaiaieoauiaeiaiaeauiyeieiaeoaeaeieauayaeieaiaoea"
+    "iaeaeaeiaeaieayieuiaieaeauoueoeoaeaiaoaieaieiaeiaoiaiaoeieoiueiueoiaiaieaiao"
+    "aueuieiaioeoaeaieoeaeaeaieieaieaeoeiayiayeaieauaoaiaiuaeioeoieoiaieaeaoauiei"
+    "auieaeiaiaoioiaioaoaiyeiaiueiaoieaieaiyiaiuoaioeuiyoioaeauoeaiayeoaeoeueaiai"
+    "oeoieoaeoaoiaeioaiaieiaeuoiuaieiaeaeiaeauaieiuaeieiueiaueiaeaioeyai",
+    "eouyiaiaeoaeaeaeayieo",
+    "eaioiaeaeuaieoaeyia",
+    "oiueiöeiaeieueieauoeoueaeuiaeaeaeüeäiaeuioeaeyeäeäeioeaeaueiüiaeueieaieuaiea"
+    "eieieaiueoeueaeuieiaeueiaeaieoaieoeoeoeoiaei",
+    "aeoeioaeaieauyeuieio",
+    "ueuoyieieaieieaeueuaeaeaoaoeaeieieiaieiaeoieuo",
 };
 
 /** @file CRandomWordConstants.h
@@ -1052,5430 +1052,5604 @@ const char     vowList[6][600] = {
   * characters: B = Begin, M = Middle, E = End of a part
 **/
 const uint32_t nameFUM[6][29][29] = {
-	/* ---------------------------------- *
-	 * --- names / de => NST_NAMES_DE --- *
-	 * ---------------------------------- */
-	{
-		{ /* Rules following letter "A" */
-			/* A : */ 0xc00e3438, /* ( |M|E) - D, E, F, K, M, N, R, S, T */
-			/* B : */ 0xc1164913, /* ( |M|E) - A, B, E, I, L, O, R, S, U, Y */
-			/* C : */ 0xe0114d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, U */
-			/* D : */ 0xe35e5b99, /* (B|M|E) - A, D, E, H, I, J, L, M, O, R, S, T, U, W, Y, Z */
-			/* E : */ 0xc00e381c, /* ( |M|E) - C, D, E, L, M, N, R, S, T */
-			/* F : */ 0xc0184131, /* ( |M|E) - A, E, F, I, O, T, U */
-			/* G : */ 0xe01279d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, U */
-			/* H : */ 0xe04e7f9b, /* (B|M|E) - A, B, D, E, H, I, J, K, L, M, N, O, R, S, T, W */
-			/* I : */ 0xe20efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, Z */
-			/* J : */ 0xc0127d19, /* ( |M|E) - A, D, E, I, K, L, M, N, O, R, U */
-			/* K : */ 0xc0144591, /* ( |M|E) - A, E, H, I, K, O, S, U */
-			/* L : */ 0xe378dfbf, /* (B|M|E) - A, B, C, D, E, F, H, I, J, K, L, M, O, P, T, U, V, W, Y, Z */
-			/* M : */ 0xe214d99f, /* (B|M|E) - A, B, C, D, E, H, I, L, M, O, P, S, U, Z */
-			/* N : */ 0xe33eefff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, P, R, S, T, U, V, Y, Z */
-			/* O : */ 0xc0141840, /* ( |M|E) - G, L, M, S, U */
-			/* P : */ 0xc00a8891, /* ( |M|E) - A, E, H, L, P, R, T */
-			/* Q : */ 0xc0100001, /* ( |M|E) - A, U */
-			/* R : */ 0xe37effdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* S : */ 0xc23ffdbd, /* ( |M|E) - A, C, D, E, F, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, Z */
-			/* T : */ 0xc31e5f91, /* ( |M|E) - A, E, H, I, J, K, L, M, O, R, S, T, U, Y, Z */
-			/* U : */ 0xe20e3c49, /* (B|M|E) - A, D, G, K, L, M, N, R, S, T, Z */
-			/* V : */ 0xc0324d51, /* ( |M|E) - A, E, G, I, K, L, O, R, U, V */
-			/* W : */ 0xc2586111, /* ( |M|E) - A, E, I, N, O, T, U, W, Z */
-			/* X : */ 0xc0000110, /* ( |M|E) - E, I */
-			/* Y : */ 0xc11e7d3b, /* ( |M|E) - A, B, D, E, F, I, K, L, M, N, O, R, S, T, U, Y */
-			/* Z : */ 0xc2005951, /* ( |M|E) - A, E, G, I, L, M, O, Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "B" */
-			/* A : */ 0xe13e2fcf, /* (B|M|E) - A, B, C, D, G, H, I, J, K, L, N, R, S, T, U, V, Y */
-			/* B : */ 0x41004111, /* ( |M| ) - A, E, I, O, Y */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe11e2fcd, /* (B|M|E) - A, C, D, G, H, I, J, K, L, N, R, S, T, U, Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40000101, /* ( |M| ) - A, I */
-			/* I : */ 0xe12e6ed7, /* (B|M|E) - A, B, C, E, G, H, J, K, L, N, O, R, S, T, V, Y */
-			/* J : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* K : */ 0x40000010, /* ( |M| ) - E */
-			/* L : */ 0xe0000111, /* (B|M|E) - A, E, I */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000110, /* ( |M| ) - E, I */
-			/* O : */ 0xe31e7bcb, /* (B|M|E) - A, B, D, G, H, I, J, L, M, N, O, R, S, T, U, Y, Z */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U, Y */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x600e0c0a, /* (B|M| ) - B, D, K, L, R, S, T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0000800, /* ( |M|E) - L */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x20020000, /* (B| | ) - R */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "C" */
-			/* A : */ 0xe32ebfda, /* (B|M|E) - B, D, E, G, H, I, J, K, L, M, N, P, R, S, T, V, Y, Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40004081, /* ( |M| ) - A, H, O */
-			/* D : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* E : */ 0xe32ebc2e, /* (B|M|E) - B, C, D, F, K, L, M, N, P, R, S, T, V, Y, Z */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe15e5519, /* (B|M|E) - A, D, E, I, K, M, O, R, S, T, U, W, Y */
-			/* I : */ 0xe03efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V */
-			/* J : */ 0x40000001, /* ( |M| ) - A */
-			/* K : */ 0xc1044991, /* ( |M|E) - A, E, H, I, L, O, S, Y */
-			/* L : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
-			/* M : */ 0x40000110, /* ( |M| ) - E, I */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0167902, /* (B|M|E) - B, I, L, M, N, O, R, S, U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0x61004111, /* (B|M| ) - A, E, I, O, Y */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x40004001, /* ( |M| ) - A, O */
-			/* U : */ 0xe0063022, /* (B|M|E) - B, F, M, N, R, S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0022000, /* (B|M|E) - N, R */
-			/* Z : */ 0x61000010, /* (B|M| ) - E, Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "D" */
-			/* A : */ 0xe17e3dca, /* (B|M|E) - B, D, G, H, I, K, L, M, N, R, S, T, U, V, W, Y */
-			/* B : */ 0x40100010, /* ( |M| ) - E, U */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x41004111, /* ( |M| ) - A, E, I, O, Y */
-			/* E : */ 0xe23e3dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, R, S, T, U, V, Z */
-			/* F : */ 0x40020000, /* ( |M| ) - R */
-			/* G : */ 0x40100011, /* ( |M| ) - A, E, U */
-			/* H : */ 0xc0020111, /* ( |M|E) - A, E, I, R */
-			/* I : */ 0xe33f7e5f, /* (B|M|E) - A, B, C, D, E, G, J, K, L, M, N, O, Q, R, S, T, U, V, Y, Z */
-			/* J : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0xc0000111, /* ( |M|E) - A, E, I */
-			/* M : */ 0x40100101, /* ( |M| ) - A, I, U */
-			/* N : */ 0x40000011, /* ( |M| ) - A, E */
-			/* O : */ 0xe0767e53, /* (B|M|E) - A, B, E, G, J, K, L, M, N, O, R, S, U, V, W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U, Y */
-			/* S : */ 0xc0000010, /* ( |M|E) - E */
-			/* T : */ 0xc0020100, /* ( |M|E) - I, R */
-			/* U : */ 0xe2063999, /* (B|M|E) - A, D, E, H, I, L, M, N, R, S, Z */
-			/* V : */ 0x40000101, /* ( |M| ) - A, I */
-			/* W : */ 0x40004101, /* ( |M| ) - A, I, O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0040001, /* ( |M|E) - A, S */
-			/* Z : */ 0x60000111, /* (B|M| ) - A, E, I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "E" */
-			/* A : */ 0xc01a2848, /* ( |M|E) - D, G, L, N, R, T, U */
-			/* B : */ 0xe0026593, /* (B|M|E) - A, B, E, H, I, K, N, O, R */
-			/* C : */ 0xe2185d99, /* (B|M|E) - A, D, E, H, I, K, L, M, O, T, U, Z */
-			/* D : */ 0xe37e7fdb, /* (B|M|E) - A, B, D, E, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, Y, Z */
-			/* E : */ 0xe00e3c08, /* (B|M|E) - D, K, L, M, N, R, S, T */
-			/* F : */ 0xe00e4d35, /* (B|M|E) - A, C, E, F, I, K, L, O, R, S, T */
-			/* G : */ 0xe05259f3, /* (B|M|E) - A, B, E, F, G, H, I, L, M, O, R, U, W */
-			/* H : */ 0xe31e3913, /* (B|M|E) - A, B, E, I, L, M, N, R, S, T, U, Y, Z */
-			/* I : */ 0xe20e7eff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, R, S, T, Z */
-			/* J : */ 0xe0087909, /* (B|M|E) - A, D, I, L, M, N, O, T */
-			/* K : */ 0xe00e5d15, /* (B|M|E) - A, C, E, I, K, L, M, O, R, S, T */
-			/* L : */ 0xe37cffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, S, T, U, V, W, Y, Z */
-			/* M : */ 0xe316dd9b, /* (B|M|E) - A, B, D, E, H, I, K, L, M, O, P, R, S, U, Y, Z */
-			/* N : */ 0xe33e6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, R, S, T, U, V, Y, Z */
-			/* O : */ 0xc002a42c, /* ( |M|E) - C, D, F, K, N, P, R */
-			/* P : */ 0xe000c191, /* (B|M|E) - A, E, H, I, O, P */
-			/* Q : */ 0x00100000, /* ( | | ) - U */
-			/* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* S : */ 0xe31efd9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, O, P, R, S, T, U, Y, Z */
-			/* T : */ 0xe25e5bf7, /* (B|M|E) - A, B, C, E, F, G, H, I, J, L, M, O, R, S, T, U, W, Z */
-			/* U : */ 0xe20e2ce8, /* (B|M|E) - D, F, G, H, K, L, N, R, S, T, Z */
-			/* V : */ 0xe30e4ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, O, R, S, T, Y, Z */
-			/* W : */ 0xe0000151, /* (B|M|E) - A, E, G, I */
-			/* X : */ 0xc0000081, /* ( |M|E) - A, H */
-			/* Y : */ 0xe32c7dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, S, T, V, Y, Z */
-			/* Z : */ 0xe002011d, /* (B|M|E) - A, C, D, E, I, R */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "F" */
-			/* A : */ 0xe37e3d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe12e389c, /* (B|M|E) - C, D, E, H, L, M, N, R, S, T, V, Y */
-			/* F : */ 0xc0024111, /* ( |M|E) - A, E, I, O, R */
-			/* G : */ 0x40000001, /* ( |M| ) - A */
-			/* H : */ 0x40000001, /* ( |M| ) - A */
-			/* I : */ 0xe3077e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, Q, R, S, Y, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000001, /* ( |M| ) - A */
-			/* L : */ 0x60004101, /* (B|M| ) - A, I, O */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000100, /* ( |M| ) - I */
-			/* O : */ 0xe01e6c0c, /* (B|M|E) - C, D, K, L, N, O, R, S, T, U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe1004111, /* (B|M|E) - A, E, I, O, Y */
-			/* S : */ 0x40080001, /* ( |M| ) - A, T */
-			/* T : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
-			/* U : */ 0x60022c11, /* (B|M| ) - A, E, K, L, N, R */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "G" */
-			/* A : */ 0xe33e3b3a, /* (B|M|E) - B, D, E, F, I, J, L, M, N, R, S, T, U, V, Y, Z */
-			/* B : */ 0x40000010, /* ( |M| ) - E */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* E : */ 0xe32e799a, /* (B|M|E) - B, D, E, H, I, L, M, N, O, R, S, T, V, Y, Z */
-			/* F : */ 0x40020000, /* ( |M| ) - R */
-			/* G : */ 0x41000111, /* ( |M| ) - A, E, I, Y */
-			/* H : */ 0xe0004111, /* (B|M|E) - A, E, I, O */
-			/* I : */ 0xe33ef81f, /* (B|M|E) - A, B, C, D, E, L, M, N, O, P, R, S, T, U, V, Y, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U, Y */
-			/* M : */ 0x40104001, /* ( |M| ) - A, O, U */
-			/* N : */ 0x41004111, /* ( |M| ) - A, E, I, O, Y */
-			/* O : */ 0xe00e380a, /* (B|M|E) - B, D, L, M, N, R, S, T */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60104151, /* (B|M| ) - A, E, G, I, O, U */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x40020000, /* ( |M| ) - R */
-			/* U : */ 0xe22e3918, /* (B|M|E) - D, E, I, L, M, N, R, S, T, V, Z */
-			/* V : */ 0x40000001, /* ( |M| ) - A */
-			/* W : */ 0x60000111, /* (B|M| ) - A, E, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xa0000800, /* (B| |E) - L */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "H" */
-			/* A : */ 0xe37ebfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40104001, /* ( |M| ) - A, O, U */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* E : */ 0xe37e7d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, O, R, S, T, U, V, W, Y, Z */
-			/* F : */ 0x40000010, /* ( |M| ) - E */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40004000, /* ( |M| ) - O */
-			/* I : */ 0xe30efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, Y, Z */
-			/* J : */ 0x40004001, /* ( |M| ) - A, O */
-			/* K : */ 0x40000001, /* ( |M| ) - A */
-			/* L : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
-			/* M : */ 0x40105111, /* ( |M| ) - A, E, I, M, O, U */
-			/* N : */ 0xc1040111, /* ( |M|E) - A, E, I, S, Y */
-			/* O : */ 0xe016fc1a, /* (B|M|E) - B, D, E, K, L, M, N, O, P, R, S, U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc1004199, /* ( |M|E) - A, D, E, H, I, O, Y */
-			/* S : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
-			/* T : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
-			/* U : */ 0xe006385b, /* (B|M|E) - A, B, D, E, G, L, M, N, R, S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000001, /* ( |M| ) - A */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0040011, /* (B|M|E) - A, E, S */
-			/* Z : */ 0x40000001, /* ( |M| ) - A */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "I" */
-			/* A : */ 0xe20e3d4c, /* (B|M|E) - C, D, G, I, K, L, M, N, R, S, T, Z */
-			/* B : */ 0xe1124113, /* (B|M|E) - A, B, E, I, O, R, U, Y */
-			/* C : */ 0xe21a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U, Z */
-			/* D : */ 0xe15a6b99, /* (B|M|E) - A, D, E, H, I, J, L, N, O, R, T, U, W, Y */
-			/* E : */ 0xc07e3ccf, /* ( |M|E) - A, B, C, D, G, H, K, L, M, N, R, S, T, U, V, W */
-			/* F : */ 0xe20a4131, /* (B|M|E) - A, E, F, I, O, R, T, Z */
-			/* G : */ 0xe01a79fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, T, U */
-			/* H : */ 0xe0066111, /* (B|M|E) - A, E, I, N, O, R, S */
-			/* I : */ 0xc0002000, /* ( |M|E) - N */
-			/* J : */ 0xe0004411, /* (B|M|E) - A, E, K, O */
-			/* K : */ 0xe01e5d91, /* (B|M|E) - A, E, H, I, K, L, M, O, R, S, T, U */
-			/* L : */ 0xe17edffb, /* (B|M|E) - A, B, D, E, F, G, H, I, J, K, L, M, O, P, R, S, T, U, V, W, Y */
-			/* M : */ 0xe012d5bb, /* (B|M|E) - A, B, D, E, F, H, I, K, M, O, P, R, U */
-			/* N : */ 0xe31e77ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, M, N, O, R, S, T, U, Y, Z */
-			/* O : */ 0xe03ea84f, /* (B|M|E) - A, B, C, D, G, L, N, P, R, S, T, U, V */
-			/* P : */ 0xe002c111, /* (B|M|E) - A, E, I, O, P, R */
-			/* Q : */ 0xc0100000, /* ( |M|E) - U */
-			/* R : */ 0xe37e77dd, /* (B|M|E) - A, C, D, E, G, H, I, J, K, M, N, O, R, S, T, U, V, W, Y, Z */
-			/* S : */ 0xe01eddb7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, O, P, R, S, T, U */
-			/* T : */ 0xe31e47d1, /* (B|M|E) - A, E, G, H, I, J, K, O, R, S, T, U, Y, Z */
-			/* U : */ 0xc0040802, /* ( |M|E) - B, L, S */
-			/* V : */ 0xe0004511, /* (B|M|E) - A, E, I, K, O */
-			/* W : */ 0x60004001, /* (B|M| ) - A, O */
-			/* X : */ 0xc0080010, /* ( |M|E) - E, T */
-			/* Y : */ 0xe0005111, /* (B|M|E) - A, E, I, M, O */
-			/* Z : */ 0xe2205191, /* (B|M|E) - A, E, H, I, M, O, V, Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "J" */
-			/* A : */ 0xe36f3def, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, Q, R, S, T, V, W, Y, Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40000100, /* ( |M| ) - I */
-			/* D : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* E : */ 0xe20ebcb9, /* (B|M|E) - A, D, E, F, H, K, L, M, N, P, R, S, T, Z */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000001, /* ( |M| ) - A */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe00e380e, /* (B|M|E) - B, C, D, L, M, N, R, S, T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004001, /* ( |M| ) - A, O */
-			/* L : */ 0x40000101, /* ( |M| ) - A, I */
-			/* M : */ 0x40000101, /* ( |M| ) - A, I */
-			/* N : */ 0x40000001, /* ( |M| ) - A */
-			/* O : */ 0xe3366cbf, /* (B|M|E) - A, B, C, D, E, F, H, K, L, N, O, R, S, U, V, Y, Z */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60001111, /* (B|M| ) - A, E, I, M */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0x40100000, /* ( |M| ) - U */
-			/* U : */ 0xe00e2c9b, /* (B|M|E) - A, B, D, E, H, K, L, N, R, S, T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "K" */
-			/* A : */ 0xe34ebbfb, /* (B|M|E) - A, B, D, E, F, G, H, I, J, L, M, N, P, R, S, T, W, Y, Z */
-			/* B : */ 0x40000011, /* ( |M| ) - A, E */
-			/* C : */ 0x40000001, /* ( |M| ) - A */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe32e3d83, /* (B|M|E) - A, B, H, I, K, L, M, N, R, S, T, V, Y, Z */
-			/* F : */ 0x40020000, /* ( |M| ) - R */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe00c4111, /* (B|M|E) - A, E, I, O, S, T */
-			/* I : */ 0xe32ebe3f, /* (B|M|E) - A, B, C, D, E, F, J, K, L, M, N, P, R, S, T, V, Y, Z */
-			/* J : */ 0x60000010, /* (B|M| ) - E */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* L : */ 0x60004111, /* (B|M| ) - A, E, I, O */
-			/* M : */ 0x40000011, /* ( |M| ) - A, E */
-			/* N : */ 0x60104001, /* (B|M| ) - A, O, U */
-			/* O : */ 0xe176e83e, /* (B|M|E) - B, C, D, E, F, L, N, O, P, R, S, U, V, W, Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x63100111, /* (B|M| ) - A, E, I, U, Y, Z */
-			/* S : */ 0xe0004111, /* (B|M|E) - A, E, I, O */
-			/* T : */ 0xc0004011, /* ( |M|E) - A, E, O */
-			/* U : */ 0xe00ebc0a, /* (B|M|E) - B, D, K, L, M, N, P, R, S, T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x60000101, /* (B|M| ) - A, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xa0020000, /* (B| |E) - R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "L" */
-			/* A : */ 0xe37e7fef, /* (B|M|E) - A, B, C, D, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R, U */
-			/* C : */ 0x40104191, /* ( |M| ) - A, E, H, I, O, U */
-			/* D : */ 0xc01a4113, /* ( |M|E) - A, B, E, I, O, R, T, U */
-			/* E : */ 0xe1fe7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, X, Y */
-			/* F : */ 0xc00241d0, /* ( |M|E) - E, G, H, I, O, R */
-			/* G : */ 0x40124111, /* ( |M| ) - A, E, I, O, R, U */
-			/* H : */ 0xc0000111, /* ( |M|E) - A, E, I */
-			/* I : */ 0xe3befeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, U, V, X, Y, Z */
-			/* J : */ 0x60104511, /* (B|M| ) - A, E, I, K, O, U */
-			/* K : */ 0xc04051b1, /* ( |M|E) - A, E, F, H, I, M, O, W */
-			/* L : */ 0xc11251b1, /* ( |M|E) - A, E, F, H, I, M, O, R, U, Y */
-			/* M : */ 0xc0184111, /* ( |M|E) - A, E, I, O, T, U */
-			/* N : */ 0x40000101, /* ( |M| ) - A, I */
-			/* O : */ 0xe17ef96a, /* (B|M|E) - B, D, F, G, I, L, M, N, O, P, R, S, T, U, V, W, Y */
-			/* P : */ 0x40100090, /* ( |M| ) - E, H, U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40100101, /* ( |M| ) - A, I, U */
-			/* S : */ 0xc0184517, /* ( |M|E) - A, B, C, E, I, K, O, T, U */
-			/* T : */ 0xc0024391, /* ( |M|E) - A, E, H, I, J, O, R */
-			/* U : */ 0xe20ebd3e, /* (B|M|E) - B, C, D, E, F, I, K, L, M, N, P, R, S, T, Z */
-			/* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0003509, /* (B|M|E) - A, D, I, K, M, N */
-			/* Z : */ 0xc0000001, /* ( |M|E) - A */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "M" */
-			/* A : */ 0xe3be3fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, R, S, T, U, V, X, Y, Z */
-			/* B : */ 0x40124011, /* ( |M| ) - A, E, O, R, U */
-			/* C : */ 0x60000080, /* (B|M| ) - H */
-			/* D : */ 0x40104101, /* ( |M| ) - A, I, O, U */
-			/* E : */ 0xe32e7dfd, /* (B|M|E) - A, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, Y, Z */
-			/* F : */ 0x40020000, /* ( |M| ) - R */
-			/* G : */ 0x40000001, /* ( |M| ) - A */
-			/* H : */ 0x40000101, /* ( |M| ) - A, I */
-			/* I : */ 0xe30e7edd, /* (B|M|E) - A, C, D, E, G, H, J, K, L, M, N, O, R, S, T, Y, Z */
-			/* J : */ 0x40000001, /* ( |M| ) - A */
-			/* K : */ 0x40000010, /* ( |M| ) - E */
-			/* L : */ 0x40000101, /* ( |M| ) - A, I */
-			/* M : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U, Y */
-			/* N : */ 0x40000100, /* ( |M| ) - I */
-			/* O : */ 0xe01e7fd8, /* (B|M|E) - D, E, G, H, I, J, K, L, M, N, O, R, S, T, U */
-			/* P : */ 0x40064111, /* ( |M| ) - A, E, I, O, R, S */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40100111, /* ( |M| ) - A, E, I, U */
-			/* S : */ 0xc0104191, /* ( |M|E) - A, E, H, I, O, U */
-			/* T : */ 0x40020001, /* ( |M| ) - A, R */
-			/* U : */ 0xe20e3edb, /* (B|M|E) - A, B, D, E, G, H, J, K, L, M, N, R, S, T, Z */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xa0020000, /* (B| |E) - R */
-			/* Z : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "N" */
-			/* A : */ 0xe37fbfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, Q, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40000011, /* ( |M| ) - A, E */
-			/* C : */ 0xc1104591, /* ( |M|E) - A, E, H, I, K, O, U, Y */
-			/* D : */ 0xc11a4911, /* ( |M|E) - A, E, I, L, O, R, T, U, Y */
-			/* E : */ 0xe33effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, Y, Z */
-			/* F : */ 0x40020110, /* ( |M| ) - E, I, R */
-			/* G : */ 0xc0765993, /* ( |M|E) - A, B, E, H, I, L, M, O, R, S, U, V, W */
-			/* H : */ 0x40004101, /* ( |M| ) - A, I, O */
-			/* I : */ 0xe31f7eff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, Q, R, S, T, U, Y, Z */
-			/* J : */ 0x40004011, /* ( |M| ) - A, E, O */
-			/* K : */ 0xc0425011, /* ( |M|E) - A, E, M, O, R, W */
-			/* L : */ 0x40100101, /* ( |M| ) - A, I, U */
-			/* M : */ 0x40000011, /* ( |M| ) - A, E */
-			/* N : */ 0xc11041d1, /* ( |M|E) - A, E, G, H, I, O, U, Y */
-			/* O : */ 0xe13e7833, /* (B|M|E) - A, B, E, F, L, M, N, O, R, S, T, U, V, Y */
-			/* P : */ 0x40000010, /* ( |M| ) - E */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41000111, /* ( |M| ) - A, E, I, Y */
-			/* S : */ 0xc05cc7f1, /* ( |M|E) - A, E, F, G, H, I, J, K, O, P, S, T, U, W */
-			/* T : */ 0xc2164791, /* ( |M|E) - A, E, H, I, J, K, O, R, S, U, Z */
-			/* U : */ 0xe00e2891, /* (B|M|E) - A, E, H, L, N, R, S, T */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x40000001, /* ( |M| ) - A */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0040011, /* ( |M|E) - A, E, S */
-			/* Z : */ 0xc0004b11, /* ( |M|E) - A, E, I, J, L, O */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "O" */
-			/* A : */ 0xc0032884, /* ( |M|E) - C, H, L, N, Q, R */
-			/* B : */ 0xe1164993, /* (B|M|E) - A, B, E, H, I, L, O, R, S, U, Y */
-			/* C : */ 0x60080595, /* (B|M| ) - A, C, E, H, I, K, T */
-			/* D : */ 0xe1424331, /* (B|M|E) - A, E, F, I, J, O, R, W, Y */
-			/* E : */ 0xe2023808, /* (B|M|E) - D, L, M, N, R, Z */
-			/* F : */ 0xc0024921, /* ( |M|E) - A, F, I, L, O, R */
-			/* G : */ 0x60124911, /* (B|M| ) - A, E, I, L, O, R, U */
-			/* H : */ 0x40063019, /* ( |M| ) - A, D, E, M, N, R, S */
-			/* I : */ 0xc0040404, /* ( |M|E) - C, K, S */
-			/* J : */ 0x40020d15, /* ( |M| ) - A, C, E, I, K, L, R */
-			/* K : */ 0xe01a5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, T, U */
-			/* L : */ 0xe17edf7f, /* (B|M|E) - A, B, C, D, E, F, G, I, J, K, L, M, O, P, R, S, T, U, V, W, Y */
-			/* M : */ 0xe112f513, /* (B|M|E) - A, B, E, I, K, M, N, O, P, R, U, Y */
-			/* N : */ 0xe31e67dd, /* (B|M|E) - A, C, D, E, G, H, I, J, K, N, O, R, S, T, U, Y, Z */
-			/* O : */ 0x4206ac0a, /* ( |M| ) - B, D, K, L, N, P, R, S, Z */
-			/* P : */ 0xe0004191, /* (B|M|E) - A, E, H, I, O */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe15efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y */
-			/* S : */ 0xe15edd97, /* (B|M|E) - A, B, C, E, H, I, K, L, M, O, P, R, S, T, U, W, Y */
-			/* T : */ 0xe04e43f1, /* (B|M|E) - A, E, F, G, H, I, J, O, R, S, T, W */
-			/* U : */ 0xe20e3def, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, R, S, T, Z */
-			/* V : */ 0xe0000111, /* (B|M|E) - A, E, I */
-			/* W : */ 0xc0000111, /* ( |M|E) - A, E, I */
-			/* X : */ 0x40000001, /* ( |M| ) - A */
-			/* Y : */ 0xc0000015, /* ( |M|E) - A, C, E */
-			/* Z : */ 0xe0044511, /* (B|M|E) - A, E, I, K, O, S */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "P" */
-			/* A : */ 0xe13efc84, /* (B|M|E) - C, H, K, L, M, N, O, P, R, S, T, U, V, Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe10aac44, /* (B|M|E) - C, G, K, L, N, P, R, T, Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe0022111, /* (B|M|E) - A, E, I, N, R */
-			/* I : */ 0xe00ae81d, /* (B|M|E) - A, C, D, E, L, N, O, P, R, T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000010, /* ( |M| ) - E */
-			/* L : */ 0x60000101, /* (B|M| ) - A, I */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0069800, /* (B|M|E) - L, M, P, R, S */
-			/* P : */ 0xc0004111, /* ( |M|E) - A, E, I, O */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60004111, /* (B|M| ) - A, E, I, O */
-			/* S : */ 0x40004000, /* ( |M| ) - O */
-			/* T : */ 0x40000101, /* ( |M| ) - A, I */
-			/* U : */ 0x60020000, /* (B|M| ) - R */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x40020000, /* ( |M| ) - R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Q" */
-			/* A : */ 0x60000008, /* (B|M| ) - D */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60000111, /* (B|M| ) - A, E, I */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "R" */
-			/* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0xc0124911, /* ( |M|E) - A, E, I, L, O, R, U */
-			/* C : */ 0xc1104591, /* ( |M|E) - A, E, H, I, K, O, U, Y */
-			/* D : */ 0xc11e5311, /* ( |M|E) - A, E, I, J, M, O, R, S, T, U, Y */
-			/* E : */ 0xe3fe7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, W, X, Y, Z */
-			/* F : */ 0xc0020001, /* ( |M|E) - A, R */
-			/* G : */ 0xc1124991, /* ( |M|E) - A, E, H, I, L, O, R, U, Y */
-			/* H : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
-			/* I : */ 0xe39dfeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, S, T, U, X, Y, Z */
-			/* J : */ 0x40004011, /* ( |M| ) - A, E, O */
-			/* K : */ 0xc0524591, /* ( |M|E) - A, E, H, I, K, O, R, U, W */
-			/* L : */ 0xc11441b1, /* ( |M|E) - A, E, F, H, I, O, S, U, Y */
-			/* M : */ 0xc01c09f1, /* ( |M|E) - A, E, F, G, H, I, L, S, T, U */
-			/* N : */ 0xc10c41b9, /* ( |M|E) - A, D, E, F, H, I, O, S, T, Y */
-			/* O : */ 0xe3fe7ddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, R, S, T, U, V, W, X, Y, Z */
-			/* P : */ 0x40004081, /* ( |M| ) - A, H, O */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U, Y */
-			/* S : */ 0xc0184195, /* ( |M|E) - A, C, E, H, I, O, T, U */
-			/* T : */ 0xc3525b91, /* ( |M|E) - A, E, H, I, J, L, M, O, R, U, W, Y, Z */
-			/* U : */ 0xe34ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, W, Y, Z */
-			/* V : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0042c1d, /* (B|M|E) - A, C, D, E, K, L, N, S */
-			/* Z : */ 0xc1004111, /* ( |M|E) - A, E, I, O, Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "S" */
-			/* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40000010, /* ( |M| ) - E */
-			/* C : */ 0x60104181, /* (B|M| ) - A, H, I, O, U */
-			/* D : */ 0x40100101, /* ( |M| ) - A, I, U */
-			/* E : */ 0xe33ebfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, Y, Z */
-			/* F : */ 0x40020111, /* ( |M| ) - A, E, I, R */
-			/* G : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* H : */ 0xe018c111, /* (B|M|E) - A, E, I, O, P, T, U */
-			/* I : */ 0xe1beffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, X, Y */
-			/* J : */ 0x40004000, /* ( |M| ) - O */
-			/* K : */ 0xc0104111, /* ( |M|E) - A, E, I, O, U */
-			/* L : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
-			/* M : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
-			/* N : */ 0x60000111, /* (B|M| ) - A, E, I */
-			/* O : */ 0xe11efdf2, /* (B|M|E) - B, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, Y */
-			/* P : */ 0x61004111, /* (B|M| ) - A, E, I, O, Y */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0x40104111, /* ( |M| ) - A, E, I, O, U */
-			/* S : */ 0xc1004911, /* ( |M|E) - A, E, I, L, O, Y */
-			/* T : */ 0xe1125bb1, /* (B|M|E) - A, E, F, H, I, J, L, M, O, R, U, Y */
-			/* U : */ 0xe22ebdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, P, R, S, T, V, Z */
-			/* V : */ 0x60000011, /* (B|M| ) - A, E */
-			/* W : */ 0x60000111, /* (B|M| ) - A, E, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0040902, /* (B|M|E) - B, I, L, S */
-			/* Z : */ 0xe0080011, /* (B|M|E) - A, E, T */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "T" */
-			/* A : */ 0xe37ebfee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40100010, /* ( |M| ) - E, U */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* F : */ 0x40020100, /* ( |M| ) - I, R */
-			/* G : */ 0x40000011, /* ( |M| ) - A, E */
-			/* H : */ 0xe1125911, /* (B|M|E) - A, E, I, L, M, O, R, U, Y */
-			/* I : */ 0xe31efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, Y, Z */
-			/* J : */ 0x60004011, /* (B|M| ) - A, E, O */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* L : */ 0xc0104111, /* ( |M|E) - A, E, I, O, U */
-			/* M : */ 0x40100011, /* ( |M| ) - A, E, U */
-			/* N : */ 0x40000001, /* ( |M| ) - A */
-			/* O : */ 0xe056be2a, /* (B|M|E) - B, D, F, J, K, L, M, N, P, R, S, U, W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U, Y */
-			/* S : */ 0xe0004115, /* (B|M|E) - A, C, E, I, O */
-			/* T : */ 0xc10059b1, /* ( |M|E) - A, E, F, H, I, L, M, O, Y */
-			/* U : */ 0xe0062869, /* (B|M|E) - A, D, F, G, L, N, R, S */
-			/* V : */ 0x40000101, /* ( |M| ) - A, I */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0002800, /* ( |M|E) - L, N */
-			/* Z : */ 0xc0000111, /* ( |M|E) - A, E, I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "U" */
-			/* A : */ 0xc00a3818, /* ( |M|E) - D, E, L, M, N, R, T */
-			/* B : */ 0xe0004993, /* (B|M|E) - A, B, E, H, I, L, O */
-			/* C : */ 0xe1020791, /* (B|M|E) - A, E, H, I, J, K, R, Y */
-			/* D : */ 0xe15a59d9, /* (B|M|E) - A, D, E, G, H, I, L, M, O, R, T, U, W, Y */
-			/* E : */ 0xe20e2c00, /* (B|M|E) - K, L, N, R, S, T, Z */
-			/* F : */ 0xc0100131, /* ( |M|E) - A, E, F, I, U */
-			/* G : */ 0xe0124911, /* (B|M|E) - A, E, I, L, O, R, U */
-			/* H : */ 0xc00c6109, /* ( |M|E) - A, D, I, N, O, S, T */
-			/* I : */ 0xc00e2848, /* ( |M|E) - D, G, L, N, R, S, T */
-			/* J : */ 0x40000101, /* ( |M| ) - A, I */
-			/* K : */ 0xe0024191, /* (B|M|E) - A, E, H, I, O, R */
-			/* L : */ 0xe13e4fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, O, R, S, T, U, V, Y */
-			/* M : */ 0xe01a5113, /* (B|M|E) - A, B, E, I, M, O, R, T, U */
-			/* N : */ 0xe21863dd, /* (B|M|E) - A, C, D, E, G, H, I, J, N, O, T, U, Z */
-			/* O : */ 0xc0000800, /* ( |M|E) - L */
-			/* P : */ 0xc002c110, /* ( |M|E) - E, I, O, P, R */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0xe31e7ddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, R, S, T, U, Y, Z */
-			/* S : */ 0xe21ef995, /* (B|M|E) - A, C, E, H, I, L, M, N, O, P, R, S, T, U, Z */
-			/* T : */ 0xe26c09f5, /* (B|M|E) - A, C, E, F, G, H, I, L, S, T, V, W, Z */
-			/* U : */ 0x60040800, /* (B|M| ) - L, S */
-			/* V : */ 0x40000011, /* ( |M| ) - A, E */
-			/* W : */ 0x60000011, /* (B|M| ) - A, E */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0xe0000041, /* (B|M|E) - A, G */
-			/* Z : */ 0xe0100191, /* (B|M|E) - A, E, H, I, U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "V" */
-			/* A : */ 0xe00e39bc, /* (B|M|E) - C, D, E, F, H, I, L, M, N, R, S, T */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40000101, /* ( |M| ) - A, I */
-			/* D : */ 0x40000101, /* ( |M| ) - A, I */
-			/* E : */ 0xe30e2dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, N, R, S, T, Y, Z */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000100, /* ( |M| ) - I */
-			/* H : */ 0x40000010, /* ( |M| ) - E */
-			/* I : */ 0xe33e7e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, R, S, T, U, V, Y, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* L : */ 0x60100101, /* (B|M| ) - A, I, U */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0023a00, /* (B|M|E) - J, L, M, N, R */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40104101, /* ( |M| ) - A, I, O, U */
-			/* S : */ 0x40000100, /* ( |M| ) - I */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60060000, /* (B|M| ) - R, S */
-			/* V : */ 0x40000001, /* ( |M| ) - A */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x40000800, /* ( |M| ) - L */
-			/* Z : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "W" */
-			/* A : */ 0xe30e29bc, /* (B|M|E) - C, D, E, F, H, I, L, N, R, S, T, Y, Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe10e2948, /* (B|M|E) - D, G, I, L, N, R, S, T, Y */
-			/* F : */ 0x40000100, /* ( |M| ) - I */
-			/* G : */ 0x40000010, /* ( |M| ) - E */
-			/* H : */ 0x60000001, /* (B|M| ) - A */
-			/* I : */ 0xe00e2cdf, /* (B|M|E) - A, B, C, D, E, G, H, K, L, N, R, S, T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x20000001, /* (B| | ) - A */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* O : */ 0xe0003a22, /* (B|M|E) - B, F, J, L, M, N */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* U : */ 0x60000800, /* (B|M| ) - L */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000001, /* ( |M| ) - A */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40000100, /* ( |M| ) - I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "X" */
-			/* A : */ 0x60202000, /* (B|M| ) - N, V */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x40002000, /* ( |M| ) - N */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xc0001000, /* ( |M|E) - M */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Y" */
-			/* A : */ 0xe37ebcdc, /* (B|M|E) - C, D, E, G, H, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40020101, /* ( |M| ) - A, I, R */
-			/* C : */ 0x40000011, /* ( |M| ) - A, E */
-			/* D : */ 0xc0004111, /* ( |M|E) - A, E, I, O */
-			/* E : */ 0xe02e38aa, /* (B|M|E) - B, D, F, H, L, M, N, R, S, T, V */
-			/* F : */ 0x40100110, /* ( |M| ) - E, I, U */
-			/* G : */ 0x40100100, /* ( |M| ) - I, U */
-			/* H : */ 0x40001001, /* ( |M| ) - A, M */
-			/* I : */ 0xe00a3c48, /* (B|M|E) - D, G, K, L, M, N, R, T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000011, /* ( |M|E) - A, E */
-			/* L : */ 0xe1200d11, /* (B|M|E) - A, E, I, K, L, V, Y */
-			/* M : */ 0x40104011, /* ( |M| ) - A, E, O, U */
-			/* N : */ 0xc0006119, /* ( |M|E) - A, D, E, I, N, O */
-			/* O : */ 0xe21e2000, /* (B|M|E) - N, R, S, T, U, Z */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40184111, /* ( |M| ) - A, E, I, O, T, U */
-			/* S : */ 0xe2080911, /* (B|M|E) - A, E, I, L, T, Z */
-			/* T : */ 0x40184000, /* ( |M| ) - O, T, U */
-			/* U : */ 0x60062012, /* (B|M| ) - B, E, N, R, S */
-			/* V : */ 0x60004011, /* (B|M| ) - A, E, O */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x40000001, /* ( |M| ) - A */
-			/* Z : */ 0x40100000, /* ( |M| ) - U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Z" */
-			/* A : */ 0xe10a3fee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, R, T, Y */
-			/* B : */ 0x60000110, /* (B|M| ) - E, I */
-			/* C : */ 0x40000001, /* ( |M| ) - A */
-			/* D : */ 0x62020111, /* (B|M| ) - A, E, I, R, Z */
-			/* E : */ 0xe12e3faa, /* (B|M|E) - B, D, F, H, I, J, K, L, M, N, R, S, T, V, Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000110, /* ( |M| ) - E, I */
-			/* H : */ 0x60000001, /* (B|M| ) - A */
-			/* I : */ 0xe12efeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, V, Y */
-			/* J : */ 0x40004000, /* ( |M| ) - O */
-			/* K : */ 0x40100001, /* ( |M| ) - A, U */
-			/* L : */ 0xe0100111, /* (B|M|E) - A, E, I, U */
-			/* M : */ 0x40000110, /* ( |M| ) - E, I */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0122180, /* (B|M|E) - H, I, N, R, U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000001, /* ( |M| ) - A */
-			/* S : */ 0x40000011, /* ( |M| ) - A, E */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60022882, /* (B|M| ) - B, H, L, N, R */
-			/* V : */ 0x60004101, /* (B|M| ) - A, I, O */
-			/* W : */ 0x20000001, /* (B| | ) - A */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0042840, /* (B|M|E) - G, L, N, S */
-			/* Z : */ 0x40000011, /* ( |M| ) - A, E */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ä" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000002, /* ( |M| ) - B */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ö" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ü" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		}
-	}, /* End of Enum 0 / 5 */
-	/* ---------------------------------- *
-	 * --- names / en => NST_NAMES_EN --- *
-	 * ---------------------------------- */
-	{
-		{ /* Rules following letter "A" */
-			/* A : */ 0x60020000, /* (B|M| ) - R,  */
-			/* B : */ 0xe116491b, /* (B|M|E) - A, B, D, E, I, L, O, R, S, U and Y */
-			/* C : */ 0xe1014d91, /* (B|M|E) - A, E, H, I, K, L, O, Q and Y */
-			/* D : */ 0xe1567d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, R, S, U, W and Y */
-			/* E : */ 0xe04e2cec, /* (B|M|E) - C, D, F, G, H, K, L, N, R, S, T and W */
-			/* F : */ 0x60084031, /* (B|M| ) - A, E, F, O and T */
-			/* G : */ 0x601069d9, /* (B|M| ) - A, D, E, G, H, I, L, N, O and U */
-			/* H : */ 0xe0105111, /* (B|M|E) - A, E, I, M, O and U */
-			/* I : */ 0xe10e3c5b, /* (B|M|E) - A, B, D, E, G, K, L, M, N, R, S, T and Y */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xe0004d11, /* (B|M|E) - A, E, I, K, L and O */
-			/* L : */ 0xe17cddff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W and Y */
-			/* M : */ 0xe316d913, /* (B|M|E) - A, B, E, I, L, M, O, P, R, S, U, Y and Z */
-			/* N : */ 0xe15e6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, R, S, T, U, W and Y */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x60029881, /* (B|M| ) - A, H, L, M, P and R */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe17fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
-			/* S : */ 0xe00cdd95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, P, S and T */
-			/* T : */ 0xe15e4db5, /* (B|M|E) - A, C, E, F, H, I, K, L, O, R, S, T, U, W and Y */
-			/* U : */ 0xe08e284e, /* (B|M|E) - B, C, D, G, L, N, R, S, T and X */
-			/* V : */ 0x61024111, /* (B|M| ) - A, E, I, O, R and Y */
-			/* W : */ 0xc10c6931, /* ( |M|E) - A, E, F, I, L, N, O, S, T and Y */
-			/* X : */ 0xe0084100, /* (B|M|E) - I, O and T */
-			/* Y : */ 0xe06e78bf, /* (B|M|E) - A, B, C, D, E, F, H, L, M, N, O, R, S, T, V and W */
-			/* Z : */ 0x42001810, /* ( |M| ) - E, L, M and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "B" */
-			/* A : */ 0xe1063d42, /* (B|M|E) - B, G, I, K, L, M, N, R, S and Y */
-			/* B : */ 0x41004110, /* ( |M| ) - E, I, O and Y */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe1ae7c1d, /* (B|M|E) - A, C, D, E, K, L, M, N, O, R, S, T, V, X and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe00e685d, /* (B|M|E) - A, C, D, E, G, L, N, O, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe05e690e, /* (B|M|E) - B, C, D, I, L, N, O, R, S, T, U and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x600e201c, /* (B|M| ) - C, D, E, N, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0022800, /* (B|M|E) - L, N and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "C" */
-			/* A : */ 0xe11e39ba, /* (B|M|E) - B, D, E, F, H, I, L, M, N, R, S, T, U and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40000001, /* ( |M| ) - A,  */
-			/* D : */ 0x40004000, /* ( |M| ) - O,  */
-			/* E : */ 0xe10e281d, /* (B|M|E) - A, C, D, E, L, N, R, S, T and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* H : */ 0xe11e5911, /* (B|M|E) - A, E, I, L, M, O, R, S, T, U and Y */
-			/* I : */ 0xe11e7815, /* (B|M|E) - A, C, E, L, M, N, O, R, S, T, U and Y */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc14479b1, /* ( |M|E) - A, E, F, H, I, L, M, N, O, S, W and Y */
-			/* L : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe17efc5a, /* (B|M|E) - B, D, E, G, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0x40004000, /* ( |M| ) - O,  */
-			/* T : */ 0x40004001, /* ( |M| ) - A and O */
-			/* U : */ 0x610e1808, /* (B|M| ) - D, L, M, R, S, T and Y */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000110, /* ( |M| ) - E and I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xa0023008, /* (B| |E) - D, M, N and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "D" */
-			/* A : */ 0xe1e6b9d4, /* (B|M|E) - C, E, G, H, I, L, M, N, P, R, S, V, W, X and Y */
-			/* B : */ 0x41124010, /* ( |M| ) - E, O, R, U and Y */
-			/* C : */ 0x40000800, /* ( |M| ) - L,  */
-			/* D : */ 0xc1124111, /* ( |M|E) - A, E, I, O, R, U and Y */
-			/* E : */ 0xe12e7c57, /* (B|M|E) - A, B, C, E, G, K, L, M, N, O, R, S, T, V and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x40000011, /* ( |M| ) - A and E */
-			/* H : */ 0x40000101, /* ( |M| ) - A and I */
-			/* I : */ 0xe09e7c55, /* (B|M|E) - A, C, E, G, K, L, M, N, O, R, S, T, U and X */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x41000011, /* ( |M| ) - A, E and Y */
-			/* M : */ 0x40104001, /* ( |M| ) - A, O and U */
-			/* N : */ 0x40000110, /* ( |M| ) - E and I */
-			/* O : */ 0xe05a380d, /* (B|M|E) - A, C, D, L, M, N, R, T, U and W */
-			/* P : */ 0x40000001, /* ( |M| ) - A,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0404091, /* ( |M|E) - A, E, H, O and W */
-			/* T : */ 0x40100000, /* ( |M| ) - U,  */
-			/* U : */ 0x60063807, /* (B|M| ) - A, B, C, L, M, N, R and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00c2804, /* (B|M|E) - C, L, N, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "E" */
-			/* A : */ 0xe07ebcce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, P, R, S, T, U, V and W */
-			/* B : */ 0xe0124813, /* (B|M|E) - A, B, E, L, O, R and U */
-			/* C : */ 0xc00a0dd5, /* ( |M|E) - A, C, E, G, H, I, K, L, R and T */
-			/* D : */ 0xe156597b, /* (B|M|E) - A, B, D, E, F, G, I, L, M, O, R, S, U, W and Y */
-			/* E : */ 0xc02e382d, /* ( |M|E) - A, C, D, F, L, M, N, R, S, T and V */
-			/* F : */ 0xe0024131, /* (B|M|E) - A, E, F, I, O and R */
-			/* G : */ 0xe00849d3, /* (B|M|E) - A, B, E, G, H, I, L, O and T */
-			/* H : */ 0xc0004011, /* ( |M|E) - A, E and O */
-			/* I : */ 0x600e386c, /* (B|M| ) - C, D, F, G, L, M, N, R, S and T */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0xc0000911, /* ( |M|E) - A, E, I and L */
-			/* L : */ 0xe17e59bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, O, R, S, T, U, V, W and Y */
-			/* M : */ 0xe100d113, /* (B|M|E) - A, B, E, I, M, O, P and Y */
-			/* N : */ 0xe34e6bff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, N, O, R, S, T, W, Y and Z */
-			/* O : */ 0xe066386a, /* (B|M|E) - B, D, F, G, L, M, N, R, S, V and W */
-			/* P : */ 0x40000080, /* ( |M| ) - H,  */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe16e7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, W and Y */
-			/* S : */ 0xe04cd99d, /* (B|M|E) - A, C, D, E, H, I, L, M, O, P, S, T and W */
-			/* T : */ 0xe05c4195, /* (B|M|E) - A, C, E, H, I, O, S, T, U and W */
-			/* U : */ 0xe086a840, /* (B|M|E) - G, L, N, P, R, S and X */
-			/* V : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
-			/* W : */ 0xe1044191, /* (B|M|E) - A, E, H, I, O, S and Y */
-			/* X : */ 0xc1180901, /* ( |M|E) - A, I, L, T, U and Y */
-			/* Y : */ 0xc00c3811, /* ( |M|E) - A, E, L, M, N, S and T */
-			/* Z : */ 0xe0000010, /* (B|M|E) - E,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "F" */
-			/* A : */ 0xe1722912, /* (B|M|E) - B, E, I, L, N, R, U, V, W and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40004000, /* ( |M| ) - O,  */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00a2801, /* (B|M|E) - A, L, N, R and T */
-			/* F : */ 0xc10a4111, /* ( |M|E) - A, E, I, O, R, T and Y */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x600c2810, /* (B|M| ) - E, L, N, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0422800, /* (B|M|E) - L, N, R and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0xc0104000, /* ( |M|E) - O and U */
-			/* U : */ 0xe0000844, /* (B|M|E) - C, G and L */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "G" */
-			/* A : */ 0xe17e2902, /* (B|M|E) - B, I, L, N, R, S, T, U, V, W and Y */
-			/* B : */ 0x41000010, /* ( |M| ) - E and Y */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* E : */ 0xe04e6993, /* (B|M|E) - A, B, E, H, I, L, N, O, R, S, T and W */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x41000110, /* ( |M| ) - E, I and Y */
-			/* H : */ 0xc0084913, /* ( |M|E) - A, B, E, I, L, O and T */
-			/* I : */ 0xe00c683b, /* (B|M|E) - A, B, D, E, F, L, N, O, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61004011, /* (B|M| ) - A, E, O and Y */
-			/* M : */ 0x40100001, /* ( |M| ) - A and U */
-			/* N : */ 0x40000011, /* ( |M| ) - A and E */
-			/* O : */ 0xe01a6808, /* (B|M|E) - D, L, N, O, R, T and U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* S : */ 0xc0080000, /* ( |M|E) - T,  */
-			/* T : */ 0x40104000, /* ( |M| ) - O and U */
-			/* U : */ 0x61042111, /* (B|M| ) - A, E, I, N, S and Y */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x60000110, /* (B|M| ) - E and I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xa0000800, /* (B| |E) - L,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "H" */
-			/* A : */ 0xe37eb97c, /* (B|M|E) - C, D, E, F, G, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41104010, /* ( |M| ) - E, O, U and Y */
-			/* C : */ 0x40000800, /* ( |M| ) - L,  */
-			/* D : */ 0x40100010, /* ( |M| ) - E and U */
-			/* E : */ 0xe15ef91f, /* (B|M|E) - A, B, C, D, E, I, L, M, N, O, P, R, S, T, U, W and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40000001, /* ( |M| ) - A,  */
-			/* I : */ 0xe00ef85f, /* (B|M|E) - A, B, C, D, E, G, L, M, N, O, P, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* M : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* N : */ 0xc0002011, /* ( |M|E) - A, E and N */
-			/* O : */ 0xe052b818, /* (B|M|E) - D, E, L, M, N, P, R, U and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0xc1104191, /* ( |M|E) - A, E, H, I, O, U and Y */
-			/* U : */ 0x608e3859, /* (B|M| ) - A, D, E, G, L, M, N, R, S, T and X */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0000801, /* (B|M|E) - A and L */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "I" */
-			/* A : */ 0xe01e38a0, /* (B|M|E) - F, H, L, M, N, R, S, T and U */
-			/* B : */ 0x41024013, /* ( |M| ) - A, B, E, O, R and Y */
-			/* C : */ 0xc0184591, /* ( |M|E) - A, E, H, I, K, O, T and U */
-			/* D : */ 0xe1446959, /* (B|M|E) - A, D, E, G, I, L, N, O, S, W and Y */
-			/* E : */ 0xc03e3c2c, /* ( |M|E) - C, D, F, K, L, M, N, R, S, T, U and V */
-			/* F : */ 0xc01a4130, /* ( |M|E) - E, F, I, O, R, T and U */
-			/* G : */ 0xe01071d3, /* (B|M|E) - A, B, E, G, H, I, M, N, O and U */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0xc0004591, /* ( |M|E) - A, E, H, I, K and O */
-			/* L : */ 0xe16c3d3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, S, T, V, W and Y */
-			/* M : */ 0xe0005113, /* (B|M|E) - A, B, E, I, M and O */
-			/* N : */ 0xe24c6d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, N, O, S, T, W and Z */
-			/* O : */ 0xe02e2844, /* (B|M|E) - C, G, L, N, R, S, T and V */
-			/* P : */ 0xc00c8010, /* ( |M|E) - E, P, S and T */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe0684d5d, /* (B|M|E) - A, C, D, E, G, I, K, L, O, T, V and W */
-			/* S : */ 0xe14c5db7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, O, S, T, W and Y */
-			/* T : */ 0xe30879b7, /* (B|M|E) - A, B, C, E, F, H, I, L, M, N, O, T, Y and Z */
-			/* U : */ 0xc0040000, /* ( |M|E) - S,  */
-			/* V : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* W : */ 0x40000010, /* ( |M| ) - E,  */
-			/* X : */ 0xc0004100, /* ( |M|E) - I and O */
-			/* Y : */ 0x60000021, /* (B|M| ) - A and F */
-			/* Z : */ 0xe2000013, /* (B|M|E) - A, B, E and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "J" */
-			/* A : */ 0xe3a73ddc, /* (B|M|E) - C, D, E, G, H, I, K, L, M, N, Q, R, S, V, X, Y and Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x600e7021, /* (B|M| ) - A, F, M, N, O, R, S and T */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xa0003800, /* (B| |E) - L, M and N */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe126289d, /* (B|M|E) - A, C, D, E, H, L, N, R, S, V and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x20042808, /* (B| | ) - D, L, N and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "K" */
-			/* A : */ 0xe10eb99c, /* (B|M|E) - C, D, E, H, I, L, M, N, P, R, S, T and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe12e7919, /* (B|M|E) - A, D, E, I, L, M, N, O, R, S, T, V and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* I : */ 0xe00eb811, /* (B|M|E) - A, E, L, M, N, P, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* L : */ 0x61000011, /* (B|M| ) - A, E and Y */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x60004010, /* (B|M| ) - E and O */
-			/* O : */ 0xe0160802, /* (B|M|E) - B, L, R, S and U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x21000100, /* (B| | ) - I and Y */
-			/* S : */ 0xc0084080, /* ( |M|E) - H, O and T */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60020000, /* (B|M| ) - R,  */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0022810, /* (B|M|E) - E, L, N and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "L" */
-			/* A : */ 0xe17ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W and Y */
-			/* B : */ 0x41124011, /* ( |M| ) - A, E, O, R, U and Y */
-			/* C : */ 0x40004090, /* ( |M| ) - E, H and O */
-			/* D : */ 0xc15e4111, /* ( |M|E) - A, E, I, O, R, S, T, U, W and Y */
-			/* E : */ 0xe1fe7b5f, /* (B|M|E) - A, B, C, D, E, G, I, J, L, M, N, O, R, S, T, U, V, W, X and Y */
-			/* F : */ 0xc042411d, /* ( |M|E) - A, C, D, E, I, O, R and W */
-			/* G : */ 0x40000090, /* ( |M| ) - E and H */
-			/* H : */ 0xc00a0099, /* ( |M|E) - A, D, E, H, R and T */
-			/* I : */ 0xe3bcea7f, /* (B|M|E) - A, B, C, D, E, F, G, J, L, N, O, P, S, T, U, V, X, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000010, /* ( |M|E) - E,  */
-			/* L : */ 0xc1565139, /* ( |M|E) - A, D, E, F, I, M, O, R, S, U, W and Y */
-			/* M : */ 0xc0004111, /* ( |M|E) - A, E, I and O */
-			/* N : */ 0x40000010, /* ( |M| ) - E,  */
-			/* O : */ 0xe17e7d5c, /* (B|M|E) - C, D, E, G, I, K, L, M, N, O, R, S, T, U, V, W and Y */
-			/* P : */ 0x40000080, /* ( |M| ) - H,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40004110, /* ( |M| ) - E, I and O */
-			/* S : */ 0xc1684193, /* ( |M|E) - A, B, E, H, I, O, T, V, W and Y */
-			/* T : */ 0xc0124190, /* ( |M|E) - E, H, I, O, R and U */
-			/* U : */ 0xe02a9d0c, /* (B|M|E) - C, D, I, K, L, M, P, R, T and V */
-			/* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0xe22e383f, /* (B|M|E) - A, B, C, D, E, F, L, M, N, R, S, T, V and Z */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "M" */
-			/* A : */ 0xe1be3dde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, R, S, T, U, V, X and Y */
-			/* B : */ 0xc0020911, /* ( |M|E) - A, E, I, L and R */
-			/* C : */ 0x20000c04, /* (B| | ) - C, K and L */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe08e7c5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, R, S, T and X */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe00e3c15, /* (B|M|E) - A, C, E, K, L, M, N, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x41000110, /* ( |M| ) - E, I and Y */
-			/* M : */ 0xc1000111, /* ( |M|E) - A, E, I and Y */
-			/* N : */ 0x40000010, /* ( |M| ) - E,  */
-			/* O : */ 0xe01e69c0, /* (B|M|E) - G, H, I, L, N, O, R, S, T and U */
-			/* P : */ 0xc00c0010, /* ( |M|E) - E, S and T */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41004110, /* ( |M| ) - E, I, O and Y */
-			/* S : */ 0x40084088, /* ( |M| ) - D, H, O and T */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60062000, /* (B|M| ) - N, R and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e2805, /* (B|M|E) - A, C, L, N, R, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "N" */
-			/* A : */ 0xe12e399e, /* (B|M|E) - B, C, D, E, H, I, L, M, N, R, S, T, V and Y */
-			/* B : */ 0x41124010, /* ( |M| ) - E, O, R, U and Y */
-			/* C : */ 0xc1004991, /* ( |M|E) - A, E, H, I, L, O and Y */
-			/* D : */ 0xc1064999, /* ( |M|E) - A, D, E, H, I, L, O, R, S and Y */
-			/* E : */ 0xe17e29ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, N, R, S, T, U, V, W and Y */
-			/* F : */ 0x40024110, /* ( |M| ) - E, I, O and R */
-			/* G : */ 0xc01e49b9, /* ( |M|E) - A, D, E, F, H, I, L, O, R, S, T and U */
-			/* H : */ 0x40004001, /* ( |M| ) - A and O */
-			/* I : */ 0xe18d6c75, /* (B|M|E) - A, C, E, F, G, K, L, N, O, Q, S, T, X and Y */
-			/* J : */ 0x40000011, /* ( |M| ) - A and E */
-			/* K : */ 0xc0040900, /* ( |M|E) - I, L and S */
-			/* L : */ 0x41000011, /* ( |M| ) - A, E and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0xc1004911, /* ( |M|E) - A, E, I, L, O and Y */
-			/* O : */ 0xe07a2814, /* (B|M|E) - C, E, L, N, R, T, U, V and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x41004101, /* ( |M| ) - A, I, O and Y */
-			/* S : */ 0xc1484895, /* ( |M|E) - A, C, E, H, L, O, T, W and Y */
-			/* T : */ 0xc1564991, /* ( |M|E) - A, E, H, I, L, O, R, S, U, W and Y */
-			/* U : */ 0x40000010, /* ( |M| ) - E,  */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0044809, /* (B|M|E) - A, D, L, O and S */
-			/* Z : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "O" */
-			/* A : */ 0xe0012400, /* (B|M|E) - K, N and Q */
-			/* B : */ 0xe1100193, /* (B|M|E) - A, B, E, H, I, U and Y */
-			/* C : */ 0xe0080c90, /* (B|M|E) - E, H, K, L and T */
-			/* D : */ 0xe1425119, /* (B|M|E) - A, D, E, I, M, O, R, W and Y */
-			/* E : */ 0xc1402841, /* ( |M|E) - A, G, L, N, W and Y */
-			/* F : */ 0x40080020, /* ( |M| ) - F and T */
-			/* G : */ 0x60000098, /* (B|M| ) - D, E and H */
-			/* H : */ 0x40002001, /* ( |M| ) - A and N */
-			/* I : */ 0xc0062000, /* ( |M|E) - N, R and S */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xe0040811, /* (B|M|E) - A, E, L and S */
-			/* L : */ 0xe13cfd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, O, P, S, T, U, V and Y */
-			/* M : */ 0xe0009d13, /* (B|M|E) - A, B, E, I, K, L, M and P */
-			/* N : */ 0xe30e615b, /* (B|M|E) - A, B, D, E, G, I, N, O, R, S, T, Y and Z */
-			/* O : */ 0x400eac08, /* ( |M| ) - D, K, L, N, P, R, S and T */
-			/* P : */ 0xc0040090, /* ( |M|E) - E, H and S */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe16effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, V, W and Y */
-			/* S : */ 0xe17e1997, /* (B|M|E) - A, B, C, E, H, I, L, M, R, S, T, U, V, W and Y */
-			/* T : */ 0xc0080191, /* ( |M|E) - A, E, H, I and T */
-			/* U : */ 0xe00e2d7c, /* (B|M|E) - C, D, E, F, G, I, K, L, N, R, S and T */
-			/* V : */ 0x40000011, /* ( |M| ) - A and E */
-			/* W : */ 0xe100a91b, /* (B|M|E) - A, B, D, E, I, L, N, P and Y */
-			/* X : */ 0xe0082021, /* (B|M|E) - A, F, N and T */
-			/* Y : */ 0xc000401d, /* ( |M|E) - A, C, D, E and O */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "P" */
-			/* A : */ 0x619e1910, /* (B|M| ) - E, I, L, M, R, S, T, U, X and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00a3959, /* (B|M|E) - A, D, E, G, I, L, M, N, R and T */
-			/* F : */ 0x20000010, /* (B| | ) - E,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
-			/* I : */ 0x6008a014, /* (B|M| ) - C, E, N, P and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x60000011, /* (B|M| ) - A and E */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x60168900, /* (B|M| ) - I, L, P, R, S and U */
-			/* P : */ 0xc0000110, /* ( |M|E) - E and I */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc1000080, /* ( |M|E) - H and Y */
-			/* T : */ 0x40004000, /* ( |M| ) - O,  */
-			/* U : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40004000, /* ( |M| ) - O,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Q" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60000191, /* (B|M| ) - A, E, H and I */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "R" */
-			/* A : */ 0xe17eb9fe, /* (B|M|E) - B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, U, V, W and Y */
-			/* B : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* C : */ 0x41104990, /* ( |M| ) - E, H, I, L, O, U and Y */
-			/* D : */ 0xc1445991, /* ( |M|E) - A, E, H, I, L, M, O, S, W and Y */
-			/* E : */ 0xe1ee7d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, R, S, T, V, W, X and Y */
-			/* F : */ 0x40004100, /* ( |M| ) - I and O */
-			/* G : */ 0x40124191, /* ( |M| ) - A, E, H, I, O, R and U */
-			/* H : */ 0xe0084911, /* (B|M|E) - A, E, I, L, O and T */
-			/* I : */ 0xe29dfc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, O, P, Q, S, T, U, X and Z */
-			/* J : */ 0x40004100, /* ( |M| ) - I and O */
-			/* K : */ 0xc1440994, /* ( |M|E) - C, E, H, I, L, S, W and Y */
-			/* L : */ 0xc1044113, /* ( |M|E) - A, B, E, I, O, S and Y */
-			/* M : */ 0xc1144111, /* ( |M|E) - A, E, I, O, S, U and Y */
-			/* N : */ 0xc10c4999, /* ( |M|E) - A, D, E, H, I, L, O, S, T and Y */
-			/* O : */ 0xe1fefc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
-			/* P : */ 0xc0004010, /* ( |M|E) - E and O */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xc1044111, /* ( |M|E) - A, E, I, O, S and Y */
-			/* S : */ 0xc0084195, /* ( |M|E) - A, C, E, H, I, O and T */
-			/* T : */ 0xc1566991, /* ( |M|E) - A, E, H, I, L, N, O, R, S, U, W and Y */
-			/* U : */ 0x600cb1fe, /* (B|M| ) - B, C, D, E, F, G, H, I, M, N, P, S and T */
-			/* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00cec5d, /* (B|M|E) - A, C, D, E, G, K, L, N, O, P, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "S" */
-			/* A : */ 0xe1f6397f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, R, S, U, V, W, X and Y */
-			/* B : */ 0x41104011, /* ( |M| ) - A, E, O, U and Y */
-			/* C : */ 0xe04049b3, /* (B|M|E) - A, B, E, F, H, I, L, O and W */
-			/* D : */ 0x40000011, /* ( |M| ) - A and E */
-			/* E : */ 0xe1eeb87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, P, R, S, T, V, W, X and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe14a4933, /* (B|M|E) - A, B, E, F, I, L, O, R, T, W and Y */
-			/* I : */ 0xe00e385b, /* (B|M|E) - A, B, D, E, G, L, M, N, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
-			/* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* M : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe012b802, /* (B|M|E) - B, L, M, N, P, R and U */
-			/* P : */ 0x60024111, /* (B|M| ) - A, E, I, O and R */
-			/* Q : */ 0x20100000, /* (B| | ) - U,  */
-			/* R : */ 0x40000101, /* ( |M| ) - A and I */
-			/* S : */ 0xc1000911, /* ( |M|E) - A, E, I, L and Y */
-			/* T : */ 0xe1524917, /* (B|M|E) - A, B, C, E, I, L, O, R, U, W and Y */
-			/* U : */ 0x620e3930, /* (B|M| ) - E, F, I, L, M, N, R, S, T and Z */
-			/* V : */ 0x40000100, /* ( |M| ) - I,  */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe000380a, /* (B|M|E) - B, D, L, M and N */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "T" */
-			/* A : */ 0xe17e39b6, /* (B|M|E) - B, C, E, F, H, I, L, M, N, R, S, T, U, V, W and Y */
-			/* B : */ 0x41020000, /* ( |M| ) - R and Y */
-			/* C : */ 0x40004080, /* ( |M| ) - H and O */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe166fd39, /* (B|M|E) - A, D, E, F, I, K, L, M, N, O, P, R, S, V, W and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe15e5937, /* (B|M|E) - A, B, C, E, F, I, L, M, O, R, S, T, U, W and Y */
-			/* I : */ 0xe00e7875, /* (B|M|E) - A, C, E, F, G, L, M, N, O, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* M : */ 0x40004000, /* ( |M| ) - O,  */
-			/* N : */ 0x40000110, /* ( |M| ) - E and I */
-			/* O : */ 0xe156bd3e, /* (B|M|E) - B, C, D, E, F, I, K, L, M, N, P, R, S, U, W and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc1004080, /* ( |M|E) - H, O and Y */
-			/* T : */ 0xc1146591, /* ( |M|E) - A, E, H, I, K, N, O, S, U and Y */
-			/* U : */ 0x6006b805, /* (B|M| ) - A, C, L, M, N, P, R and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0062851, /* (B|M|E) - A, E, G, L, N, R and S */
-			/* Z : */ 0xc0440051, /* ( |M|E) - A, E, G, S and W */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "U" */
-			/* A : */ 0xc0022008, /* ( |M|E) - D, N and R */
-			/* B : */ 0x40120110, /* ( |M| ) - E, I, R and U */
-			/* C : */ 0xc0004591, /* ( |M|E) - A, E, H, I, K and O */
-			/* D : */ 0xe1024959, /* (B|M|E) - A, D, E, G, I, L, O, R and Y */
-			/* E : */ 0xc20e2812, /* ( |M|E) - B, E, L, N, R, S, T and Z */
-			/* F : */ 0x40004020, /* ( |M| ) - F and O */
-			/* G : */ 0x40100190, /* ( |M| ) - E, H, I and U */
-			/* H : */ 0x40000801, /* ( |M| ) - A and L */
-			/* I : */ 0x400e3818, /* ( |M| ) - D, E, L, M, N, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000110, /* ( |M|E) - E and I */
-			/* L : */ 0xe1ae1973, /* (B|M|E) - A, B, E, F, G, I, L, M, R, S, T, V, X and Y */
-			/* M : */ 0xc0003033, /* ( |M|E) - A, B, E, F, M and N */
-			/* N : */ 0xe04c295f, /* (B|M|E) - A, B, C, D, E, G, I, L, N, S, T and W */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0xe0408090, /* (B|M|E) - E, H, P and W */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe14e69dd, /* (B|M|E) - A, C, D, E, G, H, I, L, N, O, R, S, T, W and Y */
-			/* S : */ 0xc00c0111, /* ( |M|E) - A, E, I, S and T */
-			/* T : */ 0xc0180894, /* ( |M|E) - C, E, H, L, T and U */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0xc0000800, /* ( |M|E) - L,  */
-			/* Y : */ 0x40000800, /* ( |M| ) - L,  */
-			/* Z : */ 0xc0000001, /* ( |M|E) - A,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "V" */
-			/* A : */ 0xe0122808, /* (B|M|E) - D, L, N, R and U */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe10e6810, /* (B|M|E) - E, L, N, O, R, S, T and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe0266c1d, /* (B|M|E) - A, C, D, E, K, L, N, O, R, S and V */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0022000, /* (B|M|E) - N and R */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41000110, /* ( |M| ) - E, I and Y */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0002000, /* ( |M|E) - N,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "W" */
-			/* A : */ 0xe12e2d1c, /* (B|M|E) - C, D, E, I, K, L, N, R, S, T, V and Y */
-			/* B : */ 0x40020000, /* ( |M| ) - R,  */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe10e7943, /* (B|M|E) - A, B, G, I, L, M, N, O, R, S, T and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* I : */ 0x600e2c54, /* (B|M| ) - C, E, G, K, L, N, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x41000011, /* ( |M| ) - A, E and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0xc0040111, /* ( |M|E) - A, E, I and S */
-			/* O : */ 0x60024808, /* (B|M| ) - D, L, O and R */
-			/* P : */ 0x40000010, /* ( |M| ) - E,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60000110, /* (B|M| ) - E and I */
-			/* S : */ 0x40084000, /* ( |M| ) - O and T */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60000800, /* (B|M| ) - L,  */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60083d14, /* (B|M| ) - C, E, I, K, L, M, N and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "X" */
-			/* A : */ 0xe0002000, /* (B|M|E) - N,  */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe0043011, /* (B|M|E) - A, E, M, N and S */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x40000010, /* ( |M| ) - E,  */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000001, /* ( |M| ) - A,  */
-			/* O : */ 0x40002000, /* ( |M| ) - N,  */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x40004010, /* ( |M| ) - E and O */
-			/* U : */ 0x40040000, /* ( |M| ) - S,  */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000010, /* ( |M| ) - E,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Z : */ 0x00000001, /* ( | | ) - A,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Y" */
-			/* A : */ 0xe00e3c88, /* (B|M|E) - D, H, K, L, M, N, R, S and T */
-			/* B : */ 0x40104010, /* ( |M| ) - E, O and U */
-			/* C : */ 0x40020190, /* ( |M| ) - E, H, I and R */
-			/* D : */ 0xc0006158, /* ( |M|E) - D, E, G, I, N and O */
-			/* E : */ 0xe00e2809, /* (B|M|E) - A, D, L, N, R, S and T */
-			/* F : */ 0xc0004100, /* ( |M|E) - I and O */
-			/* G : */ 0xc0000010, /* ( |M|E) - E,  */
-			/* H : */ 0x40100010, /* ( |M| ) - E and U */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000010, /* ( |M|E) - E,  */
-			/* L : */ 0xc1204919, /* ( |M|E) - A, D, E, I, L, O, V and Y */
-			/* M : */ 0xc0004011, /* ( |M|E) - A, E and O */
-			/* N : */ 0xc24e6139, /* ( |M|E) - A, D, E, F, I, N, O, R, S, T, W and Z */
-			/* O : */ 0x60123800, /* (B|M| ) - L, M, N, R and U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc0586519, /* ( |M|E) - A, D, E, I, K, N, O, T, U and W */
-			/* S : */ 0xc00c4195, /* ( |M|E) - A, C, E, H, I, O, S and T */
-			/* T : */ 0xc0004891, /* ( |M|E) - A, E, H, L and O */
-			/* U : */ 0x20000800, /* (B| | ) - L,  */
-			/* V : */ 0x60000110, /* (B|M| ) - E and I */
-			/* W : */ 0x40004000, /* ( |M| ) - O,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40000001, /* ( |M| ) - A,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Z" */
-			/* A : */ 0xe1222d0e, /* (B|M|E) - B, C, D, I, K, L, N, R, V and Y */
-			/* B : */ 0x40000010, /* ( |M| ) - E,  */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00a0813, /* (B|M|E) - A, B, E, L, R and T */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000100, /* ( |M| ) - I,  */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xc0000010, /* ( |M|E) - E,  */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x41000101, /* ( |M| ) - A, I and Y */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0000010, /* (B|M|E) - E,  */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x40000100, /* ( |M| ) - I,  */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000001, /* ( |M| ) - A,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Z : */ 0x41000100, /* ( |M| ) - I and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ä" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ö" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ü" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		}
-	}, /* End of Enum 1 / 5 */
-	/* ------------------------------------ *
-	 * --- names / all => NST_NAMES_ALL --- *
-	 * ------------------------------------ */
-	{
-		{ /* Rules following letter "A" */
-			/* A : */ 0xe00e3c3c, /* (B|M|E) - C, D, E, F, K, L, M, N, R, S and T */
-			/* B : */ 0xe116491b, /* (B|M|E) - A, B, D, E, I, L, O, R, S, U and Y */
-			/* C : */ 0xe1134d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, R, U and Y */
-			/* D : */ 0xe35e7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* E : */ 0xe04e3cfc, /* (B|M|E) - C, D, E, F, G, H, K, L, M, N, R, S, T and W */
-			/* F : */ 0xe01a4131, /* (B|M|E) - A, E, F, I, O, R, T and U */
-			/* G : */ 0xe05679d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, S, U and W */
-			/* H : */ 0xe15e7f9b, /* (B|M|E) - A, B, D, E, H, I, J, K, L, M, N, O, R, S, T, U, W and Y */
-			/* I : */ 0xe31efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, Y and Z */
-			/* J : */ 0xc0127d19, /* ( |M|E) - A, D, E, I, K, L, M, N, O, R and U */
-			/* K : */ 0xe0144d99, /* (B|M|E) - A, D, E, H, I, K, L, O, S and U */
-			/* L : */ 0xe37cffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe31ed99f, /* (B|M|E) - A, B, C, D, E, H, I, L, M, O, P, R, S, T, U, Y and Z */
-			/* N : */ 0xe37eefff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xc0141840, /* ( |M|E) - G, L, M, S and U */
-			/* P : */ 0xe00a9991, /* (B|M|E) - A, E, H, I, L, M, P, R and T */
-			/* Q : */ 0xc0100001, /* ( |M|E) - A and U */
-			/* R : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe23ffdbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, P, Q, R, S, T, U, V and Z */
-			/* T : */ 0xe35e5fb5, /* (B|M|E) - A, C, E, F, H, I, J, K, L, M, O, R, S, T, U, W, Y and Z */
-			/* U : */ 0xe28e3c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, R, S, T, X and Z */
-			/* V : */ 0xe1324d51, /* (B|M|E) - A, E, G, I, K, L, O, R, U, V and Y */
-			/* W : */ 0xc35e6931, /* ( |M|E) - A, E, F, I, L, N, O, R, S, T, U, W, Y and Z */
-			/* X : */ 0xe0484110, /* (B|M|E) - E, I, O, T and W */
-			/* Y : */ 0xe17e7dbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, O, R, S, T, U, V, W and Y */
-			/* Z : */ 0xc2105951, /* ( |M|E) - A, E, G, I, L, M, O, U and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "B" */
-			/* A : */ 0xe13e3fdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, L, M, N, R, S, T, U, V and Y */
-			/* B : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40100100, /* ( |M| ) - I and U */
-			/* E : */ 0xe1be7fdd, /* (B|M|E) - A, C, D, E, G, H, I, J, K, L, M, N, O, R, S, T, U, V, X and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40000101, /* ( |M| ) - A and I */
-			/* I : */ 0xe12e6edf, /* (B|M|E) - A, B, C, D, E, G, H, J, K, L, N, O, R, S, T, V and Y */
-			/* J : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* K : */ 0x40000010, /* ( |M| ) - E,  */
-			/* L : */ 0xe1004111, /* (B|M|E) - A, E, I, O and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000110, /* ( |M| ) - E and I */
-			/* O : */ 0xe35e7bcf, /* (B|M|E) - A, B, C, D, G, H, I, J, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0080000, /* ( |M|E) - T,  */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x600e2c9e, /* (B|M| ) - B, C, D, E, H, K, L, N, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000100, /* ( |M| ) - I,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0022800, /* (B|M|E) - L, N and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "C" */
-			/* A : */ 0xe33ebffa, /* (B|M|E) - B, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, Y and Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40004081, /* ( |M| ) - A, H and O */
-			/* D : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* E : */ 0xe32ebc3f, /* (B|M|E) - A, B, C, D, E, F, K, L, M, N, P, R, S, T, V, Y and Z */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* H : */ 0xe15e5d19, /* (B|M|E) - A, D, E, I, K, L, M, O, R, S, T, U, W and Y */
-			/* I : */ 0xe13efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V and Y */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0xc14479b3, /* ( |M|E) - A, B, E, F, H, I, L, M, N, O, S, W and Y */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe17efd5a, /* (B|M|E) - B, D, E, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0x40004000, /* ( |M| ) - O,  */
-			/* T : */ 0xc0104101, /* ( |M|E) - A, I, O and U */
-			/* U : */ 0xe10e382a, /* (B|M|E) - B, D, F, L, M, N, R, S, T and Y */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000110, /* ( |M| ) - E and I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0023008, /* (B|M|E) - D, M, N and R */
-			/* Z : */ 0x61000010, /* (B|M| ) - E and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "D" */
-			/* A : */ 0xe1febdde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x41124010, /* ( |M| ) - E, O, R, U and Y */
-			/* C : */ 0x40000880, /* ( |M| ) - H and L */
-			/* D : */ 0xc1124111, /* ( |M|E) - A, E, I, O, R, U and Y */
-			/* E : */ 0xe3be7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, X, Y and Z */
-			/* F : */ 0x40024000, /* ( |M| ) - O and R */
-			/* G : */ 0x40100011, /* ( |M| ) - A, E and U */
-			/* H : */ 0xc0020111, /* ( |M|E) - A, E, I and R */
-			/* I : */ 0xe3bf7e5f, /* (B|M|E) - A, B, C, D, E, G, J, K, L, M, N, O, Q, R, S, T, U, V, X, Y and Z */
-			/* J : */ 0xe0104111, /* (B|M|E) - A, E, I, O and U */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0xc1000111, /* ( |M|E) - A, E, I and Y */
-			/* M : */ 0x40104101, /* ( |M| ) - A, I, O and U */
-			/* N : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* O : */ 0xe0fe7e5f, /* (B|M|E) - A, B, C, D, E, G, J, K, L, M, N, O, R, S, T, U, V, W and X */
-			/* P : */ 0x40000001, /* ( |M| ) - A,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0404091, /* ( |M|E) - A, E, H, O and W */
-			/* T : */ 0xc0120100, /* ( |M|E) - I, R and U */
-			/* U : */ 0xe20e3d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, R, S, T and Z */
-			/* V : */ 0x40000101, /* ( |M| ) - A and I */
-			/* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00c2c05, /* (B|M|E) - A, C, K, L, N, S and T */
-			/* Z : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "E" */
-			/* A : */ 0xe17ebcce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, P, R, S, T, U, V, W and Y */
-			/* B : */ 0xe0126d93, /* (B|M|E) - A, B, E, H, I, K, L, N, O, R and U */
-			/* C : */ 0xe21a5ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, M, O, R, T, U and Z */
-			/* D : */ 0xe37e7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, Y and Z */
-			/* E : */ 0xe02e3c2d, /* (B|M|E) - A, C, D, F, K, L, M, N, R, S, T and V */
-			/* F : */ 0xe00e4d35, /* (B|M|E) - A, C, E, F, I, K, L, O, R, S and T */
-			/* G : */ 0xe05a59f3, /* (B|M|E) - A, B, E, F, G, H, I, L, M, O, R, T, U and W */
-			/* H : */ 0xe31e7913, /* (B|M|E) - A, B, E, I, L, M, N, O, R, S, T, U, Y and Z */
-			/* I : */ 0xe20efeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T and Z */
-			/* J : */ 0xe0087909, /* (B|M|E) - A, D, I, L, M, N, O and T */
-			/* K : */ 0xe00e5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, S and T */
-			/* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe31edd9b, /* (B|M|E) - A, B, D, E, H, I, K, L, M, O, P, R, S, T, U, Y and Z */
-			/* N : */ 0xe37e6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe066bc6e, /* (B|M|E) - B, C, D, F, G, K, L, M, N, P, R, S, V and W */
-			/* P : */ 0xe004c191, /* (B|M|E) - A, E, H, I, O, P and S */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe35efdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* T : */ 0xe25e5bf7, /* (B|M|E) - A, B, C, E, F, G, H, I, J, L, M, O, R, S, T, U, W and Z */
-			/* U : */ 0xe28eacee, /* (B|M|E) - B, C, D, F, G, H, K, L, N, P, R, S, T, X and Z */
-			/* V : */ 0xe30e4ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, O, R, S, T, Y and Z */
-			/* W : */ 0xe10445f1, /* (B|M|E) - A, E, F, G, H, I, K, O, S and Y */
-			/* X : */ 0xc11809a1, /* ( |M|E) - A, F, H, I, L, T, U and Y */
-			/* Y : */ 0xe32c7dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, S, T, V, Y and Z */
-			/* Z : */ 0xe202011d, /* (B|M|E) - A, C, D, E, I, R and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "F" */
-			/* A : */ 0xe37e3d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40004000, /* ( |M| ) - O,  */
-			/* D : */ 0x40000001, /* ( |M| ) - A,  */
-			/* E : */ 0xe12e389d, /* (B|M|E) - A, C, D, E, H, L, M, N, R, S, T, V and Y */
-			/* F : */ 0xc10a4111, /* ( |M|E) - A, E, I, O, R, T and Y */
-			/* G : */ 0x40000001, /* ( |M| ) - A,  */
-			/* H : */ 0x40000101, /* ( |M| ) - A and I */
-			/* I : */ 0xe30f7e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, Q, R, S, T, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000011, /* ( |M| ) - A and E */
-			/* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000100, /* ( |M| ) - I,  */
-			/* O : */ 0xe05e6c1c, /* (B|M|E) - C, D, E, K, L, N, O, R, S, T, U and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe1004111, /* (B|M|E) - A, E, I, O and Y */
-			/* S : */ 0x40080001, /* ( |M| ) - A and T */
-			/* T : */ 0xc0104191, /* ( |M|E) - A, E, H, I, O and U */
-			/* U : */ 0xe0062cd5, /* (B|M|E) - A, C, E, G, H, K, L, N, R and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000100, /* ( |M| ) - I,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xa0000000, /* (B| |E) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "G" */
-			/* A : */ 0xe37e3b7b, /* (B|M|E) - A, B, D, E, F, G, I, J, L, M, N, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41104011, /* ( |M| ) - A, E, O, U and Y */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* E : */ 0xe36e799f, /* (B|M|E) - A, B, C, D, E, H, I, L, M, N, O, R, S, T, V, W, Y and Z */
-			/* F : */ 0x40024000, /* ( |M| ) - O and R */
-			/* G : */ 0xc1000111, /* ( |M|E) - A, E, I and Y */
-			/* H : */ 0xe01a4913, /* (B|M|E) - A, B, E, I, L, O, R, T and U */
-			/* I : */ 0xe33ef87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, P, R, S, T, U, V, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40104001, /* ( |M| ) - A, O and U */
-			/* N : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* O : */ 0xe05e780a, /* (B|M|E) - B, D, L, M, N, O, R, S, T, U and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60104151, /* (B|M| ) - A, E, G, I, O and U */
-			/* S : */ 0xc0084900, /* ( |M|E) - I, L, O and T */
-			/* T : */ 0x40124000, /* ( |M| ) - O, R and U */
-			/* U : */ 0xe32e3919, /* (B|M|E) - A, D, E, I, L, M, N, R, S, T, V, Y and Z */
-			/* V : */ 0x40000001, /* ( |M| ) - A,  */
-			/* W : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0000800, /* (B|M|E) - L,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "H" */
-			/* A : */ 0xe3febfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x41104011, /* ( |M| ) - A, E, O, U and Y */
-			/* C : */ 0x40000800, /* ( |M| ) - L,  */
-			/* D : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* E : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* F : */ 0x40004010, /* ( |M| ) - E and O */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40004001, /* ( |M| ) - A and O */
-			/* I : */ 0xe30efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, Y and Z */
-			/* J : */ 0x40004001, /* ( |M| ) - A and O */
-			/* K : */ 0x40000101, /* ( |M| ) - A and I */
-			/* L : */ 0xe1004191, /* (B|M|E) - A, E, H, I, O and Y */
-			/* M : */ 0xc0105111, /* ( |M|E) - A, E, I, M, O and U */
-			/* N : */ 0xc1042111, /* ( |M|E) - A, E, I, N, S and Y */
-			/* O : */ 0xe056fc5e, /* (B|M|E) - B, C, D, E, G, K, L, M, N, O, P, R, S, U and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc1004199, /* ( |M|E) - A, D, E, H, I, O and Y */
-			/* S : */ 0xc0000191, /* ( |M|E) - A, E, H and I */
-			/* T : */ 0xc1184191, /* ( |M|E) - A, E, H, I, O, T, U and Y */
-			/* U : */ 0xe18e385b, /* (B|M|E) - A, B, D, E, G, L, M, N, R, S, T, X and Y */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0041811, /* (B|M|E) - A, E, L, M and S */
-			/* Z : */ 0x40000001, /* ( |M| ) - A,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "I" */
-			/* A : */ 0xe23e3dec, /* (B|M|E) - C, D, F, G, H, I, K, L, M, N, R, S, T, U, V and Z */
-			/* B : */ 0xe1124113, /* (B|M|E) - A, B, E, I, O, R, U and Y */
-			/* C : */ 0xe21a5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, T, U and Z */
-			/* D : */ 0xe15e6bd9, /* (B|M|E) - A, D, E, G, H, I, J, L, N, O, R, S, T, U, W and Y */
-			/* E : */ 0xc27e3cef, /* ( |M|E) - A, B, C, D, F, G, H, K, L, M, N, R, S, T, U, V, W and Z */
-			/* F : */ 0xe21a4131, /* (B|M|E) - A, E, F, I, O, R, T, U and Z */
-			/* G : */ 0xe05a79fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, T, U and W */
-			/* H : */ 0xe0066111, /* (B|M|E) - A, E, I, N, O, R and S */
-			/* I : */ 0xc0002000, /* ( |M|E) - N,  */
-			/* J : */ 0xe0044411, /* (B|M|E) - A, E, K, O and S */
-			/* K : */ 0xe01e5d91, /* (B|M|E) - A, E, H, I, K, L, M, O, R, S, T and U */
-			/* L : */ 0xe17effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* M : */ 0xe012d5bb, /* (B|M|E) - A, B, D, E, F, H, I, K, M, O, P, R and U */
-			/* N : */ 0xe35e7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* O : */ 0xe03ea84f, /* (B|M|E) - A, B, C, D, G, L, N, P, R, S, T, U and V */
-			/* P : */ 0xe00ec111, /* (B|M|E) - A, E, I, O, P, R, S and T */
-			/* Q : */ 0xc0100000, /* ( |M|E) - U,  */
-			/* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe17eddb7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, O, P, R, S, T, U, V, W and Y */
-			/* T : */ 0xe31e7ff7, /* (B|M|E) - A, B, C, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, Y and Z */
-			/* U : */ 0xc0040802, /* ( |M|E) - B, L and S */
-			/* V : */ 0xe1004511, /* (B|M|E) - A, E, I, K, O and Y */
-			/* W : */ 0x60004011, /* (B|M| ) - A, E and O */
-			/* X : */ 0xc0084110, /* ( |M|E) - E, I, O and T */
-			/* Y : */ 0xe0007131, /* (B|M|E) - A, E, F, I, M, N and O */
-			/* Z : */ 0xe2205193, /* (B|M|E) - A, B, E, H, I, M, O, V and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "J" */
-			/* A : */ 0xe3ef3dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, Q, R, S, T, V, W, X, Y and Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40000100, /* ( |M| ) - I,  */
-			/* D : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* E : */ 0xe26efcb9, /* (B|M|E) - A, D, E, F, H, K, L, M, N, O, P, R, S, T, V, W and Z */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000001, /* ( |M| ) - A,  */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe00e380f, /* (B|M|E) - A, B, C, D, L, M, N, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004001, /* ( |M| ) - A and O */
-			/* L : */ 0x40000101, /* ( |M| ) - A and I */
-			/* M : */ 0x40000101, /* ( |M| ) - A and I */
-			/* N : */ 0x40000001, /* ( |M| ) - A,  */
-			/* O : */ 0xe3366cbf, /* (B|M|E) - A, B, C, D, E, F, H, K, L, N, O, R, S, U, V, Y and Z */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60001111, /* (B|M| ) - A, E, I and M */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0x40100000, /* ( |M| ) - U,  */
-			/* U : */ 0xe00e2c9b, /* (B|M|E) - A, B, D, E, H, K, L, N, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "K" */
-			/* A : */ 0xe34ebbff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, M, N, P, R, S, T, W, Y and Z */
-			/* B : */ 0x40100011, /* ( |M| ) - A, E and U */
-			/* C : */ 0x40100001, /* ( |M| ) - A and U */
-			/* D : */ 0x40000010, /* ( |M| ) - E,  */
-			/* E : */ 0xe32e7dbb, /* (B|M|E) - A, B, D, E, F, H, I, K, L, M, N, O, R, S, T, V, Y and Z */
-			/* F : */ 0x40024000, /* ( |M| ) - O and R */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe00e4111, /* (B|M|E) - A, E, I, O, R, S and T */
-			/* I : */ 0xe32ebe3f, /* (B|M|E) - A, B, C, D, E, F, J, K, L, M, N, P, R, S, T, V, Y and Z */
-			/* J : */ 0x60000010, /* (B|M| ) - E,  */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0x60104011, /* (B|M| ) - A, E, O and U */
-			/* O : */ 0xe176e83e, /* (B|M|E) - B, C, D, E, F, L, N, O, P, R, S, U, V, W and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x63104111, /* (B|M| ) - A, E, I, O, U, Y and Z */
-			/* S : */ 0xe0084191, /* (B|M|E) - A, E, H, I, O and T */
-			/* T : */ 0xc0004011, /* ( |M|E) - A, E and O */
-			/* U : */ 0xe00ebc0a, /* (B|M|E) - B, D, K, L, M, N, P, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0022811, /* (B|M|E) - A, E, L, N and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "L" */
-			/* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
-			/* C : */ 0x40104191, /* ( |M| ) - A, E, H, I, O and U */
-			/* D : */ 0xc15e51b3, /* ( |M|E) - A, B, E, F, H, I, M, O, R, S, T, U, W and Y */
-			/* E : */ 0xe1fe7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, X and Y */
-			/* F : */ 0xc04641fd, /* ( |M|E) - A, C, D, E, F, G, H, I, O, R, S and W */
-			/* G : */ 0x40124191, /* ( |M| ) - A, E, H, I, O, R and U */
-			/* H : */ 0xc00a0199, /* ( |M|E) - A, D, E, H, I, R and T */
-			/* I : */ 0xe3fffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* J : */ 0x60104511, /* (B|M| ) - A, E, I, K, O and U */
-			/* K : */ 0xc04071b1, /* ( |M|E) - A, E, F, H, I, M, N, O and W */
-			/* L : */ 0xc15e51b9, /* ( |M|E) - A, D, E, F, H, I, M, O, R, S, T, U, W and Y */
-			/* M : */ 0xc1184111, /* ( |M|E) - A, E, I, O, T, U and Y */
-			/* N : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* O : */ 0xe17efdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* P : */ 0x40100190, /* ( |M| ) - E, H, I and U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* S : */ 0xc178459f, /* ( |M|E) - A, B, C, D, E, H, I, K, O, T, U, V, W and Y */
-			/* T : */ 0xc0124391, /* ( |M|E) - A, E, H, I, J, O, R and U */
-			/* U : */ 0xe22ebd3e, /* (B|M|E) - B, C, D, E, F, I, K, L, M, N, P, R, S, T, V and Z */
-			/* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0xe2ae3d3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, R, S, T, V, X and Z */
-			/* Z : */ 0xc0000111, /* ( |M|E) - A, E and I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "M" */
-			/* A : */ 0xe3be3fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, R, S, T, U, V, X, Y and Z */
-			/* B : */ 0xc0124911, /* ( |M|E) - A, E, I, L, O, R and U */
-			/* C : */ 0x60000cc4, /* (B|M| ) - C, G, H, K and L */
-			/* D : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* E : */ 0xe3ae7dfd, /* (B|M|E) - A, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, X, Y and Z */
-			/* F : */ 0x40024000, /* ( |M| ) - O and R */
-			/* G : */ 0x40000001, /* ( |M| ) - A,  */
-			/* H : */ 0x40000101, /* ( |M| ) - A and I */
-			/* I : */ 0xe30e7edd, /* (B|M|E) - A, C, D, E, G, H, J, K, L, M, N, O, R, S, T, Y and Z */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0x40000110, /* ( |M| ) - E and I */
-			/* L : */ 0x41000111, /* ( |M| ) - A, E, I and Y */
-			/* M : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
-			/* N : */ 0x40000110, /* ( |M| ) - E and I */
-			/* O : */ 0xe01e7fd8, /* (B|M|E) - D, E, G, H, I, J, K, L, M, N, O, R, S, T and U */
-			/* P : */ 0xc00e4191, /* ( |M|E) - A, E, H, I, O, R, S and T */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0184199, /* ( |M|E) - A, D, E, H, I, O, T and U */
-			/* T : */ 0x40020001, /* ( |M| ) - A and R */
-			/* U : */ 0xe20e3edb, /* (B|M|E) - A, B, D, E, G, H, J, K, L, M, N, R, S, T and Z */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e2805, /* (B|M|E) - A, C, L, N, R, S and T */
-			/* Z : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "N" */
-			/* A : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
-			/* C : */ 0xc1124d91, /* ( |M|E) - A, E, H, I, K, L, O, R, U and Y */
-			/* D : */ 0xc11e5999, /* ( |M|E) - A, D, E, H, I, L, M, O, R, S, T, U and Y */
-			/* E : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* F : */ 0x40024110, /* ( |M| ) - E, I, O and R */
-			/* G : */ 0xc17e59bb, /* ( |M|E) - A, B, D, E, F, H, I, L, M, O, R, S, T, U, V, W and Y */
-			/* H : */ 0x41004101, /* ( |M| ) - A, I, O and Y */
-			/* I : */ 0xe3bf7eff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, Q, R, S, T, U, V, X, Y and Z */
-			/* J : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* K : */ 0xc0465911, /* ( |M|E) - A, E, I, L, M, O, R, S and W */
-			/* L : */ 0x41100111, /* ( |M| ) - A, E, I, U and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0xc1144bd9, /* ( |M|E) - A, D, E, G, H, I, J, L, O, S, U and Y */
-			/* O : */ 0xe17e7937, /* (B|M|E) - A, B, C, E, F, I, L, M, N, O, R, S, T, U, V, W and Y */
-			/* P : */ 0x40000010, /* ( |M| ) - E,  */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* S : */ 0xc15ccff5, /* ( |M|E) - A, C, E, F, G, H, I, J, K, L, O, P, S, T, U, W and Y */
-			/* T : */ 0xc3564fd1, /* ( |M|E) - A, E, G, H, I, J, K, L, O, R, S, U, W, Y and Z */
-			/* U : */ 0xe00e3891, /* (B|M|E) - A, E, H, L, M, N, R, S and T */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0044c19, /* (B|M|E) - A, D, E, K, L, O and S */
-			/* Z : */ 0xc0004b11, /* ( |M|E) - A, E, I, J, L and O */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "O" */
-			/* A : */ 0xe0032c84, /* (B|M|E) - C, H, K, L, N, Q and R */
-			/* B : */ 0xe1164993, /* (B|M|E) - A, B, E, H, I, L, O, R, S, U and Y */
-			/* C : */ 0xe0084d95, /* (B|M|E) - A, C, E, H, I, K, L, O and T */
-			/* D : */ 0xe1427379, /* (B|M|E) - A, D, E, F, G, I, J, M, N, O, R, W and Y */
-			/* E : */ 0xe34a386b, /* (B|M|E) - A, B, D, F, G, L, M, N, R, T, W, Y and Z */
-			/* F : */ 0xc00a4931, /* ( |M|E) - A, E, F, I, L, O, R and T */
-			/* G : */ 0xe0124999, /* (B|M|E) - A, D, E, H, I, L, O, R and U */
-			/* H : */ 0x60063119, /* (B|M| ) - A, D, E, I, M, N, R and S */
-			/* I : */ 0xc0062415, /* ( |M|E) - A, C, E, K, N, R and S */
-			/* J : */ 0x60024d15, /* (B|M| ) - A, C, E, I, K, L, O and R */
-			/* K : */ 0xe01e5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, S, T and U */
-			/* L : */ 0xe17eff7f, /* (B|M|E) - A, B, C, D, E, F, G, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* M : */ 0xe112fd13, /* (B|M|E) - A, B, E, I, K, L, M, N, O, P, R, U and Y */
-			/* N : */ 0xe31e67df, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, N, O, R, S, T, U, Y and Z */
-			/* O : */ 0xc20ebc4a, /* ( |M|E) - B, D, G, K, L, M, N, P, R, S, T and Z */
-			/* P : */ 0xe004c191, /* (B|M|E) - A, E, H, I, O, P and S */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe17effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* S : */ 0xe17eddd7, /* (B|M|E) - A, B, C, E, G, H, I, K, L, M, O, P, R, S, T, U, V, W and Y */
-			/* T : */ 0xe04e43f1, /* (B|M|E) - A, E, F, G, H, I, J, O, R, S, T and W */
-			/* U : */ 0xe20e3dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, R, S, T and Z */
-			/* V : */ 0xe0000111, /* (B|M|E) - A, E and I */
-			/* W : */ 0xe100a91b, /* (B|M|E) - A, B, D, E, I, L, N, P and Y */
-			/* X : */ 0xe0082021, /* (B|M|E) - A, F, N and T */
-			/* Y : */ 0xc000481d, /* ( |M|E) - A, C, D, E, L and O */
-			/* Z : */ 0xe0044511, /* (B|M|E) - A, E, I, K, O and S */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "P" */
-			/* A : */ 0xe1fefdd6, /* (B|M|E) - B, C, E, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe10ebd5d, /* (B|M|E) - A, C, D, E, G, I, K, L, M, N, P, R, S, T and Y */
-			/* F : */ 0x20000010, /* (B| | ) - E,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe1026111, /* (B|M|E) - A, E, I, N, O, R and Y */
-			/* I : */ 0xe00ee81d, /* (B|M|E) - A, C, D, E, L, N, O, P, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000010, /* ( |M| ) - E,  */
-			/* L : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe016d900, /* (B|M|E) - I, L, M, O, P, R, S and U */
-			/* P : */ 0xc0004911, /* ( |M|E) - A, E, I, L and O */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc1004180, /* ( |M|E) - H, I, O and Y */
-			/* T : */ 0x40004101, /* ( |M| ) - A, I and O */
-			/* U : */ 0x60022000, /* (B|M| ) - N and R */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40004000, /* ( |M| ) - O,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60020000, /* (B|M| ) - R,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Q" */
-			/* A : */ 0x60000008, /* (B|M| ) - D,  */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60000191, /* (B|M| ) - A, E, H and I */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "R" */
-			/* A : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
-			/* C : */ 0xc1104d91, /* ( |M|E) - A, E, H, I, K, L, O, U and Y */
-			/* D : */ 0xc15e5b91, /* ( |M|E) - A, E, H, I, J, L, M, O, R, S, T, U, W and Y */
-			/* E : */ 0xe3fe7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0xc0124101, /* ( |M|E) - A, I, O, R and U */
-			/* G : */ 0xc1124991, /* ( |M|E) - A, E, H, I, L, O, R, U and Y */
-			/* H : */ 0xe0184911, /* (B|M|E) - A, E, I, L, O, T and U */
-			/* I : */ 0xe3bdfeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, S, T, U, V, X, Y and Z */
-			/* J : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* K : */ 0xc1564d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, S, U, W and Y */
-			/* L : */ 0xc11c41b3, /* ( |M|E) - A, B, E, F, H, I, O, S, T, U and Y */
-			/* M : */ 0xc11c49f1, /* ( |M|E) - A, E, F, G, H, I, L, O, S, T, U and Y */
-			/* N : */ 0xc15c49b9, /* ( |M|E) - A, D, E, F, H, I, L, O, S, T, U, W and Y */
-			/* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0xc0004091, /* ( |M|E) - A, E, H and O */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xc1145111, /* ( |M|E) - A, E, I, M, O, S, U and Y */
-			/* S : */ 0xc0184195, /* ( |M|E) - A, C, E, H, I, O, T and U */
-			/* T : */ 0xc35e7bb3, /* ( |M|E) - A, B, E, F, H, I, J, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* U : */ 0xe34ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, W, Y and Z */
-			/* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* W : */ 0x41004191, /* ( |M| ) - A, E, H, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00cfc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, S and T */
-			/* Z : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "S" */
-			/* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* C : */ 0xe05049b3, /* (B|M|E) - A, B, E, F, H, I, L, O, U and W */
-			/* D : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* E : */ 0xe3febfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* G : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* H : */ 0xe15ac933, /* (B|M|E) - A, B, E, F, I, L, O, P, R, T, U, W and Y */
-			/* I : */ 0xe3beffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, X, Y and Z */
-			/* J : */ 0x40004000, /* ( |M| ) - O,  */
-			/* K : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
-			/* L : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
-			/* M : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* N : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* O : */ 0xe11efdf2, /* (B|M|E) - B, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U and Y */
-			/* P : */ 0x61024111, /* (B|M| ) - A, E, I, O, R and Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* S : */ 0xc1004911, /* ( |M|E) - A, E, I, L, O and Y */
-			/* T : */ 0xe1527bb7, /* (B|M|E) - A, B, C, E, F, H, I, J, L, M, N, O, R, U, W and Y */
-			/* U : */ 0xe22ebdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, P, R, S, T, V and Z */
-			/* V : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe006391a, /* (B|M|E) - B, D, E, I, L, M, N, R and S */
-			/* Z : */ 0xe0080011, /* (B|M|E) - A, E and T */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "T" */
-			/* A : */ 0xe37fbffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, P, Q, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41120010, /* ( |M| ) - E, R, U and Y */
-			/* C : */ 0x40004180, /* ( |M| ) - H, I and O */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40024100, /* ( |M| ) - I, O and R */
-			/* G : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* H : */ 0xe15e5937, /* (B|M|E) - A, B, C, E, F, I, L, M, O, R, S, T, U, W and Y */
-			/* I : */ 0xe33efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, V, Y and Z */
-			/* J : */ 0x60004011, /* (B|M| ) - A, E and O */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* L : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
-			/* M : */ 0x40104011, /* ( |M| ) - A, E, O and U */
-			/* N : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* O : */ 0xe156bf3e, /* (B|M|E) - B, C, D, E, F, I, J, K, L, M, N, P, R, S, U, W and Y */
-			/* P : */ 0x40000010, /* ( |M| ) - E,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
-			/* S : */ 0xe1004195, /* (B|M|E) - A, C, E, H, I, O and Y */
-			/* T : */ 0xc1547db1, /* ( |M|E) - A, E, F, H, I, K, L, M, N, O, S, U, W and Y */
-			/* U : */ 0xe006b86d, /* (B|M|E) - A, C, D, F, G, L, M, N, P, R and S */
-			/* V : */ 0x40000101, /* ( |M| ) - A and I */
-			/* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0062851, /* (B|M|E) - A, E, G, L, N, R and S */
-			/* Z : */ 0xc0440151, /* ( |M|E) - A, E, G, I, S and W */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "U" */
-			/* A : */ 0xc10a3818, /* ( |M|E) - D, E, L, M, N, R, T and Y */
-			/* B : */ 0xe1124993, /* (B|M|E) - A, B, E, H, I, L, O, R, U and Y */
-			/* C : */ 0xe1024f95, /* (B|M|E) - A, C, E, H, I, J, K, L, O, R and Y */
-			/* D : */ 0xe15a59db, /* (B|M|E) - A, B, D, E, G, H, I, L, M, O, R, T, U, W and Y */
-			/* E : */ 0xe20e2c12, /* (B|M|E) - B, E, K, L, N, R, S, T and Z */
-			/* F : */ 0xc0104131, /* ( |M|E) - A, E, F, I, O and U */
-			/* G : */ 0xe0124993, /* (B|M|E) - A, B, E, H, I, L, O, R and U */
-			/* H : */ 0xc00c6909, /* ( |M|E) - A, D, I, L, N, O, S and T */
-			/* I : */ 0xc00e385c, /* ( |M|E) - C, D, E, G, L, M, N, R, S and T */
-			/* J : */ 0x40000101, /* ( |M| ) - A and I */
-			/* K : */ 0xe0024191, /* (B|M|E) - A, E, H, I, O and R */
-			/* L : */ 0xe3fe5fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, O, R, S, T, U, V, W, X, Y and Z */
-			/* M : */ 0xe01af1b3, /* (B|M|E) - A, B, E, F, H, I, M, N, O, P, R, T and U */
-			/* N : */ 0xe35c6bdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, L, N, O, S, T, U, W, Y and Z */
-			/* O : */ 0xc0000800, /* ( |M|E) - L,  */
-			/* P : */ 0xe042c190, /* (B|M|E) - E, H, I, O, P, R and W */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe35f7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, Q, R, S, T, U, W, Y and Z */
-			/* S : */ 0xe31efd95, /* (B|M|E) - A, C, E, H, I, K, L, M, N, O, P, R, S, T, U, Y and Z */
-			/* T : */ 0xe27c09f5, /* (B|M|E) - A, C, E, F, G, H, I, L, S, T, U, V, W and Z */
-			/* U : */ 0x60040800, /* (B|M| ) - L and S */
-			/* V : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* W : */ 0x60000011, /* (B|M| ) - A and E */
-			/* X : */ 0xc0000800, /* ( |M|E) - L,  */
-			/* Y : */ 0xe0000841, /* (B|M|E) - A, G and L */
-			/* Z : */ 0xe1100191, /* (B|M|E) - A, E, H, I, U and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "V" */
-			/* A : */ 0xe01e39bc, /* (B|M|E) - C, D, E, F, H, I, L, M, N, R, S, T and U */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40000101, /* ( |M| ) - A and I */
-			/* D : */ 0x40000101, /* ( |M| ) - A and I */
-			/* E : */ 0xe30e7dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, R, S, T, Y and Z */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000100, /* ( |M| ) - I,  */
-			/* H : */ 0x40000010, /* ( |M| ) - E,  */
-			/* I : */ 0xe33e7e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, R, S, T, U, V, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* L : */ 0x60100101, /* (B|M| ) - A, I and U */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0023a00, /* (B|M|E) - J, L, M, N and R */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0x40000100, /* ( |M| ) - I,  */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60060000, /* (B|M| ) - R and S */
-			/* V : */ 0x40000001, /* ( |M| ) - A,  */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0002800, /* ( |M|E) - L and N */
-			/* Z : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "W" */
-			/* A : */ 0xe32e2dfc, /* (B|M|E) - C, D, E, F, G, H, I, K, L, N, R, S, T, V, Y and Z */
-			/* B : */ 0x40020000, /* ( |M| ) - R,  */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe10e794b, /* (B|M|E) - A, B, D, G, I, L, M, N, O, R, S, T and Y */
-			/* F : */ 0x40004100, /* ( |M| ) - I and O */
-			/* G : */ 0x40000010, /* ( |M| ) - E,  */
-			/* H : */ 0x60000111, /* (B|M| ) - A, E and I */
-			/* I : */ 0xe00e2cff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, N, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61000011, /* (B|M| ) - A, E and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0xc0040111, /* ( |M|E) - A, E, I and S */
-			/* O : */ 0xe0127a2a, /* (B|M|E) - B, D, F, J, L, M, N, O, R and U */
-			/* P : */ 0x40000010, /* ( |M| ) - E,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60000110, /* (B|M| ) - E and I */
-			/* S : */ 0xc0084000, /* ( |M|E) - O and T */
-			/* T : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* U : */ 0x60000800, /* (B|M| ) - L,  */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000001, /* ( |M| ) - A,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60083d16, /* (B|M| ) - B, C, E, I, K, L, M, N and T */
-			/* Z : */ 0x40000100, /* ( |M| ) - I,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "X" */
-			/* A : */ 0xe0202000, /* (B|M|E) - N and V */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x40002800, /* ( |M| ) - L and N */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe0043011, /* (B|M|E) - A, E, M, N and S */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x40000010, /* ( |M| ) - E,  */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000001, /* ( |M| ) - A,  */
-			/* O : */ 0x40002000, /* ( |M| ) - N,  */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x40104010, /* ( |M| ) - E, O and U */
-			/* U : */ 0x40040000, /* ( |M| ) - S,  */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000010, /* ( |M| ) - E,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Z : */ 0x00000001, /* ( | | ) - A,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Y" */
-			/* A : */ 0xe37ebcdc, /* (B|M|E) - C, D, E, G, H, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* C : */ 0x40020191, /* ( |M| ) - A, E, H, I and R */
-			/* D : */ 0xc0006159, /* ( |M|E) - A, D, E, G, I, N and O */
-			/* E : */ 0xe02e38ab, /* (B|M|E) - A, B, D, F, H, L, M, N, R, S, T and V */
-			/* F : */ 0xc0104110, /* ( |M|E) - E, I, O and U */
-			/* G : */ 0xc0100110, /* ( |M|E) - E, I and U */
-			/* H : */ 0x40105011, /* ( |M| ) - A, E, M, O and U */
-			/* I : */ 0xe10a3c68, /* (B|M|E) - D, F, G, K, L, M, N, R, T and Y */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000411, /* ( |M|E) - A, E and K */
-			/* L : */ 0xe1705d19, /* (B|M|E) - A, D, E, I, K, L, M, O, U, V, W and Y */
-			/* M : */ 0xc010c011, /* ( |M|E) - A, E, O, P and U */
-			/* N : */ 0xc24e6139, /* ( |M|E) - A, D, E, F, I, N, O, R, S, T, W and Z */
-			/* O : */ 0xe21e3800, /* (B|M|E) - L, M, N, R, S, T, U and Z */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc0586519, /* ( |M|E) - A, D, E, I, K, N, O, T, U and W */
-			/* S : */ 0xe20c4995, /* (B|M|E) - A, C, E, H, I, L, O, S, T and Z */
-			/* T : */ 0xc0184891, /* ( |M|E) - A, E, H, L, O, T and U */
-			/* U : */ 0x60062812, /* (B|M| ) - B, E, L, N, R and S */
-			/* V : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* W : */ 0x40004000, /* ( |M| ) - O,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x40000001, /* ( |M| ) - A,  */
-			/* Z : */ 0x40100001, /* ( |M| ) - A and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Z" */
-			/* A : */ 0xe12a3fee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, R, T, V and Y */
-			/* B : */ 0x60000110, /* (B|M| ) - E and I */
-			/* C : */ 0x40000001, /* ( |M| ) - A,  */
-			/* D : */ 0x62020111, /* (B|M| ) - A, E, I, R and Z */
-			/* E : */ 0xe12f3fbf, /* (B|M|E) - A, B, C, D, E, F, H, I, J, K, L, M, N, Q, R, S, T, V and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40000110, /* ( |M| ) - E and I */
-			/* H : */ 0x60000001, /* (B|M| ) - A,  */
-			/* I : */ 0xe12efeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, V and Y */
-			/* J : */ 0x40004001, /* ( |M| ) - A and O */
-			/* K : */ 0x40100001, /* ( |M| ) - A and U */
-			/* L : */ 0xe0100111, /* (B|M|E) - A, E, I and U */
-			/* M : */ 0x41000111, /* ( |M| ) - A, E, I and Y */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0122190, /* (B|M|E) - E, H, I, N, R and U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000001, /* ( |M| ) - A,  */
-			/* S : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60022882, /* (B|M| ) - B, H, L, N and R */
-			/* V : */ 0x60004101, /* (B|M| ) - A, I and O */
-			/* W : */ 0x60000001, /* (B|M| ) - A,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0042840, /* (B|M|E) - G, L, N and S */
-			/* Z : */ 0x41000111, /* ( |M| ) - A, E, I and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ä" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ö" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ü" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		}
-	}, /* End of Enum 2 / 5 */
-	/* ---------------------------------- *
-	 * --- texts / de => NST_TEXTS_DE --- *
-	 * ---------------------------------- */
-	{
-		{ /* Rules following letter "A" */
-			/* A : */ 0x600e2840, /* (B|M| ) - G, L, N, R, S, T */
-			/* B : */ 0xe75efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, Z, ä */
-			/* C : */ 0xe01a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U */
-			/* D : */ 0xe57e7bbb, /* (B|M|E) - A, B, D, E, F, H, I, J, L, M, N, O, R, S, T, U, V, W, Y, ä */
-			/* E : */ 0x600e0808, /* (B|M| ) - D, L, R, S, T */
-			/* F : */ 0xf00e4971, /* (B|M|E) - A, E, F, G, I, L, O, R, S, T, ü */
-			/* G : */ 0xe25e79fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, S, T, U, W, Z */
-			/* H : */ 0xe02e791b, /* (B|M|E) - A, B, D, E, I, L, M, N, O, R, S, T, V */
-			/* I : */ 0xe00e3c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, R, S, T */
-			/* J : */ 0x40004019, /* ( |M| ) - A, D, E, O */
-			/* K : */ 0xe21e4d91, /* (B|M|E) - A, E, H, I, K, L, O, R, S, T, U, Z */
-			/* L : */ 0xe77effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä */
-			/* M : */ 0xf11cfdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, S, T, U, Y, ü */
-			/* N : */ 0xef7effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö */
-			/* O : */ 0xc0068c00, /* ( |M|E) - K, L, P, R, S */
-			/* P : */ 0xe11ec9b1, /* (B|M|E) - A, E, F, H, I, L, O, P, R, S, T, U, Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U */
-			/* R : */ 0xf3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z, ü */
-			/* S : */ 0xe33efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, Y, Z */
-			/* T : */ 0xf77effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* U : */ 0xe2febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X, Z */
-			/* V : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
-			/* W : */ 0xc0004111, /* ( |M|E) - A, E, I, O */
-			/* X : */ 0xe0004111, /* (B|M|E) - A, E, I, O */
-			/* Y : */ 0xc006491b, /* ( |M|E) - A, B, D, E, I, L, O, R, S */
-			/* Z : */ 0xe2584111, /* (B|M|E) - A, E, I, O, T, U, W, Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "B" */
-			/* A : */ 0xe31ebdce, /* (B|M|E) - B, C, D, G, H, I, K, L, M, N, P, R, S, T, U, Y, Z */
-			/* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U, Y */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R, U */
-			/* E : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* F : */ 0x54024911, /* ( |M| ) - A, E, I, L, O, R, ä, ü */
-			/* G : */ 0x40020811, /* ( |M| ) - A, E, L, R */
-			/* H : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
-			/* I : */ 0xe25efc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, O, P, R, S, T, U, W, Z */
-			/* J : */ 0x40100010, /* ( |M| ) - E, U */
-			/* K : */ 0x58126801, /* ( |M| ) - A, L, N, O, R, U, ö, ü */
-			/* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* M : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* N : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* O : */ 0xe3de7bdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, L, M, N, O, R, S, T, U, W, X, Y, Z */
-			/* P : */ 0x40020001, /* ( |M| ) - A, R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
-			/* S : */ 0xc61ccd77, /* ( |M|E) - A, B, C, E, F, G, I, K, L, O, P, S, T, U, Z, ä */
-			/* T : */ 0xc0060191, /* ( |M|E) - A, E, H, I, R, S */
-			/* U : */ 0x600e3cee, /* (B|M| ) - B, C, D, F, G, H, K, L, M, N, R, S, T */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x54000111, /* ( |M| ) - A, E, I, ä, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe2080800, /* (B|M|E) - L, T, Z */
-			/* Z : */ 0x40100110, /* ( |M| ) - E, I, U */
-			/* ä : */ 0x6012280c, /* (B|M| ) - C, D, L, N, R, U */
-			/* ö : */ 0x600e00cc, /* (B|M| ) - C, D, G, H, R, S, T */
-			/* ü : */ 0x600e28e4  /* (B|M| ) - C, F, G, H, L, N, R, S, T */
-		},
-		{ /* Rules following letter "C" */
-			/* A : */ 0xe01eb81a, /* (B|M|E) - B, D, E, L, M, N, P, R, S, T, U */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40004181, /* ( |M| ) - A, H, I, O */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe02ebc22, /* (B|M|E) - B, F, K, L, M, N, P, R, S, T, V */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xff7efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* I : */ 0xe01e6899, /* (B|M|E) - A, D, E, H, L, N, O, R, S, T, U */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
-			/* L : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe03eb84f, /* (B|M|E) - A, B, C, D, G, L, M, N, P, R, S, T, U, V */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61004111, /* (B|M| ) - A, E, I, O, Y */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x40004101, /* ( |M| ) - A, I, O */
-			/* U : */ 0x60069800, /* (B|M| ) - L, M, P, R, S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60080005, /* (B|M| ) - A, C, T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "D" */
-			/* A : */ 0xe37ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40120811, /* ( |M| ) - A, E, L, R, U */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U, Y */
-			/* E : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Z */
-			/* F : */ 0x50020911, /* ( |M| ) - A, E, I, L, R, ü */
-			/* G : */ 0x40020811, /* ( |M| ) - A, E, L, R */
-			/* H : */ 0x4c104111, /* ( |M| ) - A, E, I, O, U, ä, ö */
-			/* I : */ 0xe73efe7d, /* (B|M|E) - A, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, V, Y, Z, ä */
-			/* J : */ 0x60100011, /* (B|M| ) - A, E, U */
-			/* K : */ 0x40024001, /* ( |M| ) - A, O, R */
-			/* L : */ 0xc4104111, /* ( |M|E) - A, E, I, O, U, ä */
-			/* M : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
-			/* N : */ 0x40100111, /* ( |M| ) - A, E, I, U */
-			/* O : */ 0xe2febccf, /* (B|M|E) - A, B, C, D, G, H, K, L, M, N, P, R, S, T, U, V, W, X, Z */
-			/* P : */ 0x40024021, /* ( |M| ) - A, F, O, R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* S : */ 0xc47cddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W, ä */
-			/* T : */ 0xc0060191, /* ( |M|E) - A, E, H, I, R, S */
-			/* U : */ 0xe20efd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, O, P, R, S, T, Z */
-			/* V : */ 0x40004110, /* ( |M| ) - E, I, O */
-			/* W : */ 0x44000111, /* ( |M| ) - A, E, I, ä */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0042800, /* (B|M|E) - L, N, S */
-			/* Z : */ 0x40500111, /* ( |M| ) - A, E, I, U, W */
-			/* ä : */ 0x60033004, /* (B|M| ) - C, M, N, Q, R */
-			/* ö : */ 0x60060000, /* (B|M| ) - R, S */
-			/* ü : */ 0x60062000  /* (B|M| ) - N, R, S */
-		},
-		{ /* Rules following letter "E" */
-			/* A : */ 0xc01e3c4e, /* ( |M|E) - B, C, D, G, K, L, M, N, R, S, T, U */
-			/* B : */ 0xf61e6df3, /* (B|M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U, Z, ä, ü */
-			/* C : */ 0xe00a4d91, /* (B|M|E) - A, E, H, I, K, L, O, R, T */
-			/* D : */ 0xf75e79db, /* (B|M|E) - A, B, D, E, G, H, I, L, M, N, O, R, S, T, U, W, Y, Z, ä, ü */
-			/* E : */ 0xc04ebdea, /* ( |M|E) - B, D, F, G, H, I, K, L, M, N, P, R, S, T, W */
-			/* F : */ 0xfe3e5d73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, O, R, S, T, U, V, Z, ä, ö, ü */
-			/* G : */ 0xf65e7dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Z, ä, ü */
-			/* H : */ 0xff5efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W, Y, Z, ä, ö, ü */
-			/* I : */ 0xe27effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Z */
-			/* J : */ 0x40104001, /* ( |M| ) - A, O, U */
-			/* K : */ 0xfc1e6d11, /* (B|M|E) - A, E, I, K, L, N, O, R, S, T, U, ä, ö, ü */
-			/* L : */ 0xff7effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* M : */ 0xfe1efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, Z, ä, ö, ü */
-			/* N : */ 0xff7fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* O : */ 0xc00ebc6e, /* ( |M|E) - B, C, D, F, G, K, L, M, N, P, R, S, T */
-			/* P : */ 0xe01ec9b1, /* (B|M|E) - A, E, F, H, I, L, O, P, R, S, T, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0xff7fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* S : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* T : */ 0xff5e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Y, Z, ä, ö, ü */
-			/* U : */ 0xe25ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, W, Z */
-			/* V : */ 0xe8004111, /* (B|M|E) - A, E, I, O, ö */
-			/* W : */ 0xfc104111, /* (B|M|E) - A, E, I, O, U, ä, ö, ü */
-			/* X : */ 0xe21cd593, /* (B|M|E) - A, B, E, H, I, K, M, O, P, S, T, U, Z */
-			/* Y : */ 0xe004399a, /* (B|M|E) - B, D, E, H, I, L, M, N, S */
-			/* Z : */ 0xd6504111, /* ( |M|E) - A, E, I, O, U, W, Z, ä, ü */
-			/* ä : */ 0x40000080, /* ( |M| ) - H */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x40000002  /* ( |M| ) - B */
-		},
-		{ /* Rules following letter "F" */
-			/* A : */ 0xe3be3dde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, R, S, T, U, V, X, Y, Z */
-			/* B : */ 0x40024911, /* ( |M| ) - A, E, I, L, O, R */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x40020000, /* ( |M| ) - R */
-			/* E : */ 0xe21e3dfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, R, S, T, U, Z */
-			/* F : */ 0xd45eedd3, /* ( |M|E) - A, B, E, G, H, I, K, L, N, O, P, R, S, T, U, W, ä, ü */
-			/* G : */ 0x40020991, /* ( |M| ) - A, E, H, I, L, R */
-			/* H : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
-			/* I : */ 0xe28e6c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, N, O, R, S, T, X, Z */
-			/* J : */ 0x60004000, /* (B|M| ) - O */
-			/* K : */ 0x40024801, /* ( |M| ) - A, L, O, R */
-			/* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* M : */ 0x50004111, /* ( |M| ) - A, E, I, O, ü */
-			/* N : */ 0x40100111, /* ( |M| ) - A, E, I, U */
-			/* O : */ 0xe01e6c84, /* (B|M|E) - C, H, K, L, N, O, R, S, T, U */
-			/* P : */ 0x40020000, /* ( |M| ) - R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* S : */ 0xc44c95f7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, M, P, S, T, W, ä */
-			/* T : */ 0xc05eddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W */
-			/* U : */ 0x600e38c4, /* (B|M| ) - C, G, H, L, M, N, R, S, T */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x44000111, /* ( |M| ) - A, E, I, ä */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40100110, /* ( |M| ) - E, I, U */
-			/* ä : */ 0x6016288c, /* (B|M| ) - C, D, H, L, N, R, S, U */
-			/* ö : */ 0x60020088, /* (B|M| ) - D, H, R */
-			/* ü : */ 0x600e38c0  /* (B|M| ) - G, H, L, M, N, R, S, T */
-		},
-		{ /* Rules following letter "G" */
-			/* A : */ 0xe23eb96a, /* (B|M|E) - B, D, F, G, I, L, M, N, P, R, S, T, U, V, Z */
-			/* B : */ 0x40024811, /* ( |M| ) - A, E, L, O, R */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0xc0020011, /* ( |M|E) - A, E, R */
-			/* E : */ 0xe67fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Z, ä */
-			/* F : */ 0x54020911, /* ( |M| ) - A, E, I, L, R, ä, ü */
-			/* G : */ 0xc0024910, /* ( |M|E) - E, I, L, O, R */
-			/* H : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
-			/* I : */ 0xea1efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, Z, ö */
-			/* J : */ 0x44000000, /* ( |M| ) - ä */
-			/* K : */ 0x40024011, /* ( |M| ) - A, E, O, R */
-			/* L : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
-			/* M : */ 0x50104111, /* ( |M| ) - A, E, I, O, U, ü */
-			/* N : */ 0x70104111, /* (B|M| ) - A, E, I, O, U, ü */
-			/* O : */ 0xe01eb85a, /* (B|M|E) - B, D, E, G, L, M, N, P, R, S, T, U */
-			/* P : */ 0x40020801, /* ( |M| ) - A, L, R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* S : */ 0xd67ffdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Z, ä, ü */
-			/* T : */ 0xc0124091, /* ( |M|E) - A, E, H, O, R, U */
-			/* U : */ 0x600e3915, /* (B|M| ) - A, C, E, I, L, M, N, R, S, T */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60009000, /* (B|M| ) - M, P */
-			/* Z : */ 0x40100010, /* ( |M| ) - E, U */
-			/* ä : */ 0x60162002, /* (B|M| ) - B, N, R, S, U */
-			/* ö : */ 0x600e2008, /* (B|M| ) - D, N, R, S, T */
-			/* ü : */ 0x600a2800  /* (B|M| ) - L, N, R, T */
-		},
-		{ /* Rules following letter "H" */
-			/* A : */ 0xe37ebfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R, U */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x40024111, /* ( |M| ) - A, E, I, O, R */
-			/* E : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
-			/* F : */ 0x54124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ü */
-			/* G : */ 0x40020911, /* ( |M| ) - A, E, I, L, R */
-			/* H : */ 0x44004111, /* ( |M| ) - A, E, I, O, ä */
-			/* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, Z */
-			/* J : */ 0x40000001, /* ( |M| ) - A */
-			/* K : */ 0x44126911, /* ( |M| ) - A, E, I, L, N, O, R, U, ä */
-			/* L : */ 0xde7eddfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Z, ä, ö, ü */
-			/* M : */ 0xdc1c4913, /* ( |M|E) - A, B, E, I, L, O, S, T, U, ä, ö, ü */
-			/* N : */ 0xdc5c5ff7, /* ( |M|E) - A, B, C, E, F, G, H, I, J, K, L, M, O, S, T, U, W, ä, ö, ü */
-			/* O : */ 0xe07efdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W */
-			/* P : */ 0x40124821, /* ( |M| ) - A, F, L, O, R, U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xd77efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* S : */ 0xd65eddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Z, ä, ü */
-			/* T : */ 0xd27efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ü */
-			/* U : */ 0xe00eb8eb, /* (B|M|E) - A, B, D, F, G, H, L, M, N, P, R, S, T */
-			/* V : */ 0x40004010, /* ( |M| ) - E, O */
-			/* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe40e984b, /* (B|M|E) - A, B, D, G, L, M, P, R, S, T, ä */
-			/* Z : */ 0x40100111, /* ( |M| ) - A, E, I, U */
-			/* ä : */ 0x601e7cac, /* (B|M| ) - C, D, F, H, K, L, M, N, O, R, S, T, U */
-			/* ö : */ 0x6006a8a6, /* (B|M| ) - B, C, F, H, L, N, P, R, S */
-			/* ü : */ 0x600ea8e6  /* (B|M| ) - B, C, F, G, H, L, N, P, R, S, T */
-		},
-		{ /* Rules following letter "I" */
-			/* A : */ 0xe23ebc6e, /* (B|M|E) - B, C, D, F, G, K, L, M, N, P, R, S, T, U, V, Z */
-			/* B : */ 0xf15e4917, /* (B|M|E) - A, B, C, E, I, L, O, R, S, T, U, W, Y, ü */
-			/* C : */ 0xe0184591, /* (B|M|E) - A, E, H, I, K, O, T, U */
-			/* D : */ 0xe13e7dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, Y */
-			/* E : */ 0xc27ebdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Z */
-			/* F : */ 0xe01e49b1, /* (B|M|E) - A, E, F, H, I, L, O, R, S, T, U */
-			/* G : */ 0xe25efff3, /* (B|M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W, Z */
-			/* H : */ 0xe01e2911, /* (B|M|E) - A, E, I, L, N, R, S, T, U */
-			/* I : */ 0x40002010, /* ( |M| ) - E, N */
-			/* J : */ 0xc0004011, /* ( |M|E) - A, E, O */
-			/* K : */ 0xec5eddbb, /* (B|M|E) - A, B, D, E, F, H, I, K, L, M, O, P, R, S, T, U, W, ä, ö */
-			/* L : */ 0xe67effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä */
-			/* M : */ 0xe65cfd73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, N, O, P, S, T, U, W, Z, ä */
-			/* N : */ 0xff7fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* O : */ 0xe2aebc4f, /* (B|M|E) - A, B, C, D, G, K, L, M, N, P, R, S, T, V, X, Z */
-			/* P : */ 0xc01ec9b1, /* ( |M|E) - A, E, F, H, I, L, O, P, R, S, T, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0xe01efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U */
-			/* S : */ 0xe77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä */
-			/* T : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* U : */ 0x40043000, /* ( |M| ) - M, N, S */
-			/* V : */ 0xe07ecd73, /* (B|M|E) - A, B, E, F, G, I, K, L, O, P, R, S, T, U, V, W */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* X : */ 0xc0080110, /* ( |M|E) - E, I, T */
-			/* Y : */ 0x40000011, /* ( |M| ) - A, E */
-			/* Z : */ 0xe21c4593, /* (B|M|E) - A, B, E, H, I, K, O, S, T, U, Z */
-			/* ä : */ 0x40020000, /* ( |M| ) - R */
-			/* ö : */ 0x40040000, /* ( |M| ) - S */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "J" */
-			/* A : */ 0xe236bccc, /* (B|M|E) - C, D, G, H, K, L, M, N, P, R, S, U, V, Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00e3c09, /* (B|M|E) - A, D, K, L, M, N, R, S, T */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe01628cf, /* (B|M|E) - A, B, C, D, G, H, L, N, R, S, U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x6006a84e, /* (B|M| ) - B, C, D, G, L, N, P, R, S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x600000c0, /* (B|M| ) - G, H */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x60002008  /* (B|M| ) - D, N */
-		},
-		{ /* Rules following letter "K" */
-			/* A : */ 0xe33effef, /* (B|M|E) - A, B, C, D, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, Y, Z */
-			/* B : */ 0x40020911, /* ( |M| ) - A, E, I, L, R */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x40004000, /* ( |M| ) - O */
-			/* E : */ 0xe13ebdfa, /* (B|M|E) - B, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, Y */
-			/* F : */ 0x44120911, /* ( |M| ) - A, E, I, L, R, U, ä */
-			/* G : */ 0x40020011, /* ( |M| ) - A, E, R */
-			/* H : */ 0x60004011, /* (B|M| ) - A, E, O */
-			/* I : */ 0xe30eb87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, P, R, S, T, Y, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R, U */
-			/* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* M : */ 0x44000011, /* ( |M| ) - A, E, ä */
-			/* N : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* O : */ 0xe27efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z */
-			/* P : */ 0x40024900, /* ( |M| ) - I, L, O, R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
-			/* S : */ 0xc43cddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, S, T, U, V, ä */
-			/* T : */ 0xd03649f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, R, S, U, V, ü */
-			/* U : */ 0xe00eb9c6, /* (B|M|E) - B, C, G, H, I, L, M, N, P, R, S, T */
-			/* V : */ 0x40004010, /* ( |M| ) - E, O */
-			/* W : */ 0x54000111, /* ( |M| ) - A, E, I, ä, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0020800, /* (B|M|E) - L, R */
-			/* Z : */ 0x40100111, /* ( |M| ) - A, E, I, U */
-			/* ä : */ 0x60163820, /* (B|M| ) - F, L, M, N, R, S, U */
-			/* ö : */ 0x6002b80c, /* (B|M| ) - C, D, L, M, N, P, R */
-			/* ü : */ 0x60063886  /* (B|M| ) - B, C, H, L, M, N, R, S */
-		},
-		{ /* Rules following letter "L" */
-			/* A : */ 0xe3feffee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
-			/* B : */ 0xdc7e5dfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, R, S, T, U, V, W, ä, ö, ü */
-			/* C : */ 0x40000181, /* ( |M| ) - A, H, I */
-			/* D : */ 0xc67e79fb, /* ( |M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, S, T, U, V, W, Z, ä */
-			/* E : */ 0xe1fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y */
-			/* F : */ 0xdc1e5991, /* ( |M|E) - A, E, H, I, L, M, O, R, S, T, U, ä, ö, ü */
-			/* G : */ 0xc41e4911, /* ( |M|E) - A, E, I, L, O, R, S, T, U, ä */
-			/* H : */ 0x4c004111, /* ( |M| ) - A, E, I, O, ä, ö */
-			/* I : */ 0xe2bffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, X, Z */
-			/* J : */ 0x60100001, /* (B|M| ) - A, U */
-			/* K : */ 0xdd1e7911, /* ( |M|E) - A, E, I, L, M, N, O, R, S, T, U, Y, ä, ö, ü */
-			/* L : */ 0xd77ef5ff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* M : */ 0xd45c451b, /* ( |M|E) - A, B, D, E, I, K, O, S, T, U, W, ä, ü */
-			/* N : */ 0xc0104119, /* ( |M|E) - A, D, E, I, O, U */
-			/* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
-			/* P : */ 0x401a49b1, /* ( |M| ) - A, E, F, H, I, L, O, R, T, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* S : */ 0xd57eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Y, ä, ü */
-			/* T : */ 0xdf7efdf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* U : */ 0xe2aefd7e, /* (B|M|E) - B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V, X, Z */
-			/* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* W : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe24ebc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, P, R, S, T, W, Z */
-			/* Z : */ 0xd05cc9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, P, S, T, U, W, ü */
-			/* ä : */ 0x601e70ec, /* (B|M| ) - C, D, F, G, H, M, N, O, R, S, T, U */
-			/* ö : */ 0x604c88ee, /* (B|M| ) - B, C, D, F, G, H, L, P, S, T, W */
-			/* ü : */ 0x600cb0ee  /* (B|M| ) - B, C, D, F, G, H, M, N, P, S, T */
-		},
-		{ /* Rules following letter "M" */
-			/* A : */ 0xe39effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, X, Y, Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R, U */
-			/* C : */ 0x40000081, /* ( |M| ) - A, H */
-			/* D : */ 0xc4160111, /* ( |M|E) - A, E, I, R, S, U, ä */
-			/* E : */ 0xe31ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, Y, Z */
-			/* F : */ 0x54024911, /* ( |M| ) - A, E, I, L, O, R, ä, ü */
-			/* G : */ 0x40020011, /* ( |M| ) - A, E, R */
-			/* H : */ 0x44004111, /* ( |M| ) - A, E, I, O, ä */
-			/* I : */ 0xe39e7cfd, /* (B|M|E) - A, C, D, E, F, G, H, K, L, M, N, O, R, S, T, U, X, Y, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x44124811, /* ( |M| ) - A, E, L, O, R, U, ä */
-			/* L : */ 0x4c104111, /* ( |M| ) - A, E, I, O, U, ä, ö */
-			/* M : */ 0xc31e6df3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U, Y, Z */
-			/* N : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* O : */ 0xe29efdde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, O, P, R, S, T, U, X, Z */
-			/* P : */ 0xc01e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T, U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* S : */ 0xc45eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, ä */
-			/* T : */ 0xc0160991, /* ( |M|E) - A, E, H, I, L, R, S, U */
-			/* U : */ 0x600e3ced, /* (B|M| ) - A, C, D, F, G, H, K, L, M, N, R, S, T */
-			/* V : */ 0x40004010, /* ( |M| ) - E, O */
-			/* W : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e4c10, /* (B|M|E) - E, K, L, O, R, S, T */
-			/* Z : */ 0x40100111, /* ( |M| ) - A, E, I, U */
-			/* ä : */ 0x6016288d, /* (B|M| ) - A, C, D, H, L, N, R, S, U */
-			/* ö : */ 0x604268ca, /* (B|M| ) - B, D, G, H, L, N, O, R, W */
-			/* ü : */ 0x600e288c  /* (B|M| ) - C, D, H, L, N, R, S, T */
-		},
-		{ /* Rules following letter "N" */
-			/* A : */ 0xe37ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
-			/* B : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
-			/* C : */ 0xc0004191, /* ( |M|E) - A, E, H, I, O */
-			/* D : */ 0xd77effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* E : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
-			/* F : */ 0x5e1e4911, /* ( |M| ) - A, E, I, L, O, R, S, T, U, Z, ä, ö, ü */
-			/* G : */ 0xd67efdf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ü */
-			/* H : */ 0x5d104111, /* ( |M| ) - A, E, I, O, U, Y, ä, ö, ü */
-			/* I : */ 0xe2befcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, X, Z */
-			/* J : */ 0x44100011, /* ( |M| ) - A, E, U, ä */
-			/* K : */ 0xde5ef9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W, Z, ä, ö, ü */
-			/* L : */ 0x4c104111, /* ( |M| ) - A, E, I, O, U, ä, ö */
-			/* M : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* N : */ 0xc77e4dff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, O, R, S, T, U, V, W, Y, Z, ä */
-			/* O : */ 0xe2febd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, P, R, S, T, U, V, W, X, Z */
-			/* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* S : */ 0xdf7effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* T : */ 0xdf7efffb, /* ( |M|E) - A, B, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* U : */ 0xe00ebd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, P, R, S, T */
-			/* V : */ 0x48004111, /* ( |M| ) - A, E, I, O, ö */
-			/* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0041800, /* (B|M|E) - L, M, S */
-			/* Z : */ 0xdf7efff3, /* ( |M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* ä : */ 0x60169886, /* (B|M| ) - B, C, H, L, M, P, R, S, U */
-			/* ö : */ 0x602e880c, /* (B|M| ) - C, D, L, P, R, S, T, V */
-			/* ü : */ 0x600a8062  /* (B|M| ) - B, F, G, P, R, T */
-		},
-		{ /* Rules following letter "O" */
-			/* A : */ 0xc01e3c0e, /* ( |M|E) - B, C, D, K, L, M, N, R, S, T, U */
-			/* B : */ 0xe11e4b1b, /* (B|M|E) - A, B, D, E, I, J, L, O, R, S, T, U, Y */
-			/* C : */ 0x61000495, /* (B|M| ) - A, C, E, H, K, Y */
-			/* D : */ 0xe15e4119, /* (B|M|E) - A, D, E, I, O, R, S, T, U, W, Y */
-			/* E : */ 0xe00e2828, /* (B|M|E) - D, F, L, N, R, S, T */
-			/* F : */ 0xe00e4931, /* (B|M|E) - A, E, F, I, L, O, R, S, T */
-			/* G : */ 0xe01e7953, /* (B|M|E) - A, B, E, G, I, L, M, N, O, R, S, T, U */
-			/* H : */ 0xe50e7911, /* (B|M|E) - A, E, I, L, M, N, O, R, S, T, Y, ä */
-			/* I : */ 0xc00e2c0c, /* ( |M|E) - C, D, K, L, N, R, S, T */
-			/* J : */ 0x40000011, /* ( |M| ) - A, E */
-			/* K : */ 0xe21e4d11, /* (B|M|E) - A, E, I, K, L, O, R, S, T, U, Z */
-			/* L : */ 0xe33cfd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, S, T, U, V, Y, Z */
-			/* M : */ 0xed3ef573, /* (B|M|E) - A, B, E, F, G, I, K, M, N, O, P, R, S, T, U, V, Y, ä, ö */
-			/* N : */ 0xe77effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä */
-			/* O : */ 0x400ebc48, /* ( |M| ) - D, G, K, L, M, N, P, R, S, T */
-			/* P : */ 0xe51ecdb1, /* (B|M|E) - A, E, F, H, I, K, L, O, P, R, S, T, U, Y, ä */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* S : */ 0xe75efdf7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, Z, ä */
-			/* T : */ 0xe35eddf3, /* (B|M|E) - A, B, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Y, Z */
-			/* U : */ 0xe02eb96f, /* (B|M|E) - A, B, C, D, F, G, I, L, M, N, P, R, S, T, V */
-			/* V : */ 0x60004111, /* (B|M| ) - A, E, I, O */
-			/* W : */ 0xc0042b11, /* ( |M|E) - A, E, I, J, L, N, S */
-			/* X : */ 0xe1000111, /* (B|M|E) - A, E, I, Y */
-			/* Y : */ 0xc0000011, /* ( |M|E) - A, E */
-			/* Z : */ 0x65004111, /* (B|M| ) - A, E, I, O, Y, ä */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "P" */
-			/* A : */ 0xe23ebc4d, /* (B|M|E) - A, C, D, G, K, L, M, N, P, R, S, T, U, V, Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe21ead5d, /* (B|M|E) - A, C, D, E, G, I, K, L, N, P, R, S, T, U, Z */
-			/* F : */ 0xf45e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, ä, ü */
-			/* G : */ 0x40000010, /* ( |M| ) - E */
-			/* H : */ 0xe51a4911, /* (B|M|E) - A, E, I, L, O, R, T, U, Y, ä */
-			/* I : */ 0xe21efc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, R, S, T, U, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000001, /* ( |M| ) - A */
-			/* L : */ 0x74104111, /* (B|M| ) - A, E, I, O, U, ä, ü */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x60004010, /* (B|M| ) - E, O */
-			/* O : */ 0xe0cefd5c, /* (B|M|E) - C, D, E, G, I, K, L, M, N, O, P, R, S, T, W, X */
-			/* P : */ 0xc11e4d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, S, T, U, Y */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* S : */ 0xe108c115, /* (B|M|E) - A, C, E, I, O, P, T, Y */
-			/* T : */ 0xc0144911, /* ( |M|E) - A, E, I, L, O, S, U */
-			/* U : */ 0x620eb82e, /* (B|M| ) - B, C, D, F, L, M, N, P, R, S, T, Z */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60020800, /* (B|M| ) - L, R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x600aa18c, /* (B|M| ) - C, D, H, I, N, P, R, T */
-			/* ö : */ 0x60000402, /* (B|M| ) - B, K */
-			/* ü : */ 0x60020800  /* (B|M| ) - L, R */
-		},
-		{ /* Rules following letter "Q" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x64004111, /* (B|M| ) - A, E, I, O, ä */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "R" */
-			/* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
-			/* B : */ 0xdc1e4953, /* ( |M|E) - A, B, E, G, I, L, O, R, S, T, U, ä, ö, ü */
-			/* C : */ 0x40104591, /* ( |M| ) - A, E, H, I, K, O, U */
-			/* D : */ 0xdd5efdfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, ä, ö, ü */
-			/* E : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z */
-			/* F : */ 0xdc1e6911, /* ( |M|E) - A, E, I, L, N, O, R, S, T, U, ä, ö, ü */
-			/* G : */ 0xdc5e6db3, /* ( |M|E) - A, B, E, F, H, I, K, L, N, O, R, S, T, U, W, ä, ö, ü */
-			/* H : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
-			/* I : */ 0xe3bcfe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, S, T, U, V, X, Y, Z */
-			/* J : */ 0x44100001, /* ( |M| ) - A, U, ä */
-			/* K : */ 0xde5e7dd3, /* ( |M|E) - A, B, E, G, H, I, K, L, M, N, O, R, S, T, U, W, Z, ä, ö, ü */
-			/* L : */ 0xcc144111, /* ( |M|E) - A, E, I, O, S, U, ä, ö */
-			/* M : */ 0xde5c49f7, /* ( |M|E) - A, B, C, E, F, G, H, I, L, O, S, T, U, W, Z, ä, ö, ü */
-			/* N : */ 0xc67eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Z, ä */
-			/* O : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
-			/* P : */ 0x401e49b1, /* ( |M| ) - A, E, F, H, I, L, O, R, S, T, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0xd51c6dd1, /* ( |M|E) - A, E, G, H, I, K, L, N, O, S, T, U, Y, ä, ü */
-			/* S : */ 0xdf5eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Y, Z, ä, ö, ü */
-			/* T : */ 0xdf7effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* U : */ 0xe20ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, Z */
-			/* V : */ 0x48004111, /* ( |M| ) - A, E, I, O, ö */
-			/* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc00ce801, /* ( |M|E) - A, L, N, O, P, S, T */
-			/* Z : */ 0xde5cddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, S, T, U, W, Z, ä, ö, ü */
-			/* ä : */ 0x623ebcee, /* (B|M| ) - B, C, D, F, G, H, K, L, M, N, P, R, S, T, U, V, Z */
-			/* ö : */ 0x600eb8ae, /* (B|M| ) - B, C, D, F, H, L, M, N, P, R, S, T */
-			/* ü : */ 0x600cb8ee  /* (B|M| ) - B, C, D, F, G, H, L, M, N, P, S, T */
-		},
-		{ /* Rules following letter "S" */
-			/* A : */ 0xe1bebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, X, Y */
-			/* B : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
-			/* C : */ 0x60024181, /* (B|M| ) - A, H, I, O, R */
-			/* D : */ 0x44124111, /* ( |M| ) - A, E, I, O, R, U, ä */
-			/* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z */
-			/* F : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
-			/* G : */ 0x54124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ü */
-			/* H : */ 0xfd104111, /* (B|M|E) - A, E, I, O, U, Y, ä, ö, ü */
-			/* I : */ 0xe23efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, Z */
-			/* J : */ 0x40100001, /* ( |M| ) - A, U */
-			/* K : */ 0xfd126911, /* (B|M|E) - A, E, I, L, N, O, R, U, Y, ä, ö, ü */
-			/* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* M : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* N : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
-			/* O : */ 0xe2febcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, P, R, S, T, U, V, W, X, Z */
-			/* P : */ 0x7c1649b1, /* (B|M| ) - A, E, F, H, I, L, O, R, S, U, ä, ö, ü */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
-			/* S : */ 0xd77afdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, T, U, V, W, Y, Z, ä, ü */
-			/* T : */ 0xff7effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
-			/* U : */ 0xe00ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T */
-			/* V : */ 0x60004111, /* (B|M| ) - A, E, I, O */
-			/* W : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe006b804, /* (B|M|E) - C, L, M, N, P, R, S */
-			/* Z : */ 0x65504111, /* (B|M| ) - A, E, I, O, U, W, Y, ä */
-			/* ä : */ 0x601e3cc6, /* (B|M| ) - B, C, G, H, K, L, M, N, R, S, T, U */
-			/* ö : */ 0x600028a0, /* (B|M| ) - F, H, L, N */
-			/* ü : */ 0x6004208e  /* (B|M| ) - B, C, D, H, N, S */
-		},
-		{ /* Rules following letter "T" */
-			/* A : */ 0xe3bebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, X, Y, Z */
-			/* B : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
-			/* C : */ 0x40104080, /* ( |M| ) - H, O, U */
-			/* D : */ 0x54124111, /* ( |M| ) - A, E, I, O, R, U, ä, ü */
-			/* E : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Z */
-			/* F : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
-			/* G : */ 0x44024911, /* ( |M| ) - A, E, I, L, O, R, ä */
-			/* H : */ 0xfd127911, /* (B|M|E) - A, E, I, L, M, N, O, R, U, Y, ä, ö, ü */
-			/* I : */ 0xee3fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, Z, ä, ö */
-			/* J : */ 0x64100011, /* (B|M| ) - A, E, U, ä */
-			/* K : */ 0x4c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö */
-			/* L : */ 0xcc104111, /* ( |M|E) - A, E, I, O, U, ä, ö */
-			/* M : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* N : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
-			/* O : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Z */
-			/* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
-			/* S : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* T : */ 0xd776fdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, U, V, W, Y, Z, ä, ü */
-			/* U : */ 0xe00ef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S, T */
-			/* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0029800, /* (B|M|E) - L, M, P, R */
-			/* Z : */ 0xd15efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, ü */
-			/* ä : */ 0x601e38ee, /* (B|M| ) - B, C, D, F, G, H, L, M, N, R, S, T, U */
-			/* ö : */ 0x600ea006, /* (B|M| ) - B, C, N, P, R, S, T */
-			/* ü : */ 0x600a3886  /* (B|M| ) - B, C, H, L, M, N, R, T */
-		},
-		{ /* Rules following letter "U" */
-			/* A : */ 0xc00e2c08, /* ( |M|E) - D, K, L, N, R, S, T */
-			/* B : */ 0xf03e6f93, /* (B|M|E) - A, B, E, H, I, J, K, L, N, O, R, S, T, U, V, ü */
-			/* C : */ 0x40004595, /* ( |M| ) - A, C, E, H, I, K, O */
-			/* D : */ 0xd4564959, /* ( |M|E) - A, D, E, G, I, L, O, R, S, U, W, ä, ü */
-			/* E : */ 0xe00e3906, /* (B|M|E) - B, C, I, L, M, N, R, S, T */
-			/* F : */ 0xf65efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Z, ä, ü */
-			/* G : */ 0xc61e79f3, /* ( |M|E) - A, B, E, F, G, H, I, L, M, N, O, R, S, T, U, Z, ä */
-			/* H : */ 0xfc167911, /* (B|M|E) - A, E, I, L, M, N, O, R, S, U, ä, ö, ü */
-			/* I : */ 0xc22e285c, /* ( |M|E) - C, D, E, G, L, N, R, S, T, V, Z */
-			/* J : */ 0x40000001, /* ( |M| ) - A */
-			/* K : */ 0xdc1a6d11, /* ( |M|E) - A, E, I, K, L, N, O, R, T, U, ä, ö, ü */
-			/* L : */ 0xfe7efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ö, ü */
-			/* M : */ 0xf67efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ü */
-			/* N : */ 0xf67efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ü */
-			/* O : */ 0x400e0800, /* ( |M| ) - L, R, S, T */
-			/* P : */ 0xc01ec9b1, /* ( |M|E) - A, E, F, H, I, L, O, P, R, S, T, U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U */
-			/* R : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
-			/* S : */ 0xe67ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Z, ä */
-			/* T : */ 0xe27efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z */
-			/* U : */ 0x40003000, /* ( |M| ) - M, N */
-			/* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* W : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0xd6584113, /* ( |M|E) - A, B, E, I, O, T, U, W, Z, ä, ü */
-			/* ä : */ 0x40000800, /* ( |M| ) - L */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "V" */
-			/* A : */ 0xe00e3dc8, /* (B|M|E) - D, G, H, I, K, L, M, N, R, S, T */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe08e2d4d, /* (B|M|E) - A, C, D, G, I, K, L, N, R, S, T, X */
-			/* F : */ 0x40004000, /* ( |M| ) - O */
-			/* G : */ 0x40000010, /* ( |M| ) - E */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe22e6c5f, /* (B|M|E) - A, B, C, D, E, G, K, L, N, O, R, S, T, V, Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004000, /* ( |M| ) - O */
-			/* L : */ 0x60000101, /* (B|M| ) - A, I */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe00a2d40, /* (B|M|E) - G, I, K, L, N, R, T */
-			/* P : */ 0x40020000, /* ( |M| ) - R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000100, /* ( |M| ) - I */
-			/* S : */ 0x40080000, /* ( |M| ) - T */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60021800, /* (B|M| ) - L, M, R */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x60080000, /* (B|M| ) - T */
-			/* ö : */ 0x60000840, /* (B|M| ) - G, L */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "W" */
-			/* A : */ 0xe10ebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00e39ee, /* (B|M|E) - B, C, D, F, G, H, I, L, M, N, R, S, T */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* I : */ 0x600ebc5c, /* (B|M| ) - C, D, E, G, K, L, M, N, P, R, S, T */
-			/* J : */ 0x40000010, /* ( |M| ) - E */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x60000011, /* (B|M| ) - A, E */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* O : */ 0x600278c6, /* (B|M| ) - B, C, G, H, L, M, N, O, R */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60000001, /* (B|M| ) - A */
-			/* S : */ 0x40000410, /* ( |M| ) - E, K */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x600e2804, /* (B|M| ) - C, L, N, R, S, T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x600e38c4, /* (B|M| ) - C, G, H, L, M, N, R, S, T */
-			/* ö : */ 0x60021884, /* (B|M| ) - C, H, L, M, R */
-			/* ü : */ 0x600e2884  /* (B|M| ) - C, H, L, N, R, S, T */
-		},
-		{ /* Rules following letter "X" */
-			/* A : */ 0x60003800, /* (B|M| ) - L, M, N */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe0023c00, /* (B|M|E) - K, L, M, N, R */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40000001, /* ( |M| ) - A */
-			/* I : */ 0x40247c19, /* ( |M| ) - A, D, E, K, L, M, N, O, S, V */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40024000, /* ( |M| ) - O, R */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x400a2000, /* ( |M| ) - N, R, T */
-			/* P : */ 0x40024811, /* ( |M| ) - A, E, L, O, R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0xc0120110, /* ( |M|E) - E, I, R, U */
-			/* U : */ 0x40000011, /* ( |M| ) - A, E */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x60000808, /* (B|M| ) - D, L */
-			/* Z : */ 0x40000010, /* ( |M| ) - E */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Y" */
-			/* A : */ 0xe2063c0c, /* (B|M|E) - C, D, K, L, M, N, R, S, Z */
-			/* B : */ 0x40124011, /* ( |M| ) - A, E, O, R, U */
-			/* C : */ 0x40000890, /* ( |M| ) - E, H, L */
-			/* D : */ 0xc0020111, /* ( |M|E) - A, E, I, R */
-			/* E : */ 0xe00e2808, /* (B|M|E) - D, L, N, R, S, T */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x40024100, /* ( |M| ) - I, O, R */
-			/* H : */ 0x40000001, /* ( |M| ) - A */
-			/* I : */ 0xe0002800, /* (B|M|E) - L, N */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004810, /* ( |M| ) - E, L, O */
-			/* L : */ 0xc0244955, /* ( |M|E) - A, C, E, G, I, L, O, S, V */
-			/* M : */ 0xc010f113, /* ( |M|E) - A, B, E, I, M, N, O, P, U */
-			/* N : */ 0xc008451d, /* ( |M|E) - A, C, D, E, I, K, O, T */
-			/* O : */ 0xe01c2040, /* (B|M|E) - G, N, S, T, U */
-			/* P : */ 0xc01e6190, /* ( |M|E) - E, H, I, N, O, R, S, T, U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x401a4111, /* ( |M| ) - A, E, I, O, R, T, U */
-			/* S : */ 0xc00c0115, /* ( |M|E) - A, C, E, I, S, T */
-			/* T : */ 0xc0004190, /* ( |M|E) - E, H, I, O */
-			/* U : */ 0x60022000, /* (B|M| ) - N, R */
-			/* V : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* W : */ 0x40004000, /* ( |M| ) - O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40000011, /* ( |M| ) - A, E */
-			/* ä : */ 0x40002000, /* ( |M| ) - N */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Z" */
-			/* A : */ 0xe01abdee, /* (B|M|E) - B, C, D, F, G, H, I, K, L, M, N, P, R, T, U */
-			/* B : */ 0x50120911, /* ( |M| ) - A, E, I, L, R, U, ü */
-			/* C : */ 0x40000080, /* ( |M| ) - H */
-			/* D : */ 0x40000110, /* ( |M| ) - E, I */
-			/* E : */ 0xe11ebdaf, /* (B|M|E) - A, B, C, D, F, H, I, K, L, M, N, P, R, S, T, U, Y */
-			/* F : */ 0x44024811, /* ( |M| ) - A, E, L, O, R, ä */
-			/* G : */ 0x40020011, /* ( |M| ) - A, E, R */
-			/* H : */ 0x40004011, /* ( |M| ) - A, E, O */
-			/* I : */ 0xe93efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, Y, ö */
-			/* J : */ 0x40000001, /* ( |M| ) - A */
-			/* K : */ 0x48124101, /* ( |M| ) - A, I, O, R, U, ö */
-			/* L : */ 0x40004111, /* ( |M| ) - A, E, I, O */
-			/* M : */ 0x40000111, /* ( |M| ) - A, E, I */
-			/* N : */ 0x40000001, /* ( |M| ) - A */
-			/* O : */ 0xe00ee964, /* (B|M|E) - C, F, G, I, L, N, O, P, R, S, T */
-			/* P : */ 0x40120820, /* ( |M| ) - F, L, R, U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000011, /* ( |M| ) - A, E */
-			/* S : */ 0x40088115, /* ( |M| ) - A, C, E, I, P, T */
-			/* T : */ 0xc0020891, /* ( |M|E) - A, E, H, L, R */
-			/* U : */ 0xe66fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, V, W, Z, ä */
-			/* V : */ 0x40004010, /* ( |M| ) - E, O */
-			/* W : */ 0x6c100111, /* (B|M| ) - A, E, I, U, ä, ö */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x600c9c00, /* (B|M| ) - K, L, M, P, S, T */
-			/* Z : */ 0x40104111, /* ( |M| ) - A, E, I, O, U */
-			/* ä : */ 0x60102080, /* (B|M| ) - H, N, U */
-			/* ö : */ 0x60040840, /* (B|M| ) - G, L, S */
-			/* ü : */ 0x60022044  /* (B|M| ) - C, G, N, R */
-		},
-		{ /* Rules following letter "ä" */
-			/* A : */ 0x40002000, /* ( |M| ) - N */
-			/* B : */ 0x40080110, /* ( |M| ) - E, I, T */
-			/* C : */ 0x40000480, /* ( |M| ) - H, K */
-			/* D : */ 0x40080915, /* ( |M| ) - A, C, E, I, L, T */
-			/* E : */ 0x40022000, /* ( |M| ) - N, R */
-			/* F : */ 0x40080930, /* ( |M| ) - E, F, I, L, T */
-			/* G : */ 0x61182910, /* (B|M| ) - E, I, L, N, T, U, Y */
-			/* H : */ 0x600a3910, /* (B|M| ) - E, I, L, M, N, R, T */
-			/* I : */ 0x40040000, /* ( |M| ) - S */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40100010, /* ( |M| ) - E, U */
-			/* L : */ 0x420c083e, /* ( |M| ) - B, C, D, E, F, L, S, T, Z */
-			/* M : */ 0x4008d911, /* ( |M| ) - A, E, I, L, M, O, P, T */
-			/* N : */ 0xc20c6558, /* ( |M|E) - D, E, G, I, K, N, O, S, T, Z */
-			/* O : */ 0x40000840, /* ( |M| ) - G, L */
-			/* P : */ 0x40008021, /* ( |M| ) - A, F, P */
-			/* Q : */ 0x60100000, /* (B|M| ) - U */
-			/* R : */ 0xe25e9d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, P, R, S, T, U, W, Z */
-			/* S : */ 0x601c0114, /* (B|M| ) - C, E, I, S, T, U */
-			/* T : */ 0xe20c4590, /* (B|M|E) - E, H, I, K, O, S, T, Z */
-			/* U : */ 0x620eb87e, /* (B|M| ) - B, C, D, E, F, G, L, M, N, P, R, S, T, Z */
-			/* V : */ 0x40000010, /* ( |M| ) - E */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40000110, /* ( |M| ) - E, I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ö" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x40000810, /* ( |M| ) - E, L */
-			/* C : */ 0x40000480, /* ( |M| ) - H, K */
-			/* D : */ 0x60000110, /* (B|M| ) - E, I */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x60000830, /* (B|M| ) - E, F, L */
-			/* G : */ 0x40000810, /* ( |M| ) - E, L */
-			/* H : */ 0x40123810, /* ( |M| ) - E, L, M, N, R, U */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x60004010, /* (B|M| ) - E, O */
-			/* L : */ 0xe2000c3a, /* (B|M|E) - B, D, E, F, K, L, Z */
-			/* M : */ 0x40181110, /* ( |M| ) - E, I, M, T, U */
-			/* N : */ 0xc01c2954, /* ( |M|E) - C, E, G, I, L, N, S, T, U */
-			/* O : */ 0x40008000, /* ( |M| ) - P */
-			/* P : */ 0x40048020, /* ( |M| ) - F, P, S */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc01eb57a, /* ( |M|E) - B, D, E, F, G, I, K, M, N, P, R, S, T, U */
-			/* S : */ 0xe01c0914, /* (B|M|E) - C, E, I, L, S, T, U */
-			/* T : */ 0x42180114, /* ( |M| ) - C, E, I, T, U, Z */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x40020010, /* ( |M| ) - E, R */
-			/* W : */ 0x40000010, /* ( |M| ) - E */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ü" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x60160810, /* (B|M| ) - E, L, R, S, U */
-			/* C : */ 0x40000480, /* ( |M| ) - H, K */
-			/* D : */ 0x40444111, /* ( |M| ) - A, E, I, O, S, W */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x40180030, /* ( |M| ) - E, F, T, U */
-			/* G : */ 0x40180952, /* ( |M| ) - B, E, G, I, L, T, U */
-			/* H : */ 0x400e3a12, /* ( |M| ) - B, E, J, L, M, N, R, S, T */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0xc00c8810, /* ( |M|E) - E, L, P, S, T */
-			/* M : */ 0xc0009810, /* ( |M|E) - E, L, M, P */
-			/* N : */ 0xc204247c, /* ( |M|E) - C, D, E, F, G, K, N, S, Z */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x40008020, /* ( |M| ) - F, P */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc24e5d7e, /* ( |M|E) - B, C, D, E, F, G, I, K, L, M, O, R, S, T, W, Z */
-			/* S : */ 0x400c0114, /* ( |M| ) - C, E, I, S, T */
-			/* T : */ 0xc20c0910, /* ( |M|E) - E, I, L, S, T, Z */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		}
-	}, /* End of Enum 3 / 5 */
-	/* ---------------------------------- *
-	 * --- texts / en => NST_TEXTS_EN --- *
-	 * ---------------------------------- */
-	{
-		{ /* Rules following letter "A" */
-			/* A : */ 0x60020800, /* (B|M| ) - L and R */
-			/* B : */ 0xe1166b9b, /* (B|M|E) - A, B, D, E, H, I, J, L, N, O, R, S, U and Y */
-			/* C : */ 0xe11f4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, R, S, T, U and Y */
-			/* D : */ 0xe17efbff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* E : */ 0xe01e784d, /* (B|M|E) - A, C, D, G, L, M, N, O, R, S, T and U */
-			/* F : */ 0xe00a4931, /* (B|M|E) - A, E, F, I, L, O, R and T */
-			/* G : */ 0xe01679d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, S and U */
-			/* H : */ 0xe0145911, /* (B|M|E) - A, E, I, L, M, O, S and U */
-			/* I : */ 0xe02ebc4f, /* (B|M|E) - A, B, C, D, G, K, L, M, N, P, R, S, T and V */
-			/* J : */ 0x40004001, /* ( |M| ) - A and O */
-			/* K : */ 0xe11449b1, /* (B|M|E) - A, E, F, H, I, L, O, S, U and Y */
-			/* L : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* M : */ 0xe116f913, /* (B|M|E) - A, B, E, I, L, M, N, O, P, R, S, U and Y */
-			/* N : */ 0xe3fd6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, Q, S, T, U, V, W, X, Y and Z */
-			/* O : */ 0xc0020800, /* ( |M|E) - L and R */
-			/* P : */ 0xe11ec991, /* (B|M|E) - A, E, H, I, L, O, P, R, S, T, U and Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0xe17fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
-			/* S : */ 0xe11ddd95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, P, Q, S, T, U and Y */
-			/* T : */ 0xe35e7db7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* U : */ 0xe0aeb87e, /* (B|M|E) - B, C, D, E, F, G, L, M, N, P, R, S, T, V and X */
-			/* V : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
-			/* W : */ 0xe10e6d3b, /* (B|M|E) - A, B, D, E, F, I, K, L, N, O, R, S, T and Y */
-			/* X : */ 0xe0084111, /* (B|M|E) - A, E, I, O and T */
-			/* Y : */ 0xe04e793f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, R, S, T and W */
-			/* Z : */ 0xe2005111, /* (B|M|E) - A, E, I, M, O and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "B" */
-			/* A : */ 0xe15ebdee, /* (B|M|E) - B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, U, W and Y */
-			/* B : */ 0xc1064911, /* ( |M|E) - A, E, I, L, O, R, S and Y */
-			/* C : */ 0x40004001, /* ( |M| ) - A and O */
-			/* D : */ 0x40100100, /* ( |M| ) - I and U */
-			/* E : */ 0xe16e7dfd, /* (B|M|E) - A, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, W and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40004000, /* ( |M| ) - O,  */
-			/* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x40100010, /* ( |M| ) - E and U */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* N : */ 0x40004010, /* ( |M| ) - E and O */
-			/* O : */ 0xe1def9df, /* (B|M|E) - A, B, C, D, E, G, H, I, L, M, N, O, P, R, S, T, U, W, X and Y */
-			/* P : */ 0x40020000, /* ( |M| ) - R,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0184114, /* ( |M|E) - C, E, I, O, T and U */
-			/* T : */ 0x40020811, /* ( |M| ) - A, E, L and R */
-			/* U : */ 0x630e7d6e, /* (B|M| ) - B, C, D, F, G, I, K, L, M, N, O, R, S, T, Y and Z */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x40000010, /* ( |M| ) - E,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e0810, /* (B|M|E) - E, L, R, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "C" */
-			/* A : */ 0xe13ebffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
-			/* D : */ 0x40004000, /* ( |M| ) - O,  */
-			/* E : */ 0xe14ef93f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, P, R, S, T, W and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe15ef93b, /* (B|M|E) - A, B, D, E, F, I, L, M, N, O, P, R, S, T, U, W and Y */
-			/* I : */ 0xe23ef87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc15ef9bf, /* ( |M|E) - A, B, C, D, E, F, H, I, L, M, N, O, P, R, S, T, U, W and Y */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x40000010, /* ( |M| ) - E,  */
-			/* O : */ 0xe1fff9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, Q, R, S, T, U, V, W, X and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0004000, /* ( |M|E) - O,  */
-			/* T : */ 0xc1167931, /* ( |M|E) - A, E, F, I, L, M, N, O, R, S, U and Y */
-			/* U : */ 0x600ef93f, /* (B|M| ) - A, B, C, D, E, F, I, L, M, N, O, P, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00af807, /* (B|M|E) - A, B, C, L, M, N, O, P, R and T */
-			/* Z : */ 0x20000010, /* (B| | ) - E,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "D" */
-			/* A : */ 0xe37eb9fe, /* (B|M|E) - B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
-			/* C : */ 0x40100881, /* ( |M| ) - A, H, L and U */
-			/* D : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
-			/* E : */ 0xe1feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
-			/* F : */ 0x40104101, /* ( |M| ) - A, I, O and U */
-			/* G : */ 0x41001111, /* ( |M| ) - A, E, I, M and Y */
-			/* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* I : */ 0xe2befc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, X and Z */
-			/* J : */ 0x40104001, /* ( |M| ) - A, O and U */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* N : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* O : */ 0xe2fef95d, /* (B|M|E) - A, C, D, E, G, I, L, M, N, O, P, R, S, T, U, V, W, X and Z */
-			/* P : */ 0x40004101, /* ( |M| ) - A, I and O */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc048d995, /* ( |M|E) - A, C, E, H, I, L, M, O, P, T and W */
-			/* T : */ 0xc0000080, /* ( |M|E) - H,  */
-			/* U : */ 0xe00efd77, /* (B|M|E) - A, B, C, E, F, G, I, K, L, M, N, O, P, R, S and T */
-			/* V : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00c3911, /* (B|M|E) - A, E, I, L, M, N, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "E" */
-			/* A : */ 0xe27ebcee, /* (B|M|E) - B, C, D, F, G, H, K, L, M, N, P, R, S, T, U, V, W and Z */
-			/* B : */ 0xe0164913, /* (B|M|E) - A, B, E, I, L, O, R, S and U */
-			/* C : */ 0xe11a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xe156797f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, R, S, U, W and Y */
-			/* E : */ 0xe26ebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, V, W and Z */
-			/* F : */ 0xe11e4931, /* (B|M|E) - A, E, F, I, L, O, R, S, T, U and Y */
-			/* G : */ 0xe11679d3, /* (B|M|E) - A, B, E, G, H, I, L, M, N, O, R, S, U and Y */
-			/* H : */ 0xc1124111, /* ( |M|E) - A, E, I, O, R, U and Y */
-			/* I : */ 0xe22e7c6d, /* (B|M|E) - A, C, D, F, G, K, L, M, N, O, R, S, T, V and Z */
-			/* J : */ 0x60104011, /* (B|M| ) - A, E, O and U */
-			/* K : */ 0xe0042911, /* (B|M|E) - A, E, I, L, N and S */
-			/* L : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* M : */ 0xe114f913, /* (B|M|E) - A, B, E, I, L, M, N, O, P, S, U and Y */
-			/* N : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe05eb86c, /* (B|M|E) - C, D, F, G, L, M, N, P, R, S, T, U and W */
-			/* P : */ 0xe11ec991, /* (B|M|E) - A, E, H, I, L, O, P, R, S, T, U and Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe15ddd9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, O, P, Q, S, T, U, W and Y */
-			/* T : */ 0xe35e69b7, /* (B|M|E) - A, B, C, E, F, H, I, L, N, O, R, S, T, U, W, Y and Z */
-			/* U : */ 0xe02eb85e, /* (B|M|E) - B, C, D, E, G, L, M, N, P, R, S, T and V */
-			/* V : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
-			/* W : */ 0xe106699b, /* (B|M|E) - A, B, D, E, H, I, L, N, O, R, S and Y */
-			/* X : */ 0xe018c195, /* (B|M|E) - A, C, E, H, I, O, P, T and U */
-			/* Y : */ 0xe004f91f, /* (B|M|E) - A, B, C, D, E, I, L, M, N, O, P and S */
-			/* Z : */ 0xe2004111, /* (B|M|E) - A, E, I, O and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "F" */
-			/* A : */ 0xe1fe395e, /* (B|M|E) - B, C, D, E, G, I, L, M, N, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00e391f, /* (B|M|E) - A, B, C, D, E, I, L, M, N, R, S and T */
-			/* F : */ 0xc1166911, /* ( |M|E) - A, E, I, L, N, O, R, S, U and Y */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe28e687f, /* (B|M|E) - A, B, C, D, E, F, G, L, N, O, R, S, T, X and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000010, /* ( |M| ) - E,  */
-			/* O : */ 0xe0d67955, /* (B|M|E) - A, C, E, G, I, L, M, N, O, R, S, U, W and X */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0xc1044190, /* ( |M|E) - E, H, I, O, S and Y */
-			/* U : */ 0x600e3854, /* (B|M| ) - C, E, G, L, M, N, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0000100, /* ( |M|E) - I,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "G" */
-			/* A : */ 0xe37eb95e, /* (B|M|E) - B, C, D, E, G, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40004001, /* ( |M| ) - A and O */
-			/* E : */ 0xe14e79bb, /* (B|M|E) - A, B, D, E, F, H, I, L, M, N, O, R, S, T, W and Y */
-			/* F : */ 0x40104000, /* ( |M| ) - O and U */
-			/* G : */ 0xc1064911, /* ( |M|E) - A, E, I, L, O, R, S and Y */
-			/* H : */ 0xe00c6913, /* (B|M|E) - A, B, E, I, L, N, O, S and T */
-			/* I : */ 0xe23e787f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, R, S, T, U, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0xe0145111, /* (B|M|E) - A, E, I, M, O, S and U */
-			/* O : */ 0xe07e795b, /* (B|M|E) - A, B, D, E, G, I, L, M, N, O, R, S, T, U, V and W */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* S : */ 0xc0080080, /* ( |M|E) - H and T */
-			/* T : */ 0x40004080, /* ( |M| ) - H and O */
-			/* U : */ 0x600e7911, /* (B|M| ) - A, E, I, L, M, N, O, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe002b000, /* (B|M|E) - M, N, P and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "H" */
-			/* A : */ 0xe37ebd7e, /* (B|M|E) - B, C, D, E, F, G, I, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x40104011, /* ( |M| ) - A, E, O and U */
-			/* C : */ 0x40000801, /* ( |M| ) - A and L */
-			/* D : */ 0x40024000, /* ( |M| ) - O and R */
-			/* E : */ 0xe1fff97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, Q, R, S, T, U, V, W, X and Y */
-			/* F : */ 0x40104100, /* ( |M| ) - I, O and U */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40004000, /* ( |M| ) - O,  */
-			/* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* M : */ 0xc0004111, /* ( |M|E) - A, E, I and O */
-			/* N : */ 0xc0044111, /* ( |M|E) - A, E, I, O and S */
-			/* O : */ 0xe17efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* P : */ 0x40004000, /* ( |M| ) - O,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0080080, /* ( |M|E) - H and T */
-			/* T : */ 0xc11469b1, /* ( |M|E) - A, E, F, H, I, L, N, O, S, U and Y */
-			/* U : */ 0xe00e387f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e985b, /* (B|M|E) - A, B, D, E, G, L, M, P, R, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "I" */
-			/* A : */ 0xe00eb8de, /* (B|M|E) - B, C, D, E, G, H, L, M, N, P, R, S and T */
-			/* B : */ 0xe1164913, /* (B|M|E) - A, B, E, I, L, O, R, S, U and Y */
-			/* C : */ 0xe11e6d95, /* (B|M|E) - A, C, E, H, I, K, L, N, O, R, S, T, U and Y */
-			/* D : */ 0xe15e6959, /* (B|M|E) - A, D, E, G, I, L, N, O, R, S, T, U, W and Y */
-			/* E : */ 0xc07e3d6e, /* ( |M|E) - B, C, D, F, G, I, K, L, M, N, R, S, T, U, V and W */
-			/* F : */ 0xc11a4931, /* ( |M|E) - A, E, F, I, L, O, R, T, U and Y */
-			/* G : */ 0xe05679d1, /* (B|M|E) - A, E, G, H, I, L, M, N, O, R, S, U and W */
-			/* H : */ 0x40000100, /* ( |M| ) - I,  */
-			/* I : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0xc0044591, /* ( |M|E) - A, E, H, I, K, O and S */
-			/* L : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* M : */ 0xe014f913, /* (B|M|E) - A, B, E, I, L, M, N, O, P, S and U */
-			/* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe01eb84c, /* (B|M|E) - C, D, G, L, M, N, P, R, S, T and U */
-			/* P : */ 0xc01ed993, /* ( |M|E) - A, B, E, H, I, L, M, O, P, R, S, T and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe17efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* S : */ 0xe15fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, W and Y */
-			/* T : */ 0xe35e79b7, /* (B|M|E) - A, B, C, E, F, H, I, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* U : */ 0x40041000, /* ( |M| ) - M and S */
-			/* V : */ 0xe1204111, /* (B|M|E) - A, E, I, O, V and Y */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* X : */ 0xc0084110, /* ( |M|E) - E, I, O and T */
-			/* Y : */ 0x40000001, /* ( |M| ) - A,  */
-			/* Z : */ 0xe2004111, /* (B|M|E) - A, E, I, O and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "J" */
-			/* A : */ 0xe367bdde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, P, Q, R, S, V, W, Y and Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x604e783d, /* (B|M| ) - A, C, D, E, F, L, M, N, O, R, S, T and W */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe0083842, /* (B|M|E) - B, G, L, M, N and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe1362d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, N, R, S, U, V and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x602e3949, /* (B|M| ) - A, D, G, I, L, M, N, R, S, T and V */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "K" */
-			/* A : */ 0xe14ef9de, /* (B|M|E) - B, C, D, E, G, H, I, L, M, N, O, P, R, S, T, W and Y */
-			/* B : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x40000001, /* ( |M| ) - A,  */
-			/* E : */ 0xe16e795b, /* (B|M|E) - A, B, D, E, G, I, L, M, N, O, R, S, T, V, W and Y */
-			/* F : */ 0x40104101, /* ( |M| ) - A, I, O and U */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x60004011, /* (B|M| ) - A, E and O */
-			/* I : */ 0xe00eb81d, /* (B|M|E) - A, C, D, E, L, M, N, P, R, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* O : */ 0xe076a820, /* (B|M|E) - F, L, N, P, R, S, U, V and W */
-			/* P : */ 0x40004000, /* ( |M| ) - O,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc0085190, /* ( |M|E) - E, H, I, M, O and T */
-			/* T : */ 0x40004001, /* ( |M| ) - A and O */
-			/* U : */ 0x60029800, /* (B|M| ) - L, M, P and R */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0020801, /* (B|M|E) - A, L and R */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "L" */
-			/* A : */ 0xe3fefdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
-			/* C : */ 0x41104191, /* ( |M| ) - A, E, H, I, O, U and Y */
-			/* D : */ 0xc15e69b3, /* ( |M|E) - A, B, E, F, H, I, L, N, O, R, S, T, U, W and Y */
-			/* E : */ 0xe1feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
-			/* F : */ 0xc01e4915, /* ( |M|E) - A, C, E, I, L, O, R, S, T and U */
-			/* G : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* H : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* I : */ 0xe3fffc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc1040111, /* ( |M|E) - A, E, I, S and Y */
-			/* L : */ 0xc156f1bf, /* ( |M|E) - A, B, C, D, E, F, H, I, M, N, O, P, R, S, U, W and Y */
-			/* M : */ 0xc0044111, /* ( |M|E) - A, E, I, O and S */
-			/* N : */ 0x40000011, /* ( |M| ) - A and E */
-			/* O : */ 0xe17ff9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
-			/* P : */ 0xc00c4991, /* ( |M|E) - A, E, H, I, L, O, S and T */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x41004100, /* ( |M| ) - I, O and Y */
-			/* S : */ 0xc1084193, /* ( |M|E) - A, B, E, H, I, O, T and Y */
-			/* T : */ 0xc3164191, /* ( |M|E) - A, E, H, I, O, R, S, U, Y and Z */
-			/* U : */ 0xe0aefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V and X */
-			/* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe24eb9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, W and Z */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "M" */
-			/* A : */ 0xe3febfde, /* (B|M|E) - B, C, D, E, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0xc1164911, /* ( |M|E) - A, E, I, L, O, R, S, U and Y */
-			/* C : */ 0x60000c45, /* (B|M| ) - A, C, G, K and L */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe3cefd5f, /* (B|M|E) - A, B, C, D, E, G, I, K, L, M, N, O, P, R, S, T, W, X, Y and Z */
-			/* F : */ 0x40004100, /* ( |M| ) - I and O */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe29efc7d, /* (B|M|E) - A, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, X and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x41004110, /* ( |M| ) - E, I, O and Y */
-			/* M : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
-			/* N : */ 0xc0004111, /* ( |M|E) - A, E, I and O */
-			/* O : */ 0xe27efddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Z */
-			/* P : */ 0xc11e4991, /* ( |M|E) - A, E, H, I, L, O, R, S, T, U and Y */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40004000, /* ( |M| ) - O,  */
-			/* S : */ 0xc0084190, /* ( |M|E) - E, H, I, O and T */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x620e387c, /* (B|M| ) - C, D, E, F, G, L, M, N, R, S, T and Z */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e6815, /* (B|M|E) - A, C, E, L, N, O, R, S and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "N" */
-			/* A : */ 0xe37ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* C : */ 0xc11a4d91, /* ( |M|E) - A, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xc15ef9bf, /* ( |M|E) - A, B, C, D, E, F, H, I, L, M, N, O, P, R, S, T, U, W and Y */
-			/* E : */ 0xe3fff9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0xc15e79bb, /* ( |M|E) - A, B, D, E, F, H, I, L, M, N, O, R, S, T, U, W and Y */
-			/* H : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* I : */ 0xe2bffcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, Q, R, S, T, U, V, X and Z */
-			/* J : */ 0x40104011, /* ( |M| ) - A, E, O and U */
-			/* K : */ 0xc1046931, /* ( |M|E) - A, E, F, I, L, N, O, S and Y */
-			/* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* N : */ 0xc1144111, /* ( |M|E) - A, E, I, O, S, U and Y */
-			/* O : */ 0xe3fef97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc17cddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W and Y */
-			/* T : */ 0xc35679b1, /* ( |M|E) - A, E, F, H, I, L, M, N, O, R, S, U, W, Y and Z */
-			/* U : */ 0xe00e7d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, R, S and T */
-			/* V : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* W : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0xe0445901, /* (B|M|E) - A, I, L, M, O, S and W */
-			/* Z : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "O" */
-			/* A : */ 0xe08ebc6c, /* (B|M|E) - C, D, F, G, K, L, M, N, P, R, S, T and X */
-			/* B : */ 0xe11e4b1b, /* (B|M|E) - A, B, D, E, I, J, L, O, R, S, T, U and Y */
-			/* C : */ 0xe11a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xe15659ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, O, R, S, U, W and Y */
-			/* E : */ 0xe03e790f, /* (B|M|E) - A, B, C, D, I, L, M, N, O, R, S, T, U and V */
-			/* F : */ 0xe0184931, /* (B|M|E) - A, E, F, I, L, O, T and U */
-			/* G : */ 0xe11e79d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, S, T, U and Y */
-			/* H : */ 0x60006111, /* (B|M| ) - A, E, I, N and O */
-			/* I : */ 0xe00e284c, /* (B|M|E) - C, D, G, L, N, R, S and T */
-			/* J : */ 0x40004010, /* ( |M| ) - E and O */
-			/* K : */ 0xe1144d11, /* (B|M|E) - A, E, I, K, L, O, S, U and Y */
-			/* L : */ 0xe17cfd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, S, T, U, V, W and Y */
-			/* M : */ 0xe114f933, /* (B|M|E) - A, B, E, F, I, L, M, N, O, P, S, U and Y */
-			/* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe22ebd7c, /* (B|M|E) - C, D, E, F, G, I, K, L, M, N, P, R, S, T, V and Z */
-			/* P : */ 0xe11edd91, /* (B|M|E) - A, E, H, I, K, L, M, O, P, R, S, T, U and Y */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe17ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
-			/* S : */ 0xe15cd997, /* (B|M|E) - A, B, C, E, H, I, L, M, O, P, S, T, U, W and Y */
-			/* T : */ 0xe11ed997, /* (B|M|E) - A, B, C, E, H, I, L, M, O, P, R, S, T, U and Y */
-			/* U : */ 0xe02ea97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, N, P, R, S, T and V */
-			/* V : */ 0xe0004111, /* (B|M|E) - A, E, I and O */
-			/* W : */ 0xe10ef9bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, N, O, P, R, S, T and Y */
-			/* X : */ 0xe1080111, /* (B|M|E) - A, E, I, T and Y */
-			/* Y : */ 0xc004591d, /* ( |M|E) - A, C, D, E, I, L, M, O and S */
-			/* Z : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "P" */
-			/* A : */ 0xe1feb9de, /* (B|M|E) - B, C, D, E, G, H, I, L, M, N, P, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x40004000, /* ( |M| ) - O,  */
-			/* C : */ 0x40004000, /* ( |M| ) - O,  */
-			/* D : */ 0x40000001, /* ( |M| ) - A,  */
-			/* E : */ 0xe34efd7d, /* (B|M|E) - A, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, W, Y and Z */
-			/* F : */ 0x40100000, /* ( |M| ) - U,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe11e4911, /* (B|M|E) - A, E, I, L, O, R, S, T, U and Y */
-			/* I : */ 0xe01ffc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, Q, R, S, T and U */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0x40004010, /* ( |M| ) - E and O */
-			/* O : */ 0xe0fefd5c, /* (B|M|E) - C, D, E, G, I, K, L, M, N, O, P, R, S, T, U, V, W and X */
-			/* P : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xe1184191, /* (B|M|E) - A, E, H, I, O, T, U and Y */
-			/* T : */ 0xe1164191, /* (B|M|E) - A, E, H, I, O, R, S, U and Y */
-			/* U : */ 0x600eb87e, /* (B|M| ) - B, C, D, E, F, G, L, M, N, P, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000001, /* ( |M| ) - A,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00a0900, /* (B|M|E) - I, L, R and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Q" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "R" */
-			/* A : */ 0xe3fffffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0xc1164911, /* ( |M|E) - A, E, I, L, O, R, S, U and Y */
-			/* C : */ 0xc11a4991, /* ( |M|E) - A, E, H, I, L, O, R, T, U and Y */
-			/* D : */ 0xc15e6993, /* ( |M|E) - A, B, E, H, I, L, N, O, R, S, T, U, W and Y */
-			/* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0xc0104911, /* ( |M|E) - A, E, I, L, O and U */
-			/* G : */ 0xc1164991, /* ( |M|E) - A, E, H, I, L, O, R, S, U and Y */
-			/* H : */ 0x61184111, /* (B|M| ) - A, E, I, O, T, U and Y */
-			/* I : */ 0xe2bdfc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, Q, S, T, U, V, X and Z */
-			/* J : */ 0x40104010, /* ( |M| ) - E, O and U */
-			/* K : */ 0xc1445991, /* ( |M|E) - A, E, H, I, L, M, O, S, W and Y */
-			/* L : */ 0xc1144119, /* ( |M|E) - A, D, E, I, O, S, U and Y */
-			/* M : */ 0xc1144911, /* ( |M|E) - A, E, I, L, O, S, U and Y */
-			/* N : */ 0xc11c59b3, /* ( |M|E) - A, B, E, F, H, I, L, M, O, S, T, U and Y */
-			/* O : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0xc01e4991, /* ( |M|E) - A, E, H, I, L, O, R, S, T and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xc1104191, /* ( |M|E) - A, E, H, I, O, U and Y */
-			/* S : */ 0xc058d595, /* ( |M|E) - A, C, E, H, I, K, M, O, P, T, U and W */
-			/* T : */ 0xc35679b7, /* ( |M|E) - A, B, C, E, F, H, I, L, M, N, O, R, S, U, W, Y and Z */
-			/* U : */ 0xe00eb97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, P, R, S and T */
-			/* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* W : */ 0x41024191, /* ( |M| ) - A, E, H, I, O, R and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe04cf95f, /* (B|M|E) - A, B, C, D, E, G, I, L, M, N, O, P, S, T and W */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "S" */
-			/* A : */ 0xe1febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x41124011, /* ( |M| ) - A, E, O, R, U and Y */
-			/* C : */ 0xe1124991, /* (B|M|E) - A, E, H, I, L, O, R, U and Y */
-			/* D : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* E : */ 0xe1fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X and Y */
-			/* F : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* G : */ 0x40124100, /* ( |M| ) - I, O, R and U */
-			/* H : */ 0xe15a7d37, /* (B|M|E) - A, B, C, E, F, I, K, L, M, N, O, R, T, U, W and Y */
-			/* I : */ 0xe2befc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, X and Z */
-			/* J : */ 0x40100000, /* ( |M| ) - U,  */
-			/* K : */ 0xe1144111, /* (B|M|E) - A, E, I, O, S, U and Y */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0xe1144111, /* (B|M|E) - A, E, I, O, S, U and Y */
-			/* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* O : */ 0xe07ef97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, R, S, T, U, V and W */
-			/* P : */ 0xe1124991, /* (B|M|E) - A, E, H, I, L, O, R, U and Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* S : */ 0xc158f9b3, /* ( |M|E) - A, B, E, F, H, I, L, M, N, O, P, T, U, W and Y */
-			/* T : */ 0xe156f9b7, /* (B|M|E) - A, B, C, E, F, H, I, L, M, N, O, P, R, S, U, W and Y */
-			/* U : */ 0xe20eb97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, P, R, S, T and Z */
-			/* V : */ 0x40000110, /* ( |M| ) - E and I */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe006b80e, /* (B|M|E) - B, C, D, L, M, N, P, R and S */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "T" */
-			/* A : */ 0xe1febdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* C : */ 0x40024881, /* ( |M| ) - A, H, L, O and R */
-			/* D : */ 0x40004000, /* ( |M| ) - O,  */
-			/* E : */ 0xe1fef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S, T, U, V, W, X and Y */
-			/* F : */ 0x40104101, /* ( |M| ) - A, I, O and U */
-			/* G : */ 0x40124010, /* ( |M| ) - E, O, R and U */
-			/* H : */ 0xe15ef93f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, P, R, S, T, U, W and Y */
-			/* I : */ 0xe27ff87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* N : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* O : */ 0xe3fefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0x40024011, /* ( |M| ) - A, E, O and R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xe158d595, /* (B|M|E) - A, C, E, H, I, K, M, O, P, T, U, W and Y */
-			/* T : */ 0xc1166991, /* ( |M|E) - A, E, H, I, L, N, O, R, S, U and Y */
-			/* U : */ 0xe00ef97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe006b901, /* (B|M|E) - A, I, L, M, N, P, R and S */
-			/* Z : */ 0xc0000111, /* ( |M|E) - A, E and I */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "U" */
-			/* A : */ 0xc12e2d4e, /* ( |M|E) - B, C, D, G, I, K, L, N, R, S, T, V and Y */
-			/* B : */ 0xc01edb3f, /* ( |M|E) - A, B, C, D, E, F, I, J, L, M, O, P, R, S, T and U */
-			/* C : */ 0xc01a4d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, T and U */
-			/* D : */ 0xe1064959, /* (B|M|E) - A, D, E, G, I, L, O, R, S and Y */
-			/* E : */ 0xc21e297b, /* ( |M|E) - A, B, D, E, F, G, I, L, N, R, S, T, U and Z */
-			/* F : */ 0x40080021, /* ( |M| ) - A, F and T */
-			/* G : */ 0xe01479d1, /* (B|M|E) - A, E, G, H, I, L, M, N, O, S and U */
-			/* H : */ 0x40000001, /* ( |M| ) - A,  */
-			/* I : */ 0xc22ea81f, /* ( |M|E) - A, B, C, D, E, L, N, P, R, S, T, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000511, /* ( |M|E) - A, E, I and K */
-			/* L : */ 0xe13efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V and Y */
-			/* M : */ 0xe014f933, /* (B|M|E) - A, B, E, F, I, L, M, N, O, P, S and U */
-			/* N : */ 0xe05ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U and W */
-			/* O : */ 0x411a0000, /* ( |M| ) - R, T, U and Y */
-			/* P : */ 0xe15ec997, /* (B|M|E) - A, B, C, E, H, I, L, O, P, R, S, T, U, W and Y */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* S : */ 0xe11ced97, /* (B|M|E) - A, B, C, E, H, I, K, L, N, O, P, S, T, U and Y */
-			/* T : */ 0xe25ef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W and Z */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x40020111, /* ( |M| ) - A, E, I and R */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0xc0180110, /* ( |M|E) - E, I, T and U */
-			/* Y : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Z : */ 0xc2000001, /* ( |M|E) - A and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "V" */
-			/* A : */ 0xe01eb94e, /* (B|M|E) - B, C, D, G, I, L, M, N, P, R, S, T and U */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe18e39dd, /* (B|M|E) - A, C, D, E, G, H, I, L, M, N, R, S, T, X and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe03eec7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, N, O, P, R, S, T, U and V */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x40000001, /* ( |M| ) - A,  */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe15e2d04, /* (B|M|E) - C, I, K, L, N, R, S, T, U, W and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* S : */ 0x40000400, /* ( |M| ) - K,  */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60000800, /* (B|M| ) - L,  */
-			/* V : */ 0x41000000, /* ( |M| ) - Y,  */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0002000, /* ( |M|E) - N,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "W" */
-			/* A : */ 0xe1be3d6e, /* (B|M|E) - B, C, D, F, G, I, K, L, M, N, R, S, T, U, V, X and Y */
-			/* B : */ 0x40024011, /* ( |M| ) - A, E, O and R */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0xc0020910, /* ( |M|E) - E, I, L and R */
-			/* E : */ 0xe10e291b, /* (B|M|E) - A, B, D, E, I, L, N, R, S, T and Y */
-			/* F : */ 0x40104000, /* ( |M| ) - O and U */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* I : */ 0x622eb87c, /* (B|M| ) - C, D, E, F, G, L, M, N, P, R, S, T, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000110, /* ( |M|E) - E and I */
-			/* L : */ 0xc1040111, /* ( |M|E) - A, E, I, S and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0xc0040910, /* ( |M|E) - E, I, L and S */
-			/* O : */ 0x60127c18, /* (B|M| ) - D, E, K, L, M, N, O, R and U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* S : */ 0xc048c090, /* ( |M|E) - E, H, O, P, T and W */
-			/* T : */ 0x40004080, /* ( |M| ) - H and O */
-			/* U : */ 0x60020800, /* (B|M| ) - L and R */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0002810, /* (B|M|E) - E, L and N */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "X" */
-			/* A : */ 0x600c3844, /* (B|M| ) - C, G, L, M, N, S and T */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe006300c, /* (B|M|E) - C, D, M, N, R and S */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40004101, /* ( |M| ) - A, I and O */
-			/* I : */ 0xc00c781d, /* ( |M|E) - A, C, D, E, L, M, N, O, S and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x40000010, /* ( |M| ) - E,  */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x400a2000, /* ( |M| ) - N, R and T */
-			/* P : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0xc0124111, /* ( |M|E) - A, E, I, O, R and U */
-			/* U : */ 0x40060801, /* ( |M| ) - A, L, R and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0000800, /* ( |M|E) - L,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Y" */
-			/* A : */ 0xe04e3cce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, R, S, T and W */
-			/* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* C : */ 0x40024991, /* ( |M| ) - A, E, H, I, L, O and R */
-			/* D : */ 0xc0026111, /* ( |M|E) - A, E, I, N, O and R */
-			/* E : */ 0xe00e2809, /* (B|M|E) - A, D, L, N, R, S and T */
-			/* F : */ 0x40104000, /* ( |M| ) - O and U */
-			/* G : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* H : */ 0x40004010, /* ( |M| ) - E and O */
-			/* I : */ 0x60042010, /* (B|M| ) - E, N and S */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0000010, /* ( |M|E) - E,  */
-			/* L : */ 0xc1304911, /* ( |M|E) - A, E, I, L, O, U, V and Y */
-			/* M : */ 0xc000f113, /* ( |M|E) - A, B, E, I, M, N, O and P */
-			/* N : */ 0xc008615d, /* ( |M|E) - A, C, D, E, G, I, N, O and T */
-			/* O : */ 0xe0162c40, /* (B|M|E) - G, K, L, N, R, S and U */
-			/* P : */ 0x400e6191, /* ( |M| ) - A, E, H, I, N, O, R, S and T */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc01a6111, /* ( |M|E) - A, E, I, N, O, R, T and U */
-			/* S : */ 0xc00c5195, /* ( |M|E) - A, C, E, H, I, M, O, S and T */
-			/* T : */ 0x40004191, /* ( |M| ) - A, E, H, I and O */
-			/* U : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* X : */ 0xc0000100, /* ( |M|E) - I,  */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40000010, /* ( |M| ) - E,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Z" */
-			/* A : */ 0xe00a3d46, /* (B|M|E) - B, C, G, I, K, L, M, N, R and T */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe00ea81f, /* (B|M|E) - A, B, C, D, E, L, N, P, R, S and T */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe008f851, /* (B|M|E) - A, E, G, L, M, N, O, P and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x40000110, /* ( |M| ) - E and I */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe0027100, /* (B|M|E) - I, M, N, O and R */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x20000000, /* (B| | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Z : */ 0xc1000911, /* ( |M|E) - A, E, I, L and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ä" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ö" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ü" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		}
-	}, /* End of Enum 4 / 5 */
-	/* ------------------------------------ *
-	 * --- texts / all => NST_TEXTS_ALL --- *
-	 * ------------------------------------ */
-	{
-		{ /* Rules following letter "A" */
-			/* A : */ 0xe00e2c4e, /* (B|M|E) - B, C, D, G, K, L, N, R, S and T */
-			/* B : */ 0xe35efffb, /* (B|M|E) - A, B, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* C : */ 0xe11f4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, R, S, T, U and Y */
-			/* D : */ 0xe37efbff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* E : */ 0xe01e784d, /* (B|M|E) - A, C, D, G, L, M, N, O, R, S, T and U */
-			/* F : */ 0xe00e4971, /* (B|M|E) - A, E, F, G, I, L, O, R, S and T */
-			/* G : */ 0xe25ef9fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W and Z */
-			/* H : */ 0xe03e7d1b, /* (B|M|E) - A, B, D, E, I, K, L, M, N, O, R, S, T, U and V */
-			/* I : */ 0xe26efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V, W and Z */
-			/* J : */ 0xc0004119, /* ( |M|E) - A, D, E, I and O */
-			/* K : */ 0xe31e6db1, /* (B|M|E) - A, E, F, H, I, K, L, N, O, R, S, T, U, Y and Z */
-			/* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe15efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Y */
-			/* N : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* O : */ 0xc00ebd02, /* ( |M|E) - B, I, K, L, M, N, P, R, S and T */
-			/* P : */ 0xe11ee9b1, /* (B|M|E) - A, E, F, H, I, L, N, O, P, R, S, T, U and Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* S : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0xe2febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Z */
-			/* V : */ 0xe1124911, /* (B|M|E) - A, E, I, L, O, R, U and Y */
-			/* W : */ 0xe10e6d3b, /* (B|M|E) - A, B, D, E, F, I, K, L, N, O, R, S, T and Y */
-			/* X : */ 0xe0484111, /* (B|M|E) - A, E, I, O, T and W */
-			/* Y : */ 0xe05e79bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, N, O, R, S, T, U and W */
-			/* Z : */ 0xe3585911, /* (B|M|E) - A, E, I, L, M, O, T, U, W, Y and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "B" */
-			/* A : */ 0xe35ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, W, Y and Z */
-			/* B : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
-			/* C : */ 0x40004080, /* ( |M| ) - H and O */
-			/* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* E : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x40020811, /* ( |M| ) - A, E, L and R */
-			/* H : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* I : */ 0xe27efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, W and Z */
-			/* J : */ 0x40100010, /* ( |M| ) - E and U */
-			/* K : */ 0x40126801, /* ( |M| ) - A, L, N, O, R and U */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* N : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* O : */ 0xe3deffdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W, X, Y and Z */
-			/* P : */ 0x40020001, /* ( |M| ) - A and R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc21ccd77, /* ( |M|E) - A, B, C, E, F, G, I, K, L, O, P, S, T, U and Z */
-			/* T : */ 0xc0064991, /* ( |M|E) - A, E, H, I, L, O, R and S */
-			/* U : */ 0xe30e7dfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, Y and Z */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe20e0810, /* (B|M|E) - E, L, R, S, T and Z */
-			/* Z : */ 0x40100110, /* ( |M| ) - E, I and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "C" */
-			/* A : */ 0xe13ebffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V and Y */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
-			/* D : */ 0x40004000, /* ( |M| ) - O,  */
-			/* E : */ 0xe16efdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, O, P, R, S, T, V, W and Y */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* I : */ 0xe23ef8ff, /* (B|M|E) - A, B, C, D, E, F, G, H, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x40000010, /* ( |M| ) - E,  */
-			/* O : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* T : */ 0xc0166931, /* ( |M|E) - A, E, F, I, L, N, O, R, S and U */
-			/* U : */ 0x600ef93b, /* (B|M| ) - A, B, D, E, F, I, L, M, N, O, P, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00eb807, /* (B|M|E) - A, B, C, L, M, N, P, R, S and T */
-			/* Z : */ 0x60000010, /* (B|M| ) - E,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "D" */
-			/* A : */ 0xe37ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U and Y */
-			/* C : */ 0x40104081, /* ( |M| ) - A, H, O and U */
-			/* D : */ 0xc1124991, /* ( |M|E) - A, E, H, I, L, O, R, U and Y */
-			/* E : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x41021911, /* ( |M| ) - A, E, I, L, M, R and Y */
-			/* H : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* I : */ 0xe3befeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, U, V, X, Y and Z */
-			/* J : */ 0x60104011, /* (B|M| ) - A, E, O and U */
-			/* K : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* L : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
-			/* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* N : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* O : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X and Z */
-			/* P : */ 0x40024921, /* ( |M| ) - A, F, I, L, O and R */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc17cddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W and Y */
-			/* T : */ 0xc0160191, /* ( |M|E) - A, E, H, I, R, S and U */
-			/* U : */ 0xe20efd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, O, P, R, S, T and Z */
-			/* V : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00c3913, /* (B|M|E) - A, B, E, I, L, M, N, S and T */
-			/* Z : */ 0x40500111, /* ( |M| ) - A, E, I, U and W */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "E" */
-			/* A : */ 0xe27ebcee, /* (B|M|E) - B, C, D, F, G, H, K, L, M, N, P, R, S, T, U, V, W and Z */
-			/* B : */ 0xe21e6df3, /* (B|M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U and Z */
-			/* C : */ 0xe11a4d9d, /* (B|M|E) - A, C, D, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xe37e7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, W, Y and Z */
-			/* E : */ 0xe26ebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, V, W and Z */
-			/* F : */ 0xe23e5d73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, O, R, S, T, U, V and Z */
-			/* G : */ 0xe35e7dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* H : */ 0xe35efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* I : */ 0xe27effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Z */
-			/* J : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* K : */ 0xe01e6d19, /* (B|M|E) - A, D, E, I, K, L, N, O, R, S, T and U */
-			/* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe31efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, Y and Z */
-			/* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe25ebd6e, /* (B|M|E) - B, C, D, F, G, I, K, L, M, N, P, R, S, T, U, W and Z */
-			/* P : */ 0xe01ec9b1, /* (B|M|E) - A, E, F, H, I, L, O, P, R, S, T and U */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xe35e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Y and Z */
-			/* U : */ 0xe2febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Z */
-			/* V : */ 0xe1164911, /* (B|M|E) - A, E, I, L, O, R, S, U and Y */
-			/* W : */ 0xe11e69d9, /* (B|M|E) - A, D, E, G, H, I, L, N, O, R, S, T, U and Y */
-			/* X : */ 0xe21cd597, /* (B|M|E) - A, B, C, E, H, I, K, M, O, P, S, T, U and Z */
-			/* Y : */ 0xe00e79bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, N, O, R, S and T */
-			/* Z : */ 0xe3504111, /* (B|M|E) - A, E, I, O, U, W, Y and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "F" */
-			/* A : */ 0xe3fe3dfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x40024911, /* ( |M| ) - A, E, I, L, O and R */
-			/* C : */ 0x40000080, /* ( |M| ) - H,  */
-			/* D : */ 0x40020001, /* ( |M| ) - A and R */
-			/* E : */ 0xe33e3dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, R, S, T, U, V, Y and Z */
-			/* F : */ 0xc15efdd3, /* ( |M|E) - A, B, E, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Y */
-			/* G : */ 0x40020991, /* ( |M| ) - A, E, H, I, L and R */
-			/* H : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* I : */ 0xe28e7c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, R, S, T, X and Z */
-			/* J : */ 0x60004000, /* (B|M| ) - O,  */
-			/* K : */ 0x40024801, /* ( |M| ) - A, L, O and R */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* N : */ 0x40100111, /* ( |M| ) - A, E, I and U */
-			/* O : */ 0xe0defdd5, /* (B|M|E) - A, C, E, G, H, I, K, L, M, N, O, P, R, S, T, U, W and X */
-			/* P : */ 0x40020010, /* ( |M| ) - E and R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc04cd5f7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, M, O, P, S, T and W */
-			/* T : */ 0xc15eddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W and Y */
-			/* U : */ 0x620e38dc, /* (B|M| ) - C, D, E, G, H, L, M, N, R, S, T and Z */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0000100, /* ( |M|E) - I,  */
-			/* Z : */ 0x40100110, /* ( |M| ) - E, I and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "G" */
-			/* A : */ 0xe37eb9fe, /* (B|M|E) - B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U and Y */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0xc0024011, /* ( |M|E) - A, E, O and R */
-			/* E : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* F : */ 0x40120911, /* ( |M| ) - A, E, I, L, R and U */
-			/* G : */ 0xc1064911, /* ( |M|E) - A, E, I, L, O, R, S and Y */
-			/* H : */ 0xe01c6913, /* (B|M|E) - A, B, E, I, L, N, O, S, T and U */
-			/* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40024011, /* ( |M| ) - A, E, O and R */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* N : */ 0xe0144111, /* (B|M|E) - A, E, I, O, S and U */
-			/* O : */ 0xe07ef95f, /* (B|M|E) - A, B, C, D, E, G, I, L, M, N, O, P, R, S, T, U, V and W */
-			/* P : */ 0x40024801, /* ( |M| ) - A, L, O and R */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* S : */ 0xc27ffdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
-			/* T : */ 0xc0124091, /* ( |M|E) - A, E, H, O, R and U */
-			/* U : */ 0xe10e7915, /* (B|M|E) - A, C, E, I, L, M, N, O, R, S, T and Y */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe002b001, /* (B|M|E) - A, M, N, P and R */
-			/* Z : */ 0x40100010, /* ( |M| ) - E and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "H" */
-			/* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* C : */ 0x40004880, /* ( |M| ) - H, L and O */
-			/* D : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* E : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x40120911, /* ( |M| ) - A, E, I, L, R and U */
-			/* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0x40126911, /* ( |M| ) - A, E, I, L, N, O, R and U */
-			/* L : */ 0xc37eddfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xc01c4913, /* ( |M|E) - A, B, E, I, L, O, S, T and U */
-			/* N : */ 0xc05c5ff7, /* ( |M|E) - A, B, C, E, F, G, H, I, J, K, L, M, O, S, T, U and W */
-			/* O : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* P : */ 0x40124831, /* ( |M| ) - A, E, F, L, O, R and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xc25eddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W and Z */
-			/* T : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0xe00ebcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, P, R, S and T */
-			/* V : */ 0x40004010, /* ( |M| ) - E and O */
-			/* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00ed85b, /* (B|M|E) - A, B, D, E, G, L, M, O, P, R, S and T */
-			/* Z : */ 0x40100111, /* ( |M| ) - A, E, I and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "I" */
-			/* A : */ 0xe23ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V and Z */
-			/* B : */ 0xe15e6917, /* (B|M|E) - A, B, C, E, I, L, N, O, R, S, T, U, W and Y */
-			/* C : */ 0xe11e6d95, /* (B|M|E) - A, C, E, H, I, K, L, N, O, R, S, T, U and Y */
-			/* D : */ 0xe17efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* E : */ 0xc27ebdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W and Z */
-			/* F : */ 0xe11e49b1, /* (B|M|E) - A, E, F, H, I, L, O, R, S, T, U and Y */
-			/* G : */ 0xe25efff3, /* (B|M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W and Z */
-			/* H : */ 0xe01e6911, /* (B|M|E) - A, E, I, L, N, O, R, S, T and U */
-			/* I : */ 0xc0002010, /* ( |M|E) - E and N */
-			/* J : */ 0xc0004011, /* ( |M|E) - A, E and O */
-			/* K : */ 0xe05eddbb, /* (B|M|E) - A, B, D, E, F, H, I, K, L, M, O, P, R, S, T, U and W */
-			/* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe25efd73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W and Z */
-			/* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe2bebc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, P, R, S, T, U, V, X and Z */
-			/* P : */ 0xe01ed9b3, /* (B|M|E) - A, B, E, F, H, I, L, M, O, P, R, S, T and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* S : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0x40063800, /* ( |M| ) - L, M, N, R and S */
-			/* V : */ 0xe17ecd73, /* (B|M|E) - A, B, E, F, G, I, K, L, O, P, R, S, T, U, V, W and Y */
-			/* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* X : */ 0xc00cc111, /* ( |M|E) - A, E, I, O, P, S and T */
-			/* Y : */ 0x40000011, /* ( |M| ) - A and E */
-			/* Z : */ 0xe21c5593, /* (B|M|E) - A, B, E, H, I, K, M, O, S, T, U and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "J" */
-			/* A : */ 0xe377bdce, /* (B|M|E) - B, C, D, G, H, I, K, L, M, N, P, Q, R, S, U, V, W, Y and Z */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe04e3c3d, /* (B|M|E) - A, C, D, E, F, K, L, M, N, R, S, T and W */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe0083842, /* (B|M|E) - B, G, L, M, N and T */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe13e2ddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, N, R, S, T, U, V and Y */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x602eb94f, /* (B|M| ) - A, B, C, D, G, I, L, M, N, P, R, S, T and V */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "K" */
-			/* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* C : */ 0x40000081, /* ( |M| ) - A and H */
-			/* D : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* E : */ 0xe17efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x40020011, /* ( |M| ) - A, E and R */
-			/* H : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* I : */ 0xe30eb87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, P, R, S, T, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* O : */ 0xe27efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Z */
-			/* P : */ 0x40024900, /* ( |M| ) - I, L, O and R */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc07cddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, S, T, U, V and W */
-			/* T : */ 0xc03649f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, R, S, U and V */
-			/* U : */ 0xe00eb9c6, /* (B|M|E) - B, C, G, H, I, L, M, N, P, R, S and T */
-			/* V : */ 0x40004010, /* ( |M| ) - E and O */
-			/* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0021800, /* (B|M|E) - L, M and R */
-			/* Z : */ 0x40100111, /* ( |M| ) - A, E, I and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "L" */
-			/* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0xc17e5dfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, R, S, T, U, V, W and Y */
-			/* C : */ 0x40104191, /* ( |M| ) - A, E, H, I, O and U */
-			/* D : */ 0xc37e79ff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, R, S, T, U, V, W, Y and Z */
-			/* E : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0xc01e59b5, /* ( |M|E) - A, C, E, F, H, I, L, M, O, R, S, T and U */
-			/* G : */ 0xc01e4911, /* ( |M|E) - A, E, I, L, O, R, S, T and U */
-			/* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* I : */ 0xe3fffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* J : */ 0x60100001, /* (B|M| ) - A and U */
-			/* K : */ 0xc15e7991, /* ( |M|E) - A, E, H, I, L, M, N, O, R, S, T, U, W and Y */
-			/* L : */ 0xc37ef5ff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xc15c451b, /* ( |M|E) - A, B, D, E, I, K, O, S, T, U, W and Y */
-			/* N : */ 0xc0104119, /* ( |M|E) - A, D, E, I, O and U */
-			/* O : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0xc01e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc17eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W and Y */
-			/* T : */ 0xc37efdf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0xe2aefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V, X and Z */
-			/* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
-			/* W : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe26efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, V, W and Z */
-			/* Z : */ 0xc05cc9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, P, S, T, U and W */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "M" */
-			/* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0xc1164911, /* ( |M|E) - A, E, I, L, O, R, S, U and Y */
-			/* C : */ 0x600004c5, /* (B|M| ) - A, C, G, H and K */
-			/* D : */ 0xc0160111, /* ( |M|E) - A, E, I, R, S and U */
-			/* E : */ 0xe3defdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, X, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x40020811, /* ( |M| ) - A, E, L and R */
-			/* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* I : */ 0xe39efcfd, /* (B|M|E) - A, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, X, Y and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* L : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* M : */ 0xc31e6df3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U, Y and Z */
-			/* N : */ 0xc0104111, /* ( |M|E) - A, E, I, O and U */
-			/* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0xc11e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T, U and Y */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* S : */ 0xc05eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U and W */
-			/* T : */ 0xc0164991, /* ( |M|E) - A, E, H, I, L, O, R, S and U */
-			/* U : */ 0x620e3cfd, /* (B|M| ) - A, C, D, E, F, G, H, K, L, M, N, R, S, T and Z */
-			/* V : */ 0x40004010, /* ( |M| ) - E and O */
-			/* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00e6c14, /* (B|M|E) - C, E, K, L, N, O, R, S and T */
-			/* Z : */ 0x40100111, /* ( |M| ) - A, E, I and U */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "N" */
-			/* A : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* C : */ 0xc11a4d91, /* ( |M|E) - A, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* E : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0xc21e4911, /* ( |M|E) - A, E, I, L, O, R, S, T, U and Z */
-			/* G : */ 0xc37efdfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* H : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* I : */ 0xe3bffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, X, Y and Z */
-			/* J : */ 0x40104011, /* ( |M| ) - A, E, O and U */
-			/* K : */ 0xc35ef9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* L : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* N : */ 0xc37e4dff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, O, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe3fefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0xe00efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S and T */
-			/* V : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* W : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0xe0445911, /* (B|M|E) - A, E, I, L, M, O, S and W */
-			/* Z : */ 0xc37efff3, /* ( |M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "O" */
-			/* A : */ 0xe09ebcce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, P, R, S, T, U and X */
-			/* B : */ 0xe11e4b9b, /* (B|M|E) - A, B, D, E, H, I, J, L, O, R, S, T, U and Y */
-			/* C : */ 0xe11a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xe15e59ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, O, R, S, T, U, W and Y */
-			/* E : */ 0xe1be792f, /* (B|M|E) - A, B, C, D, F, I, L, M, N, O, R, S, T, U, V, X and Y */
-			/* F : */ 0xe01e4931, /* (B|M|E) - A, E, F, I, L, O, R, S, T and U */
-			/* G : */ 0xe11e79db, /* (B|M|E) - A, B, D, E, G, H, I, L, M, N, O, R, S, T, U and Y */
-			/* H : */ 0xe11e7911, /* (B|M|E) - A, E, I, L, M, N, O, R, S, T, U and Y */
-			/* I : */ 0xe00e2c5d, /* (B|M|E) - A, C, D, E, G, K, L, N, R, S and T */
-			/* J : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* K : */ 0xe31e5d13, /* (B|M|E) - A, B, E, I, K, L, M, O, R, S, T, U, Y and Z */
-			/* L : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe17efd73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe22ebd7c, /* (B|M|E) - C, D, E, F, G, I, K, L, M, N, P, R, S, T, V and Z */
-			/* P : */ 0xe11eddb1, /* (B|M|E) - A, E, F, H, I, K, L, M, O, P, R, S, T, U and Y */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe37efdf7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xe35eddf7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Y and Z */
-			/* U : */ 0xe22ebd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, P, R, S, T, V and Z */
-			/* V : */ 0xe0104111, /* (B|M|E) - A, E, I, O and U */
-			/* W : */ 0xe10efbbf, /* (B|M|E) - A, B, C, D, E, F, H, I, J, L, M, N, O, P, R, S, T and Y */
-			/* X : */ 0xe1084111, /* (B|M|E) - A, E, I, O, T and Y */
-			/* Y : */ 0xc004591d, /* ( |M|E) - A, C, D, E, I, L, M, O and S */
-			/* Z : */ 0xe3004111, /* (B|M|E) - A, E, I, O, Y and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "P" */
-			/* A : */ 0xe3fefddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x40004000, /* ( |M| ) - O,  */
-			/* C : */ 0x40004080, /* ( |M| ) - H and O */
-			/* D : */ 0x40000001, /* ( |M| ) - A,  */
-			/* E : */ 0xe35efd7d, /* (B|M|E) - A, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* F : */ 0xe05e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U and W */
-			/* G : */ 0x40000010, /* ( |M| ) - E,  */
-			/* H : */ 0xe11e4911, /* (B|M|E) - A, E, I, L, O, R, S, T, U and Y */
-			/* I : */ 0xe21ffc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, Q, R, S, T, U and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40000111, /* ( |M| ) - A, E and I */
-			/* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0x60004010, /* (B|M| ) - E and O */
-			/* O : */ 0xe2fefd5d, /* (B|M|E) - A, C, D, E, G, I, K, L, M, N, O, P, R, S, T, U, V, W, X and Z */
-			/* P : */ 0xc11e4d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, S, T, U and Y */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xe118c195, /* (B|M|E) - A, C, E, H, I, O, P, T, U and Y */
-			/* T : */ 0xe1165993, /* (B|M|E) - A, B, E, H, I, L, M, O, R, S, U and Y */
-			/* U : */ 0x620ebc7e, /* (B|M| ) - B, C, D, E, F, G, K, L, M, N, P, R, S, T and Z */
-			/* V : */ 0x40000010, /* ( |M| ) - E,  */
-			/* W : */ 0x40000001, /* ( |M| ) - A,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00a0900, /* (B|M|E) - I, L, R and T */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Q" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "R" */
-			/* A : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0xc11e4953, /* ( |M|E) - A, B, E, G, I, L, O, R, S, T, U and Y */
-			/* C : */ 0xc11a4d91, /* ( |M|E) - A, E, H, I, K, L, O, R, T, U and Y */
-			/* D : */ 0xc15efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Y */
-			/* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0xc01e6911, /* ( |M|E) - A, E, I, L, N, O, R, S, T and U */
-			/* G : */ 0xc15e6db3, /* ( |M|E) - A, B, E, F, H, I, K, L, N, O, R, S, T, U, W and Y */
-			/* H : */ 0xe1184111, /* (B|M|E) - A, E, I, O, T, U and Y */
-			/* I : */ 0xe3fffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* J : */ 0x40104011, /* ( |M| ) - A, E, O and U */
-			/* K : */ 0xc35efdd3, /* ( |M|E) - A, B, E, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* L : */ 0xc11c411b, /* ( |M|E) - A, B, D, E, I, O, S, T, U and Y */
-			/* M : */ 0xc35cc9f7, /* ( |M|E) - A, B, C, E, F, G, H, I, L, O, P, S, T, U, W, Y and Z */
-			/* N : */ 0xc37eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Y and Z */
-			/* O : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0xc01e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xc11c6dd1, /* ( |M|E) - A, E, G, H, I, K, L, N, O, S, T, U and Y */
-			/* S : */ 0xc35efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
-			/* T : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0xe20ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T and Z */
-			/* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
-			/* W : */ 0x41124191, /* ( |M| ) - A, E, H, I, O, R, U and Y */
-			/* X : */ 0x40000100, /* ( |M| ) - I,  */
-			/* Y : */ 0xe04cf95f, /* (B|M|E) - A, B, C, D, E, G, I, L, M, N, O, P, S, T and W */
-			/* Z : */ 0xc35cddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, S, T, U, W, Y and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "S" */
-			/* A : */ 0xe1febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
-			/* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U and Y */
-			/* C : */ 0xe1124991, /* (B|M|E) - A, E, H, I, L, O, R, U and Y */
-			/* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* H : */ 0xe15a7d37, /* (B|M|E) - A, B, C, E, F, I, K, L, M, N, O, R, T, U, W and Y */
-			/* I : */ 0xe2befcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, X and Z */
-			/* J : */ 0x40104001, /* ( |M| ) - A, O and U */
-			/* K : */ 0xe1166911, /* (B|M|E) - A, E, I, L, N, O, R, S, U and Y */
-			/* L : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
-			/* M : */ 0xe1144111, /* (B|M|E) - A, E, I, O, S, U and Y */
-			/* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0xe11649b1, /* (B|M|E) - A, E, F, H, I, L, O, R, S, U and Y */
-			/* Q : */ 0x60100000, /* (B|M| ) - U,  */
-			/* R : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* S : */ 0xc37afdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, T, U, V, W, Y and Z */
-			/* T : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0xe22ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, V and Z */
-			/* V : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe006b80e, /* (B|M|E) - B, C, D, L, M, N, P, R and S */
-			/* Z : */ 0xe1504111, /* (B|M|E) - A, E, I, O, U, W and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "T" */
-			/* A : */ 0xe3febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
-			/* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* C : */ 0x40124881, /* ( |M| ) - A, H, L, O, R and U */
-			/* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
-			/* E : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* G : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* H : */ 0xe15ef93f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, P, R, S, T, U, W and Y */
-			/* I : */ 0xe27fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
-			/* J : */ 0x60100011, /* (B|M| ) - A, E and U */
-			/* K : */ 0x40126911, /* ( |M| ) - A, E, I, L, N, O, R and U */
-			/* L : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
-			/* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* N : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
-			/* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R and U */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
-			/* S : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xc376fdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, U, V, W, Y and Z */
-			/* U : */ 0xe00ef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S and T */
-			/* V : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe006b805, /* (B|M|E) - A, C, L, M, N, P, R and S */
-			/* Z : */ 0xc17efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "U" */
-			/* A : */ 0xc13ebd4e, /* ( |M|E) - B, C, D, G, I, K, L, M, N, P, R, S, T, U, V and Y */
-			/* B : */ 0xe07effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V and W */
-			/* C : */ 0xe01a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T and U */
-			/* D : */ 0xe15649d9, /* (B|M|E) - A, D, E, G, H, I, L, O, R, S, U, W and Y */
-			/* E : */ 0xe21e397f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, R, S, T, U and Z */
-			/* F : */ 0xe25efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Z */
-			/* G : */ 0xe21e79f3, /* (B|M|E) - A, B, E, F, G, H, I, L, M, N, O, R, S, T, U and Z */
-			/* H : */ 0xe0167911, /* (B|M|E) - A, E, I, L, M, N, O, R, S and U */
-			/* I : */ 0xc22eb85f, /* ( |M|E) - A, B, C, D, E, G, L, M, N, P, R, S, T, V and Z */
-			/* J : */ 0x40100101, /* ( |M| ) - A, I and U */
-			/* K : */ 0xe01a6d11, /* (B|M|E) - A, E, I, K, L, N, O, R, T and U */
-			/* L : */ 0xe37efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* M : */ 0xe27efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Z */
-			/* N : */ 0xe27fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
-			/* O : */ 0xc11e0808, /* ( |M|E) - D, L, R, S, T, U and Y */
-			/* P : */ 0xe05ec9bd, /* (B|M|E) - A, C, D, E, F, H, I, L, O, P, R, S, T, U and W */
-			/* Q : */ 0x40100000, /* ( |M| ) - U,  */
-			/* R : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* S : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
-			/* T : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
-			/* U : */ 0x40003000, /* ( |M| ) - M and N */
-			/* V : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* W : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
-			/* X : */ 0xc0180110, /* ( |M|E) - E, I, T and U */
-			/* Y : */ 0xc0000001, /* ( |M|E) - A,  */
-			/* Z : */ 0xc2584193, /* ( |M|E) - A, B, E, H, I, O, T, U, W and Z */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "V" */
-			/* A : */ 0xe01ebdcf, /* (B|M|E) - A, B, C, D, G, H, I, K, L, M, N, P, R, S, T and U */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe18e3ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, M, N, R, S, T, X and Y */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x40000010, /* ( |M| ) - E,  */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0xe23efc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, O, P, R, S, T, U, V and Z */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40004001, /* ( |M| ) - A and O */
-			/* L : */ 0x60004101, /* (B|M| ) - A, I and O */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0xe15e3d44, /* (B|M|E) - C, G, I, K, L, M, N, R, S, T, U, W and Y */
-			/* P : */ 0x40020000, /* ( |M| ) - R,  */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* S : */ 0x40080401, /* ( |M| ) - A, K and T */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x60021800, /* (B|M| ) - L, M and R */
-			/* V : */ 0x41000010, /* ( |M| ) - E and Y */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xc0002000, /* ( |M|E) - N,  */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "W" */
-			/* A : */ 0xe3bebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, U, V, X, Y and Z */
-			/* B : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0xc0000010, /* ( |M|E) - E,  */
-			/* E : */ 0xe10e39ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, R, S, T and Y */
-			/* F : */ 0x40104000, /* ( |M| ) - O and U */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x60004111, /* (B|M| ) - A, E, I and O */
-			/* I : */ 0xe02ebc7c, /* (B|M|E) - C, D, E, F, G, K, L, M, N, P, R, S, T and V */
-			/* J : */ 0x40000010, /* ( |M| ) - E,  */
-			/* K : */ 0x40000100, /* ( |M| ) - I,  */
-			/* L : */ 0xe1040111, /* (B|M|E) - A, E, I, S and Y */
-			/* M : */ 0x40000011, /* ( |M| ) - A and E */
-			/* N : */ 0xc0040910, /* ( |M|E) - E, I, L and S */
-			/* O : */ 0xe0127cee, /* (B|M|E) - B, C, D, F, G, H, K, L, M, N, O, R and U */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
-			/* S : */ 0xc0084490, /* ( |M|E) - E, H, K, O and T */
-			/* T : */ 0x40004080, /* ( |M| ) - H and O */
-			/* U : */ 0x600ea804, /* (B|M| ) - C, L, N, P, R, S and T */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0002010, /* (B|M|E) - E and N */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "X" */
-			/* A : */ 0x600c3844, /* (B|M| ) - C, G, L, M, N, S and T */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0xe0063c4c, /* (B|M|E) - C, D, G, K, L, M, N, R and S */
-			/* F : */ 0x40004000, /* ( |M| ) - O,  */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x40004101, /* ( |M| ) - A, I and O */
-			/* I : */ 0xc02c7c1f, /* ( |M|E) - A, B, C, D, E, K, L, M, N, O, S, T and V */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x40024000, /* ( |M| ) - O and R */
-			/* L : */ 0x40000010, /* ( |M| ) - E,  */
-			/* M : */ 0x40000001, /* ( |M| ) - A,  */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x400aa000, /* ( |M| ) - N, P, R and T */
-			/* P : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x40080000, /* ( |M| ) - T,  */
-			/* T : */ 0xc0164111, /* ( |M|E) - A, E, I, O, R, S and U */
-			/* U : */ 0x40060811, /* ( |M| ) - A, E, L, R and S */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x40000010, /* ( |M| ) - E,  */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe0000808, /* (B|M|E) - D and L */
-			/* Z : */ 0x40000010, /* ( |M| ) - E,  */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Y" */
-			/* A : */ 0xe24e3cce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, R, S, T, W and Z */
-			/* B : */ 0x40124119, /* ( |M| ) - A, D, E, I, O, R and U */
-			/* C : */ 0x40024991, /* ( |M| ) - A, E, H, I, L, O and R */
-			/* D : */ 0xc0026111, /* ( |M|E) - A, E, I, N, O and R */
-			/* E : */ 0xe01e2809, /* (B|M|E) - A, D, L, N, R, S, T and U */
-			/* F : */ 0x40104110, /* ( |M| ) - E, I, O and U */
-			/* G : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
-			/* H : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* I : */ 0xe0042810, /* (B|M|E) - E, L, N and S */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0xc0004810, /* ( |M|E) - E, L and O */
-			/* L : */ 0xc134c955, /* ( |M|E) - A, C, E, G, I, L, O, P, S, U, V and Y */
-			/* M : */ 0xc010f113, /* ( |M|E) - A, B, E, I, M, N, O, P and U */
-			/* N : */ 0xc008655d, /* ( |M|E) - A, C, D, E, G, I, K, N, O and T */
-			/* O : */ 0xe01eac40, /* (B|M|E) - G, K, L, N, P, R, S, T and U */
-			/* P : */ 0xc01e6191, /* ( |M|E) - A, E, H, I, N, O, R, S, T and U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0xc01e6111, /* ( |M|E) - A, E, I, N, O, R, S, T and U */
-			/* S : */ 0xc00cd995, /* ( |M|E) - A, C, E, H, I, L, M, O, P, S and T */
-			/* T : */ 0xc0084191, /* ( |M|E) - A, E, H, I, O and T */
-			/* U : */ 0x60062400, /* (B|M| ) - K, N, R and S */
-			/* V : */ 0x60004010, /* (B|M| ) - E and O */
-			/* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* X : */ 0x80000000, /* ( | |E) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x40000011, /* ( |M| ) - A and E */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "Z" */
-			/* A : */ 0xe01abdee, /* (B|M|E) - B, C, D, F, G, H, I, K, L, M, N, P, R, T and U */
-			/* B : */ 0x40120911, /* ( |M| ) - A, E, I, L, R and U */
-			/* C : */ 0x40000080, /* ( |M| ) - H,  */
-			/* D : */ 0x40000110, /* ( |M| ) - E and I */
-			/* E : */ 0xe11ebdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, P, R, S, T, U and Y */
-			/* F : */ 0x40024811, /* ( |M| ) - A, E, L, O and R */
-			/* G : */ 0x40020011, /* ( |M| ) - A, E and R */
-			/* H : */ 0x40004011, /* ( |M| ) - A, E and O */
-			/* I : */ 0xe13efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V and Y */
-			/* J : */ 0x40000001, /* ( |M| ) - A,  */
-			/* K : */ 0x40124101, /* ( |M| ) - A, I, O, R and U */
-			/* L : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
-			/* N : */ 0x40000011, /* ( |M| ) - A and E */
-			/* O : */ 0xe00ef974, /* (B|M|E) - C, E, F, G, I, L, M, N, O, P, R, S and T */
-			/* P : */ 0x40120821, /* ( |M| ) - A, F, L, R and U */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x40000011, /* ( |M| ) - A and E */
-			/* S : */ 0x40088115, /* ( |M| ) - A, C, E, I, P and T */
-			/* T : */ 0xc0020891, /* ( |M|E) - A, E, H, L and R */
-			/* U : */ 0xe26fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, V, W and Z */
-			/* V : */ 0x40004010, /* ( |M| ) - E and O */
-			/* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0xe00c9c40, /* (B|M|E) - G, K, L, M, P, S and T */
-			/* Z : */ 0xc1104911, /* ( |M|E) - A, E, I, L, O, U and Y */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ä" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ö" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		},
-		{ /* Rules following letter "ü" */
-			/* A : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* B : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* C : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* D : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* E : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* F : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* G : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* H : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* I : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* J : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* K : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* L : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* M : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* N : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* O : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* P : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Q : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* R : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* S : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* T : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* U : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* V : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* W : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* X : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Y : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* Z : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ä : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ö : */ 0x00000000, /* ( | | ) - None are allowed */
-			/* ü : */ 0x00000000  /* ( | | ) - None are allowed */
-		}
-	} /* End of Enum 5 / 5 */
+    /* ---------------------------------- *
+     * --- names / de => NST_NAMES_DE --- *
+     * ---------------------------------- */
+    {
+        {
+            /* Rules following letter "A" */
+            /* A : */ 0xc00e3438, /* ( |M|E) - D, E, F, K, M, N, R, S, T */
+            /* B : */ 0xc1164913, /* ( |M|E) - A, B, E, I, L, O, R, S, U, Y */
+            /* C : */ 0xe0114d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, U */
+            /* D : */ 0xe35e5b99, /* (B|M|E) - A, D, E, H, I, J, L, M, O, R, S, T, U, W, Y, Z */
+            /* E : */ 0xc00e381c, /* ( |M|E) - C, D, E, L, M, N, R, S, T */
+            /* F : */ 0xc0184131, /* ( |M|E) - A, E, F, I, O, T, U */
+            /* G : */ 0xe01279d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, U */
+            /* H : */ 0xe04e7f9b, /* (B|M|E) - A, B, D, E, H, I, J, K, L, M, N, O, R, S, T, W */
+            /* I : */ 0xe20efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, Z */
+            /* J : */ 0xc0127d19, /* ( |M|E) - A, D, E, I, K, L, M, N, O, R, U */
+            /* K : */ 0xc0144591, /* ( |M|E) - A, E, H, I, K, O, S, U */
+            /* L : */ 0xe378dfbf, /* (B|M|E) - A, B, C, D, E, F, H, I, J, K, L, M, O, P, T, U, V, W, Y, Z */
+            /* M : */ 0xe214d99f, /* (B|M|E) - A, B, C, D, E, H, I, L, M, O, P, S, U, Z */
+            /* N : */ 0xe33eefff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, P, R, S, T, U, V, Y, Z */
+            /* O : */ 0xc0141840, /* ( |M|E) - G, L, M, S, U */
+            /* P : */ 0xc00a8891, /* ( |M|E) - A, E, H, L, P, R, T */
+            /* Q : */ 0xc0100001, /* ( |M|E) - A, U */
+            /* R : */ 0xe37effdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* S : */ 0xc23ffdbd, /* ( |M|E) - A, C, D, E, F, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, Z */
+            /* T : */ 0xc31e5f91, /* ( |M|E) - A, E, H, I, J, K, L, M, O, R, S, T, U, Y, Z */
+            /* U : */ 0xe20e3c49, /* (B|M|E) - A, D, G, K, L, M, N, R, S, T, Z */
+            /* V : */ 0xc0324d51, /* ( |M|E) - A, E, G, I, K, L, O, R, U, V */
+            /* W : */ 0xc2586111, /* ( |M|E) - A, E, I, N, O, T, U, W, Z */
+            /* X : */ 0xc0000110, /* ( |M|E) - E, I */
+            /* Y : */ 0xc11e7d3b, /* ( |M|E) - A, B, D, E, F, I, K, L, M, N, O, R, S, T, U, Y */
+            /* Z : */ 0xc2005951, /* ( |M|E) - A, E, G, I, L, M, O, Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "B" */
+            /* A : */ 0xe13e2fcf, /* (B|M|E) - A, B, C, D, G, H, I, J, K, L, N, R, S, T, U, V, Y */
+            /* B : */ 0x41004111, /* ( |M| ) - A, E, I, O, Y */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe11e2fcd, /* (B|M|E) - A, C, D, G, H, I, J, K, L, N, R, S, T, U, Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40000101, /* ( |M| ) - A, I */
+            /* I : */ 0xe12e6ed7, /* (B|M|E) - A, B, C, E, G, H, J, K, L, N, O, R, S, T, V, Y */
+            /* J : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* K : */ 0x40000010, /* ( |M| ) - E */
+            /* L : */ 0xe0000111, /* (B|M|E) - A, E, I */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000110, /* ( |M| ) - E, I */
+            /* O : */ 0xe31e7bcb, /* (B|M|E) - A, B, D, G, H, I, J, L, M, N, O, R, S, T, U, Y, Z */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U, Y */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x600e0c0a, /* (B|M| ) - B, D, K, L, R, S, T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0000800, /* ( |M|E) - L */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x20020000, /* (B| | ) - R */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "C" */
+            /* A : */ 0xe32ebfda, /* (B|M|E) - B, D, E, G, H, I, J, K, L, M, N, P, R, S, T, V, Y, Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40004081, /* ( |M| ) - A, H, O */
+            /* D : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* E : */ 0xe32ebc2e, /* (B|M|E) - B, C, D, F, K, L, M, N, P, R, S, T, V, Y, Z */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe15e5519, /* (B|M|E) - A, D, E, I, K, M, O, R, S, T, U, W, Y */
+            /* I : */ 0xe03efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V */
+            /* J : */ 0x40000001, /* ( |M| ) - A */
+            /* K : */ 0xc1044991, /* ( |M|E) - A, E, H, I, L, O, S, Y */
+            /* L : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
+            /* M : */ 0x40000110, /* ( |M| ) - E, I */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0167902, /* (B|M|E) - B, I, L, M, N, O, R, S, U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0x61004111, /* (B|M| ) - A, E, I, O, Y */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x40004001, /* ( |M| ) - A, O */
+            /* U : */ 0xe0063022, /* (B|M|E) - B, F, M, N, R, S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0022000, /* (B|M|E) - N, R */
+            /* Z : */ 0x61000010, /* (B|M| ) - E, Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "D" */
+            /* A : */ 0xe17e3dca, /* (B|M|E) - B, D, G, H, I, K, L, M, N, R, S, T, U, V, W, Y */
+            /* B : */ 0x40100010, /* ( |M| ) - E, U */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x41004111, /* ( |M| ) - A, E, I, O, Y */
+            /* E : */ 0xe23e3dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, R, S, T, U, V, Z */
+            /* F : */ 0x40020000, /* ( |M| ) - R */
+            /* G : */ 0x40100011, /* ( |M| ) - A, E, U */
+            /* H : */ 0xc0020111, /* ( |M|E) - A, E, I, R */
+            /* I : */ 0xe33f7e5f, /* (B|M|E) - A, B, C, D, E, G, J, K, L, M, N, O, Q, R, S, T, U, V, Y, Z */
+            /* J : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0xc0000111, /* ( |M|E) - A, E, I */
+            /* M : */ 0x40100101, /* ( |M| ) - A, I, U */
+            /* N : */ 0x40000011, /* ( |M| ) - A, E */
+            /* O : */ 0xe0767e53, /* (B|M|E) - A, B, E, G, J, K, L, M, N, O, R, S, U, V, W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U, Y */
+            /* S : */ 0xc0000010, /* ( |M|E) - E */
+            /* T : */ 0xc0020100, /* ( |M|E) - I, R */
+            /* U : */ 0xe2063999, /* (B|M|E) - A, D, E, H, I, L, M, N, R, S, Z */
+            /* V : */ 0x40000101, /* ( |M| ) - A, I */
+            /* W : */ 0x40004101, /* ( |M| ) - A, I, O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0040001, /* ( |M|E) - A, S */
+            /* Z : */ 0x60000111, /* (B|M| ) - A, E, I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "E" */
+            /* A : */ 0xc01a2848, /* ( |M|E) - D, G, L, N, R, T, U */
+            /* B : */ 0xe0026593, /* (B|M|E) - A, B, E, H, I, K, N, O, R */
+            /* C : */ 0xe2185d99, /* (B|M|E) - A, D, E, H, I, K, L, M, O, T, U, Z */
+            /* D : */ 0xe37e7fdb, /* (B|M|E) - A, B, D, E, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, Y, Z */
+            /* E : */ 0xe00e3c08, /* (B|M|E) - D, K, L, M, N, R, S, T */
+            /* F : */ 0xe00e4d35, /* (B|M|E) - A, C, E, F, I, K, L, O, R, S, T */
+            /* G : */ 0xe05259f3, /* (B|M|E) - A, B, E, F, G, H, I, L, M, O, R, U, W */
+            /* H : */ 0xe31e3913, /* (B|M|E) - A, B, E, I, L, M, N, R, S, T, U, Y, Z */
+            /* I : */ 0xe20e7eff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, R, S, T, Z */
+            /* J : */ 0xe0087909, /* (B|M|E) - A, D, I, L, M, N, O, T */
+            /* K : */ 0xe00e5d15, /* (B|M|E) - A, C, E, I, K, L, M, O, R, S, T */
+            /* L : */ 0xe37cffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, S, T, U, V, W, Y, Z */
+            /* M : */ 0xe316dd9b, /* (B|M|E) - A, B, D, E, H, I, K, L, M, O, P, R, S, U, Y, Z */
+            /* N : */ 0xe33e6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, R, S, T, U, V, Y, Z */
+            /* O : */ 0xc002a42c, /* ( |M|E) - C, D, F, K, N, P, R */
+            /* P : */ 0xe000c191, /* (B|M|E) - A, E, H, I, O, P */
+            /* Q : */ 0x00100000, /* ( | | ) - U */
+            /* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* S : */ 0xe31efd9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, O, P, R, S, T, U, Y, Z */
+            /* T : */ 0xe25e5bf7, /* (B|M|E) - A, B, C, E, F, G, H, I, J, L, M, O, R, S, T, U, W, Z */
+            /* U : */ 0xe20e2ce8, /* (B|M|E) - D, F, G, H, K, L, N, R, S, T, Z */
+            /* V : */ 0xe30e4ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, O, R, S, T, Y, Z */
+            /* W : */ 0xe0000151, /* (B|M|E) - A, E, G, I */
+            /* X : */ 0xc0000081, /* ( |M|E) - A, H */
+            /* Y : */ 0xe32c7dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, S, T, V, Y, Z */
+            /* Z : */ 0xe002011d, /* (B|M|E) - A, C, D, E, I, R */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "F" */
+            /* A : */ 0xe37e3d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe12e389c, /* (B|M|E) - C, D, E, H, L, M, N, R, S, T, V, Y */
+            /* F : */ 0xc0024111, /* ( |M|E) - A, E, I, O, R */
+            /* G : */ 0x40000001, /* ( |M| ) - A */
+            /* H : */ 0x40000001, /* ( |M| ) - A */
+            /* I : */ 0xe3077e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, Q, R, S, Y, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000001, /* ( |M| ) - A */
+            /* L : */ 0x60004101, /* (B|M| ) - A, I, O */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000100, /* ( |M| ) - I */
+            /* O : */ 0xe01e6c0c, /* (B|M|E) - C, D, K, L, N, O, R, S, T, U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe1004111, /* (B|M|E) - A, E, I, O, Y */
+            /* S : */ 0x40080001, /* ( |M| ) - A, T */
+            /* T : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
+            /* U : */ 0x60022c11, /* (B|M| ) - A, E, K, L, N, R */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "G" */
+            /* A : */ 0xe33e3b3a, /* (B|M|E) - B, D, E, F, I, J, L, M, N, R, S, T, U, V, Y, Z */
+            /* B : */ 0x40000010, /* ( |M| ) - E */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* E : */ 0xe32e799a, /* (B|M|E) - B, D, E, H, I, L, M, N, O, R, S, T, V, Y, Z */
+            /* F : */ 0x40020000, /* ( |M| ) - R */
+            /* G : */ 0x41000111, /* ( |M| ) - A, E, I, Y */
+            /* H : */ 0xe0004111, /* (B|M|E) - A, E, I, O */
+            /* I : */ 0xe33ef81f, /* (B|M|E) - A, B, C, D, E, L, M, N, O, P, R, S, T, U, V, Y, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U, Y */
+            /* M : */ 0x40104001, /* ( |M| ) - A, O, U */
+            /* N : */ 0x41004111, /* ( |M| ) - A, E, I, O, Y */
+            /* O : */ 0xe00e380a, /* (B|M|E) - B, D, L, M, N, R, S, T */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60104151, /* (B|M| ) - A, E, G, I, O, U */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x40020000, /* ( |M| ) - R */
+            /* U : */ 0xe22e3918, /* (B|M|E) - D, E, I, L, M, N, R, S, T, V, Z */
+            /* V : */ 0x40000001, /* ( |M| ) - A */
+            /* W : */ 0x60000111, /* (B|M| ) - A, E, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xa0000800, /* (B| |E) - L */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "H" */
+            /* A : */ 0xe37ebfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40104001, /* ( |M| ) - A, O, U */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* E : */ 0xe37e7d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, O, R, S, T, U, V, W, Y, Z */
+            /* F : */ 0x40000010, /* ( |M| ) - E */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40004000, /* ( |M| ) - O */
+            /* I : */ 0xe30efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, Y, Z */
+            /* J : */ 0x40004001, /* ( |M| ) - A, O */
+            /* K : */ 0x40000001, /* ( |M| ) - A */
+            /* L : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
+            /* M : */ 0x40105111, /* ( |M| ) - A, E, I, M, O, U */
+            /* N : */ 0xc1040111, /* ( |M|E) - A, E, I, S, Y */
+            /* O : */ 0xe016fc1a, /* (B|M|E) - B, D, E, K, L, M, N, O, P, R, S, U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc1004199, /* ( |M|E) - A, D, E, H, I, O, Y */
+            /* S : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
+            /* T : */ 0xc0000191, /* ( |M|E) - A, E, H, I */
+            /* U : */ 0xe006385b, /* (B|M|E) - A, B, D, E, G, L, M, N, R, S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000001, /* ( |M| ) - A */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0040011, /* (B|M|E) - A, E, S */
+            /* Z : */ 0x40000001, /* ( |M| ) - A */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "I" */
+            /* A : */ 0xe20e3d4c, /* (B|M|E) - C, D, G, I, K, L, M, N, R, S, T, Z */
+            /* B : */ 0xe1124113, /* (B|M|E) - A, B, E, I, O, R, U, Y */
+            /* C : */ 0xe21a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U, Z */
+            /* D : */ 0xe15a6b99, /* (B|M|E) - A, D, E, H, I, J, L, N, O, R, T, U, W, Y */
+            /* E : */ 0xc07e3ccf, /* ( |M|E) - A, B, C, D, G, H, K, L, M, N, R, S, T, U, V, W */
+            /* F : */ 0xe20a4131, /* (B|M|E) - A, E, F, I, O, R, T, Z */
+            /* G : */ 0xe01a79fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, T, U */
+            /* H : */ 0xe0066111, /* (B|M|E) - A, E, I, N, O, R, S */
+            /* I : */ 0xc0002000, /* ( |M|E) - N */
+            /* J : */ 0xe0004411, /* (B|M|E) - A, E, K, O */
+            /* K : */ 0xe01e5d91, /* (B|M|E) - A, E, H, I, K, L, M, O, R, S, T, U */
+            /* L : */ 0xe17edffb, /* (B|M|E) - A, B, D, E, F, G, H, I, J, K, L, M, O, P, R, S, T, U, V, W, Y */
+            /* M : */ 0xe012d5bb, /* (B|M|E) - A, B, D, E, F, H, I, K, M, O, P, R, U */
+            /* N : */ 0xe31e77ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, M, N, O, R, S, T, U, Y, Z */
+            /* O : */ 0xe03ea84f, /* (B|M|E) - A, B, C, D, G, L, N, P, R, S, T, U, V */
+            /* P : */ 0xe002c111, /* (B|M|E) - A, E, I, O, P, R */
+            /* Q : */ 0xc0100000, /* ( |M|E) - U */
+            /* R : */ 0xe37e77dd, /* (B|M|E) - A, C, D, E, G, H, I, J, K, M, N, O, R, S, T, U, V, W, Y, Z */
+            /* S : */ 0xe01eddb7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, O, P, R, S, T, U */
+            /* T : */ 0xe31e47d1, /* (B|M|E) - A, E, G, H, I, J, K, O, R, S, T, U, Y, Z */
+            /* U : */ 0xc0040802, /* ( |M|E) - B, L, S */
+            /* V : */ 0xe0004511, /* (B|M|E) - A, E, I, K, O */
+            /* W : */ 0x60004001, /* (B|M| ) - A, O */
+            /* X : */ 0xc0080010, /* ( |M|E) - E, T */
+            /* Y : */ 0xe0005111, /* (B|M|E) - A, E, I, M, O */
+            /* Z : */ 0xe2205191, /* (B|M|E) - A, E, H, I, M, O, V, Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "J" */
+            /* A : */ 0xe36f3def, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, Q, R, S, T, V, W, Y, Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40000100, /* ( |M| ) - I */
+            /* D : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* E : */ 0xe20ebcb9, /* (B|M|E) - A, D, E, F, H, K, L, M, N, P, R, S, T, Z */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000001, /* ( |M| ) - A */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe00e380e, /* (B|M|E) - B, C, D, L, M, N, R, S, T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004001, /* ( |M| ) - A, O */
+            /* L : */ 0x40000101, /* ( |M| ) - A, I */
+            /* M : */ 0x40000101, /* ( |M| ) - A, I */
+            /* N : */ 0x40000001, /* ( |M| ) - A */
+            /* O : */ 0xe3366cbf, /* (B|M|E) - A, B, C, D, E, F, H, K, L, N, O, R, S, U, V, Y, Z */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60001111, /* (B|M| ) - A, E, I, M */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0x40100000, /* ( |M| ) - U */
+            /* U : */ 0xe00e2c9b, /* (B|M|E) - A, B, D, E, H, K, L, N, R, S, T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "K" */
+            /* A : */ 0xe34ebbfb, /* (B|M|E) - A, B, D, E, F, G, H, I, J, L, M, N, P, R, S, T, W, Y, Z */
+            /* B : */ 0x40000011, /* ( |M| ) - A, E */
+            /* C : */ 0x40000001, /* ( |M| ) - A */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe32e3d83, /* (B|M|E) - A, B, H, I, K, L, M, N, R, S, T, V, Y, Z */
+            /* F : */ 0x40020000, /* ( |M| ) - R */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe00c4111, /* (B|M|E) - A, E, I, O, S, T */
+            /* I : */ 0xe32ebe3f, /* (B|M|E) - A, B, C, D, E, F, J, K, L, M, N, P, R, S, T, V, Y, Z */
+            /* J : */ 0x60000010, /* (B|M| ) - E */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* L : */ 0x60004111, /* (B|M| ) - A, E, I, O */
+            /* M : */ 0x40000011, /* ( |M| ) - A, E */
+            /* N : */ 0x60104001, /* (B|M| ) - A, O, U */
+            /* O : */ 0xe176e83e, /* (B|M|E) - B, C, D, E, F, L, N, O, P, R, S, U, V, W, Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x63100111, /* (B|M| ) - A, E, I, U, Y, Z */
+            /* S : */ 0xe0004111, /* (B|M|E) - A, E, I, O */
+            /* T : */ 0xc0004011, /* ( |M|E) - A, E, O */
+            /* U : */ 0xe00ebc0a, /* (B|M|E) - B, D, K, L, M, N, P, R, S, T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x60000101, /* (B|M| ) - A, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xa0020000, /* (B| |E) - R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "L" */
+            /* A : */ 0xe37e7fef, /* (B|M|E) - A, B, C, D, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R, U */
+            /* C : */ 0x40104191, /* ( |M| ) - A, E, H, I, O, U */
+            /* D : */ 0xc01a4113, /* ( |M|E) - A, B, E, I, O, R, T, U */
+            /* E : */ 0xe1fe7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, X, Y */
+            /* F : */ 0xc00241d0, /* ( |M|E) - E, G, H, I, O, R */
+            /* G : */ 0x40124111, /* ( |M| ) - A, E, I, O, R, U */
+            /* H : */ 0xc0000111, /* ( |M|E) - A, E, I */
+            /* I : */ 0xe3befeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, U, V, X, Y, Z */
+            /* J : */ 0x60104511, /* (B|M| ) - A, E, I, K, O, U */
+            /* K : */ 0xc04051b1, /* ( |M|E) - A, E, F, H, I, M, O, W */
+            /* L : */ 0xc11251b1, /* ( |M|E) - A, E, F, H, I, M, O, R, U, Y */
+            /* M : */ 0xc0184111, /* ( |M|E) - A, E, I, O, T, U */
+            /* N : */ 0x40000101, /* ( |M| ) - A, I */
+            /* O : */ 0xe17ef96a, /* (B|M|E) - B, D, F, G, I, L, M, N, O, P, R, S, T, U, V, W, Y */
+            /* P : */ 0x40100090, /* ( |M| ) - E, H, U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40100101, /* ( |M| ) - A, I, U */
+            /* S : */ 0xc0184517, /* ( |M|E) - A, B, C, E, I, K, O, T, U */
+            /* T : */ 0xc0024391, /* ( |M|E) - A, E, H, I, J, O, R */
+            /* U : */ 0xe20ebd3e, /* (B|M|E) - B, C, D, E, F, I, K, L, M, N, P, R, S, T, Z */
+            /* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0003509, /* (B|M|E) - A, D, I, K, M, N */
+            /* Z : */ 0xc0000001, /* ( |M|E) - A */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "M" */
+            /* A : */ 0xe3be3fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, R, S, T, U, V, X, Y, Z */
+            /* B : */ 0x40124011, /* ( |M| ) - A, E, O, R, U */
+            /* C : */ 0x60000080, /* (B|M| ) - H */
+            /* D : */ 0x40104101, /* ( |M| ) - A, I, O, U */
+            /* E : */ 0xe32e7dfd, /* (B|M|E) - A, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, Y, Z */
+            /* F : */ 0x40020000, /* ( |M| ) - R */
+            /* G : */ 0x40000001, /* ( |M| ) - A */
+            /* H : */ 0x40000101, /* ( |M| ) - A, I */
+            /* I : */ 0xe30e7edd, /* (B|M|E) - A, C, D, E, G, H, J, K, L, M, N, O, R, S, T, Y, Z */
+            /* J : */ 0x40000001, /* ( |M| ) - A */
+            /* K : */ 0x40000010, /* ( |M| ) - E */
+            /* L : */ 0x40000101, /* ( |M| ) - A, I */
+            /* M : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U, Y */
+            /* N : */ 0x40000100, /* ( |M| ) - I */
+            /* O : */ 0xe01e7fd8, /* (B|M|E) - D, E, G, H, I, J, K, L, M, N, O, R, S, T, U */
+            /* P : */ 0x40064111, /* ( |M| ) - A, E, I, O, R, S */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40100111, /* ( |M| ) - A, E, I, U */
+            /* S : */ 0xc0104191, /* ( |M|E) - A, E, H, I, O, U */
+            /* T : */ 0x40020001, /* ( |M| ) - A, R */
+            /* U : */ 0xe20e3edb, /* (B|M|E) - A, B, D, E, G, H, J, K, L, M, N, R, S, T, Z */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xa0020000, /* (B| |E) - R */
+            /* Z : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "N" */
+            /* A : */ 0xe37fbfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, Q, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40000011, /* ( |M| ) - A, E */
+            /* C : */ 0xc1104591, /* ( |M|E) - A, E, H, I, K, O, U, Y */
+            /* D : */ 0xc11a4911, /* ( |M|E) - A, E, I, L, O, R, T, U, Y */
+            /* E : */ 0xe33effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, Y, Z */
+            /* F : */ 0x40020110, /* ( |M| ) - E, I, R */
+            /* G : */ 0xc0765993, /* ( |M|E) - A, B, E, H, I, L, M, O, R, S, U, V, W */
+            /* H : */ 0x40004101, /* ( |M| ) - A, I, O */
+            /* I : */ 0xe31f7eff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, Q, R, S, T, U, Y, Z */
+            /* J : */ 0x40004011, /* ( |M| ) - A, E, O */
+            /* K : */ 0xc0425011, /* ( |M|E) - A, E, M, O, R, W */
+            /* L : */ 0x40100101, /* ( |M| ) - A, I, U */
+            /* M : */ 0x40000011, /* ( |M| ) - A, E */
+            /* N : */ 0xc11041d1, /* ( |M|E) - A, E, G, H, I, O, U, Y */
+            /* O : */ 0xe13e7833, /* (B|M|E) - A, B, E, F, L, M, N, O, R, S, T, U, V, Y */
+            /* P : */ 0x40000010, /* ( |M| ) - E */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41000111, /* ( |M| ) - A, E, I, Y */
+            /* S : */ 0xc05cc7f1, /* ( |M|E) - A, E, F, G, H, I, J, K, O, P, S, T, U, W */
+            /* T : */ 0xc2164791, /* ( |M|E) - A, E, H, I, J, K, O, R, S, U, Z */
+            /* U : */ 0xe00e2891, /* (B|M|E) - A, E, H, L, N, R, S, T */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x40000001, /* ( |M| ) - A */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0040011, /* ( |M|E) - A, E, S */
+            /* Z : */ 0xc0004b11, /* ( |M|E) - A, E, I, J, L, O */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "O" */
+            /* A : */ 0xc0032884, /* ( |M|E) - C, H, L, N, Q, R */
+            /* B : */ 0xe1164993, /* (B|M|E) - A, B, E, H, I, L, O, R, S, U, Y */
+            /* C : */ 0x60080595, /* (B|M| ) - A, C, E, H, I, K, T */
+            /* D : */ 0xe1424331, /* (B|M|E) - A, E, F, I, J, O, R, W, Y */
+            /* E : */ 0xe2023808, /* (B|M|E) - D, L, M, N, R, Z */
+            /* F : */ 0xc0024921, /* ( |M|E) - A, F, I, L, O, R */
+            /* G : */ 0x60124911, /* (B|M| ) - A, E, I, L, O, R, U */
+            /* H : */ 0x40063019, /* ( |M| ) - A, D, E, M, N, R, S */
+            /* I : */ 0xc0040404, /* ( |M|E) - C, K, S */
+            /* J : */ 0x40020d15, /* ( |M| ) - A, C, E, I, K, L, R */
+            /* K : */ 0xe01a5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, T, U */
+            /* L : */ 0xe17edf7f, /* (B|M|E) - A, B, C, D, E, F, G, I, J, K, L, M, O, P, R, S, T, U, V, W, Y */
+            /* M : */ 0xe112f513, /* (B|M|E) - A, B, E, I, K, M, N, O, P, R, U, Y */
+            /* N : */ 0xe31e67dd, /* (B|M|E) - A, C, D, E, G, H, I, J, K, N, O, R, S, T, U, Y, Z */
+            /* O : */ 0x4206ac0a, /* ( |M| ) - B, D, K, L, N, P, R, S, Z */
+            /* P : */ 0xe0004191, /* (B|M|E) - A, E, H, I, O */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe15efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y */
+            /* S : */ 0xe15edd97, /* (B|M|E) - A, B, C, E, H, I, K, L, M, O, P, R, S, T, U, W, Y */
+            /* T : */ 0xe04e43f1, /* (B|M|E) - A, E, F, G, H, I, J, O, R, S, T, W */
+            /* U : */ 0xe20e3def, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, R, S, T, Z */
+            /* V : */ 0xe0000111, /* (B|M|E) - A, E, I */
+            /* W : */ 0xc0000111, /* ( |M|E) - A, E, I */
+            /* X : */ 0x40000001, /* ( |M| ) - A */
+            /* Y : */ 0xc0000015, /* ( |M|E) - A, C, E */
+            /* Z : */ 0xe0044511, /* (B|M|E) - A, E, I, K, O, S */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "P" */
+            /* A : */ 0xe13efc84, /* (B|M|E) - C, H, K, L, M, N, O, P, R, S, T, U, V, Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe10aac44, /* (B|M|E) - C, G, K, L, N, P, R, T, Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe0022111, /* (B|M|E) - A, E, I, N, R */
+            /* I : */ 0xe00ae81d, /* (B|M|E) - A, C, D, E, L, N, O, P, R, T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000010, /* ( |M| ) - E */
+            /* L : */ 0x60000101, /* (B|M| ) - A, I */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0069800, /* (B|M|E) - L, M, P, R, S */
+            /* P : */ 0xc0004111, /* ( |M|E) - A, E, I, O */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60004111, /* (B|M| ) - A, E, I, O */
+            /* S : */ 0x40004000, /* ( |M| ) - O */
+            /* T : */ 0x40000101, /* ( |M| ) - A, I */
+            /* U : */ 0x60020000, /* (B|M| ) - R */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x40020000, /* ( |M| ) - R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Q" */
+            /* A : */ 0x60000008, /* (B|M| ) - D */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60000111, /* (B|M| ) - A, E, I */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "R" */
+            /* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0xc0124911, /* ( |M|E) - A, E, I, L, O, R, U */
+            /* C : */ 0xc1104591, /* ( |M|E) - A, E, H, I, K, O, U, Y */
+            /* D : */ 0xc11e5311, /* ( |M|E) - A, E, I, J, M, O, R, S, T, U, Y */
+            /* E : */ 0xe3fe7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, W, X, Y, Z */
+            /* F : */ 0xc0020001, /* ( |M|E) - A, R */
+            /* G : */ 0xc1124991, /* ( |M|E) - A, E, H, I, L, O, R, U, Y */
+            /* H : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
+            /* I : */ 0xe39dfeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, S, T, U, X, Y, Z */
+            /* J : */ 0x40004011, /* ( |M| ) - A, E, O */
+            /* K : */ 0xc0524591, /* ( |M|E) - A, E, H, I, K, O, R, U, W */
+            /* L : */ 0xc11441b1, /* ( |M|E) - A, E, F, H, I, O, S, U, Y */
+            /* M : */ 0xc01c09f1, /* ( |M|E) - A, E, F, G, H, I, L, S, T, U */
+            /* N : */ 0xc10c41b9, /* ( |M|E) - A, D, E, F, H, I, O, S, T, Y */
+            /* O : */ 0xe3fe7ddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, R, S, T, U, V, W, X, Y, Z */
+            /* P : */ 0x40004081, /* ( |M| ) - A, H, O */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U, Y */
+            /* S : */ 0xc0184195, /* ( |M|E) - A, C, E, H, I, O, T, U */
+            /* T : */ 0xc3525b91, /* ( |M|E) - A, E, H, I, J, L, M, O, R, U, W, Y, Z */
+            /* U : */ 0xe34ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, W, Y, Z */
+            /* V : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0042c1d, /* (B|M|E) - A, C, D, E, K, L, N, S */
+            /* Z : */ 0xc1004111, /* ( |M|E) - A, E, I, O, Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "S" */
+            /* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40000010, /* ( |M| ) - E */
+            /* C : */ 0x60104181, /* (B|M| ) - A, H, I, O, U */
+            /* D : */ 0x40100101, /* ( |M| ) - A, I, U */
+            /* E : */ 0xe33ebfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, Y, Z */
+            /* F : */ 0x40020111, /* ( |M| ) - A, E, I, R */
+            /* G : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* H : */ 0xe018c111, /* (B|M|E) - A, E, I, O, P, T, U */
+            /* I : */ 0xe1beffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, X, Y */
+            /* J : */ 0x40004000, /* ( |M| ) - O */
+            /* K : */ 0xc0104111, /* ( |M|E) - A, E, I, O, U */
+            /* L : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
+            /* M : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
+            /* N : */ 0x60000111, /* (B|M| ) - A, E, I */
+            /* O : */ 0xe11efdf2, /* (B|M|E) - B, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, Y */
+            /* P : */ 0x61004111, /* (B|M| ) - A, E, I, O, Y */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0x40104111, /* ( |M| ) - A, E, I, O, U */
+            /* S : */ 0xc1004911, /* ( |M|E) - A, E, I, L, O, Y */
+            /* T : */ 0xe1125bb1, /* (B|M|E) - A, E, F, H, I, J, L, M, O, R, U, Y */
+            /* U : */ 0xe22ebdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, P, R, S, T, V, Z */
+            /* V : */ 0x60000011, /* (B|M| ) - A, E */
+            /* W : */ 0x60000111, /* (B|M| ) - A, E, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0040902, /* (B|M|E) - B, I, L, S */
+            /* Z : */ 0xe0080011, /* (B|M|E) - A, E, T */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "T" */
+            /* A : */ 0xe37ebfee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40100010, /* ( |M| ) - E, U */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* F : */ 0x40020100, /* ( |M| ) - I, R */
+            /* G : */ 0x40000011, /* ( |M| ) - A, E */
+            /* H : */ 0xe1125911, /* (B|M|E) - A, E, I, L, M, O, R, U, Y */
+            /* I : */ 0xe31efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, Y, Z */
+            /* J : */ 0x60004011, /* (B|M| ) - A, E, O */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* L : */ 0xc0104111, /* ( |M|E) - A, E, I, O, U */
+            /* M : */ 0x40100011, /* ( |M| ) - A, E, U */
+            /* N : */ 0x40000001, /* ( |M| ) - A */
+            /* O : */ 0xe056be2a, /* (B|M|E) - B, D, F, J, K, L, M, N, P, R, S, U, W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U, Y */
+            /* S : */ 0xe0004115, /* (B|M|E) - A, C, E, I, O */
+            /* T : */ 0xc10059b1, /* ( |M|E) - A, E, F, H, I, L, M, O, Y */
+            /* U : */ 0xe0062869, /* (B|M|E) - A, D, F, G, L, N, R, S */
+            /* V : */ 0x40000101, /* ( |M| ) - A, I */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0002800, /* ( |M|E) - L, N */
+            /* Z : */ 0xc0000111, /* ( |M|E) - A, E, I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "U" */
+            /* A : */ 0xc00a3818, /* ( |M|E) - D, E, L, M, N, R, T */
+            /* B : */ 0xe0004993, /* (B|M|E) - A, B, E, H, I, L, O */
+            /* C : */ 0xe1020791, /* (B|M|E) - A, E, H, I, J, K, R, Y */
+            /* D : */ 0xe15a59d9, /* (B|M|E) - A, D, E, G, H, I, L, M, O, R, T, U, W, Y */
+            /* E : */ 0xe20e2c00, /* (B|M|E) - K, L, N, R, S, T, Z */
+            /* F : */ 0xc0100131, /* ( |M|E) - A, E, F, I, U */
+            /* G : */ 0xe0124911, /* (B|M|E) - A, E, I, L, O, R, U */
+            /* H : */ 0xc00c6109, /* ( |M|E) - A, D, I, N, O, S, T */
+            /* I : */ 0xc00e2848, /* ( |M|E) - D, G, L, N, R, S, T */
+            /* J : */ 0x40000101, /* ( |M| ) - A, I */
+            /* K : */ 0xe0024191, /* (B|M|E) - A, E, H, I, O, R */
+            /* L : */ 0xe13e4fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, O, R, S, T, U, V, Y */
+            /* M : */ 0xe01a5113, /* (B|M|E) - A, B, E, I, M, O, R, T, U */
+            /* N : */ 0xe21863dd, /* (B|M|E) - A, C, D, E, G, H, I, J, N, O, T, U, Z */
+            /* O : */ 0xc0000800, /* ( |M|E) - L */
+            /* P : */ 0xc002c110, /* ( |M|E) - E, I, O, P, R */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0xe31e7ddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, R, S, T, U, Y, Z */
+            /* S : */ 0xe21ef995, /* (B|M|E) - A, C, E, H, I, L, M, N, O, P, R, S, T, U, Z */
+            /* T : */ 0xe26c09f5, /* (B|M|E) - A, C, E, F, G, H, I, L, S, T, V, W, Z */
+            /* U : */ 0x60040800, /* (B|M| ) - L, S */
+            /* V : */ 0x40000011, /* ( |M| ) - A, E */
+            /* W : */ 0x60000011, /* (B|M| ) - A, E */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0xe0000041, /* (B|M|E) - A, G */
+            /* Z : */ 0xe0100191, /* (B|M|E) - A, E, H, I, U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "V" */
+            /* A : */ 0xe00e39bc, /* (B|M|E) - C, D, E, F, H, I, L, M, N, R, S, T */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40000101, /* ( |M| ) - A, I */
+            /* D : */ 0x40000101, /* ( |M| ) - A, I */
+            /* E : */ 0xe30e2dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, N, R, S, T, Y, Z */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000100, /* ( |M| ) - I */
+            /* H : */ 0x40000010, /* ( |M| ) - E */
+            /* I : */ 0xe33e7e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, R, S, T, U, V, Y, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* L : */ 0x60100101, /* (B|M| ) - A, I, U */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0023a00, /* (B|M|E) - J, L, M, N, R */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40104101, /* ( |M| ) - A, I, O, U */
+            /* S : */ 0x40000100, /* ( |M| ) - I */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60060000, /* (B|M| ) - R, S */
+            /* V : */ 0x40000001, /* ( |M| ) - A */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x40000800, /* ( |M| ) - L */
+            /* Z : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "W" */
+            /* A : */ 0xe30e29bc, /* (B|M|E) - C, D, E, F, H, I, L, N, R, S, T, Y, Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe10e2948, /* (B|M|E) - D, G, I, L, N, R, S, T, Y */
+            /* F : */ 0x40000100, /* ( |M| ) - I */
+            /* G : */ 0x40000010, /* ( |M| ) - E */
+            /* H : */ 0x60000001, /* (B|M| ) - A */
+            /* I : */ 0xe00e2cdf, /* (B|M|E) - A, B, C, D, E, G, H, K, L, N, R, S, T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x20000001, /* (B| | ) - A */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* O : */ 0xe0003a22, /* (B|M|E) - B, F, J, L, M, N */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* U : */ 0x60000800, /* (B|M| ) - L */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000001, /* ( |M| ) - A */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40000100, /* ( |M| ) - I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "X" */
+            /* A : */ 0x60202000, /* (B|M| ) - N, V */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x40002000, /* ( |M| ) - N */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xc0001000, /* ( |M|E) - M */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Y" */
+            /* A : */ 0xe37ebcdc, /* (B|M|E) - C, D, E, G, H, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40020101, /* ( |M| ) - A, I, R */
+            /* C : */ 0x40000011, /* ( |M| ) - A, E */
+            /* D : */ 0xc0004111, /* ( |M|E) - A, E, I, O */
+            /* E : */ 0xe02e38aa, /* (B|M|E) - B, D, F, H, L, M, N, R, S, T, V */
+            /* F : */ 0x40100110, /* ( |M| ) - E, I, U */
+            /* G : */ 0x40100100, /* ( |M| ) - I, U */
+            /* H : */ 0x40001001, /* ( |M| ) - A, M */
+            /* I : */ 0xe00a3c48, /* (B|M|E) - D, G, K, L, M, N, R, T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000011, /* ( |M|E) - A, E */
+            /* L : */ 0xe1200d11, /* (B|M|E) - A, E, I, K, L, V, Y */
+            /* M : */ 0x40104011, /* ( |M| ) - A, E, O, U */
+            /* N : */ 0xc0006119, /* ( |M|E) - A, D, E, I, N, O */
+            /* O : */ 0xe21e2000, /* (B|M|E) - N, R, S, T, U, Z */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40184111, /* ( |M| ) - A, E, I, O, T, U */
+            /* S : */ 0xe2080911, /* (B|M|E) - A, E, I, L, T, Z */
+            /* T : */ 0x40184000, /* ( |M| ) - O, T, U */
+            /* U : */ 0x60062012, /* (B|M| ) - B, E, N, R, S */
+            /* V : */ 0x60004011, /* (B|M| ) - A, E, O */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x40000001, /* ( |M| ) - A */
+            /* Z : */ 0x40100000, /* ( |M| ) - U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Z" */
+            /* A : */ 0xe10a3fee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, R, T, Y */
+            /* B : */ 0x60000110, /* (B|M| ) - E, I */
+            /* C : */ 0x40000001, /* ( |M| ) - A */
+            /* D : */ 0x62020111, /* (B|M| ) - A, E, I, R, Z */
+            /* E : */ 0xe12e3faa, /* (B|M|E) - B, D, F, H, I, J, K, L, M, N, R, S, T, V, Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000110, /* ( |M| ) - E, I */
+            /* H : */ 0x60000001, /* (B|M| ) - A */
+            /* I : */ 0xe12efeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, V, Y */
+            /* J : */ 0x40004000, /* ( |M| ) - O */
+            /* K : */ 0x40100001, /* ( |M| ) - A, U */
+            /* L : */ 0xe0100111, /* (B|M|E) - A, E, I, U */
+            /* M : */ 0x40000110, /* ( |M| ) - E, I */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0122180, /* (B|M|E) - H, I, N, R, U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000001, /* ( |M| ) - A */
+            /* S : */ 0x40000011, /* ( |M| ) - A, E */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60022882, /* (B|M| ) - B, H, L, N, R */
+            /* V : */ 0x60004101, /* (B|M| ) - A, I, O */
+            /* W : */ 0x20000001, /* (B| | ) - A */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0042840, /* (B|M|E) - G, L, N, S */
+            /* Z : */ 0x40000011, /* ( |M| ) - A, E */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ä" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000002, /* ( |M| ) - B */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ö" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ü" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        }
+    }, /* End of Enum 0 / 5 */
+    /* ---------------------------------- *
+     * --- names / en => NST_NAMES_EN --- *
+     * ---------------------------------- */
+    {
+        {
+            /* Rules following letter "A" */
+            /* A : */ 0x60020000, /* (B|M| ) - R,  */
+            /* B : */ 0xe116491b, /* (B|M|E) - A, B, D, E, I, L, O, R, S, U and Y */
+            /* C : */ 0xe1014d91, /* (B|M|E) - A, E, H, I, K, L, O, Q and Y */
+            /* D : */ 0xe1567d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, R, S, U, W and Y */
+            /* E : */ 0xe04e2cec, /* (B|M|E) - C, D, F, G, H, K, L, N, R, S, T and W */
+            /* F : */ 0x60084031, /* (B|M| ) - A, E, F, O and T */
+            /* G : */ 0x601069d9, /* (B|M| ) - A, D, E, G, H, I, L, N, O and U */
+            /* H : */ 0xe0105111, /* (B|M|E) - A, E, I, M, O and U */
+            /* I : */ 0xe10e3c5b, /* (B|M|E) - A, B, D, E, G, K, L, M, N, R, S, T and Y */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xe0004d11, /* (B|M|E) - A, E, I, K, L and O */
+            /* L : */ 0xe17cddff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W and Y */
+            /* M : */ 0xe316d913, /* (B|M|E) - A, B, E, I, L, M, O, P, R, S, U, Y and Z */
+            /* N : */ 0xe15e6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, R, S, T, U, W and Y */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x60029881, /* (B|M| ) - A, H, L, M, P and R */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe17fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
+            /* S : */ 0xe00cdd95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, P, S and T */
+            /* T : */ 0xe15e4db5, /* (B|M|E) - A, C, E, F, H, I, K, L, O, R, S, T, U, W and Y */
+            /* U : */ 0xe08e284e, /* (B|M|E) - B, C, D, G, L, N, R, S, T and X */
+            /* V : */ 0x61024111, /* (B|M| ) - A, E, I, O, R and Y */
+            /* W : */ 0xc10c6931, /* ( |M|E) - A, E, F, I, L, N, O, S, T and Y */
+            /* X : */ 0xe0084100, /* (B|M|E) - I, O and T */
+            /* Y : */ 0xe06e78bf, /* (B|M|E) - A, B, C, D, E, F, H, L, M, N, O, R, S, T, V and W */
+            /* Z : */ 0x42001810, /* ( |M| ) - E, L, M and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "B" */
+            /* A : */ 0xe1063d42, /* (B|M|E) - B, G, I, K, L, M, N, R, S and Y */
+            /* B : */ 0x41004110, /* ( |M| ) - E, I, O and Y */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe1ae7c1d, /* (B|M|E) - A, C, D, E, K, L, M, N, O, R, S, T, V, X and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe00e685d, /* (B|M|E) - A, C, D, E, G, L, N, O, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe05e690e, /* (B|M|E) - B, C, D, I, L, N, O, R, S, T, U and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x600e201c, /* (B|M| ) - C, D, E, N, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0022800, /* (B|M|E) - L, N and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "C" */
+            /* A : */ 0xe11e39ba, /* (B|M|E) - B, D, E, F, H, I, L, M, N, R, S, T, U and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40000001, /* ( |M| ) - A,  */
+            /* D : */ 0x40004000, /* ( |M| ) - O,  */
+            /* E : */ 0xe10e281d, /* (B|M|E) - A, C, D, E, L, N, R, S, T and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* H : */ 0xe11e5911, /* (B|M|E) - A, E, I, L, M, O, R, S, T, U and Y */
+            /* I : */ 0xe11e7815, /* (B|M|E) - A, C, E, L, M, N, O, R, S, T, U and Y */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc14479b1, /* ( |M|E) - A, E, F, H, I, L, M, N, O, S, W and Y */
+            /* L : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe17efc5a, /* (B|M|E) - B, D, E, G, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0x40004000, /* ( |M| ) - O,  */
+            /* T : */ 0x40004001, /* ( |M| ) - A and O */
+            /* U : */ 0x610e1808, /* (B|M| ) - D, L, M, R, S, T and Y */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000110, /* ( |M| ) - E and I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xa0023008, /* (B| |E) - D, M, N and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "D" */
+            /* A : */ 0xe1e6b9d4, /* (B|M|E) - C, E, G, H, I, L, M, N, P, R, S, V, W, X and Y */
+            /* B : */ 0x41124010, /* ( |M| ) - E, O, R, U and Y */
+            /* C : */ 0x40000800, /* ( |M| ) - L,  */
+            /* D : */ 0xc1124111, /* ( |M|E) - A, E, I, O, R, U and Y */
+            /* E : */ 0xe12e7c57, /* (B|M|E) - A, B, C, E, G, K, L, M, N, O, R, S, T, V and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x40000011, /* ( |M| ) - A and E */
+            /* H : */ 0x40000101, /* ( |M| ) - A and I */
+            /* I : */ 0xe09e7c55, /* (B|M|E) - A, C, E, G, K, L, M, N, O, R, S, T, U and X */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x41000011, /* ( |M| ) - A, E and Y */
+            /* M : */ 0x40104001, /* ( |M| ) - A, O and U */
+            /* N : */ 0x40000110, /* ( |M| ) - E and I */
+            /* O : */ 0xe05a380d, /* (B|M|E) - A, C, D, L, M, N, R, T, U and W */
+            /* P : */ 0x40000001, /* ( |M| ) - A,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0404091, /* ( |M|E) - A, E, H, O and W */
+            /* T : */ 0x40100000, /* ( |M| ) - U,  */
+            /* U : */ 0x60063807, /* (B|M| ) - A, B, C, L, M, N, R and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00c2804, /* (B|M|E) - C, L, N, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "E" */
+            /* A : */ 0xe07ebcce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, P, R, S, T, U, V and W */
+            /* B : */ 0xe0124813, /* (B|M|E) - A, B, E, L, O, R and U */
+            /* C : */ 0xc00a0dd5, /* ( |M|E) - A, C, E, G, H, I, K, L, R and T */
+            /* D : */ 0xe156597b, /* (B|M|E) - A, B, D, E, F, G, I, L, M, O, R, S, U, W and Y */
+            /* E : */ 0xc02e382d, /* ( |M|E) - A, C, D, F, L, M, N, R, S, T and V */
+            /* F : */ 0xe0024131, /* (B|M|E) - A, E, F, I, O and R */
+            /* G : */ 0xe00849d3, /* (B|M|E) - A, B, E, G, H, I, L, O and T */
+            /* H : */ 0xc0004011, /* ( |M|E) - A, E and O */
+            /* I : */ 0x600e386c, /* (B|M| ) - C, D, F, G, L, M, N, R, S and T */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0xc0000911, /* ( |M|E) - A, E, I and L */
+            /* L : */ 0xe17e59bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, O, R, S, T, U, V, W and Y */
+            /* M : */ 0xe100d113, /* (B|M|E) - A, B, E, I, M, O, P and Y */
+            /* N : */ 0xe34e6bff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, N, O, R, S, T, W, Y and Z */
+            /* O : */ 0xe066386a, /* (B|M|E) - B, D, F, G, L, M, N, R, S, V and W */
+            /* P : */ 0x40000080, /* ( |M| ) - H,  */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe16e7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, W and Y */
+            /* S : */ 0xe04cd99d, /* (B|M|E) - A, C, D, E, H, I, L, M, O, P, S, T and W */
+            /* T : */ 0xe05c4195, /* (B|M|E) - A, C, E, H, I, O, S, T, U and W */
+            /* U : */ 0xe086a840, /* (B|M|E) - G, L, N, P, R, S and X */
+            /* V : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
+            /* W : */ 0xe1044191, /* (B|M|E) - A, E, H, I, O, S and Y */
+            /* X : */ 0xc1180901, /* ( |M|E) - A, I, L, T, U and Y */
+            /* Y : */ 0xc00c3811, /* ( |M|E) - A, E, L, M, N, S and T */
+            /* Z : */ 0xe0000010, /* (B|M|E) - E,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "F" */
+            /* A : */ 0xe1722912, /* (B|M|E) - B, E, I, L, N, R, U, V, W and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40004000, /* ( |M| ) - O,  */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00a2801, /* (B|M|E) - A, L, N, R and T */
+            /* F : */ 0xc10a4111, /* ( |M|E) - A, E, I, O, R, T and Y */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x600c2810, /* (B|M| ) - E, L, N, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0422800, /* (B|M|E) - L, N, R and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0xc0104000, /* ( |M|E) - O and U */
+            /* U : */ 0xe0000844, /* (B|M|E) - C, G and L */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "G" */
+            /* A : */ 0xe17e2902, /* (B|M|E) - B, I, L, N, R, S, T, U, V, W and Y */
+            /* B : */ 0x41000010, /* ( |M| ) - E and Y */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* E : */ 0xe04e6993, /* (B|M|E) - A, B, E, H, I, L, N, O, R, S, T and W */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x41000110, /* ( |M| ) - E, I and Y */
+            /* H : */ 0xc0084913, /* ( |M|E) - A, B, E, I, L, O and T */
+            /* I : */ 0xe00c683b, /* (B|M|E) - A, B, D, E, F, L, N, O, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61004011, /* (B|M| ) - A, E, O and Y */
+            /* M : */ 0x40100001, /* ( |M| ) - A and U */
+            /* N : */ 0x40000011, /* ( |M| ) - A and E */
+            /* O : */ 0xe01a6808, /* (B|M|E) - D, L, N, O, R, T and U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* S : */ 0xc0080000, /* ( |M|E) - T,  */
+            /* T : */ 0x40104000, /* ( |M| ) - O and U */
+            /* U : */ 0x61042111, /* (B|M| ) - A, E, I, N, S and Y */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x60000110, /* (B|M| ) - E and I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xa0000800, /* (B| |E) - L,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "H" */
+            /* A : */ 0xe37eb97c, /* (B|M|E) - C, D, E, F, G, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41104010, /* ( |M| ) - E, O, U and Y */
+            /* C : */ 0x40000800, /* ( |M| ) - L,  */
+            /* D : */ 0x40100010, /* ( |M| ) - E and U */
+            /* E : */ 0xe15ef91f, /* (B|M|E) - A, B, C, D, E, I, L, M, N, O, P, R, S, T, U, W and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40000001, /* ( |M| ) - A,  */
+            /* I : */ 0xe00ef85f, /* (B|M|E) - A, B, C, D, E, G, L, M, N, O, P, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* M : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* N : */ 0xc0002011, /* ( |M|E) - A, E and N */
+            /* O : */ 0xe052b818, /* (B|M|E) - D, E, L, M, N, P, R, U and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0xc1104191, /* ( |M|E) - A, E, H, I, O, U and Y */
+            /* U : */ 0x608e3859, /* (B|M| ) - A, D, E, G, L, M, N, R, S, T and X */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0000801, /* (B|M|E) - A and L */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "I" */
+            /* A : */ 0xe01e38a0, /* (B|M|E) - F, H, L, M, N, R, S, T and U */
+            /* B : */ 0x41024013, /* ( |M| ) - A, B, E, O, R and Y */
+            /* C : */ 0xc0184591, /* ( |M|E) - A, E, H, I, K, O, T and U */
+            /* D : */ 0xe1446959, /* (B|M|E) - A, D, E, G, I, L, N, O, S, W and Y */
+            /* E : */ 0xc03e3c2c, /* ( |M|E) - C, D, F, K, L, M, N, R, S, T, U and V */
+            /* F : */ 0xc01a4130, /* ( |M|E) - E, F, I, O, R, T and U */
+            /* G : */ 0xe01071d3, /* (B|M|E) - A, B, E, G, H, I, M, N, O and U */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0xc0004591, /* ( |M|E) - A, E, H, I, K and O */
+            /* L : */ 0xe16c3d3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, S, T, V, W and Y */
+            /* M : */ 0xe0005113, /* (B|M|E) - A, B, E, I, M and O */
+            /* N : */ 0xe24c6d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, N, O, S, T, W and Z */
+            /* O : */ 0xe02e2844, /* (B|M|E) - C, G, L, N, R, S, T and V */
+            /* P : */ 0xc00c8010, /* ( |M|E) - E, P, S and T */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe0684d5d, /* (B|M|E) - A, C, D, E, G, I, K, L, O, T, V and W */
+            /* S : */ 0xe14c5db7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, O, S, T, W and Y */
+            /* T : */ 0xe30879b7, /* (B|M|E) - A, B, C, E, F, H, I, L, M, N, O, T, Y and Z */
+            /* U : */ 0xc0040000, /* ( |M|E) - S,  */
+            /* V : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* W : */ 0x40000010, /* ( |M| ) - E,  */
+            /* X : */ 0xc0004100, /* ( |M|E) - I and O */
+            /* Y : */ 0x60000021, /* (B|M| ) - A and F */
+            /* Z : */ 0xe2000013, /* (B|M|E) - A, B, E and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "J" */
+            /* A : */ 0xe3a73ddc, /* (B|M|E) - C, D, E, G, H, I, K, L, M, N, Q, R, S, V, X, Y and Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x600e7021, /* (B|M| ) - A, F, M, N, O, R, S and T */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xa0003800, /* (B| |E) - L, M and N */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe126289d, /* (B|M|E) - A, C, D, E, H, L, N, R, S, V and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x20042808, /* (B| | ) - D, L, N and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "K" */
+            /* A : */ 0xe10eb99c, /* (B|M|E) - C, D, E, H, I, L, M, N, P, R, S, T and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe12e7919, /* (B|M|E) - A, D, E, I, L, M, N, O, R, S, T, V and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* I : */ 0xe00eb811, /* (B|M|E) - A, E, L, M, N, P, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* L : */ 0x61000011, /* (B|M| ) - A, E and Y */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x60004010, /* (B|M| ) - E and O */
+            /* O : */ 0xe0160802, /* (B|M|E) - B, L, R, S and U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x21000100, /* (B| | ) - I and Y */
+            /* S : */ 0xc0084080, /* ( |M|E) - H, O and T */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60020000, /* (B|M| ) - R,  */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0022810, /* (B|M|E) - E, L, N and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "L" */
+            /* A : */ 0xe17ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W and Y */
+            /* B : */ 0x41124011, /* ( |M| ) - A, E, O, R, U and Y */
+            /* C : */ 0x40004090, /* ( |M| ) - E, H and O */
+            /* D : */ 0xc15e4111, /* ( |M|E) - A, E, I, O, R, S, T, U, W and Y */
+            /* E : */ 0xe1fe7b5f, /* (B|M|E) - A, B, C, D, E, G, I, J, L, M, N, O, R, S, T, U, V, W, X and Y */
+            /* F : */ 0xc042411d, /* ( |M|E) - A, C, D, E, I, O, R and W */
+            /* G : */ 0x40000090, /* ( |M| ) - E and H */
+            /* H : */ 0xc00a0099, /* ( |M|E) - A, D, E, H, R and T */
+            /* I : */ 0xe3bcea7f, /* (B|M|E) - A, B, C, D, E, F, G, J, L, N, O, P, S, T, U, V, X, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000010, /* ( |M|E) - E,  */
+            /* L : */ 0xc1565139, /* ( |M|E) - A, D, E, F, I, M, O, R, S, U, W and Y */
+            /* M : */ 0xc0004111, /* ( |M|E) - A, E, I and O */
+            /* N : */ 0x40000010, /* ( |M| ) - E,  */
+            /* O : */ 0xe17e7d5c, /* (B|M|E) - C, D, E, G, I, K, L, M, N, O, R, S, T, U, V, W and Y */
+            /* P : */ 0x40000080, /* ( |M| ) - H,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40004110, /* ( |M| ) - E, I and O */
+            /* S : */ 0xc1684193, /* ( |M|E) - A, B, E, H, I, O, T, V, W and Y */
+            /* T : */ 0xc0124190, /* ( |M|E) - E, H, I, O, R and U */
+            /* U : */ 0xe02a9d0c, /* (B|M|E) - C, D, I, K, L, M, P, R, T and V */
+            /* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0xe22e383f, /* (B|M|E) - A, B, C, D, E, F, L, M, N, R, S, T, V and Z */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "M" */
+            /* A : */ 0xe1be3dde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, R, S, T, U, V, X and Y */
+            /* B : */ 0xc0020911, /* ( |M|E) - A, E, I, L and R */
+            /* C : */ 0x20000c04, /* (B| | ) - C, K and L */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe08e7c5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, R, S, T and X */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe00e3c15, /* (B|M|E) - A, C, E, K, L, M, N, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x41000110, /* ( |M| ) - E, I and Y */
+            /* M : */ 0xc1000111, /* ( |M|E) - A, E, I and Y */
+            /* N : */ 0x40000010, /* ( |M| ) - E,  */
+            /* O : */ 0xe01e69c0, /* (B|M|E) - G, H, I, L, N, O, R, S, T and U */
+            /* P : */ 0xc00c0010, /* ( |M|E) - E, S and T */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41004110, /* ( |M| ) - E, I, O and Y */
+            /* S : */ 0x40084088, /* ( |M| ) - D, H, O and T */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60062000, /* (B|M| ) - N, R and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e2805, /* (B|M|E) - A, C, L, N, R, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "N" */
+            /* A : */ 0xe12e399e, /* (B|M|E) - B, C, D, E, H, I, L, M, N, R, S, T, V and Y */
+            /* B : */ 0x41124010, /* ( |M| ) - E, O, R, U and Y */
+            /* C : */ 0xc1004991, /* ( |M|E) - A, E, H, I, L, O and Y */
+            /* D : */ 0xc1064999, /* ( |M|E) - A, D, E, H, I, L, O, R, S and Y */
+            /* E : */ 0xe17e29ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, N, R, S, T, U, V, W and Y */
+            /* F : */ 0x40024110, /* ( |M| ) - E, I, O and R */
+            /* G : */ 0xc01e49b9, /* ( |M|E) - A, D, E, F, H, I, L, O, R, S, T and U */
+            /* H : */ 0x40004001, /* ( |M| ) - A and O */
+            /* I : */ 0xe18d6c75, /* (B|M|E) - A, C, E, F, G, K, L, N, O, Q, S, T, X and Y */
+            /* J : */ 0x40000011, /* ( |M| ) - A and E */
+            /* K : */ 0xc0040900, /* ( |M|E) - I, L and S */
+            /* L : */ 0x41000011, /* ( |M| ) - A, E and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0xc1004911, /* ( |M|E) - A, E, I, L, O and Y */
+            /* O : */ 0xe07a2814, /* (B|M|E) - C, E, L, N, R, T, U, V and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x41004101, /* ( |M| ) - A, I, O and Y */
+            /* S : */ 0xc1484895, /* ( |M|E) - A, C, E, H, L, O, T, W and Y */
+            /* T : */ 0xc1564991, /* ( |M|E) - A, E, H, I, L, O, R, S, U, W and Y */
+            /* U : */ 0x40000010, /* ( |M| ) - E,  */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0044809, /* (B|M|E) - A, D, L, O and S */
+            /* Z : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "O" */
+            /* A : */ 0xe0012400, /* (B|M|E) - K, N and Q */
+            /* B : */ 0xe1100193, /* (B|M|E) - A, B, E, H, I, U and Y */
+            /* C : */ 0xe0080c90, /* (B|M|E) - E, H, K, L and T */
+            /* D : */ 0xe1425119, /* (B|M|E) - A, D, E, I, M, O, R, W and Y */
+            /* E : */ 0xc1402841, /* ( |M|E) - A, G, L, N, W and Y */
+            /* F : */ 0x40080020, /* ( |M| ) - F and T */
+            /* G : */ 0x60000098, /* (B|M| ) - D, E and H */
+            /* H : */ 0x40002001, /* ( |M| ) - A and N */
+            /* I : */ 0xc0062000, /* ( |M|E) - N, R and S */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xe0040811, /* (B|M|E) - A, E, L and S */
+            /* L : */ 0xe13cfd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, O, P, S, T, U, V and Y */
+            /* M : */ 0xe0009d13, /* (B|M|E) - A, B, E, I, K, L, M and P */
+            /* N : */ 0xe30e615b, /* (B|M|E) - A, B, D, E, G, I, N, O, R, S, T, Y and Z */
+            /* O : */ 0x400eac08, /* ( |M| ) - D, K, L, N, P, R, S and T */
+            /* P : */ 0xc0040090, /* ( |M|E) - E, H and S */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe16effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, V, W and Y */
+            /* S : */ 0xe17e1997, /* (B|M|E) - A, B, C, E, H, I, L, M, R, S, T, U, V, W and Y */
+            /* T : */ 0xc0080191, /* ( |M|E) - A, E, H, I and T */
+            /* U : */ 0xe00e2d7c, /* (B|M|E) - C, D, E, F, G, I, K, L, N, R, S and T */
+            /* V : */ 0x40000011, /* ( |M| ) - A and E */
+            /* W : */ 0xe100a91b, /* (B|M|E) - A, B, D, E, I, L, N, P and Y */
+            /* X : */ 0xe0082021, /* (B|M|E) - A, F, N and T */
+            /* Y : */ 0xc000401d, /* ( |M|E) - A, C, D, E and O */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "P" */
+            /* A : */ 0x619e1910, /* (B|M| ) - E, I, L, M, R, S, T, U, X and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00a3959, /* (B|M|E) - A, D, E, G, I, L, M, N, R and T */
+            /* F : */ 0x20000010, /* (B| | ) - E,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
+            /* I : */ 0x6008a014, /* (B|M| ) - C, E, N, P and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x60000011, /* (B|M| ) - A and E */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x60168900, /* (B|M| ) - I, L, P, R, S and U */
+            /* P : */ 0xc0000110, /* ( |M|E) - E and I */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc1000080, /* ( |M|E) - H and Y */
+            /* T : */ 0x40004000, /* ( |M| ) - O,  */
+            /* U : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40004000, /* ( |M| ) - O,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Q" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60000191, /* (B|M| ) - A, E, H and I */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "R" */
+            /* A : */ 0xe17eb9fe, /* (B|M|E) - B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, U, V, W and Y */
+            /* B : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* C : */ 0x41104990, /* ( |M| ) - E, H, I, L, O, U and Y */
+            /* D : */ 0xc1445991, /* ( |M|E) - A, E, H, I, L, M, O, S, W and Y */
+            /* E : */ 0xe1ee7d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, R, S, T, V, W, X and Y */
+            /* F : */ 0x40004100, /* ( |M| ) - I and O */
+            /* G : */ 0x40124191, /* ( |M| ) - A, E, H, I, O, R and U */
+            /* H : */ 0xe0084911, /* (B|M|E) - A, E, I, L, O and T */
+            /* I : */ 0xe29dfc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, O, P, Q, S, T, U, X and Z */
+            /* J : */ 0x40004100, /* ( |M| ) - I and O */
+            /* K : */ 0xc1440994, /* ( |M|E) - C, E, H, I, L, S, W and Y */
+            /* L : */ 0xc1044113, /* ( |M|E) - A, B, E, I, O, S and Y */
+            /* M : */ 0xc1144111, /* ( |M|E) - A, E, I, O, S, U and Y */
+            /* N : */ 0xc10c4999, /* ( |M|E) - A, D, E, H, I, L, O, S, T and Y */
+            /* O : */ 0xe1fefc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
+            /* P : */ 0xc0004010, /* ( |M|E) - E and O */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xc1044111, /* ( |M|E) - A, E, I, O, S and Y */
+            /* S : */ 0xc0084195, /* ( |M|E) - A, C, E, H, I, O and T */
+            /* T : */ 0xc1566991, /* ( |M|E) - A, E, H, I, L, N, O, R, S, U, W and Y */
+            /* U : */ 0x600cb1fe, /* (B|M| ) - B, C, D, E, F, G, H, I, M, N, P, S and T */
+            /* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00cec5d, /* (B|M|E) - A, C, D, E, G, K, L, N, O, P, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "S" */
+            /* A : */ 0xe1f6397f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, R, S, U, V, W, X and Y */
+            /* B : */ 0x41104011, /* ( |M| ) - A, E, O, U and Y */
+            /* C : */ 0xe04049b3, /* (B|M|E) - A, B, E, F, H, I, L, O and W */
+            /* D : */ 0x40000011, /* ( |M| ) - A and E */
+            /* E : */ 0xe1eeb87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, P, R, S, T, V, W, X and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe14a4933, /* (B|M|E) - A, B, E, F, I, L, O, R, T, W and Y */
+            /* I : */ 0xe00e385b, /* (B|M|E) - A, B, D, E, G, L, M, N, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
+            /* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* M : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe012b802, /* (B|M|E) - B, L, M, N, P, R and U */
+            /* P : */ 0x60024111, /* (B|M| ) - A, E, I, O and R */
+            /* Q : */ 0x20100000, /* (B| | ) - U,  */
+            /* R : */ 0x40000101, /* ( |M| ) - A and I */
+            /* S : */ 0xc1000911, /* ( |M|E) - A, E, I, L and Y */
+            /* T : */ 0xe1524917, /* (B|M|E) - A, B, C, E, I, L, O, R, U, W and Y */
+            /* U : */ 0x620e3930, /* (B|M| ) - E, F, I, L, M, N, R, S, T and Z */
+            /* V : */ 0x40000100, /* ( |M| ) - I,  */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe000380a, /* (B|M|E) - B, D, L, M and N */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "T" */
+            /* A : */ 0xe17e39b6, /* (B|M|E) - B, C, E, F, H, I, L, M, N, R, S, T, U, V, W and Y */
+            /* B : */ 0x41020000, /* ( |M| ) - R and Y */
+            /* C : */ 0x40004080, /* ( |M| ) - H and O */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe166fd39, /* (B|M|E) - A, D, E, F, I, K, L, M, N, O, P, R, S, V, W and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe15e5937, /* (B|M|E) - A, B, C, E, F, I, L, M, O, R, S, T, U, W and Y */
+            /* I : */ 0xe00e7875, /* (B|M|E) - A, C, E, F, G, L, M, N, O, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* M : */ 0x40004000, /* ( |M| ) - O,  */
+            /* N : */ 0x40000110, /* ( |M| ) - E and I */
+            /* O : */ 0xe156bd3e, /* (B|M|E) - B, C, D, E, F, I, K, L, M, N, P, R, S, U, W and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc1004080, /* ( |M|E) - H, O and Y */
+            /* T : */ 0xc1146591, /* ( |M|E) - A, E, H, I, K, N, O, S, U and Y */
+            /* U : */ 0x6006b805, /* (B|M| ) - A, C, L, M, N, P, R and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0062851, /* (B|M|E) - A, E, G, L, N, R and S */
+            /* Z : */ 0xc0440051, /* ( |M|E) - A, E, G, S and W */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "U" */
+            /* A : */ 0xc0022008, /* ( |M|E) - D, N and R */
+            /* B : */ 0x40120110, /* ( |M| ) - E, I, R and U */
+            /* C : */ 0xc0004591, /* ( |M|E) - A, E, H, I, K and O */
+            /* D : */ 0xe1024959, /* (B|M|E) - A, D, E, G, I, L, O, R and Y */
+            /* E : */ 0xc20e2812, /* ( |M|E) - B, E, L, N, R, S, T and Z */
+            /* F : */ 0x40004020, /* ( |M| ) - F and O */
+            /* G : */ 0x40100190, /* ( |M| ) - E, H, I and U */
+            /* H : */ 0x40000801, /* ( |M| ) - A and L */
+            /* I : */ 0x400e3818, /* ( |M| ) - D, E, L, M, N, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000110, /* ( |M|E) - E and I */
+            /* L : */ 0xe1ae1973, /* (B|M|E) - A, B, E, F, G, I, L, M, R, S, T, V, X and Y */
+            /* M : */ 0xc0003033, /* ( |M|E) - A, B, E, F, M and N */
+            /* N : */ 0xe04c295f, /* (B|M|E) - A, B, C, D, E, G, I, L, N, S, T and W */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0xe0408090, /* (B|M|E) - E, H, P and W */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe14e69dd, /* (B|M|E) - A, C, D, E, G, H, I, L, N, O, R, S, T, W and Y */
+            /* S : */ 0xc00c0111, /* ( |M|E) - A, E, I, S and T */
+            /* T : */ 0xc0180894, /* ( |M|E) - C, E, H, L, T and U */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0xc0000800, /* ( |M|E) - L,  */
+            /* Y : */ 0x40000800, /* ( |M| ) - L,  */
+            /* Z : */ 0xc0000001, /* ( |M|E) - A,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "V" */
+            /* A : */ 0xe0122808, /* (B|M|E) - D, L, N, R and U */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe10e6810, /* (B|M|E) - E, L, N, O, R, S, T and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe0266c1d, /* (B|M|E) - A, C, D, E, K, L, N, O, R, S and V */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0022000, /* (B|M|E) - N and R */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41000110, /* ( |M| ) - E, I and Y */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0002000, /* ( |M|E) - N,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "W" */
+            /* A : */ 0xe12e2d1c, /* (B|M|E) - C, D, E, I, K, L, N, R, S, T, V and Y */
+            /* B : */ 0x40020000, /* ( |M| ) - R,  */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe10e7943, /* (B|M|E) - A, B, G, I, L, M, N, O, R, S, T and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* I : */ 0x600e2c54, /* (B|M| ) - C, E, G, K, L, N, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x41000011, /* ( |M| ) - A, E and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0xc0040111, /* ( |M|E) - A, E, I and S */
+            /* O : */ 0x60024808, /* (B|M| ) - D, L, O and R */
+            /* P : */ 0x40000010, /* ( |M| ) - E,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60000110, /* (B|M| ) - E and I */
+            /* S : */ 0x40084000, /* ( |M| ) - O and T */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60000800, /* (B|M| ) - L,  */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60083d14, /* (B|M| ) - C, E, I, K, L, M, N and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "X" */
+            /* A : */ 0xe0002000, /* (B|M|E) - N,  */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe0043011, /* (B|M|E) - A, E, M, N and S */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x40000010, /* ( |M| ) - E,  */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000001, /* ( |M| ) - A,  */
+            /* O : */ 0x40002000, /* ( |M| ) - N,  */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x40004010, /* ( |M| ) - E and O */
+            /* U : */ 0x40040000, /* ( |M| ) - S,  */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000010, /* ( |M| ) - E,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Z : */ 0x00000001, /* ( | | ) - A,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Y" */
+            /* A : */ 0xe00e3c88, /* (B|M|E) - D, H, K, L, M, N, R, S and T */
+            /* B : */ 0x40104010, /* ( |M| ) - E, O and U */
+            /* C : */ 0x40020190, /* ( |M| ) - E, H, I and R */
+            /* D : */ 0xc0006158, /* ( |M|E) - D, E, G, I, N and O */
+            /* E : */ 0xe00e2809, /* (B|M|E) - A, D, L, N, R, S and T */
+            /* F : */ 0xc0004100, /* ( |M|E) - I and O */
+            /* G : */ 0xc0000010, /* ( |M|E) - E,  */
+            /* H : */ 0x40100010, /* ( |M| ) - E and U */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000010, /* ( |M|E) - E,  */
+            /* L : */ 0xc1204919, /* ( |M|E) - A, D, E, I, L, O, V and Y */
+            /* M : */ 0xc0004011, /* ( |M|E) - A, E and O */
+            /* N : */ 0xc24e6139, /* ( |M|E) - A, D, E, F, I, N, O, R, S, T, W and Z */
+            /* O : */ 0x60123800, /* (B|M| ) - L, M, N, R and U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc0586519, /* ( |M|E) - A, D, E, I, K, N, O, T, U and W */
+            /* S : */ 0xc00c4195, /* ( |M|E) - A, C, E, H, I, O, S and T */
+            /* T : */ 0xc0004891, /* ( |M|E) - A, E, H, L and O */
+            /* U : */ 0x20000800, /* (B| | ) - L,  */
+            /* V : */ 0x60000110, /* (B|M| ) - E and I */
+            /* W : */ 0x40004000, /* ( |M| ) - O,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40000001, /* ( |M| ) - A,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Z" */
+            /* A : */ 0xe1222d0e, /* (B|M|E) - B, C, D, I, K, L, N, R, V and Y */
+            /* B : */ 0x40000010, /* ( |M| ) - E,  */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00a0813, /* (B|M|E) - A, B, E, L, R and T */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000100, /* ( |M| ) - I,  */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xc0000010, /* ( |M|E) - E,  */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x41000101, /* ( |M| ) - A, I and Y */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0000010, /* (B|M|E) - E,  */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x40000100, /* ( |M| ) - I,  */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000001, /* ( |M| ) - A,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Z : */ 0x41000100, /* ( |M| ) - I and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ä" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ö" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ü" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        }
+    }, /* End of Enum 1 / 5 */
+    /* ------------------------------------ *
+     * --- names / all => NST_NAMES_ALL --- *
+     * ------------------------------------ */
+    {
+        {
+            /* Rules following letter "A" */
+            /* A : */ 0xe00e3c3c, /* (B|M|E) - C, D, E, F, K, L, M, N, R, S and T */
+            /* B : */ 0xe116491b, /* (B|M|E) - A, B, D, E, I, L, O, R, S, U and Y */
+            /* C : */ 0xe1134d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, R, U and Y */
+            /* D : */ 0xe35e7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* E : */ 0xe04e3cfc, /* (B|M|E) - C, D, E, F, G, H, K, L, M, N, R, S, T and W */
+            /* F : */ 0xe01a4131, /* (B|M|E) - A, E, F, I, O, R, T and U */
+            /* G : */ 0xe05679d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, S, U and W */
+            /* H : */ 0xe15e7f9b, /* (B|M|E) - A, B, D, E, H, I, J, K, L, M, N, O, R, S, T, U, W and Y */
+            /* I : */ 0xe31efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, Y and Z */
+            /* J : */ 0xc0127d19, /* ( |M|E) - A, D, E, I, K, L, M, N, O, R and U */
+            /* K : */ 0xe0144d99, /* (B|M|E) - A, D, E, H, I, K, L, O, S and U */
+            /* L : */ 0xe37cffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe31ed99f, /* (B|M|E) - A, B, C, D, E, H, I, L, M, O, P, R, S, T, U, Y and Z */
+            /* N : */ 0xe37eefff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xc0141840, /* ( |M|E) - G, L, M, S and U */
+            /* P : */ 0xe00a9991, /* (B|M|E) - A, E, H, I, L, M, P, R and T */
+            /* Q : */ 0xc0100001, /* ( |M|E) - A and U */
+            /* R : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe23ffdbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, P, Q, R, S, T, U, V and Z */
+            /* T : */ 0xe35e5fb5, /* (B|M|E) - A, C, E, F, H, I, J, K, L, M, O, R, S, T, U, W, Y and Z */
+            /* U : */ 0xe28e3c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, R, S, T, X and Z */
+            /* V : */ 0xe1324d51, /* (B|M|E) - A, E, G, I, K, L, O, R, U, V and Y */
+            /* W : */ 0xc35e6931, /* ( |M|E) - A, E, F, I, L, N, O, R, S, T, U, W, Y and Z */
+            /* X : */ 0xe0484110, /* (B|M|E) - E, I, O, T and W */
+            /* Y : */ 0xe17e7dbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, O, R, S, T, U, V, W and Y */
+            /* Z : */ 0xc2105951, /* ( |M|E) - A, E, G, I, L, M, O, U and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "B" */
+            /* A : */ 0xe13e3fdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, L, M, N, R, S, T, U, V and Y */
+            /* B : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40100100, /* ( |M| ) - I and U */
+            /* E : */ 0xe1be7fdd, /* (B|M|E) - A, C, D, E, G, H, I, J, K, L, M, N, O, R, S, T, U, V, X and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40000101, /* ( |M| ) - A and I */
+            /* I : */ 0xe12e6edf, /* (B|M|E) - A, B, C, D, E, G, H, J, K, L, N, O, R, S, T, V and Y */
+            /* J : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* K : */ 0x40000010, /* ( |M| ) - E,  */
+            /* L : */ 0xe1004111, /* (B|M|E) - A, E, I, O and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000110, /* ( |M| ) - E and I */
+            /* O : */ 0xe35e7bcf, /* (B|M|E) - A, B, C, D, G, H, I, J, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0080000, /* ( |M|E) - T,  */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x600e2c9e, /* (B|M| ) - B, C, D, E, H, K, L, N, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000100, /* ( |M| ) - I,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0022800, /* (B|M|E) - L, N and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "C" */
+            /* A : */ 0xe33ebffa, /* (B|M|E) - B, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, Y and Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40004081, /* ( |M| ) - A, H and O */
+            /* D : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* E : */ 0xe32ebc3f, /* (B|M|E) - A, B, C, D, E, F, K, L, M, N, P, R, S, T, V, Y and Z */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* H : */ 0xe15e5d19, /* (B|M|E) - A, D, E, I, K, L, M, O, R, S, T, U, W and Y */
+            /* I : */ 0xe13efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V and Y */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0xc14479b3, /* ( |M|E) - A, B, E, F, H, I, L, M, N, O, S, W and Y */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe17efd5a, /* (B|M|E) - B, D, E, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0x40004000, /* ( |M| ) - O,  */
+            /* T : */ 0xc0104101, /* ( |M|E) - A, I, O and U */
+            /* U : */ 0xe10e382a, /* (B|M|E) - B, D, F, L, M, N, R, S, T and Y */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000110, /* ( |M| ) - E and I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0023008, /* (B|M|E) - D, M, N and R */
+            /* Z : */ 0x61000010, /* (B|M| ) - E and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "D" */
+            /* A : */ 0xe1febdde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x41124010, /* ( |M| ) - E, O, R, U and Y */
+            /* C : */ 0x40000880, /* ( |M| ) - H and L */
+            /* D : */ 0xc1124111, /* ( |M|E) - A, E, I, O, R, U and Y */
+            /* E : */ 0xe3be7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, X, Y and Z */
+            /* F : */ 0x40024000, /* ( |M| ) - O and R */
+            /* G : */ 0x40100011, /* ( |M| ) - A, E and U */
+            /* H : */ 0xc0020111, /* ( |M|E) - A, E, I and R */
+            /* I : */ 0xe3bf7e5f, /* (B|M|E) - A, B, C, D, E, G, J, K, L, M, N, O, Q, R, S, T, U, V, X, Y and Z */
+            /* J : */ 0xe0104111, /* (B|M|E) - A, E, I, O and U */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0xc1000111, /* ( |M|E) - A, E, I and Y */
+            /* M : */ 0x40104101, /* ( |M| ) - A, I, O and U */
+            /* N : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* O : */ 0xe0fe7e5f, /* (B|M|E) - A, B, C, D, E, G, J, K, L, M, N, O, R, S, T, U, V, W and X */
+            /* P : */ 0x40000001, /* ( |M| ) - A,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0404091, /* ( |M|E) - A, E, H, O and W */
+            /* T : */ 0xc0120100, /* ( |M|E) - I, R and U */
+            /* U : */ 0xe20e3d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, R, S, T and Z */
+            /* V : */ 0x40000101, /* ( |M| ) - A and I */
+            /* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00c2c05, /* (B|M|E) - A, C, K, L, N, S and T */
+            /* Z : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "E" */
+            /* A : */ 0xe17ebcce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, P, R, S, T, U, V, W and Y */
+            /* B : */ 0xe0126d93, /* (B|M|E) - A, B, E, H, I, K, L, N, O, R and U */
+            /* C : */ 0xe21a5ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, M, O, R, T, U and Z */
+            /* D : */ 0xe37e7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, Y and Z */
+            /* E : */ 0xe02e3c2d, /* (B|M|E) - A, C, D, F, K, L, M, N, R, S, T and V */
+            /* F : */ 0xe00e4d35, /* (B|M|E) - A, C, E, F, I, K, L, O, R, S and T */
+            /* G : */ 0xe05a59f3, /* (B|M|E) - A, B, E, F, G, H, I, L, M, O, R, T, U and W */
+            /* H : */ 0xe31e7913, /* (B|M|E) - A, B, E, I, L, M, N, O, R, S, T, U, Y and Z */
+            /* I : */ 0xe20efeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T and Z */
+            /* J : */ 0xe0087909, /* (B|M|E) - A, D, I, L, M, N, O and T */
+            /* K : */ 0xe00e5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, S and T */
+            /* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe31edd9b, /* (B|M|E) - A, B, D, E, H, I, K, L, M, O, P, R, S, T, U, Y and Z */
+            /* N : */ 0xe37e6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe066bc6e, /* (B|M|E) - B, C, D, F, G, K, L, M, N, P, R, S, V and W */
+            /* P : */ 0xe004c191, /* (B|M|E) - A, E, H, I, O, P and S */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe35efdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* T : */ 0xe25e5bf7, /* (B|M|E) - A, B, C, E, F, G, H, I, J, L, M, O, R, S, T, U, W and Z */
+            /* U : */ 0xe28eacee, /* (B|M|E) - B, C, D, F, G, H, K, L, N, P, R, S, T, X and Z */
+            /* V : */ 0xe30e4ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, O, R, S, T, Y and Z */
+            /* W : */ 0xe10445f1, /* (B|M|E) - A, E, F, G, H, I, K, O, S and Y */
+            /* X : */ 0xc11809a1, /* ( |M|E) - A, F, H, I, L, T, U and Y */
+            /* Y : */ 0xe32c7dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, S, T, V, Y and Z */
+            /* Z : */ 0xe202011d, /* (B|M|E) - A, C, D, E, I, R and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "F" */
+            /* A : */ 0xe37e3d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, N, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40004000, /* ( |M| ) - O,  */
+            /* D : */ 0x40000001, /* ( |M| ) - A,  */
+            /* E : */ 0xe12e389d, /* (B|M|E) - A, C, D, E, H, L, M, N, R, S, T, V and Y */
+            /* F : */ 0xc10a4111, /* ( |M|E) - A, E, I, O, R, T and Y */
+            /* G : */ 0x40000001, /* ( |M| ) - A,  */
+            /* H : */ 0x40000101, /* ( |M| ) - A and I */
+            /* I : */ 0xe30f7e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, Q, R, S, T, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000011, /* ( |M| ) - A and E */
+            /* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000100, /* ( |M| ) - I,  */
+            /* O : */ 0xe05e6c1c, /* (B|M|E) - C, D, E, K, L, N, O, R, S, T, U and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe1004111, /* (B|M|E) - A, E, I, O and Y */
+            /* S : */ 0x40080001, /* ( |M| ) - A and T */
+            /* T : */ 0xc0104191, /* ( |M|E) - A, E, H, I, O and U */
+            /* U : */ 0xe0062cd5, /* (B|M|E) - A, C, E, G, H, K, L, N, R and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000100, /* ( |M| ) - I,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xa0000000, /* (B| |E) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "G" */
+            /* A : */ 0xe37e3b7b, /* (B|M|E) - A, B, D, E, F, G, I, J, L, M, N, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41104011, /* ( |M| ) - A, E, O, U and Y */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* E : */ 0xe36e799f, /* (B|M|E) - A, B, C, D, E, H, I, L, M, N, O, R, S, T, V, W, Y and Z */
+            /* F : */ 0x40024000, /* ( |M| ) - O and R */
+            /* G : */ 0xc1000111, /* ( |M|E) - A, E, I and Y */
+            /* H : */ 0xe01a4913, /* (B|M|E) - A, B, E, I, L, O, R, T and U */
+            /* I : */ 0xe33ef87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, P, R, S, T, U, V, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40104001, /* ( |M| ) - A, O and U */
+            /* N : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* O : */ 0xe05e780a, /* (B|M|E) - B, D, L, M, N, O, R, S, T, U and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60104151, /* (B|M| ) - A, E, G, I, O and U */
+            /* S : */ 0xc0084900, /* ( |M|E) - I, L, O and T */
+            /* T : */ 0x40124000, /* ( |M| ) - O, R and U */
+            /* U : */ 0xe32e3919, /* (B|M|E) - A, D, E, I, L, M, N, R, S, T, V, Y and Z */
+            /* V : */ 0x40000001, /* ( |M| ) - A,  */
+            /* W : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0000800, /* (B|M|E) - L,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "H" */
+            /* A : */ 0xe3febfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x41104011, /* ( |M| ) - A, E, O, U and Y */
+            /* C : */ 0x40000800, /* ( |M| ) - L,  */
+            /* D : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* E : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* F : */ 0x40004010, /* ( |M| ) - E and O */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40004001, /* ( |M| ) - A and O */
+            /* I : */ 0xe30efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, Y and Z */
+            /* J : */ 0x40004001, /* ( |M| ) - A and O */
+            /* K : */ 0x40000101, /* ( |M| ) - A and I */
+            /* L : */ 0xe1004191, /* (B|M|E) - A, E, H, I, O and Y */
+            /* M : */ 0xc0105111, /* ( |M|E) - A, E, I, M, O and U */
+            /* N : */ 0xc1042111, /* ( |M|E) - A, E, I, N, S and Y */
+            /* O : */ 0xe056fc5e, /* (B|M|E) - B, C, D, E, G, K, L, M, N, O, P, R, S, U and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc1004199, /* ( |M|E) - A, D, E, H, I, O and Y */
+            /* S : */ 0xc0000191, /* ( |M|E) - A, E, H and I */
+            /* T : */ 0xc1184191, /* ( |M|E) - A, E, H, I, O, T, U and Y */
+            /* U : */ 0xe18e385b, /* (B|M|E) - A, B, D, E, G, L, M, N, R, S, T, X and Y */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x61000111, /* (B|M| ) - A, E, I and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0041811, /* (B|M|E) - A, E, L, M and S */
+            /* Z : */ 0x40000001, /* ( |M| ) - A,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "I" */
+            /* A : */ 0xe23e3dec, /* (B|M|E) - C, D, F, G, H, I, K, L, M, N, R, S, T, U, V and Z */
+            /* B : */ 0xe1124113, /* (B|M|E) - A, B, E, I, O, R, U and Y */
+            /* C : */ 0xe21a5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, T, U and Z */
+            /* D : */ 0xe15e6bd9, /* (B|M|E) - A, D, E, G, H, I, J, L, N, O, R, S, T, U, W and Y */
+            /* E : */ 0xc27e3cef, /* ( |M|E) - A, B, C, D, F, G, H, K, L, M, N, R, S, T, U, V, W and Z */
+            /* F : */ 0xe21a4131, /* (B|M|E) - A, E, F, I, O, R, T, U and Z */
+            /* G : */ 0xe05a79fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, T, U and W */
+            /* H : */ 0xe0066111, /* (B|M|E) - A, E, I, N, O, R and S */
+            /* I : */ 0xc0002000, /* ( |M|E) - N,  */
+            /* J : */ 0xe0044411, /* (B|M|E) - A, E, K, O and S */
+            /* K : */ 0xe01e5d91, /* (B|M|E) - A, E, H, I, K, L, M, O, R, S, T and U */
+            /* L : */ 0xe17effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* M : */ 0xe012d5bb, /* (B|M|E) - A, B, D, E, F, H, I, K, M, O, P, R and U */
+            /* N : */ 0xe35e7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* O : */ 0xe03ea84f, /* (B|M|E) - A, B, C, D, G, L, N, P, R, S, T, U and V */
+            /* P : */ 0xe00ec111, /* (B|M|E) - A, E, I, O, P, R, S and T */
+            /* Q : */ 0xc0100000, /* ( |M|E) - U,  */
+            /* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe17eddb7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, O, P, R, S, T, U, V, W and Y */
+            /* T : */ 0xe31e7ff7, /* (B|M|E) - A, B, C, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, Y and Z */
+            /* U : */ 0xc0040802, /* ( |M|E) - B, L and S */
+            /* V : */ 0xe1004511, /* (B|M|E) - A, E, I, K, O and Y */
+            /* W : */ 0x60004011, /* (B|M| ) - A, E and O */
+            /* X : */ 0xc0084110, /* ( |M|E) - E, I, O and T */
+            /* Y : */ 0xe0007131, /* (B|M|E) - A, E, F, I, M, N and O */
+            /* Z : */ 0xe2205193, /* (B|M|E) - A, B, E, H, I, M, O, V and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "J" */
+            /* A : */ 0xe3ef3dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, Q, R, S, T, V, W, X, Y and Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40000100, /* ( |M| ) - I,  */
+            /* D : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* E : */ 0xe26efcb9, /* (B|M|E) - A, D, E, F, H, K, L, M, N, O, P, R, S, T, V, W and Z */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000001, /* ( |M| ) - A,  */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe00e380f, /* (B|M|E) - A, B, C, D, L, M, N, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004001, /* ( |M| ) - A and O */
+            /* L : */ 0x40000101, /* ( |M| ) - A and I */
+            /* M : */ 0x40000101, /* ( |M| ) - A and I */
+            /* N : */ 0x40000001, /* ( |M| ) - A,  */
+            /* O : */ 0xe3366cbf, /* (B|M|E) - A, B, C, D, E, F, H, K, L, N, O, R, S, U, V, Y and Z */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60001111, /* (B|M| ) - A, E, I and M */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0x40100000, /* ( |M| ) - U,  */
+            /* U : */ 0xe00e2c9b, /* (B|M|E) - A, B, D, E, H, K, L, N, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "K" */
+            /* A : */ 0xe34ebbff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, M, N, P, R, S, T, W, Y and Z */
+            /* B : */ 0x40100011, /* ( |M| ) - A, E and U */
+            /* C : */ 0x40100001, /* ( |M| ) - A and U */
+            /* D : */ 0x40000010, /* ( |M| ) - E,  */
+            /* E : */ 0xe32e7dbb, /* (B|M|E) - A, B, D, E, F, H, I, K, L, M, N, O, R, S, T, V, Y and Z */
+            /* F : */ 0x40024000, /* ( |M| ) - O and R */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe00e4111, /* (B|M|E) - A, E, I, O, R, S and T */
+            /* I : */ 0xe32ebe3f, /* (B|M|E) - A, B, C, D, E, F, J, K, L, M, N, P, R, S, T, V, Y and Z */
+            /* J : */ 0x60000010, /* (B|M| ) - E,  */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* L : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0x60104011, /* (B|M| ) - A, E, O and U */
+            /* O : */ 0xe176e83e, /* (B|M|E) - B, C, D, E, F, L, N, O, P, R, S, U, V, W and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x63104111, /* (B|M| ) - A, E, I, O, U, Y and Z */
+            /* S : */ 0xe0084191, /* (B|M|E) - A, E, H, I, O and T */
+            /* T : */ 0xc0004011, /* ( |M|E) - A, E and O */
+            /* U : */ 0xe00ebc0a, /* (B|M|E) - B, D, K, L, M, N, P, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0022811, /* (B|M|E) - A, E, L, N and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "L" */
+            /* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
+            /* C : */ 0x40104191, /* ( |M| ) - A, E, H, I, O and U */
+            /* D : */ 0xc15e51b3, /* ( |M|E) - A, B, E, F, H, I, M, O, R, S, T, U, W and Y */
+            /* E : */ 0xe1fe7fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, R, S, T, U, V, W, X and Y */
+            /* F : */ 0xc04641fd, /* ( |M|E) - A, C, D, E, F, G, H, I, O, R, S and W */
+            /* G : */ 0x40124191, /* ( |M| ) - A, E, H, I, O, R and U */
+            /* H : */ 0xc00a0199, /* ( |M|E) - A, D, E, H, I, R and T */
+            /* I : */ 0xe3fffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* J : */ 0x60104511, /* (B|M| ) - A, E, I, K, O and U */
+            /* K : */ 0xc04071b1, /* ( |M|E) - A, E, F, H, I, M, N, O and W */
+            /* L : */ 0xc15e51b9, /* ( |M|E) - A, D, E, F, H, I, M, O, R, S, T, U, W and Y */
+            /* M : */ 0xc1184111, /* ( |M|E) - A, E, I, O, T, U and Y */
+            /* N : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* O : */ 0xe17efdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* P : */ 0x40100190, /* ( |M| ) - E, H, I and U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* S : */ 0xc178459f, /* ( |M|E) - A, B, C, D, E, H, I, K, O, T, U, V, W and Y */
+            /* T : */ 0xc0124391, /* ( |M|E) - A, E, H, I, J, O, R and U */
+            /* U : */ 0xe22ebd3e, /* (B|M|E) - B, C, D, E, F, I, K, L, M, N, P, R, S, T, V and Z */
+            /* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0xe2ae3d3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, R, S, T, V, X and Z */
+            /* Z : */ 0xc0000111, /* ( |M|E) - A, E and I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "M" */
+            /* A : */ 0xe3be3fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, R, S, T, U, V, X, Y and Z */
+            /* B : */ 0xc0124911, /* ( |M|E) - A, E, I, L, O, R and U */
+            /* C : */ 0x60000cc4, /* (B|M| ) - C, G, H, K and L */
+            /* D : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* E : */ 0xe3ae7dfd, /* (B|M|E) - A, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, X, Y and Z */
+            /* F : */ 0x40024000, /* ( |M| ) - O and R */
+            /* G : */ 0x40000001, /* ( |M| ) - A,  */
+            /* H : */ 0x40000101, /* ( |M| ) - A and I */
+            /* I : */ 0xe30e7edd, /* (B|M|E) - A, C, D, E, G, H, J, K, L, M, N, O, R, S, T, Y and Z */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0x40000110, /* ( |M| ) - E and I */
+            /* L : */ 0x41000111, /* ( |M| ) - A, E, I and Y */
+            /* M : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
+            /* N : */ 0x40000110, /* ( |M| ) - E and I */
+            /* O : */ 0xe01e7fd8, /* (B|M|E) - D, E, G, H, I, J, K, L, M, N, O, R, S, T and U */
+            /* P : */ 0xc00e4191, /* ( |M|E) - A, E, H, I, O, R, S and T */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0184199, /* ( |M|E) - A, D, E, H, I, O, T and U */
+            /* T : */ 0x40020001, /* ( |M| ) - A and R */
+            /* U : */ 0xe20e3edb, /* (B|M|E) - A, B, D, E, G, H, J, K, L, M, N, R, S, T and Z */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e2805, /* (B|M|E) - A, C, L, N, R, S and T */
+            /* Z : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "N" */
+            /* A : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
+            /* C : */ 0xc1124d91, /* ( |M|E) - A, E, H, I, K, L, O, R, U and Y */
+            /* D : */ 0xc11e5999, /* ( |M|E) - A, D, E, H, I, L, M, O, R, S, T, U and Y */
+            /* E : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* F : */ 0x40024110, /* ( |M| ) - E, I, O and R */
+            /* G : */ 0xc17e59bb, /* ( |M|E) - A, B, D, E, F, H, I, L, M, O, R, S, T, U, V, W and Y */
+            /* H : */ 0x41004101, /* ( |M| ) - A, I, O and Y */
+            /* I : */ 0xe3bf7eff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, Q, R, S, T, U, V, X, Y and Z */
+            /* J : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* K : */ 0xc0465911, /* ( |M|E) - A, E, I, L, M, O, R, S and W */
+            /* L : */ 0x41100111, /* ( |M| ) - A, E, I, U and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0xc1144bd9, /* ( |M|E) - A, D, E, G, H, I, J, L, O, S, U and Y */
+            /* O : */ 0xe17e7937, /* (B|M|E) - A, B, C, E, F, I, L, M, N, O, R, S, T, U, V, W and Y */
+            /* P : */ 0x40000010, /* ( |M| ) - E,  */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* S : */ 0xc15ccff5, /* ( |M|E) - A, C, E, F, G, H, I, J, K, L, O, P, S, T, U, W and Y */
+            /* T : */ 0xc3564fd1, /* ( |M|E) - A, E, G, H, I, J, K, L, O, R, S, U, W, Y and Z */
+            /* U : */ 0xe00e3891, /* (B|M|E) - A, E, H, L, M, N, R, S and T */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0044c19, /* (B|M|E) - A, D, E, K, L, O and S */
+            /* Z : */ 0xc0004b11, /* ( |M|E) - A, E, I, J, L and O */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "O" */
+            /* A : */ 0xe0032c84, /* (B|M|E) - C, H, K, L, N, Q and R */
+            /* B : */ 0xe1164993, /* (B|M|E) - A, B, E, H, I, L, O, R, S, U and Y */
+            /* C : */ 0xe0084d95, /* (B|M|E) - A, C, E, H, I, K, L, O and T */
+            /* D : */ 0xe1427379, /* (B|M|E) - A, D, E, F, G, I, J, M, N, O, R, W and Y */
+            /* E : */ 0xe34a386b, /* (B|M|E) - A, B, D, F, G, L, M, N, R, T, W, Y and Z */
+            /* F : */ 0xc00a4931, /* ( |M|E) - A, E, F, I, L, O, R and T */
+            /* G : */ 0xe0124999, /* (B|M|E) - A, D, E, H, I, L, O, R and U */
+            /* H : */ 0x60063119, /* (B|M| ) - A, D, E, I, M, N, R and S */
+            /* I : */ 0xc0062415, /* ( |M|E) - A, C, E, K, N, R and S */
+            /* J : */ 0x60024d15, /* (B|M| ) - A, C, E, I, K, L, O and R */
+            /* K : */ 0xe01e5d95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, R, S, T and U */
+            /* L : */ 0xe17eff7f, /* (B|M|E) - A, B, C, D, E, F, G, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* M : */ 0xe112fd13, /* (B|M|E) - A, B, E, I, K, L, M, N, O, P, R, U and Y */
+            /* N : */ 0xe31e67df, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, N, O, R, S, T, U, Y and Z */
+            /* O : */ 0xc20ebc4a, /* ( |M|E) - B, D, G, K, L, M, N, P, R, S, T and Z */
+            /* P : */ 0xe004c191, /* (B|M|E) - A, E, H, I, O, P and S */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe17effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* S : */ 0xe17eddd7, /* (B|M|E) - A, B, C, E, G, H, I, K, L, M, O, P, R, S, T, U, V, W and Y */
+            /* T : */ 0xe04e43f1, /* (B|M|E) - A, E, F, G, H, I, J, O, R, S, T and W */
+            /* U : */ 0xe20e3dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, R, S, T and Z */
+            /* V : */ 0xe0000111, /* (B|M|E) - A, E and I */
+            /* W : */ 0xe100a91b, /* (B|M|E) - A, B, D, E, I, L, N, P and Y */
+            /* X : */ 0xe0082021, /* (B|M|E) - A, F, N and T */
+            /* Y : */ 0xc000481d, /* ( |M|E) - A, C, D, E, L and O */
+            /* Z : */ 0xe0044511, /* (B|M|E) - A, E, I, K, O and S */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "P" */
+            /* A : */ 0xe1fefdd6, /* (B|M|E) - B, C, E, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe10ebd5d, /* (B|M|E) - A, C, D, E, G, I, K, L, M, N, P, R, S, T and Y */
+            /* F : */ 0x20000010, /* (B| | ) - E,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe1026111, /* (B|M|E) - A, E, I, N, O, R and Y */
+            /* I : */ 0xe00ee81d, /* (B|M|E) - A, C, D, E, L, N, O, P, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000010, /* ( |M| ) - E,  */
+            /* L : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe016d900, /* (B|M|E) - I, L, M, O, P, R, S and U */
+            /* P : */ 0xc0004911, /* ( |M|E) - A, E, I, L and O */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc1004180, /* ( |M|E) - H, I, O and Y */
+            /* T : */ 0x40004101, /* ( |M| ) - A, I and O */
+            /* U : */ 0x60022000, /* (B|M| ) - N and R */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40004000, /* ( |M| ) - O,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60020000, /* (B|M| ) - R,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Q" */
+            /* A : */ 0x60000008, /* (B|M| ) - D,  */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60000191, /* (B|M| ) - A, E, H and I */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "R" */
+            /* A : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
+            /* C : */ 0xc1104d91, /* ( |M|E) - A, E, H, I, K, L, O, U and Y */
+            /* D : */ 0xc15e5b91, /* ( |M|E) - A, E, H, I, J, L, M, O, R, S, T, U, W and Y */
+            /* E : */ 0xe3fe7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0xc0124101, /* ( |M|E) - A, I, O, R and U */
+            /* G : */ 0xc1124991, /* ( |M|E) - A, E, H, I, L, O, R, U and Y */
+            /* H : */ 0xe0184911, /* (B|M|E) - A, E, I, L, O, T and U */
+            /* I : */ 0xe3bdfeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, S, T, U, V, X, Y and Z */
+            /* J : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* K : */ 0xc1564d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, S, U, W and Y */
+            /* L : */ 0xc11c41b3, /* ( |M|E) - A, B, E, F, H, I, O, S, T, U and Y */
+            /* M : */ 0xc11c49f1, /* ( |M|E) - A, E, F, G, H, I, L, O, S, T, U and Y */
+            /* N : */ 0xc15c49b9, /* ( |M|E) - A, D, E, F, H, I, L, O, S, T, U, W and Y */
+            /* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0xc0004091, /* ( |M|E) - A, E, H and O */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xc1145111, /* ( |M|E) - A, E, I, M, O, S, U and Y */
+            /* S : */ 0xc0184195, /* ( |M|E) - A, C, E, H, I, O, T and U */
+            /* T : */ 0xc35e7bb3, /* ( |M|E) - A, B, E, F, H, I, J, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* U : */ 0xe34ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, W, Y and Z */
+            /* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* W : */ 0x41004191, /* ( |M| ) - A, E, H, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00cfc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, S and T */
+            /* Z : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "S" */
+            /* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* C : */ 0xe05049b3, /* (B|M|E) - A, B, E, F, H, I, L, O, U and W */
+            /* D : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* E : */ 0xe3febfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* G : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* H : */ 0xe15ac933, /* (B|M|E) - A, B, E, F, I, L, O, P, R, T, U, W and Y */
+            /* I : */ 0xe3beffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, X, Y and Z */
+            /* J : */ 0x40004000, /* ( |M| ) - O,  */
+            /* K : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
+            /* L : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
+            /* M : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* N : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* O : */ 0xe11efdf2, /* (B|M|E) - B, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U and Y */
+            /* P : */ 0x61024111, /* (B|M| ) - A, E, I, O, R and Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* S : */ 0xc1004911, /* ( |M|E) - A, E, I, L, O and Y */
+            /* T : */ 0xe1527bb7, /* (B|M|E) - A, B, C, E, F, H, I, J, L, M, N, O, R, U, W and Y */
+            /* U : */ 0xe22ebdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, P, R, S, T, V and Z */
+            /* V : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe006391a, /* (B|M|E) - B, D, E, I, L, M, N, R and S */
+            /* Z : */ 0xe0080011, /* (B|M|E) - A, E and T */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "T" */
+            /* A : */ 0xe37fbffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, P, Q, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41120010, /* ( |M| ) - E, R, U and Y */
+            /* C : */ 0x40004180, /* ( |M| ) - H, I and O */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40024100, /* ( |M| ) - I, O and R */
+            /* G : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* H : */ 0xe15e5937, /* (B|M|E) - A, B, C, E, F, I, L, M, O, R, S, T, U, W and Y */
+            /* I : */ 0xe33efe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, V, Y and Z */
+            /* J : */ 0x60004011, /* (B|M| ) - A, E and O */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* L : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
+            /* M : */ 0x40104011, /* ( |M| ) - A, E, O and U */
+            /* N : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* O : */ 0xe156bf3e, /* (B|M|E) - B, C, D, E, F, I, J, K, L, M, N, P, R, S, U, W and Y */
+            /* P : */ 0x40000010, /* ( |M| ) - E,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
+            /* S : */ 0xe1004195, /* (B|M|E) - A, C, E, H, I, O and Y */
+            /* T : */ 0xc1547db1, /* ( |M|E) - A, E, F, H, I, K, L, M, N, O, S, U, W and Y */
+            /* U : */ 0xe006b86d, /* (B|M|E) - A, C, D, F, G, L, M, N, P, R and S */
+            /* V : */ 0x40000101, /* ( |M| ) - A and I */
+            /* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0062851, /* (B|M|E) - A, E, G, L, N, R and S */
+            /* Z : */ 0xc0440151, /* ( |M|E) - A, E, G, I, S and W */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "U" */
+            /* A : */ 0xc10a3818, /* ( |M|E) - D, E, L, M, N, R, T and Y */
+            /* B : */ 0xe1124993, /* (B|M|E) - A, B, E, H, I, L, O, R, U and Y */
+            /* C : */ 0xe1024f95, /* (B|M|E) - A, C, E, H, I, J, K, L, O, R and Y */
+            /* D : */ 0xe15a59db, /* (B|M|E) - A, B, D, E, G, H, I, L, M, O, R, T, U, W and Y */
+            /* E : */ 0xe20e2c12, /* (B|M|E) - B, E, K, L, N, R, S, T and Z */
+            /* F : */ 0xc0104131, /* ( |M|E) - A, E, F, I, O and U */
+            /* G : */ 0xe0124993, /* (B|M|E) - A, B, E, H, I, L, O, R and U */
+            /* H : */ 0xc00c6909, /* ( |M|E) - A, D, I, L, N, O, S and T */
+            /* I : */ 0xc00e385c, /* ( |M|E) - C, D, E, G, L, M, N, R, S and T */
+            /* J : */ 0x40000101, /* ( |M| ) - A and I */
+            /* K : */ 0xe0024191, /* (B|M|E) - A, E, H, I, O and R */
+            /* L : */ 0xe3fe5fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, O, R, S, T, U, V, W, X, Y and Z */
+            /* M : */ 0xe01af1b3, /* (B|M|E) - A, B, E, F, H, I, M, N, O, P, R, T and U */
+            /* N : */ 0xe35c6bdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, L, N, O, S, T, U, W, Y and Z */
+            /* O : */ 0xc0000800, /* ( |M|E) - L,  */
+            /* P : */ 0xe042c190, /* (B|M|E) - E, H, I, O, P, R and W */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe35f7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, Q, R, S, T, U, W, Y and Z */
+            /* S : */ 0xe31efd95, /* (B|M|E) - A, C, E, H, I, K, L, M, N, O, P, R, S, T, U, Y and Z */
+            /* T : */ 0xe27c09f5, /* (B|M|E) - A, C, E, F, G, H, I, L, S, T, U, V, W and Z */
+            /* U : */ 0x60040800, /* (B|M| ) - L and S */
+            /* V : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* W : */ 0x60000011, /* (B|M| ) - A and E */
+            /* X : */ 0xc0000800, /* ( |M|E) - L,  */
+            /* Y : */ 0xe0000841, /* (B|M|E) - A, G and L */
+            /* Z : */ 0xe1100191, /* (B|M|E) - A, E, H, I, U and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "V" */
+            /* A : */ 0xe01e39bc, /* (B|M|E) - C, D, E, F, H, I, L, M, N, R, S, T and U */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40000101, /* ( |M| ) - A and I */
+            /* D : */ 0x40000101, /* ( |M| ) - A and I */
+            /* E : */ 0xe30e7dbd, /* (B|M|E) - A, C, D, E, F, H, I, K, L, M, N, O, R, S, T, Y and Z */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000100, /* ( |M| ) - I,  */
+            /* H : */ 0x40000010, /* ( |M| ) - E,  */
+            /* I : */ 0xe33e7e5d, /* (B|M|E) - A, C, D, E, G, J, K, L, M, N, O, R, S, T, U, V, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* L : */ 0x60100101, /* (B|M| ) - A, I and U */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0023a00, /* (B|M|E) - J, L, M, N and R */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0x40000100, /* ( |M| ) - I,  */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60060000, /* (B|M| ) - R and S */
+            /* V : */ 0x40000001, /* ( |M| ) - A,  */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0002800, /* ( |M|E) - L and N */
+            /* Z : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "W" */
+            /* A : */ 0xe32e2dfc, /* (B|M|E) - C, D, E, F, G, H, I, K, L, N, R, S, T, V, Y and Z */
+            /* B : */ 0x40020000, /* ( |M| ) - R,  */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe10e794b, /* (B|M|E) - A, B, D, G, I, L, M, N, O, R, S, T and Y */
+            /* F : */ 0x40004100, /* ( |M| ) - I and O */
+            /* G : */ 0x40000010, /* ( |M| ) - E,  */
+            /* H : */ 0x60000111, /* (B|M| ) - A, E and I */
+            /* I : */ 0xe00e2cff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, N, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61000011, /* (B|M| ) - A, E and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0xc0040111, /* ( |M|E) - A, E, I and S */
+            /* O : */ 0xe0127a2a, /* (B|M|E) - B, D, F, J, L, M, N, O, R and U */
+            /* P : */ 0x40000010, /* ( |M| ) - E,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60000110, /* (B|M| ) - E and I */
+            /* S : */ 0xc0084000, /* ( |M|E) - O and T */
+            /* T : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* U : */ 0x60000800, /* (B|M| ) - L,  */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000001, /* ( |M| ) - A,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60083d16, /* (B|M| ) - B, C, E, I, K, L, M, N and T */
+            /* Z : */ 0x40000100, /* ( |M| ) - I,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "X" */
+            /* A : */ 0xe0202000, /* (B|M|E) - N and V */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x40002800, /* ( |M| ) - L and N */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe0043011, /* (B|M|E) - A, E, M, N and S */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x40000010, /* ( |M| ) - E,  */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000001, /* ( |M| ) - A,  */
+            /* O : */ 0x40002000, /* ( |M| ) - N,  */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x40104010, /* ( |M| ) - E, O and U */
+            /* U : */ 0x40040000, /* ( |M| ) - S,  */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000010, /* ( |M| ) - E,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Z : */ 0x00000001, /* ( | | ) - A,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Y" */
+            /* A : */ 0xe37ebcdc, /* (B|M|E) - C, D, E, G, H, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* C : */ 0x40020191, /* ( |M| ) - A, E, H, I and R */
+            /* D : */ 0xc0006159, /* ( |M|E) - A, D, E, G, I, N and O */
+            /* E : */ 0xe02e38ab, /* (B|M|E) - A, B, D, F, H, L, M, N, R, S, T and V */
+            /* F : */ 0xc0104110, /* ( |M|E) - E, I, O and U */
+            /* G : */ 0xc0100110, /* ( |M|E) - E, I and U */
+            /* H : */ 0x40105011, /* ( |M| ) - A, E, M, O and U */
+            /* I : */ 0xe10a3c68, /* (B|M|E) - D, F, G, K, L, M, N, R, T and Y */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000411, /* ( |M|E) - A, E and K */
+            /* L : */ 0xe1705d19, /* (B|M|E) - A, D, E, I, K, L, M, O, U, V, W and Y */
+            /* M : */ 0xc010c011, /* ( |M|E) - A, E, O, P and U */
+            /* N : */ 0xc24e6139, /* ( |M|E) - A, D, E, F, I, N, O, R, S, T, W and Z */
+            /* O : */ 0xe21e3800, /* (B|M|E) - L, M, N, R, S, T, U and Z */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc0586519, /* ( |M|E) - A, D, E, I, K, N, O, T, U and W */
+            /* S : */ 0xe20c4995, /* (B|M|E) - A, C, E, H, I, L, O, S, T and Z */
+            /* T : */ 0xc0184891, /* ( |M|E) - A, E, H, L, O, T and U */
+            /* U : */ 0x60062812, /* (B|M| ) - B, E, L, N, R and S */
+            /* V : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* W : */ 0x40004000, /* ( |M| ) - O,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x40000001, /* ( |M| ) - A,  */
+            /* Z : */ 0x40100001, /* ( |M| ) - A and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Z" */
+            /* A : */ 0xe12a3fee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, R, T, V and Y */
+            /* B : */ 0x60000110, /* (B|M| ) - E and I */
+            /* C : */ 0x40000001, /* ( |M| ) - A,  */
+            /* D : */ 0x62020111, /* (B|M| ) - A, E, I, R and Z */
+            /* E : */ 0xe12f3fbf, /* (B|M|E) - A, B, C, D, E, F, H, I, J, K, L, M, N, Q, R, S, T, V and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40000110, /* ( |M| ) - E and I */
+            /* H : */ 0x60000001, /* (B|M| ) - A,  */
+            /* I : */ 0xe12efeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, V and Y */
+            /* J : */ 0x40004001, /* ( |M| ) - A and O */
+            /* K : */ 0x40100001, /* ( |M| ) - A and U */
+            /* L : */ 0xe0100111, /* (B|M|E) - A, E, I and U */
+            /* M : */ 0x41000111, /* ( |M| ) - A, E, I and Y */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0122190, /* (B|M|E) - E, H, I, N, R and U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000001, /* ( |M| ) - A,  */
+            /* S : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60022882, /* (B|M| ) - B, H, L, N and R */
+            /* V : */ 0x60004101, /* (B|M| ) - A, I and O */
+            /* W : */ 0x60000001, /* (B|M| ) - A,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0042840, /* (B|M|E) - G, L, N and S */
+            /* Z : */ 0x41000111, /* ( |M| ) - A, E, I and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ä" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ö" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ü" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        }
+    }, /* End of Enum 2 / 5 */
+    /* ---------------------------------- *
+     * --- texts / de => NST_TEXTS_DE --- *
+     * ---------------------------------- */
+    {
+        {
+            /* Rules following letter "A" */
+            /* A : */ 0x600e2840, /* (B|M| ) - G, L, N, R, S, T */
+            /* B : */ 0xe75efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, Z, ä */
+            /* C : */ 0xe01a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U */
+            /* D : */ 0xe57e7bbb, /* (B|M|E) - A, B, D, E, F, H, I, J, L, M, N, O, R, S, T, U, V, W, Y, ä */
+            /* E : */ 0x600e0808, /* (B|M| ) - D, L, R, S, T */
+            /* F : */ 0xf00e4971, /* (B|M|E) - A, E, F, G, I, L, O, R, S, T, ü */
+            /* G : */ 0xe25e79fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, S, T, U, W, Z */
+            /* H : */ 0xe02e791b, /* (B|M|E) - A, B, D, E, I, L, M, N, O, R, S, T, V */
+            /* I : */ 0xe00e3c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, R, S, T */
+            /* J : */ 0x40004019, /* ( |M| ) - A, D, E, O */
+            /* K : */ 0xe21e4d91, /* (B|M|E) - A, E, H, I, K, L, O, R, S, T, U, Z */
+            /* L : */ 0xe77effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä */
+            /* M : */ 0xf11cfdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, S, T, U, Y, ü */
+            /* N : */ 0xef7effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö */
+            /* O : */ 0xc0068c00, /* ( |M|E) - K, L, P, R, S */
+            /* P : */ 0xe11ec9b1, /* (B|M|E) - A, E, F, H, I, L, O, P, R, S, T, U, Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U */
+            /* R : */ 0xf3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z, ü */
+            /* S : */ 0xe33efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, Y, Z */
+            /* T : */ 0xf77effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* U : */ 0xe2febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X, Z */
+            /* V : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
+            /* W : */ 0xc0004111, /* ( |M|E) - A, E, I, O */
+            /* X : */ 0xe0004111, /* (B|M|E) - A, E, I, O */
+            /* Y : */ 0xc006491b, /* ( |M|E) - A, B, D, E, I, L, O, R, S */
+            /* Z : */ 0xe2584111, /* (B|M|E) - A, E, I, O, T, U, W, Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "B" */
+            /* A : */ 0xe31ebdce, /* (B|M|E) - B, C, D, G, H, I, K, L, M, N, P, R, S, T, U, Y, Z */
+            /* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U, Y */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R, U */
+            /* E : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* F : */ 0x54024911, /* ( |M| ) - A, E, I, L, O, R, ä, ü */
+            /* G : */ 0x40020811, /* ( |M| ) - A, E, L, R */
+            /* H : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
+            /* I : */ 0xe25efc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, O, P, R, S, T, U, W, Z */
+            /* J : */ 0x40100010, /* ( |M| ) - E, U */
+            /* K : */ 0x58126801, /* ( |M| ) - A, L, N, O, R, U, ö, ü */
+            /* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* M : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* N : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* O : */ 0xe3de7bdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, L, M, N, O, R, S, T, U, W, X, Y, Z */
+            /* P : */ 0x40020001, /* ( |M| ) - A, R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
+            /* S : */ 0xc61ccd77, /* ( |M|E) - A, B, C, E, F, G, I, K, L, O, P, S, T, U, Z, ä */
+            /* T : */ 0xc0060191, /* ( |M|E) - A, E, H, I, R, S */
+            /* U : */ 0x600e3cee, /* (B|M| ) - B, C, D, F, G, H, K, L, M, N, R, S, T */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x54000111, /* ( |M| ) - A, E, I, ä, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe2080800, /* (B|M|E) - L, T, Z */
+            /* Z : */ 0x40100110, /* ( |M| ) - E, I, U */
+            /* ä : */ 0x6012280c, /* (B|M| ) - C, D, L, N, R, U */
+            /* ö : */ 0x600e00cc, /* (B|M| ) - C, D, G, H, R, S, T */
+            /* ü : */ 0x600e28e4  /* (B|M| ) - C, F, G, H, L, N, R, S, T */
+        },
+        {
+            /* Rules following letter "C" */
+            /* A : */ 0xe01eb81a, /* (B|M|E) - B, D, E, L, M, N, P, R, S, T, U */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40004181, /* ( |M| ) - A, H, I, O */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe02ebc22, /* (B|M|E) - B, F, K, L, M, N, P, R, S, T, V */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xff7efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* I : */ 0xe01e6899, /* (B|M|E) - A, D, E, H, L, N, O, R, S, T, U */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z */
+            /* L : */ 0x60104111, /* (B|M| ) - A, E, I, O, U */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe03eb84f, /* (B|M|E) - A, B, C, D, G, L, M, N, P, R, S, T, U, V */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61004111, /* (B|M| ) - A, E, I, O, Y */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x40004101, /* ( |M| ) - A, I, O */
+            /* U : */ 0x60069800, /* (B|M| ) - L, M, P, R, S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60080005, /* (B|M| ) - A, C, T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "D" */
+            /* A : */ 0xe37ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40120811, /* ( |M| ) - A, E, L, R, U */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U, Y */
+            /* E : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Z */
+            /* F : */ 0x50020911, /* ( |M| ) - A, E, I, L, R, ü */
+            /* G : */ 0x40020811, /* ( |M| ) - A, E, L, R */
+            /* H : */ 0x4c104111, /* ( |M| ) - A, E, I, O, U, ä, ö */
+            /* I : */ 0xe73efe7d, /* (B|M|E) - A, C, D, E, F, G, J, K, L, M, N, O, P, R, S, T, U, V, Y, Z, ä */
+            /* J : */ 0x60100011, /* (B|M| ) - A, E, U */
+            /* K : */ 0x40024001, /* ( |M| ) - A, O, R */
+            /* L : */ 0xc4104111, /* ( |M|E) - A, E, I, O, U, ä */
+            /* M : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
+            /* N : */ 0x40100111, /* ( |M| ) - A, E, I, U */
+            /* O : */ 0xe2febccf, /* (B|M|E) - A, B, C, D, G, H, K, L, M, N, P, R, S, T, U, V, W, X, Z */
+            /* P : */ 0x40024021, /* ( |M| ) - A, F, O, R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* S : */ 0xc47cddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W, ä */
+            /* T : */ 0xc0060191, /* ( |M|E) - A, E, H, I, R, S */
+            /* U : */ 0xe20efd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, O, P, R, S, T, Z */
+            /* V : */ 0x40004110, /* ( |M| ) - E, I, O */
+            /* W : */ 0x44000111, /* ( |M| ) - A, E, I, ä */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0042800, /* (B|M|E) - L, N, S */
+            /* Z : */ 0x40500111, /* ( |M| ) - A, E, I, U, W */
+            /* ä : */ 0x60033004, /* (B|M| ) - C, M, N, Q, R */
+            /* ö : */ 0x60060000, /* (B|M| ) - R, S */
+            /* ü : */ 0x60062000  /* (B|M| ) - N, R, S */
+        },
+        {
+            /* Rules following letter "E" */
+            /* A : */ 0xc01e3c4e, /* ( |M|E) - B, C, D, G, K, L, M, N, R, S, T, U */
+            /* B : */ 0xf61e6df3, /* (B|M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U, Z, ä, ü */
+            /* C : */ 0xe00a4d91, /* (B|M|E) - A, E, H, I, K, L, O, R, T */
+            /* D : */ 0xf75e79db, /* (B|M|E) - A, B, D, E, G, H, I, L, M, N, O, R, S, T, U, W, Y, Z, ä, ü */
+            /* E : */ 0xc04ebdea, /* ( |M|E) - B, D, F, G, H, I, K, L, M, N, P, R, S, T, W */
+            /* F : */ 0xfe3e5d73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, O, R, S, T, U, V, Z, ä, ö, ü */
+            /* G : */ 0xf65e7dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Z, ä, ü */
+            /* H : */ 0xff5efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W, Y, Z, ä, ö, ü */
+            /* I : */ 0xe27effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Z */
+            /* J : */ 0x40104001, /* ( |M| ) - A, O, U */
+            /* K : */ 0xfc1e6d11, /* (B|M|E) - A, E, I, K, L, N, O, R, S, T, U, ä, ö, ü */
+            /* L : */ 0xff7effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* M : */ 0xfe1efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, Z, ä, ö, ü */
+            /* N : */ 0xff7fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* O : */ 0xc00ebc6e, /* ( |M|E) - B, C, D, F, G, K, L, M, N, P, R, S, T */
+            /* P : */ 0xe01ec9b1, /* (B|M|E) - A, E, F, H, I, L, O, P, R, S, T, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0xff7fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* S : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* T : */ 0xff5e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Y, Z, ä, ö, ü */
+            /* U : */ 0xe25ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, W, Z */
+            /* V : */ 0xe8004111, /* (B|M|E) - A, E, I, O, ö */
+            /* W : */ 0xfc104111, /* (B|M|E) - A, E, I, O, U, ä, ö, ü */
+            /* X : */ 0xe21cd593, /* (B|M|E) - A, B, E, H, I, K, M, O, P, S, T, U, Z */
+            /* Y : */ 0xe004399a, /* (B|M|E) - B, D, E, H, I, L, M, N, S */
+            /* Z : */ 0xd6504111, /* ( |M|E) - A, E, I, O, U, W, Z, ä, ü */
+            /* ä : */ 0x40000080, /* ( |M| ) - H */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x40000002  /* ( |M| ) - B */
+        },
+        {
+            /* Rules following letter "F" */
+            /* A : */ 0xe3be3dde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, R, S, T, U, V, X, Y, Z */
+            /* B : */ 0x40024911, /* ( |M| ) - A, E, I, L, O, R */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x40020000, /* ( |M| ) - R */
+            /* E : */ 0xe21e3dfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, R, S, T, U, Z */
+            /* F : */ 0xd45eedd3, /* ( |M|E) - A, B, E, G, H, I, K, L, N, O, P, R, S, T, U, W, ä, ü */
+            /* G : */ 0x40020991, /* ( |M| ) - A, E, H, I, L, R */
+            /* H : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
+            /* I : */ 0xe28e6c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, N, O, R, S, T, X, Z */
+            /* J : */ 0x60004000, /* (B|M| ) - O */
+            /* K : */ 0x40024801, /* ( |M| ) - A, L, O, R */
+            /* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* M : */ 0x50004111, /* ( |M| ) - A, E, I, O, ü */
+            /* N : */ 0x40100111, /* ( |M| ) - A, E, I, U */
+            /* O : */ 0xe01e6c84, /* (B|M|E) - C, H, K, L, N, O, R, S, T, U */
+            /* P : */ 0x40020000, /* ( |M| ) - R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* S : */ 0xc44c95f7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, M, P, S, T, W, ä */
+            /* T : */ 0xc05eddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W */
+            /* U : */ 0x600e38c4, /* (B|M| ) - C, G, H, L, M, N, R, S, T */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x44000111, /* ( |M| ) - A, E, I, ä */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40100110, /* ( |M| ) - E, I, U */
+            /* ä : */ 0x6016288c, /* (B|M| ) - C, D, H, L, N, R, S, U */
+            /* ö : */ 0x60020088, /* (B|M| ) - D, H, R */
+            /* ü : */ 0x600e38c0  /* (B|M| ) - G, H, L, M, N, R, S, T */
+        },
+        {
+            /* Rules following letter "G" */
+            /* A : */ 0xe23eb96a, /* (B|M|E) - B, D, F, G, I, L, M, N, P, R, S, T, U, V, Z */
+            /* B : */ 0x40024811, /* ( |M| ) - A, E, L, O, R */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0xc0020011, /* ( |M|E) - A, E, R */
+            /* E : */ 0xe67fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Z, ä */
+            /* F : */ 0x54020911, /* ( |M| ) - A, E, I, L, R, ä, ü */
+            /* G : */ 0xc0024910, /* ( |M|E) - E, I, L, O, R */
+            /* H : */ 0xe0104111, /* (B|M|E) - A, E, I, O, U */
+            /* I : */ 0xea1efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, Z, ö */
+            /* J : */ 0x44000000, /* ( |M| ) - ä */
+            /* K : */ 0x40024011, /* ( |M| ) - A, E, O, R */
+            /* L : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
+            /* M : */ 0x50104111, /* ( |M| ) - A, E, I, O, U, ü */
+            /* N : */ 0x70104111, /* (B|M| ) - A, E, I, O, U, ü */
+            /* O : */ 0xe01eb85a, /* (B|M|E) - B, D, E, G, L, M, N, P, R, S, T, U */
+            /* P : */ 0x40020801, /* ( |M| ) - A, L, R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* S : */ 0xd67ffdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Z, ä, ü */
+            /* T : */ 0xc0124091, /* ( |M|E) - A, E, H, O, R, U */
+            /* U : */ 0x600e3915, /* (B|M| ) - A, C, E, I, L, M, N, R, S, T */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60009000, /* (B|M| ) - M, P */
+            /* Z : */ 0x40100010, /* ( |M| ) - E, U */
+            /* ä : */ 0x60162002, /* (B|M| ) - B, N, R, S, U */
+            /* ö : */ 0x600e2008, /* (B|M| ) - D, N, R, S, T */
+            /* ü : */ 0x600a2800  /* (B|M| ) - L, N, R, T */
+        },
+        {
+            /* Rules following letter "H" */
+            /* A : */ 0xe37ebfff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R, U */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x40024111, /* ( |M| ) - A, E, I, O, R */
+            /* E : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
+            /* F : */ 0x54124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ü */
+            /* G : */ 0x40020911, /* ( |M| ) - A, E, I, L, R */
+            /* H : */ 0x44004111, /* ( |M| ) - A, E, I, O, ä */
+            /* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, Z */
+            /* J : */ 0x40000001, /* ( |M| ) - A */
+            /* K : */ 0x44126911, /* ( |M| ) - A, E, I, L, N, O, R, U, ä */
+            /* L : */ 0xde7eddfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Z, ä, ö, ü */
+            /* M : */ 0xdc1c4913, /* ( |M|E) - A, B, E, I, L, O, S, T, U, ä, ö, ü */
+            /* N : */ 0xdc5c5ff7, /* ( |M|E) - A, B, C, E, F, G, H, I, J, K, L, M, O, S, T, U, W, ä, ö, ü */
+            /* O : */ 0xe07efdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W */
+            /* P : */ 0x40124821, /* ( |M| ) - A, F, L, O, R, U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xd77efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* S : */ 0xd65eddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Z, ä, ü */
+            /* T : */ 0xd27efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ü */
+            /* U : */ 0xe00eb8eb, /* (B|M|E) - A, B, D, F, G, H, L, M, N, P, R, S, T */
+            /* V : */ 0x40004010, /* ( |M| ) - E, O */
+            /* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe40e984b, /* (B|M|E) - A, B, D, G, L, M, P, R, S, T, ä */
+            /* Z : */ 0x40100111, /* ( |M| ) - A, E, I, U */
+            /* ä : */ 0x601e7cac, /* (B|M| ) - C, D, F, H, K, L, M, N, O, R, S, T, U */
+            /* ö : */ 0x6006a8a6, /* (B|M| ) - B, C, F, H, L, N, P, R, S */
+            /* ü : */ 0x600ea8e6  /* (B|M| ) - B, C, F, G, H, L, N, P, R, S, T */
+        },
+        {
+            /* Rules following letter "I" */
+            /* A : */ 0xe23ebc6e, /* (B|M|E) - B, C, D, F, G, K, L, M, N, P, R, S, T, U, V, Z */
+            /* B : */ 0xf15e4917, /* (B|M|E) - A, B, C, E, I, L, O, R, S, T, U, W, Y, ü */
+            /* C : */ 0xe0184591, /* (B|M|E) - A, E, H, I, K, O, T, U */
+            /* D : */ 0xe13e7dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, Y */
+            /* E : */ 0xc27ebdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Z */
+            /* F : */ 0xe01e49b1, /* (B|M|E) - A, E, F, H, I, L, O, R, S, T, U */
+            /* G : */ 0xe25efff3, /* (B|M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W, Z */
+            /* H : */ 0xe01e2911, /* (B|M|E) - A, E, I, L, N, R, S, T, U */
+            /* I : */ 0x40002010, /* ( |M| ) - E, N */
+            /* J : */ 0xc0004011, /* ( |M|E) - A, E, O */
+            /* K : */ 0xec5eddbb, /* (B|M|E) - A, B, D, E, F, H, I, K, L, M, O, P, R, S, T, U, W, ä, ö */
+            /* L : */ 0xe67effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä */
+            /* M : */ 0xe65cfd73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, N, O, P, S, T, U, W, Z, ä */
+            /* N : */ 0xff7fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* O : */ 0xe2aebc4f, /* (B|M|E) - A, B, C, D, G, K, L, M, N, P, R, S, T, V, X, Z */
+            /* P : */ 0xc01ec9b1, /* ( |M|E) - A, E, F, H, I, L, O, P, R, S, T, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0xe01efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U */
+            /* S : */ 0xe77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä */
+            /* T : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* U : */ 0x40043000, /* ( |M| ) - M, N, S */
+            /* V : */ 0xe07ecd73, /* (B|M|E) - A, B, E, F, G, I, K, L, O, P, R, S, T, U, V, W */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* X : */ 0xc0080110, /* ( |M|E) - E, I, T */
+            /* Y : */ 0x40000011, /* ( |M| ) - A, E */
+            /* Z : */ 0xe21c4593, /* (B|M|E) - A, B, E, H, I, K, O, S, T, U, Z */
+            /* ä : */ 0x40020000, /* ( |M| ) - R */
+            /* ö : */ 0x40040000, /* ( |M| ) - S */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "J" */
+            /* A : */ 0xe236bccc, /* (B|M|E) - C, D, G, H, K, L, M, N, P, R, S, U, V, Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00e3c09, /* (B|M|E) - A, D, K, L, M, N, R, S, T */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe01628cf, /* (B|M|E) - A, B, C, D, G, H, L, N, R, S, U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x6006a84e, /* (B|M| ) - B, C, D, G, L, N, P, R, S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x600000c0, /* (B|M| ) - G, H */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x60002008  /* (B|M| ) - D, N */
+        },
+        {
+            /* Rules following letter "K" */
+            /* A : */ 0xe33effef, /* (B|M|E) - A, B, C, D, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, Y, Z */
+            /* B : */ 0x40020911, /* ( |M| ) - A, E, I, L, R */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x40004000, /* ( |M| ) - O */
+            /* E : */ 0xe13ebdfa, /* (B|M|E) - B, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, Y */
+            /* F : */ 0x44120911, /* ( |M| ) - A, E, I, L, R, U, ä */
+            /* G : */ 0x40020011, /* ( |M| ) - A, E, R */
+            /* H : */ 0x60004011, /* (B|M| ) - A, E, O */
+            /* I : */ 0xe30eb87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, P, R, S, T, Y, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R, U */
+            /* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* M : */ 0x44000011, /* ( |M| ) - A, E, ä */
+            /* N : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* O : */ 0xe27efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z */
+            /* P : */ 0x40024900, /* ( |M| ) - I, L, O, R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
+            /* S : */ 0xc43cddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, S, T, U, V, ä */
+            /* T : */ 0xd03649f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, R, S, U, V, ü */
+            /* U : */ 0xe00eb9c6, /* (B|M|E) - B, C, G, H, I, L, M, N, P, R, S, T */
+            /* V : */ 0x40004010, /* ( |M| ) - E, O */
+            /* W : */ 0x54000111, /* ( |M| ) - A, E, I, ä, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0020800, /* (B|M|E) - L, R */
+            /* Z : */ 0x40100111, /* ( |M| ) - A, E, I, U */
+            /* ä : */ 0x60163820, /* (B|M| ) - F, L, M, N, R, S, U */
+            /* ö : */ 0x6002b80c, /* (B|M| ) - C, D, L, M, N, P, R */
+            /* ü : */ 0x60063886  /* (B|M| ) - B, C, H, L, M, N, R, S */
+        },
+        {
+            /* Rules following letter "L" */
+            /* A : */ 0xe3feffee, /* (B|M|E) - B, C, D, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
+            /* B : */ 0xdc7e5dfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, R, S, T, U, V, W, ä, ö, ü */
+            /* C : */ 0x40000181, /* ( |M| ) - A, H, I */
+            /* D : */ 0xc67e79fb, /* ( |M|E) - A, B, D, E, F, G, H, I, L, M, N, O, R, S, T, U, V, W, Z, ä */
+            /* E : */ 0xe1fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y */
+            /* F : */ 0xdc1e5991, /* ( |M|E) - A, E, H, I, L, M, O, R, S, T, U, ä, ö, ü */
+            /* G : */ 0xc41e4911, /* ( |M|E) - A, E, I, L, O, R, S, T, U, ä */
+            /* H : */ 0x4c004111, /* ( |M| ) - A, E, I, O, ä, ö */
+            /* I : */ 0xe2bffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, X, Z */
+            /* J : */ 0x60100001, /* (B|M| ) - A, U */
+            /* K : */ 0xdd1e7911, /* ( |M|E) - A, E, I, L, M, N, O, R, S, T, U, Y, ä, ö, ü */
+            /* L : */ 0xd77ef5ff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* M : */ 0xd45c451b, /* ( |M|E) - A, B, D, E, I, K, O, S, T, U, W, ä, ü */
+            /* N : */ 0xc0104119, /* ( |M|E) - A, D, E, I, O, U */
+            /* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
+            /* P : */ 0x401a49b1, /* ( |M| ) - A, E, F, H, I, L, O, R, T, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* S : */ 0xd57eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Y, ä, ü */
+            /* T : */ 0xdf7efdf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* U : */ 0xe2aefd7e, /* (B|M|E) - B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V, X, Z */
+            /* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* W : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe24ebc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, P, R, S, T, W, Z */
+            /* Z : */ 0xd05cc9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, P, S, T, U, W, ü */
+            /* ä : */ 0x601e70ec, /* (B|M| ) - C, D, F, G, H, M, N, O, R, S, T, U */
+            /* ö : */ 0x604c88ee, /* (B|M| ) - B, C, D, F, G, H, L, P, S, T, W */
+            /* ü : */ 0x600cb0ee  /* (B|M| ) - B, C, D, F, G, H, M, N, P, S, T */
+        },
+        {
+            /* Rules following letter "M" */
+            /* A : */ 0xe39effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, X, Y, Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R, U */
+            /* C : */ 0x40000081, /* ( |M| ) - A, H */
+            /* D : */ 0xc4160111, /* ( |M|E) - A, E, I, R, S, U, ä */
+            /* E : */ 0xe31ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, Y, Z */
+            /* F : */ 0x54024911, /* ( |M| ) - A, E, I, L, O, R, ä, ü */
+            /* G : */ 0x40020011, /* ( |M| ) - A, E, R */
+            /* H : */ 0x44004111, /* ( |M| ) - A, E, I, O, ä */
+            /* I : */ 0xe39e7cfd, /* (B|M|E) - A, C, D, E, F, G, H, K, L, M, N, O, R, S, T, U, X, Y, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x44124811, /* ( |M| ) - A, E, L, O, R, U, ä */
+            /* L : */ 0x4c104111, /* ( |M| ) - A, E, I, O, U, ä, ö */
+            /* M : */ 0xc31e6df3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U, Y, Z */
+            /* N : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* O : */ 0xe29efdde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, O, P, R, S, T, U, X, Z */
+            /* P : */ 0xc01e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T, U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* S : */ 0xc45eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, ä */
+            /* T : */ 0xc0160991, /* ( |M|E) - A, E, H, I, L, R, S, U */
+            /* U : */ 0x600e3ced, /* (B|M| ) - A, C, D, F, G, H, K, L, M, N, R, S, T */
+            /* V : */ 0x40004010, /* ( |M| ) - E, O */
+            /* W : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e4c10, /* (B|M|E) - E, K, L, O, R, S, T */
+            /* Z : */ 0x40100111, /* ( |M| ) - A, E, I, U */
+            /* ä : */ 0x6016288d, /* (B|M| ) - A, C, D, H, L, N, R, S, U */
+            /* ö : */ 0x604268ca, /* (B|M| ) - B, D, G, H, L, N, O, R, W */
+            /* ü : */ 0x600e288c  /* (B|M| ) - C, D, H, L, N, R, S, T */
+        },
+        {
+            /* Rules following letter "N" */
+            /* A : */ 0xe37ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y, Z */
+            /* B : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
+            /* C : */ 0xc0004191, /* ( |M|E) - A, E, H, I, O */
+            /* D : */ 0xd77effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* E : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
+            /* F : */ 0x5e1e4911, /* ( |M| ) - A, E, I, L, O, R, S, T, U, Z, ä, ö, ü */
+            /* G : */ 0xd67efdf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ü */
+            /* H : */ 0x5d104111, /* ( |M| ) - A, E, I, O, U, Y, ä, ö, ü */
+            /* I : */ 0xe2befcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, X, Z */
+            /* J : */ 0x44100011, /* ( |M| ) - A, E, U, ä */
+            /* K : */ 0xde5ef9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W, Z, ä, ö, ü */
+            /* L : */ 0x4c104111, /* ( |M| ) - A, E, I, O, U, ä, ö */
+            /* M : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* N : */ 0xc77e4dff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, O, R, S, T, U, V, W, Y, Z, ä */
+            /* O : */ 0xe2febd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, P, R, S, T, U, V, W, X, Z */
+            /* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* S : */ 0xdf7effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* T : */ 0xdf7efffb, /* ( |M|E) - A, B, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* U : */ 0xe00ebd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, P, R, S, T */
+            /* V : */ 0x48004111, /* ( |M| ) - A, E, I, O, ö */
+            /* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0041800, /* (B|M|E) - L, M, S */
+            /* Z : */ 0xdf7efff3, /* ( |M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* ä : */ 0x60169886, /* (B|M| ) - B, C, H, L, M, P, R, S, U */
+            /* ö : */ 0x602e880c, /* (B|M| ) - C, D, L, P, R, S, T, V */
+            /* ü : */ 0x600a8062  /* (B|M| ) - B, F, G, P, R, T */
+        },
+        {
+            /* Rules following letter "O" */
+            /* A : */ 0xc01e3c0e, /* ( |M|E) - B, C, D, K, L, M, N, R, S, T, U */
+            /* B : */ 0xe11e4b1b, /* (B|M|E) - A, B, D, E, I, J, L, O, R, S, T, U, Y */
+            /* C : */ 0x61000495, /* (B|M| ) - A, C, E, H, K, Y */
+            /* D : */ 0xe15e4119, /* (B|M|E) - A, D, E, I, O, R, S, T, U, W, Y */
+            /* E : */ 0xe00e2828, /* (B|M|E) - D, F, L, N, R, S, T */
+            /* F : */ 0xe00e4931, /* (B|M|E) - A, E, F, I, L, O, R, S, T */
+            /* G : */ 0xe01e7953, /* (B|M|E) - A, B, E, G, I, L, M, N, O, R, S, T, U */
+            /* H : */ 0xe50e7911, /* (B|M|E) - A, E, I, L, M, N, O, R, S, T, Y, ä */
+            /* I : */ 0xc00e2c0c, /* ( |M|E) - C, D, K, L, N, R, S, T */
+            /* J : */ 0x40000011, /* ( |M| ) - A, E */
+            /* K : */ 0xe21e4d11, /* (B|M|E) - A, E, I, K, L, O, R, S, T, U, Z */
+            /* L : */ 0xe33cfd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, S, T, U, V, Y, Z */
+            /* M : */ 0xed3ef573, /* (B|M|E) - A, B, E, F, G, I, K, M, N, O, P, R, S, T, U, V, Y, ä, ö */
+            /* N : */ 0xe77effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä */
+            /* O : */ 0x400ebc48, /* ( |M| ) - D, G, K, L, M, N, P, R, S, T */
+            /* P : */ 0xe51ecdb1, /* (B|M|E) - A, E, F, H, I, K, L, O, P, R, S, T, U, Y, ä */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* S : */ 0xe75efdf7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, Z, ä */
+            /* T : */ 0xe35eddf3, /* (B|M|E) - A, B, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Y, Z */
+            /* U : */ 0xe02eb96f, /* (B|M|E) - A, B, C, D, F, G, I, L, M, N, P, R, S, T, V */
+            /* V : */ 0x60004111, /* (B|M| ) - A, E, I, O */
+            /* W : */ 0xc0042b11, /* ( |M|E) - A, E, I, J, L, N, S */
+            /* X : */ 0xe1000111, /* (B|M|E) - A, E, I, Y */
+            /* Y : */ 0xc0000011, /* ( |M|E) - A, E */
+            /* Z : */ 0x65004111, /* (B|M| ) - A, E, I, O, Y, ä */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "P" */
+            /* A : */ 0xe23ebc4d, /* (B|M|E) - A, C, D, G, K, L, M, N, P, R, S, T, U, V, Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe21ead5d, /* (B|M|E) - A, C, D, E, G, I, K, L, N, P, R, S, T, U, Z */
+            /* F : */ 0xf45e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, ä, ü */
+            /* G : */ 0x40000010, /* ( |M| ) - E */
+            /* H : */ 0xe51a4911, /* (B|M|E) - A, E, I, L, O, R, T, U, Y, ä */
+            /* I : */ 0xe21efc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, R, S, T, U, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000001, /* ( |M| ) - A */
+            /* L : */ 0x74104111, /* (B|M| ) - A, E, I, O, U, ä, ü */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x60004010, /* (B|M| ) - E, O */
+            /* O : */ 0xe0cefd5c, /* (B|M|E) - C, D, E, G, I, K, L, M, N, O, P, R, S, T, W, X */
+            /* P : */ 0xc11e4d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, S, T, U, Y */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* S : */ 0xe108c115, /* (B|M|E) - A, C, E, I, O, P, T, Y */
+            /* T : */ 0xc0144911, /* ( |M|E) - A, E, I, L, O, S, U */
+            /* U : */ 0x620eb82e, /* (B|M| ) - B, C, D, F, L, M, N, P, R, S, T, Z */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60020800, /* (B|M| ) - L, R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x600aa18c, /* (B|M| ) - C, D, H, I, N, P, R, T */
+            /* ö : */ 0x60000402, /* (B|M| ) - B, K */
+            /* ü : */ 0x60020800  /* (B|M| ) - L, R */
+        },
+        {
+            /* Rules following letter "Q" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x64004111, /* (B|M| ) - A, E, I, O, ä */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "R" */
+            /* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
+            /* B : */ 0xdc1e4953, /* ( |M|E) - A, B, E, G, I, L, O, R, S, T, U, ä, ö, ü */
+            /* C : */ 0x40104591, /* ( |M| ) - A, E, H, I, K, O, U */
+            /* D : */ 0xdd5efdfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, ä, ö, ü */
+            /* E : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z */
+            /* F : */ 0xdc1e6911, /* ( |M|E) - A, E, I, L, N, O, R, S, T, U, ä, ö, ü */
+            /* G : */ 0xdc5e6db3, /* ( |M|E) - A, B, E, F, H, I, K, L, N, O, R, S, T, U, W, ä, ö, ü */
+            /* H : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
+            /* I : */ 0xe3bcfe7f, /* (B|M|E) - A, B, C, D, E, F, G, J, K, L, M, N, O, P, S, T, U, V, X, Y, Z */
+            /* J : */ 0x44100001, /* ( |M| ) - A, U, ä */
+            /* K : */ 0xde5e7dd3, /* ( |M|E) - A, B, E, G, H, I, K, L, M, N, O, R, S, T, U, W, Z, ä, ö, ü */
+            /* L : */ 0xcc144111, /* ( |M|E) - A, E, I, O, S, U, ä, ö */
+            /* M : */ 0xde5c49f7, /* ( |M|E) - A, B, C, E, F, G, H, I, L, O, S, T, U, W, Z, ä, ö, ü */
+            /* N : */ 0xc67eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Z, ä */
+            /* O : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y, Z */
+            /* P : */ 0x401e49b1, /* ( |M| ) - A, E, F, H, I, L, O, R, S, T, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0xd51c6dd1, /* ( |M|E) - A, E, G, H, I, K, L, N, O, S, T, U, Y, ä, ü */
+            /* S : */ 0xdf5eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Y, Z, ä, ö, ü */
+            /* T : */ 0xdf7effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* U : */ 0xe20ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, Z */
+            /* V : */ 0x48004111, /* ( |M| ) - A, E, I, O, ö */
+            /* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc00ce801, /* ( |M|E) - A, L, N, O, P, S, T */
+            /* Z : */ 0xde5cddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, S, T, U, W, Z, ä, ö, ü */
+            /* ä : */ 0x623ebcee, /* (B|M| ) - B, C, D, F, G, H, K, L, M, N, P, R, S, T, U, V, Z */
+            /* ö : */ 0x600eb8ae, /* (B|M| ) - B, C, D, F, H, L, M, N, P, R, S, T */
+            /* ü : */ 0x600cb8ee  /* (B|M| ) - B, C, D, F, G, H, L, M, N, P, S, T */
+        },
+        {
+            /* Rules following letter "S" */
+            /* A : */ 0xe1bebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, X, Y */
+            /* B : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
+            /* C : */ 0x60024181, /* (B|M| ) - A, H, I, O, R */
+            /* D : */ 0x44124111, /* ( |M| ) - A, E, I, O, R, U, ä */
+            /* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z */
+            /* F : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
+            /* G : */ 0x54124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ü */
+            /* H : */ 0xfd104111, /* (B|M|E) - A, E, I, O, U, Y, ä, ö, ü */
+            /* I : */ 0xe23efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, Z */
+            /* J : */ 0x40100001, /* ( |M| ) - A, U */
+            /* K : */ 0xfd126911, /* (B|M|E) - A, E, I, L, N, O, R, U, Y, ä, ö, ü */
+            /* L : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* M : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* N : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
+            /* O : */ 0xe2febcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, P, R, S, T, U, V, W, X, Z */
+            /* P : */ 0x7c1649b1, /* (B|M| ) - A, E, F, H, I, L, O, R, S, U, ä, ö, ü */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
+            /* S : */ 0xd77afdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, T, U, V, W, Y, Z, ä, ü */
+            /* T : */ 0xff7effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ö, ü */
+            /* U : */ 0xe00ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T */
+            /* V : */ 0x60004111, /* (B|M| ) - A, E, I, O */
+            /* W : */ 0x7c104111, /* (B|M| ) - A, E, I, O, U, ä, ö, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe006b804, /* (B|M|E) - C, L, M, N, P, R, S */
+            /* Z : */ 0x65504111, /* (B|M| ) - A, E, I, O, U, W, Y, ä */
+            /* ä : */ 0x601e3cc6, /* (B|M| ) - B, C, G, H, K, L, M, N, R, S, T, U */
+            /* ö : */ 0x600028a0, /* (B|M| ) - F, H, L, N */
+            /* ü : */ 0x6004208e  /* (B|M| ) - B, C, D, H, N, S */
+        },
+        {
+            /* Rules following letter "T" */
+            /* A : */ 0xe3bebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, X, Y, Z */
+            /* B : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
+            /* C : */ 0x40104080, /* ( |M| ) - H, O, U */
+            /* D : */ 0x54124111, /* ( |M| ) - A, E, I, O, R, U, ä, ü */
+            /* E : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Z */
+            /* F : */ 0x5c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö, ü */
+            /* G : */ 0x44024911, /* ( |M| ) - A, E, I, L, O, R, ä */
+            /* H : */ 0xfd127911, /* (B|M|E) - A, E, I, L, M, N, O, R, U, Y, ä, ö, ü */
+            /* I : */ 0xee3fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, Z, ä, ö */
+            /* J : */ 0x64100011, /* (B|M| ) - A, E, U, ä */
+            /* K : */ 0x4c124911, /* ( |M| ) - A, E, I, L, O, R, U, ä, ö */
+            /* L : */ 0xcc104111, /* ( |M|E) - A, E, I, O, U, ä, ö */
+            /* M : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* N : */ 0x44104111, /* ( |M| ) - A, E, I, O, U, ä */
+            /* O : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Z */
+            /* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0x7d104111, /* (B|M| ) - A, E, I, O, U, Y, ä, ö, ü */
+            /* S : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* T : */ 0xd776fdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, U, V, W, Y, Z, ä, ü */
+            /* U : */ 0xe00ef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S, T */
+            /* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* W : */ 0x5c104111, /* ( |M| ) - A, E, I, O, U, ä, ö, ü */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0029800, /* (B|M|E) - L, M, P, R */
+            /* Z : */ 0xd15efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y, ü */
+            /* ä : */ 0x601e38ee, /* (B|M| ) - B, C, D, F, G, H, L, M, N, R, S, T, U */
+            /* ö : */ 0x600ea006, /* (B|M| ) - B, C, N, P, R, S, T */
+            /* ü : */ 0x600a3886  /* (B|M| ) - B, C, H, L, M, N, R, T */
+        },
+        {
+            /* Rules following letter "U" */
+            /* A : */ 0xc00e2c08, /* ( |M|E) - D, K, L, N, R, S, T */
+            /* B : */ 0xf03e6f93, /* (B|M|E) - A, B, E, H, I, J, K, L, N, O, R, S, T, U, V, ü */
+            /* C : */ 0x40004595, /* ( |M| ) - A, C, E, H, I, K, O */
+            /* D : */ 0xd4564959, /* ( |M|E) - A, D, E, G, I, L, O, R, S, U, W, ä, ü */
+            /* E : */ 0xe00e3906, /* (B|M|E) - B, C, I, L, M, N, R, S, T */
+            /* F : */ 0xf65efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Z, ä, ü */
+            /* G : */ 0xc61e79f3, /* ( |M|E) - A, B, E, F, G, H, I, L, M, N, O, R, S, T, U, Z, ä */
+            /* H : */ 0xfc167911, /* (B|M|E) - A, E, I, L, M, N, O, R, S, U, ä, ö, ü */
+            /* I : */ 0xc22e285c, /* ( |M|E) - C, D, E, G, L, N, R, S, T, V, Z */
+            /* J : */ 0x40000001, /* ( |M| ) - A */
+            /* K : */ 0xdc1a6d11, /* ( |M|E) - A, E, I, K, L, N, O, R, T, U, ä, ö, ü */
+            /* L : */ 0xfe7efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ö, ü */
+            /* M : */ 0xf67efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ü */
+            /* N : */ 0xf67efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z, ä, ü */
+            /* O : */ 0x400e0800, /* ( |M| ) - L, R, S, T */
+            /* P : */ 0xc01ec9b1, /* ( |M|E) - A, E, F, H, I, L, O, P, R, S, T, U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U */
+            /* R : */ 0xf77efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y, Z, ä, ü */
+            /* S : */ 0xe67ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Z, ä */
+            /* T : */ 0xe27efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Z */
+            /* U : */ 0x40003000, /* ( |M| ) - M, N */
+            /* V : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* W : */ 0x54104111, /* ( |M| ) - A, E, I, O, U, ä, ü */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0xd6584113, /* ( |M|E) - A, B, E, I, O, T, U, W, Z, ä, ü */
+            /* ä : */ 0x40000800, /* ( |M| ) - L */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "V" */
+            /* A : */ 0xe00e3dc8, /* (B|M|E) - D, G, H, I, K, L, M, N, R, S, T */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe08e2d4d, /* (B|M|E) - A, C, D, G, I, K, L, N, R, S, T, X */
+            /* F : */ 0x40004000, /* ( |M| ) - O */
+            /* G : */ 0x40000010, /* ( |M| ) - E */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe22e6c5f, /* (B|M|E) - A, B, C, D, E, G, K, L, N, O, R, S, T, V, Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004000, /* ( |M| ) - O */
+            /* L : */ 0x60000101, /* (B|M| ) - A, I */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe00a2d40, /* (B|M|E) - G, I, K, L, N, R, T */
+            /* P : */ 0x40020000, /* ( |M| ) - R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000100, /* ( |M| ) - I */
+            /* S : */ 0x40080000, /* ( |M| ) - T */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60021800, /* (B|M| ) - L, M, R */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x60080000, /* (B|M| ) - T */
+            /* ö : */ 0x60000840, /* (B|M| ) - G, L */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "W" */
+            /* A : */ 0xe10ebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00e39ee, /* (B|M|E) - B, C, D, F, G, H, I, L, M, N, R, S, T */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* I : */ 0x600ebc5c, /* (B|M| ) - C, D, E, G, K, L, M, N, P, R, S, T */
+            /* J : */ 0x40000010, /* ( |M| ) - E */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x60000011, /* (B|M| ) - A, E */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* O : */ 0x600278c6, /* (B|M| ) - B, C, G, H, L, M, N, O, R */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60000001, /* (B|M| ) - A */
+            /* S : */ 0x40000410, /* ( |M| ) - E, K */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x600e2804, /* (B|M| ) - C, L, N, R, S, T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x600e38c4, /* (B|M| ) - C, G, H, L, M, N, R, S, T */
+            /* ö : */ 0x60021884, /* (B|M| ) - C, H, L, M, R */
+            /* ü : */ 0x600e2884  /* (B|M| ) - C, H, L, N, R, S, T */
+        },
+        {
+            /* Rules following letter "X" */
+            /* A : */ 0x60003800, /* (B|M| ) - L, M, N */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe0023c00, /* (B|M|E) - K, L, M, N, R */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40000001, /* ( |M| ) - A */
+            /* I : */ 0x40247c19, /* ( |M| ) - A, D, E, K, L, M, N, O, S, V */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40024000, /* ( |M| ) - O, R */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x400a2000, /* ( |M| ) - N, R, T */
+            /* P : */ 0x40024811, /* ( |M| ) - A, E, L, O, R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0xc0120110, /* ( |M|E) - E, I, R, U */
+            /* U : */ 0x40000011, /* ( |M| ) - A, E */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x60000808, /* (B|M| ) - D, L */
+            /* Z : */ 0x40000010, /* ( |M| ) - E */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Y" */
+            /* A : */ 0xe2063c0c, /* (B|M|E) - C, D, K, L, M, N, R, S, Z */
+            /* B : */ 0x40124011, /* ( |M| ) - A, E, O, R, U */
+            /* C : */ 0x40000890, /* ( |M| ) - E, H, L */
+            /* D : */ 0xc0020111, /* ( |M|E) - A, E, I, R */
+            /* E : */ 0xe00e2808, /* (B|M|E) - D, L, N, R, S, T */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x40024100, /* ( |M| ) - I, O, R */
+            /* H : */ 0x40000001, /* ( |M| ) - A */
+            /* I : */ 0xe0002800, /* (B|M|E) - L, N */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004810, /* ( |M| ) - E, L, O */
+            /* L : */ 0xc0244955, /* ( |M|E) - A, C, E, G, I, L, O, S, V */
+            /* M : */ 0xc010f113, /* ( |M|E) - A, B, E, I, M, N, O, P, U */
+            /* N : */ 0xc008451d, /* ( |M|E) - A, C, D, E, I, K, O, T */
+            /* O : */ 0xe01c2040, /* (B|M|E) - G, N, S, T, U */
+            /* P : */ 0xc01e6190, /* ( |M|E) - E, H, I, N, O, R, S, T, U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x401a4111, /* ( |M| ) - A, E, I, O, R, T, U */
+            /* S : */ 0xc00c0115, /* ( |M|E) - A, C, E, I, S, T */
+            /* T : */ 0xc0004190, /* ( |M|E) - E, H, I, O */
+            /* U : */ 0x60022000, /* (B|M| ) - N, R */
+            /* V : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* W : */ 0x40004000, /* ( |M| ) - O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40000011, /* ( |M| ) - A, E */
+            /* ä : */ 0x40002000, /* ( |M| ) - N */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Z" */
+            /* A : */ 0xe01abdee, /* (B|M|E) - B, C, D, F, G, H, I, K, L, M, N, P, R, T, U */
+            /* B : */ 0x50120911, /* ( |M| ) - A, E, I, L, R, U, ü */
+            /* C : */ 0x40000080, /* ( |M| ) - H */
+            /* D : */ 0x40000110, /* ( |M| ) - E, I */
+            /* E : */ 0xe11ebdaf, /* (B|M|E) - A, B, C, D, F, H, I, K, L, M, N, P, R, S, T, U, Y */
+            /* F : */ 0x44024811, /* ( |M| ) - A, E, L, O, R, ä */
+            /* G : */ 0x40020011, /* ( |M| ) - A, E, R */
+            /* H : */ 0x40004011, /* ( |M| ) - A, E, O */
+            /* I : */ 0xe93efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, Y, ö */
+            /* J : */ 0x40000001, /* ( |M| ) - A */
+            /* K : */ 0x48124101, /* ( |M| ) - A, I, O, R, U, ö */
+            /* L : */ 0x40004111, /* ( |M| ) - A, E, I, O */
+            /* M : */ 0x40000111, /* ( |M| ) - A, E, I */
+            /* N : */ 0x40000001, /* ( |M| ) - A */
+            /* O : */ 0xe00ee964, /* (B|M|E) - C, F, G, I, L, N, O, P, R, S, T */
+            /* P : */ 0x40120820, /* ( |M| ) - F, L, R, U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000011, /* ( |M| ) - A, E */
+            /* S : */ 0x40088115, /* ( |M| ) - A, C, E, I, P, T */
+            /* T : */ 0xc0020891, /* ( |M|E) - A, E, H, L, R */
+            /* U : */ 0xe66fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, V, W, Z, ä */
+            /* V : */ 0x40004010, /* ( |M| ) - E, O */
+            /* W : */ 0x6c100111, /* (B|M| ) - A, E, I, U, ä, ö */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x600c9c00, /* (B|M| ) - K, L, M, P, S, T */
+            /* Z : */ 0x40104111, /* ( |M| ) - A, E, I, O, U */
+            /* ä : */ 0x60102080, /* (B|M| ) - H, N, U */
+            /* ö : */ 0x60040840, /* (B|M| ) - G, L, S */
+            /* ü : */ 0x60022044  /* (B|M| ) - C, G, N, R */
+        },
+        {
+            /* Rules following letter "ä" */
+            /* A : */ 0x40002000, /* ( |M| ) - N */
+            /* B : */ 0x40080110, /* ( |M| ) - E, I, T */
+            /* C : */ 0x40000480, /* ( |M| ) - H, K */
+            /* D : */ 0x40080915, /* ( |M| ) - A, C, E, I, L, T */
+            /* E : */ 0x40022000, /* ( |M| ) - N, R */
+            /* F : */ 0x40080930, /* ( |M| ) - E, F, I, L, T */
+            /* G : */ 0x61182910, /* (B|M| ) - E, I, L, N, T, U, Y */
+            /* H : */ 0x600a3910, /* (B|M| ) - E, I, L, M, N, R, T */
+            /* I : */ 0x40040000, /* ( |M| ) - S */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40100010, /* ( |M| ) - E, U */
+            /* L : */ 0x420c083e, /* ( |M| ) - B, C, D, E, F, L, S, T, Z */
+            /* M : */ 0x4008d911, /* ( |M| ) - A, E, I, L, M, O, P, T */
+            /* N : */ 0xc20c6558, /* ( |M|E) - D, E, G, I, K, N, O, S, T, Z */
+            /* O : */ 0x40000840, /* ( |M| ) - G, L */
+            /* P : */ 0x40008021, /* ( |M| ) - A, F, P */
+            /* Q : */ 0x60100000, /* (B|M| ) - U */
+            /* R : */ 0xe25e9d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, P, R, S, T, U, W, Z */
+            /* S : */ 0x601c0114, /* (B|M| ) - C, E, I, S, T, U */
+            /* T : */ 0xe20c4590, /* (B|M|E) - E, H, I, K, O, S, T, Z */
+            /* U : */ 0x620eb87e, /* (B|M| ) - B, C, D, E, F, G, L, M, N, P, R, S, T, Z */
+            /* V : */ 0x40000010, /* ( |M| ) - E */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40000110, /* ( |M| ) - E, I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ö" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x40000810, /* ( |M| ) - E, L */
+            /* C : */ 0x40000480, /* ( |M| ) - H, K */
+            /* D : */ 0x60000110, /* (B|M| ) - E, I */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x60000830, /* (B|M| ) - E, F, L */
+            /* G : */ 0x40000810, /* ( |M| ) - E, L */
+            /* H : */ 0x40123810, /* ( |M| ) - E, L, M, N, R, U */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x60004010, /* (B|M| ) - E, O */
+            /* L : */ 0xe2000c3a, /* (B|M|E) - B, D, E, F, K, L, Z */
+            /* M : */ 0x40181110, /* ( |M| ) - E, I, M, T, U */
+            /* N : */ 0xc01c2954, /* ( |M|E) - C, E, G, I, L, N, S, T, U */
+            /* O : */ 0x40008000, /* ( |M| ) - P */
+            /* P : */ 0x40048020, /* ( |M| ) - F, P, S */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc01eb57a, /* ( |M|E) - B, D, E, F, G, I, K, M, N, P, R, S, T, U */
+            /* S : */ 0xe01c0914, /* (B|M|E) - C, E, I, L, S, T, U */
+            /* T : */ 0x42180114, /* ( |M| ) - C, E, I, T, U, Z */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x40020010, /* ( |M| ) - E, R */
+            /* W : */ 0x40000010, /* ( |M| ) - E */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ü" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x60160810, /* (B|M| ) - E, L, R, S, U */
+            /* C : */ 0x40000480, /* ( |M| ) - H, K */
+            /* D : */ 0x40444111, /* ( |M| ) - A, E, I, O, S, W */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x40180030, /* ( |M| ) - E, F, T, U */
+            /* G : */ 0x40180952, /* ( |M| ) - B, E, G, I, L, T, U */
+            /* H : */ 0x400e3a12, /* ( |M| ) - B, E, J, L, M, N, R, S, T */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0xc00c8810, /* ( |M|E) - E, L, P, S, T */
+            /* M : */ 0xc0009810, /* ( |M|E) - E, L, M, P */
+            /* N : */ 0xc204247c, /* ( |M|E) - C, D, E, F, G, K, N, S, Z */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x40008020, /* ( |M| ) - F, P */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc24e5d7e, /* ( |M|E) - B, C, D, E, F, G, I, K, L, M, O, R, S, T, W, Z */
+            /* S : */ 0x400c0114, /* ( |M| ) - C, E, I, S, T */
+            /* T : */ 0xc20c0910, /* ( |M|E) - E, I, L, S, T, Z */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        }
+    }, /* End of Enum 3 / 5 */
+    /* ---------------------------------- *
+     * --- texts / en => NST_TEXTS_EN --- *
+     * ---------------------------------- */
+    {
+        {
+            /* Rules following letter "A" */
+            /* A : */ 0x60020800, /* (B|M| ) - L and R */
+            /* B : */ 0xe1166b9b, /* (B|M|E) - A, B, D, E, H, I, J, L, N, O, R, S, U and Y */
+            /* C : */ 0xe11f4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, R, S, T, U and Y */
+            /* D : */ 0xe17efbff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* E : */ 0xe01e784d, /* (B|M|E) - A, C, D, G, L, M, N, O, R, S, T and U */
+            /* F : */ 0xe00a4931, /* (B|M|E) - A, E, F, I, L, O, R and T */
+            /* G : */ 0xe01679d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, S and U */
+            /* H : */ 0xe0145911, /* (B|M|E) - A, E, I, L, M, O, S and U */
+            /* I : */ 0xe02ebc4f, /* (B|M|E) - A, B, C, D, G, K, L, M, N, P, R, S, T and V */
+            /* J : */ 0x40004001, /* ( |M| ) - A and O */
+            /* K : */ 0xe11449b1, /* (B|M|E) - A, E, F, H, I, L, O, S, U and Y */
+            /* L : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* M : */ 0xe116f913, /* (B|M|E) - A, B, E, I, L, M, N, O, P, R, S, U and Y */
+            /* N : */ 0xe3fd6fff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, N, O, Q, S, T, U, V, W, X, Y and Z */
+            /* O : */ 0xc0020800, /* ( |M|E) - L and R */
+            /* P : */ 0xe11ec991, /* (B|M|E) - A, E, H, I, L, O, P, R, S, T, U and Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0xe17fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
+            /* S : */ 0xe11ddd95, /* (B|M|E) - A, C, E, H, I, K, L, M, O, P, Q, S, T, U and Y */
+            /* T : */ 0xe35e7db7, /* (B|M|E) - A, B, C, E, F, H, I, K, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* U : */ 0xe0aeb87e, /* (B|M|E) - B, C, D, E, F, G, L, M, N, P, R, S, T, V and X */
+            /* V : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
+            /* W : */ 0xe10e6d3b, /* (B|M|E) - A, B, D, E, F, I, K, L, N, O, R, S, T and Y */
+            /* X : */ 0xe0084111, /* (B|M|E) - A, E, I, O and T */
+            /* Y : */ 0xe04e793f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, R, S, T and W */
+            /* Z : */ 0xe2005111, /* (B|M|E) - A, E, I, M, O and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "B" */
+            /* A : */ 0xe15ebdee, /* (B|M|E) - B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, U, W and Y */
+            /* B : */ 0xc1064911, /* ( |M|E) - A, E, I, L, O, R, S and Y */
+            /* C : */ 0x40004001, /* ( |M| ) - A and O */
+            /* D : */ 0x40100100, /* ( |M| ) - I and U */
+            /* E : */ 0xe16e7dfd, /* (B|M|E) - A, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, V, W and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40004000, /* ( |M| ) - O,  */
+            /* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x40100010, /* ( |M| ) - E and U */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* N : */ 0x40004010, /* ( |M| ) - E and O */
+            /* O : */ 0xe1def9df, /* (B|M|E) - A, B, C, D, E, G, H, I, L, M, N, O, P, R, S, T, U, W, X and Y */
+            /* P : */ 0x40020000, /* ( |M| ) - R,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0184114, /* ( |M|E) - C, E, I, O, T and U */
+            /* T : */ 0x40020811, /* ( |M| ) - A, E, L and R */
+            /* U : */ 0x630e7d6e, /* (B|M| ) - B, C, D, F, G, I, K, L, M, N, O, R, S, T, Y and Z */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x40000010, /* ( |M| ) - E,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e0810, /* (B|M|E) - E, L, R, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "C" */
+            /* A : */ 0xe13ebffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
+            /* D : */ 0x40004000, /* ( |M| ) - O,  */
+            /* E : */ 0xe14ef93f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, P, R, S, T, W and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe15ef93b, /* (B|M|E) - A, B, D, E, F, I, L, M, N, O, P, R, S, T, U, W and Y */
+            /* I : */ 0xe23ef87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc15ef9bf, /* ( |M|E) - A, B, C, D, E, F, H, I, L, M, N, O, P, R, S, T, U, W and Y */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x40000010, /* ( |M| ) - E,  */
+            /* O : */ 0xe1fff9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, Q, R, S, T, U, V, W, X and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0004000, /* ( |M|E) - O,  */
+            /* T : */ 0xc1167931, /* ( |M|E) - A, E, F, I, L, M, N, O, R, S, U and Y */
+            /* U : */ 0x600ef93f, /* (B|M| ) - A, B, C, D, E, F, I, L, M, N, O, P, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00af807, /* (B|M|E) - A, B, C, L, M, N, O, P, R and T */
+            /* Z : */ 0x20000010, /* (B| | ) - E,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "D" */
+            /* A : */ 0xe37eb9fe, /* (B|M|E) - B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
+            /* C : */ 0x40100881, /* ( |M| ) - A, H, L and U */
+            /* D : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
+            /* E : */ 0xe1feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
+            /* F : */ 0x40104101, /* ( |M| ) - A, I, O and U */
+            /* G : */ 0x41001111, /* ( |M| ) - A, E, I, M and Y */
+            /* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* I : */ 0xe2befc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, X and Z */
+            /* J : */ 0x40104001, /* ( |M| ) - A, O and U */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* N : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* O : */ 0xe2fef95d, /* (B|M|E) - A, C, D, E, G, I, L, M, N, O, P, R, S, T, U, V, W, X and Z */
+            /* P : */ 0x40004101, /* ( |M| ) - A, I and O */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc048d995, /* ( |M|E) - A, C, E, H, I, L, M, O, P, T and W */
+            /* T : */ 0xc0000080, /* ( |M|E) - H,  */
+            /* U : */ 0xe00efd77, /* (B|M|E) - A, B, C, E, F, G, I, K, L, M, N, O, P, R, S and T */
+            /* V : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00c3911, /* (B|M|E) - A, E, I, L, M, N, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "E" */
+            /* A : */ 0xe27ebcee, /* (B|M|E) - B, C, D, F, G, H, K, L, M, N, P, R, S, T, U, V, W and Z */
+            /* B : */ 0xe0164913, /* (B|M|E) - A, B, E, I, L, O, R, S and U */
+            /* C : */ 0xe11a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xe156797f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, R, S, U, W and Y */
+            /* E : */ 0xe26ebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, V, W and Z */
+            /* F : */ 0xe11e4931, /* (B|M|E) - A, E, F, I, L, O, R, S, T, U and Y */
+            /* G : */ 0xe11679d3, /* (B|M|E) - A, B, E, G, H, I, L, M, N, O, R, S, U and Y */
+            /* H : */ 0xc1124111, /* ( |M|E) - A, E, I, O, R, U and Y */
+            /* I : */ 0xe22e7c6d, /* (B|M|E) - A, C, D, F, G, K, L, M, N, O, R, S, T, V and Z */
+            /* J : */ 0x60104011, /* (B|M| ) - A, E, O and U */
+            /* K : */ 0xe0042911, /* (B|M|E) - A, E, I, L, N and S */
+            /* L : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* M : */ 0xe114f913, /* (B|M|E) - A, B, E, I, L, M, N, O, P, S, U and Y */
+            /* N : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe05eb86c, /* (B|M|E) - C, D, F, G, L, M, N, P, R, S, T, U and W */
+            /* P : */ 0xe11ec991, /* (B|M|E) - A, E, H, I, L, O, P, R, S, T, U and Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe15ddd9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, M, O, P, Q, S, T, U, W and Y */
+            /* T : */ 0xe35e69b7, /* (B|M|E) - A, B, C, E, F, H, I, L, N, O, R, S, T, U, W, Y and Z */
+            /* U : */ 0xe02eb85e, /* (B|M|E) - B, C, D, E, G, L, M, N, P, R, S, T and V */
+            /* V : */ 0xe1024111, /* (B|M|E) - A, E, I, O, R and Y */
+            /* W : */ 0xe106699b, /* (B|M|E) - A, B, D, E, H, I, L, N, O, R, S and Y */
+            /* X : */ 0xe018c195, /* (B|M|E) - A, C, E, H, I, O, P, T and U */
+            /* Y : */ 0xe004f91f, /* (B|M|E) - A, B, C, D, E, I, L, M, N, O, P and S */
+            /* Z : */ 0xe2004111, /* (B|M|E) - A, E, I, O and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "F" */
+            /* A : */ 0xe1fe395e, /* (B|M|E) - B, C, D, E, G, I, L, M, N, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00e391f, /* (B|M|E) - A, B, C, D, E, I, L, M, N, R, S and T */
+            /* F : */ 0xc1166911, /* ( |M|E) - A, E, I, L, N, O, R, S, U and Y */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe28e687f, /* (B|M|E) - A, B, C, D, E, F, G, L, N, O, R, S, T, X and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000010, /* ( |M| ) - E,  */
+            /* O : */ 0xe0d67955, /* (B|M|E) - A, C, E, G, I, L, M, N, O, R, S, U, W and X */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0xc1044190, /* ( |M|E) - E, H, I, O, S and Y */
+            /* U : */ 0x600e3854, /* (B|M| ) - C, E, G, L, M, N, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0000100, /* ( |M|E) - I,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "G" */
+            /* A : */ 0xe37eb95e, /* (B|M|E) - B, C, D, E, G, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40004001, /* ( |M| ) - A and O */
+            /* E : */ 0xe14e79bb, /* (B|M|E) - A, B, D, E, F, H, I, L, M, N, O, R, S, T, W and Y */
+            /* F : */ 0x40104000, /* ( |M| ) - O and U */
+            /* G : */ 0xc1064911, /* ( |M|E) - A, E, I, L, O, R, S and Y */
+            /* H : */ 0xe00c6913, /* (B|M|E) - A, B, E, I, L, N, O, S and T */
+            /* I : */ 0xe23e787f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, R, S, T, U, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0xe0145111, /* (B|M|E) - A, E, I, M, O, S and U */
+            /* O : */ 0xe07e795b, /* (B|M|E) - A, B, D, E, G, I, L, M, N, O, R, S, T, U, V and W */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* S : */ 0xc0080080, /* ( |M|E) - H and T */
+            /* T : */ 0x40004080, /* ( |M| ) - H and O */
+            /* U : */ 0x600e7911, /* (B|M| ) - A, E, I, L, M, N, O, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe002b000, /* (B|M|E) - M, N, P and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "H" */
+            /* A : */ 0xe37ebd7e, /* (B|M|E) - B, C, D, E, F, G, I, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x40104011, /* ( |M| ) - A, E, O and U */
+            /* C : */ 0x40000801, /* ( |M| ) - A and L */
+            /* D : */ 0x40024000, /* ( |M| ) - O and R */
+            /* E : */ 0xe1fff97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, Q, R, S, T, U, V, W, X and Y */
+            /* F : */ 0x40104100, /* ( |M| ) - I, O and U */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40004000, /* ( |M| ) - O,  */
+            /* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* M : */ 0xc0004111, /* ( |M|E) - A, E, I and O */
+            /* N : */ 0xc0044111, /* ( |M|E) - A, E, I, O and S */
+            /* O : */ 0xe17efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* P : */ 0x40004000, /* ( |M| ) - O,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0080080, /* ( |M|E) - H and T */
+            /* T : */ 0xc11469b1, /* ( |M|E) - A, E, F, H, I, L, N, O, S, U and Y */
+            /* U : */ 0xe00e387f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e985b, /* (B|M|E) - A, B, D, E, G, L, M, P, R, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "I" */
+            /* A : */ 0xe00eb8de, /* (B|M|E) - B, C, D, E, G, H, L, M, N, P, R, S and T */
+            /* B : */ 0xe1164913, /* (B|M|E) - A, B, E, I, L, O, R, S, U and Y */
+            /* C : */ 0xe11e6d95, /* (B|M|E) - A, C, E, H, I, K, L, N, O, R, S, T, U and Y */
+            /* D : */ 0xe15e6959, /* (B|M|E) - A, D, E, G, I, L, N, O, R, S, T, U, W and Y */
+            /* E : */ 0xc07e3d6e, /* ( |M|E) - B, C, D, F, G, I, K, L, M, N, R, S, T, U, V and W */
+            /* F : */ 0xc11a4931, /* ( |M|E) - A, E, F, I, L, O, R, T, U and Y */
+            /* G : */ 0xe05679d1, /* (B|M|E) - A, E, G, H, I, L, M, N, O, R, S, U and W */
+            /* H : */ 0x40000100, /* ( |M| ) - I,  */
+            /* I : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0xc0044591, /* ( |M|E) - A, E, H, I, K, O and S */
+            /* L : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* M : */ 0xe014f913, /* (B|M|E) - A, B, E, I, L, M, N, O, P, S and U */
+            /* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe01eb84c, /* (B|M|E) - C, D, G, L, M, N, P, R, S, T and U */
+            /* P : */ 0xc01ed993, /* ( |M|E) - A, B, E, H, I, L, M, O, P, R, S, T and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe17efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* S : */ 0xe15fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, W and Y */
+            /* T : */ 0xe35e79b7, /* (B|M|E) - A, B, C, E, F, H, I, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* U : */ 0x40041000, /* ( |M| ) - M and S */
+            /* V : */ 0xe1204111, /* (B|M|E) - A, E, I, O, V and Y */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* X : */ 0xc0084110, /* ( |M|E) - E, I, O and T */
+            /* Y : */ 0x40000001, /* ( |M| ) - A,  */
+            /* Z : */ 0xe2004111, /* (B|M|E) - A, E, I, O and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "J" */
+            /* A : */ 0xe367bdde, /* (B|M|E) - B, C, D, E, G, H, I, K, L, M, N, P, Q, R, S, V, W, Y and Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x604e783d, /* (B|M| ) - A, C, D, E, F, L, M, N, O, R, S, T and W */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe0083842, /* (B|M|E) - B, G, L, M, N and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe1362d9f, /* (B|M|E) - A, B, C, D, E, H, I, K, L, N, R, S, U, V and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x602e3949, /* (B|M| ) - A, D, G, I, L, M, N, R, S, T and V */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "K" */
+            /* A : */ 0xe14ef9de, /* (B|M|E) - B, C, D, E, G, H, I, L, M, N, O, P, R, S, T, W and Y */
+            /* B : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x40000001, /* ( |M| ) - A,  */
+            /* E : */ 0xe16e795b, /* (B|M|E) - A, B, D, E, G, I, L, M, N, O, R, S, T, V, W and Y */
+            /* F : */ 0x40104101, /* ( |M| ) - A, I, O and U */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x60004011, /* (B|M| ) - A, E and O */
+            /* I : */ 0xe00eb81d, /* (B|M|E) - A, C, D, E, L, M, N, P, R, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* O : */ 0xe076a820, /* (B|M|E) - F, L, N, P, R, S, U, V and W */
+            /* P : */ 0x40004000, /* ( |M| ) - O,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc0085190, /* ( |M|E) - E, H, I, M, O and T */
+            /* T : */ 0x40004001, /* ( |M| ) - A and O */
+            /* U : */ 0x60029800, /* (B|M| ) - L, M, P and R */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0020801, /* (B|M|E) - A, L and R */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "L" */
+            /* A : */ 0xe3fefdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x41124111, /* ( |M| ) - A, E, I, O, R, U and Y */
+            /* C : */ 0x41104191, /* ( |M| ) - A, E, H, I, O, U and Y */
+            /* D : */ 0xc15e69b3, /* ( |M|E) - A, B, E, F, H, I, L, N, O, R, S, T, U, W and Y */
+            /* E : */ 0xe1feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X and Y */
+            /* F : */ 0xc01e4915, /* ( |M|E) - A, C, E, I, L, O, R, S, T and U */
+            /* G : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* H : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* I : */ 0xe3fffc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc1040111, /* ( |M|E) - A, E, I, S and Y */
+            /* L : */ 0xc156f1bf, /* ( |M|E) - A, B, C, D, E, F, H, I, M, N, O, P, R, S, U, W and Y */
+            /* M : */ 0xc0044111, /* ( |M|E) - A, E, I, O and S */
+            /* N : */ 0x40000011, /* ( |M| ) - A and E */
+            /* O : */ 0xe17ff9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
+            /* P : */ 0xc00c4991, /* ( |M|E) - A, E, H, I, L, O, S and T */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x41004100, /* ( |M| ) - I, O and Y */
+            /* S : */ 0xc1084193, /* ( |M|E) - A, B, E, H, I, O, T and Y */
+            /* T : */ 0xc3164191, /* ( |M|E) - A, E, H, I, O, R, S, U, Y and Z */
+            /* U : */ 0xe0aefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V and X */
+            /* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* W : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe24eb9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, W and Z */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "M" */
+            /* A : */ 0xe3febfde, /* (B|M|E) - B, C, D, E, G, H, I, J, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0xc1164911, /* ( |M|E) - A, E, I, L, O, R, S, U and Y */
+            /* C : */ 0x60000c45, /* (B|M| ) - A, C, G, K and L */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe3cefd5f, /* (B|M|E) - A, B, C, D, E, G, I, K, L, M, N, O, P, R, S, T, W, X, Y and Z */
+            /* F : */ 0x40004100, /* ( |M| ) - I and O */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe29efc7d, /* (B|M|E) - A, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, X and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x41004110, /* ( |M| ) - E, I, O and Y */
+            /* M : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
+            /* N : */ 0xc0004111, /* ( |M|E) - A, E, I and O */
+            /* O : */ 0xe27efddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Z */
+            /* P : */ 0xc11e4991, /* ( |M|E) - A, E, H, I, L, O, R, S, T, U and Y */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40004000, /* ( |M| ) - O,  */
+            /* S : */ 0xc0084190, /* ( |M|E) - E, H, I, O and T */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x620e387c, /* (B|M| ) - C, D, E, F, G, L, M, N, R, S, T and Z */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e6815, /* (B|M|E) - A, C, E, L, N, O, R, S and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "N" */
+            /* A : */ 0xe37ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* C : */ 0xc11a4d91, /* ( |M|E) - A, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xc15ef9bf, /* ( |M|E) - A, B, C, D, E, F, H, I, L, M, N, O, P, R, S, T, U, W and Y */
+            /* E : */ 0xe3fff9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0xc15e79bb, /* ( |M|E) - A, B, D, E, F, H, I, L, M, N, O, R, S, T, U, W and Y */
+            /* H : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* I : */ 0xe2bffcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, Q, R, S, T, U, V, X and Z */
+            /* J : */ 0x40104011, /* ( |M| ) - A, E, O and U */
+            /* K : */ 0xc1046931, /* ( |M|E) - A, E, F, I, L, N, O, S and Y */
+            /* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* N : */ 0xc1144111, /* ( |M|E) - A, E, I, O, S, U and Y */
+            /* O : */ 0xe3fef97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc17cddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W and Y */
+            /* T : */ 0xc35679b1, /* ( |M|E) - A, E, F, H, I, L, M, N, O, R, S, U, W, Y and Z */
+            /* U : */ 0xe00e7d7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, R, S and T */
+            /* V : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* W : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0xe0445901, /* (B|M|E) - A, I, L, M, O, S and W */
+            /* Z : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "O" */
+            /* A : */ 0xe08ebc6c, /* (B|M|E) - C, D, F, G, K, L, M, N, P, R, S, T and X */
+            /* B : */ 0xe11e4b1b, /* (B|M|E) - A, B, D, E, I, J, L, O, R, S, T, U and Y */
+            /* C : */ 0xe11a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xe15659ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, O, R, S, U, W and Y */
+            /* E : */ 0xe03e790f, /* (B|M|E) - A, B, C, D, I, L, M, N, O, R, S, T, U and V */
+            /* F : */ 0xe0184931, /* (B|M|E) - A, E, F, I, L, O, T and U */
+            /* G : */ 0xe11e79d9, /* (B|M|E) - A, D, E, G, H, I, L, M, N, O, R, S, T, U and Y */
+            /* H : */ 0x60006111, /* (B|M| ) - A, E, I, N and O */
+            /* I : */ 0xe00e284c, /* (B|M|E) - C, D, G, L, N, R, S and T */
+            /* J : */ 0x40004010, /* ( |M| ) - E and O */
+            /* K : */ 0xe1144d11, /* (B|M|E) - A, E, I, K, L, O, S, U and Y */
+            /* L : */ 0xe17cfd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, S, T, U, V, W and Y */
+            /* M : */ 0xe114f933, /* (B|M|E) - A, B, E, F, I, L, M, N, O, P, S, U and Y */
+            /* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe22ebd7c, /* (B|M|E) - C, D, E, F, G, I, K, L, M, N, P, R, S, T, V and Z */
+            /* P : */ 0xe11edd91, /* (B|M|E) - A, E, H, I, K, L, M, O, P, R, S, T, U and Y */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe17ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W and Y */
+            /* S : */ 0xe15cd997, /* (B|M|E) - A, B, C, E, H, I, L, M, O, P, S, T, U, W and Y */
+            /* T : */ 0xe11ed997, /* (B|M|E) - A, B, C, E, H, I, L, M, O, P, R, S, T, U and Y */
+            /* U : */ 0xe02ea97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, N, P, R, S, T and V */
+            /* V : */ 0xe0004111, /* (B|M|E) - A, E, I and O */
+            /* W : */ 0xe10ef9bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, N, O, P, R, S, T and Y */
+            /* X : */ 0xe1080111, /* (B|M|E) - A, E, I, T and Y */
+            /* Y : */ 0xc004591d, /* ( |M|E) - A, C, D, E, I, L, M, O and S */
+            /* Z : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "P" */
+            /* A : */ 0xe1feb9de, /* (B|M|E) - B, C, D, E, G, H, I, L, M, N, P, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x40004000, /* ( |M| ) - O,  */
+            /* C : */ 0x40004000, /* ( |M| ) - O,  */
+            /* D : */ 0x40000001, /* ( |M| ) - A,  */
+            /* E : */ 0xe34efd7d, /* (B|M|E) - A, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, W, Y and Z */
+            /* F : */ 0x40100000, /* ( |M| ) - U,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe11e4911, /* (B|M|E) - A, E, I, L, O, R, S, T, U and Y */
+            /* I : */ 0xe01ffc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, Q, R, S, T and U */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0x40004010, /* ( |M| ) - E and O */
+            /* O : */ 0xe0fefd5c, /* (B|M|E) - C, D, E, G, I, K, L, M, N, O, P, R, S, T, U, V, W and X */
+            /* P : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xe1184191, /* (B|M|E) - A, E, H, I, O, T, U and Y */
+            /* T : */ 0xe1164191, /* (B|M|E) - A, E, H, I, O, R, S, U and Y */
+            /* U : */ 0x600eb87e, /* (B|M| ) - B, C, D, E, F, G, L, M, N, P, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000001, /* ( |M| ) - A,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00a0900, /* (B|M|E) - I, L, R and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Q" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "R" */
+            /* A : */ 0xe3fffffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0xc1164911, /* ( |M|E) - A, E, I, L, O, R, S, U and Y */
+            /* C : */ 0xc11a4991, /* ( |M|E) - A, E, H, I, L, O, R, T, U and Y */
+            /* D : */ 0xc15e6993, /* ( |M|E) - A, B, E, H, I, L, N, O, R, S, T, U, W and Y */
+            /* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0xc0104911, /* ( |M|E) - A, E, I, L, O and U */
+            /* G : */ 0xc1164991, /* ( |M|E) - A, E, H, I, L, O, R, S, U and Y */
+            /* H : */ 0x61184111, /* (B|M| ) - A, E, I, O, T, U and Y */
+            /* I : */ 0xe2bdfc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, Q, S, T, U, V, X and Z */
+            /* J : */ 0x40104010, /* ( |M| ) - E, O and U */
+            /* K : */ 0xc1445991, /* ( |M|E) - A, E, H, I, L, M, O, S, W and Y */
+            /* L : */ 0xc1144119, /* ( |M|E) - A, D, E, I, O, S, U and Y */
+            /* M : */ 0xc1144911, /* ( |M|E) - A, E, I, L, O, S, U and Y */
+            /* N : */ 0xc11c59b3, /* ( |M|E) - A, B, E, F, H, I, L, M, O, S, T, U and Y */
+            /* O : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0xc01e4991, /* ( |M|E) - A, E, H, I, L, O, R, S, T and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xc1104191, /* ( |M|E) - A, E, H, I, O, U and Y */
+            /* S : */ 0xc058d595, /* ( |M|E) - A, C, E, H, I, K, M, O, P, T, U and W */
+            /* T : */ 0xc35679b7, /* ( |M|E) - A, B, C, E, F, H, I, L, M, N, O, R, S, U, W, Y and Z */
+            /* U : */ 0xe00eb97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, P, R, S and T */
+            /* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* W : */ 0x41024191, /* ( |M| ) - A, E, H, I, O, R and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe04cf95f, /* (B|M|E) - A, B, C, D, E, G, I, L, M, N, O, P, S, T and W */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "S" */
+            /* A : */ 0xe1febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x41124011, /* ( |M| ) - A, E, O, R, U and Y */
+            /* C : */ 0xe1124991, /* (B|M|E) - A, E, H, I, L, O, R, U and Y */
+            /* D : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* E : */ 0xe1fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X and Y */
+            /* F : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* G : */ 0x40124100, /* ( |M| ) - I, O, R and U */
+            /* H : */ 0xe15a7d37, /* (B|M|E) - A, B, C, E, F, I, K, L, M, N, O, R, T, U, W and Y */
+            /* I : */ 0xe2befc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V, X and Z */
+            /* J : */ 0x40100000, /* ( |M| ) - U,  */
+            /* K : */ 0xe1144111, /* (B|M|E) - A, E, I, O, S, U and Y */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0xe1144111, /* (B|M|E) - A, E, I, O, S, U and Y */
+            /* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* O : */ 0xe07ef97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, R, S, T, U, V and W */
+            /* P : */ 0xe1124991, /* (B|M|E) - A, E, H, I, L, O, R, U and Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* S : */ 0xc158f9b3, /* ( |M|E) - A, B, E, F, H, I, L, M, N, O, P, T, U, W and Y */
+            /* T : */ 0xe156f9b7, /* (B|M|E) - A, B, C, E, F, H, I, L, M, N, O, P, R, S, U, W and Y */
+            /* U : */ 0xe20eb97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, P, R, S, T and Z */
+            /* V : */ 0x40000110, /* ( |M| ) - E and I */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe006b80e, /* (B|M|E) - B, C, D, L, M, N, P, R and S */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "T" */
+            /* A : */ 0xe1febdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* C : */ 0x40024881, /* ( |M| ) - A, H, L, O and R */
+            /* D : */ 0x40004000, /* ( |M| ) - O,  */
+            /* E : */ 0xe1fef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S, T, U, V, W, X and Y */
+            /* F : */ 0x40104101, /* ( |M| ) - A, I, O and U */
+            /* G : */ 0x40124010, /* ( |M| ) - E, O, R and U */
+            /* H : */ 0xe15ef93f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, P, R, S, T, U, W and Y */
+            /* I : */ 0xe27ff87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* N : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* O : */ 0xe3fefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0x40024011, /* ( |M| ) - A, E, O and R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xe158d595, /* (B|M|E) - A, C, E, H, I, K, M, O, P, T, U, W and Y */
+            /* T : */ 0xc1166991, /* ( |M|E) - A, E, H, I, L, N, O, R, S, U and Y */
+            /* U : */ 0xe00ef97f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, O, P, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe006b901, /* (B|M|E) - A, I, L, M, N, P, R and S */
+            /* Z : */ 0xc0000111, /* ( |M|E) - A, E and I */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "U" */
+            /* A : */ 0xc12e2d4e, /* ( |M|E) - B, C, D, G, I, K, L, N, R, S, T, V and Y */
+            /* B : */ 0xc01edb3f, /* ( |M|E) - A, B, C, D, E, F, I, J, L, M, O, P, R, S, T and U */
+            /* C : */ 0xc01a4d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, T and U */
+            /* D : */ 0xe1064959, /* (B|M|E) - A, D, E, G, I, L, O, R, S and Y */
+            /* E : */ 0xc21e297b, /* ( |M|E) - A, B, D, E, F, G, I, L, N, R, S, T, U and Z */
+            /* F : */ 0x40080021, /* ( |M| ) - A, F and T */
+            /* G : */ 0xe01479d1, /* (B|M|E) - A, E, G, H, I, L, M, N, O, S and U */
+            /* H : */ 0x40000001, /* ( |M| ) - A,  */
+            /* I : */ 0xc22ea81f, /* ( |M|E) - A, B, C, D, E, L, N, P, R, S, T, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000511, /* ( |M|E) - A, E, I and K */
+            /* L : */ 0xe13efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V and Y */
+            /* M : */ 0xe014f933, /* (B|M|E) - A, B, E, F, I, L, M, N, O, P, S and U */
+            /* N : */ 0xe05ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U and W */
+            /* O : */ 0x411a0000, /* ( |M| ) - R, T, U and Y */
+            /* P : */ 0xe15ec997, /* (B|M|E) - A, B, C, E, H, I, L, O, P, R, S, T, U, W and Y */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* S : */ 0xe11ced97, /* (B|M|E) - A, B, C, E, H, I, K, L, N, O, P, S, T, U and Y */
+            /* T : */ 0xe25ef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W and Z */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x40020111, /* ( |M| ) - A, E, I and R */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0xc0180110, /* ( |M|E) - E, I, T and U */
+            /* Y : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Z : */ 0xc2000001, /* ( |M|E) - A and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "V" */
+            /* A : */ 0xe01eb94e, /* (B|M|E) - B, C, D, G, I, L, M, N, P, R, S, T and U */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe18e39dd, /* (B|M|E) - A, C, D, E, G, H, I, L, M, N, R, S, T, X and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe03eec7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, N, O, P, R, S, T, U and V */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x40000001, /* ( |M| ) - A,  */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe15e2d04, /* (B|M|E) - C, I, K, L, N, R, S, T, U, W and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* S : */ 0x40000400, /* ( |M| ) - K,  */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60000800, /* (B|M| ) - L,  */
+            /* V : */ 0x41000000, /* ( |M| ) - Y,  */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0002000, /* ( |M|E) - N,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "W" */
+            /* A : */ 0xe1be3d6e, /* (B|M|E) - B, C, D, F, G, I, K, L, M, N, R, S, T, U, V, X and Y */
+            /* B : */ 0x40024011, /* ( |M| ) - A, E, O and R */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0xc0020910, /* ( |M|E) - E, I, L and R */
+            /* E : */ 0xe10e291b, /* (B|M|E) - A, B, D, E, I, L, N, R, S, T and Y */
+            /* F : */ 0x40104000, /* ( |M| ) - O and U */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* I : */ 0x622eb87c, /* (B|M| ) - C, D, E, F, G, L, M, N, P, R, S, T, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000110, /* ( |M|E) - E and I */
+            /* L : */ 0xc1040111, /* ( |M|E) - A, E, I, S and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0xc0040910, /* ( |M|E) - E, I, L and S */
+            /* O : */ 0x60127c18, /* (B|M| ) - D, E, K, L, M, N, O, R and U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* S : */ 0xc048c090, /* ( |M|E) - E, H, O, P, T and W */
+            /* T : */ 0x40004080, /* ( |M| ) - H and O */
+            /* U : */ 0x60020800, /* (B|M| ) - L and R */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0002810, /* (B|M|E) - E, L and N */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "X" */
+            /* A : */ 0x600c3844, /* (B|M| ) - C, G, L, M, N, S and T */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe006300c, /* (B|M|E) - C, D, M, N, R and S */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40004101, /* ( |M| ) - A, I and O */
+            /* I : */ 0xc00c781d, /* ( |M|E) - A, C, D, E, L, M, N, O, S and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x40000010, /* ( |M| ) - E,  */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x400a2000, /* ( |M| ) - N, R and T */
+            /* P : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0xc0124111, /* ( |M|E) - A, E, I, O, R and U */
+            /* U : */ 0x40060801, /* ( |M| ) - A, L, R and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0000800, /* ( |M|E) - L,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Y" */
+            /* A : */ 0xe04e3cce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, R, S, T and W */
+            /* B : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* C : */ 0x40024991, /* ( |M| ) - A, E, H, I, L, O and R */
+            /* D : */ 0xc0026111, /* ( |M|E) - A, E, I, N, O and R */
+            /* E : */ 0xe00e2809, /* (B|M|E) - A, D, L, N, R, S and T */
+            /* F : */ 0x40104000, /* ( |M| ) - O and U */
+            /* G : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* H : */ 0x40004010, /* ( |M| ) - E and O */
+            /* I : */ 0x60042010, /* (B|M| ) - E, N and S */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0000010, /* ( |M|E) - E,  */
+            /* L : */ 0xc1304911, /* ( |M|E) - A, E, I, L, O, U, V and Y */
+            /* M : */ 0xc000f113, /* ( |M|E) - A, B, E, I, M, N, O and P */
+            /* N : */ 0xc008615d, /* ( |M|E) - A, C, D, E, G, I, N, O and T */
+            /* O : */ 0xe0162c40, /* (B|M|E) - G, K, L, N, R, S and U */
+            /* P : */ 0x400e6191, /* ( |M| ) - A, E, H, I, N, O, R, S and T */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc01a6111, /* ( |M|E) - A, E, I, N, O, R, T and U */
+            /* S : */ 0xc00c5195, /* ( |M|E) - A, C, E, H, I, M, O, S and T */
+            /* T : */ 0x40004191, /* ( |M| ) - A, E, H, I and O */
+            /* U : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* X : */ 0xc0000100, /* ( |M|E) - I,  */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40000010, /* ( |M| ) - E,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Z" */
+            /* A : */ 0xe00a3d46, /* (B|M|E) - B, C, G, I, K, L, M, N, R and T */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe00ea81f, /* (B|M|E) - A, B, C, D, E, L, N, P, R, S and T */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe008f851, /* (B|M|E) - A, E, G, L, M, N, O, P and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x40000110, /* ( |M| ) - E and I */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe0027100, /* (B|M|E) - I, M, N, O and R */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x20000000, /* (B| | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Z : */ 0xc1000911, /* ( |M|E) - A, E, I, L and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ä" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ö" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ü" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        }
+    }, /* End of Enum 4 / 5 */
+    /* ------------------------------------ *
+     * --- texts / all => NST_TEXTS_ALL --- *
+     * ------------------------------------ */
+    {
+        {
+            /* Rules following letter "A" */
+            /* A : */ 0xe00e2c4e, /* (B|M|E) - B, C, D, G, K, L, N, R, S and T */
+            /* B : */ 0xe35efffb, /* (B|M|E) - A, B, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* C : */ 0xe11f4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, Q, R, S, T, U and Y */
+            /* D : */ 0xe37efbff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* E : */ 0xe01e784d, /* (B|M|E) - A, C, D, G, L, M, N, O, R, S, T and U */
+            /* F : */ 0xe00e4971, /* (B|M|E) - A, E, F, G, I, L, O, R, S and T */
+            /* G : */ 0xe25ef9fb, /* (B|M|E) - A, B, D, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W and Z */
+            /* H : */ 0xe03e7d1b, /* (B|M|E) - A, B, D, E, I, K, L, M, N, O, R, S, T, U and V */
+            /* I : */ 0xe26efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V, W and Z */
+            /* J : */ 0xc0004119, /* ( |M|E) - A, D, E, I and O */
+            /* K : */ 0xe31e6db1, /* (B|M|E) - A, E, F, H, I, K, L, N, O, R, S, T, U, Y and Z */
+            /* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe15efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Y */
+            /* N : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* O : */ 0xc00ebd02, /* ( |M|E) - B, I, K, L, M, N, P, R, S and T */
+            /* P : */ 0xe11ee9b1, /* (B|M|E) - A, E, F, H, I, L, N, O, P, R, S, T, U and Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* S : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0xe2febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Z */
+            /* V : */ 0xe1124911, /* (B|M|E) - A, E, I, L, O, R, U and Y */
+            /* W : */ 0xe10e6d3b, /* (B|M|E) - A, B, D, E, F, I, K, L, N, O, R, S, T and Y */
+            /* X : */ 0xe0484111, /* (B|M|E) - A, E, I, O, T and W */
+            /* Y : */ 0xe05e79bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, N, O, R, S, T, U and W */
+            /* Z : */ 0xe3585911, /* (B|M|E) - A, E, I, L, M, O, T, U, W, Y and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "B" */
+            /* A : */ 0xe35ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, W, Y and Z */
+            /* B : */ 0xc1124911, /* ( |M|E) - A, E, I, L, O, R, U and Y */
+            /* C : */ 0x40004080, /* ( |M| ) - H and O */
+            /* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* E : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x40020811, /* ( |M| ) - A, E, L and R */
+            /* H : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* I : */ 0xe27efcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, W and Z */
+            /* J : */ 0x40100010, /* ( |M| ) - E and U */
+            /* K : */ 0x40126801, /* ( |M| ) - A, L, N, O, R and U */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* N : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* O : */ 0xe3deffdf, /* (B|M|E) - A, B, C, D, E, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W, X, Y and Z */
+            /* P : */ 0x40020001, /* ( |M| ) - A and R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc21ccd77, /* ( |M|E) - A, B, C, E, F, G, I, K, L, O, P, S, T, U and Z */
+            /* T : */ 0xc0064991, /* ( |M|E) - A, E, H, I, L, O, R and S */
+            /* U : */ 0xe30e7dfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, Y and Z */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe20e0810, /* (B|M|E) - E, L, R, S, T and Z */
+            /* Z : */ 0x40100110, /* ( |M| ) - E, I and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "C" */
+            /* A : */ 0xe13ebffe, /* (B|M|E) - B, C, D, E, F, G, H, I, J, K, L, M, N, P, R, S, T, U, V and Y */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
+            /* D : */ 0x40004000, /* ( |M| ) - O,  */
+            /* E : */ 0xe16efdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, O, P, R, S, T, V, W and Y */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* I : */ 0xe23ef8ff, /* (B|M|E) - A, B, C, D, E, F, G, H, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x40000010, /* ( |M| ) - E,  */
+            /* O : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* T : */ 0xc0166931, /* ( |M|E) - A, E, F, I, L, N, O, R, S and U */
+            /* U : */ 0x600ef93b, /* (B|M| ) - A, B, D, E, F, I, L, M, N, O, P, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00eb807, /* (B|M|E) - A, B, C, L, M, N, P, R, S and T */
+            /* Z : */ 0x60000010, /* (B|M| ) - E,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "D" */
+            /* A : */ 0xe37ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U and Y */
+            /* C : */ 0x40104081, /* ( |M| ) - A, H, O and U */
+            /* D : */ 0xc1124991, /* ( |M|E) - A, E, H, I, L, O, R, U and Y */
+            /* E : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x41021911, /* ( |M| ) - A, E, I, L, M, R and Y */
+            /* H : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* I : */ 0xe3befeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, R, S, T, U, V, X, Y and Z */
+            /* J : */ 0x60104011, /* (B|M| ) - A, E, O and U */
+            /* K : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* L : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
+            /* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* N : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* O : */ 0xe2fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X and Z */
+            /* P : */ 0x40024921, /* ( |M| ) - A, F, I, L, O and R */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc17cddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, S, T, U, V, W and Y */
+            /* T : */ 0xc0160191, /* ( |M|E) - A, E, H, I, R, S and U */
+            /* U : */ 0xe20efd3f, /* (B|M|E) - A, B, C, D, E, F, I, K, L, M, N, O, P, R, S, T and Z */
+            /* V : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* W : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00c3913, /* (B|M|E) - A, B, E, I, L, M, N, S and T */
+            /* Z : */ 0x40500111, /* ( |M| ) - A, E, I, U and W */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "E" */
+            /* A : */ 0xe27ebcee, /* (B|M|E) - B, C, D, F, G, H, K, L, M, N, P, R, S, T, U, V, W and Z */
+            /* B : */ 0xe21e6df3, /* (B|M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U and Z */
+            /* C : */ 0xe11a4d9d, /* (B|M|E) - A, C, D, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xe37e7dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, V, W, Y and Z */
+            /* E : */ 0xe26ebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, V, W and Z */
+            /* F : */ 0xe23e5d73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, O, R, S, T, U, V and Z */
+            /* G : */ 0xe35e7dfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* H : */ 0xe35efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* I : */ 0xe27effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W and Z */
+            /* J : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* K : */ 0xe01e6d19, /* (B|M|E) - A, D, E, I, K, L, N, O, R, S, T and U */
+            /* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe31efd7b, /* (B|M|E) - A, B, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, Y and Z */
+            /* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe25ebd6e, /* (B|M|E) - B, C, D, F, G, I, K, L, M, N, P, R, S, T, U, W and Z */
+            /* P : */ 0xe01ec9b1, /* (B|M|E) - A, E, F, H, I, L, O, P, R, S, T and U */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xe35e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U, W, Y and Z */
+            /* U : */ 0xe2febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Z */
+            /* V : */ 0xe1164911, /* (B|M|E) - A, E, I, L, O, R, S, U and Y */
+            /* W : */ 0xe11e69d9, /* (B|M|E) - A, D, E, G, H, I, L, N, O, R, S, T, U and Y */
+            /* X : */ 0xe21cd597, /* (B|M|E) - A, B, C, E, H, I, K, M, O, P, S, T, U and Z */
+            /* Y : */ 0xe00e79bf, /* (B|M|E) - A, B, C, D, E, F, H, I, L, M, N, O, R, S and T */
+            /* Z : */ 0xe3504111, /* (B|M|E) - A, E, I, O, U, W, Y and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "F" */
+            /* A : */ 0xe3fe3dfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x40024911, /* ( |M| ) - A, E, I, L, O and R */
+            /* C : */ 0x40000080, /* ( |M| ) - H,  */
+            /* D : */ 0x40020001, /* ( |M| ) - A and R */
+            /* E : */ 0xe33e3dff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, R, S, T, U, V, Y and Z */
+            /* F : */ 0xc15efdd3, /* ( |M|E) - A, B, E, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Y */
+            /* G : */ 0x40020991, /* ( |M| ) - A, E, H, I, L and R */
+            /* H : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* I : */ 0xe28e7c7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, R, S, T, X and Z */
+            /* J : */ 0x60004000, /* (B|M| ) - O,  */
+            /* K : */ 0x40024801, /* ( |M| ) - A, L, O and R */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* N : */ 0x40100111, /* ( |M| ) - A, E, I and U */
+            /* O : */ 0xe0defdd5, /* (B|M|E) - A, C, E, G, H, I, K, L, M, N, O, P, R, S, T, U, W and X */
+            /* P : */ 0x40020010, /* ( |M| ) - E and R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc04cd5f7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, M, O, P, S, T and W */
+            /* T : */ 0xc15eddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W and Y */
+            /* U : */ 0x620e38dc, /* (B|M| ) - C, D, E, G, H, L, M, N, R, S, T and Z */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0000100, /* ( |M|E) - I,  */
+            /* Z : */ 0x40100110, /* ( |M| ) - E, I and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "G" */
+            /* A : */ 0xe37eb9fe, /* (B|M|E) - B, C, D, E, F, G, H, I, L, M, N, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U and Y */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0xc0024011, /* ( |M|E) - A, E, O and R */
+            /* E : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* F : */ 0x40120911, /* ( |M| ) - A, E, I, L, R and U */
+            /* G : */ 0xc1064911, /* ( |M|E) - A, E, I, L, O, R, S and Y */
+            /* H : */ 0xe01c6913, /* (B|M|E) - A, B, E, I, L, N, O, S, T and U */
+            /* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40024011, /* ( |M| ) - A, E, O and R */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* N : */ 0xe0144111, /* (B|M|E) - A, E, I, O, S and U */
+            /* O : */ 0xe07ef95f, /* (B|M|E) - A, B, C, D, E, G, I, L, M, N, O, P, R, S, T, U, V and W */
+            /* P : */ 0x40024801, /* ( |M| ) - A, L, O and R */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* S : */ 0xc27ffdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
+            /* T : */ 0xc0124091, /* ( |M|E) - A, E, H, O, R and U */
+            /* U : */ 0xe10e7915, /* (B|M|E) - A, C, E, I, L, M, N, O, R, S, T and Y */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe002b001, /* (B|M|E) - A, M, N, P and R */
+            /* Z : */ 0x40100010, /* ( |M| ) - E and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "H" */
+            /* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* C : */ 0x40004880, /* ( |M| ) - H, L and O */
+            /* D : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* E : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x40120911, /* ( |M| ) - A, E, I, L, R and U */
+            /* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* I : */ 0xe23efc7f, /* (B|M|E) - A, B, C, D, E, F, G, K, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0x40126911, /* ( |M| ) - A, E, I, L, N, O, R and U */
+            /* L : */ 0xc37eddfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xc01c4913, /* ( |M|E) - A, B, E, I, L, O, S, T and U */
+            /* N : */ 0xc05c5ff7, /* ( |M|E) - A, B, C, E, F, G, H, I, J, K, L, M, O, S, T, U and W */
+            /* O : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* P : */ 0x40124831, /* ( |M| ) - A, E, F, L, O, R and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xc25eddf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W and Z */
+            /* T : */ 0xc37efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0xe00ebcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, P, R, S and T */
+            /* V : */ 0x40004010, /* ( |M| ) - E and O */
+            /* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00ed85b, /* (B|M|E) - A, B, D, E, G, L, M, O, P, R, S and T */
+            /* Z : */ 0x40100111, /* ( |M| ) - A, E, I and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "I" */
+            /* A : */ 0xe23ebdfe, /* (B|M|E) - B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V and Z */
+            /* B : */ 0xe15e6917, /* (B|M|E) - A, B, C, E, I, L, N, O, R, S, T, U, W and Y */
+            /* C : */ 0xe11e6d95, /* (B|M|E) - A, C, E, H, I, K, L, N, O, R, S, T, U and Y */
+            /* D : */ 0xe17efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* E : */ 0xc27ebdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W and Z */
+            /* F : */ 0xe11e49b1, /* (B|M|E) - A, E, F, H, I, L, O, R, S, T, U and Y */
+            /* G : */ 0xe25efff3, /* (B|M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, W and Z */
+            /* H : */ 0xe01e6911, /* (B|M|E) - A, E, I, L, N, O, R, S, T and U */
+            /* I : */ 0xc0002010, /* ( |M|E) - E and N */
+            /* J : */ 0xc0004011, /* ( |M|E) - A, E and O */
+            /* K : */ 0xe05eddbb, /* (B|M|E) - A, B, D, E, F, H, I, K, L, M, O, P, R, S, T, U and W */
+            /* L : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe25efd73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W and Z */
+            /* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe2bebc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, P, R, S, T, U, V, X and Z */
+            /* P : */ 0xe01ed9b3, /* (B|M|E) - A, B, E, F, H, I, L, M, O, P, R, S, T and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe17efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* S : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0x40063800, /* ( |M| ) - L, M, N, R and S */
+            /* V : */ 0xe17ecd73, /* (B|M|E) - A, B, E, F, G, I, K, L, O, P, R, S, T, U, V, W and Y */
+            /* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* X : */ 0xc00cc111, /* ( |M|E) - A, E, I, O, P, S and T */
+            /* Y : */ 0x40000011, /* ( |M| ) - A and E */
+            /* Z : */ 0xe21c5593, /* (B|M|E) - A, B, E, H, I, K, M, O, S, T, U and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "J" */
+            /* A : */ 0xe377bdce, /* (B|M|E) - B, C, D, G, H, I, K, L, M, N, P, Q, R, S, U, V, W, Y and Z */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe04e3c3d, /* (B|M|E) - A, C, D, E, F, K, L, M, N, R, S, T and W */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe0083842, /* (B|M|E) - B, G, L, M, N and T */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe13e2ddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, N, R, S, T, U, V and Y */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x602eb94f, /* (B|M| ) - A, B, C, D, G, I, L, M, N, P, R, S, T and V */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "K" */
+            /* A : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* C : */ 0x40000081, /* ( |M| ) - A and H */
+            /* D : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* E : */ 0xe17efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x40020011, /* ( |M| ) - A, E and R */
+            /* H : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* I : */ 0xe30eb87f, /* (B|M|E) - A, B, C, D, E, F, G, L, M, N, P, R, S, T, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* O : */ 0xe27efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Z */
+            /* P : */ 0x40024900, /* ( |M| ) - I, L, O and R */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc07cddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, S, T, U, V and W */
+            /* T : */ 0xc03649f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, R, S, U and V */
+            /* U : */ 0xe00eb9c6, /* (B|M|E) - B, C, G, H, I, L, M, N, P, R, S and T */
+            /* V : */ 0x40004010, /* ( |M| ) - E and O */
+            /* W : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0021800, /* (B|M|E) - L, M and R */
+            /* Z : */ 0x40100111, /* ( |M| ) - A, E, I and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "L" */
+            /* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0xc17e5dfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, O, R, S, T, U, V, W and Y */
+            /* C : */ 0x40104191, /* ( |M| ) - A, E, H, I, O and U */
+            /* D : */ 0xc37e79ff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, R, S, T, U, V, W, Y and Z */
+            /* E : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0xc01e59b5, /* ( |M|E) - A, C, E, F, H, I, L, M, O, R, S, T and U */
+            /* G : */ 0xc01e4911, /* ( |M|E) - A, E, I, L, O, R, S, T and U */
+            /* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* I : */ 0xe3fffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* J : */ 0x60100001, /* (B|M| ) - A and U */
+            /* K : */ 0xc15e7991, /* ( |M|E) - A, E, H, I, L, M, N, O, R, S, T, U, W and Y */
+            /* L : */ 0xc37ef5ff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xc15c451b, /* ( |M|E) - A, B, D, E, I, K, O, S, T, U, W and Y */
+            /* N : */ 0xc0104119, /* ( |M|E) - A, D, E, I, O and U */
+            /* O : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0xc01e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc17eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W and Y */
+            /* T : */ 0xc37efdf7, /* ( |M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0xe2aefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, V, X and Z */
+            /* V : */ 0x41004111, /* ( |M| ) - A, E, I, O and Y */
+            /* W : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe26efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, V, W and Z */
+            /* Z : */ 0xc05cc9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, O, P, S, T, U and W */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "M" */
+            /* A : */ 0xe3feffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0xc1164911, /* ( |M|E) - A, E, I, L, O, R, S, U and Y */
+            /* C : */ 0x600004c5, /* (B|M| ) - A, C, G, H and K */
+            /* D : */ 0xc0160111, /* ( |M|E) - A, E, I, R, S and U */
+            /* E : */ 0xe3defdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, X, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x40020811, /* ( |M| ) - A, E, L and R */
+            /* H : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* I : */ 0xe39efcfd, /* (B|M|E) - A, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, X, Y and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* L : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* M : */ 0xc31e6df3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, N, O, R, S, T, U, Y and Z */
+            /* N : */ 0xc0104111, /* ( |M|E) - A, E, I, O and U */
+            /* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0xc11e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T, U and Y */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* S : */ 0xc05eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U and W */
+            /* T : */ 0xc0164991, /* ( |M|E) - A, E, H, I, L, O, R, S and U */
+            /* U : */ 0x620e3cfd, /* (B|M| ) - A, C, D, E, F, G, H, K, L, M, N, R, S, T and Z */
+            /* V : */ 0x40004010, /* ( |M| ) - E and O */
+            /* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00e6c14, /* (B|M|E) - C, E, K, L, N, O, R, S and T */
+            /* Z : */ 0x40100111, /* ( |M| ) - A, E, I and U */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "N" */
+            /* A : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* C : */ 0xc11a4d91, /* ( |M|E) - A, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* E : */ 0xe3fffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0xc21e4911, /* ( |M|E) - A, E, I, L, O, R, S, T, U and Z */
+            /* G : */ 0xc37efdfb, /* ( |M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* H : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* I : */ 0xe3bffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, X, Y and Z */
+            /* J : */ 0x40104011, /* ( |M| ) - A, E, O and U */
+            /* K : */ 0xc35ef9f3, /* ( |M|E) - A, B, E, F, G, H, I, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* L : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* N : */ 0xc37e4dff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, O, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe3fefd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x41104111, /* ( |M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0xe00efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S and T */
+            /* V : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* W : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0xe0445911, /* (B|M|E) - A, E, I, L, M, O, S and W */
+            /* Z : */ 0xc37efff3, /* ( |M|E) - A, B, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "O" */
+            /* A : */ 0xe09ebcce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, P, R, S, T, U and X */
+            /* B : */ 0xe11e4b9b, /* (B|M|E) - A, B, D, E, H, I, J, L, O, R, S, T, U and Y */
+            /* C : */ 0xe11a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xe15e59ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, O, R, S, T, U, W and Y */
+            /* E : */ 0xe1be792f, /* (B|M|E) - A, B, C, D, F, I, L, M, N, O, R, S, T, U, V, X and Y */
+            /* F : */ 0xe01e4931, /* (B|M|E) - A, E, F, I, L, O, R, S, T and U */
+            /* G : */ 0xe11e79db, /* (B|M|E) - A, B, D, E, G, H, I, L, M, N, O, R, S, T, U and Y */
+            /* H : */ 0xe11e7911, /* (B|M|E) - A, E, I, L, M, N, O, R, S, T, U and Y */
+            /* I : */ 0xe00e2c5d, /* (B|M|E) - A, C, D, E, G, K, L, N, R, S and T */
+            /* J : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* K : */ 0xe31e5d13, /* (B|M|E) - A, B, E, I, K, L, M, O, R, S, T, U, Y and Z */
+            /* L : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe17efd73, /* (B|M|E) - A, B, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* N : */ 0xe37fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe22ebd7c, /* (B|M|E) - C, D, E, F, G, I, K, L, M, N, P, R, S, T, V and Z */
+            /* P : */ 0xe11eddb1, /* (B|M|E) - A, E, F, H, I, K, L, M, O, P, R, S, T, U and Y */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe37efdf7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xe35eddf7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, O, P, R, S, T, U, W, Y and Z */
+            /* U : */ 0xe22ebd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, P, R, S, T, V and Z */
+            /* V : */ 0xe0104111, /* (B|M|E) - A, E, I, O and U */
+            /* W : */ 0xe10efbbf, /* (B|M|E) - A, B, C, D, E, F, H, I, J, L, M, N, O, P, R, S, T and Y */
+            /* X : */ 0xe1084111, /* (B|M|E) - A, E, I, O, T and Y */
+            /* Y : */ 0xc004591d, /* ( |M|E) - A, C, D, E, I, L, M, O and S */
+            /* Z : */ 0xe3004111, /* (B|M|E) - A, E, I, O, Y and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "P" */
+            /* A : */ 0xe3fefddf, /* (B|M|E) - A, B, C, D, E, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x40004000, /* ( |M| ) - O,  */
+            /* C : */ 0x40004080, /* ( |M| ) - H and O */
+            /* D : */ 0x40000001, /* ( |M| ) - A,  */
+            /* E : */ 0xe35efd7d, /* (B|M|E) - A, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* F : */ 0xe05e7df7, /* (B|M|E) - A, B, C, E, F, G, H, I, K, L, M, N, O, R, S, T, U and W */
+            /* G : */ 0x40000010, /* ( |M| ) - E,  */
+            /* H : */ 0xe11e4911, /* (B|M|E) - A, E, I, L, O, R, S, T, U and Y */
+            /* I : */ 0xe21ffc5d, /* (B|M|E) - A, C, D, E, G, K, L, M, N, O, P, Q, R, S, T, U and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40000111, /* ( |M| ) - A, E and I */
+            /* L : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0x60004010, /* (B|M| ) - E and O */
+            /* O : */ 0xe2fefd5d, /* (B|M|E) - A, C, D, E, G, I, K, L, M, N, O, P, R, S, T, U, V, W, X and Z */
+            /* P : */ 0xc11e4d95, /* ( |M|E) - A, C, E, H, I, K, L, O, R, S, T, U and Y */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xe118c195, /* (B|M|E) - A, C, E, H, I, O, P, T, U and Y */
+            /* T : */ 0xe1165993, /* (B|M|E) - A, B, E, H, I, L, M, O, R, S, U and Y */
+            /* U : */ 0x620ebc7e, /* (B|M| ) - B, C, D, E, F, G, K, L, M, N, P, R, S, T and Z */
+            /* V : */ 0x40000010, /* ( |M| ) - E,  */
+            /* W : */ 0x40000001, /* ( |M| ) - A,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00a0900, /* (B|M|E) - I, L, R and T */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Q" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "R" */
+            /* A : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0xc11e4953, /* ( |M|E) - A, B, E, G, I, L, O, R, S, T, U and Y */
+            /* C : */ 0xc11a4d91, /* ( |M|E) - A, E, H, I, K, L, O, R, T, U and Y */
+            /* D : */ 0xc15efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Y */
+            /* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0xc01e6911, /* ( |M|E) - A, E, I, L, N, O, R, S, T and U */
+            /* G : */ 0xc15e6db3, /* ( |M|E) - A, B, E, F, H, I, K, L, N, O, R, S, T, U, W and Y */
+            /* H : */ 0xe1184111, /* (B|M|E) - A, E, I, O, T, U and Y */
+            /* I : */ 0xe3fffeff, /* (B|M|E) - A, B, C, D, E, F, G, H, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* J : */ 0x40104011, /* ( |M| ) - A, E, O and U */
+            /* K : */ 0xc35efdd3, /* ( |M|E) - A, B, E, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* L : */ 0xc11c411b, /* ( |M|E) - A, B, D, E, I, O, S, T, U and Y */
+            /* M : */ 0xc35cc9f7, /* ( |M|E) - A, B, C, E, F, G, H, I, L, O, P, S, T, U, W, Y and Z */
+            /* N : */ 0xc37eddff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, O, P, R, S, T, U, V, W, Y and Z */
+            /* O : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0xc01e49b1, /* ( |M|E) - A, E, F, H, I, L, O, R, S, T and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xc11c6dd1, /* ( |M|E) - A, E, G, H, I, K, L, N, O, S, T, U and Y */
+            /* S : */ 0xc35efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W, Y and Z */
+            /* T : */ 0xc37effff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0xe20ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T and Z */
+            /* V : */ 0xc1004111, /* ( |M|E) - A, E, I, O and Y */
+            /* W : */ 0x41124191, /* ( |M| ) - A, E, H, I, O, R, U and Y */
+            /* X : */ 0x40000100, /* ( |M| ) - I,  */
+            /* Y : */ 0xe04cf95f, /* (B|M|E) - A, B, C, D, E, G, I, L, M, N, O, P, S, T and W */
+            /* Z : */ 0xc35cddf3, /* ( |M|E) - A, B, E, F, G, H, I, K, L, M, O, P, S, T, U, W, Y and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "S" */
+            /* A : */ 0xe1febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X and Y */
+            /* B : */ 0x41124911, /* ( |M| ) - A, E, I, L, O, R, U and Y */
+            /* C : */ 0xe1124991, /* (B|M|E) - A, E, H, I, L, O, R, U and Y */
+            /* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* E : */ 0xe3ffffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* H : */ 0xe15a7d37, /* (B|M|E) - A, B, C, E, F, I, K, L, M, N, O, R, T, U, W and Y */
+            /* I : */ 0xe2befcff, /* (B|M|E) - A, B, C, D, E, F, G, H, K, L, M, N, O, P, R, S, T, U, V, X and Z */
+            /* J : */ 0x40104001, /* ( |M| ) - A, O and U */
+            /* K : */ 0xe1166911, /* (B|M|E) - A, E, I, L, N, O, R, S, U and Y */
+            /* L : */ 0xe1104111, /* (B|M|E) - A, E, I, O, U and Y */
+            /* M : */ 0xe1144111, /* (B|M|E) - A, E, I, O, S, U and Y */
+            /* N : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0xe11649b1, /* (B|M|E) - A, E, F, H, I, L, O, R, S, U and Y */
+            /* Q : */ 0x60100000, /* (B|M| ) - U,  */
+            /* R : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* S : */ 0xc37afdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, T, U, V, W, Y and Z */
+            /* T : */ 0xe37effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0xe22ebdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, V and Z */
+            /* V : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe006b80e, /* (B|M|E) - B, C, D, L, M, N, P, R and S */
+            /* Z : */ 0xe1504111, /* (B|M|E) - A, E, I, O, U, W and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "T" */
+            /* A : */ 0xe3febdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, P, R, S, T, U, V, W, X, Y and Z */
+            /* B : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* C : */ 0x40124881, /* ( |M| ) - A, H, L, O, R and U */
+            /* D : */ 0x40124111, /* ( |M| ) - A, E, I, O, R and U */
+            /* E : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* F : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* G : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* H : */ 0xe15ef93f, /* (B|M|E) - A, B, C, D, E, F, I, L, M, N, O, P, R, S, T, U, W and Y */
+            /* I : */ 0xe27fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
+            /* J : */ 0x60100011, /* (B|M| ) - A, E and U */
+            /* K : */ 0x40126911, /* ( |M| ) - A, E, I, L, N, O, R and U */
+            /* L : */ 0xc1104111, /* ( |M|E) - A, E, I, O, U and Y */
+            /* M : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* N : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* O : */ 0xe3fefdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, X, Y and Z */
+            /* P : */ 0x401249b1, /* ( |M| ) - A, E, F, H, I, L, O, R and U */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0x61104111, /* (B|M| ) - A, E, I, O, U and Y */
+            /* S : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xc376fdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, U, V, W, Y and Z */
+            /* U : */ 0xe00ef9ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, O, P, R, S and T */
+            /* V : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe006b805, /* (B|M|E) - A, C, L, M, N, P, R and S */
+            /* Z : */ 0xc17efdff, /* ( |M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "U" */
+            /* A : */ 0xc13ebd4e, /* ( |M|E) - B, C, D, G, I, K, L, M, N, P, R, S, T, U, V and Y */
+            /* B : */ 0xe07effff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, S, T, U, V and W */
+            /* C : */ 0xe01a4d95, /* (B|M|E) - A, C, E, H, I, K, L, O, R, T and U */
+            /* D : */ 0xe15649d9, /* (B|M|E) - A, D, E, G, H, I, L, O, R, S, U, W and Y */
+            /* E : */ 0xe21e397f, /* (B|M|E) - A, B, C, D, E, F, G, I, L, M, N, R, S, T, U and Z */
+            /* F : */ 0xe25efdfb, /* (B|M|E) - A, B, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, W and Z */
+            /* G : */ 0xe21e79f3, /* (B|M|E) - A, B, E, F, G, H, I, L, M, N, O, R, S, T, U and Z */
+            /* H : */ 0xe0167911, /* (B|M|E) - A, E, I, L, M, N, O, R, S and U */
+            /* I : */ 0xc22eb85f, /* ( |M|E) - A, B, C, D, E, G, L, M, N, P, R, S, T, V and Z */
+            /* J : */ 0x40100101, /* ( |M| ) - A, I and U */
+            /* K : */ 0xe01a6d11, /* (B|M|E) - A, E, I, K, L, N, O, R, T and U */
+            /* L : */ 0xe37efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* M : */ 0xe27efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W and Z */
+            /* N : */ 0xe27fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W and Z */
+            /* O : */ 0xc11e0808, /* ( |M|E) - D, L, R, S, T, U and Y */
+            /* P : */ 0xe05ec9bd, /* (B|M|E) - A, C, D, E, F, H, I, L, O, P, R, S, T, U and W */
+            /* Q : */ 0x40100000, /* ( |M| ) - U,  */
+            /* R : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* S : */ 0xe37ffdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, Q, R, S, T, U, V, W, Y and Z */
+            /* T : */ 0xe37efdff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, K, L, M, N, O, P, R, S, T, U, V, W, Y and Z */
+            /* U : */ 0x40003000, /* ( |M| ) - M and N */
+            /* V : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* W : */ 0x40104111, /* ( |M| ) - A, E, I, O and U */
+            /* X : */ 0xc0180110, /* ( |M|E) - E, I, T and U */
+            /* Y : */ 0xc0000001, /* ( |M|E) - A,  */
+            /* Z : */ 0xc2584193, /* ( |M|E) - A, B, E, H, I, O, T, U, W and Z */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "V" */
+            /* A : */ 0xe01ebdcf, /* (B|M|E) - A, B, C, D, G, H, I, K, L, M, N, P, R, S, T and U */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe18e3ddd, /* (B|M|E) - A, C, D, E, G, H, I, K, L, M, N, R, S, T, X and Y */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x40000010, /* ( |M| ) - E,  */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0xe23efc5f, /* (B|M|E) - A, B, C, D, E, G, K, L, M, N, O, P, R, S, T, U, V and Z */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40004001, /* ( |M| ) - A and O */
+            /* L : */ 0x60004101, /* (B|M| ) - A, I and O */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0xe15e3d44, /* (B|M|E) - C, G, I, K, L, M, N, R, S, T, U, W and Y */
+            /* P : */ 0x40020000, /* ( |M| ) - R,  */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* S : */ 0x40080401, /* ( |M| ) - A, K and T */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x60021800, /* (B|M| ) - L, M and R */
+            /* V : */ 0x41000010, /* ( |M| ) - E and Y */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xc0002000, /* ( |M|E) - N,  */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "W" */
+            /* A : */ 0xe3bebdef, /* (B|M|E) - A, B, C, D, F, G, H, I, K, L, M, N, P, R, S, T, U, V, X, Y and Z */
+            /* B : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0xc0000010, /* ( |M|E) - E,  */
+            /* E : */ 0xe10e39ff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, L, M, N, R, S, T and Y */
+            /* F : */ 0x40104000, /* ( |M| ) - O and U */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x60004111, /* (B|M| ) - A, E, I and O */
+            /* I : */ 0xe02ebc7c, /* (B|M|E) - C, D, E, F, G, K, L, M, N, P, R, S, T and V */
+            /* J : */ 0x40000010, /* ( |M| ) - E,  */
+            /* K : */ 0x40000100, /* ( |M| ) - I,  */
+            /* L : */ 0xe1040111, /* (B|M|E) - A, E, I, S and Y */
+            /* M : */ 0x40000011, /* ( |M| ) - A and E */
+            /* N : */ 0xc0040910, /* ( |M|E) - E, I, L and S */
+            /* O : */ 0xe0127cee, /* (B|M|E) - B, C, D, F, G, H, K, L, M, N, O, R and U */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x61004111, /* (B|M| ) - A, E, I, O and Y */
+            /* S : */ 0xc0084490, /* ( |M|E) - E, H, K, O and T */
+            /* T : */ 0x40004080, /* ( |M| ) - H and O */
+            /* U : */ 0x600ea804, /* (B|M| ) - C, L, N, P, R, S and T */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0002010, /* (B|M|E) - E and N */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "X" */
+            /* A : */ 0x600c3844, /* (B|M| ) - C, G, L, M, N, S and T */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x40124991, /* ( |M| ) - A, E, H, I, L, O, R and U */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0xe0063c4c, /* (B|M|E) - C, D, G, K, L, M, N, R and S */
+            /* F : */ 0x40004000, /* ( |M| ) - O,  */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x40004101, /* ( |M| ) - A, I and O */
+            /* I : */ 0xc02c7c1f, /* ( |M|E) - A, B, C, D, E, K, L, M, N, O, S, T and V */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x40024000, /* ( |M| ) - O and R */
+            /* L : */ 0x40000010, /* ( |M| ) - E,  */
+            /* M : */ 0x40000001, /* ( |M| ) - A,  */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x400aa000, /* ( |M| ) - N, P, R and T */
+            /* P : */ 0x40124911, /* ( |M| ) - A, E, I, L, O, R and U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x40080000, /* ( |M| ) - T,  */
+            /* T : */ 0xc0164111, /* ( |M|E) - A, E, I, O, R, S and U */
+            /* U : */ 0x40060811, /* ( |M| ) - A, E, L, R and S */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x40000010, /* ( |M| ) - E,  */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe0000808, /* (B|M|E) - D and L */
+            /* Z : */ 0x40000010, /* ( |M| ) - E,  */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Y" */
+            /* A : */ 0xe24e3cce, /* (B|M|E) - B, C, D, G, H, K, L, M, N, R, S, T, W and Z */
+            /* B : */ 0x40124119, /* ( |M| ) - A, D, E, I, O, R and U */
+            /* C : */ 0x40024991, /* ( |M| ) - A, E, H, I, L, O and R */
+            /* D : */ 0xc0026111, /* ( |M|E) - A, E, I, N, O and R */
+            /* E : */ 0xe01e2809, /* (B|M|E) - A, D, L, N, R, S, T and U */
+            /* F : */ 0x40104110, /* ( |M| ) - E, I, O and U */
+            /* G : */ 0x40024111, /* ( |M| ) - A, E, I, O and R */
+            /* H : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* I : */ 0xe0042810, /* (B|M|E) - E, L, N and S */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0xc0004810, /* ( |M|E) - E, L and O */
+            /* L : */ 0xc134c955, /* ( |M|E) - A, C, E, G, I, L, O, P, S, U, V and Y */
+            /* M : */ 0xc010f113, /* ( |M|E) - A, B, E, I, M, N, O, P and U */
+            /* N : */ 0xc008655d, /* ( |M|E) - A, C, D, E, G, I, K, N, O and T */
+            /* O : */ 0xe01eac40, /* (B|M|E) - G, K, L, N, P, R, S, T and U */
+            /* P : */ 0xc01e6191, /* ( |M|E) - A, E, H, I, N, O, R, S, T and U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0xc01e6111, /* ( |M|E) - A, E, I, N, O, R, S, T and U */
+            /* S : */ 0xc00cd995, /* ( |M|E) - A, C, E, H, I, L, M, O, P, S and T */
+            /* T : */ 0xc0084191, /* ( |M|E) - A, E, H, I, O and T */
+            /* U : */ 0x60062400, /* (B|M| ) - K, N, R and S */
+            /* V : */ 0x60004010, /* (B|M| ) - E and O */
+            /* W : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* X : */ 0x80000000, /* ( | |E) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x40000011, /* ( |M| ) - A and E */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "Z" */
+            /* A : */ 0xe01abdee, /* (B|M|E) - B, C, D, F, G, H, I, K, L, M, N, P, R, T and U */
+            /* B : */ 0x40120911, /* ( |M| ) - A, E, I, L, R and U */
+            /* C : */ 0x40000080, /* ( |M| ) - H,  */
+            /* D : */ 0x40000110, /* ( |M| ) - E and I */
+            /* E : */ 0xe11ebdbf, /* (B|M|E) - A, B, C, D, E, F, H, I, K, L, M, N, P, R, S, T, U and Y */
+            /* F : */ 0x40024811, /* ( |M| ) - A, E, L, O and R */
+            /* G : */ 0x40020011, /* ( |M| ) - A, E and R */
+            /* H : */ 0x40004011, /* ( |M| ) - A, E and O */
+            /* I : */ 0xe13efd7f, /* (B|M|E) - A, B, C, D, E, F, G, I, K, L, M, N, O, P, R, S, T, U, V and Y */
+            /* J : */ 0x40000001, /* ( |M| ) - A,  */
+            /* K : */ 0x40124101, /* ( |M| ) - A, I, O, R and U */
+            /* L : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* M : */ 0x40004111, /* ( |M| ) - A, E, I and O */
+            /* N : */ 0x40000011, /* ( |M| ) - A and E */
+            /* O : */ 0xe00ef974, /* (B|M|E) - C, E, F, G, I, L, M, N, O, P, R, S and T */
+            /* P : */ 0x40120821, /* ( |M| ) - A, F, L, R and U */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x40000011, /* ( |M| ) - A and E */
+            /* S : */ 0x40088115, /* ( |M| ) - A, C, E, I, P and T */
+            /* T : */ 0xc0020891, /* ( |M|E) - A, E, H, L and R */
+            /* U : */ 0xe26fffff, /* (B|M|E) - A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, V, W and Z */
+            /* V : */ 0x40004010, /* ( |M| ) - E and O */
+            /* W : */ 0x60104111, /* (B|M| ) - A, E, I, O and U */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0xe00c9c40, /* (B|M|E) - G, K, L, M, P, S and T */
+            /* Z : */ 0xc1104911, /* ( |M|E) - A, E, I, L, O, U and Y */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ä" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ö" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        },
+        {
+            /* Rules following letter "ü" */
+            /* A : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* B : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* C : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* D : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* E : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* F : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* G : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* H : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* I : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* J : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* K : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* L : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* M : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* N : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* O : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* P : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Q : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* R : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* S : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* T : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* U : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* V : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* W : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* X : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Y : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* Z : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ä : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ö : */ 0x00000000, /* ( | | ) - None are allowed */
+            /* ü : */ 0x00000000  /* ( | | ) - None are allowed */
+        }
+    } /* End of Enum 5 / 5 */
 };
 
 

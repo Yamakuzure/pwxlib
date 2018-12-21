@@ -12,17 +12,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -102,93 +102,92 @@ namespace pwx {
   * set this value to NO and compare the outcome of the speed tests of the
   * testlib program.
 **/
-class PWX_API CLockable
-{
-public:
+class PWX_API CLockable {
+  public:
 
-	/* ===============================================
-	 * === Public Types                            ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public Types                            ===
+     * ===============================================
+    */
 
 #ifndef PWX_USE_FLAGSPIN
-	typedef std::mutex lock_t; //!< Use standard mutex if no spinlocks are used.
+    typedef std::mutex lock_t; //!< Use standard mutex if no spinlocks are used.
 #endif // !PWX_USE_FLAGSPIN
 
 
-	/* ===============================================
-	 * === Public Constructors and destructor      ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public Constructors and destructor      ===
+     * ===============================================
+    */
 
-	explicit CLockable() noexcept;
-	CLockable (const CLockable &src) noexcept;
-	virtual ~CLockable() noexcept;
-
-
-	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	*/
-
-	bool     beThreadSafe()      const noexcept PWX_WARNUNUSED; //!< true if thread safety is turned on
-	void     beThreadSafe(bool doLock) noexcept;                //!< set thread safety to @a doLock
-	bool     clear_locks ()            noexcept;                //!< remove all locks
-	bool     destroyed   ()      const noexcept PWX_WARNUNUSED; //!< if true the object will no longer lock
-	void     do_locking  (bool doLock) noexcept;                //!< set thread safety to @a doLock
-	bool     is_locked   ()      const noexcept PWX_WARNUNUSED; //!< return true if this object is locked
-	bool     is_locking  ()      const noexcept PWX_WARNUNUSED; //!< true if thread safety is turned on
-	void     lock        ()            noexcept;                //!< lock this object
-	uint32_t lock_count  ()      const noexcept PWX_WARNUNUSED; //!< number of locks this thread holds on this object
-	bool     try_lock    ()            noexcept PWX_WARNUNUSED; //!< try to lock and return at once
-	void     unlock      ()            noexcept;                //!< unlock this object
+    explicit CLockable() noexcept;
+    CLockable ( const CLockable& src ) noexcept;
+    virtual ~CLockable() noexcept;
 
 
-	/* ===============================================
-	 * === Public operators                        ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public methods                          ===
+     * ===============================================
+    */
 
-	CLockable& operator= (const CLockable &src) noexcept;
+    bool     beThreadSafe()      const noexcept PWX_WARNUNUSED; //!< true if thread safety is turned on
+    void     beThreadSafe( bool doLock ) noexcept;              //!< set thread safety to @a doLock
+    bool     clear_locks ()            noexcept;                //!< remove all locks
+    bool     destroyed   ()      const noexcept PWX_WARNUNUSED; //!< if true the object will no longer lock
+    void     do_locking  ( bool doLock ) noexcept;              //!< set thread safety to @a doLock
+    bool     is_locked   ()      const noexcept PWX_WARNUNUSED; //!< return true if this object is locked
+    bool     is_locking  ()      const noexcept PWX_WARNUNUSED; //!< true if thread safety is turned on
+    void     lock        ()            noexcept;                //!< lock this object
+    uint32_t lock_count  ()      const noexcept PWX_WARNUNUSED; //!< number of locks this thread holds on this object
+    bool     try_lock    ()            noexcept PWX_WARNUNUSED; //!< try to lock and return at once
+    void     unlock      ()            noexcept;                //!< unlock this object
 
 
-protected:
+    /* ===============================================
+     * === Public operators                        ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Protected members                       ===
-	 * ===============================================
-	*/
+    CLockable& operator= ( const CLockable& src ) noexcept;
 
-	mutable
-	abool_t isDestroyed  = ATOMIC_VAR_INIT(false); //!< Should be set to true by the destructors of deriving classes.
-	mord_t  memOrdLoad   = PWX_MEMORDER_ACQUIRE;   //!< to be used with atomic::load()
-	mord_t  memOrdStore  = PWX_MEMORDER_RELEASE;   //!< to be used with atomic::store()
+
+  protected:
+
+    /* ===============================================
+     * === Protected members                       ===
+     * ===============================================
+    */
+
+    mutable
+    abool_t isDestroyed  = ATOMIC_VAR_INIT( false ); //!< Should be set to true by the destructors of deriving classes.
+    mord_t  memOrdLoad   = PWX_MEMORDER_ACQUIRE;   //!< to be used with atomic::load()
+    mord_t  memOrdStore  = PWX_MEMORDER_RELEASE;   //!< to be used with atomic::store()
 
 
 // If the DEBUG_LOCK_STATE is enabled, the members need to be accessible from
 // the callers, which must be derived from CLockable anyway.
 #ifdef PWX_THREADDEBUG
-public:
+  public:
 #else
-private:
+  private:
 #endif // PWX_THREADDEBUG
 
-	/* ===============================================
-	 * === Private members                         ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Private members                         ===
+     * ===============================================
+    */
 
-	abool_t CL_Do_Locking = ATOMIC_VAR_INIT(true);   //!< If set to false with do_locking(false), no real locking is done.
-	abool_t CL_Is_Locked  = ATOMIC_VAR_INIT(false);  //!< Set to true if a lock is imposed, atomic_flag can't do it.
+    abool_t CL_Do_Locking = ATOMIC_VAR_INIT( true ); //!< If set to false with do_locking(false), no real locking is done.
+    abool_t CL_Is_Locked  = ATOMIC_VAR_INIT( false ); //!< Set to true if a lock is imposed, atomic_flag can't do it.
 
 #ifdef PWX_USE_FLAGSPIN
-	aflag_t CL_Lock       = ATOMIC_FLAG_INIT;        //!< Instead of a costly mutex atomic_flag spinlocks are used.
+    aflag_t CL_Lock       = ATOMIC_FLAG_INIT;        //!< Instead of a costly mutex atomic_flag spinlocks are used.
 #else
-	lock_t CL_Lock;                                  //!< Use standard mutex to handle locking
+    lock_t CL_Lock;                                  //!< Use standard mutex to handle locking
 #endif // PWX_USE_FLAGSPIN
 
-	aui32_t CL_Lock_Count = ATOMIC_VAR_INIT(0);      //!< How many times the current thread has locked.
-	asize_t CL_Thread_ID  = ATOMIC_VAR_INIT(0);      //!< The owning thread of a lock
+    aui32_t CL_Lock_Count = ATOMIC_VAR_INIT( 0 );    //!< How many times the current thread has locked.
+    asize_t CL_Thread_ID  = ATOMIC_VAR_INIT( 0 );    //!< The owning thread of a lock
 }; // class CLockable
 
 
@@ -197,12 +196,12 @@ private:
  * ===============================================================
  */
 
-bool PWX_API are_locked(const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
-bool PWX_API are_locked(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept PWX_WARNUNUSED;
-bool PWX_API try_locks (const CLockable* objA, const CLockable* objB)                        noexcept PWX_WARNUNUSED;
-bool PWX_API try_locks (const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept PWX_WARNUNUSED;
-bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB)                        noexcept;
-bool PWX_API unlock_all(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept;
+bool PWX_API are_locked( const CLockable* objA, const CLockable* objB )                        noexcept PWX_WARNUNUSED;
+bool PWX_API are_locked( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept PWX_WARNUNUSED;
+bool PWX_API try_locks ( const CLockable* objA, const CLockable* objB )                        noexcept PWX_WARNUNUSED;
+bool PWX_API try_locks ( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept PWX_WARNUNUSED;
+bool PWX_API unlock_all( const CLockable* objA, const CLockable* objB )                        noexcept;
+bool PWX_API unlock_all( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept;
 
 // Note: A RAII-based class that uses these helpers is pwx::CLockGuard in pwx/types/pwxCLockGuard.h
 

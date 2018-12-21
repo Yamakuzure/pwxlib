@@ -12,17 +12,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,83 +62,82 @@ class CThreadElementStore;
   * <LI>eNr needs no const_cast, it is mutable.</LI>
   * </UL>
 **/
-class PWX_API VElement : public CLockable
-{
-public:
+class PWX_API VElement : public CLockable {
+  public:
 
-	/* ===============================================
-	 * === Public types                            ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public types                            ===
+     * ===============================================
+    */
 
-	typedef CLockable                     base_t;
-	typedef VElement                      elem_t;
-	typedef private_::CThreadElementStore store_t;
-
-
-	/* ===============================================
-	 * === Public constructors and destructors     ===
-	 * ===============================================
-	*/
-
-	explicit VElement() noexcept;
-	VElement (const VElement &src) noexcept;
-	virtual ~VElement() noexcept;
+    typedef CLockable                     base_t;
+    typedef VElement                      elem_t;
+    typedef private_::CThreadElementStore store_t;
 
 
-	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public constructors and destructors     ===
+     * ===============================================
+    */
 
-	virtual void     disable_thread_safety()    noexcept;                //!< turn off locking
-	virtual void     enable_thread_safety()     noexcept;                //!< turn on locking
-	virtual void     insert(store_t* new_store) noexcept;                //!< mark as inserted
-	        bool     inserted()           const noexcept PWX_WARNUNUSED; //!< return true if marked as inserted
-	        uint32_t nr()                 const noexcept PWX_WARNUNUSED; //!< return current number
-	virtual void     remove()                   noexcept;                //!< mark as removed
-	        bool     removed()            const noexcept PWX_WARNUNUSED; //!< return true if marked as removed
+    explicit VElement() noexcept;
+    VElement ( const VElement& src ) noexcept;
+    virtual ~VElement() noexcept;
 
 
-	/* ===============================================
-	 * === Public operators                        ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public methods                          ===
+     * ===============================================
+    */
 
-	virtual VElement &operator=(const VElement &src) noexcept;
-
-
-	/* ===============================================
-	 * === Public members                          ===
-	 * ===============================================
-	*/
-
-	mutable
-	aui32_t eNr = ATOMIC_VAR_INIT(0); //!< Number of the element
+    virtual void     disable_thread_safety()    noexcept;                //!< turn off locking
+    virtual void     enable_thread_safety()     noexcept;                //!< turn on locking
+    virtual void     insert( store_t* new_store ) noexcept;              //!< mark as inserted
+    bool     inserted()           const noexcept PWX_WARNUNUSED; //!< return true if marked as inserted
+    uint32_t nr()                 const noexcept PWX_WARNUNUSED; //!< return current number
+    virtual void     remove()                   noexcept;                //!< mark as removed
+    bool     removed()            const noexcept PWX_WARNUNUSED; //!< return true if marked as removed
 
 
-protected:
+    /* ===============================================
+     * === Public operators                        ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Protected members                       ===
-	 * ===============================================
-	 */
-
-	using base_t::isDestroyed;
-	using base_t::memOrdLoad;
-	using base_t::memOrdStore;
+    virtual VElement& operator=( const VElement& src ) noexcept;
 
 
-private:
+    /* ===============================================
+     * === Public members                          ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Private members                         ===
-	 * ===============================================
-	 */
+    mutable
+    aui32_t eNr = ATOMIC_VAR_INIT( 0 ); //!< Number of the element
 
-	store_t* currStore = nullptr;                //!< If set by a container the element will invalidate itself upon removal.
-	mutable
-	abool_t  isRemoved = ATOMIC_VAR_INIT(true);  //!< Set to true by ctor and remove*(), set to false by insert*() methods.
+
+  protected:
+
+    /* ===============================================
+     * === Protected members                       ===
+     * ===============================================
+     */
+
+    using base_t::isDestroyed;
+    using base_t::memOrdLoad;
+    using base_t::memOrdStore;
+
+
+  private:
+
+    /* ===============================================
+     * === Private members                         ===
+     * ===============================================
+     */
+
+    store_t* currStore = nullptr;                //!< If set by a container the element will invalidate itself upon removal.
+    mutable
+    abool_t  isRemoved = ATOMIC_VAR_INIT( true ); //!< Set to true by ctor and remove*(), set to false by insert*() methods.
 
 }; // class VContainer
 

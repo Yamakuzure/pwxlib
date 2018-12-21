@@ -7,17 +7,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,15 +42,14 @@ VElement::VElement() noexcept
 { }
 
 /// @brief VElement copy constructor.
-VElement::VElement(const VElement& src) noexcept
- :	base_t(src)
+VElement::VElement( const VElement& src ) noexcept
+    :	base_t( src )
 { }
 
 
 /// @brief ~VElement default destructor.
-VElement::~VElement() noexcept
-{
-	this->remove();
+VElement::~VElement() noexcept {
+    this->remove();
 }
 
 
@@ -63,9 +62,8 @@ VElement::~VElement() noexcept
   * threads work with this element while this method is
   * called, the outcome is unpredictable.
   */
-void VElement::disable_thread_safety() noexcept
-{
-	this->do_locking(false);
+void VElement::disable_thread_safety() noexcept {
+    this->do_locking( false );
 }
 
 
@@ -73,9 +71,8 @@ void VElement::disable_thread_safety() noexcept
   *
   * This method enables all thread safety measures.
   */
-void VElement::enable_thread_safety() noexcept
-{
-	this->do_locking(true);
+void VElement::enable_thread_safety() noexcept {
+    this->do_locking( true );
 }
 
 
@@ -90,12 +87,11 @@ void VElement::enable_thread_safety() noexcept
   *
   * @param[in] new_store pointer to the CThreadElementStore that might handle this element from now on.
 **/
-void VElement::insert(store_t* new_store) noexcept
-{
-	isRemoved.store(false, memOrdStore);
-	if (currStore)
-		currStore->invalidate(this);
-	currStore = new_store;
+void VElement::insert( store_t* new_store ) noexcept {
+    isRemoved.store( false, memOrdStore );
+    if ( currStore )
+        currStore->invalidate( this );
+    currStore = new_store;
 }
 
 
@@ -106,18 +102,16 @@ void VElement::insert(store_t* new_store) noexcept
   *
   * @return true if the element is a member of any container
 **/
-bool VElement::inserted() const noexcept
-{
-	return !isRemoved.load(memOrdLoad);
+bool VElement::inserted() const noexcept {
+    return !isRemoved.load( memOrdLoad );
 }
 
 
 /** @brief return the current number of the element in a thread safe way
   * @return the current number of the element
 **/
-uint32_t VElement::nr() const noexcept
-{
-	return eNr.load(memOrdLoad);
+uint32_t VElement::nr() const noexcept {
+    return eNr.load( memOrdLoad );
 }
 
 
@@ -129,11 +123,10 @@ uint32_t VElement::nr() const noexcept
   * Additionally this method will call invalidate(this) on that
   * a set CThreadElementStore store if it has been set upon insertion.
 **/
-void VElement::remove() noexcept
-{
-	isRemoved.store(true, memOrdStore);
-	if (currStore)
-		currStore->invalidate(this);
+void VElement::remove() noexcept {
+    isRemoved.store( true, memOrdStore );
+    if ( currStore )
+        currStore->invalidate( this );
 }
 
 
@@ -144,17 +137,15 @@ void VElement::remove() noexcept
   *
   * @return true if the element is not a member of any container
 **/
-bool VElement::removed() const noexcept
-{
-	return isRemoved.load(memOrdLoad);
+bool VElement::removed() const noexcept {
+    return isRemoved.load( memOrdLoad );
 }
 
 
 /// Copy nothing but CLockable values, number and CThreadElementStore must be set by containers.
-VElement &VElement::operator=(const VElement &src) noexcept
-{
-	beThreadSafe(src.beThreadSafe());
-	return *this;
+VElement& VElement::operator=( const VElement& src ) noexcept {
+    beThreadSafe( src.beThreadSafe() );
+    return *this;
 }
 
 

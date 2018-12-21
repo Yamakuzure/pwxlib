@@ -11,17 +11,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,21 +46,20 @@ namespace pwx {
   * This is meant to be used with a callback function. If a target pointer
   * is to be used, use TArgTarget instead.
 **/
-class CArgCallback : public VArgTargetBase
-{
-public:
-	explicit CArgCallback(const char* arg_short, const char* arg_long,
-				void (*arg_cb)(const char*, const char*),
-				const char* arg_desc, const char* param_name) noexcept;
+class CArgCallback : public VArgTargetBase {
+  public:
+    explicit CArgCallback( const char* arg_short, const char* arg_long,
+                           void ( *arg_cb )( const char*, const char* ),
+                           const char* arg_desc, const char* param_name ) noexcept;
 
-	virtual ~CArgCallback() noexcept;
+    virtual ~CArgCallback() noexcept;
 
-	virtual eArgErrorNumber process(const char* param);
+    virtual eArgErrorNumber process( const char* param );
 
-private:
+  private:
 
-	// callback
-	void (*cb)(const char*, const char*);
+    // callback
+    void ( *cb )( const char*, const char* );
 
 };
 

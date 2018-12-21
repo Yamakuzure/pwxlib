@@ -12,17 +12,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,54 +54,53 @@ namespace pwx {
   * <LI>Both doRenumber and eCount are mutable and need no const_cast</LI>
   * </UL>
 **/
-class PWX_API VContainer : public CLockable
-{
-public:
-	/* ===============================================
-	 * === Public types                            ===
-	 * ===============================================
-	*/
+class PWX_API VContainer : public CLockable {
+  public:
+    /* ===============================================
+     * === Public types                            ===
+     * ===============================================
+    */
 
-	typedef CLockable                 base_t;
-	typedef VContainer                list_t;
-
-
-	/* ===============================================
-	 * === Public Constructors and destructors     ===
-	 * ===============================================
-	*/
-
-	explicit VContainer() noexcept;
-	VContainer (const VContainer &src) noexcept;
-	virtual ~VContainer() noexcept;
+    typedef CLockable                 base_t;
+    typedef VContainer                list_t;
 
 
-	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public Constructors and destructors     ===
+     * ===============================================
+    */
 
-	virtual void     clear()                 noexcept PWX_VIRTUAL_PURE;
-	virtual void     disable_thread_safety() noexcept PWX_VIRTUAL_PURE;
-	virtual bool     empty()           const noexcept PWX_VIRTUAL_PURE;
-	virtual void     enable_thread_safety()  noexcept PWX_VIRTUAL_PURE;
-	virtual uint32_t size()            const noexcept PWX_VIRTUAL_PURE;
+    explicit VContainer() noexcept;
+    VContainer ( const VContainer& src ) noexcept;
+    virtual ~VContainer() noexcept;
 
 
-protected:
+    /* ===============================================
+     * === Public methods                          ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Protected members                       ===
-	 * ===============================================
-	*/
+    virtual void     clear()                 noexcept PWX_VIRTUAL_PURE;
+    virtual void     disable_thread_safety() noexcept PWX_VIRTUAL_PURE;
+    virtual bool     empty()           const noexcept PWX_VIRTUAL_PURE;
+    virtual void     enable_thread_safety()  noexcept PWX_VIRTUAL_PURE;
+    virtual uint32_t size()            const noexcept PWX_VIRTUAL_PURE;
 
-	mutable
-	abool_t doRenumber = ATOMIC_VAR_INIT(false); //!< If set to true, a renumbering is done before retrieving elements by index
-	mutable
-	aui32_t eCount     = ATOMIC_VAR_INIT(0);     //!< Current number of elements
 
-	using base_t::memOrdLoad;
-	using base_t::memOrdStore;
+  protected:
+
+    /* ===============================================
+     * === Protected members                       ===
+     * ===============================================
+    */
+
+    mutable
+    abool_t doRenumber = ATOMIC_VAR_INIT( false ); //!< If set to true, a renumbering is done before retrieving elements by index
+    mutable
+    aui32_t eCount     = ATOMIC_VAR_INIT( 0 );   //!< Current number of elements
+
+    using base_t::memOrdLoad;
+    using base_t::memOrdStore;
 }; // class VContainer
 
 } // namespace pwx

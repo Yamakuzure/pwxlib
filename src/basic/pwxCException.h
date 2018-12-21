@@ -17,17 +17,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -65,59 +65,58 @@ namespace pwx {
   * trace(): Return a trace of all methods this exceptions passed through. If it didn't pass through anywhere,
   *          the trace is empty.
 **/
-class PWX_API CException : public std::exception
-{
+class PWX_API CException : public std::exception {
 
-public:
+  public:
 
-	/* ===============================================
-	 * === Public Constructors and destructor      ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public Constructors and destructor      ===
+     * ===============================================
+    */
 
-	explicit
-	CException (const char* const name_, const char* const what_, const char* const where_,
-				const char* const func_, const char* const desc_) noexcept;
-	CException (const CException &src) noexcept;
-	CException () PWX_DELETE;          // No empty ctor!
-	virtual ~CException() noexcept;
-
-
-	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	*/
-
-	const char* name       ()                   const noexcept;
-	const char* what       ()                   const noexcept;
-	const char* where      ()                   const noexcept;
-	const char* desc       ()                   const noexcept;
-	const char* pfunc      ()                   const noexcept;
-	const char* trace      ()                   const noexcept;
-	void        addToTrace (const char* trace_)       noexcept;
+    explicit
+    CException ( const char* const name_, const char* const what_, const char* const where_,
+                 const char* const func_, const char* const desc_ ) noexcept;
+    CException ( const CException& src ) noexcept;
+    CException () PWX_DELETE;          // No empty ctor!
+    virtual ~CException() noexcept;
 
 
-	/* ===============================================
-	 * === Public operators                        ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public methods                          ===
+     * ===============================================
+    */
 
-	CException &operator= (const CException &e) PWX_DELETE; // No assignment
+    const char* name       ()                   const noexcept;
+    const char* what       ()                   const noexcept;
+    const char* where      ()                   const noexcept;
+    const char* desc       ()                   const noexcept;
+    const char* pfunc      ()                   const noexcept;
+    const char* trace      ()                   const noexcept;
+    void        addToTrace ( const char* trace_ )       noexcept;
 
 
-private:
+    /* ===============================================
+     * === Public operators                        ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Private members                         ===
-	 * ===============================================
-	*/
+    CException& operator= ( const CException& e ) PWX_DELETE; // No assignment
 
-	const char *const txtName;  //!< the name of the exception
-	const char *const txtWhat;  //!< the classic what() text
-	const char *const txtWhere; //!< A malloc'd C-String with "file:line - method"
-	const char *const txtFunc;  //!< The result of __PRETTY_FUNC__
-	const char *const txtDesc;  //!< Optional description
-	std::string txtTrace;     //!< A trace, that can hopefully be added together
+
+  private:
+
+    /* ===============================================
+     * === Private members                         ===
+     * ===============================================
+    */
+
+    const char* const txtName;  //!< the name of the exception
+    const char* const txtWhat;  //!< the classic what() text
+    const char* const txtWhere; //!< A malloc'd C-String with "file:line - method"
+    const char* const txtFunc;  //!< The result of __PRETTY_FUNC__
+    const char* const txtDesc;  //!< Optional description
+    std::string txtTrace;     //!< A trace, that can hopefully be added together
 };
 
 

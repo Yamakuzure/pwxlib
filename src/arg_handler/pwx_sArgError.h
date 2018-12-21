@@ -11,17 +11,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -44,27 +44,26 @@ namespace pwx {
 /** @struct sArgError
   * @brief tiny struct to hold an error number and text together.
 **/
-struct sArgError
-{
-	int32_t     arg_errno; //!< number of the error, taken from eArgErrorNumber
-	const char* arg_error; //!< String with the error text
+struct sArgError {
+    int32_t     arg_errno; //!< number of the error, taken from eArgErrorNumber
+    const char* arg_error; //!< String with the error text
 
-	// Note: The prefix arg_ is needed, or the preprocessor will
-	//       substitute "errno" with "(*__errno_location ())"
+    // Note: The prefix arg_ is needed, or the preprocessor will
+    //       substitute "errno" with "(*__errno_location ())"
 
-	explicit sArgError(eArgErrorNumber errno_, const char* error_) noexcept;
-	~sArgError() noexcept;
+    explicit sArgError( eArgErrorNumber errno_, const char* error_ ) noexcept;
+    ~sArgError() noexcept;
 
-	// No empty ctor, no copying
-	sArgError() PWX_DELETE;
-	sArgError(const sArgError&) PWX_DELETE;
-	sArgError &operator=(const sArgError&) PWX_DELETE;
+    // No empty ctor, no copying
+    sArgError() PWX_DELETE;
+    sArgError( const sArgError& ) PWX_DELETE;
+    sArgError& operator=( const sArgError& ) PWX_DELETE;
 
 };
 
 // Operators needed for pwx container storage:
-bool operator==(const sArgError &lhs, const sArgError &rhs) noexcept;
-bool operator>(const sArgError &lhs, const sArgError &rhs) noexcept;
+bool operator==( const sArgError& lhs, const sArgError& rhs ) noexcept;
+bool operator>( const sArgError& lhs, const sArgError& rhs ) noexcept;
 
 } // namespace pwx
 

@@ -7,17 +7,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -75,10 +75,10 @@ CLockable::CLockable() noexcept
   * All objects have their private locking.
   * Only the state whether to actually do the locking is copied.
   */
-CLockable::CLockable (const CLockable &src) noexcept
- :	memOrdLoad(src.memOrdLoad),
-	memOrdStore(src.memOrdStore),
-	CL_Do_Locking(ATOMIC_VAR_INIT(src.CL_Do_Locking.load(PWX_MEMORDER_RELAXED)))
+CLockable::CLockable ( const CLockable& src ) noexcept
+    :	memOrdLoad( src.memOrdLoad ),
+      memOrdStore( src.memOrdStore ),
+      CL_Do_Locking( ATOMIC_VAR_INIT( src.CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) )
 { /* --- nothing to do here. ---*/ }
 
 
@@ -87,20 +87,19 @@ CLockable::CLockable (const CLockable &src) noexcept
   *
   * The default dtor will try to unlock a held mutex until it succeeds.
   */
-CLockable::~CLockable() noexcept
-{
-	DEBUG_LOCK_STATE("~CLockable", this, this)
-	isDestroyed.store(true, memOrdStore);
+CLockable::~CLockable() noexcept {
+    DEBUG_LOCK_STATE( "~CLockable", this, this )
+    isDestroyed.store( true, memOrdStore );
 #ifdef PWX_USE_FLAGSPIN
-	// Simply move the id to this thread:
-	CL_Thread_ID.store(CURRENT_THREAD_ID, PWX_MEMORDER_RELAXED);
+    // Simply move the id to this thread:
+    CL_Thread_ID.store( CURRENT_THREAD_ID, PWX_MEMORDER_RELAXED );
 #else
-	// Otherwise we have to wait for a real lock.
-	lock();
+    // Otherwise we have to wait for a real lock.
+    lock();
 #endif // PWX_USE_FLAGSPIN
-	clear_locks();
-	// the return value is unimportant, we can't do
-	// anything about it in the middle of a dtor anyway.
+    clear_locks();
+    // the return value is unimportant, we can't do
+    // anything about it in the middle of a dtor anyway.
 }
 
 
@@ -109,10 +108,9 @@ CLockable::~CLockable() noexcept
   * All objects have their private locking.
   * Only the state whether to actually do the locking is copied.
   */
-CLockable &CLockable::operator= (const CLockable &src) noexcept
-{
-	do_locking(src.CL_Do_Locking.load(PWX_MEMORDER_RELAXED));
-	return *this;
+CLockable& CLockable::operator= ( const CLockable& src ) noexcept {
+    do_locking( src.CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) );
+    return *this;
 }
 
 
@@ -122,17 +120,15 @@ CLockable &CLockable::operator= (const CLockable &src) noexcept
 
 
 /// @brief return true if thread safety mode is turned on
-bool CLockable::beThreadSafe() const noexcept
-{
-	return CL_Do_Locking.load(PWX_MEMORDER_RELAXED);
+bool CLockable::beThreadSafe() const noexcept {
+    return CL_Do_Locking.load( PWX_MEMORDER_RELAXED );
 }
 
 
 /// @brief set thread safety mode to @a doLock
 /// This is just an alias for do_locking().
-void CLockable::beThreadSafe(bool doLock) noexcept
-{
-	this->do_locking(doLock);
+void CLockable::beThreadSafe( bool doLock ) noexcept {
+    this->do_locking( doLock );
 }
 
 
@@ -145,28 +141,27 @@ void CLockable::beThreadSafe(bool doLock) noexcept
   *
   * @return true if this thread is the owner and all locks could be cleared.
 **/
-bool CLockable::clear_locks() noexcept
-{
-	if (CL_Do_Locking.load(PWX_MEMORDER_RELAXED)) {
-		if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_RELAXED) ) {
-			THREAD_LOG("base", "clear_locks(), Owner id 0x%08lx, %u locks [%s]",
-					CL_Thread_ID.load(PWX_MEMORDER_RELAXED),
-					CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
-					CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
-			CL_Lock_Count.store(0, PWX_MEMORDER_RELAXED);
-			CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
-			CL_Is_Locked.store(false, PWX_MEMORDER_RELAXED);
+bool CLockable::clear_locks() noexcept {
+    if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+        if ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
+            THREAD_LOG( "base", "clear_locks(), Owner id 0x%08lx, %u locks [%s]",
+                        CL_Thread_ID.load( PWX_MEMORDER_RELAXED ),
+                        CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
+                        CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" )
+            CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
+            CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
+            CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
 #ifdef PWX_USE_FLAGSPIN
-			CL_Lock.clear(memOrdStore); // This *must* be last!
+            CL_Lock.clear( memOrdStore ); // This *must* be last!
 #else
-			CL_Lock.unlock();
+            CL_Lock.unlock();
 #endif // PWX_USE_FLAGSPIN
-		} // End of trying from within the right thread
-		else
-			return false; // Not from this thread!
-	} // End of having to care about locking
+        } // End of trying from within the right thread
+        else
+            return false; // Not from this thread!
+    } // End of having to care about locking
 
-	return true;
+    return true;
 }
 
 
@@ -180,9 +175,8 @@ bool CLockable::clear_locks() noexcept
   *
   * @return true if the element is within its destruction process.
 **/
-bool CLockable::destroyed() const noexcept
-{
-	return isDestroyed.load(memOrdLoad);
+bool CLockable::destroyed() const noexcept {
+    return isDestroyed.load( memOrdLoad );
 }
 
 
@@ -194,71 +188,68 @@ bool CLockable::destroyed() const noexcept
   *
   * @param[in] doLock true to turn locking on, false to turn it off.
 **/
-void CLockable::do_locking(bool doLock) noexcept
-{
-	if (doLock != CL_Do_Locking.load(PWX_MEMORDER_RELAXED)) {
-		// If locking is enabled, change memory order now to strict
-		if (doLock) {
-			memOrdLoad  = PWX_MEMORDER_ACQUIRE;
-			memOrdStore = PWX_MEMORDER_RELEASE;
-		}
+void CLockable::do_locking( bool doLock ) noexcept {
+    if ( doLock != CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+        // If locking is enabled, change memory order now to strict
+        if ( doLock ) {
+            memOrdLoad  = PWX_MEMORDER_ACQUIRE;
+            memOrdStore = PWX_MEMORDER_RELEASE;
+        }
 
-		// Switch now, so other threads stop locking
-		// If this is a switch "on", it is finished anyway.
-		CL_Do_Locking.store(doLock, PWX_MEMORDER_RELEASE);
+        // Switch now, so other threads stop locking
+        // If this is a switch "on", it is finished anyway.
+        CL_Do_Locking.store( doLock, PWX_MEMORDER_RELEASE );
 
-		if (!doLock) {
-			/* If this is not locked by the calling thread, it
-			 * is either not locked or locked by another thread.
-			 * In any case before disabling locking, this very
-			 * thread must be the exclusive user.
-			 */
-			if (CL_Thread_ID.load(PWX_MEMORDER_RELAXED) != CURRENT_THREAD_ID) {
-				/* Sorry for the code doubling, but lock() would listen
-				 * to CL_Do_Locking and that has to be false by now.
-				 */
-				std::this_thread::yield(); // to be sure this thread is last
+        if ( !doLock ) {
+            /* If this is not locked by the calling thread, it
+             * is either not locked or locked by another thread.
+             * In any case before disabling locking, this very
+             * thread must be the exclusive user.
+             */
+            if ( CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) != CURRENT_THREAD_ID ) {
+                /* Sorry for the code doubling, but lock() would listen
+                 * to CL_Do_Locking and that has to be false by now.
+                 */
+                std::this_thread::yield(); // to be sure this thread is last
 #ifdef PWX_USE_FLAGSPIN
-				while (CL_Lock.test_and_set()) {
+                while ( CL_Lock.test_and_set() ) {
 # ifdef PWX_USE_FLAGSPIN_YIELD
-					std::this_thread::yield();
+                    std::this_thread::yield();
 # endif // PWX_USE_FLAGSPIN_YIELD
-				}
+                }
 #else
-				CL_Lock.lock();
+                CL_Lock.lock();
 #endif // PWX_USE_FLAGSPIN
-			} // end of having to gain the lock
+            } // end of having to gain the lock
 
-			// Nuke all data:
-			CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
-			CL_Lock_Count.store(0, PWX_MEMORDER_RELAXED);
+            // Nuke all data:
+            CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
+            CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
 #ifdef PWX_USE_FLAGSPIN
             // Note: Here it is in order to clear relaxed, as no
             //       other thread should be waitng right now.
-			CL_Lock.clear(PWX_MEMORDER_RELAXED);
+            CL_Lock.clear( PWX_MEMORDER_RELAXED );
 #else
-			CL_Lock.unlock();
+            CL_Lock.unlock();
 #endif // PWX_USE_FLAGSPIN
-			CL_Is_Locked.store(false, PWX_MEMORDER_RELEASE);
-			// The memory order is relaxed last
-			memOrdLoad  = PWX_MEMORDER_RELAXED;
-			memOrdStore = PWX_MEMORDER_RELAXED;
-		} // End of switching locking off
-	} // End of having a change
+            CL_Is_Locked.store( false, PWX_MEMORDER_RELEASE );
+            // The memory order is relaxed last
+            memOrdLoad  = PWX_MEMORDER_RELAXED;
+            memOrdStore = PWX_MEMORDER_RELAXED;
+        } // End of switching locking off
+    } // End of having a change
 }
 
 
 /// @brief return true if this object is currently locked
-bool CLockable::is_locked() const noexcept
-{
-	return CL_Is_Locked.load(memOrdLoad);
+bool CLockable::is_locked() const noexcept {
+    return CL_Is_Locked.load( memOrdLoad );
 }
 
 
 /// @brief return true if the locking is turned on.
-bool CLockable::is_locking() const noexcept
-{
-	return CL_Do_Locking.load(PWX_MEMORDER_RELAXED);
+bool CLockable::is_locking() const noexcept {
+    return CL_Do_Locking.load( PWX_MEMORDER_RELAXED );
 }
 
 
@@ -266,51 +257,49 @@ bool CLockable::is_locking() const noexcept
   *
   * Lock this object for the current thread if locking is enabled.
   */
-void CLockable::lock() noexcept
-{
-	// return at once if this object is in destruction
-	if (isDestroyed.load(memOrdLoad))
-		return;
+void CLockable::lock() noexcept {
+    // return at once if this object is in destruction
+    if ( isDestroyed.load( memOrdLoad ) )
+        return;
 
-	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED) ) {
-		size_t ctid = CURRENT_THREAD_ID;
-		THREAD_LOG("base", "lock(), Owner id 0x%08lx, %u locks [%s]",
-				ctid, CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
-				CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
+    if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+        size_t ctid = CURRENT_THREAD_ID;
+        THREAD_LOG( "base", "lock(), Owner id 0x%08lx, %u locks [%s]",
+                    ctid, CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
+                    CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" )
 
-		// For both the spinlock and the mutex an action
-		// is only taken if this object is not already
-		// locked by this thread
-		if ( ctid != CL_Thread_ID.load(PWX_MEMORDER_RELAXED) ) {
+        // For both the spinlock and the mutex an action
+        // is only taken if this object is not already
+        // locked by this thread
+        if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
 #ifdef PWX_USE_FLAGSPIN
-			while (CL_Lock.test_and_set()) {
+            while ( CL_Lock.test_and_set() ) {
 # ifdef PWX_USE_FLAGSPIN_YIELD
-				std::this_thread::yield();
+                std::this_thread::yield();
 # endif // PWX_USE_FLAGSPIN_YIELD
-			}
+            }
 #else
-			CL_Lock.lock();
+            CL_Lock.lock();
 #endif // PWX_USE_FLAGSPIN
 
-			// Got it now, so note it:
-			CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
-			CL_Thread_ID.store(ctid, PWX_MEMORDER_RELAXED);
-			CL_Lock_Count.store(1, PWX_MEMORDER_RELAXED);
-		} else
-			// If this thread already has a lock, the call is just counted
-			CL_Lock_Count.fetch_add(1, PWX_MEMORDER_RELAXED);
-	} // End of doing locking
+            // Got it now, so note it:
+            CL_Is_Locked.store( true, PWX_MEMORDER_RELEASE );
+            CL_Thread_ID.store( ctid, PWX_MEMORDER_RELAXED );
+            CL_Lock_Count.store( 1, PWX_MEMORDER_RELAXED );
+        } else
+            // If this thread already has a lock, the call is just counted
+            CL_Lock_Count.fetch_add( 1, PWX_MEMORDER_RELAXED );
+    } // End of doing locking
 }
 
 
 /** @brief return the number of locks on this object *this* thread has
   * @return the number of current locks held by the calling thread
 **/
-uint32_t CLockable::lock_count() const noexcept
-{
-	if (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_RELAXED))
-		return CL_Lock_Count.load(PWX_MEMORDER_RELAXED);
-	return 0;
+uint32_t CLockable::lock_count() const noexcept {
+    if ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) )
+        return CL_Lock_Count.load( PWX_MEMORDER_RELAXED );
+    return 0;
 }
 
 
@@ -320,39 +309,38 @@ uint32_t CLockable::lock_count() const noexcept
   *
   * @return true if the object could be locked, false otherwise.
   */
-bool CLockable::try_lock() noexcept
-{
-	// return at once if this object is in destruction
-	if (isDestroyed.load(memOrdLoad))
-		return false;
+bool CLockable::try_lock() noexcept {
+    // return at once if this object is in destruction
+    if ( isDestroyed.load( memOrdLoad ) )
+        return false;
 
-	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED) ) {
-		size_t ctid = CURRENT_THREAD_ID;
-		THREAD_LOG("base", "try_lock(), Owner id 0x%08lx, %u locks [%s]",
-				CL_Thread_ID.load(PWX_MEMORDER_RELAXED),
-				CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
-				CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
+    if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+        size_t ctid = CURRENT_THREAD_ID;
+        THREAD_LOG( "base", "try_lock(), Owner id 0x%08lx, %u locks [%s]",
+                    CL_Thread_ID.load( PWX_MEMORDER_RELAXED ),
+                    CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
+                    CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" )
 
-		// Same as with locking: Only try if this thread does
-		// not already own the lock
-		if (ctid != CL_Thread_ID.load(PWX_MEMORDER_RELAXED)) {
+        // Same as with locking: Only try if this thread does
+        // not already own the lock
+        if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
 #ifdef PWX_USE_FLAGSPIN
-			if (!CL_Lock.test_and_set()) {
+            if ( !CL_Lock.test_and_set() ) {
 #else
-			if (CL_Lock.try_lock()) {
+            if ( CL_Lock.try_lock() ) {
 #endif // PWX_USE_FLAGSPIN
-				// Got it now, so note it:
-				CL_Is_Locked.store(true, PWX_MEMORDER_RELEASE);
-				CL_Thread_ID.store(ctid, PWX_MEMORDER_RELAXED);
-				CL_Lock_Count.store(1, PWX_MEMORDER_RELAXED);
-				return true;
-			}
-			return false; // Nope, and only condition for a no-no.
-		} // end of really having to try
-	}
+                // Got it now, so note it:
+                CL_Is_Locked.store( true, PWX_MEMORDER_RELEASE );
+                CL_Thread_ID.store( ctid, PWX_MEMORDER_RELAXED );
+                CL_Lock_Count.store( 1, PWX_MEMORDER_RELAXED );
+                return true;
+            }
+            return false; // Nope, and only condition for a no-no.
+        } // end of really having to try
+    }
 
-	// return true otherwise, we are fine.
-	return true;
+    // return true otherwise, we are fine.
+    return true;
 }
 
 
@@ -361,26 +349,25 @@ bool CLockable::try_lock() noexcept
   * If locking is disabled or if the current thread does not hold
   * the lock, nothing happens. Otherwise the last lock is released.
   */
-void CLockable::unlock() noexcept
-{
-	if ( CL_Do_Locking.load(PWX_MEMORDER_RELAXED)
-	  && (CURRENT_THREAD_ID == CL_Thread_ID.load(PWX_MEMORDER_RELAXED))) {
-		THREAD_LOG("base", "unlock(), Owner id 0x%08lx, %u locks [%s]",
-				CL_Thread_ID.load(PWX_MEMORDER_RELAXED),
-				CL_Lock_Count.load(PWX_MEMORDER_RELAXED),
-				CL_Is_Locked.load(PWX_MEMORDER_ACQUIRE) ? "locked" : "not locked")
+void CLockable::unlock() noexcept {
+    if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED )
+            && ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) ) {
+        THREAD_LOG( "base", "unlock(), Owner id 0x%08lx, %u locks [%s]",
+                    CL_Thread_ID.load( PWX_MEMORDER_RELAXED ),
+                    CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
+                    CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" )
 
-		if (1 == CL_Lock_Count.fetch_sub(1, PWX_MEMORDER_RELAXED)) {
-			// The lock will go away now:
-			CL_Thread_ID.store(0, PWX_MEMORDER_RELAXED);
-			CL_Is_Locked.store(false, PWX_MEMORDER_RELAXED);
+        if ( 1 == CL_Lock_Count.fetch_sub( 1, PWX_MEMORDER_RELAXED ) ) {
+            // The lock will go away now:
+            CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
+            CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
 #ifdef PWX_USE_FLAGSPIN
-			CL_Lock.clear(PWX_MEMORDER_RELEASE);
+            CL_Lock.clear( PWX_MEMORDER_RELEASE );
 #else
-			CL_Lock.unlock();
+            CL_Lock.unlock();
 #endif // PWX_USE_FLAGSPIN
-		} // end of reducing the lock count
-	}
+        } // end of reducing the lock count
+    }
 }
 
 
@@ -402,11 +389,10 @@ void CLockable::unlock() noexcept
   * @param[in] objB the second object to check
   * @return true if both are locked, false if at least one is not locked
 **/
-bool are_locked(const CLockable* objA, const CLockable* objB) noexcept
-{
-	bool isLockedA = objA ? objA->is_locked() : true;
-	bool isLockedB = objB ? objB->is_locked() : true;
-	return isLockedA && isLockedB;
+bool are_locked( const CLockable* objA, const CLockable* objB ) noexcept {
+    bool isLockedA = objA ? objA->is_locked() : true;
+    bool isLockedB = objB ? objB->is_locked() : true;
+    return isLockedA && isLockedB;
 }
 
 
@@ -424,12 +410,11 @@ bool are_locked(const CLockable* objA, const CLockable* objB) noexcept
   * @param[in] objC the third object to check
   * @return true if all three are locked, false if at least one is not locked
 **/
-bool are_locked(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
-{
-	bool isLockedA = objA ? objA->is_locked() : true;
-	bool isLockedB = objB ? objB->is_locked() : true;
-	bool isLockedC = objC ? objC->is_locked() : true;
-	return isLockedA && isLockedB && isLockedC;
+bool are_locked( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept {
+    bool isLockedA = objA ? objA->is_locked() : true;
+    bool isLockedB = objB ? objB->is_locked() : true;
+    bool isLockedC = objC ? objC->is_locked() : true;
+    return isLockedA && isLockedB && isLockedC;
 }
 
 
@@ -446,25 +431,24 @@ bool are_locked(const CLockable* objA, const CLockable* objB, const CLockable* o
   * @param[in] objB the second object to lock
   * @return true if both could be locked, false if at least one lock failed
 **/
-bool try_locks(const CLockable* objA, const CLockable* objB) noexcept
-{
-	CLockable* xObjA = const_cast<CLockable*>(objA);
-	CLockable* xObjB = const_cast<CLockable*>(objB);
+bool try_locks( const CLockable* objA, const CLockable* objB ) noexcept {
+    CLockable* xObjA = const_cast<CLockable*>( objA );
+    CLockable* xObjB = const_cast<CLockable*>( objB );
 
-	bool lockedA = objA ? false : true;
-	bool lockedB = objB ? false : true;
+    bool lockedA = objA ? false : true;
+    bool lockedB = objB ? false : true;
 
-	if (!lockedA || !lockedB) {
-		if (xObjA) lockedA = xObjA->try_lock();
-		if (xObjB) lockedB = xObjB->try_lock();
+    if ( !lockedA || !lockedB ) {
+        if ( xObjA ) lockedA = xObjA->try_lock();
+        if ( xObjB ) lockedB = xObjB->try_lock();
 
-		if (!lockedA || !lockedB) {
-			if (xObjA && lockedA) xObjA->unlock();
-			if (xObjB && lockedB) xObjB->unlock();
-		}
-	}
+        if ( !lockedA || !lockedB ) {
+            if ( xObjA && lockedA ) xObjA->unlock();
+            if ( xObjB && lockedB ) xObjB->unlock();
+        }
+    }
 
-	return lockedA && lockedB;
+    return lockedA && lockedB;
 }
 
 
@@ -483,29 +467,28 @@ bool try_locks(const CLockable* objA, const CLockable* objB) noexcept
   * @param[in] objC the third object to lock
   * @return true if all three could be locked, false if at least one lock failed
 **/
-bool try_locks(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
-{
-	CLockable* xObjA = const_cast<CLockable*>(objA);
-	CLockable* xObjB = const_cast<CLockable*>(objB);
-	CLockable* xObjC = const_cast<CLockable*>(objC);
+bool try_locks( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept {
+    CLockable* xObjA = const_cast<CLockable*>( objA );
+    CLockable* xObjB = const_cast<CLockable*>( objB );
+    CLockable* xObjC = const_cast<CLockable*>( objC );
 
-	bool lockedA = xObjA ? false : true;
-	bool lockedB = xObjB ? false : true;
-	bool lockedC = xObjC ? false : true;
+    bool lockedA = xObjA ? false : true;
+    bool lockedB = xObjB ? false : true;
+    bool lockedC = xObjC ? false : true;
 
-	if (!lockedA || !lockedB || !lockedC) {
-		if (xObjA) lockedA = xObjA->try_lock();
-		if (xObjB) lockedB = xObjB->try_lock();
-		if (xObjC) lockedC = xObjC->try_lock();
+    if ( !lockedA || !lockedB || !lockedC ) {
+        if ( xObjA ) lockedA = xObjA->try_lock();
+        if ( xObjB ) lockedB = xObjB->try_lock();
+        if ( xObjC ) lockedC = xObjC->try_lock();
 
-		if (!lockedA || !lockedB || !lockedC) {
-			if (xObjA && lockedA) xObjA->unlock();
-			if (xObjB && lockedB) xObjB->unlock();
-			if (xObjC && lockedC) xObjC->unlock();
-		}
-	}
+        if ( !lockedA || !lockedB || !lockedC ) {
+            if ( xObjA && lockedA ) xObjA->unlock();
+            if ( xObjB && lockedB ) xObjB->unlock();
+            if ( xObjC && lockedC ) xObjC->unlock();
+        }
+    }
 
-	return lockedA && lockedB && lockedC;
+    return lockedA && lockedB && lockedC;
 }
 
 
@@ -522,14 +505,13 @@ bool try_locks(const CLockable* objA, const CLockable* objB, const CLockable* ob
   * @param[in] objB the second object to unlock
   * @return true if both could be unlocked, false if at least one was not locked
 **/
-bool unlock_all(const CLockable* objA, const CLockable* objB) noexcept
-{
-	if (are_locked(objA, objB)) {
-		if (objA) const_cast<CLockable*>(objA)->unlock();
-		if (objB) const_cast<CLockable*>(objB)->unlock();
-		return true;
-	}
-	return false;
+bool unlock_all( const CLockable* objA, const CLockable* objB ) noexcept {
+    if ( are_locked( objA, objB ) ) {
+        if ( objA ) const_cast<CLockable*>( objA )->unlock();
+        if ( objB ) const_cast<CLockable*>( objB )->unlock();
+        return true;
+    }
+    return false;
 }
 
 
@@ -547,15 +529,14 @@ bool unlock_all(const CLockable* objA, const CLockable* objB) noexcept
   * @param[in] objB the third object to unlock
   * @return true if all three could be unlocked, false if at least one was not locked
 **/
-bool unlock_all(const CLockable* objA, const CLockable* objB, const CLockable* objC) noexcept
-{
-	if (are_locked(objA, objB, objC)) {
-		if (objA) const_cast<CLockable*>(objA)->unlock();
-		if (objB) const_cast<CLockable*>(objB)->unlock();
-		if (objC) const_cast<CLockable*>(objC)->unlock();
-		return true;
-	}
-	return false;
+bool unlock_all( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept {
+    if ( are_locked( objA, objB, objC ) ) {
+        if ( objA ) const_cast<CLockable*>( objA )->unlock();
+        if ( objB ) const_cast<CLockable*>( objB )->unlock();
+        if ( objC ) const_cast<CLockable*>( objC )->unlock();
+        return true;
+    }
+    return false;
 }
 
 

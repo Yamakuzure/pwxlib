@@ -11,17 +11,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -68,73 +68,72 @@ namespace private_ {
   * use the internal hash table but simply change/retrieve on general
   * curr pointer. This can be reversed using beThreadSafe(true).
 **/
-class CThreadElementStore : public CLockable
-{
-public:
+class CThreadElementStore : public CLockable {
+  public:
 
-	/* ===============================================
-	 * === Public types                            ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public types                            ===
+     * ===============================================
+    */
 
-	typedef CLockable                    base_t;
-	typedef CThreadElementStore          store_t;
-	typedef VElement                     curr_t;
-	typedef TOpenHash<size_t, curr_t>    hash_t;
-	typedef THashElement<size_t, curr_t> elem_t;
-
-
-	/* ===============================================
-	 * === Public Constructors and destructors     ===
-	 * ===============================================
-	*/
-
-	explicit
-	CThreadElementStore(uint32_t initial_size) PWX_API;
-	CThreadElementStore()             noexcept PWX_API;
-	virtual ~CThreadElementStore()    noexcept PWX_API;
+    typedef CLockable                    base_t;
+    typedef CThreadElementStore          store_t;
+    typedef VElement                     curr_t;
+    typedef TOpenHash<size_t, curr_t>    hash_t;
+    typedef THashElement<size_t, curr_t> elem_t;
 
 
-	// No copying:
-    CThreadElementStore(CThreadElementStore&) PWX_DELETE;
-    CThreadElementStore &operator=(const CThreadElementStore&) PWX_DELETE;
+    /* ===============================================
+     * === Public Constructors and destructors     ===
+     * ===============================================
+    */
+
+    explicit
+    CThreadElementStore( uint32_t initial_size ) PWX_API;
+    CThreadElementStore()             noexcept PWX_API;
+    virtual ~CThreadElementStore()    noexcept PWX_API;
 
 
-	/* ===============================================
-	 * === Public Methods                          ===
-	 * ===============================================
-	*/
-
-	void    clear()                                  noexcept PWX_API;
-	curr_t* curr()                             const noexcept PWX_API;
-	curr_t* curr()                                   noexcept PWX_API;
-	void    curr(const curr_t* new_curr)       const noexcept PWX_API;
-	void    curr(curr_t* new_curr)                   noexcept PWX_API;
-	void    disable_thread_safety()                  noexcept PWX_API;
-	void    enable_thread_safety()                   noexcept PWX_API;
-	void    invalidate(const curr_t* old_curr) const noexcept PWX_API;
-	void    invalidate(curr_t* old_curr)             noexcept PWX_API;
+    // No copying:
+    CThreadElementStore( CThreadElementStore& ) PWX_DELETE;
+    CThreadElementStore& operator=( const CThreadElementStore& ) PWX_DELETE;
 
 
-protected:
+    /* ===============================================
+     * === Public Methods                          ===
+     * ===============================================
+    */
 
-	using base_t::memOrdLoad;
-	using base_t::memOrdStore;
+    void    clear()                                  noexcept PWX_API;
+    curr_t* curr()                             const noexcept PWX_API;
+    curr_t* curr()                                   noexcept PWX_API;
+    void    curr( const curr_t* new_curr )       const noexcept PWX_API;
+    void    curr( curr_t* new_curr )                   noexcept PWX_API;
+    void    disable_thread_safety()                  noexcept PWX_API;
+    void    enable_thread_safety()                   noexcept PWX_API;
+    void    invalidate( const curr_t* old_curr ) const noexcept PWX_API;
+    void    invalidate( curr_t* old_curr )             noexcept PWX_API;
 
 
-private:
+  protected:
 
-	/* ===============================================
-	 * === Private Members                         ===
-	 * ===============================================
-	*/
+    using base_t::memOrdLoad;
+    using base_t::memOrdStore;
 
-	mutable
-	hash_t  currs;                                 //!< Used when thread saftey is enabled (default)
-	mutable
-	abool_t invalidating = ATOMIC_VAR_INIT(false); //!< If set to true by invalidate(), curr() wait for a lock
-	mutable
-	curr_t* oneCurr      = nullptr;                //!< Used when thread safety is disabled
+
+  private:
+
+    /* ===============================================
+     * === Private Members                         ===
+     * ===============================================
+    */
+
+    mutable
+    hash_t  currs;                                 //!< Used when thread saftey is enabled (default)
+    mutable
+    abool_t invalidating = ATOMIC_VAR_INIT( false ); //!< If set to true by invalidate(), curr() wait for a lock
+    mutable
+    curr_t* oneCurr      = nullptr;                //!< Used when thread safety is disabled
 };
 
 

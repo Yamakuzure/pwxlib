@@ -4,7 +4,7 @@
 
 #include "test_lib.h"
 
-int32_t testRNG (sEnv &env);
+int32_t testRNG ( sEnv& env );
 
 
 #endif // PWX_LIBPWX_TESTLIB_TESTRNG_H_INCLUDED

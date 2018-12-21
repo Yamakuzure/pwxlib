@@ -7,17 +7,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -53,23 +53,21 @@ namespace pwx {
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-CArgCallback::CArgCallback(const char* arg_short, const char* arg_long,
-			void (*arg_cb)(const char*, const char*),
-			const char* arg_desc, const char* param_name)
-		noexcept :
-	VArgTargetBase(arg_short, arg_long, ATT_CB, arg_desc, param_name),
-	cb    (arg_cb)
-{
-	/* nothing to do here */
+CArgCallback::CArgCallback( const char* arg_short, const char* arg_long,
+                            void ( *arg_cb )( const char*, const char* ),
+                            const char* arg_desc, const char* param_name )
+noexcept :
+    VArgTargetBase( arg_short, arg_long, ATT_CB, arg_desc, param_name ),
+    cb    ( arg_cb ) {
+    /* nothing to do here */
 }
 
 
 /** @brief destructor
   * has nothing to do.
 **/
-CArgCallback::~CArgCallback() noexcept
-{
-	/* nothing to do here */
+CArgCallback::~CArgCallback() noexcept {
+    /* nothing to do here */
 }
 
 
@@ -82,20 +80,19 @@ CArgCallback::~CArgCallback() noexcept
   *
   * @return AEN_OK if the callback function was set.
 **/
-eArgErrorNumber CArgCallback::process(const char *param)
-{
-	if (cb) {
-		try {
-			cb(aLong.size() ? aLong.c_str() : aShort.c_str(), param);
-			this->gotParameter = true;
-		}
-		PWX_THROW_STD_FURTHER("ArgCbException","")
-		catch (...) {
-			PWX_THROW("ArgCbException", "Unknown exception", "")
-		}
-	}
+eArgErrorNumber CArgCallback::process( const char* param ) {
+    if ( cb ) {
+        try {
+            cb( aLong.size() ? aLong.c_str() : aShort.c_str(), param );
+            this->gotParameter = true;
+        }
+        PWX_THROW_STD_FURTHER( "ArgCbException","" )
+        catch ( ... ) {
+            PWX_THROW( "ArgCbException", "Unknown exception", "" )
+        }
+    }
 
-	return AEN_OK;
+    return AEN_OK;
 }
 
 } // namespace pwx

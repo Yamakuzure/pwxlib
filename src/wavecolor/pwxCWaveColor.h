@@ -11,17 +11,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,19 +43,18 @@ namespace pwx {
 /** @struct sWave
   * @brief tiny and simple struct to store wavelengths and their gamma
 **/
-struct PWX_API sWave
-{
-	double gamma      = 0.0; //!< Specific gamma value derived out of the source RGB
-	double wavelength = 0.0; //!< The wavelength in nanometers
+struct PWX_API sWave {
+    double gamma      = 0.0; //!< Specific gamma value derived out of the source RGB
+    double wavelength = 0.0; //!< The wavelength in nanometers
 
-	explicit sWave(double aWavelength, double gamma_) noexcept;
-	sWave(const sWave &src) noexcept;
-	sWave() PWX_DELETE;
-	~sWave() PWX_DEFAULT;
+    explicit sWave( double aWavelength, double gamma_ ) noexcept;
+    sWave( const sWave& src ) noexcept;
+    sWave() PWX_DELETE;
+    ~sWave() PWX_DEFAULT;
 
-	sWave &operator= (const sWave &src) noexcept;
-	bool   operator==(const sWave &rhs) const noexcept;
-	bool   operator> (const sWave &rhs) const noexcept;
+    sWave& operator= ( const sWave& src ) noexcept;
+    bool   operator==( const sWave& rhs ) const noexcept;
+    bool   operator> ( const sWave& rhs ) const noexcept;
 };
 
 
@@ -73,74 +72,73 @@ struct PWX_API sWave
   * Important: Wavelengths are considered to be nanometers and frequencies
   * are considered to be gigahertz by the methods of this class.
 **/
-class PWX_API CWaveColor : public CLockable
-{
-public:
+class PWX_API CWaveColor : public CLockable {
+  public:
 
-	/* ===============================================
-	 * === Public types                            ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public types                            ===
+     * ===============================================
+    */
 
-	typedef CLockable          base_t;
-	typedef TSingleList<sWave> list_t;
+    typedef CLockable          base_t;
+    typedef TSingleList<sWave> list_t;
 
-	/* ===============================================
-	 * === Public constructors and destructor      ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public constructors and destructor      ===
+     * ===============================================
+    */
 
-	explicit
-	CWaveColor(uint8_t r, uint8_t g, uint8_t b, double gamma_ = 1.0);
-	CWaveColor()  noexcept;
-	CWaveColor(const CWaveColor &src);
-	~CWaveColor() noexcept;
+    explicit
+    CWaveColor( uint8_t r, uint8_t g, uint8_t b, double gamma_ = 1.0 );
+    CWaveColor()  noexcept;
+    CWaveColor( const CWaveColor& src );
+    ~CWaveColor() noexcept;
 
-	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	*/
+    /* ===============================================
+     * === Public methods                          ===
+     * ===============================================
+    */
 
-	uint32_t addRGB       (uint8_t r, uint8_t g, uint8_t b);
-	void     clear        ()                                         noexcept;
-	uint32_t count        ()                                   const noexcept;
-	uint32_t delRGB       (uint8_t r, uint8_t g, uint8_t b);
-	void     doppler      (double camX, double camY, double camZ,
-						   double objX, double objY, double objZ,
-						   double movX, double movY, double movZ)    noexcept;
-	void     doppler      (double objX, double objY, double objZ,
-						   double movX, double movY, double movZ)    noexcept;
-	void     doppler      (double movX, double movY, double movZ)    noexcept;
-	double   getFrequency (int32_t index)                      const noexcept;
-	double   getGamma     ()                                   const noexcept;
-	uint32_t getRGB       (uint8_t &r, uint8_t &g, uint8_t &b) const noexcept;
-	double   getWavelength(int32_t index)                      const noexcept;
-	void     modFrequency (int32_t index, double modifier)           noexcept;
-	void     modWavelength(int32_t index, double modifier)           noexcept;
-	void     setFrequency (int32_t index, double frequency);
-	void     setGamma     (double gamma_)                            noexcept;
-	uint32_t setRGB       (uint8_t r, uint8_t g, uint8_t b);
-	void     setWavelength(int32_t index, double wavelength);
-	uint32_t size         ()                                   const noexcept;
-
-
-	/* ===============================================
-	 * === Public operators                        ===
-	 * ===============================================
-	*/
-
-	CWaveColor &operator=(const CWaveColor &src);
+    uint32_t addRGB       ( uint8_t r, uint8_t g, uint8_t b );
+    void     clear        ()                                         noexcept;
+    uint32_t count        ()                                   const noexcept;
+    uint32_t delRGB       ( uint8_t r, uint8_t g, uint8_t b );
+    void     doppler      ( double camX, double camY, double camZ,
+                            double objX, double objY, double objZ,
+                            double movX, double movY, double movZ )    noexcept;
+    void     doppler      ( double objX, double objY, double objZ,
+                            double movX, double movY, double movZ )    noexcept;
+    void     doppler      ( double movX, double movY, double movZ )    noexcept;
+    double   getFrequency ( int32_t index )                      const noexcept;
+    double   getGamma     ()                                   const noexcept;
+    uint32_t getRGB       ( uint8_t& r, uint8_t& g, uint8_t& b ) const noexcept;
+    double   getWavelength( int32_t index )                      const noexcept;
+    void     modFrequency ( int32_t index, double modifier )           noexcept;
+    void     modWavelength( int32_t index, double modifier )           noexcept;
+    void     setFrequency ( int32_t index, double frequency );
+    void     setGamma     ( double gamma_ )                            noexcept;
+    uint32_t setRGB       ( uint8_t r, uint8_t g, uint8_t b );
+    void     setWavelength( int32_t index, double wavelength );
+    uint32_t size         ()                                   const noexcept;
 
 
-private:
+    /* ===============================================
+     * === Public operators                        ===
+     * ===============================================
+    */
 
-	/* ===============================================
-	 * === Private members                         ===
-	 * ===============================================
-	*/
+    CWaveColor& operator=( const CWaveColor& src );
 
-	double gamma = 1.0; //!< General gamma value, applied to the resulting RGB value
-	list_t waves;       //!< Storage of wavelength
+
+  private:
+
+    /* ===============================================
+     * === Private members                         ===
+     * ===============================================
+    */
+
+    double gamma = 1.0; //!< General gamma value, applied to the resulting RGB value
+    list_t waves;       //!< Storage of wavelength
 };
 
 

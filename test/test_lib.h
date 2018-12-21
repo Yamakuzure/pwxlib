@@ -36,11 +36,11 @@ const uint32_t doTestCWaveColor = 16;
 const uint32_t doTestPAH        = 32;
 
 const uint32_t doTestAll        = doTestContainers
-                                | doTestSpeed
-                                | doTestRNG
-                                | doTestSCT
-                                | doTestCWaveColor
-                                | doTestPAH;
+                                  | doTestSpeed
+                                  | doTestRNG
+                                  | doTestSCT
+                                  | doTestCWaveColor
+                                  | doTestPAH;
 
 
 #include "env.h"

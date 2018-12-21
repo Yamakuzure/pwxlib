@@ -6,17 +6,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,16 +49,16 @@ namespace pwx {
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
-			eArgTargetType arg_type,
-			const char* arg_desc, const char* param_name)
-		noexcept :
-	aShort (arg_short  ? arg_short  : ""),
-	aLong  (arg_long   ? arg_long   : ""),
-	desc   (arg_desc   ? arg_desc   : ""),
-	pName  (param_name ? param_name : ""),
-	type   (arg_type),
-	setType(STT_OVERWRITE)
+VArgTargetBase::VArgTargetBase( const char* arg_short, const char* arg_long,
+                                eArgTargetType arg_type,
+                                const char* arg_desc, const char* param_name )
+noexcept :
+    aShort ( arg_short  ? arg_short  : "" ),
+    aLong  ( arg_long   ? arg_long   : "" ),
+    desc   ( arg_desc   ? arg_desc   : "" ),
+    pName  ( param_name ? param_name : "" ),
+    type   ( arg_type ),
+    setType( STT_OVERWRITE )
 { /* nothing to do here */ }
 
 
@@ -84,48 +84,44 @@ VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-VArgTargetBase::VArgTargetBase(const char* arg_short, const char* arg_long,
-			eArgSetType set_type,
-			const char* arg_desc, const char* param_name)
-		noexcept :
-	VArgTargetBase(arg_short, arg_long, ATT_SET, arg_desc, param_name)
-{
-	setType = set_type;
+VArgTargetBase::VArgTargetBase( const char* arg_short, const char* arg_long,
+                                eArgSetType set_type,
+                                const char* arg_desc, const char* param_name )
+noexcept :
+    VArgTargetBase( arg_short, arg_long, ATT_SET, arg_desc, param_name ) {
+    setType = set_type;
 }
 
 
 /** @brief destructor
   * has nothing to do.
 **/
-VArgTargetBase::~VArgTargetBase() noexcept
-{
-	aShort.clear();
-	aLong.clear();
-	desc.clear();
-	pName.clear();
+VArgTargetBase::~VArgTargetBase() noexcept {
+    aShort.clear();
+    aLong.clear();
+    desc.clear();
+    pName.clear();
 }
 
 
 /** @brief returns true if at least one parameter was processed
   * @return true if at least one parameter was processed, false otherwise.
   */
-bool VArgTargetBase::hasParameter() const noexcept
-{
-	return gotParameter;
+bool VArgTargetBase::hasParameter() const noexcept {
+    return gotParameter;
 }
 
 
 /** @brief return true if a parameter is needed according type
   * @return true if the type needs a aprameter, false otehrwise
   */
-bool VArgTargetBase::needsParameter() const noexcept
-{
-	if ( (ATT_ADD == type)
-	  || (ATT_SUB == type)
-	  || (ATT_SET == type)
-	  || ( (ATT_CB  == type) && pName.length() ) )
-		return true;
-	return false;
+bool VArgTargetBase::needsParameter() const noexcept {
+    if ( ( ATT_ADD == type )
+            || ( ATT_SUB == type )
+            || ( ATT_SET == type )
+            || ( ( ATT_CB  == type ) && pName.length() ) )
+        return true;
+    return false;
 }
 
 
@@ -134,12 +130,11 @@ bool VArgTargetBase::needsParameter() const noexcept
   * @param[in] rhs rhs hand side instance.
   * @return true if the short/long args are equal, false otherwise.
 **/
-bool operator==(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept
-{
-	return ( ( lhs.aShort.size() == rhs.aShort.size() )
-		  && ( lhs.aLong.size()  == rhs.aLong.size() )
-		  && ( !lhs.aShort.size() || (lhs.aShort == rhs.aShort) )
-		  && ( !lhs.aLong.size()  || (lhs.aLong == rhs.aLong) ) ) ;
+bool operator==( const VArgTargetBase& lhs, const VArgTargetBase& rhs ) noexcept {
+    return ( ( lhs.aShort.size() == rhs.aShort.size() )
+             && ( lhs.aLong.size()  == rhs.aLong.size() )
+             && ( !lhs.aShort.size() || ( lhs.aShort == rhs.aShort ) )
+             && ( !lhs.aLong.size()  || ( lhs.aLong == rhs.aLong ) ) ) ;
 }
 
 
@@ -148,10 +143,9 @@ bool operator==(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept
   * @param[in] rhs rhs hand side instance.
   * @return true if the short/long args of lhs are greater than the args of rhs.
 **/
-bool operator>(const VArgTargetBase &lhs, const VArgTargetBase &rhs) noexcept
-{
-	return ( ( lhs.aShort.size() && (!rhs.aShort.size() || (lhs.aShort > rhs.aShort) ) )
-		  || ( lhs.aLong.size()  && (!rhs.aLong.size()  || (lhs.aLong  > rhs.aLong ) ) ) );
+bool operator>( const VArgTargetBase& lhs, const VArgTargetBase& rhs ) noexcept {
+    return ( ( lhs.aShort.size() && ( !rhs.aShort.size() || ( lhs.aShort > rhs.aShort ) ) )
+             || ( lhs.aLong.size()  && ( !rhs.aLong.size()  || ( lhs.aLong  > rhs.aLong ) ) ) );
 }
 
 

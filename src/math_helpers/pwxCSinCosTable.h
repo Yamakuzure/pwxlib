@@ -11,17 +11,17 @@
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
   *
   * The PrydeWorX Library is free software under MIT License
-  * 
+  *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
   * in the Software without restriction, including without limitation the rights
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * The above copyright notice and this permission notice shall be included in all
   * copies or substantial portions of the Software.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -82,127 +82,120 @@ namespace pwx {
   * between -1 (life calculation) and the initial value
   * does not trigger a re-initialization of the tables.
 **/
-class PWX_API CSinCosTable: public CLockable
-{
-public:
+class PWX_API CSinCosTable: public CLockable {
+  public:
 
-	/* ===============================================
-	 * === Public Constructors and destructors     ===
-	 * ===============================================
-	 */
+    /* ===============================================
+     * === Public Constructors and destructors     ===
+     * ===============================================
+     */
 
-	explicit CSinCosTable(const int32_t newPrecision);
-	virtual ~CSinCosTable() noexcept;
+    explicit CSinCosTable( const int32_t newPrecision );
+    virtual ~CSinCosTable() noexcept;
 
-	CSinCosTable() PWX_DELETE;
+    CSinCosTable() PWX_DELETE;
 
-	/* ===============================================
-	 * === Public methods                          ===
-	 * ===============================================
-	 */
+    /* ===============================================
+     * === Public methods                          ===
+     * ===============================================
+     */
 
-	int32_t getPrecision() const noexcept;
-	void    setPrecision(const int32_t newPrecision);
-
-
-	/** @brief return the cosine of @a degree
-	  *
-	  * The type T must be a type that can be cast into
-	  * a double and back.
-	  *
-	  * @param[in] degree The degree to calculate the cosine of.
-	  * @return The cosine of @a degree.
-	**/
-	template<typename T> T cos(const T degree) const noexcept
-	{
-		return this->privGetCos(degree);
-	}
+    int32_t getPrecision() const noexcept;
+    void    setPrecision( const int32_t newPrecision );
 
 
-	/** @brief return the cosine of @a degree
-	  *
-	  * The type T must be a type that can be cast into
-	  * a double and back.
-	  *
-	  * @param[in] degree The degree to calculate the cosine of.
-	  * @return The cosine of @a degree.
-	**/
-	template<typename T> T sin(const T degree) const noexcept
-	{
-		return this->privGetCos(degree);
-	}
+    /** @brief return the cosine of @a degree
+      *
+      * The type T must be a type that can be cast into
+      * a double and back.
+      *
+      * @param[in] degree The degree to calculate the cosine of.
+      * @return The cosine of @a degree.
+    **/
+    template<typename T> T cos( const T degree ) const noexcept {
+        return this->privGetCos( degree );
+    }
 
 
-	/** @brief set @a cosDest to the cosine and @a sinDest to the sine of @a degree
-	  *
-	  * The type T must be a type that can be cast into
-	  * a double and back.
-	  *
-	  * @param[in] degree The degree to calculate the cosine of.
-	  * @param[out] cosDest The target for the cosine of @a degree.
-	  * @param[out] sinDest The target for the sine of @a degree.
-	**/
-	template<typename T> void sincos(const T degree, T &cosDest, T &sinDest) const noexcept
-	{
-		return this->privGetSinCos(degree, cosDest, sinDest);
-	}
+    /** @brief return the cosine of @a degree
+      *
+      * The type T must be a type that can be cast into
+      * a double and back.
+      *
+      * @param[in] degree The degree to calculate the cosine of.
+      * @return The cosine of @a degree.
+    **/
+    template<typename T> T sin( const T degree ) const noexcept {
+        return this->privGetCos( degree );
+    }
 
 
-	/* ===============================================
-	 * === Public operators                        ===
-	 * ===============================================
-	 */
-
-	CSinCosTable &operator=(CSinCosTable&) PWX_DELETE;
-
-
-private:
-
-	/* ===============================================
-	 * === Private methods                         ===
-	 * ===============================================
-	 */
-
-	double      privGetCos(const double degree) const noexcept;
-	template<typename T>
-	T           privGetCos(const T      degree) const noexcept
-	{
-		return static_cast<T>(this->privGetCos(static_cast<double>(degree)));
-	}
-
-	double privGetSin(const double degree) const noexcept;
-	template<typename T>
-	T      privGetSin(const T      degree) const noexcept
-	{
-		return static_cast<T>(this->privGetSin(static_cast<double>(degree)));
-	}
-
-	void privGetSinCos(const double degree, double &cosDest, double &sinDest) const noexcept;
-	template<typename T>
-	void privGetSinCos(const T      degree, T      &cosDest, T      &sinDest) const noexcept
-	{
-		double xDegree  = static_cast<double>(degree);
-		double xCosDest = static_cast<double>(cosDest);
-		double xSinDest = static_cast<double>(sinDest);
-
-		this->privGetSinCos(xDegree, xCosDest, xSinDest);
-
-		cosDest = static_cast<T>(xCosDest);
-		sinDest = static_cast<T>(xSinDest);
-	}
+    /** @brief set @a cosDest to the cosine and @a sinDest to the sine of @a degree
+      *
+      * The type T must be a type that can be cast into
+      * a double and back.
+      *
+      * @param[in] degree The degree to calculate the cosine of.
+      * @param[out] cosDest The target for the cosine of @a degree.
+      * @param[out] sinDest The target for the sine of @a degree.
+    **/
+    template<typename T> void sincos( const T degree, T& cosDest, T& sinDest ) const noexcept {
+        return this->privGetSinCos( degree, cosDest, sinDest );
+    }
 
 
-	/* ===============================================
-	 * === Private members                         ===
-	 * ===============================================
-	 */
+    /* ===============================================
+     * === Public operators                        ===
+     * ===============================================
+     */
 
-	int32_t precision;
-	int32_t precision_last;
-	double* tableCos;
-	int32_t tableMultiplier;
-	double* tableSin;
-	int32_t tableSize;
+    CSinCosTable& operator=( CSinCosTable& ) PWX_DELETE;
+
+
+  private:
+
+    /* ===============================================
+     * === Private methods                         ===
+     * ===============================================
+     */
+
+    double      privGetCos( const double degree ) const noexcept;
+    template<typename T>
+    T           privGetCos( const T      degree ) const noexcept {
+        return static_cast<T>( this->privGetCos( static_cast<double>( degree ) ) );
+    }
+
+    double privGetSin( const double degree ) const noexcept;
+    template<typename T>
+    T      privGetSin( const T      degree ) const noexcept {
+        return static_cast<T>( this->privGetSin( static_cast<double>( degree ) ) );
+    }
+
+    void privGetSinCos( const double degree, double& cosDest, double& sinDest ) const noexcept;
+    template<typename T>
+    void privGetSinCos( const T      degree, T&      cosDest, T&      sinDest ) const noexcept {
+        double xDegree  = static_cast<double>( degree );
+        double xCosDest = static_cast<double>( cosDest );
+        double xSinDest = static_cast<double>( sinDest );
+
+        this->privGetSinCos( xDegree, xCosDest, xSinDest );
+
+        cosDest = static_cast<T>( xCosDest );
+        sinDest = static_cast<T>( xSinDest );
+    }
+
+
+    /* ===============================================
+     * === Private members                         ===
+     * ===============================================
+     */
+
+    int32_t precision;
+    int32_t precision_last;
+    double* tableCos;
+    int32_t tableMultiplier;
+    double* tableSin;
+    int32_t tableSize;
 
 };
 

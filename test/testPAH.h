@@ -4,7 +4,7 @@
 
 #include "test_lib.h"
 
-int32_t testPAH (sEnv &env);
+int32_t testPAH ( sEnv& env );
 
 
 #endif // PWX_LIBPWX_TESTLIB_TESTPAH_H_INCLUDED
