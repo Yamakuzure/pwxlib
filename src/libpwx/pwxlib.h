@@ -2,58 +2,46 @@
 #ifndef PWX_LIBPWX_PWX_H_INCLUDED
 #define PWX_LIBPWX_PWX_H_INCLUDED 1
 
-/** @file pwx.h
+/** @file pwxlib.h
   *
-  * @brief Main include file for the PrydeWorX library
+  * This is a "catch-all" include file that simply adds everything there
+  * is. It is not necessary to include anything else for the library to
+  * be fully usable.
   *
-  * This include file makes everything in the pwxLib available.
+  * @mainpage PrydeWorX Library
   *
-  * As you most probably do not need everything, you might be better off
-  * including only the files you really need.
+  * This library provides some tools and utilities that may make your life
+  * as a programmer easier. There are some mathematical tools as well as
+  * standard containers for variable data types and some input and output
+  * stream helpers. Further there are some larger helper classes called
+  * &quot;workers&quot; that do more than the ordinary.
   *
-  * The individual components of the library can be added by including:
+  * @tableofcontents
   *
-  * <TABLE border='1'>
-  * <TR><TH>Class/Template/Tools</TH><TH>Task</TH><TH>Include file</TH></TR>
-  * <TR><TD>Basics</TD><TD>Add basic functionality most parts use.</TD>
-  *   <TD>pwx_basic.h</TD></TR>
-  * <TR><TD>Containers</TD><TD>Add all container definitions currently provided.</TD>
-  *   <TD>pwx_containers.h</TD></TR>
-  * <TR><TD>Helpers</TD><TD>Add all helper classes and functions currently provided.</TD>
-  *   <TD>pwx_helpers.h</TD></TR>
-  * <TR><TD>Utilities</TD><TD>Add all utility classes and templates currently provided.</TD>
-  *   <TD>pwx_utils.h</TD></TR>
-  * <TR><TD>PAH, RNG, SCT</TD><TD>Make the worker instances available</TD>
-  *   <TD>pwx_workers.h</TD></TR>
-  * <TR><TD>CArgHandler</TD><TD>Make CArgHandler available, without instantiating PAH</TD>
-  *   <TD>CArgHandler.h</TD></TR>
-  * <TR><TD>CRandom</TD><TD>Make CRandom available, without instantiating RNG</TD>
-  *   <TD>CRandom.h</TD></TR>
-  * <TR><TD>CSinCosTable</TD><TD>Make CSinCosTable available, without instantiating SCT</TD>
-  *   <TD>CSinCosTable.h</TD></TR>
-  * <TR><TD>CHashBuilder</TD><TD>Class to get the hash of a value of variable
-  *   type, available as a functor. </TD><TD>pwx/pwxCHashBuilder.h</TD></TR>
-  * <TR><TD>CWaveColor</TD><TD>Convert light waves in RGB values and vice versa.
-  *   </TD><TD>pwx/pwxCWaveColor.h</TD></TR>
-  * <TR><TD>TChainHash</TD><TD>Thread safe chained hash table.</TD>
-  *   <TD>pwx/pwxTChainHash.h</TD></TR>
-  * <TR><TD>TDoubleList</TD><TD>Thread safe doubly linked list.</TD>
-  *   <TD>pwx/pwxTDoubleList.h</TD></TR>
-  * <TR><TD>TDoubleRing</TD><TD>Thread safe doubly linked ring.</TD>
-  *   <TD>pwx/pwxTDoubleRing.h</TD></TR>
-  * <TR><TD>TOpenHash</TD><TD>Thread safe open hash with optional robin hood
-  *    insertion.</TD><TD>pwx/pwxTOpenHash.h</TD></TR>
-  * <TR><TD>TQueue</TD><TD>Thread safe 'queue' container (FiFo).</TD>
-  *    <TD>pwx/pwxTQueue.h</TD></TR>
-  * <TR><TD>TSet</TD><TD>Thread safe 'set' container (unique items).</TD>
-  *    <TD>pwx/pwxTSet.h</TD></TR>
-  * <TR><TD>TSingleList</TD><TD>Thread safe singly linked list.</TD>
-  *   <TD>pwx/pwxTSingleList.h</TD></TR>
-  * <TR><TD>TSingleRing</TD><TD>Thread safe singly linked ring.</TD>
-  *   <TD>pwx/pwxTSingleRing.h</TD></TR>
-  * <TR><TD>TStack</TD><TD>Thread safe 'stack' container (FiLo).</TD>
-  *    <TD>pwx/pwxTStack.h</TD></TR>
-  * </TABLE>
+  * @section overview Overview
+  * @todo write overview
+  *
+  * @section ghLinks GitHub
+  * Additional information on the GitHub project page:
+  * @subsection ghOverview
+  * Overview page on GitHub
+  *
+  * @section BuildInst Building and Installation
+  *
+  * @section contMain Content
+  * @todo write
+  * @subsection contWorkers Workers
+  * @subpage CSimplexTexture CSimplexTexture
+  * @todo write
+  * @subsection contContain Containers
+  * @todo write
+  * @subsection contTools Tools
+  * @todo write
+  * @subsection contTypes Types
+  * @todo write
+  * @subsection contGeneral General
+  * @todo write
+  * @section CopyLic Copyright and license
   *
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
