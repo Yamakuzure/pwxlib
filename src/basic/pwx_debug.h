@@ -96,8 +96,12 @@ void PWX_API debug_err(const char* fmt, ...);
 #else
 # define DEBUG_LOG(...) {}
 # define DEBUG_ERR(...) {}
-# define debug_log(...) {} // Just in case someone uses it directly...
-# define debug_err(...) {}
+/* debug_log() and debug_err() are not defined here, because they would cause
+ *   pwx::debug_log(...);
+ * to become
+ *   pwx::{};
+ ' which no compiler is happy with.
+*/
 #endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
 // Specialized logging macros for mutex locking/unlocking

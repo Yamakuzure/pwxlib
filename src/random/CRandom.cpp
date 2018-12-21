@@ -828,7 +828,7 @@ CRandom::CRandom() noexcept
 				spxOffs[i][j] = 0;
 		}
 	}
-  DEBUG_LOG("RNG ctor", "RNG initialized with seed %d", seed)
+	DEBUG_LOG("RNG ctor", "RNG initialized with seed %d", seed);
 }
 
 

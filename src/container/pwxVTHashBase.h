@@ -762,7 +762,7 @@ public:
 			uint32_t oldSize = hashSize.load(memOrdLoad);
 
 			if (targetSize > oldSize) {
-                                debug_log("Growing hash table from %u top %u", oldSize, targetSize);
+                DEBUG_LOG("Hash Grow", "Growing hash table from %u top %u", oldSize, targetSize);
 				// --- Create a new larger table ---
 				elem_t** oldTab = hashTable;
 				try {
