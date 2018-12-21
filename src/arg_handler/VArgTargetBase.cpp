@@ -123,7 +123,7 @@ bool VArgTargetBase::needsParameter() const noexcept
 	if ( (ATT_ADD == type)
 	  || (ATT_SUB == type)
 	  || (ATT_SET == type)
-	  || (ATT_CB  == type) )
+	  || ( (ATT_CB  == type) && pName.length() ) )
 		return true;
 	return false;
 }
