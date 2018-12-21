@@ -51,34 +51,34 @@ cxx_id               = cxx.get_id()
 pkgconfig            = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
 buildtype            = get_option('buildtype')
+sanitize             = get_option('b_sanitize')
 
 ############################################################
 
 # Set debug options
 annotations = get_option('annotations')
-debugextra  = get_option('debug-extra')
+debug       = get_option('debug')
 debugthread = get_option('debug-thread')
-graphite    = get_option('graphite')
 profile     = get_option('profile')
 spinlocks   = get_option('spinlocks')
 yielding    = get_option('yielding')
 
 if buildtype != 'debug'
         annotations = false
-        debugextra  = false
+        debug       = false
         debugthread = false
 endif
 
 if profile
         annotations = false
-        debugextra  = false
+        debug       = false
         debugthread = false
         add_project_arguments('-pg', language : 'cpp')
         add_project_link_arguments('-pg', language : 'cpp')
 endif
 
 if annotations
-        debugextra = true
+        debug = true
         conf.set('PWX_ANNOTATIONS', true)
 else
         if yielding
@@ -91,7 +91,7 @@ else
 endif
 
 if debugthread
-        debugextra = true
+        debug = true
         conf.set('PWX_THREADDEBUG', true)
 endif
 
@@ -113,7 +113,7 @@ possible_cxx_flags = [
         '-fPIC',
         '-fPIE',
         '-fexceptions',
-	    '-fvisibility=hidden'
+        '-fvisibility=hidden'
 ]
 
 # --as-needed and --no-undefined are provided by meson by default,
@@ -139,7 +139,7 @@ if get_option('buildtype') != 'debug'
         possible_link_flags += '-Wl,--gc-sections'
 endif
 
-if debugextra
+if debug
         conf.set('LIBPWX_DEBUG', true)
         possible_cxx_flags += [
                 '-ggdb3',
@@ -350,10 +350,12 @@ install_data('AUTHORS',
 status = [
         '@0@ @1@'.format(meson.project_name(), meson.project_version()),
 
-        'prefix:                            @0@'.format(prefixdir),
-        'includedir:                        @0@'.format(pkgincludedir),
-        'lib dir:                           @0@'.format(libdir),
-        'bin dir:                           @0@'.format(bindir),
-        'data dir:                          @0@'.format(datadir)]
+        'build type:  @0@'.format(buildtype),
+        'prefix:      @0@'.format(prefixdir),
+        'includedir:  @0@'.format(pkgincludedir),
+        'lib dir:     @0@'.format(libdir),
+        'bin dir:     @0@'.format(bindir),
+        'data dir:    @0@'.format(datadir),
+        'sanitizer:   @0@'.format(sanitize)]
 
 message('\n         '.join(status))

@@ -1,6 +1,3 @@
-option('debug-extra', type : 'boolean', value : false,
-       description : 'Enable extra debugging output. (Default: false)')
-
 option('debug-thread', type : 'boolean', value : false,
        description : '''Enabling this produces massive output and should not be
                                               enabled lightly.
@@ -20,9 +17,6 @@ option('annotations', type : 'boolean', value : false,
 option('profile', type : 'boolean', value : false,
        description : '''Enable profiling output.
                                               (Default: false, Implies debug=false)''')
-
-option('graphite', type : 'boolean', value : false,
-       description : 'Enable gcc graphite extensions. (Default: false)')
 
 # By default pwxLib uses yielding spinlocks (see below
 # for an explanation), but there might be reasons to use
