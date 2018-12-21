@@ -18,7 +18,7 @@ test_libpwx_sym_cpp = custom_target(
         input : [libpwx_sym_path] + libpwx_all_in_one_header,
         output : 'test-libpwx-sym.cpp',
         command : [generate_sym_test_py, libpwx_sym_path,
-                   debugextra.to_string()] + libpwx_all_in_one_header,
+                   debug.to_string()] + libpwx_all_in_one_header,
         capture : true)
 
 if want_test
