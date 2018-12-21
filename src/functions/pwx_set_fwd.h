@@ -31,7 +31,7 @@
   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   * SOFTWARE.
   *
-  * History and change log are maintained in pwx.h
+  * History and change log are maintained in pwxlib.h
 **/
 
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
