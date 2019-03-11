@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_BASE_VARGTARGETBASE_H_INCLUDED
 #define PWX_LIBPWX_PWX_BASE_VARGTARGETBASE_H_INCLUDED
 
-/** @file pwxVArgTargetBase.h
+/** @file VArgTargetBase.h
   *
   * @brief Simple basic struct holding all non-templated members for TArgTarget
   *

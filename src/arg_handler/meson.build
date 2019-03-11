@@ -10,7 +10,7 @@ arg_headers = '''
         CArgCallback.h
         CArgHandler.h
         TArgTarget.h
-        pwxVArgTargetBase.h
+        VArgTargetBase.h
         eArgErrorNumber.h
         eArgSetType.h
         eArgTargetType.h

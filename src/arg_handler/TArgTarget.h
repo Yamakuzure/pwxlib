@@ -38,7 +38,7 @@
 
 #include "pwxCException.h"
 #include "pwx_macros.h"
-#include "pwxVArgTargetBase.h"
+#include "VArgTargetBase.h"
 
 
 namespace pwx {

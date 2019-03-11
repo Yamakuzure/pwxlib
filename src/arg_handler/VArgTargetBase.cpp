@@ -29,7 +29,7 @@
 **/
 
 
-#include "pwxVArgTargetBase.h"
+#include "VArgTargetBase.h"
 
 
 namespace pwx {
