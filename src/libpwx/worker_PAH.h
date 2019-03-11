@@ -2,7 +2,7 @@
 #ifndef PWX_PWX_WORKERS_PAH_H_INCLUDED
 #define PWX_PWX_WORKERS_PAH_H_INCLUDED
 
-/** @file pwx_worker_PAH.h
+/** @file worker_PAH.h
   *
   * @brief This file makes the worker PAH available.
   *

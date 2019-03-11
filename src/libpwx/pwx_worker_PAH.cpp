@@ -30,7 +30,7 @@
 **/
 
 
-#include "pwx_worker_PAH.h"
+#include "worker_PAH.h"
 
 
 /* --- Instantiations of global worker PAH --- */
