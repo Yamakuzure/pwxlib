@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_TOOLS_STREAMHELPERS_H_INCLUDED
 #define PWX_LIBPWX_PWX_TOOLS_STREAMHELPERS_H_INCLUDED 1
 
-/** @file pwxStreamHelpers.h
+/** @file StreamHelpers.h
   *
   * @brief This file defines some tools to work with streams.
   *

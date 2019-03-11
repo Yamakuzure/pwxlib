@@ -127,7 +127,7 @@
 		<Unit filename="../src/random/eNameSourceType.h" />
 		<Unit filename="../src/stream_helpers/StreamHelpers.cpp" />
 		<Unit filename="../src/stream_helpers/meson.build" />
-		<Unit filename="../src/stream_helpers/pwxStreamHelpers.h" />
+		<Unit filename="../src/stream_helpers/StreamHelpers.h" />
 		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
 		<Unit filename="../src/wavecolor/meson.build" />
 		<Unit filename="../src/wavecolor/pwxCWaveColor.h" />

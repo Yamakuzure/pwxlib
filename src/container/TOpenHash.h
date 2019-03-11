@@ -35,7 +35,7 @@
 
 
 #if defined(LIBPWX_DEBUG)
-#  include "pwxStreamHelpers.h"
+#  include "StreamHelpers.h"
 #endif // LIBPWX_DEBUG
 #include "VTHashBase.h"
 
