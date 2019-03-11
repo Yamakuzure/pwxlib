@@ -36,7 +36,7 @@
 
 
 #include "CLockable.h"
-#include "pwxCLockGuard.h"
+#include "CLockGuard.h"
 #include "pwx_macros.h"
 #include "pwxTVarDeleter.h"
 

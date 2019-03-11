@@ -34,7 +34,7 @@
 
 #include "pwx_compiler.h"
 #include "CException.h"
-#include "pwxCLockGuard.h"
+#include "CLockGuard.h"
 #include "pwxCSinCosTable.h"
 #include "pwx_debug.h"
 #include "pwx_macros.h"

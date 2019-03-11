@@ -203,7 +203,7 @@ bool PWX_API try_locks ( const CLockable* objA, const CLockable* objB, const CLo
 bool PWX_API unlock_all( const CLockable* objA, const CLockable* objB )                        noexcept;
 bool PWX_API unlock_all( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept;
 
-// Note: A RAII-based class that uses these helpers is pwx::CLockGuard in pwx/types/pwxCLockGuard.h
+// Note: A RAII-based class that uses these helpers is pwx::CLockGuard in pwx/types/CLockGuard.h
 
 
 } // namespace pwx

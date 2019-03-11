@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_CLOCKGUARD_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_CLOCKGUARD_H_INCLUDED
 
-/** @file pwxCLockGuard.h
+/** @file CLockGuard.h
   *
   * @brief Simple Class to RAII-lock up to 3 objects derived from pwx::Clockable
   *

@@ -59,7 +59,7 @@
 
 #include "CException.h"
 #include "CLockable.h"
-#include "pwxCLockGuard.h"
+#include "CLockGuard.h"
 #include "pwx_compiler.h"
 #include "pwx_debug.h"
 #include "pwx_macros.h"

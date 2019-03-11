@@ -57,11 +57,11 @@
 		<Unit filename="../src/basic/CException.cpp" />
 		<Unit filename="../src/basic/CException.h" />
 		<Unit filename="../src/basic/CLockGuard.cpp" />
+		<Unit filename="../src/basic/CLockGuard.h" />
 		<Unit filename="../src/basic/CLockable.cpp" />
 		<Unit filename="../src/basic/CLockable.h" />
 		<Unit filename="../src/basic/debug.cpp" />
 		<Unit filename="../src/basic/meson.build" />
-		<Unit filename="../src/basic/pwxCLockGuard.h" />
 		<Unit filename="../src/basic/pwx_compiler.h" />
 		<Unit filename="../src/basic/pwx_debug.h" />
 		<Unit filename="../src/basic/pwx_macros.h" />
