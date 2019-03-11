@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
 
-/** @file pwxCArgCallback.h
+/** @file CArgCallback.h
   *
   * @brief Declaration of the CArgCallback class
   *

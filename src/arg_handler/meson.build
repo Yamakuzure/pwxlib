@@ -7,7 +7,7 @@ arg_sources = files('''
 '''.split())
 
 arg_headers = '''
-        pwxCArgCallback.h
+        CArgCallback.h
         pwxCArgHandler.h
         pwxTArgTarget.h
         pwxVArgTargetBase.h

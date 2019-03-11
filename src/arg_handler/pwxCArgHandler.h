@@ -36,7 +36,7 @@
 
 #include <string>
 
-#include "pwxCArgCallback.h"
+#include "CArgCallback.h"
 #include "pwxCException.h"
 #include "sArgError.h"
 #include "pwxTArgTarget.h"
