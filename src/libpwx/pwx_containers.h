@@ -58,7 +58,7 @@
 #include "TQueue.h"
 #include "TSet.h"
 #include "TSingleList.h"
-#include "pwxTSingleRing.h"
+#include "TSingleRing.h"
 #include "pwxTStack.h"
 
 

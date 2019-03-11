@@ -2,7 +2,7 @@
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TSINGLERING_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TSINGLERING_H_INCLUDED 1
 
-/** @file pwxTSingleRing.h
+/** @file TSingleRing.h
   *
   * @brief Declaration of a basic template for singly linked rings
   *
