@@ -2,7 +2,7 @@
 #ifndef PWX_PWX_WORKERS_SCT_H_INCLUDED
 #define PWX_PWX_WORKERS_SCT_H_INCLUDED
 
-/** @file pwx_worker_SCT.h
+/** @file worker_SCT.h
   *
   * @brief This file makes the worker SCT available.
   *

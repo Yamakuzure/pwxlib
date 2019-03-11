@@ -49,7 +49,7 @@
 
 #include <worker_PAH.h>
 #include <worker_RNG.h>
-#include <pwx_worker_SCT.h>
+#include <worker_SCT.h>
 
 
 #endif // PWX_PWX_WORKERS_H_INCLUDED
