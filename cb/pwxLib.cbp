@@ -74,7 +74,7 @@
 		<Unit filename="../src/container/meson.build" />
 		<Unit filename="../src/container/CHashBuilder.h" />
 		<Unit filename="../src/container/CThreadElementStore.h" />
-		<Unit filename="../src/container/pwxTChainHash.h" />
+		<Unit filename="../src/container/TChainHash.h" />
 		<Unit filename="../src/container/pwxTDoubleElement.h" />
 		<Unit filename="../src/container/pwxTDoubleList.h" />
 		<Unit filename="../src/container/pwxTDoubleRing.h" />

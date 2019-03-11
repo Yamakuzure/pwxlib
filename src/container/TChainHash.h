@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TCHAINHASH_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TCHAINHASH_H_INCLUDED
 
-/** @file pwxTChainHash.h
+/** @file TChainHash.h
   *
   * @brief Declaration of a basic template for chained hash containers.
   *

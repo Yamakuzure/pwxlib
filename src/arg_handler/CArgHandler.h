@@ -40,7 +40,7 @@
 #include "CException.h"
 #include "sArgError.h"
 #include "TArgTarget.h"
-#include "pwxTChainHash.h"
+#include "TChainHash.h"
 #include "pwxTQueue.h"
 
 

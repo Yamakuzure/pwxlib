@@ -39,7 +39,7 @@
 #include "pwx_macros.h"
 #include "pwx_set_fwd.h"
 #include "pwxTDoubleList.h"
-#include "pwxTChainHash.h"
+#include "TChainHash.h"
 
 
 namespace pwx {

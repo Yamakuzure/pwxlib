@@ -51,7 +51,7 @@
 **/
 
 
-#include "pwxTChainHash.h"
+#include "TChainHash.h"
 #include "pwxTDoubleList.h"
 #include "pwxTDoubleRing.h"
 #include "pwxTOpenHash.h"
