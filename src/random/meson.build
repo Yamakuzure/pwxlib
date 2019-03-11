@@ -11,7 +11,7 @@ random_sources = files('''
 
 random_headers = '''
         pwxCRandom.h
-        pwx_eNameSourceType.h
+        eNameSourceType.h
 '''.split()
 
 libpwx_headers += files(random_headers)

@@ -37,7 +37,7 @@
 
 #include "CLockable.h"
 #include "pwx_compiler.h"
-#include "pwx_eNameSourceType.h"
+#include "eNameSourceType.h"
 
 
 namespace pwx {

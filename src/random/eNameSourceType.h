@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_ENAMESOURCETYPE_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_ENAMESOURCETYPE_H_INCLUDED 1
 
-/** @file pwx_eNameSourceType.h
+/** @file eNameSourceType.h
   *
   * @brief Automatically generated header for the name generator.
   *
