@@ -38,7 +38,7 @@
 
 #include "pwx_compiler.h"
 #include "pwx_eArgTargetType.h"
-#include "pwx_eArgSetType.h"
+#include "eArgSetType.h"
 #include "eArgErrorNumber.h"
 
 

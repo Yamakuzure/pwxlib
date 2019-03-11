@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_EARGSETTYPE_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_EARGSETTYPE_H_INCLUDED
 
-/** @file pwx_eArgSetType.h
+/** @file eArgSetType.h
   *
   * @brief enum to describe what PAH should do when an ATT_SET target receives more than one parameter
   *
