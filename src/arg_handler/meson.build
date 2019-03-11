@@ -14,7 +14,7 @@ arg_headers = '''
         eArgErrorNumber.h
         eArgSetType.h
         eArgTargetType.h
-        pwx_sArgError.h
+        sArgError.h
 '''.split()
 
 libpwx_headers += files(arg_headers)

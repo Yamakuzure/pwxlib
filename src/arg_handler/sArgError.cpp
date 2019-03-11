@@ -33,7 +33,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "pwx_sArgError.h"
+#include "sArgError.h"
 
 
 namespace pwx {

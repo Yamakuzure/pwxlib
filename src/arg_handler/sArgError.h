@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_SARGERROR_H_INCLDUED
 #define PWX_LIBPWX_PWX_TYPES_SARGERROR_H_INCLDUED
 
-/** @file pwx_sArgError.h
+/** @file sArgError.h
   *
   * @brief Declaration of struct sArgError for CArgHandler error handling
   *

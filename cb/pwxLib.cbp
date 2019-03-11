@@ -52,8 +52,8 @@
 		<Unit filename="../src/arg_handler/pwxCArgHandler.h" />
 		<Unit filename="../src/arg_handler/pwxTArgTarget.h" />
 		<Unit filename="../src/arg_handler/pwxVArgTargetBase.h" />
-		<Unit filename="../src/arg_handler/pwx_sArgError.h" />
 		<Unit filename="../src/arg_handler/sArgError.cpp" />
+		<Unit filename="../src/arg_handler/sArgError.h" />
 		<Unit filename="../src/basic/CException.cpp" />
 		<Unit filename="../src/basic/CLockGuard.cpp" />
 		<Unit filename="../src/basic/CLockable.cpp" />

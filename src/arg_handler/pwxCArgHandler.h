@@ -38,7 +38,7 @@
 
 #include "pwxCArgCallback.h"
 #include "pwxCException.h"
-#include "pwx_sArgError.h"
+#include "sArgError.h"
 #include "pwxTArgTarget.h"
 #include "pwxTChainHash.h"
 #include "pwxTQueue.h"
