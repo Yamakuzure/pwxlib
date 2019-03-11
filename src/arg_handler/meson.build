@@ -13,7 +13,7 @@ arg_headers = '''
         pwxVArgTargetBase.h
         eArgErrorNumber.h
         eArgSetType.h
-        pwx_eArgTargetType.h
+        eArgTargetType.h
         pwx_sArgError.h
 '''.split()
 

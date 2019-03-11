@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_EARGTARGETTYPE_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_EARGTARGETTYPE_H_INCLUDED
 
-/** @file pwx_eArgTargetType.h
+/** @file eArgTargetType.h
   *
   * @brief Enum to describe what to do with a PAH target
   *
