@@ -34,7 +34,7 @@
 **/
 
 
-#include "pwxVTHashBase.h"
+#include "VTHashBase.h"
 
 
 namespace pwx {

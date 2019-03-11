@@ -37,7 +37,7 @@
 #if defined(LIBPWX_DEBUG)
 #  include "pwxStreamHelpers.h"
 #endif // LIBPWX_DEBUG
-#include "pwxVTHashBase.h"
+#include "VTHashBase.h"
 
 
 namespace pwx {

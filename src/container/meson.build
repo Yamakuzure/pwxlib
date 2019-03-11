@@ -23,7 +23,7 @@ container_headers = '''
         TVarDeleter.h
         VContainer.h
         VElement.h
-        pwxVTHashBase.h
+        VTHashBase.h
 '''.split()
 
 libpwx_headers += files(container_headers)
