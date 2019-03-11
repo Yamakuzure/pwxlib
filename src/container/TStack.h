@@ -3,7 +3,7 @@
 #define PWX_LIBPWX_PWX_CONTAINER_TSTACK_H_INCLUDED 1
 
 #include "TSingleList.h"
-/** @file pwxTStack.h
+/** @file TStack.h
   *
   * @brief Declaration of a basic template for stacks based on singly linked lists
   *

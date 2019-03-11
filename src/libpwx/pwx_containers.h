@@ -59,7 +59,7 @@
 #include "TSet.h"
 #include "TSingleList.h"
 #include "TSingleRing.h"
-#include "pwxTStack.h"
+#include "TStack.h"
 
 
 #endif // PWX_CONTAINERS_H_INCLUDED

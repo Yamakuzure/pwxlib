@@ -19,7 +19,7 @@ container_headers = '''
         TSingleElement.h
         TSingleList.h
         TSingleRing.h
-        pwxTStack.h
+        TStack.h
         pwxTVarDeleter.h
         pwxVContainer.h
         pwxVElement.h
