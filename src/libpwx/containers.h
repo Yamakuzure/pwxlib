@@ -2,7 +2,7 @@
 #ifndef PWX_CONTAINERS_H_INCLUDED
 #define PWX_CONTAINERS_H_INCLUDED
 
-/** @file pwx_containers.h
+/** @file containers.h
   *
   * @brief This file adds all container types from pwxLib.
   *

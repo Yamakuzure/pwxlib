@@ -7,7 +7,7 @@ libpwx_internal_sources = files('''
 
 _libpwx_headers = '''
         basic.h
-        pwx_containers.h
+        containers.h
         pwx_tools.h
         pwx_utils.h
         pwx_worker_PAH.h

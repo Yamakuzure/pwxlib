@@ -95,7 +95,7 @@
 		<Unit filename="../src/functions/pwx_set_fwd.h" />
 		<Unit filename="../src/libpwx/meson.build" />
 		<Unit filename="../src/libpwx/basic.h" />
-		<Unit filename="../src/libpwx/pwx_containers.h" />
+		<Unit filename="../src/libpwx/containers.h" />
 		<Unit filename="../src/libpwx/pwx_tools.h" />
 		<Unit filename="../src/libpwx/pwx_utils.h" />
 		<Unit filename="../src/libpwx/pwx_worker_PAH.cpp" />
