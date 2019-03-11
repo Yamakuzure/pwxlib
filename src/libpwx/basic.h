@@ -2,7 +2,7 @@
 #ifndef PWX_PWX_BASIC_H_INCLUDED
 #define PWX_PWX_BASIC_H_INCLUDED
 
-/** @file pwx_basic.h
+/** @file basic.h
   *
   * @brief This file adds the basic functionality of the pwxLib.
   *
