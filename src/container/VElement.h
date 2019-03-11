@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED
 #define PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED 1
 
-/** @file pwxVElement.h
+/** @file VElement.h
   *
   * @brief Virtual base class for all container elements.
   *

@@ -22,7 +22,7 @@ container_headers = '''
         TStack.h
         TVarDeleter.h
         VContainer.h
-        pwxVElement.h
+        VElement.h
         pwxVTHashBase.h
 '''.split()
 

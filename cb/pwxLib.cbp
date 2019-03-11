@@ -88,7 +88,7 @@
 		<Unit filename="../src/container/TStack.h" />
 		<Unit filename="../src/container/TVarDeleter.h" />
 		<Unit filename="../src/container/VContainer.h" />
-		<Unit filename="../src/container/pwxVElement.h" />
+		<Unit filename="../src/container/VElement.h" />
 		<Unit filename="../src/container/pwxVTHashBase.h" />
 		<Unit filename="../src/functions/meson.build" />
 		<Unit filename="../src/functions/pwx_set_func.h" />

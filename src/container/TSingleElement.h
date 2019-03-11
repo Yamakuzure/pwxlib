@@ -38,7 +38,7 @@
 #include "CException.h"
 #include "pwx_debug.h"
 #include "pwxMathHelpers.h"
-#include "pwxVElement.h"
+#include "VElement.h"
 
 
 namespace pwx {

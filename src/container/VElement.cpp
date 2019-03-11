@@ -31,7 +31,7 @@
 
 
 #include "CThreadElementStore.h"
-#include "pwxVElement.h"
+#include "VElement.h"
 
 
 namespace pwx {
