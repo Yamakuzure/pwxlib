@@ -15,7 +15,7 @@ container_headers = '''
         THashElement.h
         TOpenHash.h
         TQueue.h
-        pwxTSet.h
+        TSet.h
         pwxTSingleElement.h
         pwxTSingleList.h
         pwxTSingleRing.h

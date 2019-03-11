@@ -56,7 +56,7 @@
 #include "TDoubleRing.h"
 #include "TOpenHash.h"
 #include "TQueue.h"
-#include "pwxTSet.h"
+#include "TSet.h"
 #include "pwxTSingleList.h"
 #include "pwxTSingleRing.h"
 #include "pwxTStack.h"

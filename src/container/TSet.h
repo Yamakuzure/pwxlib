@@ -2,7 +2,7 @@
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED 1
 
-/** @file pwxTSet.h
+/** @file TSet.h
   *
   * @brief Declaration of the TSet template to store unique elements
   *

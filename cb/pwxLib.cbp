@@ -81,7 +81,7 @@
 		<Unit filename="../src/container/THashElement.h" />
 		<Unit filename="../src/container/TOpenHash.h" />
 		<Unit filename="../src/container/TQueue.h" />
-		<Unit filename="../src/container/pwxTSet.h" />
+		<Unit filename="../src/container/TSet.h" />
 		<Unit filename="../src/container/pwxTSingleElement.h" />
 		<Unit filename="../src/container/pwxTSingleList.h" />
 		<Unit filename="../src/container/pwxTSingleRing.h" />
