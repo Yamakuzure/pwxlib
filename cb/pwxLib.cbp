@@ -97,7 +97,7 @@
 		<Unit filename="../src/libpwx/basic.h" />
 		<Unit filename="../src/libpwx/containers.h" />
 		<Unit filename="../src/libpwx/tools.h" />
-		<Unit filename="../src/libpwx/pwx_utils.h" />
+		<Unit filename="../src/libpwx/utils.h" />
 		<Unit filename="../src/libpwx/pwx_worker_PAH.cpp" />
 		<Unit filename="../src/libpwx/pwx_worker_PAH.h" />
 		<Unit filename="../src/libpwx/pwx_worker_RNG.cpp" />

@@ -9,7 +9,7 @@ _libpwx_headers = '''
         basic.h
         containers.h
         tools.h
-        pwx_utils.h
+        utils.h
         pwx_worker_PAH.h
         pwx_worker_RNG.h
         pwx_worker_SCT.h

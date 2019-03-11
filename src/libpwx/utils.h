@@ -2,7 +2,7 @@
 #ifndef PWX_UTILS_H_INCLUDED
 #define PWX_UTILS_H_INCLUDED
 
-/** @file pwx_utils.h
+/** @file utils.h
   *
   * @brief This file adds all utility classes and templates.
   *
