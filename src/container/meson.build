@@ -13,7 +13,7 @@ container_headers = '''
         TDoubleList.h
         TDoubleRing.h
         THashElement.h
-        pwxTOpenHash.h
+        TOpenHash.h
         pwxTQueue.h
         pwxTSet.h
         pwxTSingleElement.h

@@ -79,7 +79,7 @@
 		<Unit filename="../src/container/TDoubleList.h" />
 		<Unit filename="../src/container/TDoubleRing.h" />
 		<Unit filename="../src/container/THashElement.h" />
-		<Unit filename="../src/container/pwxTOpenHash.h" />
+		<Unit filename="../src/container/TOpenHash.h" />
 		<Unit filename="../src/container/pwxTQueue.h" />
 		<Unit filename="../src/container/pwxTSet.h" />
 		<Unit filename="../src/container/pwxTSingleElement.h" />

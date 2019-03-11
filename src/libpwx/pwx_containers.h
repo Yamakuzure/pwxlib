@@ -54,7 +54,7 @@
 #include "TChainHash.h"
 #include "TDoubleList.h"
 #include "TDoubleRing.h"
-#include "pwxTOpenHash.h"
+#include "TOpenHash.h"
 #include "pwxTQueue.h"
 #include "pwxTSet.h"
 #include "pwxTSingleList.h"

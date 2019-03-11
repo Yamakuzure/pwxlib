@@ -34,7 +34,7 @@
 **/
 
 
-#include "pwxTOpenHash.h"
+#include "TOpenHash.h"
 
 
 namespace pwx {
