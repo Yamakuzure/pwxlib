@@ -2,7 +2,7 @@
 #ifndef PWX_PWX_WORKERS_RNG_H_INCLUDED
 #define PWX_PWX_WORKERS_RNG_H_INCLUDED
 
-/** @file pwx_worker_RNG.h
+/** @file worker_RNG.h
   *
   * @brief This file makes the worker RNG available.
   *

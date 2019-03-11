@@ -48,7 +48,7 @@
 
 
 #include <worker_PAH.h>
-#include <pwx_worker_RNG.h>
+#include <worker_RNG.h>
 #include <pwx_worker_SCT.h>
 
 

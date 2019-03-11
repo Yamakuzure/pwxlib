@@ -1,7 +1,7 @@
 libpwx_internal_sources = files('''
         pwxlib.h
         worker_PAH.cpp
-        pwx_worker_RNG.cpp
+        worker_RNG.cpp
         pwx_worker_SCT.cpp
 '''.split())
 
@@ -11,7 +11,7 @@ _libpwx_headers = '''
         tools.h
         utils.h
         worker_PAH.h
-        pwx_worker_RNG.h
+        worker_RNG.h
         pwx_worker_SCT.h
         pwx_workers.h
 '''.split()
