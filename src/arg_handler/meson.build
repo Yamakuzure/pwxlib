@@ -11,7 +11,7 @@ arg_headers = '''
         pwxCArgHandler.h
         pwxTArgTarget.h
         pwxVArgTargetBase.h
-        pwx_eArgErrorNumber.h
+        eArgErrorNumber.h
         pwx_eArgSetType.h
         pwx_eArgTargetType.h
         pwx_sArgError.h

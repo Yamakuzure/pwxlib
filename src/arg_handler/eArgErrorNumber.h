@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
 
-/** @file pwx_eArgErrorNumber.h
+/** @file eArgErrorNumber.h
   *
   * @brief enum describing all valid error numbers for argument parsing
   *

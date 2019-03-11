@@ -35,7 +35,7 @@
 
 
 #include "pwx_compiler.h"
-#include "pwx_eArgErrorNumber.h"
+#include "eArgErrorNumber.h"
 
 
 namespace pwx {
@@ -48,7 +48,7 @@ struct sArgError {
     int32_t     arg_errno; //!< number of the error, taken from eArgErrorNumber
     const char* arg_error; //!< String with the error text
 
-    // Note: The prefix arg_ is needed, or the preprocessor will
+    // Note: The prefix arg_ is needed, or the preprocessor m
     //       substitute "errno" with "(*__errno_location ())"
 
     explicit sArgError( eArgErrorNumber errno_, const char* error_ ) noexcept;

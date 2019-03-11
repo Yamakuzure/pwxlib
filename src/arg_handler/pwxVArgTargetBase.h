@@ -39,7 +39,7 @@
 #include "pwx_compiler.h"
 #include "pwx_eArgTargetType.h"
 #include "pwx_eArgSetType.h"
-#include "pwx_eArgErrorNumber.h"
+#include "eArgErrorNumber.h"
 
 
 namespace pwx {
