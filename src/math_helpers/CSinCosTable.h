@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_WORKER_CSINCOSTABLE_H_INCLUDED
 #define PWX_LIBPWX_PWX_WORKER_CSINCOSTABLE_H_INCLUDED
 
-/** @file pwxCSinCosTable.h
+/** @file CSinCosTable.h
   *
   * @brief Declaration of CSinCosTables
   *
