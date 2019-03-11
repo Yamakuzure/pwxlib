@@ -3,7 +3,7 @@
 #define PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED 1
 
 #include "TDoubleList.h"
-/** @file pwxTQueue.h
+/** @file TQueue.h
   *
   * @brief Declaration of a basic template for queues based on doubly linked lists
   *

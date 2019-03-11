@@ -41,7 +41,7 @@
 #include "sArgError.h"
 #include "TArgTarget.h"
 #include "TChainHash.h"
-#include "pwxTQueue.h"
+#include "TQueue.h"
 
 
 namespace pwx {
