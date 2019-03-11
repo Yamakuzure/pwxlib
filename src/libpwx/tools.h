@@ -2,7 +2,7 @@
 #ifndef PWX_HELPERS_H_INCLUDED
 #define PWX_HELPERS_H_INCLUDED
 
-/** @file pwx_tools.h
+/** @file tools.h
   *
   * @brief This file adds all tool classes and functions.
   *
