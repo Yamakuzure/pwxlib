@@ -104,8 +104,8 @@
 		<Unit filename="../src/libpwx/worker_RNG.h" />
 		<Unit filename="../src/libpwx/worker_SCT.cpp" />
 		<Unit filename="../src/libpwx/worker_SCT.h" />
-		<Unit filename="../src/libpwx/pwx_workers.cpp" />
-		<Unit filename="../src/libpwx/pwx_workers.h" />
+		<Unit filename="../src/libpwx/workers.cpp" />
+		<Unit filename="../src/libpwx/workers.h" />
 		<Unit filename="../src/libpwx/pwxlib.h" />
 		<Unit filename="../src/libpwx/pwxlib.pc.in" />
 		<Unit filename="../src/libpwx/pwxlib.sym" />

@@ -2,7 +2,7 @@
 #ifndef PWX_PWX_WORKERS_H_INCLUDED
 #define PWX_PWX_WORKERS_H_INCLUDED
 
-/** @file pwx_workers.h
+/** @file workers.h
   *
   * @brief This file makes the workers (PAH, RNG, SCT) available.
   *

@@ -115,7 +115,7 @@
 #include <containers.h>
 #include <tools.h>
 #include <utils.h>
-#include <pwx_workers.h>
+#include <workers.h>
 
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED

@@ -13,7 +13,7 @@ _libpwx_headers = '''
         worker_PAH.h
         worker_RNG.h
         worker_SCT.h
-        pwx_workers.h
+        workers.h
 '''.split()
 
 _libpwx_all_in_one_header = [ 'pwxlib.h' ]
