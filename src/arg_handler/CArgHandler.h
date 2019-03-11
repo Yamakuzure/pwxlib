@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_WORKER_CARGHANDLER_H_INCLUDED
 #define PWX_LIBPWX_PWX_WORKER_CARGHANDLER_H_INCLUDED
 
-/** @file pwxCArgHandler.h
+/** @file CArgHandler.h
   *
   * @brief Declaration of CArgHandler
   *

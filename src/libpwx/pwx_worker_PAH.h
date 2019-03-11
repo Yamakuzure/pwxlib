@@ -37,7 +37,7 @@
 **/
 
 
-#include "pwxCArgHandler.h"
+#include "CArgHandler.h"
 
 
 namespace pwx {
