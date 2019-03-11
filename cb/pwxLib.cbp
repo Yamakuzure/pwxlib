@@ -123,7 +123,7 @@
 		<Unit filename="../src/random/CRandomWordConstants.h" />
 		<Unit filename="../src/random/eNameSourceType.cpp" />
 		<Unit filename="../src/random/meson.build" />
-		<Unit filename="../src/random/pwxCRandom.h" />
+		<Unit filename="../src/random/CRandom.h" />
 		<Unit filename="../src/random/eNameSourceType.h" />
 		<Unit filename="../src/stream_helpers/StreamHelpers.cpp" />
 		<Unit filename="../src/stream_helpers/meson.build" />

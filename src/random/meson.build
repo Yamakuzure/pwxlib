@@ -10,7 +10,7 @@ random_sources = files('''
 '''.split())
 
 random_headers = '''
-        pwxCRandom.h
+        CRandom.h
         eNameSourceType.h
 '''.split()
 

@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED
 #define PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED 1
 
-/** @file pwxCRandom.h
+/** @file CRandom.h
   *
   * @brief Declaration of CRandom worker class
   *

@@ -38,7 +38,7 @@
 **/
 
 
-#include "pwxCRandom.h"
+#include "CRandom.h"
 
 
 namespace pwx {
