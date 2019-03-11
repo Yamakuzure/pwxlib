@@ -4,7 +4,7 @@
 
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 #include "pwxCLockable.h"
-#include "pwxCException.h"
+#include "CException.h"
 
 
 using pwx::abool_t;

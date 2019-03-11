@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED 1
 
-/** @file pwxCException.h
+/** @file CException.h
   *
   * @brief Declaration of CException, a tracing exception
   *

@@ -33,7 +33,7 @@
 #include <cstring>
 
 #include "pwx_compiler.h"
-#include "pwxCException.h"
+#include "CException.h"
 #include "pwxCLockGuard.h"
 #include "pwxCSinCosTable.h"
 #include "pwx_debug.h"

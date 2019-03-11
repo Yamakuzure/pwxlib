@@ -33,7 +33,7 @@
 #include <cstring>
 
 #include "CArgCallback.h"
-#include "pwxCException.h"
+#include "CException.h"
 #include "pwx_macros.h"
 
 

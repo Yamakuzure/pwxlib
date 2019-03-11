@@ -36,7 +36,7 @@
 
 #include <cstring>
 
-#include "pwxCException.h"
+#include "CException.h"
 #include "pwx_macros.h"
 #include "VArgTargetBase.h"
 

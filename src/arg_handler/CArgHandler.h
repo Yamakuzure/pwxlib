@@ -37,7 +37,7 @@
 #include <string>
 
 #include "CArgCallback.h"
-#include "pwxCException.h"
+#include "CException.h"
 #include "sArgError.h"
 #include "TArgTarget.h"
 #include "pwxTChainHash.h"
