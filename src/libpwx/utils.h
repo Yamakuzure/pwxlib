@@ -44,7 +44,7 @@
 **/
 
 
-#include "pwxCWaveColor.h"
+#include "CWaveColor.h"
 
 
 #endif // PWX_UTILS_H_INCLUDED

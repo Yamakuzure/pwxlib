@@ -130,7 +130,7 @@
 		<Unit filename="../src/stream_helpers/StreamHelpers.h" />
 		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
 		<Unit filename="../src/wavecolor/meson.build" />
-		<Unit filename="../src/wavecolor/pwxCWaveColor.h" />
+		<Unit filename="../src/wavecolor/CWaveColor.h" />
 		<Unit filename="../test/cluster_check.cpp" />
 		<Unit filename="../test/cluster_check.h" />
 		<Unit filename="../test/destroy.cpp" />

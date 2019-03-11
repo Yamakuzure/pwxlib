@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_WORKER_CWAVECOLOR_H_INCLUDED
 #define PWX_LIBPWX_PWX_WORKER_CWAVECOLOR_H_INCLUDED
 
-/** @file pwxCWaveColor.h
+/** @file CWaveColor.h
   *
   * @brief Helper class to work with colors via wavelength versus RGB
   *
