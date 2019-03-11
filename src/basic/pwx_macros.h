@@ -204,7 +204,7 @@
 
 /** @brief Use object->lock if @a object is not nullptr
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
@@ -226,7 +226,7 @@
   * are very certain that 'foo' can never be nullptr, then
   * just use PWX_LOCK_OBJ(foo) instead.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
@@ -239,7 +239,7 @@
 
 /** @brief Use object->try_lock if @a object is defined
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to try_lock.
   * @return true if the lock could be acquired, false otherwise
@@ -249,7 +249,7 @@
 
 /** @brief Use object->unlock if @a object is defined.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to unlock.
 **/

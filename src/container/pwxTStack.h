@@ -36,7 +36,7 @@
 **/
 
 
-#include "pwxCLockable.h"
+#include "CLockable.h"
 #include "pwx_macros.h"
 #include "pwxTSingleList.h"
 

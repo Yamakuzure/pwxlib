@@ -7,7 +7,7 @@ basic_sources = files('''
 
 _basic_headers = '''
         CException.h
-        pwxCLockable.h
+        CLockable.h
         pwxCLockGuard.h
         pwx_compiler.h
         pwx_debug.h

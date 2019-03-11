@@ -58,7 +58,7 @@
 
 
 #include "CException.h"
-#include "pwxCLockable.h"
+#include "CLockable.h"
 #include "pwxCLockGuard.h"
 #include "pwx_compiler.h"
 #include "pwx_debug.h"

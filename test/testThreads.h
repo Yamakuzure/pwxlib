@@ -3,7 +3,7 @@
 #define PWX_LIBPWX_TEST_TESTTHREADS_H_INCLUDED
 
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
-#include "pwxCLockable.h"
+#include "CLockable.h"
 #include "CException.h"
 
 

@@ -38,7 +38,7 @@
 **/
 
 
-#include "pwxCLockable.h"
+#include "CLockable.h"
 
 
 namespace pwx {

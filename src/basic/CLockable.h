@@ -2,7 +2,7 @@
 #ifndef PWX_PWXLIB_THREADS_CLOCKABLE_H_INCLUDED
 #define PWX_PWXLIB_THREADS_CLOCKABLE_H_INCLUDED 1
 
-/** @file pwxCLockable.h
+/** @file CLockable.h
   *
   * @brief Declaration of a general base class to add locking mechanisms to classes derived from CLockable.
   *
