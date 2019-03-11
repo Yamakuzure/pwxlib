@@ -38,7 +38,7 @@
 #include "CLockable.h"
 #include "pwx_macros.h"
 #include "pwx_set_fwd.h"
-#include "pwxTDoubleList.h"
+#include "TDoubleList.h"
 #include "TChainHash.h"
 
 

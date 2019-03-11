@@ -76,7 +76,7 @@
 		<Unit filename="../src/container/CThreadElementStore.h" />
 		<Unit filename="../src/container/TChainHash.h" />
 		<Unit filename="../src/container/TDoubleElement.h" />
-		<Unit filename="../src/container/pwxTDoubleList.h" />
+		<Unit filename="../src/container/TDoubleList.h" />
 		<Unit filename="../src/container/pwxTDoubleRing.h" />
 		<Unit filename="../src/container/pwxTHashElement.h" />
 		<Unit filename="../src/container/pwxTOpenHash.h" />

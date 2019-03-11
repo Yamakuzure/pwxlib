@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED 1
 
-#include "pwxTDoubleList.h"
+#include "TDoubleList.h"
 /** @file pwxTQueue.h
   *
   * @brief Declaration of a basic template for queues based on doubly linked lists
@@ -38,7 +38,7 @@
 
 #include "CLockable.h"
 #include "pwx_macros.h"
-#include "pwxTDoubleList.h"
+#include "TDoubleList.h"
 
 
 namespace pwx {

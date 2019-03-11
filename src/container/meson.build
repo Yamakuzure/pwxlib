@@ -10,7 +10,7 @@ container_headers = '''
         CThreadElementStore.h
         TChainHash.h
         TDoubleElement.h
-        pwxTDoubleList.h
+        TDoubleList.h
         pwxTDoubleRing.h
         pwxTHashElement.h
         pwxTOpenHash.h

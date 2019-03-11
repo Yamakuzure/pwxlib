@@ -35,7 +35,7 @@
 **/
 
 
-#include "pwxTDoubleList.h"
+#include "TDoubleList.h"
 
 
 namespace pwx {
