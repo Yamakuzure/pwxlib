@@ -6,7 +6,7 @@ container_sources = files('''
 '''.split())
 
 container_headers = '''
-        pwxCHashBuilder.h
+        CHashBuilder.h
         pwxCThreadElementStore.h
         pwxTChainHash.h
         pwxTDoubleElement.h

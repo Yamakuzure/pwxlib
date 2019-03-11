@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_THASHBUILDER_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_THASHBUILDER_H_INCLUDED
 
-/** @file pwxCHashBuilder.h
+/** @file CHashBuilder.h
   *
   * @brief Class to get the hash of a value of variable type
   *

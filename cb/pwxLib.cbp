@@ -72,7 +72,7 @@
 		<Unit filename="../src/container/VContainer.cpp" />
 		<Unit filename="../src/container/VElement.cpp" />
 		<Unit filename="../src/container/meson.build" />
-		<Unit filename="../src/container/pwxCHashBuilder.h" />
+		<Unit filename="../src/container/CHashBuilder.h" />
 		<Unit filename="../src/container/pwxCThreadElementStore.h" />
 		<Unit filename="../src/container/pwxTChainHash.h" />
 		<Unit filename="../src/container/pwxTDoubleElement.h" />

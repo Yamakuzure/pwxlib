@@ -30,7 +30,7 @@
 **/
 
 
-#include "pwxCHashBuilder.h"
+#include "CHashBuilder.h"
 #include "pwxCRandom.h"
 
 
