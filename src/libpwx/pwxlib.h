@@ -100,7 +100,7 @@
   * 0.8.6.14  2012-11-22  sed, PrydeWorX  Removed PWX_INLINE macro, it is of no use any more in a real library!
   * 0.8.7.0   2013-06-11  sed, PrydeWorX  After a lot of work all basic containers are now thread safe without using mutexes.
   * 0.8.7.1   2013-06-21  sed, PrydeWorX  Chained and open hash table containers are now available.
-  * 0.8.7.2   2013-07-29  sed, PrydeWorX  Optimized open hash table, added tools/pwxMathHelpers.h
+  * 0.8.7.2   2013-07-29  sed, PrydeWorX  Optimized open hash table, added tools/MathHelpers.h
   * 0.8.7.3   2013-08-25  sed, PrydeWorX  Changed TSet to use a TChainHash for lookup and optimized all containers.
   *                                       pwxLibNG now supports Spinlocks without yield() and using mutexes via Makefile.
   * 0.8.7.4   2013-08-27  sed, PrydeWorX  Imported pwxLib CWaveColor.

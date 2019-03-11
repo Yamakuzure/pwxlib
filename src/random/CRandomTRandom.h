@@ -39,7 +39,7 @@
 #include <atomic>
 #include <random>
 
-#include "pwxMathHelpers.h"
+#include "MathHelpers.h"
 
 
 namespace pwx {

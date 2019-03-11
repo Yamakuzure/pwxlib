@@ -30,7 +30,7 @@
 **/
 
 
-#include "pwxMathHelpers.h"
+#include "MathHelpers.h"
 
 
 namespace pwx {

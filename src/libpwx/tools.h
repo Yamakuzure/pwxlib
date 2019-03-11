@@ -46,7 +46,7 @@
 **/
 
 
-#include "pwxMathHelpers.h"
+#include "MathHelpers.h"
 #include "pwxStreamHelpers.h"
 
 

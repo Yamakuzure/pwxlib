@@ -36,7 +36,7 @@
 
 
 #include "VElement.h"
-#include "pwxMathHelpers.h"
+#include "MathHelpers.h"
 
 
 namespace pwx {

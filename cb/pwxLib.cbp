@@ -113,7 +113,7 @@
 		<Unit filename="../src/math_helpers/MathHelpers.cpp" />
 		<Unit filename="../src/math_helpers/meson.build" />
 		<Unit filename="../src/math_helpers/CSinCosTable.h" />
-		<Unit filename="../src/math_helpers/pwxMathHelpers.h" />
+		<Unit filename="../src/math_helpers/MathHelpers.h" />
 		<Unit filename="../src/random/CRandom.cpp" />
 		<Unit filename="../src/random/CRandomConstants.h" />
 		<Unit filename="../src/random/CRandomTHash.cpp" />

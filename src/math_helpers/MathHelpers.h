@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TOOLS_MATHHELPERS_H_INCLUDED
 #define PWX_LIBPWX_PWX_TOOLS_MATHHELPERS_H_INCLUDED
 
-/** @file pwxMathHelpers.h
+/** @file MathHelpers.h
   *
   * @brief This file defines some general mathematical helper functions
   *

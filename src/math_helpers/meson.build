@@ -5,7 +5,7 @@ mathhelpers_sources = files('''
 
 mathhelpers_headers = '''
         CSinCosTable.h
-        pwxMathHelpers.h
+        MathHelpers.h
 '''.split()
 
 libpwx_headers += files(mathhelpers_headers)

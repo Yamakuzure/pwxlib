@@ -40,7 +40,7 @@
 
 #include "CRandomConstants.h"
 #include "pwx_macros.h"
-#include "pwxMathHelpers.h"
+#include "MathHelpers.h"
 
 
 namespace pwx {
