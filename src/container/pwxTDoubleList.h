@@ -36,7 +36,7 @@
 
 
 #include "pwxTSingleList.h"
-#include "pwxTDoubleElement.h"
+#include "TDoubleElement.h"
 
 
 namespace pwx {

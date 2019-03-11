@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TYPES_TDOUBLEELEMENT_H_INCLUDED
 #define PWX_LIBPWX_TYPES_TDOUBLEELEMENT_H_INCLUDED 1
 
-/** @file pwxTDoubleElement.h
+/** @file TDoubleElement.h
   *
   * @brief Declaration of a basic template for doubly linked list elements
   *

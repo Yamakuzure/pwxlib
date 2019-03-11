@@ -9,7 +9,7 @@ container_headers = '''
         CHashBuilder.h
         CThreadElementStore.h
         TChainHash.h
-        pwxTDoubleElement.h
+        TDoubleElement.h
         pwxTDoubleList.h
         pwxTDoubleRing.h
         pwxTHashElement.h
