@@ -45,7 +45,7 @@
 
 
 #include "CHashBuilder.h"
-#include "pwxTHashElement.h"
+#include "THashElement.h"
 #include "pwxVContainer.h"
 
 

@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_THASHELEMENT_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_THASHELEMENT_H_INCLUDED
 
-/** @file pwxTHashElement.h
+/** @file THashElement.h
   *
   * @brief Declaration of a template for hash container elements.
   *
