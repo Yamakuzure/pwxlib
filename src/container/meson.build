@@ -20,7 +20,7 @@ container_headers = '''
         TSingleList.h
         TSingleRing.h
         TStack.h
-        pwxTVarDeleter.h
+        TVarDeleter.h
         pwxVContainer.h
         pwxVElement.h
         pwxVTHashBase.h

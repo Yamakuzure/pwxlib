@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TYPES_TVARDELETER_H_INCLUDED
 #define PWX_LIBPWX_TYPES_TVARDELETER_H_INCLUDED 1
 
-/** @file pwxTVarDeleter.h
+/** @file TVarDeleter.h
   *
   * @brief Definition of a template to delegate pointer deletions to external functions
   *

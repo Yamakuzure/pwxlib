@@ -38,7 +38,7 @@
 #include "CLockable.h"
 #include "CLockGuard.h"
 #include "pwx_macros.h"
-#include "pwxTVarDeleter.h"
+#include "TVarDeleter.h"
 
 
 namespace pwx {

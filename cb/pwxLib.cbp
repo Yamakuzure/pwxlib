@@ -86,7 +86,7 @@
 		<Unit filename="../src/container/TSingleList.h" />
 		<Unit filename="../src/container/TSingleRing.h" />
 		<Unit filename="../src/container/TStack.h" />
-		<Unit filename="../src/container/pwxTVarDeleter.h" />
+		<Unit filename="../src/container/TVarDeleter.h" />
 		<Unit filename="../src/container/pwxVContainer.h" />
 		<Unit filename="../src/container/pwxVElement.h" />
 		<Unit filename="../src/container/pwxVTHashBase.h" />
