@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_INTERNAL_CTHREADELEMENTSTORE_H_INCLUDED
 #define PWX_LIBPWX_PWX_INTERNAL_CTHREADELEMENTSTORE_H_INCLUDED
 
-/** @file pwxCThreadElementStore.h
+/** @file CThreadElementStore.h
   *
   * @brief Store for the currently handled element by each thread
   *

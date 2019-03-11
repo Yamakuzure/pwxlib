@@ -7,7 +7,7 @@ container_sources = files('''
 
 container_headers = '''
         CHashBuilder.h
-        pwxCThreadElementStore.h
+        CThreadElementStore.h
         pwxTChainHash.h
         pwxTDoubleElement.h
         pwxTDoubleList.h

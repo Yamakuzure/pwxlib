@@ -30,7 +30,7 @@
 **/
 
 
-#include "pwxCThreadElementStore.h"
+#include "CThreadElementStore.h"
 #include "pwxVContainer.h"
 
 
