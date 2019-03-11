@@ -36,7 +36,7 @@
 
 
 #include "CThreadElementStore.h"
-#include "pwxTSingleElement.h"
+#include "TSingleElement.h"
 #include "pwxVContainer.h"
 
 

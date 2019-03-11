@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED
 #define PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED 1
 
-/** @file pwxTSingleElement.h
+/** @file TSingleElement.h
   *
   * @brief Declaration of a basic template for singly linked list elements
   *
