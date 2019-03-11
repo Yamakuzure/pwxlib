@@ -17,7 +17,7 @@ container_headers = '''
         TQueue.h
         TSet.h
         TSingleElement.h
-        pwxTSingleList.h
+        TSingleList.h
         pwxTSingleRing.h
         pwxTStack.h
         pwxTVarDeleter.h

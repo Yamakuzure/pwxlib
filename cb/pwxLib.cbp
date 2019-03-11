@@ -83,7 +83,7 @@
 		<Unit filename="../src/container/TQueue.h" />
 		<Unit filename="../src/container/TSet.h" />
 		<Unit filename="../src/container/TSingleElement.h" />
-		<Unit filename="../src/container/pwxTSingleList.h" />
+		<Unit filename="../src/container/TSingleList.h" />
 		<Unit filename="../src/container/pwxTSingleRing.h" />
 		<Unit filename="../src/container/pwxTStack.h" />
 		<Unit filename="../src/container/pwxTVarDeleter.h" />

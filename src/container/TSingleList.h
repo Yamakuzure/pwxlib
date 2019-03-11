@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_CONTAINER_TSINGLELIST_H_INCLUDED
 #define PWX_LIBPWX_CONTAINER_TSINGLELIST_H_INCLUDED 1
 
-/** @file pwxTSingleList.h
+/** @file TSingleList.h
   *
   * @brief Declaration of a basic template for singly linked lists
   *

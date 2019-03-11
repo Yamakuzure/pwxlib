@@ -35,7 +35,7 @@
 **/
 
 
-#include "pwxTSingleList.h"
+#include "TSingleList.h"
 
 
 namespace pwx {
