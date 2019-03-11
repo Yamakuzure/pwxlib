@@ -21,7 +21,7 @@ container_headers = '''
         TSingleRing.h
         TStack.h
         TVarDeleter.h
-        pwxVContainer.h
+        VContainer.h
         pwxVElement.h
         pwxVTHashBase.h
 '''.split()

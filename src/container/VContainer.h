@@ -2,7 +2,7 @@
 #ifndef PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED
 #define PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED 1
 
-/** @file pwxVContainer.h
+/** @file VContainer.h
   *
   * @brief Virtual base class for all containers.
   *

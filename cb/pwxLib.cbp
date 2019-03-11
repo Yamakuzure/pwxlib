@@ -87,7 +87,7 @@
 		<Unit filename="../src/container/TSingleRing.h" />
 		<Unit filename="../src/container/TStack.h" />
 		<Unit filename="../src/container/TVarDeleter.h" />
-		<Unit filename="../src/container/pwxVContainer.h" />
+		<Unit filename="../src/container/VContainer.h" />
 		<Unit filename="../src/container/pwxVElement.h" />
 		<Unit filename="../src/container/pwxVTHashBase.h" />
 		<Unit filename="../src/functions/meson.build" />

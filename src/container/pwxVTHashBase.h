@@ -46,7 +46,7 @@
 
 #include "CHashBuilder.h"
 #include "THashElement.h"
-#include "pwxVContainer.h"
+#include "VContainer.h"
 
 
 namespace pwx {
