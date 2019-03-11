@@ -2,7 +2,7 @@
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED 1
 
-/** @file pwxTDoubleRing.h
+/** @file TDoubleRing.h
   *
   * @brief Declaration of a basic template for doubly linked rings
   *

@@ -77,7 +77,7 @@
 		<Unit filename="../src/container/TChainHash.h" />
 		<Unit filename="../src/container/TDoubleElement.h" />
 		<Unit filename="../src/container/TDoubleList.h" />
-		<Unit filename="../src/container/pwxTDoubleRing.h" />
+		<Unit filename="../src/container/TDoubleRing.h" />
 		<Unit filename="../src/container/pwxTHashElement.h" />
 		<Unit filename="../src/container/pwxTOpenHash.h" />
 		<Unit filename="../src/container/pwxTQueue.h" />

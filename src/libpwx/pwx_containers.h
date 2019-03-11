@@ -53,7 +53,7 @@
 
 #include "TChainHash.h"
 #include "TDoubleList.h"
-#include "pwxTDoubleRing.h"
+#include "TDoubleRing.h"
 #include "pwxTOpenHash.h"
 #include "pwxTQueue.h"
 #include "pwxTSet.h"
