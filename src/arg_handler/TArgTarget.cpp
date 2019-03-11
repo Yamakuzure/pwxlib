@@ -31,7 +31,7 @@
 
 
 #include "pwxStreamHelpers.h"
-#include "pwxTArgTarget.h"
+#include "TArgTarget.h"
 
 
 namespace pwx {

@@ -9,7 +9,7 @@ arg_sources = files('''
 arg_headers = '''
         CArgCallback.h
         CArgHandler.h
-        pwxTArgTarget.h
+        TArgTarget.h
         pwxVArgTargetBase.h
         eArgErrorNumber.h
         eArgSetType.h

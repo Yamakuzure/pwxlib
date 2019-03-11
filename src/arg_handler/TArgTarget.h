@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
 
-/** @file pwxTArgTarget.h
+/** @file TArgTarget.h
   *
   * @brief Declaration of the TArgTarget class template
   *
