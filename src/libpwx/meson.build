@@ -1,19 +1,19 @@
 libpwx_internal_sources = files('''
         pwxlib.h
-        pwx_worker_PAH.cpp
-        pwx_worker_RNG.cpp
-        pwx_worker_SCT.cpp
+        worker_PAH.cpp
+        worker_RNG.cpp
+        worker_SCT.cpp
 '''.split())
 
 _libpwx_headers = '''
-        pwx_basic.h
-        pwx_containers.h
-        pwx_tools.h
-        pwx_utils.h
-        pwx_worker_PAH.h
-        pwx_worker_RNG.h
-        pwx_worker_SCT.h
-        pwx_workers.h
+        basic.h
+        containers.h
+        tools.h
+        utils.h
+        worker_PAH.h
+        worker_RNG.h
+        worker_SCT.h
+        workers.h
 '''.split()
 
 _libpwx_all_in_one_header = [ 'pwxlib.h' ]

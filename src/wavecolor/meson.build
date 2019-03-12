@@ -3,7 +3,7 @@ wavecolor_sources = '''
 '''.split()
 
 wavecolor_headers = '''
-        pwxCWaveColor.h
+        CWaveColor.h
 '''.split()
 
 libpwx_headers += files(wavecolor_headers)

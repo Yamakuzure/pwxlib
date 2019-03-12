@@ -6,9 +6,9 @@ basic_sources = files('''
 '''.split())
 
 _basic_headers = '''
-        pwxCException.h
-        pwxCLockable.h
-        pwxCLockGuard.h
+        CException.h
+        CLockable.h
+        CLockGuard.h
         pwx_compiler.h
         pwx_debug.h
         pwx_macros.h

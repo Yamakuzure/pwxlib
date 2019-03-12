@@ -67,7 +67,7 @@
   *
   * This macro fills in positional information before throwing pwx::CException.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] name const char name of the exception
   * @param[in] msg const char message to be returned by the exceptions what() method
@@ -87,7 +87,7 @@
   * This macro catches any pwx::CException exception derivate, adds positional
   * data to the trace, and re-throws the exception.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
 **/
 #define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) { \
 		char _pwx_trace_info[256]; \
@@ -103,7 +103,7 @@
   * a tracking pwx::CException. The message will always be the return value of the
   * caught exceptions what() method.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] name const char name of the exception
   * @param[in] desc const char message to be returned by the exceptions desc() method
@@ -120,7 +120,7 @@
   * If an std::exception is caught, the message will always be the return value
   * of the caught exceptions what() method.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] name const char name of the exception for std::exception
   * @param[in] desc const char message to be returned by the exceptions desc() method if an std::exception is caught.
@@ -136,7 +136,7 @@
   * a delegation of a possibly thrown pwx::CException
   * in one call.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
 **/
@@ -151,7 +151,7 @@
   * a delegation of a possibly thrown std::exception, that is
   * transformed into a pwx::CException, further in one call
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
   * @param[in] name const char name of the exception.
@@ -168,7 +168,7 @@
   * a delegation of a possibly thrown pwx::CException, that
   * can be a transformation of an std::exception, in one call
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCException.h
+  * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
   * @param[in] name const char name of the exception for std::exception
@@ -204,7 +204,7 @@
 
 /** @brief Use object->lock if @a object is not nullptr
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
@@ -226,7 +226,7 @@
   * are very certain that 'foo' can never be nullptr, then
   * just use PWX_LOCK_OBJ(foo) instead.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
@@ -239,7 +239,7 @@
 
 /** @brief Use object->try_lock if @a object is defined
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to try_lock.
   * @return true if the lock could be acquired, false otherwise
@@ -249,7 +249,7 @@
 
 /** @brief Use object->unlock if @a object is defined.
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockable.h
+  * <I>Prerequisites</I>: pwx/types/CLockable.h
   *
   * @param object pointer to the object to unlock.
 **/
@@ -262,7 +262,7 @@
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to lock
@@ -275,7 +275,7 @@
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param object pointer to the object to lock
 **/
@@ -284,7 +284,7 @@
 
 /** @brief Reset a lock guard to a new value
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to reset the lock guard to
@@ -297,7 +297,7 @@
 
 /** @brief Reset a lock guard to a new value
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param object pointer to the object to reset the lock guard to
 **/
@@ -307,7 +307,7 @@
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param objA pointer to the first object to lock
@@ -322,7 +322,7 @@
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param objA pointer to the first object to lock
   * @param objB pointer to the second object to lock
@@ -333,7 +333,7 @@
 
 /** @brief Reset a double lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param objA pointer to the first object to reset the lock guard to
@@ -347,7 +347,7 @@
 
 /** @brief Reset a double lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param objA pointer to the first object to reset the lock guard to
   * @param objB pointer to the second object to reset the lock guard to
@@ -358,7 +358,7 @@
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param objA pointer to the first object to lock
@@ -375,7 +375,7 @@
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param objA pointer to the first object to lock
   * @param objB pointer to the second object to lock
@@ -387,7 +387,7 @@
 
 /** @brief Reset a triple lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param objA pointer to the first object to reset the lock guard to
@@ -402,7 +402,7 @@
 
 /** @brief Reset a triple lock guard to two new values
   *
-  * <I>Prerequisites</I>: pwx/types/pwxCLockGuard.h
+  * <I>Prerequisites</I>: pwx/types/CLockGuard.h
   *
   * @param objA pointer to the first object to reset the lock guard to
   * @param objB pointer to the second object to reset the lock guard to

@@ -1,6 +1,6 @@
 #include "testColor.h"
 
-#include "pwxCWaveColor.h"
+#include "CWaveColor.h"
 
 
 /* ==================================

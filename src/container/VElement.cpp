@@ -30,8 +30,8 @@
 **/
 
 
-#include "pwxCThreadElementStore.h"
-#include "pwxVElement.h"
+#include "CThreadElementStore.h"
+#include "VElement.h"
 
 
 namespace pwx {

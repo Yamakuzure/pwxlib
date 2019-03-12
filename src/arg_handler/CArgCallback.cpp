@@ -32,8 +32,8 @@
 
 #include <cstring>
 
-#include "pwxCArgCallback.h"
-#include "pwxCException.h"
+#include "CArgCallback.h"
+#include "CException.h"
 #include "pwx_macros.h"
 
 

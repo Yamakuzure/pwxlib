@@ -33,12 +33,12 @@
 #include <cstring>
 
 #include "pwx_compiler.h"
-#include "pwxCException.h"
-#include "pwxCLockGuard.h"
-#include "pwxCSinCosTable.h"
+#include "CException.h"
+#include "CLockGuard.h"
+#include "CSinCosTable.h"
 #include "pwx_debug.h"
 #include "pwx_macros.h"
-#include "pwxMathHelpers.h"
+#include "MathHelpers.h"
 
 
 namespace pwx {

@@ -36,13 +36,13 @@
 #include <string>
 
 #include "pwx_compiler.h"
-#include "pwxCRandom.h"
+#include "CRandom.h"
 #include "CRandomTHash.h"
 #include "CRandomTRandom.h"
 #include "CRandomWordConstants.h"
 #include "pwx_debug.h"
 #include "pwx_macros.h"
-#include "pwxStreamHelpers.h"
+#include "StreamHelpers.h"
 
 
 namespace pwx {

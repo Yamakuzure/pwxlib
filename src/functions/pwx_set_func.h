@@ -4,7 +4,7 @@
 
 /** @file pwx_set_func.h
   *
-  * @brief Definitions of functions for pwx/container/pwxTSet.h
+  * @brief Definitions of functions for pwx/container/TSet.h
   *
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -35,10 +35,10 @@
 **/
 
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
-# error "Do not include pwx_set_fwd.h, include pwx/container/pwxTSet.h!"
+# error "Do not include pwx_set_fwd.h, include pwx/container/TSet.h!"
 #endif // Check for main file
 
-#include "pwxTSet.h" // Make IDE-Parsers happy
+#include "TSet.h" // Make IDE-Parsers happy
 
 namespace pwx {
 

@@ -32,7 +32,7 @@
 
 #include <thread>
 
-#include "pwxCLockable.h"
+#include "CLockable.h"
 #include "pwx_debug.h"
 #include "pwx_macros.h"
 

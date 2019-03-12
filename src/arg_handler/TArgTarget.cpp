@@ -30,8 +30,8 @@
 **/
 
 
-#include "pwxStreamHelpers.h"
-#include "pwxTArgTarget.h"
+#include "StreamHelpers.h"
+#include "TArgTarget.h"
 
 
 namespace pwx {

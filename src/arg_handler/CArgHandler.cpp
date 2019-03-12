@@ -32,8 +32,8 @@
 
 #include <string>
 
-#include "pwxCArgHandler.h"
-#include "pwxStreamHelpers.h"
+#include "CArgHandler.h"
+#include "StreamHelpers.h"
 
 
 namespace pwx {

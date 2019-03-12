@@ -30,7 +30,7 @@
 **/
 
 
-#include "pwx_eNameSourceType.h"
+#include "eNameSourceType.h"
 #include "pwx_types.h"
 
 

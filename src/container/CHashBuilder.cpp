@@ -30,8 +30,8 @@
 **/
 
 
-#include "pwxCHashBuilder.h"
-#include "pwxCRandom.h"
+#include "CHashBuilder.h"
+#include "CRandom.h"
 
 
 namespace pwx {

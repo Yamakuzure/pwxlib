@@ -32,7 +32,7 @@
 
 #include <thread>
 
-#include "pwxCLockGuard.h"
+#include "CLockGuard.h"
 
 
 namespace pwx {
