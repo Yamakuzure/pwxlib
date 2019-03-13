@@ -3,7 +3,7 @@
 xType="$1"
 
 if [[ "x" == "x$xType" ]]; then
-	echo "Usage: $0 <type>"
+	echo "Usage: $0 <type> [extra options for meson]" 
 	echo
 	echo "Type can be one of:"
 	echo "  release - Release build"
@@ -14,6 +14,9 @@ if [[ "x" == "x$xType" ]]; then
 	echo "  tsan      - Use thread sanitizer  (enables debug)"
 	exit 0
 fi
+
+shift 1
+xExtra="$@"
 
 base_opts=""
 if [[ "release" == "$xType" ]]; then
@@ -42,6 +45,7 @@ meson $base_opts             \
         -Dtests=true         \
         -Dinstall-tests=true \
         -Dtorture=true       \
+        $xExtra              \
         build
 
 if [[ 0 -ne $? ]]; then
