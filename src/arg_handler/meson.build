@@ -17,11 +17,20 @@ arg_headers = '''
         sArgError.h
 '''.split()
 
-libpwx_headers += files(arg_headers)
-
 libarghandler = static_library(
         'arghandler',
         arg_sources,
         cpp_args : ['-DPWX_EXPORTS'],
         include_directories : includes,
         install : false)
+
+install_headers(
+        arg_headers,
+        subdir : 'pwxlib/pwx')
+
+arg_wrapper = 'PArgHandler'
+install_headers(
+        arg_wrapper,
+        subdir : 'pwxlib')
+
+libpwx_wrapper_list += files(arg_wrapper)
