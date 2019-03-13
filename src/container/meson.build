@@ -36,7 +36,7 @@ libcontainer = static_library(
 
 install_headers(
         container_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/container')
 
 container_wrappers = '''
         PChainHash

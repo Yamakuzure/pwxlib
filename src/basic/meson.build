@@ -26,7 +26,7 @@ libbasic = static_library(
 
 install_headers(
         basic_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/basic')
 
 basic_wrappers = '''
         PException

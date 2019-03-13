@@ -17,7 +17,7 @@ libmathhelpers = static_library(
 
 install_headers(
         mathhelpers_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/math_helpers')
 
 mathhelpers_wrappers = '''
         PMath

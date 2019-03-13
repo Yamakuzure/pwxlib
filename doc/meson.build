@@ -6,19 +6,19 @@ if want_html
         sources = result.stdout().strip().split('\n')
         outdir  = '@0@/doc'.format(meson.build_root())
 
-        base_path = '@0@/'.format(meson.current_source_dir())
+        base_path = '@0@/'.format(meson.source_root())
 
         doxsub = configuration_data()
         doxsub.set('PACKAGE_NAME',     substs.get('PACKAGE_NAME'))
         doxsub.set('PACKAGE_VERSION',  substs.get('PACKAGE_VERSION'))
         doxsub.set('PACKAGE_SOURCES',  ' '.join(sources))
         doxsub.set('INCLUDE_PATHS',    base_path + ' @0@'.format(base_path).join(include_paths))
-        doxsub.set('STRIP_FROM_PATHS', '../' + ' ../'.join(include_paths))
+        doxsub.set('STRIP_FROM_PATHS', '../ ' + '@0@src/'.format(base_path))
         doxsub.set('OUTPUT_PATH',      outdir)
         doxsub.set('WANT_HTML',        want_html.to_string( 'YES', 'NO'))
-        doxsub.set('DOX_FOOTER',       '@0@@1@'.format(base_path, 'doxfooter.html'))
-        doxsub.set('DOX_LAYOUT',       '@0@@1@'.format(base_path, 'doxylayout.xml'))
-        doxsub.set('DOX_STYLE',        '@0@@1@'.format(base_path, 'doxstyle.css'))
+        doxsub.set('DOX_FOOTER',       '@0@@1@'.format(base_path, 'doc/doxfooter.html'))
+        doxsub.set('DOX_LAYOUT',       '@0@@1@'.format(base_path, 'doc/doxylayout.xml'))
+        doxsub.set('DOX_STYLE',        '@0@@1@'.format(base_path, 'doc/doxstyle.css'))
 
         doxyfile = configure_file(
                 input : 'doxyfile.in',

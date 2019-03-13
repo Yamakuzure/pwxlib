@@ -6,4 +6,4 @@ funcs_sources = files(funcs_headers)
 
 install_headers(
         funcs_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/functions')

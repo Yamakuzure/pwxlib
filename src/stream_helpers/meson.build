@@ -10,7 +10,7 @@ libpwx_external_sources += files(stream_helpers_sources)
 
 install_headers(
         stream_helpers_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/stream_helpers')
 
 stream_helpers_wrappers = '''
         PStreamHelpers

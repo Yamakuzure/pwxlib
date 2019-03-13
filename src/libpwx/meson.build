@@ -31,7 +31,7 @@ install_data(libpwx_pc,
 
 install_headers(
         libpwx_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/libpwx')
 
 libpwx_wrappers = '''
         PAH

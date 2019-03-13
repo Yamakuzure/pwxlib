@@ -26,7 +26,7 @@ libarghandler = static_library(
 
 install_headers(
         arg_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/arg_handler')
 
 arg_wrapper = 'PArgHandler'
 install_headers(

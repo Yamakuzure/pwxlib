@@ -23,7 +23,7 @@ librandom = static_library(
 
 install_headers(
         random_headers,
-        subdir : 'pwxlib/pwx')
+        subdir : 'pwxlib/random')
 
 random_wrappers = '''
         PRandom
