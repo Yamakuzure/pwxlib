@@ -26,8 +26,6 @@ container_headers = '''
         VTHashBase.h
 '''.split()
 
-libpwx_headers += files(container_headers)
-
 libcontainer = static_library(
         'container',
         container_sources,
@@ -35,3 +33,24 @@ libcontainer = static_library(
         cpp_args : ['-DPWX_EXPORTS'],
         include_directories : includes,
         install : false)
+
+install_headers(
+        container_headers,
+        subdir : 'pwxlib/pwx')
+
+container_wrappers = '''
+        PChainHash
+        PDoubleList
+        PDoubleRing
+        POpenHash
+        PQueue
+        PSet
+        PSingleList
+        PSingleRing
+        PStack
+'''.split()
+install_headers(
+        container_wrappers,
+        subdir : 'pwxlib')
+
+libpwx_wrapper_list += files(container_wrappers)
