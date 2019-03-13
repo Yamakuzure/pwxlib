@@ -5,7 +5,7 @@ basic_sources = files('''
         debug.cpp
 '''.split())
 
-_basic_headers = '''
+basic_headers = '''
         CException.h
         CLockable.h
         CLockGuard.h
@@ -16,8 +16,6 @@ _basic_headers = '''
         pwx_types.h
 '''.split()
 
-libpwx_headers += files(_basic_headers)
-
 libbasic = static_library(
         'basic',
         basic_sources,
@@ -25,3 +23,18 @@ libbasic = static_library(
         include_directories : includes,
         dependencies : [ threads ],
         install : false)
+
+install_headers(
+        basic_headers,
+        subdir : 'pwxlib/pwx')
+
+basic_wrappers = '''
+        PException
+        PLockable
+        PLockGuard
+'''.split()
+install_headers(
+        basic_wrappers,
+        subdir : 'pwxlib')
+
+libpwx_wrapper_list += files(basic_wrappers)
