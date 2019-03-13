@@ -1,3 +1,5 @@
+option('pkgconfiglibdir', type : 'string', value : '', description : 'directory for pkg-config')
+
 option('debug-thread', type : 'boolean', value : false,
        description : '''Enabling this produces massive output and should not be
                                               enabled lightly.

@@ -15,10 +15,10 @@ test_env.prepend('PATH', meson.build_root())
 
 test_libpwx_sym_cpp = custom_target(
         'test-libpwx-sym.cpp',
-        input : [libpwx_sym_path] + libpwx_all_in_one_header,
+        input : [libpwx_sym_path] + pwxlib_h,
         output : 'test-libpwx-sym.cpp',
         command : [generate_sym_test_py, libpwx_sym_path,
-                   debug.to_string()] + libpwx_all_in_one_header,
+                   debug.to_string()] + pwxlib_h,
         capture : true)
 
 if want_test

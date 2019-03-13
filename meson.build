@@ -2,7 +2,7 @@ project('pwxlib', 'cpp',
         version : '0.8.9',
         license : 'MIT',
         default_options: [
-                'cpp_std=c++17',
+                'cpp_std=gnu++17',
                 'prefix=/usr',
         ],
         meson_version : '>= 0.48',
@@ -26,9 +26,9 @@ testsdir = join_paths(libdir, 'pwx')
 includedir = join_paths(prefixdir, get_option('includedir'))
 datadir = join_paths(prefixdir, get_option('datadir'))
 
-pkgconfigdatadir = join_paths(datadir, 'pkgconfig')
-pkgconfiglibdir = join_paths(libdir, 'pkgconfig')
+pkgconfiglibdir = get_option('pkgconfiglibdir') == '' ? join_paths(libdir, 'pkgconfig') : get_option('pkgconfiglibdir')
 pkgincludedir = join_paths(includedir, 'pwxlib')
+pkgdatadir = join_paths(datadir, 'pwxlib')
 
 docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
                              meson.project_version()])
@@ -242,10 +242,9 @@ includes = include_directories(include_paths)
 
 add_project_arguments('-include', 'config.h', language : 'cpp')
 
-libpwx_headers           = []
-libpwx_all_in_one_header = []
 libpwx_internal_sources  = []
 libpwx_external_sources  = []
+libpwx_wrapper_list      = []
 
 subdir('src/basic')
 subdir('src/functions')
@@ -278,12 +277,6 @@ libpwx = shared_library(
         link_depends : [ libpwx_sym ],
         install : true,
         install_dir : libdir)
-
-install_headers(
-        libpwx_all_in_one_header)
-install_headers(
-        libpwx_headers,
-        subdir : 'pwxlib')
 
 ############################################################
 
