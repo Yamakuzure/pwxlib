@@ -111,11 +111,11 @@
 **/
 
 
-#include "basic.h"
-#include "containers.h"
-#include "tools.h"
-#include "utils.h"
-#include "workers.h"
+#include "PBasic"
+#include "PContainers"
+#include "PTools"
+#include "PUtils"
+#include "PWorkers"
 
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED

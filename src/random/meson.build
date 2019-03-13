@@ -24,12 +24,3 @@ librandom = static_library(
 install_headers(
         random_headers,
         subdir : 'pwxlib/random')
-
-random_wrappers = '''
-        PRandom
-'''.split()
-install_headers(
-        random_wrappers,
-        subdir : 'pwxlib')
-
-libpwx_wrapper_list += files(random_wrappers)

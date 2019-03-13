@@ -11,12 +11,3 @@ libpwx_external_sources += files(wavecolor_sources)
 install_headers(
         wavecolor_headers,
         subdir : 'pwxlib/wavecolor')
-
-wavecolor_wrappers = '''
-        PWaveColor
-'''.split()
-install_headers(
-        wavecolor_wrappers,
-        subdir : 'pwxlib')
-
-libpwx_wrapper_list += files(wavecolor_wrappers)

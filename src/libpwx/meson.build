@@ -1,5 +1,5 @@
 libpwx_internal_sources = files('''
-        pwxlib.h
+        ../pwxlib.h
         worker_PAH.cpp
         worker_RNG.cpp
         worker_SCT.cpp
@@ -16,10 +16,6 @@ libpwx_headers = '''
         workers.h
 '''.split()
 
-pwxlib_h = files('''
-        pwxlib.h
-'''.split())
-
 libpwx_sym = 'src/libpwx/pwxlib.sym'
 
 libpwx_pc = configure_file(
@@ -32,21 +28,3 @@ install_data(libpwx_pc,
 install_headers(
         libpwx_headers,
         subdir : 'pwxlib/libpwx')
-
-libpwx_wrappers = '''
-        PAH
-        PBasic
-        PContainers
-        PTools
-        PUtils
-        PWXlib
-        PWorkers
-        RNG
-        SCT
-        pwxlib.h
-'''.split()
-install_headers(
-        libpwx_wrappers,
-        subdir : 'pwxlib')
-
-libpwx_wrapper_list += files(libpwx_wrappers)

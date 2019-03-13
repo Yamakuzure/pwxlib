@@ -228,6 +228,7 @@ config_h = configure_file(
         configuration : conf)
 
 include_paths = '''
+        src
         src/arg_handler
         src/basic
         src/container
@@ -246,15 +247,7 @@ libpwx_internal_sources  = []
 libpwx_external_sources  = []
 libpwx_wrapper_list      = []
 
-subdir('src/basic')
-subdir('src/functions')
-subdir('src/math_helpers')
-subdir('src/random')
-subdir('src/stream_helpers')
-subdir('src/container')
-subdir('src/arg_handler')
-subdir('src/wavecolor')
-subdir('src/libpwx')
+subdir('src')
 
 libpwx_sym_path = '@0@/@1@'.format(meson.current_source_dir(), libpwx_sym)
 libpwx = shared_library(

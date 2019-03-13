@@ -37,20 +37,3 @@ libcontainer = static_library(
 install_headers(
         container_headers,
         subdir : 'pwxlib/container')
-
-container_wrappers = '''
-        PChainHash
-        PDoubleList
-        PDoubleRing
-        POpenHash
-        PQueue
-        PSet
-        PSingleList
-        PSingleRing
-        PStack
-'''.split()
-install_headers(
-        container_wrappers,
-        subdir : 'pwxlib')
-
-libpwx_wrapper_list += files(container_wrappers)

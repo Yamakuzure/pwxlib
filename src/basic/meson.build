@@ -27,14 +27,3 @@ libbasic = static_library(
 install_headers(
         basic_headers,
         subdir : 'pwxlib/basic')
-
-basic_wrappers = '''
-        PException
-        PLockable
-        PLockGuard
-'''.split()
-install_headers(
-        basic_wrappers,
-        subdir : 'pwxlib')
-
-libpwx_wrapper_list += files(basic_wrappers)

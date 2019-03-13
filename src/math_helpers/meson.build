@@ -18,13 +18,3 @@ libmathhelpers = static_library(
 install_headers(
         mathhelpers_headers,
         subdir : 'pwxlib/math_helpers')
-
-mathhelpers_wrappers = '''
-        PMath
-        PSinCos
-'''.split()
-install_headers(
-        mathhelpers_wrappers,
-        subdir : 'pwxlib')
-
-libpwx_wrapper_list += files(mathhelpers_wrappers)
