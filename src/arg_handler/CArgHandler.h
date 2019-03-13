@@ -54,62 +54,61 @@ namespace pwx {
   * which is done in the library, namely pwx::PAH.
   *
   * Usage is quite simple.
-  * <LIST>
-  * <LI>Call <I>addArg()</I> for each argument your program
-  * should support.</LI>
-  * <LI>Use <I>addPassthrough()</I> if command line arguments
+  * 
+  * 1. Call `addArg()` for each argument your program
+  * should support.
+  * 2. Use `addPassthrough()` if command line arguments
   * must be preserved for later distribution to another
-  * program.<BR />
+  * program.  
   * Be aware, though, that passed arguments are malloc'd
-  * C-Strings that you have to free yourself.</LI>
-  * <LI>Call <I>parseArgs(argc, argv)</I> to have them applied
-  * to your arguments.</LI>
-  * <LI>With <I>getErrorCount()</I> the number of errors
-  * encountered can be retrieved.</LI>
-  * <LI><I>getError(nr)</I> returns the error number for error
-  * number <I>nr</I>, <I>getErrorStr(nr)</I> returns a string
-  * with an error text.</LI>
-  * <LI><I>getHelpArg(arg)</I> returns a string with the short
-  * and/or long argument and parameter if needed.</LI>
-  * <LI><I>getHelpDesc(arg)</I> returns a string with the
-  * argument descriptions.</LI>
-  * <LI><I>getHelpStr(arg, length)</LI> returns a string with
+  * C-Strings that you have to free yourself.
+  * 3. Call `parseArgs(argc, argv)` to have them applied
+  * to your arguments.
+  * 4. With `getErrorCount()` the number of errors
+  * encountered can be retrieved.
+  * 5. `getError(nr)` returns the error number for error
+  * number `nr`, `getErrorStr(nr)` returns a string
+  * with an error text.
+  * 6. `getHelpArg(arg)` returns a string with the short
+  * and/or long argument and parameter if needed.
+  * 7. `getHelpDesc(arg)` returns a string with the
+  * argument descriptions.
+  * 8. `getHelpStr(arg, length)` returns a string with
   * both the short and/or long argument plus parameter and
   * description. This string is formatted using the found
   * maximum lengths of short arguments, long arguments and
   * parameter names according to the given line length. If the
-  * resulting string is too long, it will line break.</LI>
-  * <LI>Finally <I>clearArgs()</I> frees all allocated memory.
-  * </LI></LIST>
+  * resulting string is too long, it will line break.
+  * 9. Finally `clearArgs()` frees all allocated memory.
   *
-  * Supported types:<BR />
+  * Supported types:  
   * The system directly supports bool, [u]int{8,16,32,64}_t,
-  * float, [long] double and std::string targets.<BR />
+  * float, [long] double and std::string targets.  
   * If a different type is to be handled, a callback function
   * must be installed that converts a const char* parameter
-  * into the target type and handles the processing.<BR />
+  * into the target type and handles the processing.  
   * Further it is advised to use a callback function if an
   * argument should be able to receive and store more than
-  * one parameter.<BR />
+  * one parameter.  
   * For this reason there are two different kinds of the
   * addArg() function. One to set a target type and a target
   * pointer, the other to install a callback function.
   *
-  * Adding a target pointer using <I>addArg()</I><BR />
+  * Adding a target pointer using `addArg()`  
   * There are some basic tests to ensure that the
-  * <I>arg_target</I> and the <I>arg_type</I> make sense.
+  * `arg_target` and the `arg_type` make sense.
   * If they do not, bad things may happen, at least the
   * argument might not do what you expect. This condition
   * is tested with an assertion.
   *
   * Both the short argument and the long argument must be
   * unique. If a given argument is already known to the
-  * handler, it will be <B>ignored</B>! This condition is
+  * handler, it will be **ignored**! This condition is
   * tested with an assertion.
   *
-  * Either of the arguments <I>arg_short</I> or <I>arg_long</I>
+  * Either of the arguments `arg_short` or `arg_long`
   * can be nullptr, but not both. If both are set to
-  * nullptr, the method does <B>nothing</B>! This condition
+  * nullptr, the method does **nothing**! This condition
   * is tested with an assert.
   *
   * If the creation of an argument target instance fails, a
@@ -121,11 +120,11 @@ namespace pwx {
   * If you need to pass arguments to a called process,
   * add the marker separating the command line arguments
   * from the called process arguments with the method
-  * <I>addPassthrough()</I> and not <I>addArg()</I>.
+  * `addPassthrough()` and not `addArg()`.
   *
-  * Adding a callback function using <I>addArg()</I><BR />
+  * Adding a callback function using `addArg()`  
   * Here the same rules apply. The callback function is
-  * supposed to work as follows:<BR />
+  * supposed to work as follows:  
   * The callback function will receive the long argument, if
   * set, otherwise the short argument as a first parameter.
   * The second parameter will be the command line parameter(s)
