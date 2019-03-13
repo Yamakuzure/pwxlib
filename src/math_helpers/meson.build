@@ -8,11 +8,23 @@ mathhelpers_headers = '''
         MathHelpers.h
 '''.split()
 
-libpwx_headers += files(mathhelpers_headers)
-
 libmathhelpers = static_library(
         'mathhelpers',
         mathhelpers_sources,
         cpp_args : ['-DPWX_EXPORTS'],
         include_directories : includes,
         install : false)
+
+install_headers(
+        mathhelpers_headers,
+        subdir : 'pwxlib/pwx')
+
+mathhelpers_wrappers = '''
+        PMath
+        PSinCos
+'''.split()
+install_headers(
+        mathhelpers_wrappers,
+        subdir : 'pwxlib')
+
+libpwx_wrapper_list += files(mathhelpers_wrappers)
