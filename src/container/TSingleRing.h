@@ -41,7 +41,7 @@
 namespace pwx {
 
 
-/** @class TSingleRing
+/** @class TSingleRing PSingleRing <PSingleRing>
   *
   * @brief Template to build singly linked rings of variable types
   *

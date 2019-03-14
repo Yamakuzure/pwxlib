@@ -1,1 +1,9 @@
-#include "container/CSingleList.h"
+/** @file PSingleList
+  * @brief Wraps container/TSingleList.h and typedefs pwx::TSingleList to PSingleList.
+**/
+#include "container/TSingleList.h"
+
+/** @typedef PSingleList
+  * @brief Allows to use pwx::TSingleList outside all namespaces.
+**/
+typedef ::pwx::TSingleList PSingleList;

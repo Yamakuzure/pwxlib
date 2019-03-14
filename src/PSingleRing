@@ -1,1 +1,9 @@
-#include "container/CSingleRing.h"
+/** @file PSingleRing
+  * @brief Wraps container/TSingleRing.h and typedefs pwx::TSingleRing to PSingleRing.
+**/
+#include "container/TSingleRing.h"
+
+/** @typedef PSingleRing
+  * @brief Allows to use pwx::TSingleRing outside all namespaces.
+**/
+typedef ::pwx::TSingleRing PSingleRing;

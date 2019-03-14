@@ -46,7 +46,7 @@
 namespace pwx {
 
 
-/** @class CLockable
+/** @class CLockable PLockable <PLockable>
   *
   * @brief Base class to make objects lockable via atomic_flag and lock counting.
   *

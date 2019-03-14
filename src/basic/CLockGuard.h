@@ -44,7 +44,7 @@
 namespace pwx {
 
 
-/** @class CLockGuard
+/** @class CLockGuard PLockGuard <PLockGuard>
   * @brief Basic RAII lock guard to lock/unlock one, two or three objects within its ctor/dtor
   *
   * There are the following advantages when using this class instead of

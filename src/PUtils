@@ -1,1 +1,4 @@
+/** @file PUtils
+  * @brief Add all utility classes and templates (See: libpwx/utils.h)
+**/
 #include "libpwx/utils.h"

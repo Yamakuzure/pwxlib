@@ -4,9 +4,9 @@
 
 /** @file worker_PAH.h
   *
-  * @brief This file makes the worker PAH available.
+  * @brief This file makes the [P]rogram [A]rgument [H]andler (pwx::PAH) available.
   *
-  * The PAH worker handles arguments to, and help texts from a program.
+  * The PAH worker handles arguments, and help texts of a program.
   *
   * (c) 2007 - 2018 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany

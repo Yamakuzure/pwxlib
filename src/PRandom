@@ -1,1 +1,9 @@
+/** @file PRandom
+  * @brief Wraps random/CRandom.h and typedefs pwx::CRandom to PRandom.
+**/
 #include "random/CRandom.h"
+
+/** @typedef PRandom
+  * @brief Allows to use pwx::CRandom outside all namespaces.
+**/
+typedef ::pwx::CRandom PRandom;

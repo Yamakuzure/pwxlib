@@ -41,7 +41,7 @@
 namespace pwx {
 
 
-/** @class TDoubleRing
+/** @class TDoubleRing PDoubleRing <PDoubleRing>
   *
   * @brief Template to build doubly linked rings of variable types
   *

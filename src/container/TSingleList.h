@@ -43,7 +43,7 @@
 namespace pwx {
 
 
-/** @class TSingleList
+/** @class TSingleList PSingleList <PSingleList>
   *
   * @brief Template to build singly linked lists of variable types
   *

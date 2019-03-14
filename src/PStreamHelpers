@@ -1,1 +1,4 @@
+/** @file PStreamHelpers
+  * @brief Add some tools to work with streams (See: stream_helpers/StreamHelpers.h)
+**/
 #include "stream_helpers/StreamHelpers.h"

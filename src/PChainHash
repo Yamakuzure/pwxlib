@@ -1,1 +1,9 @@
-#include "container/CChainHash.h"
+/** @file PChainHash
+  * @brief Wraps container/TChainHash.h and typedefs pwx::TChainHash to PChainHash.
+**/
+#include "container/TChainHash.h"
+
+/** @typedef PChainHash
+  * @brief Allows to use pwx::TChainHash outside all namespaces.
+**/
+typedef ::pwx::TChainHash PChainHash;

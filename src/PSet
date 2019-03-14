@@ -1,1 +1,9 @@
-#include "container/CSet.h"
+/** @file PSet
+  * @brief Wraps container/TSet.h and typedefs pwx::TSet to PSet.
+**/
+#include "container/TSet.h"
+
+/** @typedef PSet
+  * @brief Allows to use pwx::TSet outside all namespaces.
+**/
+typedef ::pwx::TSet PSet;

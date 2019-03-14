@@ -1,1 +1,9 @@
+/** @file PArgHandler
+  * @brief Wraps arg_handler/CArgHandler.h and typedefs pwx::CArgHandler to PArgHandler.
+**/
 #include "arg_handler/CArgHandler.h"
+
+/** @typedef PArgHandler
+  * @brief Allows to use pwx::CArgHandler outside all namespaces.
+**/
+typedef ::pwx::CArgHandler PArgHandler;

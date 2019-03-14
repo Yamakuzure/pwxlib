@@ -58,7 +58,7 @@ struct PWX_API sWave {
 };
 
 
-/** @class CWaveColor
+/** @class CWaveColor PWaveColor <PWaveColor>
   * @brief Class to work with the frequencies any RGB color is made of.
   *
   * The main idea of this class is, to build an instance out of RGB

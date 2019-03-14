@@ -1,1 +1,9 @@
-#include "container/CDoubleRing.h"
+/** @file PDoubleRing
+  * @brief Wraps container/TDoubleRing.h and typedefs pwx::TDoubleRing to PDoubleRing.
+**/
+#include "container/TDoubleRing.h"
+
+/** @typedef PDoubleRing
+  * @brief Allows to use pwx::TDoubleRing outside all namespaces.
+**/
+typedef ::pwx::TDoubleRing PDoubleRing;

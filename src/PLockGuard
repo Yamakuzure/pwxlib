@@ -1,1 +1,9 @@
+/** @file PLockGuard
+  * @brief Wraps basic/CLockGuard.h and typedefs pwx::CLockGuard to PLockGuard.
+**/
 #include "basic/CLockGuard.h"
+
+/** @typedef PLockGuard
+  * @brief Allows to use pwx::CLockGuard outside all namespaces.
+**/
+typedef ::pwx::CLockGuard PLockGuard;

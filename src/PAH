@@ -1,1 +1,4 @@
+/** @file PAH
+  * @brief Convenience wrapper for the [P]rogram [A]rgument [H]andler
+**/
 #include "libpwx/worker_PAH.h"

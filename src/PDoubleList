@@ -1,1 +1,9 @@
-#include "container/CDoubleList.h"
+/** @file PDoubleList
+  * @brief Wraps container/TDoubleList.h and typedefs pwx::TDoubleList to PDoubleList.
+**/
+#include "container/TDoubleList.h"
+
+/** @typedef PDoubleList
+  * @brief Allows to use pwx::TDoubleList outside all namespaces.
+**/
+typedef ::pwx::TDoubleList PDoubleList;

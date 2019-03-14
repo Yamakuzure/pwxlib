@@ -45,7 +45,7 @@
 namespace pwx {
 
 
-/** @class TSet
+/** @class TSet PSet <PSet>
   *
   * @brief Template to build sets of variable types
   *

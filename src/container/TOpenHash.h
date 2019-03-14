@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TOPENHASH_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TOPENHASH_H_INCLUDED
 
-/** @file TOpenHash.h
+/** @file TOpenHash.h POpenHash <POpenHash>
   *
   * @brief Declaration of a basic template for open hash containers
   *

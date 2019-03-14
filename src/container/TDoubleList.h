@@ -42,7 +42,7 @@
 namespace pwx {
 
 
-/** @class TDoubleList
+/** @class TDoubleList PDoubleList <PDoubleList>
   *
   * @brief Template to build doubly linked lists of variable types
   *

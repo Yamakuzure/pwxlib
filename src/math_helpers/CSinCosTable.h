@@ -37,7 +37,7 @@
 
 namespace pwx {
 
-/** @class CSinCosTable
+/** @class CSinCosTable PSinCos <PSinCos>
   *
   * @brief Provides pre-calculated sine and cosine tables
   *

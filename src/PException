@@ -1,1 +1,9 @@
+/** @file PException
+  * @brief Wraps basic/CException.h and typedefs pwx::CException to PException.
+**/
 #include "basic/CException.h"
+
+/** @typedef PException
+  * @brief Allows to use pwx::CException outside all namespaces.
+**/
+typedef ::pwx::CException PException;

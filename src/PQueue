@@ -1,1 +1,9 @@
-#include "container/CQueue.h"
+/** @file PQueue
+  * @brief Wraps container/TQueue.h and typedefs pwx::TQueue to PQueue.
+**/
+#include "container/TQueue.h"
+
+/** @typedef PQueue
+  * @brief Allows to use pwx::TQueue outside all namespaces.
+**/
+typedef ::pwx::TQueue PQueue;

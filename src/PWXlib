@@ -1,1 +1,4 @@
+/** @file PWXlib
+  * @brief Include everything at once. (See: pwxlib.h)
+**/
 #include "pwxlib.h"

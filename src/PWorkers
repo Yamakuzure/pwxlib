@@ -1,1 +1,4 @@
+/** @file PWorkers
+  * @brief Make the workers (PAH, RNG, SCT) available. (See: libpwx/workers.h)
+**/
 #include "libpwx/workers.h"

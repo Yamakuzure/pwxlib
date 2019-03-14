@@ -43,7 +43,7 @@
 namespace pwx {
 
 
-/** @class CRandom
+/** @class CRandom PRandom <PRandom>
   *
   * @brief Static class to produce unique or pseudo random numbers, hashes and names.
   *

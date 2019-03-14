@@ -3,6 +3,7 @@
 #define PWX_LIBPWX_PWX_H_INCLUDED 1
 
 /** @file pwxlib.h
+  * @brief Include everything at once.
   *
   * This is a "catch-all" include file that simply adds everything there
   * is. It is not necessary to include anything else for the library to
@@ -107,6 +108,7 @@
   * 0.8.7.5   2013-11-04  sed, PrydeWorX  Imported pwxLib CArgHandler
   * 0.8.8.0   2015-08-13  sed, PrydeWorX  Reordered and modernized
   * 0.8.9     2018-12-13  sed, PrydeWorX  First release on GitHub.
+  * 0.8.9.1   2019-03-14  sed, PrydeWorX  Layout of the files resetted and reordered. Doxygen config fixed.
   @endverbatim
 **/
 

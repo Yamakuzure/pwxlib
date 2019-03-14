@@ -1,1 +1,9 @@
-#include "container/CStack.h"
+/** @file PStack
+  * @brief Wraps container/TStack.h and typedefs pwx::TStack to PStack.
+**/
+#include "container/TStack.h"
+
+/** @typedef PStack
+  * @brief Allows to use pwx::TStack outside all namespaces.
+**/
+typedef ::pwx::TStack PStack;

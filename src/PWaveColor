@@ -1,1 +1,9 @@
+/** @file PWaveColor
+  * @brief Wraps wavecolor/CWaveColor.h and typedefs pwx::CWaveColor to PWaveColor.
+**/
 #include "wavecolor/CWaveColor.h"
+
+/** @typedef PWaveColor
+  * @brief Allows to use pwx::CWaveColor outside all namespaces.
+**/
+typedef ::pwx::CWaveColor PWaveColor;

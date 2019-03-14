@@ -40,7 +40,7 @@
 namespace pwx {
 
 
-/** @class TChainHash
+/** @class TChainHash PChainHash <PChainHash>
   *
   * @brief Chained hash container for variable types
   *

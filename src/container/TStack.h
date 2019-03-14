@@ -44,7 +44,7 @@
 namespace pwx {
 
 
-/** @class TStack
+/** @class TStack PStack <PStack>
   *
   * @brief Template to build stacks of variable types
   *

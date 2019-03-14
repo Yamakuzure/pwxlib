@@ -46,8 +46,7 @@
 
 namespace pwx {
 
-
-/** @class CArgHandler
+/** @class CArgHandler PArgHandler <PArgHandler>
   * @brief Handler for command line arguments
   *
   * This class is intended to be instantiated exactly once

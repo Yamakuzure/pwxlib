@@ -49,7 +49,7 @@
 namespace pwx {
 
 
-/** @class CException
+/** @class CException PException <PException>
   * @brief Basic exception class with tracing functionality
   *
   * This class is meant to provide a tracing exception to get as much information as possible.

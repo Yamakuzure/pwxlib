@@ -1,1 +1,9 @@
-#include "container/COpenHash.h"
+/** @file POpenHash
+  * @brief Wraps container/TOpenHash.h and typedefs pwx::TOpenHash to POpenHash.
+**/
+#include "container/TOpenHash.h"
+
+/** @typedef POpenHash
+  * @brief Allows to use pwx::TOpenHash outside all namespaces.
+**/
+typedef ::pwx::TOpenHash POpenHash;

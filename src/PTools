@@ -1,1 +1,4 @@
+/** @file PTools
+  * @brief Add all tool classes and functions. (See: libpwx/tools.h)
+**/
 #include "libpwx/tools.h"
