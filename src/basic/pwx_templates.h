@@ -6,7 +6,7 @@
   *
   * @brief Helper templates and macros for various little issues
   *
-  * (c) 2007 - 2018 PrydeWorX
+  * (c) 2007 - 2019 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

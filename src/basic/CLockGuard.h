@@ -9,7 +9,7 @@
   * up to three objects at once. This is helpful handling
   * doubly linked list based containers and elements.
   *
-  * (c) 2007 - 2018 PrydeWorX
+  * (c) 2007 - 2019 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

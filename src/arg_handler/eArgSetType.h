@@ -5,7 +5,7 @@
   *
   * @brief enum to describe what PAH should do when an ATT_SET target receives more than one parameter
   *
-  * (c) 2007 - 2018 PrydeWorX
+  * (c) 2007 - 2019 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

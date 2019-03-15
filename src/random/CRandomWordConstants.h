@@ -9,7 +9,7 @@
   * <B>Automatically generated Header! Do NOT modify! See bottom
   * of this file for more information!</B>
   *
-  * (c) 2007 - 2018 PrydeWorX
+  * (c) 2007 - 2019 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
