@@ -43,6 +43,7 @@ namespace private_ {
 
 
 /** @internal
+  * @class CThreadElementStore
   * @brief Hash based store for thread individual element handling
   *
   * This class is used by all list based containers to store

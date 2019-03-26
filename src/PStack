@@ -6,4 +6,5 @@
 /** @typedef PStack
   * @brief Allows to use pwx::TStack outside all namespaces.
 **/
-typedef ::pwx::TStack PStack;
+template<typename data_t>
+using PStack = ::pwx::TStack<data_t>;

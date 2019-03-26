@@ -6,4 +6,5 @@
 /** @typedef PSingleRing
   * @brief Allows to use pwx::TSingleRing outside all namespaces.
 **/
-typedef ::pwx::TSingleRing PSingleRing;
+template<typename data_t, typename elem_t = ::pwx::TSingleElement<data_t> >
+using PSingleRing = ::pwx::TSingleRing<data_t, elem_t>;

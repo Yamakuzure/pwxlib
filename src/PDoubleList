@@ -6,4 +6,5 @@
 /** @typedef PDoubleList
   * @brief Allows to use pwx::TDoubleList outside all namespaces.
 **/
-typedef ::pwx::TDoubleList PDoubleList;
+template<typename data_t, typename elem_t = ::pwx::TDoubleElement<data_t> >
+using PDoubleList = ::pwx::TDoubleList<data_t, elem_t>;

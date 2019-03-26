@@ -6,4 +6,5 @@
 /** @typedef PChainHash
   * @brief Allows to use pwx::TChainHash outside all namespaces.
 **/
-typedef ::pwx::TChainHash PChainHash;
+template<typename key_t, typename data_t, typename elem_t = ::pwx::THashElement<key_t, data_t> >
+using PChainHash = ::pwx::TChainHash<key_t, data_t, elem_t>;

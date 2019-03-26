@@ -6,4 +6,5 @@
 /** @typedef PSingleList
   * @brief Allows to use pwx::TSingleList outside all namespaces.
 **/
-typedef ::pwx::TSingleList PSingleList;
+template<typename data_t, typename elem_t = ::pwx::TSingleElement<data_t> >
+using PSingleList = ::pwx::TSingleList<data_t, elem_t>;

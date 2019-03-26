@@ -6,4 +6,5 @@
 /** @typedef POpenHash
   * @brief Allows to use pwx::TOpenHash outside all namespaces.
 **/
-typedef ::pwx::TOpenHash POpenHash;
+template<typename key_t, typename data_t, typename elem_t = ::pwx::THashElement<key_t, data_t> >
+using POpenHash = ::pwx::TOpenHash<key_t, data_t, elem_t>;

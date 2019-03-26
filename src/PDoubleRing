@@ -6,4 +6,5 @@
 /** @typedef PDoubleRing
   * @brief Allows to use pwx::TDoubleRing outside all namespaces.
 **/
-typedef ::pwx::TDoubleRing PDoubleRing;
+template<typename data_t, typename elem_t = ::pwx::TDoubleElement<data_t> >
+using PDoubleRing = ::pwx::TDoubleRing<data_t, elem_t>;

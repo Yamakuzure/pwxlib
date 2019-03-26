@@ -6,4 +6,5 @@
 /** @typedef PSet
   * @brief Allows to use pwx::TSet outside all namespaces.
 **/
-typedef ::pwx::TSet PSet;
+template<typename data_t>
+using PSet = ::pwx::TSet<data_t>;

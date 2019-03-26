@@ -6,4 +6,5 @@
 /** @typedef PQueue
   * @brief Allows to use pwx::TQueue outside all namespaces.
 **/
-typedef ::pwx::TQueue PQueue;
+template<typename data_t>
+using PQueue = ::pwx::TQueue<data_t>;
