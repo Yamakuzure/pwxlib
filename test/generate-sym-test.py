@@ -168,6 +168,6 @@ for line in open(sys.argv[1]):
 # Step five : Add the function test loop
 print('''
 \tfor (unsigned i = 0; i < sizeof(functions)/sizeof(void*)/2; i++)
-\t\tprintf("%16s: %p\\n", (const char*)functions[i][0], functions[i][1]);
+\t\tprintf("%16s: %p\\n", (char const*)functions[i][0], functions[i][1]);
 \treturn 0;
 }\n''')

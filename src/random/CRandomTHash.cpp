@@ -40,7 +40,7 @@ namespace private_ {
 
 
 /// @internal hash handler for strings. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-uint32_t private_hash_str( const char* key, size_t keyLen ) noexcept {
+uint32_t private_hash_str( char const* key, size_t keyLen ) noexcept {
     uint32_t part  = 0, sum = 0;
     size_t   len   = keyLen ? keyLen : strlen( key );
     size_t   phase = 0, level = 0;

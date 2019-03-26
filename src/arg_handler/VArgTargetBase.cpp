@@ -49,9 +49,9 @@ namespace pwx {
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-VArgTargetBase::VArgTargetBase( const char* arg_short, const char* arg_long,
+VArgTargetBase::VArgTargetBase( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type,
-                                const char* arg_desc, const char* param_name )
+                                char const* arg_desc, char const* param_name )
 noexcept :
     aShort ( arg_short  ? arg_short  : "" ),
     aLong  ( arg_long   ? arg_long   : "" ),
@@ -84,9 +84,9 @@ noexcept :
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-VArgTargetBase::VArgTargetBase( const char* arg_short, const char* arg_long,
+VArgTargetBase::VArgTargetBase( char const* arg_short, char const* arg_long,
                                 eArgSetType set_type,
-                                const char* arg_desc, const char* param_name )
+                                char const* arg_desc, char const* param_name )
 noexcept :
     VArgTargetBase( arg_short, arg_long, ATT_SET, arg_desc, param_name ) {
     setType = set_type;

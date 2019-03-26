@@ -56,8 +56,8 @@ namespace pwx {
   * @param[in] func_ Name of the function where this was thrown.
   * @param[in] desc_ Description of what wnet wrong.
   */
-CException::CException ( const char* const name_, const char* const what_, const char* const where_,
-                         const char* const func_, const char* const desc_ ) noexcept
+CException::CException ( char const* const name_, char const* const what_, char const* const where_,
+                         char const* const func_, char const* const desc_ ) noexcept
     : std::exception(),
       txtName  ( strdup ( name_ ) ),
       txtWhat  ( strdup ( what_ ) ),
@@ -93,7 +93,7 @@ CException::CException ( const CException& src ) noexcept
   * are ignored. It is better to have a broken trace than
   * a broken unwinding.
   */
-void CException::addToTrace ( const char* trace_ ) noexcept {
+void CException::addToTrace ( char const* trace_ ) noexcept {
     if ( txtTrace.empty() ) {
         PWX_TRY ( txtTrace  = "Thrown from : "; txtTrace += txtWhere )
         PWX_CATCH_AND_FORGET ( std::exception )
@@ -117,37 +117,37 @@ CException::~CException() noexcept {
 
 
 /// @brief Return the name of the exception
-const char* CException::name() const noexcept {
+char const* CException::name() const noexcept {
     return txtName;
 }
 
 
 /// @brief Return the exception reason
-const char* CException::what() const noexcept {
+char const* CException::what() const noexcept {
     return txtWhat;
 }
 
 
 /// @brief Return the original throwing position
-const char* CException::where() const noexcept {
+char const* CException::where() const noexcept {
     return txtWhere;
 }
 
 
 /// @brief Return the exception description
-const char* CException::desc() const noexcept {
+char const* CException::desc() const noexcept {
     return txtDesc;
 }
 
 
 /// @brief Return the pretty function where the original throw occurred.
-const char* CException::pfunc() const noexcept {
+char const* CException::pfunc() const noexcept {
     return txtFunc;
 }
 
 
 /// @brief Return the trace of the exceptions path
-const char* CException::trace() const noexcept {
+char const* CException::trace() const noexcept {
     return txtTrace.c_str();
 }
 

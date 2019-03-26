@@ -118,7 +118,7 @@ class PWX_API CRandom: public CLockable {
     uint32_t    hash     ( float       key ) const noexcept;
     uint32_t    hash     ( double      key ) const noexcept;
     uint32_t    hash     ( long double key ) const noexcept;
-    uint32_t    hash     ( const char* key, size_t keyLen = 0 ) const noexcept;
+    uint32_t    hash     ( char const* key, size_t keyLen = 0 ) const noexcept;
     uint32_t    hash     ( std::string& key ) const noexcept;
     eNameSourceType
     nextNST  ( void ) noexcept;
@@ -198,7 +198,7 @@ class PWX_API CRandom: public CLockable {
      * ===============================================
     */
 
-    PWX_PRIVATE_INLINE void    checkRule  ( uint32_t& state, const char first, const char second, const char third ) noexcept;
+    PWX_PRIVATE_INLINE void    checkRule  ( uint32_t& state, char const first, char const second, char const third ) noexcept;
     PWX_PRIVATE_INLINE int32_t genSyllable( double& idx, double step, char*  syll, uint32_t& state, char*  lastChrs ) noexcept PWX_WARNUNUSED;
     PWX_PRIVATE_INLINE double  getStepping( double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl ) noexcept PWX_WARNUNUSED;
 

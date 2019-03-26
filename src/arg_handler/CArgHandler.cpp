@@ -62,12 +62,12 @@ namespace pwx {
 **/
 template<typename T>
 static bool internalAddArg (
-    const char* arg_short, const char* arg_long,
+    char const* arg_short, char const* arg_long,
     eArgTargetType arg_type,
     eArgSetType set_type,
     T* arg_target,
-    void ( *arg_cb )( const char*, const char* ),
-    const char* arg_desc, const char* param_name,
+    void ( *arg_cb )( char const*, char const* ),
+    char const* arg_desc, char const* param_name,
     CArgHandler::hash_t& tgtShort, CArgHandler::hash_t& tgtLong,
     size_t& maxLongLen, size_t& maxParamLen, size_t& maxShortLen ) {
     typedef VArgTargetBase              data_t;
@@ -217,9 +217,9 @@ CArgHandler::~CArgHandler() noexcept {
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, bool* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -241,9 +241,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int8_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -265,9 +265,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint8_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -289,9 +289,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int16_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -313,9 +313,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint16_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -337,9 +337,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int32_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -361,9 +361,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint32_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -385,9 +385,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int64_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -409,9 +409,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint64_t* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -433,9 +433,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, float* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -457,9 +457,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, double* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -481,9 +481,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, long double* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -505,9 +505,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, std::string* arg_target,
-                          const char* arg_desc, const char* param_name,
+                          char const* arg_desc, char const* param_name,
                           eArgSetType set_type ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
                                 arg_target, nullptr, arg_desc, param_name,
@@ -533,10 +533,10 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
  * @param[in] param_name Name shown in <> in the help text.
  * @return true if an argument was added, false otherwise.
  **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type,
-                          void ( *arg_cb )( const char*, const char* ),
-                          const char* arg_desc, const char* param_name ) {
+                          void ( *arg_cb )( char const*, char const* ),
+                          char const* arg_desc, char const* param_name ) {
     assert( ATT_CB == arg_type );
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, STT_OVERWRITE,
                                 ( uint8_t* )nullptr, arg_cb, arg_desc, param_name,
@@ -556,9 +556,9 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[in] param_name Name shown in <> in the help text.
   * @return true if an argument was added, false otherwise.
 **/
-bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
-                          void ( *arg_cb )( const char*, const char* ),
-                          const char* arg_desc, const char* param_name ) {
+bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
+                          void ( *arg_cb )( char const*, char const* ),
+                          char const* arg_desc, char const* param_name ) {
     PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, ATT_CB, STT_OVERWRITE,
                                 ( uint8_t* )nullptr, arg_cb, arg_desc, param_name,
                                 this->shortArgs, this->longArgs,
@@ -594,7 +594,7 @@ bool CArgHandler::addArg( const char* arg_short, const char* arg_long,
   * @param[out] pass_argc pointer receiving the number of passed arguments
   * @param[out] pass_argv pointer receiving the passed through arguments
   */
-void CArgHandler::addPassthrough( const char* init_arg, int32_t* pass_argc, char*** pass_argv ) {
+void CArgHandler::addPassthrough( char const* init_arg, int32_t* pass_argc, char*** pass_argv ) {
     if ( !init_arg || !pass_argc || !pass_argv )
         PWX_THROW( "IllegalParameters", "nullptr parameter",
                    "CArgHandler::addPassthrough must not be called with any parameter being nullptr!" )
@@ -664,7 +664,7 @@ int CArgHandler::getErrorCount() const noexcept {
   * @param[in] nr Number of the error to retrieve the error text from
   * @return retrieved error text or nullptr, if no such error exists.
   */
-const char* CArgHandler::getErrorStr( const int32_t nr ) const noexcept {
+char const* CArgHandler::getErrorStr( const int32_t nr ) const noexcept {
     int idx  = nr - 1;
     int size = static_cast<int>( errlist.size() );
 
@@ -725,7 +725,7 @@ const char* CArgHandler::getErrorStr( const int32_t nr ) const noexcept {
   * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
   * @return a string with the help text or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpArg( const char* argument, size_t length, size_t indent,
+std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t indent,
                                      char argSep, char paramSep,
                                      bool emptyLine, bool autoSep, bool autoSpace ) const noexcept {
     std::string result = "";
@@ -883,7 +883,7 @@ std::string CArgHandler::getHelpArg( const char* argument, size_t length, size_t
   * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
   * @return a string with the description or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpDesc( const char* argument, size_t* pos,
+std::string CArgHandler::getHelpDesc( char const* argument, size_t* pos,
                                       size_t length, char descSep,
                                       bool autoSep, bool autoSpace ) const noexcept {
     assert ( argument && strlen( argument )
@@ -993,7 +993,7 @@ std::string CArgHandler::getHelpDesc( const char* argument, size_t* pos,
   * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
   * @return a string with the description or an error message if @a argument could not be found.
   */
-std::string CArgHandler::getHelpStr( const char* argument, size_t length, size_t indent,
+std::string CArgHandler::getHelpStr( char const* argument, size_t length, size_t indent,
                                      char argSep, char paramSep, char descSep,
                                      bool autoSep, bool autoSpace ) const noexcept {
     std::string result;
@@ -1056,7 +1056,7 @@ std::string CArgHandler::getHelpStr( const char* argument, size_t length, size_t
   * @return Number of errors encountered.
   */
 int32_t CArgHandler::parseArgs( const int32_t argc, char* argv[] ) noexcept {
-    return parseArgs( argc, const_cast<const char**>( argv ) );
+    return parseArgs( argc, const_cast<char const**>( argv ) );
 }
 
 
@@ -1073,7 +1073,7 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char* argv[] ) noexcept {
   * @param[in] argv array of C-Strings.
   * @return Number of errors encountered.
   */
-int32_t CArgHandler::parseArgs( const int32_t argc, const char* argv[] ) noexcept {
+int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcept {
     // New round, new errors:
     if ( errlist.size() )
         errlist.clear();
@@ -1242,7 +1242,7 @@ int32_t CArgHandler::parseArgs( const int32_t argc, const char* argv[] ) noexcep
 
 /** @brief get target for short/long arg @arg or return nullptr if not found
 **/
-CArgHandler::data_t* CArgHandler::getTarget( const char* arg ) const noexcept {
+CArgHandler::data_t* CArgHandler::getTarget( char const* arg ) const noexcept {
     data_t* target = nullptr;
 
     if ( arg && strlen( arg ) ) {
@@ -1260,14 +1260,14 @@ CArgHandler::data_t* CArgHandler::getTarget( const char* arg ) const noexcept {
 
 /** @return the program call, if <I>parseArgs()</I> has found one, nullptr otherwise.
 **/
-const char* CArgHandler::getPrgCall() const noexcept {
+char const* CArgHandler::getPrgCall() const noexcept {
     return prgCall;
 }
 
 
 /** @brief store argc/argv in pass_cnt/pass_args values
 **/
-void CArgHandler::passThrough( const int32_t argc, const char** argv ) noexcept {
+void CArgHandler::passThrough( const int32_t argc, char const** argv ) noexcept {
     if ( argc > 0 ) {
         *pass_args = ( char** )calloc( argc, sizeof( char* ) );
         for ( int32_t i = 0; *pass_args && ( i < argc ); ++i )
@@ -1281,10 +1281,10 @@ void CArgHandler::passThrough( const int32_t argc, const char** argv ) noexcept 
   * arg_list will be empty if false is returned.
   * @return true if all characters could be found, false otherwise.
 **/
-bool CArgHandler::uncombine( const char* arg, arg_list_t& arg_list ) {
+bool CArgHandler::uncombine( char const* arg, arg_list_t& arg_list ) {
     bool        allFound = true;
     std::string dashes   = "";
-    const char* pChr     = arg;
+    char const* pChr     = arg;
     data_t*     target   = nullptr;
 
     // Step one: Get number of dashes

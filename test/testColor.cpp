@@ -16,18 +16,18 @@
  * === Helper function prototypes ===
  * ==================================
  */
-static int  addRGB  ( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int  addRGB  ( PWaveColor& wc, char const* const name, uint8_t r, uint8_t g, uint8_t b,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static int  delRGB  ( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int  delRGB  ( PWaveColor& wc, char const* const name, uint8_t r, uint8_t g, uint8_t b,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static void printRGB( PWaveColor& wc, const char* const name, const char* const call, bool isEnd = true );
-static void printRGB( int32_t nr, PWaveColor& wc, const char* const name, const char* const call, bool isEnd = true );
-static int  modFreq ( PWaveColor& wc, const char* const name, double modifier,
+static void printRGB( PWaveColor& wc, char const* const name, char const* const call, bool isEnd = true );
+static void printRGB( int32_t nr, PWaveColor& wc, char const* const name, char const* const call, bool isEnd = true );
+static int  modFreq ( PWaveColor& wc, char const* const name, double modifier,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static int  setGamma( PWaveColor& wc, const char* const name, double gamma,
+static int  setGamma( PWaveColor& wc, char const* const name, double gamma,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static int  setRGB  ( int32_t nr, PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b );
-static int  modWave ( PWaveColor& wc, const char* const name, double modifier,
+static int  setRGB  ( int32_t nr, PWaveColor& wc, char const* const name, uint8_t r, uint8_t g, uint8_t b );
+static int  modWave ( PWaveColor& wc, char const* const name, double modifier,
                       uint8_t tR, uint8_t tG, uint8_t tB );
 
 
@@ -239,7 +239,7 @@ int32_t testColor ( sEnv& env ) {
  * =======================================
  */
 
-static int addRGB( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int addRGB( PWaveColor& wc, char const* const name, uint8_t r, uint8_t g, uint8_t b,
                    uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
@@ -256,7 +256,7 @@ static int addRGB( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g,
     return result;
 }
 
-static int delRGB( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int delRGB( PWaveColor& wc, char const* const name, uint8_t r, uint8_t g, uint8_t b,
                    uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
@@ -273,7 +273,7 @@ static int delRGB( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g,
     return result;
 }
 
-static int modFreq( PWaveColor& wc, const char* const name, double modifier,
+static int modFreq( PWaveColor& wc, char const* const name, double modifier,
                     uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10]  = "";
     char fTxt[33] = "";
@@ -304,7 +304,7 @@ static int modFreq( PWaveColor& wc, const char* const name, double modifier,
     return result;
 }
 
-static int modWave( PWaveColor& wc, const char* const name, double modifier,
+static int modWave( PWaveColor& wc, char const* const name, double modifier,
                     uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     char fTxt[33] = "";
@@ -335,7 +335,7 @@ static int modWave( PWaveColor& wc, const char* const name, double modifier,
     return result;
 }
 
-static void printRGB( PWaveColor& wc, const char* const name, const char* const call, bool isEnd ) {
+static void printRGB( PWaveColor& wc, char const* const name, char const* const call, bool isEnd ) {
     uint8_t r, g, b;
     wc.getRGB( r, g, b );
     printf ( "--> %-15s [Call %8s]: %2d waves -> RGB %02x %02x %02x %s",
@@ -343,7 +343,7 @@ static void printRGB( PWaveColor& wc, const char* const name, const char* const 
              isEnd ? ": " : "" );
 }
 
-static void printRGB( int32_t nr, PWaveColor& wc, const char* const name, const char* const call, bool isEnd ) {
+static void printRGB( int32_t nr, PWaveColor& wc, char const* const name, char const* const call, bool isEnd ) {
     uint8_t r, g, b;
     wc.getRGB( r, g, b );
     printf ( "%02d. %-15s [Call %8s]: %2d waves -> RGB %02x %02x %02x %s",
@@ -351,7 +351,7 @@ static void printRGB( int32_t nr, PWaveColor& wc, const char* const name, const 
              isEnd ? ": " : "" );
 }
 
-static int setGamma( PWaveColor& wc, const char* const name, double gamma,
+static int setGamma( PWaveColor& wc, char const* const name, double gamma,
                      uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
@@ -369,7 +369,7 @@ static int setGamma( PWaveColor& wc, const char* const name, double gamma,
     return result;
 }
 
-static int setRGB( int32_t nr, PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b ) {
+static int setRGB( int32_t nr, PWaveColor& wc, char const* const name, uint8_t r, uint8_t g, uint8_t b ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
     int result = 0;

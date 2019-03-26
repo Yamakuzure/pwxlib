@@ -55,7 +55,7 @@ namespace pwx {
 /** @brief checkRule - check state and character against followup matrix rules from namecon
   * Note: It is assumed, that all three characters are lowercase
 **/
-void CRandom::checkRule ( uint32_t& state, const char first, const char second, const char third ) noexcept {
+void CRandom::checkRule ( uint32_t& state, char const first, char const second, char const third ) noexcept {
     int32_t one   = FUM_IDX( first );
     int32_t two   = FUM_IDX( second );
     int32_t three = FUM_IDX( third );
@@ -930,7 +930,7 @@ uint32_t CRandom::hash ( long double key ) const noexcept {
   * @param[in] keyLen if omitted, a 0-terminated C-String is assumed
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( const char* key, size_t keyLen ) const noexcept {
+uint32_t CRandom::hash ( char const* key, size_t keyLen ) const noexcept {
     return private_::private_hash_str( key, keyLen );
 }
 

@@ -53,9 +53,9 @@ namespace pwx {
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> int the help text.
 **/
-CArgCallback::CArgCallback( const char* arg_short, const char* arg_long,
-                            void ( *arg_cb )( const char*, const char* ),
-                            const char* arg_desc, const char* param_name )
+CArgCallback::CArgCallback( char const* arg_short, char const* arg_long,
+                            void ( *arg_cb )( char const*, char const* ),
+                            char const* arg_desc, char const* param_name )
 noexcept :
     VArgTargetBase( arg_short, arg_long, ATT_CB, arg_desc, param_name ),
     cb    ( arg_cb ) {
@@ -80,7 +80,7 @@ CArgCallback::~CArgCallback() noexcept {
   *
   * @return AEN_OK if the callback function was set.
 **/
-eArgErrorNumber CArgCallback::process( const char* param ) {
+eArgErrorNumber CArgCallback::process( char const* param ) {
     if ( cb ) {
         try {
             cb( aLong.size() ? aLong.c_str() : aShort.c_str(), param );

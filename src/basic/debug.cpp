@@ -47,7 +47,7 @@ namespace pwx {
 // The central log needs a log lock:
 std::atomic_flag _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
 
-static void debug_log_out( _IO_FILE* target, const char* fmt, va_list ap ) {
+static void debug_log_out( _IO_FILE* target, char const* fmt, va_list ap ) {
     while ( _pwx_internal_LOG_output_lock.test_and_set( PWX_MEMORDER_ACQUIRE ) )
         std::this_thread::yield();
 
@@ -56,14 +56,14 @@ static void debug_log_out( _IO_FILE* target, const char* fmt, va_list ap ) {
     _pwx_internal_LOG_output_lock.clear( PWX_MEMORDER_RELEASE );
 }
 
-void debug_log( const char* fmt, ... ) {
+void debug_log( char const* fmt, ... ) {
     va_list ap;
     va_start ( ap, fmt );
     debug_log_out( stdout, fmt, ap );
     va_end( ap );
 }
 
-void debug_err( const char* fmt, ... ) {
+void debug_err( char const* fmt, ... ) {
     va_list ap;
     va_start ( ap, fmt );
     debug_log_out( stderr, fmt, ap );

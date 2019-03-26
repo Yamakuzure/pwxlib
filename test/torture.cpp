@@ -2,8 +2,8 @@
 
 
 // --- Prototypes, the implementations are below main() ---
-static int32_t setNumThreads( const char* chNum, uint32_t& numThreads );
-static int32_t setTestType( const char* chType, eTestType& testType );
+static int32_t setNumThreads( char const* chNum, uint32_t& numThreads );
+static int32_t setTestType( char const* chType, eTestType& testType );
 static int32_t startTest( uint32_t numThreads, eTestType testType );
 
 
@@ -81,7 +81,7 @@ int32_t main( int32_t argc, char** argv ) {
 
 
 // Small helper to get the number out of an argument and check it
-static int32_t setNumThreads( const char* chNum, uint32_t& numThreads ) {
+static int32_t setNumThreads( char const* chNum, uint32_t& numThreads ) {
     int32_t result = EXIT_SUCCESS;
 
     numThreads = pwx::to_uint32( chNum );
@@ -97,7 +97,7 @@ static int32_t setNumThreads( const char* chNum, uint32_t& numThreads ) {
 
 
 // Small helper to get the test type out of an argument and check it
-static int32_t setTestType( const char* chType, eTestType& testType ) {
+static int32_t setTestType( char const* chType, eTestType& testType ) {
     int32_t result = EXIT_SUCCESS;
 
     if ( STREQ( "all", chType ) )

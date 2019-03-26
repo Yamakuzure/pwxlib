@@ -781,7 +781,7 @@ const int32_t chrIndexUmlautU = 28;
 /* --- resulting consonant array --- */
 const uint32_t conListLen[6] = { 791, 458, 587, 792, 345, 637 };
 
-const char     conList[6][793] = {
+char const     conList[6][793] = {
     "zmhrczcbdbgrnbrbnrtrnmhbhlhmgbmbcfcdzljnchckcsrdcsclmczcwcsdrdtdrtkdrdndjdnd"
     "lspdgdrdjdsdhdcdcdrdndldsdlhldrjrfndglrfknhfkftfdfrftfsmlhclbkspgrntgkvngmrl"
     "mnrhzsdgsmlhnfvhrhphthnhstngclbwfhdhsmkhsrhfhdkrhshghlmnhnlmdjrnsmrjrthmkjkn"
@@ -838,7 +838,7 @@ const char     conList[6][793] = {
 /* --- resulting vowel array --- */
 const uint32_t vowListLen[6] = { 599, 21, 19, 120, 20, 46 };
 
-const char     vowList[6][600] = {
+char const     vowList[6][600] = {
     "yeaeoyaeiuiyueayeaiuaeiyeaoyiaiaiaeaoaeaiaiaeaeioaoeuieaoaiaeuiauieaeaoaeaoi"
     "eaoeiaieyaieuaoeaeaieaeaeiaiuauaeaeaeaieaiauaieieoaeoaiaoiaeauieyeaeaeaeiaie"
     "aiaeaeoiaeaeaoeaoeuaiayaeaieuaeieieoaieoöueieiaoeuieoeieaieauaiaeaeaiayaeaea"

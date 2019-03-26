@@ -44,7 +44,7 @@ namespace pwx {
   * @param[in] errno_ error number of the error
   * @param[in] error_ text describing the error
   */
-sArgError::sArgError( eArgErrorNumber errno_, const char* error_ ) noexcept :
+sArgError::sArgError( eArgErrorNumber errno_, char const* error_ ) noexcept :
     arg_errno( static_cast<int32_t>( errno_ ) ),
     arg_error( error_ ? strdup( error_ ) : nullptr ) {
     /* nothing to do here */

@@ -220,7 +220,7 @@ class PWX_API CHashBuilder {
     uint32_t hash_rng( const float*       key ) const noexcept;
     uint32_t hash_rng( const double*      key ) const noexcept;
     uint32_t hash_rng( const long double* key ) const noexcept;
-    uint32_t hash_rng( const char*        key ) const noexcept;
+    uint32_t hash_rng( char const*        key ) const noexcept;
     uint32_t hash_rng( const std::string* key ) const noexcept;
     template<typename key_t>
     uint32_t hash_rng( key_t* key );

@@ -157,7 +157,7 @@ that to get integer representations.
 
    ================================================================================================ */
 
-uint32_t private_hash_str( const char* key, size_t keyLen ) noexcept;
+uint32_t private_hash_str( char const* key, size_t keyLen ) noexcept;
 uint32_t private_hash_buf( const uint8_t* key, size_t keyLen ) noexcept;
 
 using constants::fullMaxInt;

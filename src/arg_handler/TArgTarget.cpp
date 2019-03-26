@@ -41,7 +41,7 @@ namespace pwx {
 
 
 template<>
-eArgErrorNumber TArgTarget<std::string>::process( const char* param ) {
+eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
     eArgErrorNumber argErrno = AEN_OK;
 
     switch( this->type ) {
@@ -81,7 +81,7 @@ eArgErrorNumber TArgTarget<std::string>::process( const char* param ) {
 
 // --- bool ---
 template<>
-void TArgTarget<bool>::par_to_val( bool*    tgt, const char* param ) noexcept {
+void TArgTarget<bool>::par_to_val( bool*    tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_bool  ( param );
 }
@@ -89,68 +89,68 @@ void TArgTarget<bool>::par_to_val( bool*    tgt, const char* param ) noexcept {
 
 // --- integers ---
 template<>
-void TArgTarget<int8_t>::par_to_val( int8_t*  tgt, const char* param ) noexcept {
+void TArgTarget<int8_t>::par_to_val( int8_t*  tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_int8  ( param );
 }
 
 template<>
-void TArgTarget<int16_t>::par_to_val( int16_t* tgt, const char* param ) noexcept {
+void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_int16 ( param );
 }
 
 template<>
-void TArgTarget<int32_t>::par_to_val( int32_t* tgt, const char* param ) noexcept {
+void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_int32 ( param );
 }
 
 template<>
-void TArgTarget<int64_t>::par_to_val( int64_t* tgt, const char* param ) noexcept {
+void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_int64 ( param );
 }
 
 template<>
-void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, const char* param ) noexcept {
+void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_uint8 ( param );
 }
 
 template<>
-void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, const char* param ) noexcept {
+void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_uint16( param );
 }
 
 template<>
-void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, const char* param ) noexcept {
+void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_uint32( param );
 }
 
 template<>
-void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, const char* param ) noexcept {
+void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_uint64( param );
 }
 
 // --- floats ---
 template<>
-void TArgTarget<float>::par_to_val( float*      tgt, const char* param ) noexcept {
+void TArgTarget<float>::par_to_val( float*      tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_float ( param );
 }
 
 template<>
-void TArgTarget<double>::par_to_val( double*     tgt, const char* param ) noexcept {
+void TArgTarget<double>::par_to_val( double*     tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_double( param );
 }
 
 template<>
-void TArgTarget<long double>::par_to_val( long double* tgt, const char* param ) noexcept {
+void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept {
     if ( tgt )
         *tgt = to_long_double( param );
 }

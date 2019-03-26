@@ -46,12 +46,12 @@ namespace pwx {
 **/
 struct sArgError {
     int32_t     arg_errno; //!< number of the error, taken from eArgErrorNumber
-    const char* arg_error; //!< String with the error text
+    char const* arg_error; //!< String with the error text
 
     // Note: The prefix arg_ is needed, or the preprocessor m
     //       substitute "errno" with "(*__errno_location ())"
 
-    explicit sArgError( eArgErrorNumber errno_, const char* error_ ) noexcept;
+    explicit sArgError( eArgErrorNumber errno_, char const* error_ ) noexcept;
     ~sArgError() noexcept;
 
     // No empty ctor, no copying

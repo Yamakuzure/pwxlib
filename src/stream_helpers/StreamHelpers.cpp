@@ -83,7 +83,7 @@ std::ostream& operator<< ( std::ostream& os, const CAdjRight& r ) noexcept {
   * @param[in,out] data The data string to search
   * @return true if a representation was found.
 **/
-bool cropShell ( const char* key, std::string& data ) noexcept {
+bool cropShell ( char const* key, std::string& data ) noexcept {
     std::string shLike = "$";
     shLike += key;
     size_t pos = data.find ( shLike );
@@ -159,7 +159,7 @@ void ltrim ( std::string& text, char extra ) noexcept {
   * @param[in] mode you can specify a non-default openmode if you like.
   * @return the file name on success, so you can get rid of the file, or NULL if something went wrong
 **/
-const char* makeTemp ( const char* aPath, const char* aTemplate, const char* aSuffix,
+char const* makeTemp ( char const* aPath, char const* aTemplate, char const* aSuffix,
                        std::ofstream& ofs, std::ios_base::openmode mode ) noexcept {
     try {
         std::string fileName ( aPath );

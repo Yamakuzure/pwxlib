@@ -77,8 +77,8 @@ namespace pwx {
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
 // The main logging function:
-void PWX_API debug_log( const char* fmt, ... );
-void PWX_API debug_err( const char* fmt, ... );
+void PWX_API debug_log( char const* fmt, ... );
+void PWX_API debug_err( char const* fmt, ... );
 
 // And the main wrapper:
 # define DEBUG_LOG(part, fmt, ...) { \

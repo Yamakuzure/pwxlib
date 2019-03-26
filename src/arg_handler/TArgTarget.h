@@ -69,9 +69,9 @@ class TArgTarget : public VArgTargetBase {
       * @param[in] arg_desc Help text for this argument.
       * @param[in] param_name Name shown in <> int the help text.
     **/
-    explicit TArgTarget( const char* arg_short, const char* arg_long,
+    explicit TArgTarget( char const* arg_short, char const* arg_long,
                          eArgTargetType arg_type,T* arg_target,
-                         const char* arg_desc, const char* param_name )
+                         char const* arg_desc, char const* param_name )
     noexcept :
         VArgTargetBase( arg_short, arg_long, arg_type, arg_desc, param_name ),
         target( arg_target )
@@ -96,9 +96,9 @@ class TArgTarget : public VArgTargetBase {
       * @param[in] arg_desc Help text for this argument.
       * @param[in] param_name Name shown in <> int the help text.
     **/
-    TArgTarget( const char* arg_short, const char* arg_long,
+    TArgTarget( char const* arg_short, char const* arg_long,
                 eArgSetType set_type,T* arg_target,
-                const char* arg_desc, const char* param_name )
+                char const* arg_desc, char const* param_name )
     noexcept :
         VArgTargetBase( arg_short, arg_long, set_type, arg_desc, param_name ),
         target( arg_target )
@@ -120,7 +120,7 @@ class TArgTarget : public VArgTargetBase {
       *
       * @param[in] param The parameter found or nullptr if no parameter is needed.
     **/
-    virtual eArgErrorNumber process( const char* param );
+    virtual eArgErrorNumber process( char const* param );
 
 
   private:
@@ -129,18 +129,18 @@ class TArgTarget : public VArgTargetBase {
     T* target;
 
     // === par_to_val conversion chain prototype ===
-    void par_to_val( T* tgt, const char* param ) noexcept;
+    void par_to_val( T* tgt, char const* param ) noexcept;
 };
 
 
 // === Processing specializations prototypes ===
 template<>
-eArgErrorNumber TArgTarget<std::string>::process( const char* param );
+eArgErrorNumber TArgTarget<std::string>::process( char const* param );
 
 
 // === Generic non-specialized handler ===
 template<typename T>
-eArgErrorNumber TArgTarget<T>::process( const char* param ) {
+eArgErrorNumber TArgTarget<T>::process( char const* param ) {
     eArgErrorNumber argErrno = AEN_OK;
 
     T val = ( T )0;
@@ -192,29 +192,29 @@ eArgErrorNumber TArgTarget<T>::process( const char* param ) {
 
 // === par_to_val specializations prototypes ===
 template<>
-void TArgTarget<bool>::par_to_val( bool* tgt, const char* param ) noexcept;
+void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<int8_t>::par_to_val( int8_t* tgt, const char* param ) noexcept;
+void TArgTarget<int8_t>::par_to_val( int8_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<int16_t>::par_to_val( int16_t* tgt, const char* param ) noexcept;
+void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<int32_t>::par_to_val( int32_t* tgt, const char* param ) noexcept;
+void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<int64_t>::par_to_val( int64_t* tgt, const char* param ) noexcept;
+void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, const char* param ) noexcept;
+void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, const char* param ) noexcept;
+void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, const char* param ) noexcept;
+void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, const char* param ) noexcept;
+void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<float>::par_to_val( float* tgt, const char* param ) noexcept;
+void TArgTarget<float>::par_to_val( float* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<double>::par_to_val( double* tgt, const char* param ) noexcept;
+void TArgTarget<double>::par_to_val( double* tgt, char const* param ) noexcept;
 template<>
-void TArgTarget<long double>::par_to_val( long double* tgt, const char* param ) noexcept;
+void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept;
 
 } // namespace pwx
 

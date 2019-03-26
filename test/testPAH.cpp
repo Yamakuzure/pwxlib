@@ -20,7 +20,7 @@ using pwx::eArgSetType::STT_OVERWRITE;
 static std::string cbtarget[5] = {"", "", "", "", ""};
 
 // And the callback function
-static void cb_addstr( const char* arg, const char* param );
+static void cb_addstr( char const* arg, char const* param );
 // Helper to clear the strings
 static void cb_clrstr();
 
@@ -30,8 +30,8 @@ static char**  xArgv = nullptr;
 
 // Helper to add/set/free the fake argc/argv
 // index 0 is always "./testlib" !
-static void addFakeArg( int32_t nr, const char* arg ); // Set arg number nr to arg
-static void addFakePar( int32_t nr, const char* arg, const char* param ); // Quickly set both
+static void addFakeArg( int32_t nr, char const* arg ); // Set arg number nr to arg
+static void addFakePar( int32_t nr, char const* arg, char const* param ); // Quickly set both
 static void clrFakeArg();                            // free xArgv
 static void setFakeArg( int32_t aSize );              // (re)alloc to size aSize
 
@@ -182,7 +182,7 @@ int32_t testPAH ( sEnv& env ) {
     int64_t     tgt_set_ovw = 0; // set type STT_OVERWRITE
 
     // Pass through targets:
-    // const char* init_arg, int32_t* pass_argc, char*** pass_argv
+    // char const* init_arg, int32_t* pass_argc, char*** pass_argv
     int32_t pass_argc = 0;
     char**  pass_argv = nullptr;
 
@@ -466,7 +466,7 @@ int32_t testPAH ( sEnv& env ) {
 
 // --- callback test function ---
 // simply add the argument to the string array (push = back, unshift = front)
-static void cb_addstr( const char* arg, const char* param ) {
+static void cb_addstr( char const* arg, char const* param ) {
     if ( arg && param ) {
         if ( STREQ( arg, "push" ) ) {
             for ( int i = 4; i >= 0; --i ) {
@@ -498,7 +498,7 @@ static void cb_clrstr() {
 
 
 /// @internal Set arg number nr to arg
-static void addFakeArg( int32_t nr, const char* arg ) {
+static void addFakeArg( int32_t nr, char const* arg ) {
     size_t argSize = arg ? strlen( arg ) : 0;
     if ( argSize ) {
         if ( nr >= xArgc )
@@ -513,7 +513,7 @@ static void addFakeArg( int32_t nr, const char* arg ) {
 
 
 /// @internal Set arg number nr to arg and nr+1 to param
-static void addFakePar( int32_t nr, const char* arg, const char* param ) {
+static void addFakePar( int32_t nr, char const* arg, char const* param ) {
     size_t argSize = arg ? strlen( arg ) : 0;
     size_t parSize = param ? strlen( param ) : 0;
     if ( argSize && parSize ) {

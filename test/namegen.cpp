@@ -52,9 +52,9 @@ static const int32_t ml_len = 23;
 
 static int32_t max_nc_len;
 
-static void print_arg_err( const char *prog, const char *arg );
-static void print_arg_unknown( const char *prog, const char *arg, const char *param );
-static void print_help( const char *prog );
+static void print_arg_err( char const *prog, char const *arg );
+static void print_arg_unknown( char const *prog, char const *arg, char const *param );
+static void print_help( char const *prog );
 static void print_table( bool ss, bool sl, bool ms, bool ml );
 static int  print_type( nst_t type );
 
@@ -217,17 +217,17 @@ int main( int argc, char *argv[] ) {
         return result;
 }
 
-static void print_arg_unknown( const char *prog, const char *arg, const char *param ) {
+static void print_arg_unknown( char const *prog, char const *arg, char const *param ) {
         cerr << "ERROR: Parameter \"" << param << "\" invalid for option \"" << arg << "\"" << endl;
         print_help( prog );
 }
 
-static void print_arg_err( const char *prog, const char *arg ) {
+static void print_arg_err( char const *prog, char const *arg ) {
         cerr << "ERROR: Option \"" << arg << "\" needs a parameter!\n" << endl;
         print_help( prog );
 }
 
-static void print_help( const char *prog ) {
+static void print_help( char const *prog ) {
         cout << "Name Generator for " << PACKAGE_STRING << endl;
         cout << "----------------------------------" << endl;
         cout << "Usage: " << prog << " <options>\n" << endl;

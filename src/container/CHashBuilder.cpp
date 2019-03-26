@@ -68,7 +68,7 @@ uint32_t CHashBuilder::hash_rng( const float* key )        const noexcept { retu
 uint32_t CHashBuilder::hash_rng( const double* key )       const noexcept { return RNG.hash( *key ); }
 uint32_t CHashBuilder::hash_rng( const long double* key )  const noexcept { return RNG.hash( *key ); }
 
-uint32_t CHashBuilder::hash_rng( const char* key )  const noexcept {
+uint32_t CHashBuilder::hash_rng( char const* key )  const noexcept {
     if ( keyLen )
         return RNG.hash( key, keyLen );
     else

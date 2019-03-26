@@ -57,18 +57,18 @@ struct VArgTargetBase {
     eArgTargetType type;
     eArgSetType    setType;
 
-    explicit VArgTargetBase( const char* arg_short, const char* arg_long,
+    explicit VArgTargetBase( char const* arg_short, char const* arg_long,
                              eArgTargetType arg_type,
-                             const char* arg_desc, const char* param_name )
+                             char const* arg_desc, char const* param_name )
     noexcept;
-    VArgTargetBase( const char* arg_short, const char* arg_long,
+    VArgTargetBase( char const* arg_short, char const* arg_long,
                     eArgSetType set_type,
-                    const char* arg_desc, const char* param_name )
+                    char const* arg_desc, char const* param_name )
     noexcept;
     virtual ~VArgTargetBase() noexcept;
 
     // Must be defined by TArgTarget:
-    virtual eArgErrorNumber process( const char* ) PWX_VIRTUAL_PURE;
+    virtual eArgErrorNumber process( char const* ) PWX_VIRTUAL_PURE;
 
     // Public methods that do not need a templated value:
     bool hasParameter  () const noexcept;

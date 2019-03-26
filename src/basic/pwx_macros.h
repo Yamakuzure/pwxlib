@@ -69,9 +69,9 @@
   *
   * <I>Prerequisites</I>: pwx/types/CException.h
   *
-  * @param[in] name const char name of the exception
-  * @param[in] msg const char message to be returned by the exceptions what() method
-  * @param[in] desc const char message to be returned by the exceptions desc() method
+  * @param[in] name char const name of the exception
+  * @param[in] msg char const message to be returned by the exceptions what() method
+  * @param[in] desc char const message to be returned by the exceptions desc() method
 **/
 #define PWX_THROW(name, msg, desc) { \
 		char _pwx_trace_info[256]; \
@@ -105,8 +105,8 @@
   *
   * <I>Prerequisites</I>: pwx/types/CException.h
   *
-  * @param[in] name const char name of the exception
-  * @param[in] desc const char message to be returned by the exceptions desc() method
+  * @param[in] name char const name of the exception
+  * @param[in] desc char const message to be returned by the exceptions desc() method
 **/
 #define PWX_THROW_STD_FURTHER(name, desc) catch(std::exception &e) { \
 		PWX_THROW(name, e.what(), desc) \
@@ -122,8 +122,8 @@
   *
   * <I>Prerequisites</I>: pwx/types/CException.h
   *
-  * @param[in] name const char name of the exception for std::exception
-  * @param[in] desc const char message to be returned by the exceptions desc() method if an std::exception is caught.
+  * @param[in] name char const name of the exception for std::exception
+  * @param[in] desc char const message to be returned by the exceptions desc() method if an std::exception is caught.
 **/
 #define PWX_THROW_PWXSTD_FURTHER(name, desc) \
 		PWX_THROW_PWX_FURTHER \
@@ -154,8 +154,8 @@
   * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
-  * @param[in] name const char name of the exception.
-  * @param[in] desc const char message to be returned by the exceptions desc() method.
+  * @param[in] name char const name of the exception.
+  * @param[in] desc char const message to be returned by the exceptions desc() method.
 **/
 #define PWX_TRY_STD_FURTHER(func, name, desc) { \
 		PWX_TRY(func) \
@@ -171,8 +171,8 @@
   * <I>Prerequisites</I>: pwx/types/CException.h
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
-  * @param[in] name const char name of the exception for std::exception
-  * @param[in] desc const char message to be returned by the exceptions desc() method if an std::exception is caught.
+  * @param[in] name char const name of the exception for std::exception
+  * @param[in] desc char const message to be returned by the exceptions desc() method if an std::exception is caught.
 **/
 #define PWX_TRY_PWXSTD_FURTHER(func, name, desc) { \
 		PWX_TRY(func) \

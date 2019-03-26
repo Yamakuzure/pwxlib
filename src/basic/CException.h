@@ -75,8 +75,8 @@ class PWX_API CException : public std::exception {
     */
 
     explicit
-    CException ( const char* const name_, const char* const what_, const char* const where_,
-                 const char* const func_, const char* const desc_ ) noexcept;
+    CException ( char const* const name_, char const* const what_, char const* const where_,
+                 char const* const func_, char const* const desc_ ) noexcept;
     CException ( const CException& src ) noexcept;
     CException () PWX_DELETE;          // No empty ctor!
     virtual ~CException() noexcept;
@@ -87,13 +87,13 @@ class PWX_API CException : public std::exception {
      * ===============================================
     */
 
-    const char* name       ()                   const noexcept;
-    const char* what       ()                   const noexcept;
-    const char* where      ()                   const noexcept;
-    const char* desc       ()                   const noexcept;
-    const char* pfunc      ()                   const noexcept;
-    const char* trace      ()                   const noexcept;
-    void        addToTrace ( const char* trace_ )       noexcept;
+    char const* name       ()                   const noexcept;
+    char const* what       ()                   const noexcept;
+    char const* where      ()                   const noexcept;
+    char const* desc       ()                   const noexcept;
+    char const* pfunc      ()                   const noexcept;
+    char const* trace      ()                   const noexcept;
+    void        addToTrace ( char const* trace_ )       noexcept;
 
 
     /* ===============================================
@@ -111,11 +111,11 @@ class PWX_API CException : public std::exception {
      * ===============================================
     */
 
-    const char* const txtName;  //!< the name of the exception
-    const char* const txtWhat;  //!< the classic what() text
-    const char* const txtWhere; //!< A malloc'd C-String with "file:line - method"
-    const char* const txtFunc;  //!< The result of __PRETTY_FUNC__
-    const char* const txtDesc;  //!< Optional description
+    char const* const txtName;  //!< the name of the exception
+    char const* const txtWhat;  //!< the classic what() text
+    char const* const txtWhere; //!< A malloc'd C-String with "file:line - method"
+    char const* const txtFunc;  //!< The result of __PRETTY_FUNC__
+    char const* const txtDesc;  //!< Optional description
     std::string txtTrace;     //!< A trace, that can hopefully be added together
 };
 

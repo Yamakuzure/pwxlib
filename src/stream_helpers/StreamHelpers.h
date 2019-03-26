@@ -44,11 +44,11 @@
 namespace pwx {
 
 
-bool        PWX_API cropShell    ( const char* key, std::string& data )  noexcept;
+bool        PWX_API cropShell    ( char const* key, std::string& data )  noexcept;
 void        PWX_API forwardTo    ( std::ifstream& is, char value )       noexcept;
 void        PWX_API ltrim        ( std::string& text, char extra = 0x0 ) noexcept;
-const char  PWX_API* makeTemp    ( const char* aPath, const char* aTemplate,
-                                   const char* aSuffix, std::ofstream& ofs,
+char const  PWX_API* makeTemp    ( char const* aPath, char const* aTemplate,
+                                   char const* aSuffix, std::ofstream& ofs,
                                    std::ios_base::openmode mode
                                    = std::ios_base::out |std::ios_base::trunc )
 noexcept PWX_WARNUNUSED;

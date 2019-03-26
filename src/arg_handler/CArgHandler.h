@@ -84,7 +84,7 @@ namespace pwx {
   * The system directly supports bool, [u]int{8,16,32,64}_t,
   * float, [long] double and std::string targets.  
   * If a different type is to be handled, a callback function
-  * must be installed that converts a const char* parameter
+  * must be installed that converts a char const* parameter
   * into the target type and handles the processing.  
   * Further it is advised to use a callback function if an
   * argument should be able to receive and store more than
@@ -127,7 +127,7 @@ namespace pwx {
   * The callback function will receive the long argument, if
   * set, otherwise the short argument as a first parameter.
   * The second parameter will be the command line parameter(s)
-  * that follow(s) the argument as a const char*.
+  * that follow(s) the argument as a char const*.
 **/
 class PWX_API CArgHandler {
   public:
@@ -160,84 +160,84 @@ class PWX_API CArgHandler {
      * ===============================================
      */
 
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, bool* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, int8_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, uint8_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, int16_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, uint16_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, int32_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, uint32_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, int64_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, uint64_t* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, float* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, double* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, long double* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type, std::string* arg_target,
-                                const char* arg_desc, const char* param_name,
+                                char const* arg_desc, char const* param_name,
                                 eArgSetType set_type = STT_OVERWRITE );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
                                 eArgTargetType arg_type,
-                                void ( *arg_cb )( const char*, const char* ),
-                                const char* arg_desc, const char* param_name );
-    bool		addArg		  ( const char* arg_short, const char* arg_long,
-                                void ( *arg_cb )( const char*, const char* ),
-                                const char* arg_desc, const char* param_name );
-    void        addPassthrough( const char* init_arg, int32_t* pass_argc, char*** pass_argv );
+                                void ( *arg_cb )( char const*, char const* ),
+                                char const* arg_desc, char const* param_name );
+    bool		addArg		  ( char const* arg_short, char const* arg_long,
+                                void ( *arg_cb )( char const*, char const* ),
+                                char const* arg_desc, char const* param_name );
+    void        addPassthrough( char const* init_arg, int32_t* pass_argc, char*** pass_argv );
     void        clearArgs     () noexcept;
     int32_t     getError      ( const int32_t nr ) const noexcept;
     int32_t     getErrorCount () const noexcept;
-    const char* getErrorStr   ( const int32_t nr ) const noexcept;
-    std::string getHelpArg    ( const char* argument, size_t length = 0, size_t indent = 0,
+    char const* getErrorStr   ( const int32_t nr ) const noexcept;
+    std::string getHelpArg    ( char const* argument, size_t length = 0, size_t indent = 0,
                                 char argSep = 0x20, char paramSep = 0x20,
                                 bool emptyLine = false, bool autoSep = true,
                                 bool autoSpace = false ) const noexcept;
-    std::string getHelpDesc   ( const char* argument, size_t* pos = nullptr, size_t length = 0,
+    std::string getHelpDesc   ( char const* argument, size_t* pos = nullptr, size_t length = 0,
                                 char descSep = 0x20, bool autoSep = true,
                                 bool autoSpace = false ) const noexcept;
-    std::string getHelpStr    ( const char* argument, size_t length, size_t indent = 0,
+    std::string getHelpStr    ( char const* argument, size_t length, size_t indent = 0,
                                 char argSep = 0x20, char paramSep = 0x20,
                                 char descSep = 0x20, bool autoSep = true,
                                 bool autoSpace = false ) const noexcept;
-    const char* getPrgCall    () const noexcept;
+    char const* getPrgCall    () const noexcept;
     int32_t     parseArgs     ( const int32_t argc, char* argv[] ) noexcept;
-    int32_t     parseArgs     ( const int32_t argc, const char* argv[] ) noexcept;
+    int32_t     parseArgs     ( const int32_t argc, char const* argv[] ) noexcept;
 
 
   private:
@@ -251,9 +251,9 @@ class PWX_API CArgHandler {
     /// (or cleaning short args, destroys targets of long args!)
     static void do_not_destroy( data_t* ) { }
 
-    data_t* getTarget  ( const char* arg )                       const noexcept;
-    void    passThrough( const int32_t argc, const char** argv )       noexcept;
-    bool    uncombine  ( const char* arg, arg_list_t& arg_list );
+    data_t* getTarget  ( char const* arg )                       const noexcept;
+    void    passThrough( const int32_t argc, char const** argv )       noexcept;
+    bool    uncombine  ( char const* arg, arg_list_t& arg_list );
 
 
     /* ===============================================
