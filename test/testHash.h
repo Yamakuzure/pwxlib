@@ -1,11 +1,22 @@
 #ifndef PWX_LIBPWX_TEST_TESTHASH_H_INCLUDED
 #define PWX_LIBPWX_TEST_TESTHASH_H_INCLUDED
 
+/** @file testHash.h
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
+
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific set:
-typedef pwx::TChainHash<keydata_t, hashval_t>   chash_t;
-typedef pwx::TOpenHash<keydata_t, hashval_t>    ohash_t;
+#include <PChainHash>
+#include <POpenHash>
+typedef PChainHash<keydata_t, hashval_t>        chash_t;
+typedef POpenHash<keydata_t, hashval_t>         ohash_t;
 typedef pwx::THashElement<keydata_t, hashval_t> elem_t;
 
 /** @brief test a specific set type template

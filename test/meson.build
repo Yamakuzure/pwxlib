@@ -27,20 +27,23 @@ if want_test
 		[['test_cluster'],
 		[files('''
 			cluster_check.cpp
-			cluster_check.h'''.split())],
+			cluster_check.h
+         '''.split())],
 		['manual'],
 		[]],
 
 		[['test_hash'],
 		[files('''
 			hash_builder.cpp
-			hash_builder.h'''.split())],
+			hash_builder.h
+         '''.split())],
 		['manual'],
 		[]],
 
 		[['test_name'],
 		[files('''
-			namegen.cpp'''.split())],
+			namegen.cpp
+         '''.split())],
 		['manual'],
 		[]],
 
@@ -66,7 +69,8 @@ if want_test
 			testSet.h
 			testSpeed.h
 			testStackQueue.h
-			testThreads.h'''.split())],
+			testThreads.h
+         '''.split())],
 		['automatic'],
 		[threads]]
 	]

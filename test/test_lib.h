@@ -2,6 +2,15 @@
 #ifndef PWX_LIBPWX_TEST_MAIN_H_INCLUDED
 #define PWX_LIBPWX_TEST_MAIN_H_INCLUDED 1
 
+/** @file test_lib.h
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
+
 #include <thread>
 #include <chrono>
 #include <iostream>
@@ -9,7 +18,8 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#include "PWXlib"
+#include <PBasic>
+#include <PStreamHelpers>
 typedef pwx::CAdjLeft  adjLeft;
 typedef pwx::CAdjRight adjRight;
 

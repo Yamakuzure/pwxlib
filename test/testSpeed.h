@@ -2,6 +2,17 @@
 #ifndef PWX_LIBPWX_TESTLIB_TESTSPEED_H_INCLUDED
 #define PWX_LIBPWX_TESTLIB_TESTSPEED_H_INCLUDED 1
 
+/** @file testSpeed.h
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
+
+#include <RNG>
+
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 #include "testThreads.h"
 

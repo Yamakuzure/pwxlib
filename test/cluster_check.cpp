@@ -1,12 +1,41 @@
+/**
+  * This file is part of the PrydeWorX Library (pwxLib).
+  *
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+  * in the Software without restriction, including without limitation the rights
+  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  * copies of the Software, and to permit persons to whom the Software is
+  * furnished to do so, subject to the following conditions:
+  *
+  * The above copyright notice and this permission notice shall be included in all
+  * copies or substantial portions of the Software.
+  *
+  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  * SOFTWARE.
+  *
+  * History and change log are maintained in pwxlib.h
+**/
+
 #include "cluster_check.h"
-
-
 
 /// @internal build a numerical hash list
 template<typename T>
 int32_t build_cluster_num( string &outfile_chain, string &outfile_open, int32_t cnt_, bool useBigHash ) {
-        typedef pwx::TChainHash<T, char> c_hash_t; //!< Type of the chained hash
-        typedef pwx::TOpenHash<T, char>  o_hash_t; //!< Type of the open hash
+        typedef PChainHash<T, char> c_hash_t; //!< Type of the chained hash
+        typedef POpenHash <T, char> o_hash_t; //!< Type of the open hash
 
         static char hopBuf[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -108,8 +137,8 @@ int32_t build_cluster_num( string &outfile_chain, string &outfile_open, int32_t 
 
 /// @internal build a string based cluster list
 static int32_t build_cluster_string( string &outfile_chain, string &outfile_open, int32_t cnt_, bool useBigHash ) {
-        typedef pwx::TChainHash<string, char> c_hash_t; //!< Type of the chained hash
-        typedef pwx::TOpenHash<string, char>  o_hash_t; //!< Type of the open hash
+        typedef PChainHash<string, char> c_hash_t; //!< Type of the chained hash
+        typedef POpenHash <string, char> o_hash_t; //!< Type of the open hash
 
         static char hopBuf[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -183,16 +212,17 @@ int32_t main( int32_t argc, char **argv ) {
         int32_t result = EXIT_SUCCESS;
 
         if ( ( argc < 3 ) || ( argc > 5 ) ) {
-                cerr << "Usage:\n  " << basename( argv[0] ) << " <destination directory> <number of hashes> [type] [bighash]\n";
-                cerr << " type is one of:\n";
-                cerr << "   all   : build cluster lists for all key types (default)\n";
-                cerr << "   string: build the cluster list for string keys\n";
-                cerr << "   float : build cluster lists for float, double and long double keys\n";
-                cerr << "   int   : build cluster lists for [u]int16_t to [u]int64_t keys\n";
-                cerr << "\n bighash:\n";
-                cerr << "If this keyword is seen the hash tables are initialized with ten\n";
-                cerr << "times the number of hashes to build. This is useful to detect\n";
-                cerr << "secondary clustering." << endl;
+                cerr << "Usage:\n  " << basename( argv[0] )
+                     << " <destination directory> <number of hashes> [type] [bighash]\n"
+                     << " type is one of:\n"
+                     << "   all   : build cluster lists for all key types (default)\n"
+                     << "   string: build the cluster list for string keys\n"
+                     << "   float : build cluster lists for float, double and long double keys\n"
+                     << "   int   : build cluster lists for [u]int16_t to [u]int64_t keys\n"
+                     << "\n bighash:\n"
+                     << "If this keyword is seen the hash tables are initialized with ten\n"
+                     << "times the number of hashes to build. This is useful to detect\n"
+                     << "secondary clustering." << endl;
                 return EXIT_FAILURE;
         }
 

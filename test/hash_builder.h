@@ -2,7 +2,18 @@
 #ifndef PWX_LIBPWX_TEST_HASH_BUILDER_H_INCLUDED
 #define PWX_LIBPWX_TEST_HASH_BUILDER_H_INCLUDED 1
 
-#include <pwxlib.h>
+/** @file hash_builder.h
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
+
+#include <PBasic>
+#include <PStreamHelpers>
+#include <RNG>
 using pwx::RNG;
 typedef pwx::CAdjRight adjRight;
 

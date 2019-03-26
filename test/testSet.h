@@ -2,10 +2,21 @@
 #ifndef PWX_LIBPWX_TEST_TESTSET_H_INCLUDED
 #define PWX_LIBPWX_TEST_TESTSET_H_INCLUDED 1
 
+/** @file testSet.h
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
+
+#include <PSet>
+
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific set:
-typedef pwx::TSet<keydata_t> set_t;
+typedef PSet<keydata_t> set_t;
 
 /** @brief test a specific set type template
   *

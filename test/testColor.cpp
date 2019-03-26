@@ -1,28 +1,37 @@
-#include "testColor.h"
+/** @file testColor.cpp
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
 
-#include "CWaveColor.h"
+#include <PWaveColor>
+
+#include "testColor.h"
 
 
 /* ==================================
  * === Helper function prototypes ===
  * ==================================
  */
-static int  addRGB  ( pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int  addRGB  ( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static int  delRGB  ( pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int  delRGB  ( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static void printRGB( pwx::CWaveColor& wc, const char* const name, const char* const call, bool isEnd = true );
-static void printRGB( int32_t nr, pwx::CWaveColor& wc, const char* const name, const char* const call, bool isEnd = true );
-static int  modFreq ( pwx::CWaveColor& wc, const char* const name, double modifier,
+static void printRGB( PWaveColor& wc, const char* const name, const char* const call, bool isEnd = true );
+static void printRGB( int32_t nr, PWaveColor& wc, const char* const name, const char* const call, bool isEnd = true );
+static int  modFreq ( PWaveColor& wc, const char* const name, double modifier,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static int  setGamma( pwx::CWaveColor& wc, const char* const name, double gamma,
+static int  setGamma( PWaveColor& wc, const char* const name, double gamma,
                       uint8_t tR, uint8_t tG, uint8_t tB );
-static int  setRGB  ( int32_t nr, pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b );
-static int  modWave ( pwx::CWaveColor& wc, const char* const name, double modifier,
+static int  setRGB  ( int32_t nr, PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b );
+static int  modWave ( PWaveColor& wc, const char* const name, double modifier,
                       uint8_t tR, uint8_t tG, uint8_t tB );
 
 
-/** @brief central function to test pwx::CWaveColor
+/** @brief central function to test PWaveColor
   *
   *************************************************************************
   ** A) Try 10 standard colors                                           **
@@ -37,7 +46,7 @@ int32_t testColor ( sEnv& env ) {
 
     cout << "\nTest CWaveColor type\n------------------------------" << endl;
 
-    pwx::CWaveColor WC;
+    PWaveColor WC;
 
     /************************************************************************
     ** A) Try 10 standard colors                                           **
@@ -230,7 +239,7 @@ int32_t testColor ( sEnv& env ) {
  * =======================================
  */
 
-static int addRGB( pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int addRGB( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
                    uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
@@ -247,7 +256,7 @@ static int addRGB( pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8
     return result;
 }
 
-static int delRGB( pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
+static int delRGB( PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b,
                    uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
@@ -264,7 +273,7 @@ static int delRGB( pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8
     return result;
 }
 
-static int modFreq( pwx::CWaveColor& wc, const char* const name, double modifier,
+static int modFreq( PWaveColor& wc, const char* const name, double modifier,
                     uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10]  = "";
     char fTxt[33] = "";
@@ -295,7 +304,7 @@ static int modFreq( pwx::CWaveColor& wc, const char* const name, double modifier
     return result;
 }
 
-static int modWave( pwx::CWaveColor& wc, const char* const name, double modifier,
+static int modWave( PWaveColor& wc, const char* const name, double modifier,
                     uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     char fTxt[33] = "";
@@ -326,7 +335,7 @@ static int modWave( pwx::CWaveColor& wc, const char* const name, double modifier
     return result;
 }
 
-static void printRGB( pwx::CWaveColor& wc, const char* const name, const char* const call, bool isEnd ) {
+static void printRGB( PWaveColor& wc, const char* const name, const char* const call, bool isEnd ) {
     uint8_t r, g, b;
     wc.getRGB( r, g, b );
     printf ( "--> %-15s [Call %8s]: %2d waves -> RGB %02x %02x %02x %s",
@@ -334,7 +343,7 @@ static void printRGB( pwx::CWaveColor& wc, const char* const name, const char* c
              isEnd ? ": " : "" );
 }
 
-static void printRGB( int32_t nr, pwx::CWaveColor& wc, const char* const name, const char* const call, bool isEnd ) {
+static void printRGB( int32_t nr, PWaveColor& wc, const char* const name, const char* const call, bool isEnd ) {
     uint8_t r, g, b;
     wc.getRGB( r, g, b );
     printf ( "%02d. %-15s [Call %8s]: %2d waves -> RGB %02x %02x %02x %s",
@@ -342,7 +351,7 @@ static void printRGB( int32_t nr, pwx::CWaveColor& wc, const char* const name, c
              isEnd ? ": " : "" );
 }
 
-static int setGamma( pwx::CWaveColor& wc, const char* const name, double gamma,
+static int setGamma( PWaveColor& wc, const char* const name, double gamma,
                      uint8_t tR, uint8_t tG, uint8_t tB ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
@@ -360,7 +369,7 @@ static int setGamma( pwx::CWaveColor& wc, const char* const name, double gamma,
     return result;
 }
 
-static int setRGB( int32_t nr, pwx::CWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b ) {
+static int setRGB( int32_t nr, PWaveColor& wc, const char* const name, uint8_t r, uint8_t g, uint8_t b ) {
     char call[10] = "";
     uint8_t r2, g2, b2;
     int result = 0;

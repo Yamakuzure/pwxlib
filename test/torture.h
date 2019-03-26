@@ -2,12 +2,22 @@
 #ifndef PWX_LIBPWX_TEST_TORTURE_H_INCLUDED
 #define PWX_LIBPWX_TEST_TORTURE_H_INCLUDED 1
 
+/** @file torture.h
+  * (c) 2007 - 2019 PrydeWorX
+  * @author Sven Eden, PrydeWorX - Bardowick, Germany
+  *         sven.eden@prydeworx.com
+  *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
+  *
+  * The PrydeWorX Library is free software under MIT License
+**/
+
 #include <chrono>
 #include <iostream>
 #include <limits>
 #include <thread>
 
-#include <pwxlib.h>
+#include <PContainers>
+#include <RNG>
 
 using std::cout;
 using std::cerr;
