@@ -1,0 +1,17 @@
+sudo: true
+language: cpp
+services:
+- docker
+before_install:
+- docker run -d --name build_img -v $(pwd):/travis voidlinux/voidlinux tail -f /dev/null
+- docker ps
+install:
+- docker exec -t build_img sh -c "xbps-install -Suy m4 pkg-config meson base-devel valgrind-devel"
+script:
+- docker exec -t build_img sh -c "
+   cd /travis &&
+   meson --buildtype=debug -Ddebug=true -Ddebug-thread=false
+         --prefix=/usr -Dtests=true -Dinstall-tests=true
+         -Dtorture=true -Dhtml=false _build &&
+   ninja -C _build &&
+   env DESTDIR=$(pwd)/install ninja -C _build install"
