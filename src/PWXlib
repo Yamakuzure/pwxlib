@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PWXLIB_INCLUDED
+#define PWX_PWXLIB_SRC_PWXLIB_INCLUDED
+
+
 /** @file PWXlib
   * @brief Include everything at once. (See: pwxlib.h)
 **/
 #include "pwxlib.h"
+
+
+#endif // PWX_PWXLIB_SRC_PWXLIB_INCLUDED

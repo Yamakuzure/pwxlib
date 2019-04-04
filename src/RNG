@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_RNG_INCLUDED
+#define PWX_PWXLIB_SRC_RNG_INCLUDED
+
+
 /** @file RNG
   * @brief Convenience wrapper for the [R]andom [N]-Value [G]enerator
 **/
 #include "libpwx/worker_RNG.h"
+
+
+#endif // PWX_PWXLIB_SRC_RNG_INCLUDED

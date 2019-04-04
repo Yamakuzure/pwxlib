@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PTOOLS_INCLUDED
+#define PWX_PWXLIB_SRC_PTOOLS_INCLUDED
+
+
 /** @file PTools
   * @brief Add all tool classes and functions. (See: libpwx/tools.h)
 **/
 #include "libpwx/tools.h"
+
+
+#endif // PWX_PWXLIB_SRC_PTOOLS_INCLUDED

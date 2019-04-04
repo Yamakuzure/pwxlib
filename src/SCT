@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_SCT_INCLUDED
+#define PWX_PWXLIB_SRC_SCT_INCLUDED
+
+
 /** @file SCT
   * @brief Convenience wrapper for the [S]ine-/[C]osine-[T]able
 **/
 #include "libpwx/worker_SCT.h"
+
+
+#endif // PWX_PWXLIB_SRC_SCT_INCLUDED

@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PQUEUE_INCLUDED
+#define PWX_PWXLIB_SRC_PQUEUE_INCLUDED
+
+
 /** @file PQueue
   * @brief Wraps container/TQueue.h and typedefs pwx::TQueue to PQueue.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename data_t>
 using PQueue = ::pwx::TQueue<data_t>;
+
+
+#endif // PWX_PWXLIB_SRC_PQUEUE_INCLUDED

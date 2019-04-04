@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PBASIC_INCLUDED
+#define PWX_PWXLIB_SRC_PBASIC_INCLUDED
+
+
 /** @file PBasic
   * @brief Add the basic functionality of the pwxLib (See: libpwx/basic.h)
 **/
 #include "libpwx/basic.h"
+
+
+#endif // PWX_PWXLIB_SRC_PBASIC_INCLUDED

@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSINGLERING_INCLUDED
+#define PWX_PWXLIB_SRC_PSINGLERING_INCLUDED
+
+
 /** @file PSingleRing
   * @brief Wraps container/TSingleRing.h and typedefs pwx::TSingleRing to PSingleRing.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename data_t, typename elem_t = ::pwx::TSingleElement<data_t> >
 using PSingleRing = ::pwx::TSingleRing<data_t, elem_t>;
+
+
+#endif // PWX_PWXLIB_SRC_PSINGLERING_INCLUDED

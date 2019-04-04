@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PMATH_INCLUDED
+#define PWX_PWXLIB_SRC_PMATH_INCLUDED
+
+
 /** @file PMath
   * @brief Add basic math helpers (See: math_helpers/MathHelpers.h")
 **/
 #include "math_helpers/MathHelpers.h"
+
+
+#endif // PWX_PWXLIB_SRC_PMATH_INCLUDED

@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PLOCKABLE_INCLUDED
+#define PWX_PWXLIB_SRC_PLOCKABLE_INCLUDED
+
+
 /** @file PLockable
   * @brief Wraps basic/CLockable.h and typedefs pwx::CLockable to PLockable.
 **/
@@ -7,3 +12,6 @@
   * @brief Allows to use pwx::CLockable outside all namespaces.
 **/
 typedef ::pwx::CLockable PLockable;
+
+
+#endif // PWX_PWXLIB_SRC_PLOCKABLE_INCLUDED

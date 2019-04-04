@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PUTILS_INCLUDED
+#define PWX_PWXLIB_SRC_PUTILS_INCLUDED
+
+
 /** @file PUtils
   * @brief Add all utility classes and templates (See: libpwx/utils.h)
 **/
 #include "libpwx/utils.h"
+
+
+#endif // PWX_PWXLIB_SRC_PUTILS_INCLUDED

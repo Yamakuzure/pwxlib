@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PLOCKGUARD_INCLUDED
+#define PWX_PWXLIB_SRC_PLOCKGUARD_INCLUDED
+
+
 /** @file PLockGuard
   * @brief Wraps basic/CLockGuard.h and typedefs pwx::CLockGuard to PLockGuard.
 **/
@@ -7,3 +12,6 @@
   * @brief Allows to use pwx::CLockGuard outside all namespaces.
 **/
 typedef ::pwx::CLockGuard PLockGuard;
+
+
+#endif // PWX_PWXLIB_SRC_PLOCKGUARD_INCLUDED

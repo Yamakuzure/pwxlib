@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PCONTAINERS_INCLUDED
+#define PWX_PWXLIB_SRC_PCONTAINERS_INCLUDED
+
+
 /** @file PContainers
   * @brief Add all pwxLib container types (See: libpwx/containers.h)
 **/
 #include "libpwx/containers.h"
+
+
+#endif // PWX_PWXLIB_SRC_PCONTAINERS_INCLUDED

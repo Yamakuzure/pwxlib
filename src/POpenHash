@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_POPENHASH_INCLUDED
+#define PWX_PWXLIB_SRC_POPENHASH_INCLUDED
+
+
 /** @file POpenHash
   * @brief Wraps container/TOpenHash.h and typedefs pwx::TOpenHash to POpenHash.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename key_t, typename data_t, typename elem_t = ::pwx::THashElement<key_t, data_t> >
 using POpenHash = ::pwx::TOpenHash<key_t, data_t, elem_t>;
+
+
+#endif // PWX_PWXLIB_SRC_POPENHASH_INCLUDED

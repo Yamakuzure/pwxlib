@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSET_INCLUDED
+#define PWX_PWXLIB_SRC_PSET_INCLUDED
+
+
 /** @file PSet
   * @brief Wraps container/TSet.h and typedefs pwx::TSet to PSet.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename data_t>
 using PSet = ::pwx::TSet<data_t>;
+
+
+#endif // PWX_PWXLIB_SRC_PSET_INCLUDED

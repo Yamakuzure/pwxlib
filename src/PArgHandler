@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PARGHANDLER_INCLUDED
+#define PWX_PWXLIB_SRC_PARGHANDLER_INCLUDED
+
+
 /** @file PArgHandler
   * @brief Wraps arg_handler/CArgHandler.h and typedefs pwx::CArgHandler to PArgHandler.
 **/
@@ -7,3 +12,6 @@
   * @brief Allows to use pwx::CArgHandler outside all namespaces.
 **/
 typedef ::pwx::CArgHandler PArgHandler;
+
+
+#endif // PWX_PWXLIB_SRC_PARGHANDLER_INCLUDED

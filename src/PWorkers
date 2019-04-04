@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PWORKERS_INCLUDED
+#define PWX_PWXLIB_SRC_PWORKERS_INCLUDED
+
+
 /** @file PWorkers
   * @brief Make the workers (PAH, RNG, SCT) available. (See: libpwx/workers.h)
 **/
 #include "libpwx/workers.h"
+
+
+#endif // PWX_PWXLIB_SRC_PWORKERS_INCLUDED

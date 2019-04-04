@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSTACK_INCLUDED
+#define PWX_PWXLIB_SRC_PSTACK_INCLUDED
+
+
 /** @file PStack
   * @brief Wraps container/TStack.h and typedefs pwx::TStack to PStack.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename data_t>
 using PStack = ::pwx::TStack<data_t>;
+
+
+#endif // PWX_PWXLIB_SRC_PSTACK_INCLUDED

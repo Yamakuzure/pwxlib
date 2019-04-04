@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PDOUBLERING_INCLUDED
+#define PWX_PWXLIB_SRC_PDOUBLERING_INCLUDED
+
+
 /** @file PDoubleRing
   * @brief Wraps container/TDoubleRing.h and typedefs pwx::TDoubleRing to PDoubleRing.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename data_t, typename elem_t = ::pwx::TDoubleElement<data_t> >
 using PDoubleRing = ::pwx::TDoubleRing<data_t, elem_t>;
+
+
+#endif // PWX_PWXLIB_SRC_PDOUBLERING_INCLUDED

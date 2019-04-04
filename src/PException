@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PEXCEPTION_INCLUDED
+#define PWX_PWXLIB_SRC_PEXCEPTION_INCLUDED
+
+
 /** @file PException
   * @brief Wraps basic/CException.h and typedefs pwx::CException to PException.
 **/
@@ -7,3 +12,6 @@
   * @brief Allows to use pwx::CException outside all namespaces.
 **/
 typedef ::pwx::CException PException;
+
+
+#endif // PWX_PWXLIB_SRC_PEXCEPTION_INCLUDED

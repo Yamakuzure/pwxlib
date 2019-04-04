@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSINGLELIST_INCLUDED
+#define PWX_PWXLIB_SRC_PSINGLELIST_INCLUDED
+
+
 /** @file PSingleList
   * @brief Wraps container/TSingleList.h and typedefs pwx::TSingleList to PSingleList.
 **/
@@ -8,3 +13,6 @@
 **/
 template<typename data_t, typename elem_t = ::pwx::TSingleElement<data_t> >
 using PSingleList = ::pwx::TSingleList<data_t, elem_t>;
+
+
+#endif // PWX_PWXLIB_SRC_PSINGLELIST_INCLUDED

@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PWAVECOLOR_INCLUDED
+#define PWX_PWXLIB_SRC_PWAVECOLOR_INCLUDED
+
+
 /** @file PWaveColor
   * @brief Wraps wavecolor/CWaveColor.h and typedefs pwx::CWaveColor to PWaveColor.
 **/
@@ -7,3 +12,6 @@
   * @brief Allows to use pwx::CWaveColor outside all namespaces.
 **/
 typedef ::pwx::CWaveColor PWaveColor;
+
+
+#endif // PWX_PWXLIB_SRC_PWAVECOLOR_INCLUDED

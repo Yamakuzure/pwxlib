@@ -1,4 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSTREAMHELPERS_INCLUDED
+#define PWX_PWXLIB_SRC_PSTREAMHELPERS_INCLUDED
+
+
 /** @file PStreamHelpers
   * @brief Add some tools to work with streams (See: stream_helpers/StreamHelpers.h)
 **/
 #include "stream_helpers/StreamHelpers.h"
+
+
+#endif // PWX_PWXLIB_SRC_PSTREAMHELPERS_INCLUDED

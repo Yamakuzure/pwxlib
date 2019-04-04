@@ -1,3 +1,8 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSINCOS_INCLUDED
+#define PWX_PWXLIB_SRC_PSINCOS_INCLUDED
+
+
 /** @file PSinCos
   * @brief Wraps math_helpers/CSinCosTable.h and typedefs pwx::CSinCosTable to PSinCos.
 **/
@@ -7,3 +12,6 @@
   * @brief Allows to use pwx::CSinCosTable outside all namespaces.
 **/
 typedef ::pwx::CSinCosTable PSinCos;
+
+
+#endif // PWX_PWXLIB_SRC_PSINCOS_INCLUDED

@@ -39,6 +39,9 @@
 		<Unit filename="../doc/doxyfile.in" />
 		<Unit filename="../doc/meson.build" />
 		<Unit filename="../meson.build" />
+		<Unit filename="../meson/check_compilation.sh" />
+		<Unit filename="../meson/find_source.sh" />
+		<Unit filename="../meson/link_test.cpp" />
 		<Unit filename="../meson_options.txt" />
 		<Unit filename="../src/PAH" />
 		<Unit filename="../src/PArgHandler" />
