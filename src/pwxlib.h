@@ -20,22 +20,125 @@
   * @tableofcontents
   *
   * @section overview Overview
-  * @todo write overview
+  * The PrydeWorX Library is split into sections, which have their own
+  * subdirectories. For simpler access all major API components have a wrapper
+  * include file in the main include directory, which is by default
+  * `/usr/include/pwxlib`.
+  * So, instead of writing
+  * ~~~~~~~~ .c
+  * #include <math_helpers/MathHelpers.h>
+  * ~~~~~~~~
+  * you can simply write
+  * ~~~~~~~~ .c
+  * #include <PMath>
+  * ~~~~~~~~
+  *
+  * The main components are:
+  * | Folder            | Content                                                       |
+  * | ----------------- | ------------------------------------------------------------- |
+  * | `arg_handler/`    | Components of PAH, the program argument handler               |
+  * | `basic/`          | Core tools for exception and thread lock handling             |
+  * | `container/`      | Threadsafe containers from lists to hashes                    |
+  * | `math_helpers/`   | Tools helping with angles, degrees and floating point numbers |
+  * | `random/`         | Components of RNG, the Random NVal Generator                  |
+  * | `stream_helpers/` | Tools helping with handling streams, like alignment           |
+  * | `wavecolor/`      |  Helper for using wavelengths to describe RGB                 |
   *
   * @section ghLinks GitHub
-  * Additional information on the GitHub project page:
-  * @subsection ghOverview
-  * Overview page on GitHub
+  * You can find additional information on the [GitHub project page][pgpp].
+  *
+  * @subsection ghIssues Issues
+  * Please report any issues you find on the [GitHub issues page][pgip].
+  *
+  * @subsection ghPR Pull Request
+  * If you fix things yourself in your own fork, please send  your fixes back
+  * using the [GitHub Pull Request][pgpr] feature.
+  *
+  * [pgpp]: https://github.com/Yamakuzure/pwxlib        "pwxLib on GitHub"
+  * [pgip]: https://github.com/Yamakuzure/pwxlib/issues "GitHub issues page"
+  * [pgpr]: https://github.com/Yamakuzure/pwxlib/pulls  "GitHub pull request"
   *
   * @section BuildInst Building and Installation
+  * The PrydeWorX library is configured with meson and built with ninja.
   *
-  * @section contMain Content
-  * @todo write
+  * If you are uncomfortable with this build system, you can use the wrapper
+  * configure script and Makefile:
+  * - Use `./configure --help` to see all options.
+  * - Build with a simple `make`
+  *
+  * @section contMain Motivation
+  * The original motivation to write this library were random numbers. In 2007
+  * I had a problem with a bug in a game. In a particular place a random number
+  * was generated, and it was always the same.
+  *
+  * To work around this phenomenon, I wrote a tiny random wrapper that ensured
+  * that the random number generated was different than the last. It was, of
+  * course, useless, as two times the same number in a row is completely in
+  * order for random number generation.
+  *
+  * The real issue was, that srand() was called in a place right before the
+  * &quot;malfunctioning&quot; function was called. But I already had added
+  * some tiny tools to get random numbers in a specific range, as the project
+  * I worked on was full of `rand() % x + y` and similar.
+  * Additionally the project made heavy use of the classic Perlin noise
+  * algorithm. But at that time, Ken Perlin had already published his Simplex
+  * Noise algorithm, which was faster and less prone to build artefacts.
+  * I wanted that!
+  *
+  * This was the birth of the RNG worker, the *R*andom *N*umber *G*enerator.
+  * Later I added name generation, which I needed for another project. And as
+  * both &quot;Name&quot; and &quot;Noise&quot; start with an 'N', everything
+  * was fine. Now it also includes hash generation, so it is *N*Value now.
+  * 
+  * To speed things up in a game, I added the SCT worker, the *S*ine *C*osine
+  * *T*able. And as I do not want to write the same stuff again and again, the
+  * PAH worker, the *P*rogram *A*rgument *H*andler followed.
+  *
+  * For a project that needed thousands of objects of the same type, I started
+  * inventing the container classes. The standard containers were too slow and
+  * using them with multithreading was a real pain. Well, it was only C++03/tr1
+  * back then! And adding a dependency to BOOST to a library was a big no-no!
+  *
+  * So the containers here can handle pointers just fine and are internally
+  * threadsafe. But they lack a lot of the convenience the standard containers
+  * offer, so don't use them unless you have a real gain!
+  *
+  * The whole project started as JBoH, just a bunch of headers, which shot over
+  * its possibilities rather quickly. But it wasn't until 2012 that I changed
+  * the whole project into a real library. Since then the project paused every
+  * now and so often, as I have very limited spare time, and am maintaining
+  * other projects as well. But the pwxLib is still an active project, and will
+  * remain to be so for a long time.
+  * 
   * @subsection contWorkers Workers
-  * @subpage CSimplexTexture CSimplexTexture
-  * @todo write
+  * Currently there are three workers, which basically are global instances of
+  * classes you can use yourself, too.
+  *
+  * 1. pwx::PAH : This is an instance of pwx::CArgHandler and can manage both
+  * the program arguments of your software, and the arguments help texts.
+  * 2. pwx::RNG : This is an instance of pwx::CRandom and can generate random
+  * numbers, [simplex] noise, names and hashes on various types.
+  * 3. pwx::SCT : This is an instance of pwx::CSinCosTable and might be able to
+  * help and/or speed up degree calculations.
+  *
   * @subsection contContain Containers
-  * @todo write
+  * All containers are based on pointers instead of copying objects. Further they
+  * are internally threadsafe. But they lack many convent tools and utilities the
+  * standard containers offer, so you are encouraged to use them instead.
+  *
+  * The containers are, in alphabetical order:
+  * | Container        | Include     | Description                                                       |
+  * | ---------------- | ----------- | ----------------------------------------------------------------- |
+  * | pwx::TChainHash  | PChainHash  | Chained hash container.                                           |
+  * | pwx::TDoubleList | PDoubleList | Doubly linked list.                                               |
+  * | pwx::TDoubleRing | PDoubleRing | Doubly linked list where the head and tail are connected.         |
+  * | pwx::TOpenHash   | POpenHash   | Open hash container with auto grow and Robin Hood Insertion.      |
+  * | pwx::TQueue      | PQueue      | Doubly linked list variant that pop()s head and push()es tail.    |
+  * | pwx::TSet        | PSet        | A set container supporting unions, differences and intersections. |
+  * | pwx::TSingleList | PSingleList | Singly linked list.                                               |
+  * | pwx::TSingleRing | PSingleRing | Singly linked list where head is next of tail.                    |
+  * | pwx::TStack      | PStack      | Singly linked list variant that pop()s tail and push()es tail.    |
+  *
   * @subsection contTools Tools
   * @todo write
   * @subsection contTypes Types

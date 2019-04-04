@@ -1,5 +1,5 @@
-want_html  = get_option('html')
-doxygen    = find_program('doxygen', required : want_html)
+want_html   = get_option('html')
+doxygen     = find_program('doxygen', required : want_html)
 
 if want_html
         result  = run_command(find_src_sh, libpwx_wrapper_list)
@@ -25,11 +25,11 @@ if want_html
                 output : 'doxyfile',
                 configuration : doxsub)
 
-        doc_gen = custom_target('doc_gen',
+        custom_target('doc_gen',
                 capture          : true,
                 build_by_default : want_html,
                 command          : [doxygen, doxyfile],
-                depend_files     : [doxyfile],
+                depend_files     : [doxyfile] + sources,
                 install          : false,
                 output           : 'doxygen.log' )
 
