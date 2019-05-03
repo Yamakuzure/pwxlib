@@ -66,6 +66,43 @@
   * - Use `./configure --help` to see all options.
   * - Build with a simple `make`
   *
+  * @subsection contWorkers Workers
+  * Currently there are three workers, which basically are global instances of
+  * classes you can use yourself, too.
+  *
+  * 1. pwx::PAH : This is an instance of pwx::CArgHandler and can manage both
+  * the program arguments of your software, and the arguments help texts.
+  * 2. pwx::RNG : This is an instance of pwx::CRandom and can generate random
+  * numbers, [simplex] noise, names and hashes on various types.
+  * 3. pwx::SCT : This is an instance of pwx::CSinCosTable and might be able to
+  * help and/or speed up degree calculations.
+  *
+  * @subsection contContain Containers
+  * All containers are based on pointers instead of copying objects. Further they
+  * are internally threadsafe. But they lack many convent tools and utilities the
+  * standard containers offer, so you are encouraged to use them instead.
+  *
+  * The containers are, in alphabetical order:
+  * | Container        | Include     | Description                                                       |
+  * | ---------------- | ----------- | ----------------------------------------------------------------- |
+  * | pwx::TChainHash  | PChainHash  | Chained hash container.                                           |
+  * | pwx::TDoubleList | PDoubleList | Doubly linked list.                                               |
+  * | pwx::TDoubleRing | PDoubleRing | Doubly linked list where the head and tail are connected.         |
+  * | pwx::TOpenHash   | POpenHash   | Open hash container with auto grow and Robin Hood Insertion.      |
+  * | pwx::TQueue      | PQueue      | Doubly linked list variant that pop()s head and push()es tail.    |
+  * | pwx::TSet        | PSet        | A set container supporting unions, differences and intersections. |
+  * | pwx::TSingleList | PSingleList | Singly linked list.                                               |
+  * | pwx::TSingleRing | PSingleRing | Singly linked list where head is next of tail.                    |
+  * | pwx::TStack      | PStack      | Singly linked list variant that pop()s tail and push()es tail.    |
+  *
+  * @subsection contTools Tools
+  * Apart from the workers and the containers, there are some tools that might be
+  * helpful. 
+  * @subsection contTypes Types
+  * @todo write
+  * @subsection contGeneral General
+  * @todo write
+  *
   * @section contMain Motivation
   * The original motivation to write this library were random numbers. In 2007
   * I had a problem with a bug in a game. In a particular place a random number
@@ -110,41 +147,6 @@
   * other projects as well. But the pwxLib is still an active project, and will
   * remain to be so for a long time.
   * 
-  * @subsection contWorkers Workers
-  * Currently there are three workers, which basically are global instances of
-  * classes you can use yourself, too.
-  *
-  * 1. pwx::PAH : This is an instance of pwx::CArgHandler and can manage both
-  * the program arguments of your software, and the arguments help texts.
-  * 2. pwx::RNG : This is an instance of pwx::CRandom and can generate random
-  * numbers, [simplex] noise, names and hashes on various types.
-  * 3. pwx::SCT : This is an instance of pwx::CSinCosTable and might be able to
-  * help and/or speed up degree calculations.
-  *
-  * @subsection contContain Containers
-  * All containers are based on pointers instead of copying objects. Further they
-  * are internally threadsafe. But they lack many convent tools and utilities the
-  * standard containers offer, so you are encouraged to use them instead.
-  *
-  * The containers are, in alphabetical order:
-  * | Container        | Include     | Description                                                       |
-  * | ---------------- | ----------- | ----------------------------------------------------------------- |
-  * | pwx::TChainHash  | PChainHash  | Chained hash container.                                           |
-  * | pwx::TDoubleList | PDoubleList | Doubly linked list.                                               |
-  * | pwx::TDoubleRing | PDoubleRing | Doubly linked list where the head and tail are connected.         |
-  * | pwx::TOpenHash   | POpenHash   | Open hash container with auto grow and Robin Hood Insertion.      |
-  * | pwx::TQueue      | PQueue      | Doubly linked list variant that pop()s head and push()es tail.    |
-  * | pwx::TSet        | PSet        | A set container supporting unions, differences and intersections. |
-  * | pwx::TSingleList | PSingleList | Singly linked list.                                               |
-  * | pwx::TSingleRing | PSingleRing | Singly linked list where head is next of tail.                    |
-  * | pwx::TStack      | PStack      | Singly linked list variant that pop()s tail and push()es tail.    |
-  *
-  * @subsection contTools Tools
-  * @todo write
-  * @subsection contTypes Types
-  * @todo write
-  * @subsection contGeneral General
-  * @todo write
   * @section CopyLic Copyright and license
   *
   * (c) 2007 - 2019 PrydeWorX
