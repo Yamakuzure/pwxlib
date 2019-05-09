@@ -15,6 +15,7 @@
 /// Typedefs for the specific set:
 #include <PChainHash>
 #include <POpenHash>
+#include <RNG>
 typedef PChainHash<keydata_t, hashval_t>        chash_t;
 typedef POpenHash<keydata_t, hashval_t>         ohash_t;
 typedef pwx::THashElement<keydata_t, hashval_t> elem_t;
@@ -30,6 +31,8 @@ typedef pwx::THashElement<keydata_t, hashval_t> elem_t;
   ** E) Build a second hash (all 5 elements) and add to first (5 elements)  **
   ** F) Remove elements 2,4 from the second, substract remaining from first **
   **    (2->2.2, 4->4.4)                                                    **
+  ** G) Fill in 500 random elements. The OpenHash then has to grow several  **
+  **    times, so this is tested, too.
   ****************************************************************************
 **/
 template<typename hash_t>
@@ -262,6 +265,34 @@ int32_t testHash ( sEnv& env ) {
             }
         }
     } // End of outer guard at E)
+
+    /***************************************************************************
+    ** G) Add 500 random elements                                             **
+    ***************************************************************************/
+    if (EXIT_SUCCESS == result) {
+        cout << adjRight ( 4, 0 ) << ++env.testCount << " G) Add 500 random elements         : \n        ";
+
+        keydata_t  new_key = keys[4];
+        hashval_t* new_val = nullptr;
+
+        for (size_t i = 0; i < 500; ++i) {
+                new_key += pwx::RNG.random(1, 10);
+                new_val  = new hashval_t(pwx::RNG.random(999999.999999));
+                ifHash.push(new_key, new_val);
+        }
+        
+        size_t hash_size = ifHash.size();
+
+        cout << "Result : ";
+        if ( ( EXIT_SUCCESS == result ) && ( 502 == hash_size ) ) {
+            cout << "Success" << endl;
+            ++env.testSuccess;
+        } else {
+            cout << "FAIL (" << hash_size << " / 502)" << endl;
+            ++env.testFail;
+            result = EXIT_FAILURE;
+        }
+    }
 
     cout << endl;
     return result;
