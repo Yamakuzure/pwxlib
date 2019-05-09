@@ -435,9 +435,52 @@ class PWX_API TDoubleList : public TSingleList<data_t, elem_t> {
      * ===============================================
     */
 
-    using base_t::operator=;
-    using base_t::operator+=;
-    using base_t::operator-=;
+    /** @brief assignment operator
+      *
+      * Clears this list and copies all elements from @a rhs
+      * into this list.
+      *
+      * @param[in] rhs reference of the list to copy.
+      * @return reference to this.
+    **/
+    virtual list_t& operator= ( const list_t& rhs ) {
+        if ( &rhs != this )
+            PWX_TRY_PWX_FURTHER ( base_t::operator= ( rhs ) )
+        return *this;
+    }
+
+
+    /** @brief addition assignment operator
+      *
+      * Add all elements from @a rhs to this list.
+      *
+      * @param[in] rhs reference of the list to add.
+      * @return reference to this.
+    **/
+    virtual list_t& operator+= ( const list_t& rhs ) {
+        if ( &rhs != this ) {
+            PWX_TRY_PWX_FURTHER ( base_t::operator+= ( rhs ) )
+        }
+        return *this;
+    }
+
+
+    /** @brief substraction assignment operator
+      *
+      * Remove all elements from @a rhs from this list.
+      *
+      * @param[in] rhs reference of the list to substract.
+      * @return reference to this.
+    **/
+    virtual list_t& operator-= ( const list_t& rhs ) {
+        if ( &rhs != this )
+            PWX_TRY_PWX_FURTHER ( base_t::operator-= ( rhs ) )
+        else
+            clear();
+        return *this;
+    }
+
+
     using base_t::operator[];
 
 
