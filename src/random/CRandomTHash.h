@@ -38,9 +38,9 @@
 
 #include <type_traits>
 
-#include "CRandomConstants.h"
-#include "pwx_macros.h"
-#include "MathHelpers.h"
+#include "basic/pwx_macros.h"
+#include "math_helpers/MathHelpers.h"
+#include "random/CRandomConstants.h"
 
 
 namespace pwx {

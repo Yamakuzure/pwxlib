@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED
 #define PWX_LIBPWX_PWX_WORKER_CRANDOM_H_INCLUDED 1
+#pragma once
 
 /** @file CRandom.h
   *
@@ -35,9 +35,9 @@
 **/
 
 
-#include "CLockable.h"
-#include "pwx_compiler.h"
-#include "eNameSourceType.h"
+#include "basic/CLockable.h"
+#include "basic/pwx_compiler.h"
+#include "random/eNameSourceType.h"
 
 
 namespace pwx {

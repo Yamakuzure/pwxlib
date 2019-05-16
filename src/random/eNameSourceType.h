@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_TYPES_ENAMESOURCETYPE_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_ENAMESOURCETYPE_H_INCLUDED 1
+#pragma once
 
 /** @file eNameSourceType.h
   *
@@ -37,7 +37,7 @@
 **/
 
 
-#include "pwx_compiler.h"
+#include "basic/pwx_compiler.h"
 
 
 namespace pwx {

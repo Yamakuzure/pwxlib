@@ -1,13 +1,13 @@
+#ifndef PWX_LIBPWX_PWX_RANDOM_CRANDOMWORDCONSTANTS_H_INCLUDED
+#define PWX_LIBPWX_PWX_RANDOM_CRANDOMWORDCONSTANTS_H_INCLUDED 1
 #pragma once
-#ifndef PWX_LIBPWX_PWX_INTERNAL_CRANDOMWORDCONSTANTS_H_INCLUDED
-#define PWX_LIBPWX_PWX_INTERNAL_CRANDOMWORDCONSTANTS_H_INCLUDED 1
 
 /** @file CRandomWordConstants.h
   *
   * @brief Automatically generated header for the name generator.
   *
-  * <B>Automatically generated Header! Do NOT modify! See bottom
-  * of this file for more information!</B>
+  * **Automatically generated Header! Do NOT modify! See bottom
+  * of this file for more information!**
   *
   * (c) 2007 - 2019 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -37,7 +37,6 @@
   * History and change log are maintained in pwxlib.h
 **/
 
-
 namespace pwx {
 
 /** @namespace pwx::NameConstants
@@ -49,7 +48,7 @@ namespace pwx {
 **/
 namespace NameConstants {
 
-/** --- constants for generation states --- **/
+/* --- constants for generation states --- */
 
 /* --- General states--- */
 const uint32_t genFinished    = 0x00000000; //!< The generation has been finished
@@ -79,24 +78,38 @@ const uint32_t genMiddleAllow = 0x40000000; //!< A 2-character-combination is al
 const uint32_t genEndAllow    = 0x80000000; //!< A 2-character-combination is allowed to end a part
 
 /* --- constants for character to index offsets --- */
-const uint32_t chrOffsetLowStart = static_cast<uint32_t>( 'a' );          // 0x61
-const uint32_t chrOffsetLowEnd   = static_cast<uint32_t>( 'z' );          // 0x7a
-const uint32_t chrOffsetUppStart = static_cast<uint32_t>( 'A' );          // 0x41
-const uint32_t chrOffsetUppEnd   = static_cast<uint32_t>( 'Z' );          // 0x5a
-const uint32_t chrOffsetDown     = chrOffsetLowStart - chrOffsetUppStart; // 0x20
+const uint32_t chrOffsetLowStart = static_cast<uint32_t>( 'a' );          //!< 0x61
+const uint32_t chrOffsetLowEnd   = static_cast<uint32_t>( 'z' );          //!< 0x7a
+const uint32_t chrOffsetUppStart = static_cast<uint32_t>( 'A' );          //!< 0x41
+const uint32_t chrOffsetUppEnd   = static_cast<uint32_t>( 'Z' );          //!< 0x5a
+const uint32_t chrOffsetDown     = chrOffsetLowStart - chrOffsetUppStart; //!< 0x20
 
 /* --- constants for the umlaut indexes --- */
-const int32_t chrIndexUmlautA = 26;
-const int32_t chrIndexUmlautO = 27;
-const int32_t chrIndexUmlautU = 28;
+const int32_t chrIndexUmlautA = 26; //!< Where 'ä' is
+const int32_t chrIndexUmlautO = 27; //!< Where 'ö' is
+const int32_t chrIndexUmlautU = 28; //!< Where 'ü' is
 
 /* --- macros to check for umlauts and return the  ---
    --- appropriate index of a lower case character --- */
+
+/// @def IS_UMLAUT_A(x)
+/// @return true if @a x is 'ä', false otherwise
+/// @param[in] x The character to check
 #define IS_UMLAUT_A(x) ( static_cast<uint8_t>(x) == 0xe4 )
+
+/// @def IS_UMLAUT_O
+/// @return true if @a x is 'ö', false otherwise
+/// @param[in] x The character to check
 #define IS_UMLAUT_O(x) ( static_cast<uint8_t>(x) == 0xf6 )
+
+/// @def IS_UMLAUT_U
+/// @return true if @a x is 'ü', false otherwise
+/// @param[in] x The character to check
 #define IS_UMLAUT_U(x) ( static_cast<uint8_t>(x) == 0xfc )
 
-// Return the index of a lower case character
+/// @def FUM_IDX
+/// @return the index of a lower case character
+/// @param[in] x The character to check
 #define FUM_IDX(x) \
 	( ( static_cast<uint8_t>(x) <= NameConstants::chrOffsetLowEnd) \
 	? (static_cast<uint8_t>(x) - NameConstants::chrOffsetLowStart) \
@@ -105,43 +118,77 @@ const int32_t chrIndexUmlautU = 28;
 	: IS_UMLAUT_U(x) ? NameConstants::chrIndexUmlautU \
 	: -1 )
 
-// Return the rule of the FUM using two lower case characters
+/// @def FUM_CHR_RULE
+/// @return the rule of the FUM using two lower case characters
+/// @param[in] type eNameSourceType to check
+/// @param[in] chOne first lower case character
+/// @param[in] chTwo second lower case character
 #define FUM_CHR_RULE(type, chOne, chTwo)  \
 	NameConstants::nameFUM[(int)type][FUM_IDX(chOne)][FUM_IDX(chTwo)]
 
-// Return the rule of the FUM using two indexes
+/// @def FUM_IDX_RULE
+/// @return the rule of the FUM using two indexes
+/// @param[in] type eNameSourceType to check
+/// @param[in] first first index
+/// @param[in] second second index
 #define FUM_IDX_RULE(type, first, second) \
 	NameConstants::nameFUM[(int)type][first][second]
 
-// Return true if the combination is allowed at the start of a part
+/// @def FUM_ALLOW_START
+/// @return true if the combination is allowed at the start of a part
+/// @param[in] type eNameSourceType to check
+/// @param[in] chOne first lower case character
+/// @param[in] chTwo second lower case character
 #define FUM_ALLOW_START(type, chOne, chTwo) \
 	(NameConstants::genStartAllow & FUM_CHR_RULE(type, chOne, chTwo))
 
-// Return true if the combination is allowed in the middle of a part
+/// @def FUM_ALLOW_MIDDLE
+/// @return true if the combination is allowed in the middle of a part
+/// @param[in] type eNameSourceType to check
+/// @param[in] chOne first lower case character
+/// @param[in] chTwo second lower case character
 #define FUM_ALLOW_MIDDLE(type, chOne, chTwo) \
 	(NameConstants::genMiddleAllow & FUM_CHR_RULE(type, chOne, chTwo))
 
-// Return true if the combination is allowed at the end of a part
+/// @def FUM_ALLOW_END
+/// @return true if the combination is allowed at the end of a part
+/// @param[in] type eNameSourceType to check
+/// @param[in] chOne first lower case character
+/// @param[in] chTwo second lower case character
 #define FUM_ALLOW_END(type, chOne, chTwo) \
 	(NameConstants::genEndAllow & FUM_CHR_RULE(type, chOne, chTwo))
 
-// Return true if the combination does not allow a following character, false otherwise
+/// @def FUM_MUST_FINISH
+/// @return true if the combination does not allow a following character, false otherwise
+/// @param[in] type eNameSourceType to check
+/// @param[in] chOne first lower case character
+/// @param[in] chTwo second lower case character
 #define FUM_MUST_FINISH(type, chOne, chTwo) \
 	(0 == (NameConstants::genCharMask & FUM_CHR_RULE(type, chOne, chTwo)))
 
-// Return typed length of the consonant array
+/// @def CL_LEN
+/// @return typed length of the consonant array
+/// @param[in] type eNameSourceType to check
 #define CL_LEN(type) NameConstants::conListLen[(int)type]
 
-// Return index modded character of the consonant array
+/// @def CL_CHR
+/// @return index modded character of the consonant array
+/// @param[in] type eNameSourceType to check
+/// @param[in] idx index to mod and check
 #define CL_CHR(type, idx) NameConstants::conList[(int)type][(idx) % CL_LEN(type)]
 
-// Return typed length of the vowel array
+/// @def VL_LEN
+/// @return typed length of the vowel array
+/// @param[in] type eNameSourceType to check
 #define VL_LEN(type) NameConstants::vowListLen[(int)type]
 
-// Return index modded character of the vowel array
+/// @def VL_CHR
+/// @return index modded character of the vowel array
+/// @param[in] type eNameSourceType to check
+/// @param[in] idx index to mod and check
 #define VL_CHR(type, idx) NameConstants::vowList[(int)type][(idx) % VL_LEN(type)]
 
-/** @file CRandomWordConstants.h
+/** @namespace pwx::NameConstants
   @verbatim
   * ==== Automatic Text Analyzation Result from PrydeWorX textAnalyzer.pl  ==== *
   *=============================================================================*
@@ -778,9 +825,10 @@ const int32_t chrIndexUmlautU = 28;
   @endverbatim
 **/
 
-/* --- resulting consonant array --- */
+/// @brief resulting consonant array lengths
 const uint32_t conListLen[6] = { 791, 458, 587, 792, 345, 637 };
 
+/// @brief resulting consonant arrays
 char const     conList[6][793] = {
     "zmhrczcbdbgrnbrbnrtrnmhbhlhmgbmbcfcdzljnchckcsrdcsclmczcwcsdrdtdrtkdrdndjdnd"
     "lspdgdrdjdsdhdcdcdrdndldsdlhldrjrfndglrfknhfkftfdfrftfsmlhclbkspgrntgkvngmrl"
@@ -835,9 +883,10 @@ char const     conList[6][793] = {
     "vrdfvsvlvwlwgrwbwrbsxzgzgztsz",
 };
 
-/* --- resulting vowel array --- */
+/// @brief resulting vowel array lengths
 const uint32_t vowListLen[6] = { 599, 21, 19, 120, 20, 46 };
 
+/// @brief resulting vowel arrays
 char const     vowList[6][600] = {
     "yeaeoyaeiuiyueayeaiuaeiyeaoyiaiaiaeaoaeaiaiaeaeioaoeuieaoaiaeuiauieaeaoaeaoi"
     "eaoeiaieyaieuaoeaeaieaeaeiaiuauaeaeaeaieaiauaieieoaeoaiaoiaeauieyeaeaeaeiaie"
@@ -855,7 +904,7 @@ char const     vowList[6][600] = {
     "ueuoyieieaieieaeueuaeaeaoaoeaeieieiaieiaeoieuo",
 };
 
-/** @file CRandomWordConstants.h
+/** @namespace pwx::NameConstants
   *
   @verbatim
   * Follow-up statistics :
@@ -1040,6 +1089,7 @@ char const     vowList[6][600] = {
   * Y | 11|  3|  6|  6| 10|  1|  2|  1|  4|  1|  2| 13| 10| 16|  5| 12|  0|  9| 17|  7|  1|  1|  1|  1|  1|  1|
   * Z | 21|  3|  1|  1|100|  1|  2|  1| 55|  1|  2|  3|  1|  1| 14|  1|  0|  1|  3| 10|148|  1| 15|  0|  4|  4|
   * ------------------------------------------------------------------------------------------------------------
+  @endverbatim
 **/
 
 /** @brief resulting [F]ollow-[U]p rules [M]atrix
@@ -6689,5 +6739,5 @@ const uint32_t nameFUM[6][29][29] = {
   @endverbatim
 **/
 
-#endif // PWX_LIBPWX_PWX_INTERNAL_CRANDOMWORDCONSTANTS_H_INCLUDED
+#endif // PWX_LIBPWX_PWX_RANDOM_CRANDOMWORDCONSTANTS_H_INCLUDED
 

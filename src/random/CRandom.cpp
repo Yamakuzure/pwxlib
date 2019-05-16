@@ -1,4 +1,4 @@
-/**
+/** @file CRandom.cpp
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c) 2007 - 2019 PrydeWorX
@@ -35,16 +35,17 @@
 #include <cstring>
 #include <string>
 
-#include "pwx_compiler.h"
-#include "CRandom.h"
-#include "CRandomTHash.h"
-#include "CRandomTRandom.h"
-#include "CRandomWordConstants.h"
-#include "pwx_debug.h"
-#include "pwx_macros.h"
-#include "StreamHelpers.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
+#include "random/CRandom.h"
+#include "random/CRandomTHash.h"
+#include "random/CRandomTRandom.h"
+#include "random/CRandomWordConstants.h"
+#include "stream_helpers/StreamHelpers.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 

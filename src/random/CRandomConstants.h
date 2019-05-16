@@ -1,9 +1,8 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_INTERNAL_CRANDOMCONSTANTS_H_INCLUDED
 #define PWX_LIBPWX_PWX_INTERNAL_CRANDOMCONSTANTS_H_INCLUDED 1
+#pragma once
 
-/** @internal
-  * @file CRandomConstants.h
+/** @file CRandomConstants.h
   *
   * @brief Internal constants used by CRandom.cpp
   *
@@ -38,7 +37,7 @@
 
 #include <limits>
 
-#include "pwx_types.h"
+#include "basic/pwx_types.h"
 
 
 namespace pwx {
@@ -53,13 +52,13 @@ namespace pwx {
 **/
 namespace constants {
 
-/** The following are shortcuts for various limits used by CRandom: **/
-const int32_t fullMaxInt    = std::numeric_limits<int32_t>::max();
-const int32_t fullMinInt    = std::numeric_limits<int32_t>::lowest();
-const int32_t halfMaxInt    = fullMaxInt >> 1;
-const int32_t fourthMaxInt  = halfMaxInt >> 1;
-const int64_t fullMaxLong   = std::numeric_limits<int64_t>::max();
-const double  noiseMod      = static_cast<double>( fullMaxInt );
+/* The following are shortcuts for various limits used by CRandom: */
+const int32_t fullMaxInt    = std::numeric_limits<int32_t>::max();    //!< Shortcut to the int32_t maximum value
+const int32_t fullMinInt    = std::numeric_limits<int32_t>::lowest(); //!< Shortcut to the int32_t minimum value
+const int32_t halfMaxInt    = fullMaxInt >> 1;            //!< Shortcut to the half of the int32_t maximum value
+const int32_t fourthMaxInt  = halfMaxInt >> 1;            //!< Shortcut to the half of the int32_t minimum value
+const int64_t fullMaxLong   = std::numeric_limits<int64_t>::max();    //!< Shortcut to the int64_t maximum value 
+const double  noiseMod      = static_cast<double>( fullMaxInt );      //!< fullMaxInt as double for noise modulation
 
 
 /** Simplex manipulation grid **/

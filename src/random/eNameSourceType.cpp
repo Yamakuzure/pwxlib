@@ -30,8 +30,8 @@
 **/
 
 
-#include "eNameSourceType.h"
-#include "pwx_types.h"
+#include "basic/pwx_types.h"
+#include "random/eNameSourceType.h"
 
 
 namespace pwx {
