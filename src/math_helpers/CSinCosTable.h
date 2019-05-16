@@ -33,7 +33,7 @@
   * History and change log are maintained in pwxlib.h
 **/
 
-#include "CLockable.h"
+#include "basic/CLockable.h"
 
 namespace pwx {
 
@@ -90,7 +90,7 @@ class PWX_API CSinCosTable: public CLockable {
      * ===============================================
      */
 
-    explicit CSinCosTable( const int32_t newPrecision );
+    explicit CSinCosTable( const int32_t initial_precision );
     virtual ~CSinCosTable() noexcept;
 
     CSinCosTable() PWX_DELETE;

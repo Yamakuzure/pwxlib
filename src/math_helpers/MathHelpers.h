@@ -45,8 +45,8 @@
 #include <limits>
 #include <type_traits>
 
-#include "pwx_compiler.h"
-#include "pwx_macros.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 
 
 namespace pwx {
@@ -74,13 +74,22 @@ namespace pwx {
 **/
 template<typename Tf>
 struct sFloatPoint {
-    typedef size_t Ti;
+    typedef size_t Ti; //!< Raw integer representation is in size_t per default
 
+    /// @brief The base ctor sets the initial value and does nothing else
+    /// @param[in] num Initial value
     explicit sFloatPoint( Tf num ) : f( num ) {}
+
+    /// @brief The empty ctor sets the initial value to zero
     sFloatPoint() : f( static_cast<Tf>( 0 ) ) {}
 
+    /// @return always false
     bool Negative()    const { return false; }
+
+    /// @return always zero
     Ti   RawMantissa() const { return static_cast<Ti>( 0 ); }
+
+    /// @return always zero
     Ti   RawExponent() const { return static_cast<Ti>( 0 ); }
 
     union {
@@ -88,7 +97,9 @@ struct sFloatPoint {
         Tf f;
     };
 
-    static const int digits = 0;
+    static const int digits = 0; //!< Always zero in this base struct
+
+    /// @return always zero
     static       Tf  epsilon() noexcept { return static_cast<Ti>( 0 ); }
 };
 
@@ -96,21 +107,32 @@ struct sFloatPoint {
 /// @brief Specialized helper to handle floats
 template<>
 struct sFloatPoint<float> {
-    typedef int32_t Ti;
+    typedef int32_t Ti; //!< Raw integer representation is in int32_t
 
+    /// @brief The default ctor sets the initial value and does nothing else
+    /// @param[in] num Initial value
     explicit sFloatPoint( float num ) : f( num ) {}
+
+    /// @brief The empty ctor sets the initial value to zero
     sFloatPoint() : f( static_cast<float>( 0 ) ) {}
 
+    /// @return true if the integer representation is negative
     bool Negative()    const { return ( i >> 31 ) != 0; }
+
+    /// @return The integer representation of the mantissa
     Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 23 ) - 1 ); }
+
+    /// @return The integer representation of the exponent
     Ti   RawExponent() const { return ( i >> 23 ) & 0xff; }
 
     union {
-        Ti    i;
-        float f;
+        Ti    i; //!< Integer representation
+        float f; //!< Float representation
     };
 
-    static const int   digits  = std::numeric_limits<float>::digits;
+    static const int   digits  = std::numeric_limits<float>::digits; //!< Number of digits of the float type
+
+    /// @return the epsilon of the float type
     static       float epsilon() noexcept {
         return std::numeric_limits<float>::epsilon();
     }
@@ -120,21 +142,32 @@ struct sFloatPoint<float> {
 /// @brief Specialized helper to handle doubles
 template<>
 struct sFloatPoint<double> {
-    typedef int64_t Ti;
+    typedef int64_t Ti; //!< Raw integer representation is in int64_t
 
+    /// @brief The default ctor sets the initial value and does nothing else
+    /// @param[in] num Initial value
     explicit sFloatPoint( double num ) : f( num ) {}
+
+    /// @brief The empty ctor sets the initial value to zero
     sFloatPoint() : f( static_cast<double>( 0 ) ) {}
 
+    /// @return true if the integer representation is negative
     bool Negative()    const { return ( i >> 63 ) != 0; }
+
+    /// @return The integer representation of the mantissa
     Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 52 ) - 1 ); }
+
+    /// @return The integer representation of the exponent
     Ti   RawExponent() const { return ( i >> 52 ) & 0xffff; }
 
     union {
-        Ti     i;
-        double f;
+        Ti     i; //!< Integer representation
+        double f; //!< Double representation
     };
 
-    static const int    digits  = std::numeric_limits<double>::digits;
+    static const int    digits  = std::numeric_limits<double>::digits; //!< Number of digits of the double type
+    
+    /// @return the epsilon of the double type
     static       double epsilon() noexcept {
         return std::numeric_limits<double>::epsilon();
     }
@@ -144,21 +177,32 @@ struct sFloatPoint<double> {
 /// @brief Specialized helper to handle long doubles
 template<>
 struct sFloatPoint<long double> {
-    typedef __int128_t Ti;
+    typedef __int128_t Ti; //!< Raw integer representation is in __int128_t
 
+    /// @brief The default ctor sets the initial value and does nothing else
+    /// @param[in] num Initial value
     explicit sFloatPoint( long double num ) : f( num ) {}
+
+    /// @brief The empty ctor sets the initial value to zero
     sFloatPoint() : f( static_cast<long double>( 0 ) ) {}
 
+    /// @return true if the integer representation is negative
     bool Negative()    const { return ( i >> 127 ) != 0; }
+
+    /// @return The integer representation of the mantissa
     Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 63 ) - 1 ); }
+
+    /// @return The integer representation of the exponent
     Ti   RawExponent() const { return ( i >> 63 ) & 0xffffffffffffffff; }
 
     union {
-        Ti          i;
-        long double f;
+        Ti          i; //!< Integer representation
+        long double f; //!< Long double representation
     };
 
-    static const int         digits  = std::numeric_limits<long double>::digits;
+    static const int         digits  = std::numeric_limits<long double>::digits; //!< Number of digits of the long double type
+    
+    /// @return the epsilon of the long double type
     static       long double epsilon() noexcept {
         return std::numeric_limits<long double>::epsilon();
     }
@@ -172,7 +216,7 @@ struct sFloatPoint<long double> {
 bool PWX_API areAlmostEqual( const float lhs, const float rhs ) noexcept;
 bool PWX_API areAlmostEqual( const double lhs, const double rhs ) noexcept;
 bool PWX_API areAlmostEqual( const long double lhs, const long double rhs ) noexcept;
-// template dummy to enable areAlmostEqual() to be used with type_traits conditions
+/// @brief template dummy to enable areAlmostEqual() to be used with type_traits conditions
 template<typename T>
 bool PWX_API areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
     return lhs == rhs;
