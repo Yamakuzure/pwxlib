@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_H_INCLUDED
 #define PWX_LIBPWX_PWX_H_INCLUDED 1
+#pragma once
 
 /** @file pwxlib.h
   * @brief Include everything at once.
@@ -79,7 +79,7 @@
   *
   * @subsection contContain Containers
   * All containers are based on pointers instead of copying objects. Further they
-  * are internally threadsafe. But they lack many convent tools and utilities the
+  * are internally threadsafe. But they lack many convenient tools and utilities the
   * standard containers offer, so you are encouraged to use them instead.
   *
   * The containers are, in alphabetical order:
@@ -214,6 +214,7 @@
   * 0.8.8.0   2015-08-13  sed, PrydeWorX  Reordered and modernized
   * 0.8.9     2018-12-13  sed, PrydeWorX  First release on GitHub.
   * 0.8.9.1   2019-03-14  sed, PrydeWorX  Layout of the files resetted and reordered. Doxygen config fixed.
+  * 0.8.9.2   2019-05-16  sed, PrydeWorX  Doxygen documentation (almost) completed, at least doxygen is happy now.
   @endverbatim
 **/
 
