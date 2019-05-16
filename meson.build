@@ -229,15 +229,6 @@ config_h = configure_file(
 
 include_paths = '''
         src
-        src/arg_handler
-        src/basic
-        src/container
-        src/functions
-        src/libpwx
-        src/math_helpers
-        src/random
-        src/stream_helpers
-        src/wavecolor
 '''.split()
 includes = include_directories(include_paths)
 
