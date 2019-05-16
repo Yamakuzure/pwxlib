@@ -34,7 +34,7 @@
 **/
 
 
-#include "TSingleList.h"
+#include "container/TSingleList.h"
 
 
 namespace pwx {
@@ -80,8 +80,8 @@ class PWX_API CWaveColor : public CLockable {
      * ===============================================
     */
 
-    typedef CLockable          base_t;
-    typedef TSingleList<sWave> list_t;
+    typedef CLockable          base_t; //!< Base type of CWaveColor
+    typedef TSingleList<sWave> list_t; //!< List type of CWaveColor
 
     /* ===============================================
      * === Public constructors and destructor      ===
