@@ -10,6 +10,11 @@ The library is published under MIT license, which is included both at the
 bottom of this file and in the dedicated LICENSE file.
 
 
+Current Build Status
+--------------------
+* master : [![Build Status](https://www.travis-ci.org/Yamakuzure/pwxlib.svg?branch=master)](https://www.travis-ci.org/Yamakuzure/pwxlib)
+
+
 Usage
 ---------------------------------------
 The only thing needed to use the library is to place
