@@ -35,8 +35,8 @@
 #include <unistd.h>
 #include <vector>
 
-#include "StreamHelpers.h"
-#include "pwx_macros.h"
+#include "basic/pwx_macros.h"
+#include "stream_helpers/StreamHelpers.h"
 
 
 namespace pwx {

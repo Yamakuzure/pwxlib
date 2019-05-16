@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_TOOLS_STREAMHELPERS_H_INCLUDED
 #define PWX_LIBPWX_PWX_TOOLS_STREAMHELPERS_H_INCLUDED 1
+#pragma once
 
 /** @file StreamHelpers.h
   *
@@ -38,7 +38,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "pwx_compiler.h"
+#include "basic/pwx_compiler.h"
 
 
 namespace pwx {
