@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
+#pragma once
 
 /** @file TArgTarget.h
   *
@@ -36,11 +37,12 @@
 
 #include <cstring>
 
-#include "CException.h"
-#include "pwx_macros.h"
-#include "VArgTargetBase.h"
+#include "arg_handler/VArgTargetBase.h"
+#include "basic/CException.h"
+#include "basic/pwx_macros.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -113,7 +115,7 @@ class TArgTarget : public VArgTargetBase {
     }
 
 
-    /** @brief process one command line parameter or argument occurence
+    /** @brief process one command line parameter or argument occurrence
       *
       * This method is called whenever the type of an argument needs
       * direct action, or a parameter to that argument is met.
@@ -125,20 +127,27 @@ class TArgTarget : public VArgTargetBase {
 
   private:
 
-    // Members
-    T* target;
+    T* target; //!< The target to handle
 
-    // === par_to_val conversion chain prototype ===
+    /** @brief par_to_val conversion chain prototype
+      *
+      * All supported types have specializations.
+      *
+      * @param[out] tgt target to create
+      * @param[in] param sring to interpret
+    **/
     void par_to_val( T* tgt, char const* param ) noexcept;
 };
 
 
 // === Processing specializations prototypes ===
+
+/// @brief Specialization for std::string targets
 template<>
 eArgErrorNumber TArgTarget<std::string>::process( char const* param );
 
 
-// === Generic non-specialized handler ===
+/// @brief Generic non-specialized handler
 template<typename T>
 eArgErrorNumber TArgTarget<T>::process( char const* param ) {
     eArgErrorNumber argErrno = AEN_OK;
@@ -191,28 +200,52 @@ eArgErrorNumber TArgTarget<T>::process( char const* param ) {
 
 
 // === par_to_val specializations prototypes ===
+
+/// @brief Specialization for bool targets
 template<>
 void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for int8_t targets
 template<>
 void TArgTarget<int8_t>::par_to_val( int8_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for int16_t targets
 template<>
 void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for int32_t targets
 template<>
 void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for int64_t targets
 template<>
 void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for uint8_t targets
 template<>
 void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for uint16_t targets
 template<>
 void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for uint32_t targets
 template<>
 void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for uint64_t targets
 template<>
 void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for float targets
 template<>
 void TArgTarget<float>::par_to_val( float* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for double targets
 template<>
 void TArgTarget<double>::par_to_val( double* tgt, char const* param ) noexcept;
+
+/// @brief Specialization for long double targets
 template<>
 void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept;
 

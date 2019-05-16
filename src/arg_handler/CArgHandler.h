@@ -36,12 +36,12 @@
 
 #include <string>
 
-#include "CArgCallback.h"
-#include "CException.h"
-#include "sArgError.h"
-#include "TArgTarget.h"
-#include "TChainHash.h"
-#include "TQueue.h"
+#include "arg_handler/CArgCallback.h"
+#include "arg_handler/sArgError.h"
+#include "arg_handler/TArgTarget.h"
+#include "basic/CException.h"
+#include "container/TChainHash.h"
+#include "container/TQueue.h"
 
 
 namespace pwx {
@@ -137,13 +137,13 @@ class PWX_API CArgHandler {
      * ===============================================
      */
 
-    typedef VArgTargetBase            data_t;
-    typedef std::string               key_t;
-    typedef TChainHash<key_t, data_t> hash_t;
-    typedef sArgError                 error_t;
-    typedef TQueue<error_t>           errlist_t;
-    typedef TQueue<data_t>            arg_list_t;
-    typedef arg_list_t::elem_t        arg_elem_t;
+    typedef VArgTargetBase            data_t;     //!< Default data type is VArgTargetBase - handles all derivates
+    typedef std::string               key_t;      //!< Default key type is std::string
+    typedef TChainHash<key_t, data_t> hash_t;     //!< Shortcut to TChainhash with key_t and data_t
+    typedef sArgError                 error_t;    //!< Shortcut to sArgError
+    typedef TQueue<error_t>           errlist_t;  //!< Shortcut to TQueue for error_t
+    typedef TQueue<data_t>            arg_list_t; //!< Shortcut to TQueue for data_t
+    typedef arg_list_t::elem_t        arg_elem_t; //!< Shortcut to the arg_list_t element type
 
 
     /* ===============================================

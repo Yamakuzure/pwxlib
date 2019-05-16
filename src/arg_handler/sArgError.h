@@ -34,8 +34,8 @@
 **/
 
 
-#include "pwx_compiler.h"
-#include "eArgErrorNumber.h"
+#include "basic/pwx_compiler.h"
+#include "arg_handler/eArgErrorNumber.h"
 
 
 namespace pwx {

@@ -1,4 +1,4 @@
-/**
+/** @file
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c) 2007 - 2019 PrydeWorX
@@ -30,8 +30,8 @@
 **/
 
 
-#include "StreamHelpers.h"
-#include "TArgTarget.h"
+#include "arg_handler/TArgTarget.h"
+#include "stream_helpers/StreamHelpers.h"
 
 
 namespace pwx {
@@ -40,6 +40,7 @@ namespace pwx {
 // === Specialized processing handlers ===
 
 
+/// @brief Generic non-specialized handler
 template<>
 eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
     eArgErrorNumber argErrno = AEN_OK;

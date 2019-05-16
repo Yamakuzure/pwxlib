@@ -36,10 +36,10 @@
 
 #include <string>
 
-#include "pwx_compiler.h"
-#include "eArgTargetType.h"
-#include "eArgSetType.h"
-#include "eArgErrorNumber.h"
+#include "basic/pwx_compiler.h"
+#include "arg_handler/eArgTargetType.h"
+#include "arg_handler/eArgSetType.h"
+#include "arg_handler/eArgErrorNumber.h"
 
 
 namespace pwx {
@@ -50,12 +50,12 @@ namespace pwx {
 **/
 struct VArgTargetBase {
     // Members
-    std::string    aShort;
-    std::string    aLong;
-    std::string    desc;
-    std::string    pName;
-    eArgTargetType type;
-    eArgSetType    setType;
+    std::string    aShort;   //!< Short argument (one character) variant
+    std::string    aLong;    //!< Long argument (multiple characters) variant
+    std::string    desc;     //!< Description of the argument
+    std::string    pName;    //!< Parameter name/description
+    eArgTargetType type;     //!< eArgTargetType describing what to do with the target
+    eArgSetType    setType;  //!< eArgSetType describing what to do with ATT_SET targets
 
     explicit VArgTargetBase( char const* arg_short, char const* arg_long,
                              eArgTargetType arg_type,
@@ -67,7 +67,7 @@ struct VArgTargetBase {
     noexcept;
     virtual ~VArgTargetBase() noexcept;
 
-    // Must be defined by TArgTarget:
+    /// @brief Must be defined by TArgTarget:
     virtual eArgErrorNumber process( char const* ) PWX_VIRTUAL_PURE;
 
     // Public methods that do not need a templated value:
