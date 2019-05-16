@@ -47,9 +47,9 @@
 **/
 
 
-#include <worker_PAH.h>
-#include <worker_RNG.h>
-#include <worker_SCT.h>
+#include <libpwx/worker_PAH.h>
+#include <libpwx/worker_RNG.h>
+#include <libpwx/worker_SCT.h>
 
 
 #endif // PWX_PWX_WORKERS_H_INCLUDED

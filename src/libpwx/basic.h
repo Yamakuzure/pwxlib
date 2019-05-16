@@ -57,14 +57,14 @@
 **/
 
 
-#include "CException.h"
-#include "CLockable.h"
-#include "CLockGuard.h"
-#include "pwx_compiler.h"
-#include "pwx_debug.h"
-#include "pwx_macros.h"
-#include "pwx_templates.h"
-#include "pwx_types.h"
+#include "basic/CException.h"
+#include "basic/CLockable.h"
+#include "basic/CLockGuard.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_templates.h"
+#include "basic/pwx_types.h"
 
 
 #endif // PWX_PWX_BASIC_H_INCLUDED

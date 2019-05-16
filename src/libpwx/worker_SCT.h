@@ -37,7 +37,7 @@
 **/
 
 
-#include "CSinCosTable.h"
+#include "math_helpers/CSinCosTable.h"
 
 
 namespace pwx {

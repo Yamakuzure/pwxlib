@@ -51,15 +51,15 @@
 **/
 
 
-#include "TChainHash.h"
-#include "TDoubleList.h"
-#include "TDoubleRing.h"
-#include "TOpenHash.h"
-#include "TQueue.h"
-#include "TSet.h"
-#include "TSingleList.h"
-#include "TSingleRing.h"
-#include "TStack.h"
+#include "container/TChainHash.h"
+#include "container/TDoubleList.h"
+#include "container/TDoubleRing.h"
+#include "container/TOpenHash.h"
+#include "container/TQueue.h"
+#include "container/TSet.h"
+#include "container/TSingleList.h"
+#include "container/TSingleRing.h"
+#include "container/TStack.h"
 
 
 #endif // PWX_CONTAINERS_H_INCLUDED

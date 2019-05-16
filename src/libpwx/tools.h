@@ -9,13 +9,11 @@
   * This include file adds tool classes and functions for various tasks that
   * are currently included in pwxLib. In detail these are:
   *
-  * <TABLE border='1'>
-  * <TR><TH>Tasks</TH><TH>Include file</TH></TR>
-  * <TR><TD>Tools to work with float comparison, distances and degrees.</TD>
-  *   <TD>MathHelpers.h.h</TD></TR>
-  * <TR>Tools to help with stream formatting and handling.<TD>
-  *   </TD><TD>StreamHelpers.h.h</TD></TR>
-  * </TABLE>
+  * | Tasks                                                       | Include file      |
+  * | ----------------------------------------------------------- | ----------------- |
+  * | Tools to work with float comparison, distances and degrees. | MathHelpers.h.h   |
+  * | Tools to help with stream formatting and handling.          | StreamHelpers.h.h |
+  *
   *
   * (c) 2007 - 2019 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
@@ -46,8 +44,8 @@
 **/
 
 
-#include "MathHelpers.h"
-#include "StreamHelpers.h"
+#include "math_helpers/MathHelpers.h"
+#include "stream_helpers/StreamHelpers.h"
 
 
 #endif // PWX_HELPERS_H_INCLUDED
