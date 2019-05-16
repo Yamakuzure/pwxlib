@@ -38,7 +38,7 @@
 **/
 
 
-#include "CLockable.h"
+#include "basic/CLockable.h"
 
 
 namespace pwx {
@@ -49,11 +49,11 @@ namespace pwx {
   *
   * There are the following advantages when using this class instead of
   * doing locks directly:
-  * <list=1><li>Locking is done in the ctor, unlocking in the dtor automatically.</li>
-  * <li>The class is exception free and can handle null pointers.</li>
-  * <li>The guard can be assigned or copied, making overlapping locks easy to do.</li>
-  * <li>If it is not possible to wait for the destructor, the lock(s) can be unlocked
-  * by resetting to nullptr.</li></list>
+  *  1. Locking is done in the ctor, unlocking in the dtor automatically.
+  *  2. The class is exception free and can handle null pointers.
+  *  3. The guard can be assigned or copied, making overlapping locks easy to do.
+  *  4. If it is not possible to wait for the destructor, the lock(s) can be unlocked
+  * by resetting to nullptr.
 **/
 class PWX_API CLockGuard {
   public:

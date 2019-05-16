@@ -1,6 +1,6 @@
 #pragma once
 #ifndef PWX_PWXLIB_THREADS_CLOCKABLE_H_INCLUDED
-#define PWX_PWXLIB_THREADS_CLOCKABLE_H_INCLUDED 1
+#define PWX_PWXLIB_THREADS_CLOCKABLE_H_INCLUDED
 
 /** @file CLockable.h
   *
@@ -39,8 +39,8 @@
 #  include <mutex>
 #endif // PWX_USE_FLAGSPIN
 
-#include "pwx_compiler.h"
-#include "pwx_types.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_types.h"
 
 
 namespace pwx {

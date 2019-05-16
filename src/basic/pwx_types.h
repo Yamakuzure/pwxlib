@@ -41,11 +41,11 @@
 namespace pwx {
 
 
-typedef std::atomic_bool          abool_t;
-typedef std::atomic_flag          aflag_t;
-typedef std::atomic_uint_fast32_t aui32_t;
-typedef std::atomic_size_t        asize_t;
-typedef std::memory_order         mord_t;
+typedef std::atomic_bool          abool_t; //!< Shortcut to std::atomic_bool
+typedef std::atomic_flag          aflag_t; //!< Shortcut to std::atomic_flag
+typedef std::atomic_uint_fast32_t aui32_t; //!< Shortcut to std::atomic_uint_fast32_t
+typedef std::atomic_size_t        asize_t; //!< Shortcut to std::atomic_size_t
+typedef std::memory_order         mord_t;  //!< Shortcut to std::memory_order
 
 
 } // namespace pwx

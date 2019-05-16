@@ -1,6 +1,6 @@
+#ifndef PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED
+#define PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED
 #pragma once
-#ifndef PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED
-#define PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED 1
 
 /** @file pwx_compiler.h
   *
@@ -34,45 +34,78 @@
   * History and change log are maintained in pwxlib.h
 **/
 
+
 /* -----------------------------------------------------------------------
- * --- Microsoft Visual C++ is no longer supported until they include  ---
- * --- enough C++11 support to be usable again. The extended           ---
- * --- initialization lists are still missing, while gcc supports them ---
- * --- for ages now.                                                   ---
- * -----------------------------------------------------------------------
+ * --- pwxLib needs C++17 features. Sorry, no way around this!         ---
 */
+#if (!defined(__cplusplus)) || (__cplusplus < 201703L)
+   #pragma error "pwxLib needs at least C++17!" 
+#endif // __cplusplus defined and large enough?
+
+
+/** @def PWX_IS_MSC
+  * @brief 1 if Visual C++ is used, 0 otherwise
+  *  Microsoft Visual C++ is C++17 feature complete enough since:
+  *  * Product Name : Visual Studio 2017 version 15.7.1
+  *  * VC++ version : 14.14
+  *  * _MSC_VER     : 1914
+  *  * _MSC_FULL_VER: 191426428
+**/
 #if defined(_MSC_VER)
-#  pragma error "Visual C++ is not supported! Use gcc-4.5+ via cygwin or mingw instead."
-#elif !defined(__GNUC__)
-#  error "You need gcc 4.7.3 / gcc-4.8.1 or newer to compile libpwx."
-#endif
-
-
-/* ---------------------------------------------------------------
- * --- gcc prior 4.7.3 / 4.8.1 have problems with std::atomic. ---
- * ---------------------------------------------------------------
-*/
-#if (__GNUC__ < 4) \
- || ( (__GNUC__ == 4) \
-   && ( (__GNUC_MINOR__ < 7) \
-     || ((__GNUC_MINOR__ == 7) && (__GNUC_PATCHLEVEL__ < 3)) \
-     || ((__GNUC_MINOR__ == 8) && (__GNUC_PATCHLEVEL__ < 1)) ) )
-#  error "gcc versions before gcc-4.7.3 / gcc-4.8.1 are not supported. Please upgrade to a newer version."
-#elif (!defined(__cplusplus) || (__cplusplus < 201103L)) && !defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  error "C++11 features must be enabled to compile and use libpwx."
+#  if (_MSC_VER < 1914)
+#    pragma error "You need at least Visual Studio version 15.7.1 / VC++ 14.14 to build pwxLib!"
+#  endif // version check
+#  define PWX_IS_MSC 1
 #else
-# define PWX_MEMORDER_RELAXED std::memory_order_relaxed
-# define PWX_MEMORDER_CONSUME std::memory_order_consume
-# define PWX_MEMORDER_ACQUIRE std::memory_order_acquire
-# define PWX_MEMORDER_RELEASE std::memory_order_release
-# define PWX_MEMORDER_ACQ_REL std::memory_order_acq_rel
-# define PWX_MEMORDER_ACQ_CST std::memory_order_seq_cst
-#endif // Problematic gcc versions
+#  define PWX_IS_MSC 0
+#endif // _MSC_VER is defined
 
 
-/* -------------------------------------------------------------------
- * --- defines to set the right modifier for library export/import ---
- * -------------------------------------------------------------------
+/** @def PWX_IS_GCC
+  * @brief 1 if GNU gcc is used, 0 otherwise
+  *  GNU gcc is C++17 feature complete enough since gcc-7.1.0
+**/
+#if defined(__GNUC__)
+#  define PWX_IS_GCC 1
+#  if (__GNUC__ < 7)
+#    pragma error "You need at least gcc-7.1 to build pwxLib!"
+#  endif
+#else
+#  define PWX_IS_GCC 0
+#endif // __GNUC__
+
+
+/** @def PWX_IS_CLANG
+  * @brief 1 if LLVM clang is used, 0 otherwise
+  *  LLVM clang is C++17 feature complete enough since clang-5
+**/
+#if defined(__clang__)
+#  define PWX_IS_CLANG 1
+#  if (__clang_major__ < 5)
+#    pragma error "You need at least clang-5 to build pwxLib!"
+#  endif
+#else
+#  define PWX_IS_CLANG 0
+#endif // __clang__
+
+
+/* --- some shortcuts --- */
+/// @brief More distinct shortcut to std::memory_order_relaxed
+#define PWX_MEMORDER_RELAXED std::memory_order_relaxed
+/// @brief More distinct shortcut to std::memory_order_consume
+#define PWX_MEMORDER_CONSUME std::memory_order_consume
+/// @brief More distinct shortcut to std::memory_order_acquire
+#define PWX_MEMORDER_ACQUIRE std::memory_order_acquire
+/// @brief More distinct shortcut to std::memory_order_release
+#define PWX_MEMORDER_RELEASE std::memory_order_release
+/// @brief More distinct shortcut to std::memory_order_acq_rel
+#define PWX_MEMORDER_ACQ_REL std::memory_order_acq_rel
+/// @brief More distinct shortcut to std::memory_order_seq_cst
+#define PWX_MEMORDER_ACQ_CST std::memory_order_seq_cst
+
+
+/** @def PWX_API
+  * @brief defines to set the right modifier for library export/import
 */
 #ifdef PWX_EXPORTS
 #  define PWX_API __attribute__((visibility("default")))
@@ -81,11 +114,10 @@
 #endif
 
 
-/* ---------------------------------------------------------------------
- * --- Private methods of the worker classes can be inlined, unless  ---
- * --- this is a debugging build                                     ---
- * ---------------------------------------------------------------------
-*/
+/** @def PWX_PRIVATE_INLINE
+  * @brief Private methods of the worker classes can be inlined, unless
+  *        this is a debugging build
+**/
 #if defined(LIBPWX_DEBUG) || !defined(PWX_EXPORTS)
 # define PWX_PRIVATE_INLINE
 #else
@@ -99,6 +131,7 @@
  * --- global scope.                                                 ---
  * ---------------------------------------------------------------------
 */
+#ifndef PWX_NODOX
 #define PWX_DEFAULT      =default
 #define PWX_DELETE       =delete
 #define PWX_PURE         __attribute__ ((pure))
@@ -106,5 +139,6 @@
 #define PWX_USED         __attribute__ ((used))
 #define PWX_VIRTUAL_PURE =0
 #define PWX_WARNUNUSED   __attribute__ ((warn_unused_result))
+#endif // ignored by doxygen
 
-#endif // PWX_LIBPWX_CONFIG_COMPILER_H_INCLUDED
+#endif // PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED

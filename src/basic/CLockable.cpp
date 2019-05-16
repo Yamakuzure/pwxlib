@@ -526,7 +526,7 @@ bool unlock_all( const CLockable* objA, const CLockable* objB ) noexcept {
   *
   * @param[in] objA the first object to unlock
   * @param[in] objB the second object to unlock
-  * @param[in] objB the third object to unlock
+  * @param[in] objC the third object to unlock
   * @return true if all three could be unlocked, false if at least one was not locked
 **/
 bool unlock_all( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept {

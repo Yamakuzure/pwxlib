@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_PWXLIB_BASE_MACROS_H_INCLUDED
 #define PWX_PWXLIB_BASE_MACROS_H_INCLUDED 1
+#pragma once
 
 /** @file pwx_macros.h
   *

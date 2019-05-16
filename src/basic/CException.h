@@ -1,6 +1,6 @@
 #pragma once
 #ifndef PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED 1
+#define PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED
 
 /** @file CException.h
   *
@@ -43,7 +43,7 @@
 #include <exception>
 #include <string>
 
-#include "pwx_compiler.h"
+#include "basic/pwx_compiler.h"
 
 
 namespace pwx {

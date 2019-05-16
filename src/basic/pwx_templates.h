@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_GENERAL_TEMPLATES_H_INCLUDED
 #define PWX_LIBPWX_PWX_GENERAL_TEMPLATES_H_INCLUDED 1
+#pragma once
 
 /** @file pwx_templates.h
   *
@@ -35,7 +35,7 @@
 **/
 
 
-#include "pwx_compiler.h"
+#include "basic/pwx_compiler.h"
 
 
 /** @namespace pwx
@@ -124,8 +124,6 @@
   * that is thread safe.</LI></UL>
   * </OL>
 **/
-
-
 namespace pwx {
 
 
@@ -138,6 +136,7 @@ namespace pwx {
 **/
 template <bool> struct PWX_API TCompAssert;
 template <>     struct PWX_API TCompAssert<true> {};
+/// @brief Shortcut for using TCompAssert
 #define compAssert(expression) (::pwx::TCompAssert<(expression) != 0>())
 
 } // namespace pwx

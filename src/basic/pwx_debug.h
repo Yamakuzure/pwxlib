@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED
 #define PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED 1
+#pragma once
 
 /** @file pwx_debug.h
   *
@@ -104,12 +104,16 @@ void PWX_API debug_err( char const* fmt, ... );
 */
 #endif // LIBPWX_DEBUG || PWX_THREADDEBUG
 
+/** @def DEBUG_LOG
+  * @brief Print a debugging information message with automatic location information.
+  * This is a macro that gets removed in release builds.
+  * @def DEBUG_ERR
+  * @brief Print a debugging error message with automatic location information.
+  * This is a macro that gets removed in release builds.
+**/
+
 // Specialized logging macros for mutex locking/unlocking
 #ifdef PWX_THREADDEBUG
-/** @internal
-  * Almost same as DEBUG_LOG, just adds current thread id
-  * and is deactivated unless PWX_THREADDEBUG is defined.
-**/
 # define THREAD_LOG(part, fmt, ...) { \
 	char trace_info[1024]; \
 	snprintf(trace_info, 256, ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
@@ -124,14 +128,6 @@ void PWX_API debug_err( char const* fmt, ... );
 		basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
 	pwx::debug_err(trace_info, __VA_ARGS__); \
 }
-/** @internal
-  * @brief Special macro to log locking states.
-  * IMPORTANT: If @a to_lock is anything else but an object derived from pwx::CLockable,
-  * this macro will probably cause crashes or won't even compile.
-  * @param action C-String with the name of the function that will be called without parentheses.
-  * @param locker object that is calling @a action()
-  * @param to_lock pointer to a CLockable derived object that is going to be locked/used
- **/
 # define DEBUG_LOCK_STATE(action, locker, to_lock) { \
 	if (to_lock && to_lock->is_locking()) \
 		THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
@@ -191,6 +187,55 @@ if (objC && objC->is_locking()) { \
 # define LOG_TRIPLE_LOCK_GUARD(...) {}
 # define LOG_TRIPLE_UNLOCK_GUARD(...) {}
 #endif // PWX_THREADDEBUG
+
+/** @def  THREAD_LOG
+  * @brief Almost the same as DEBUG_LOG, the current thread id is added.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  THREAD_ERR
+  * @brief Almost the same as DEBUG_ERR, the current thread id is added.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  DEBUG_LOCK_STATE
+  * @brief Special macro to log locking states.
+  * IMPORTANT: If @a to_lock is anything else but an object derived from pwx::CLockable,
+  * this macro will probably cause crashes or won't even compile.
+  * @param action C-String with the name of the function that will be called without parentheses.
+  * @param locker object that is calling @a action()
+  * @param to_lock pointer to a CLockable derived object that is going to be locked/used
+  *
+  * @def  LOG_LOCK
+  * @brief Use THREAD_LOG to log when @a obj is locked.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_UNLOCK
+  * @brief Use THREAD_LOG to log when @a obj is unlocked.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_LOCK_GUARD
+  * @brief Use THREAD_LOG to log when @a obj is guarded using CLockGuard.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_UNLOCK_GUARD
+  * @brief Use THREAD_LOG to log when @a obj is no longer guarded by CLockGuard.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_DOUBLE_LOCK_GUARD
+  * @brief Use THREAD_LOG to log when @a objA and @a objB are guarded using CLockGuard.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_DOUBLE_UNLOCK_GUARD
+  * @brief Use THREAD_LOG to log when @a objA and objB are no longer guarded by CLockGuard.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_TRIPLE_LOCK_GUARD
+  * @brief Use THREAD_LOG to log when @a objA, @a objB and @a objC are guarded using CLockGuard.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+  *
+  * @def  LOG_TRIPLE_UNLOCK_GUARD
+  * @brief Use THREAD_LOG to log when @a objA, @a objB and objC are no longer guarded by CLockGuard.
+  * This macro is only active in debug mode when PWX_THREADDEBUG is defined.
+**/
 
 
 } // namespace pwx
