@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_PWXLIB_PWX_FUNCTIONS_SET_FUNC_H_INCLUDED
 #define PWX_PWXLIB_PWX_FUNCTIONS_SET_FUNC_H_INCLUDED 1
+#pragma once
 
 /** @file pwx_set_func.h
   *
@@ -38,7 +38,7 @@
 # error "Do not include pwx_set_fwd.h, include pwx/container/TSet.h!"
 #endif // Check for main file
 
-#include "TSet.h" // Make IDE-Parsers happy
+#include "container/TSet.h" // Make IDE-Parsers happy
 
 namespace pwx {
 
