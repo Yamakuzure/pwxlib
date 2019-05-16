@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_TYPES_TDOUBLEELEMENT_H_INCLUDED
 #define PWX_LIBPWX_TYPES_TDOUBLEELEMENT_H_INCLUDED 1
+#pragma once
 
 /** @file TDoubleElement.h
   *
@@ -35,8 +35,8 @@
 **/
 
 
-#include "VElement.h"
-#include "MathHelpers.h"
+#include "container/VElement.h"
+#include "math_helpers/MathHelpers.h"
 
 
 namespace pwx {
@@ -322,7 +322,7 @@ struct PWX_API TDoubleElement : public VElement {
       * there is something seriously wrong.
       *
       * @param[in] new_next target where the next pointer should point at.
-      * @param[in] new_store optional pointer to the CThreadElementStore that will handle this element
+      * @param[in] store optional pointer to the CThreadElementStore that will handle this element
     **/
     void insertBefore( elem_t* new_next, store_t* store ) {
         if ( !new_next || ( new_next == this ) ) {

@@ -1,9 +1,8 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TQUEUE_H_INCLUDED 1
+#pragma once
 
-#include "TDoubleList.h"
-/** @file TQueue.h PQueue <PQueue>
+/** @file TQueue.h
   *
   * @brief Declaration of a basic template for queues based on doubly linked lists
   *
@@ -36,15 +35,15 @@
 **/
 
 
-#include "CLockable.h"
-#include "pwx_macros.h"
-#include "TDoubleList.h"
+#include "basic/CLockable.h"
+#include "basic/pwx_macros.h"
+#include "container/TDoubleList.h"
 
 
 namespace pwx {
 
 
-/** @class TQueue
+/** @class TQueue PQueue <PQueue>
   *
   * @brief Template to build queues of variable types
   *

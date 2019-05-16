@@ -30,8 +30,8 @@
 **/
 
 
-#include "CHashBuilder.h"
-#include "CRandom.h"
+#include "container/CHashBuilder.h"
+#include "random/CRandom.h"
 
 
 namespace pwx {
@@ -41,22 +41,13 @@ namespace pwx {
 extern CRandom RNG; // [R]andom [N]-Value [G]enerator
 
 
-/** @brief get the current key length
-  *
-  * @return the currently set key length
-  */
 uint32_t CHashBuilder::getKeyLen() const noexcept {
     return keyLen;
 }
 
-/** @brief seta new key length
-  *
-  * @param[in] keyLen_ the key length to use in the future
-  */
 void CHashBuilder::setKeyLen( uint32_t keyLen_ ) noexcept {
     keyLen = keyLen_;
 }
-
 
 uint32_t CHashBuilder::hash_rng( const int16_t* key )      const noexcept { return RNG.hash( *key ); }
 uint32_t CHashBuilder::hash_rng( const uint16_t* key )     const noexcept { return RNG.hash( *key ); }

@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_CONTAINER_TSINGLELIST_H_INCLUDED
 #define PWX_LIBPWX_CONTAINER_TSINGLELIST_H_INCLUDED 1
+#pragma once
 
 /** @file TSingleList.h
   *
@@ -35,11 +35,12 @@
 **/
 
 
-#include "CThreadElementStore.h"
-#include "TSingleElement.h"
-#include "VContainer.h"
+#include "container/CThreadElementStore.h"
+#include "container/TSingleElement.h"
+#include "container/VContainer.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -218,7 +219,7 @@ class PWX_API TSingleList : public VContainer {
     }
 
 
-    /// @brief return true if this container is empty
+    /// @return true if this container is empty
     virtual bool empty() const noexcept {
         return !eCount.load( memOrdLoad );
     }
@@ -442,7 +443,7 @@ class PWX_API TSingleList : public VContainer {
       * If the new element can not be created, a pwx::CException with
       * the name "ElementCreationFailed" is thrown.
       *
-      * @param[in] data the pointer that is to be added.
+      * @param[in] src the element that is to be copied.
       * @return the number of elements in this list after the insertion
     **/
     virtual uint32_t insert_sorted ( const elem_t& src ) {
@@ -708,7 +709,7 @@ class PWX_API TSingleList : public VContainer {
     }
 
 
-    /// @brief return the number of stored elements
+    /// @return the number of stored elements
     uint32_t size() const noexcept {
         return this->eCount.load( memOrdLoad );
     }
@@ -865,6 +866,7 @@ class PWX_API TSingleList : public VContainer {
      * ===============================================
     */
 
+    /// @brief function pointer to a user provided destroy method
     void ( *destroy ) ( data_t* data_ );
 
     // accessors for curr/head/tail
@@ -1265,7 +1267,7 @@ class PWX_API TSingleList : public VContainer {
      * ===============================================
     */
 
-    store_t currStore;
+    store_t currStore;         //!< Storage for the thread id bound curr pointers
     using base_t::memOrdLoad;
     using base_t::memOrdStore;
 

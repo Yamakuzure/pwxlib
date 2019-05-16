@@ -34,7 +34,7 @@
 **/
 
 
-#include "VTHashBase.h"
+#include "container/VTHashBase.h"
 
 
 namespace pwx {
@@ -148,7 +148,7 @@ class PWX_API TChainHash : public VTHashBase<key_t, data_t, elem_t> {
       * method with explicit key length.
       *
       * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-      * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+      * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
       * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
     **/
     TChainHash(	void ( *destroy_ ) ( data_t* data ),
@@ -164,7 +164,7 @@ class PWX_API TChainHash : public VTHashBase<key_t, data_t, elem_t> {
       * method without explicit key length.
       *
       * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-      * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+      * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
     **/
     TChainHash(	void ( *destroy_ ) ( data_t* data ),
                 uint32_t ( *hash_ ) ( const key_t* key ) ) noexcept :

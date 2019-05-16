@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED
 #define PWX_LIBPWX_BASE_VCONTAINER_H_INCLUDED 1
+#pragma once
 
 /** @file VContainer.h
   *
@@ -35,8 +35,8 @@
 **/
 
 
-#include "CLockable.h"
-#include "pwx_macros.h"
+#include "basic/CLockable.h"
+#include "basic/pwx_macros.h"
 
 
 namespace pwx {
@@ -61,8 +61,8 @@ class PWX_API VContainer : public CLockable {
      * ===============================================
     */
 
-    typedef CLockable                 base_t;
-    typedef VContainer                list_t;
+    typedef CLockable  base_t; //!< Base type of VContainer
+    typedef VContainer list_t; //!< List type of VContainer
 
 
     /* ===============================================
@@ -80,11 +80,11 @@ class PWX_API VContainer : public CLockable {
      * ===============================================
     */
 
-    virtual void     clear()                 noexcept PWX_VIRTUAL_PURE;
-    virtual void     disable_thread_safety() noexcept PWX_VIRTUAL_PURE;
-    virtual bool     empty()           const noexcept PWX_VIRTUAL_PURE;
-    virtual void     enable_thread_safety()  noexcept PWX_VIRTUAL_PURE;
-    virtual uint32_t size()            const noexcept PWX_VIRTUAL_PURE;
+    virtual void     clear()                 noexcept PWX_VIRTUAL_PURE; //!< Remove all elements
+    virtual void     disable_thread_safety() noexcept PWX_VIRTUAL_PURE; //!< Turn off thread safety measures
+    virtual bool     empty()           const noexcept PWX_VIRTUAL_PURE; //!< Return true if empty
+    virtual void     enable_thread_safety()  noexcept PWX_VIRTUAL_PURE; //!< Turn on thread safety measures
+    virtual uint32_t size()            const noexcept PWX_VIRTUAL_PURE; //!< Return number of elements
 
 
   protected:

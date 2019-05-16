@@ -36,9 +36,9 @@
 
 #include <cstring>
 
-#include "CException.h"
-#include "pwx_macros.h"
-#include "pwx_templates.h"
+#include "basic/CException.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_templates.h"
 
 
 namespace pwx {
@@ -118,8 +118,17 @@ class PWX_API CHashBuilder {
      * ===============================================
     */
 
-    uint32_t getKeyLen()           const noexcept;
-    void     setKeyLen( uint32_t keyLen_ ) noexcept;
+    /** @brief get the current key length
+      *
+      * @return the currently set key length
+      */
+    uint32_t getKeyLen() const noexcept;
+
+    /** @brief set a new key length
+      *
+      * @param[in] keyLen_ the key length to use in the future
+      */
+    void setKeyLen( uint32_t keyLen_ ) noexcept;
 
 
     /* ===============================================
@@ -177,7 +186,7 @@ class PWX_API CHashBuilder {
       * has not provided a hashing function or because operator()
       * is faulty.
       *
-      * @param[in] pointer to the key to hash
+      * @param[in] key pointer to the key to hash
       * @return the hash modded to the hash size
     **/
     template<typename key_t>

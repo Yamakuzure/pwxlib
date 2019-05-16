@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_TYPES_TVARDELETER_H_INCLUDED
 #define PWX_LIBPWX_TYPES_TVARDELETER_H_INCLUDED 1
+#pragma once
 
 /** @file TVarDeleter.h
   *

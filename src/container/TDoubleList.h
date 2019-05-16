@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_CONTAINER_TDOUBLELIST_H_INCLUDED
 #define PWX_LIBPWX_CONTAINER_TDOUBLELIST_H_INCLUDED 1
+#pragma once
 
 /** @file TDoubleList.h
   *
@@ -35,8 +35,8 @@
 **/
 
 
-#include "TSingleList.h"
-#include "TDoubleElement.h"
+#include "container/TSingleList.h"
+#include "container/TDoubleElement.h"
 
 
 namespace pwx {

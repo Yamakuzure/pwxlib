@@ -36,10 +36,10 @@
 
 #include <cstring>
 
-#include "CException.h"
-#include "pwx_debug.h"
-#include "MathHelpers.h"
-#include "VElement.h"
+#include "basic/CException.h"
+#include "basic/pwx_debug.h"
+#include "container/VElement.h"
+#include "math_helpers/MathHelpers.h"
 
 
 namespace pwx {
@@ -490,7 +490,7 @@ class PWX_API THashElement : public VElement {
 
 
     /** @brief return true if this element has the key @a key
-      * @param[in] key const reference of the key to check
+      * @param[in] key_ const reference of the key to check
       * @return true if this element has the same key
     **/
     bool operator==( const key_t& key_ ) const noexcept PWX_WARNUNUSED {
@@ -512,7 +512,7 @@ class PWX_API THashElement : public VElement {
 
 
     /** @brief return true if this element has a differnet key than @a key
-      * @param[in] key const reference of the key to check
+      * @param[in] key_ const reference of the key to check
       * @return true if this element a different key
     **/
     bool operator!=( const key_t& key_ ) const noexcept PWX_WARNUNUSED {
@@ -527,10 +527,10 @@ class PWX_API THashElement : public VElement {
      * ===============================================
     */
 
-    key_t      key;                             //!< The key that identifies this element
-    share_t    data; 							//!< The data this list element points to, wrapped in a shared_ptr.
+    key_t      key;                               //!< The key that identifies this element
+    share_t    data; 							  //!< The data this list element points to, wrapped in a shared_ptr.
     neighbor_t next = ATOMIC_VAR_INIT( nullptr ); //!< The next element in the list or nullptr if this is the tail.
-    uint32_t   hops = 0; // to track hops when inserting an element
+    uint32_t   hops = 0;                          //!< Counts hops when inserting an element
 
 
   protected:

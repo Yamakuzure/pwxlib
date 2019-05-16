@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TSINGLERING_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TSINGLERING_H_INCLUDED 1
+#pragma once
 
 /** @file TSingleRing.h
   *
@@ -35,7 +35,7 @@
 **/
 
 
-#include "TSingleList.h"
+#include "container/TSingleList.h"
 
 
 namespace pwx {

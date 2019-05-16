@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TDOUBLERING_H_INCLUDED 1
+#pragma once
 
 /** @file TDoubleRing.h
   *
@@ -35,7 +35,7 @@
 **/
 
 
-#include "TDoubleList.h"
+#include "container/TDoubleList.h"
 
 
 namespace pwx {

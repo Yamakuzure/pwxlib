@@ -44,9 +44,9 @@
 #include <thread>
 
 
-#include "CHashBuilder.h"
-#include "THashElement.h"
-#include "VContainer.h"
+#include "container/CHashBuilder.h"
+#include "container/THashElement.h"
+#include "container/VContainer.h"
 
 
 namespace pwx {
@@ -255,7 +255,7 @@ class VTHashBase : public VContainer {
       * method with explicit key length.
       *
       * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-      * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+      * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
       * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
       * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
       * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
@@ -276,7 +276,7 @@ class VTHashBase : public VContainer {
       * method without explicit key length.
       *
       * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-      * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+      * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
       * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
       * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
     **/
@@ -1175,8 +1175,13 @@ class VTHashBase : public VContainer {
      * freezing while waiting for themselves to end!
      */
 
-    void     ( *destroy )      ( data_t* data )                     = nullptr;
-    uint32_t ( *hash_user )    ( const key_t*  key )                = nullptr;
+    /// @brief function pointer to an alternative destroy function to delete @a data
+    void     ( *destroy )      ( data_t* data )                       = nullptr;
+
+    /// @brief function pointer to an alternative function to hash a single @a key
+    uint32_t ( *hash_user )    ( const key_t*  key )                  = nullptr;
+
+    /// @brief function pointer to an alternative function to hash a single @a key with given @a keyLen
     uint32_t ( *hash_limited ) ( const key_t*  key, uint32_t keyLen ) = nullptr;
 
 

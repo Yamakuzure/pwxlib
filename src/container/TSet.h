@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 #define PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED 1
+#pragma once
 
 /** @file TSet.h
   *
@@ -35,11 +35,11 @@
 **/
 
 
-#include "CLockable.h"
-#include "pwx_macros.h"
-#include "pwx_set_fwd.h"
-#include "TDoubleList.h"
-#include "TChainHash.h"
+#include "basic/CLockable.h"
+#include "basic/pwx_macros.h"
+#include "container/TDoubleList.h"
+#include "container/TChainHash.h"
+#include "functions/pwx_set_fwd.h"
 
 
 namespace pwx {
@@ -962,6 +962,6 @@ TSet<data_t>::~TSet() noexcept
 
 } // namespace pwx
 
-#include "pwx_set_func.h"
+#include "functions/pwx_set_func.h"
 #endif // PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 

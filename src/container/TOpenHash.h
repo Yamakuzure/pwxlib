@@ -1,7 +1,7 @@
 #ifndef PWX_LIBPWX_PWX_CONTAINER_TOPENHASH_H_INCLUDED
 #define PWX_LIBPWX_PWX_CONTAINER_TOPENHASH_H_INCLUDED
 
-/** @file TOpenHash.h POpenHash <POpenHash>
+/** @file TOpenHash.h
   *
   * @brief Declaration of a basic template for open hash containers
   *
@@ -35,15 +35,15 @@
 
 
 #if defined(LIBPWX_DEBUG)
-#  include "StreamHelpers.h"
+#  include "stream_helpers/StreamHelpers.h"
 #endif // LIBPWX_DEBUG
-#include "VTHashBase.h"
+#include "container/VTHashBase.h"
 
 
 namespace pwx {
 
 
-/** @class TOpenHash
+/** @class TOpenHash POpenHash <POpenHash>
   *
   * @brief Open hash container for variable types
   *
@@ -151,7 +151,7 @@ class PWX_API TOpenHash : public VTHashBase<key_t, data_t, elem_t> {
       * method with explicit key length.
       *
       * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-      * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+      * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
       * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
     **/
     TOpenHash(	void ( *destroy_ ) ( data_t* data ),
@@ -167,7 +167,7 @@ class PWX_API TOpenHash : public VTHashBase<key_t, data_t, elem_t> {
       * method without explicit key length.
       *
       * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
-      * @param[in] hash__ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
+      * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
     **/
     TOpenHash(	void ( *destroy_ ) ( data_t* data ),
                 uint32_t ( *hash_ ) ( const key_t* key ) ) noexcept :

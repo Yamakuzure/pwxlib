@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED
 #define PWX_LIBPWX_TYPES_TSINGLEELEMENT_H_INCLUDED 1
+#pragma once
 
 /** @file TSingleElement.h
   *
@@ -35,10 +35,10 @@
 **/
 
 
-#include "CException.h"
-#include "pwx_debug.h"
-#include "MathHelpers.h"
-#include "VElement.h"
+#include "basic/CException.h"
+#include "basic/pwx_debug.h"
+#include "container/VElement.h"
+#include "math_helpers/MathHelpers.h"
 
 
 namespace pwx {

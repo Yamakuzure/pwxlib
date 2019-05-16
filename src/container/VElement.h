@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED
 #define PWX_LIBPWX_BASE_VELEMENT_H_INCLUDED 1
+#pragma once
 
 /** @file VElement.h
   *
@@ -35,10 +35,10 @@
 **/
 
 
-#include "CLockable.h"
-#include "CLockGuard.h"
-#include "pwx_macros.h"
-#include "TVarDeleter.h"
+#include "basic/CLockable.h"
+#include "basic/CLockGuard.h"
+#include "basic/pwx_macros.h"
+#include "container/TVarDeleter.h"
 
 
 namespace pwx {
@@ -70,9 +70,9 @@ class PWX_API VElement : public CLockable {
      * ===============================================
     */
 
-    typedef CLockable                     base_t;
-    typedef VElement                      elem_t;
-    typedef private_::CThreadElementStore store_t;
+    typedef CLockable                     base_t;  //!< Base type of VElement
+    typedef VElement                      elem_t;  //!< Element type, which is VElement itself
+    typedef private_::CThreadElementStore store_t; //!< Storage type for thread ids
 
 
     /* ===============================================

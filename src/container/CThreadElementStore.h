@@ -34,7 +34,7 @@
 **/
 
 
-#include "TOpenHash.h"
+#include "container/TOpenHash.h"
 
 
 namespace pwx {
@@ -42,13 +42,13 @@ namespace pwx {
 namespace private_ {
 
 
-/** @internal
-  * @class CThreadElementStore
+/** @class CThreadElementStore
   * @brief Hash based store for thread individual element handling
   *
   * This class is used by all list based containers to store
   * the currently handled element for each thread.
   *
+  * @internal
   * For this to work there is an important rule:
   * Any container methods that removes an element from the container
   * using this storage <B>must</B> report this to their element
@@ -77,11 +77,11 @@ class CThreadElementStore : public CLockable {
      * ===============================================
     */
 
-    typedef CLockable                    base_t;
-    typedef CThreadElementStore          store_t;
-    typedef VElement                     curr_t;
-    typedef TOpenHash<size_t, curr_t>    hash_t;
-    typedef THashElement<size_t, curr_t> elem_t;
+    typedef CLockable                    base_t;  //!< Base type of CThreadElementStore
+    typedef CThreadElementStore          store_t; //!< Storage type, thus CThreadElementStore itself
+    typedef VElement                     curr_t;  //!< Type of the 'curr' element to handle
+    typedef TOpenHash<size_t, curr_t>    hash_t;  //!< Hash container type with size_t and curr_t
+    typedef THashElement<size_t, curr_t> elem_t;  //!< Hash element type with size_t and curr_t
 
 
     /* ===============================================
