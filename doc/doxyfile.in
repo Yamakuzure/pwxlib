@@ -28,7 +28,7 @@ INLINE_SIMPLE_STRUCTS  = NO
 TYPEDEF_HIDES_STRUCT   = YES
 EXTRACT_LOCAL_CLASSES  = NO
 SORT_MEMBERS_CTORS_1ST = YES
-ITERNAL_DOCS           = NO
+INTERNAL_DOCS          = NO
 LAYOUT_FILE            = @DOX_LAYOUT@
 INPUT                  = @PACKAGE_SOURCES@
 FILE_PATTERNS          = *.cpp *.h
@@ -54,18 +54,38 @@ GENERATE_AUTOGEN_DEF   = NO
 GENERATE_PERLMOD       = NO
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
-PREDEFINED             = PWX_INTERNAL= \
+PREDEFINED             = PWX_API= \
+                         PWX_INTERNAL= \
                          PWX_VISIBLE= \
-                         PWX_WARNUNUSED= \
                          _GLIBCXX_TR1_TYPE_TRAITS=1 \
                          _GLIBCXX_CMATH=1 \
                          PWX_INLINE=inline \
-                         PWX_THROW()= \
-                         PWX_TRY()= \
-                         PWX_CATCH_AND_FORGET()= \
+                         PWX_THROW= \
+                         PWX_TRY= \
+                         PWX_CATCH_AND_FORGET= \
                          PWX_THROW_FURTHER= \
-                         PWX_UNUSED
-EXPAND_AS_DEFINED      = PWX_INLINE \
+                         PWX_DEFAULT==default \ 
+                         PWX_DELETE==delete  \
+                         PWX_PURE= \
+                         PWX_UNUSED= \
+                         PWX_USED= \
+                         PWX_VIRTUAL_PURE==0 \
+                         PWX_WARNUNUSED= \
+                         PWX_NODOX=1
+EXPAND_AS_DEFINED      = PWX_API \
+                         PWX_INTERNAL \
+                         PWX_VISIBLE \
+                         PWX_INLINEinline \
+                         PWX_THROW \
+                         PWX_TRY \
+                         PWX_CATCH_AND_FORGET \
+                         PWX_THROW_FURTHER \
+                         PWX_DEFAULT \ 
+                         PWX_DELETE  \
+                         PWX_PURE \
+                         PWX_UNUSED \
+                         PWX_USED \
+                         PWX_VIRTUAL_PURE \
                          PWX_WARNUNUSED
 HAVE_DOT               = YES
 UML_LOOK               = YES
@@ -75,3 +95,4 @@ CALLER_GRAPH           = YES
 INTERACTIVE_SVG        = YES
 DOT_TRANSPARENT        = YES
 DOT_MULTI_TARGETS      = YES
+INPUT_ENCODING         = ISO-8859-15
