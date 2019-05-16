@@ -30,7 +30,7 @@
 **/
 
 
-#include "CRandomTRandom.h"
+#include "random/CRandomTRandom.h"
 
 
 /// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !

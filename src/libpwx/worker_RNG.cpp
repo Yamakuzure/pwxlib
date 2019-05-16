@@ -30,7 +30,7 @@
 **/
 
 
-#include "worker_RNG.h"
+#include "libpwx/worker_RNG.h"
 
 
 /* --- Instantiations of global workers --- */

@@ -31,7 +31,7 @@
 
 #include <cstring>
 
-#include "CRandomTHash.h"
+#include "random/CRandomTHash.h"
 
 
 namespace pwx {

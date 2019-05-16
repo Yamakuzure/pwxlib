@@ -32,8 +32,8 @@
 
 #include <cstring>
 
-#include "CException.h"
-#include "pwx_macros.h"
+#include "basic/CException.h"
+#include "basic/pwx_macros.h"
 
 
 namespace pwx {

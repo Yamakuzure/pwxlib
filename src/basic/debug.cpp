@@ -34,9 +34,9 @@
 #  include <cstdarg>
 #  include <thread>
 
-#  include "pwx_compiler.h"
+#  include "basic/pwx_compiler.h"
 #endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-#include "pwx_debug.h"
+#include "basic/pwx_debug.h"
 
 
 namespace pwx {

@@ -32,9 +32,9 @@
 
 #include <thread>
 
-#include "CLockable.h"
-#include "pwx_debug.h"
-#include "pwx_macros.h"
+#include "basic/CLockable.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
 
 
 namespace pwx {

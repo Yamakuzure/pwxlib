@@ -30,7 +30,7 @@
 **/
 
 
-#include "CWaveColor.h"
+#include "wavecolor/CWaveColor.h"
 
 
 namespace pwx {

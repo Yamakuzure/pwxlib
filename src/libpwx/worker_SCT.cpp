@@ -30,7 +30,7 @@
 **/
 
 
-#include "worker_SCT.h"
+#include "libpwx/worker_SCT.h"
 
 
 #if !defined(PWX_INITIAL_SCT_PRECISION)
