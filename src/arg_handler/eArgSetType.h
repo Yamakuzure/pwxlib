@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_EARGSETTYPE_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_EARGSETTYPE_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_EARGSETTYPE_H_INCLUDED 1
+#pragma once
 
 /** @file eArgSetType.h
   *
@@ -34,6 +35,7 @@
 **/
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -45,9 +47,9 @@ namespace pwx {
   * set value on each call to process().
 **/
 enum eArgSetType {
-    STT_ERROR     = 0, //!< Receiving more than one parameter is an error.
-    STT_OVERWRITE = 1, //!< Overwrite the set value (default)
-    STT_IGNORE    = 2  //!< Only set the value once, silently ignore all further parameters.
+	STT_ERROR     = 0, //!< Receiving more than one parameter is an error.
+	STT_OVERWRITE = 1, //!< Overwrite the set value (default)
+	STT_IGNORE    = 2  //!< Only set the value once, silently ignore all further parameters.
 };
 
 

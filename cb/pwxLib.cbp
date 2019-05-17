@@ -34,6 +34,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../Makefile" />
+		<Unit filename="../TODO.md" />
 		<Unit filename="../build/test/test-libpwx-sym.cpp" />
 		<Unit filename="../configure" />
 		<Unit filename="../doc/doxyfile.in" />
@@ -96,7 +97,9 @@
 		<Unit filename="../src/basic/pwx_debug.h" />
 		<Unit filename="../src/basic/pwx_macros.h" />
 		<Unit filename="../src/basic/pwx_templates.h" />
+		<Unit filename="../src/basic/pwx_trace_info.h" />
 		<Unit filename="../src/basic/pwx_types.h" />
+		<Unit filename="../src/basic/trace_info.cpp" />
 		<Unit filename="../src/container/CHashBuilder.cpp" />
 		<Unit filename="../src/container/CHashBuilder.h" />
 		<Unit filename="../src/container/CThreadElementStore.cpp" />
@@ -197,7 +200,7 @@
 			<envvars />
 			<lib_finder disable_auto="1" />
 			<debugger />
-			<editor_config active="1" use_tabs="0" tab_indents="1" tab_width="4" indent="4" eol_mode="2" />
+			<editor_config active="1" use_tabs="0" tab_indents="1" tab_width="8" indent="8" eol_mode="2" />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

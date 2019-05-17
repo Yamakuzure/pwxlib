@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_EARGTARGETTYPE_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_EARGTARGETTYPE_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_EARGTARGETTYPE_H_INCLUDED 1
+#pragma once
 
 /** @file eArgTargetType.h
   *
@@ -34,6 +35,7 @@
 **/
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -45,14 +47,14 @@ namespace pwx {
   * target when parsing command line arguments.
 **/
 enum eArgTargetType {
-    ATT_FALSE = 0, //!< Set target to false (or (T)0 if not bool)
-    ATT_TRUE  = 1, //!< Set target to true  (or (T)1 if not bool)
-    ATT_ADD   = 2, //!< Add parameter to target
-    ATT_INC   = 3, //!< Increase target by 1
-    ATT_SUB   = 4, //!< Substract parameter from target
-    ATT_DEC   = 5, //!< Decrease target by 1
-    ATT_SET   = 6, //!< Set target to the value of the parameter
-    ATT_CB    = 7  //!< The target is a callback function of the type void (*cb)(char const*, T*)
+	ATT_FALSE = 0, //!< Set target to false (or (T)0 if not bool)
+	ATT_TRUE  = 1, //!< Set target to true  (or (T)1 if not bool)
+	ATT_ADD   = 2, //!< Add parameter to target
+	ATT_INC   = 3, //!< Increase target by 1
+	ATT_SUB   = 4, //!< Substract parameter from target
+	ATT_DEC   = 5, //!< Decrease target by 1
+	ATT_SET   = 6, //!< Set target to the value of the parameter
+	ATT_CB    = 7  //!< The target is a callback function of the type void (*cb)(char const*, T*)
 };
 
 

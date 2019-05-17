@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_SARGERROR_H_INCLDUED
-#define PWX_LIBPWX_PWX_TYPES_SARGERROR_H_INCLDUED
+#define PWX_LIBPWX_PWX_TYPES_SARGERROR_H_INCLDUED 1
+#pragma once
 
 /** @file sArgError.h
   *
@@ -38,6 +39,7 @@
 #include "arg_handler/eArgErrorNumber.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -45,27 +47,45 @@ namespace pwx {
   * @brief tiny struct to hold an error number and text together.
 **/
 struct sArgError {
-    int32_t     arg_errno; //!< number of the error, taken from eArgErrorNumber
-    char const* arg_error; //!< String with the error text
+	int32_t     arg_errno; //!< number of the error, taken from eArgErrorNumber
+	char const* arg_error; //!< String with the error text
 
-    // Note: The prefix arg_ is needed, or the preprocessor m
-    //       substitute "errno" with "(*__errno_location ())"
+	// Note: The prefix arg_ is needed, or the preprocessor might
+	//       substitute "errno" with "(*__errno_location ())"
 
-    explicit sArgError( eArgErrorNumber errno_, char const* error_ ) noexcept;
-    ~sArgError() noexcept;
+	/** @brief default ctor
+	  *
+	  * @param[in] errno_ error number of the error
+	  * @param[in] error_ text describing the error
+	  */
+	explicit sArgError( eArgErrorNumber errno_, char const* error_ ) noexcept;
 
-    // No empty ctor, no copying
-    sArgError() PWX_DELETE;
-    sArgError( const sArgError& ) PWX_DELETE;
-    sArgError& operator=( const sArgError& ) PWX_DELETE;
+
+	/// @brief default dtor
+	~sArgError() noexcept;
+
+	// No empty ctor, no copying
+	sArgError()                               PWX_DELETE;
+	sArgError( sArgError const& )             PWX_DELETE;
+	sArgError( sArgError const&& )            PWX_DELETE;
+	sArgError& operator=( sArgError const&  ) PWX_DELETE;
+	sArgError& operator=( sArgError const&& ) PWX_DELETE;
 
 };
 
+
 // Operators needed for pwx container storage:
+
+/// @brief return true if both errors have the same errno
 bool operator==( const sArgError& lhs, const sArgError& rhs ) noexcept;
+
+
+/// @brief return true if lhs.errno is greater than rhs.errno
 bool operator>( const sArgError& lhs, const sArgError& rhs ) noexcept;
 
+
 } // namespace pwx
+
 
 #endif // PWX_LIBPWX_PWX_TYPES_SARGERROR_H_INCLDUED
 

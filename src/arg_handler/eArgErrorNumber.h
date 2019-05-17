@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_EARGERRORNUMBER_H_INCLUDED 1
+#pragma once
 
 /** @file eArgErrorNumber.h
   *
@@ -34,6 +35,7 @@
 **/
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -41,12 +43,12 @@ namespace pwx {
   * @brief defines valid error numbers for argument parsing
 **/
 enum eArgErrorNumber {
-    AEN_OK                  = 0,          //!< Everything in order
-    AEN_ARGUMENT_UNKNOWN    = 0x00000001, //!< The found argument is not known
-    AEN_PARAM_TYPE_MISMATCH = 0x00000002, //!< The type of the parameter doesn't match the target
-    AEN_PARAMETER_MISSING   = 0x00000004, //!< An argument that needs a parameter got none to process
-    AEN_PROCESSING_ERROR    = 0x00000008, //!< Set when target->process() threw an exception.
-    AEN_MULTIPLE_SET_PARAM  = 0x00000010  //!< More than one parameter provided for a STT_ERROR set target
+	AEN_OK                  = 0,          //!< Everything in order
+	AEN_ARGUMENT_UNKNOWN    = 0x00000001, //!< The found argument is not known
+	AEN_PARAM_TYPE_MISMATCH = 0x00000002, //!< The type of the parameter doesn't match the target
+	AEN_PARAMETER_MISSING   = 0x00000004, //!< An argument that needs a parameter got none to process
+	AEN_PROCESSING_ERROR    = 0x00000008, //!< Set when target->process() threw an exception.
+	AEN_MULTIPLE_SET_PARAM  = 0x00000010  //!< More than one parameter provided for a STT_ERROR set target
 };
 
 

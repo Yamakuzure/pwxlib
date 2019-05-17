@@ -34,46 +34,44 @@
 #include "stream_helpers/StreamHelpers.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
 // === Specialized processing handlers ===
 
 
-/// @brief Generic non-specialized handler
 template<>
 eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
-    eArgErrorNumber argErrno = AEN_OK;
+	eArgErrorNumber argErrno = AEN_OK;
 
-    switch( this->type ) {
-        case ATT_FALSE:
-        case ATT_TRUE:
-        case ATT_INC:
-        case ATT_DEC:
-        case ATT_ADD:
-        case ATT_SUB:
-            PWX_THROW( "IllegalTargetType",
-                       "std::string is only supported with ATT_CB and ATT_SET",
-                       "" )
-            break;
-        case ATT_SET:
-            // This needs handling for all three set types:
-            if ( ( STT_OVERWRITE == this->setType )
-                    || ( !this->gotParameter ) ) {
-                target->assign( param );
-                this->gotParameter = true;
-            } else if ( STT_ERROR == this->setType )
-                argErrno = AEN_MULTIPLE_SET_PARAM;
-            // Last possibility is STT_IGNORE, which is, well, ignored. ;)
-            break;
-        case ATT_CB:
-            PWX_THROW( "UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "" )
-            break;
-        default:
-            PWX_THROW( "UnhandledTargetType", "The given target type is not implemented, yet!", "" )
-    }
+	switch( this->type ) {
+		case ATT_FALSE:
+		case ATT_TRUE:
+		case ATT_INC:
+		case ATT_DEC:
+		case ATT_ADD:
+		case ATT_SUB:
+			PWX_THROW( "IllegalTargetType", "std::string is only supported with ATT_CB and ATT_SET", "" )
+			break;
+		case ATT_SET:
+			// This needs handling for all three set types:
+			if ( ( STT_OVERWRITE == this->setType )
+			                || ( !this->gotParameter ) ) {
+				target->assign( param );
+				this->gotParameter = true;
+			} else if ( STT_ERROR == this->setType )
+				argErrno = AEN_MULTIPLE_SET_PARAM;
+			// Last possibility is STT_IGNORE, which is, well, ignored. ;)
+			break;
+		case ATT_CB:
+			PWX_THROW( "UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "" )
+			break;
+		default:
+			PWX_THROW( "UnhandledTargetType", "The given target type is not implemented, yet!", "" )
+	}
 
-    return argErrno;
+	return argErrno;
 }
 
 
@@ -83,77 +81,77 @@ eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
 // --- bool ---
 template<>
 void TArgTarget<bool>::par_to_val( bool*    tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_bool  ( param );
+	if ( tgt )
+		*tgt = to_bool  ( param );
 }
 
 
 // --- integers ---
 template<>
 void TArgTarget<int8_t>::par_to_val( int8_t*  tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_int8  ( param );
+	if ( tgt )
+		*tgt = to_int8  ( param );
 }
 
 template<>
 void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_int16 ( param );
+	if ( tgt )
+		*tgt = to_int16 ( param );
 }
 
 template<>
 void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_int32 ( param );
+	if ( tgt )
+		*tgt = to_int32 ( param );
 }
 
 template<>
 void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_int64 ( param );
+	if ( tgt )
+		*tgt = to_int64 ( param );
 }
 
 template<>
 void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_uint8 ( param );
+	if ( tgt )
+		*tgt = to_uint8 ( param );
 }
 
 template<>
 void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_uint16( param );
+	if ( tgt )
+		*tgt = to_uint16( param );
 }
 
 template<>
 void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_uint32( param );
+	if ( tgt )
+		*tgt = to_uint32( param );
 }
 
 template<>
 void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_uint64( param );
+	if ( tgt )
+		*tgt = to_uint64( param );
 }
 
 // --- floats ---
 template<>
 void TArgTarget<float>::par_to_val( float*      tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_float ( param );
+	if ( tgt )
+		*tgt = to_float ( param );
 }
 
 template<>
 void TArgTarget<double>::par_to_val( double*     tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_double( param );
+	if ( tgt )
+		*tgt = to_double( param );
 }
 
 template<>
 void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept {
-    if ( tgt )
-        *tgt = to_long_double( param );
+	if ( tgt )
+		*tgt = to_long_double( param );
 }
 
 

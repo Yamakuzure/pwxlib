@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_CARGCALLBACK_H_INCLUDED 1
+#pragma once
 
 /** @file CArgCallback.h
   *
@@ -37,6 +38,7 @@
 #include "arg_handler/VArgTargetBase.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -47,19 +49,43 @@ namespace pwx {
   * is to be used, use TArgTarget instead.
 **/
 class CArgCallback : public VArgTargetBase {
-  public:
-    explicit CArgCallback( char const* arg_short, char const* arg_long,
-                           void ( *arg_cb )( char const*, char const* ),
-                           char const* arg_desc, char const* param_name ) noexcept;
 
-    virtual ~CArgCallback() noexcept;
+public:
 
-    virtual eArgErrorNumber process( char const* param );
+	/** brief default ctor
+	  *
+	  * No parameter check, the caller must ensure consistent
+	  * values that make the instance usable.
+	  *
+	  * @see pwx::CArgHandler::addArg()
+	  *
+	  * @param[in] arg_short Short argument like "-a" or "x".
+	  * @param[in] arg_long Long argument like "--foo" or "-bar".
+	  * @param[out] arg_cb Pointer to the callback function to use.
+	  * @param[in] arg_desc Help text for this argument.
+	  * @param[in] param_name Name shown in <> int the help text.
+	**/
+	explicit CArgCallback( char const* arg_short, char const* arg_long,
+	                       void ( *arg_cb )( char const*, char const* ),
+	                       char const* arg_desc, char const* param_name ) noexcept;
 
-  private:
+	/// @brief The destructor has nothing to do.
+	virtual ~CArgCallback() noexcept;
 
-    // callback
-    void ( *cb )( char const*, char const* );
+	/** @brief process an argument parameter
+	  *
+	  * Simple method that calls the stored callback function with @a param.
+	  *
+	  * If no callback function was installed using the constructor,
+	  * this method does silently nothing.
+	  *
+	  * @return AEN_OK if the callback function was set.
+	**/
+	virtual eArgErrorNumber process( char const* param );
+
+private:
+
+	void ( *cb )( char const*, char const* );   //!< callback function to use
 
 };
 

@@ -1,5 +1,5 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED 1
 #pragma once
 
 /** @file TArgTarget.h
@@ -55,88 +55,88 @@ namespace pwx {
 template<typename T>
 class TArgTarget : public VArgTargetBase {
 
-  public:
+public:
 
-    /** brief default ctor
-      *
-      * No parameter check, the caller must ensure consistent
-      * values that make the instance usable.
-      *
-      * @see pwx::CArgHandler::addArg()
-      *
-      * @param[in] arg_short Short argument like "-a" or "x".
-      * @param[in] arg_long Long argument like "--foo" or "-bar".
-      * @param[in] arg_type Determines what to do with the target.
-      * @param[out] arg_target Pointer to the value to handle.
-      * @param[in] arg_desc Help text for this argument.
-      * @param[in] param_name Name shown in <> int the help text.
-    **/
-    explicit TArgTarget( char const* arg_short, char const* arg_long,
-                         eArgTargetType arg_type,T* arg_target,
-                         char const* arg_desc, char const* param_name )
-    noexcept :
-        VArgTargetBase( arg_short, arg_long, arg_type, arg_desc, param_name ),
-        target( arg_target )
-    { /* nothing to do here */ }
-
-
-    /** brief ATT_SET ctor
-      *
-      * No parameter check, the caller must ensure consistent
-      * values that make the instance usable.
-      *
-      * This is a constructor variant for ATT_SET targets.
-      * Use this constructor if the set target type is
-      * STT_IGNORE or STT_ERROR, STT_OVERWRITE is the default.
-      *
-      * @see pwx::CArgHandler::addArg()
-      *
-      * @param[in] arg_short Short argument like "-a" or "x".
-      * @param[in] arg_long Long argument like "--foo" or "-bar".
-      * @param[in] set_type Determines the set target type.
-      * @param[out] arg_target Pointer to the value to handle.
-      * @param[in] arg_desc Help text for this argument.
-      * @param[in] param_name Name shown in <> int the help text.
-    **/
-    TArgTarget( char const* arg_short, char const* arg_long,
-                eArgSetType set_type,T* arg_target,
-                char const* arg_desc, char const* param_name )
-    noexcept :
-        VArgTargetBase( arg_short, arg_long, set_type, arg_desc, param_name ),
-        target( arg_target )
-    { /* nothing to do here */ }
+	/** brief default ctor
+	  *
+	  * No parameter check, the caller must ensure consistent
+	  * values that make the instance usable.
+	  *
+	  * @see pwx::CArgHandler::addArg()
+	  *
+	  * @param[in] arg_short Short argument like "-a" or "x".
+	  * @param[in] arg_long Long argument like "--foo" or "-bar".
+	  * @param[in] arg_type Determines what to do with the target.
+	  * @param[out] arg_target Pointer to the value to handle.
+	  * @param[in] arg_desc Help text for this argument.
+	  * @param[in] param_name Name shown in <> int the help text.
+	**/
+	explicit TArgTarget( char const* arg_short, char const* arg_long,
+	                     eArgTargetType arg_type, T* arg_target,
+	                     char const* arg_desc, char const* param_name )
+	noexcept :
+		VArgTargetBase( arg_short, arg_long, arg_type, arg_desc, param_name ),
+		target( arg_target )
+	{ /* nothing to do here */ }
 
 
-    /** @brief destructor
-      * has nothing to do.
-    **/
-    virtual ~TArgTarget() noexcept {
-        target = nullptr;
-    }
+	/** brief ATT_SET ctor
+	  *
+	  * No parameter check, the caller must ensure consistent
+	  * values that make the instance usable.
+	  *
+	  * This is a constructor variant for ATT_SET targets.
+	  * Use this constructor if the set target type is
+	  * STT_IGNORE or STT_ERROR, STT_OVERWRITE is the default.
+	  *
+	  * @see pwx::CArgHandler::addArg()
+	  *
+	  * @param[in] arg_short Short argument like "-a" or "x".
+	  * @param[in] arg_long Long argument like "--foo" or "-bar".
+	  * @param[in] set_type Determines the set target type.
+	  * @param[out] arg_target Pointer to the value to handle.
+	  * @param[in] arg_desc Help text for this argument.
+	  * @param[in] param_name Name shown in <> int the help text.
+	**/
+	TArgTarget( char const* arg_short, char const* arg_long,
+	            eArgSetType set_type, T* arg_target,
+	            char const* arg_desc, char const* param_name )
+	noexcept :
+		VArgTargetBase( arg_short, arg_long, set_type, arg_desc, param_name ),
+		target( arg_target )
+	{ /* nothing to do here */ }
 
 
-    /** @brief process one command line parameter or argument occurrence
-      *
-      * This method is called whenever the type of an argument needs
-      * direct action, or a parameter to that argument is met.
-      *
-      * @param[in] param The parameter found or nullptr if no parameter is needed.
-    **/
-    virtual eArgErrorNumber process( char const* param );
+	/** @brief destructor
+	  * has nothing to do.
+	**/
+	virtual ~TArgTarget() noexcept {
+		target = nullptr;
+	}
 
 
-  private:
+	/** @brief process one command line parameter or argument occurrence
+	  *
+	  * This method is called whenever the type of an argument needs
+	  * direct action, or a parameter to that argument is met.
+	  *
+	  * @param[in] param The parameter found or nullptr if no parameter is needed.
+	**/
+	virtual eArgErrorNumber process( char const* param );
 
-    T* target; //!< The target to handle
 
-    /** @brief par_to_val conversion chain prototype
-      *
-      * All supported types have specializations.
-      *
-      * @param[out] tgt target to create
-      * @param[in] param sring to interpret
-    **/
-    void par_to_val( T* tgt, char const* param ) noexcept;
+private:
+
+	T* target; //!< The target to handle
+
+	/** @brief par_to_val conversion chain prototype
+	  *
+	  * All supported types have specializations.
+	  *
+	  * @param[out] tgt target to create
+	  * @param[in] param sring to interpret
+	**/
+	void par_to_val( T* tgt, char const* param ) noexcept;
 };
 
 
@@ -150,52 +150,52 @@ eArgErrorNumber TArgTarget<std::string>::process( char const* param );
 /// @brief Generic non-specialized handler
 template<typename T>
 eArgErrorNumber TArgTarget<T>::process( char const* param ) {
-    eArgErrorNumber argErrno = AEN_OK;
+	eArgErrorNumber argErrno = AEN_OK;
 
-    T val = ( T )0;
-    if ( param && strlen( param ) )
-        this->par_to_val( &val, param );
+	T val = ( T )0;
+	if ( param && strlen( param ) )
+		this->par_to_val( &val, param );
 
-    switch( this->type ) {
-        case ATT_FALSE:
-            *target = ( T )false;
-            break;
-        case ATT_TRUE:
-            *target = ( T )true;
-            break;
-        case ATT_INC:
-            *target += ( T )1;
-            break;
-        case ATT_DEC:
-            *target -= ( T )1;
-            break;
-        case ATT_ADD:
-            *target  += val;
-            break;
-        case ATT_SUB:
-            *target  -= val;
-            break;
-        case ATT_SET:
-            // This needs handling for all three set types:
-            if ( ( STT_OVERWRITE == this->setType )
-                    || ( !this->gotParameter ) )
-                *target = val;
-            else if ( STT_ERROR == this->setType )
-                argErrno = AEN_MULTIPLE_SET_PARAM;
-            // Last possibility is STT_IGNORE, which is, well, ignored. ;)
-            break;
-        case ATT_CB:
-            PWX_THROW( "UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "" )
-            break;
-        default:
-            PWX_THROW( "UnhandledTargetType", "The given target type is not implemented, yet!", "" )
-    }
+	switch( this->type ) {
+		case ATT_FALSE:
+			*target = ( T )false;
+			break;
+		case ATT_TRUE:
+			*target = ( T )true;
+			break;
+		case ATT_INC:
+			*target += ( T )1;
+			break;
+		case ATT_DEC:
+			*target -= ( T )1;
+			break;
+		case ATT_ADD:
+			*target  += val;
+			break;
+		case ATT_SUB:
+			*target  -= val;
+			break;
+		case ATT_SET:
+			// This needs handling for all three set types:
+			if ( ( STT_OVERWRITE == this->setType )
+			                || ( !this->gotParameter ) )
+				*target = val;
+			else if ( STT_ERROR == this->setType )
+				argErrno = AEN_MULTIPLE_SET_PARAM;
+			// Last possibility is STT_IGNORE, which is, well, ignored. ;)
+			break;
+		case ATT_CB:
+			PWX_THROW( "UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "" )
+			break;
+		default:
+			PWX_THROW( "UnhandledTargetType", "The given target type is not implemented, yet!", "" )
+	}
 
-    // if a parameter was given, it must be noted now:
-    if ( param && strlen( param ) )
-        this->gotParameter = true;
+	// if a parameter was given, it must be noted now:
+	if ( param && strlen( param ) )
+		this->gotParameter = true;
 
-    return argErrno;
+	return argErrno;
 }
 
 
