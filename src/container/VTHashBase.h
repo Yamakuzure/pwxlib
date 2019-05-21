@@ -63,7 +63,7 @@ while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load
 /// @brief Support macro to stop growing a hastable
 #define HASH_STOP_GROW \
 growing.fetch_sub(1, memOrdStore); \
-PWX_LOCK_GUARD_RESET(nullptr)
+PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to start inserting an element only when it is save to do so
@@ -77,7 +77,7 @@ inserting.fetch_add(1, memOrdStore);
 /// @brief Support macro to stop inserting an element
 #define HASH_STOP_INSERT \
 inserting.fetch_sub(1, memOrdStore); \
-PWX_LOCK_GUARD_RESET(nullptr)
+PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to start removing an element only when it is save to do so
@@ -91,15 +91,15 @@ removing.fetch_add(1, memOrdStore);
 /// @brief Support macro to stop removing an element
 #define HASH_STOP_REMOVE \
 removing.fetch_sub(1, memOrdStore); \
-PWX_LOCK_GUARD_RESET(nullptr)
+PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to wait for possible growing actions to finish
 #define HASH_WAIT_FOR_CLEAR_AND_GROW \
-PWX_LOCK_GUARD(nullptr) \
+PWX_LOCK_GUARD(this) \
 while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
-PWX_LOCK_GUARD_RESET(nullptr)
+PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to have the clear method wait until all actions ceased
@@ -110,7 +110,7 @@ while ( removing.load(memOrdLoad) \
 	||  inserting.load(memOrdLoad) ) \
 	PWX_LOCK_GUARD_RESET(this) \
 clearing.fetch_add(1, memOrdStore); \
-PWX_LOCK_GUARD_RESET(nullptr)
+PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to notifiy other threads that the container is cleared
