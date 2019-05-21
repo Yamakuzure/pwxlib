@@ -71,7 +71,8 @@ PREDEFINED             = PWX_API= \
                          PWX_USED= \
                          PWX_VIRTUAL_PURE==0 \
                          PWX_WARNUNUSED= \
-                         PWX_NODOX=1
+                         PWX_NODOX=1 \
+                         PWX_USE_FLAGSPIN=
 EXPAND_AS_DEFINED      = PWX_API \
                          PWX_INTERNAL \
                          PWX_VISIBLE \
