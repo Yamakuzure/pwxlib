@@ -29,6 +29,9 @@
   * History and change log are maintained in pwxlib.h
 **/
 
+#include <cstring>
+
+
 #include "hash_builder.h"
 
 

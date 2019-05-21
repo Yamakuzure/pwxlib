@@ -499,7 +499,7 @@ static void cb_clrstr() {
 
 /// @internal Set arg number nr to arg
 static void addFakeArg( int32_t nr, char const* arg ) {
-    size_t argSize = arg ? strlen( arg ) : 0;
+    size_t argSize = arg ? strlen( arg ) + 1: 0;
     if ( argSize ) {
         if ( nr >= xArgc )
             setFakeArg( nr + 1 );

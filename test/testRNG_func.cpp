@@ -7,6 +7,9 @@
   * The PrydeWorX Library is free software under MIT License
 **/
 
+#include <cstring>
+
+
 #include "testRNG_func.h"
 
 const double fullMaxDouble = std::numeric_limits<double>::max();

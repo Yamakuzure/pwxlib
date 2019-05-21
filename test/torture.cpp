@@ -1,3 +1,5 @@
+#include <PStreamHelpers>
+
 #include "torture.h"
 
 

@@ -30,6 +30,7 @@
 **/
 
 #include <iostream>
+#include <cstring>
 using std::cout;
 using std::cerr;
 using std::endl;
