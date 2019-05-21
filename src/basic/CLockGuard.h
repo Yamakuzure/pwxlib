@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_CLOCKGUARD_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_CLOCKGUARD_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_CLOCKGUARD_H_INCLUDED 1
+#pragma once
 
 /** @file CLockGuard.h
   *
@@ -41,6 +42,7 @@
 #include "basic/CLockable.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -56,55 +58,119 @@ namespace pwx {
   * by resetting to nullptr.
 **/
 class PWX_API CLockGuard {
-  public:
+public:
 
-    /* ===============================================
-     * === Public constructors and destructors     ===
-     * ===============================================
-    */
+        /* ===============================================
+         * === Public constructors and destructors     ===
+         * ===============================================
+        */
 
-    CLockGuard( const CLockable* objA ) noexcept;
-    CLockGuard( const CLockable* objA, const CLockable* objB ) noexcept;
-    CLockGuard( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept;
-    CLockGuard( const CLockGuard& src ) noexcept;
-    ~CLockGuard() noexcept;
-
-    // No empty ctor
-    CLockGuard() PWX_DELETE;
-
-
-    /* ===============================================
-     * === Public operators                        ===
-     * ===============================================
-    */
-
-    CLockGuard& operator=( const CLockGuard& src ) noexcept;
+        /** @brief One object locking constructor
+          *
+          * RAII constructor that returns once @a objA is locked.  
+          * **Important**: @a objA must be derived from pwx::CLockable !
+          *
+          * @param[in,out] objA Pointer to the object that is to be locked.
+        **/
+        CLockGuard( CLockable const* objA ) noexcept;
 
 
-    /* ===============================================
-     * === Public Methods                          ===
-     * ===============================================
-    */
+        /** @brief Two objects locking constructor
+          *
+          * RAII constructor that returns once @a objA and @a objB are locked.  
+          * **Important**: @a objA and @a objB must be derived from pwx::CLockable !
+          *
+          * @param[in,out] objA Pointer to the first object that is to be locked.
+          * @param[in,out] objB Pointer to the second object that is to be locked.
+        **/
+        CLockGuard( CLockable const* objA, CLockable const* objB ) noexcept;
 
-    void reset( const CLockable* objA ) noexcept;
-    void reset( const CLockable* objA, const CLockable* objB ) noexcept;
-    void reset( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept;
+
+        /** @brief Three objects locking constructor
+          *
+          * RAII constructor that returns once @a objA, @a objB and @a objC are locked.  
+          * **Important**: @a objA, @a objB and @a objC must be derived from pwx::CLockable !
+          *
+          * @param[in,out] objA Pointer to the first object that is to be locked.
+          * @param[in,out] objB Pointer to the second object that is to be locked.
+          * @param[in,out] objC Pointer to the third object that is to be locked.
+        **/
+        CLockGuard( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept;
 
 
-  private:
+        /** @brief Copy constructor that takes over the locks from another CLockGuard instance
+          *
+          * Before the objects can be locked, they have to be unlocked by @a src, which
+          * means that there is a tiny window in which another thread might lock any of
+          * these objects.
+          *
+          * @param[in,out] src Reference to the source to copy.
+        **/
+        CLockGuard( CLockGuard const &src ) noexcept;
 
-    /* ===============================================
-     * === Private Members                         ===
-     * ===============================================
-    */
 
-    CLockable* l_a = nullptr;
-    CLockable* l_b = nullptr;
-    CLockable* l_c = nullptr;
+        /// @brief The default destructor unlocks all objects currently held locked.
+        ~CLockGuard() noexcept;
+
+        // No empty ctor
+        CLockGuard() PWX_DELETE;
+
+
+        /* ===============================================
+         * === Public operators                        ===
+         * ===============================================
+        */
+
+        /** @brief The assignment operator takes over the locks from another CLockGuard instance
+          *
+          * Before the objects can be locked, they have to be unlocked by @a src, which
+          * means that there is a tiny window in which another thread might lock any of
+          * these objects.
+          *
+          * @param[in,out] src Reference to the source to take over from.
+        **/
+        CLockGuard &operator=( CLockGuard const &src ) noexcept;
+
+
+        /* ===============================================
+         * === Public Methods                          ===
+         * ===============================================
+        */
+
+        /** @brief Unlock all objects, and switch to only lock @a objA instead.
+          * @param[in,out] objA Pointer to the object that is to be locked.
+        **/
+        void reset( CLockable const* objA ) noexcept;
+
+
+        /** @brief Unlock all objects, and switch to lock @a objA and @a objB instead.
+          * @param[in,out] objA Pointer to the first object that is to be locked.
+          * @param[in,out] objB Pointer to the second object that is to be locked.
+        **/
+        void reset( CLockable const* objA, CLockable const* objB ) noexcept;
+
+
+        /** @brief Unlock all objects, and switch to only lock @a objA, @a objB and @a objC instead.
+          * @param[in,out] objA Pointer to the first object that is to be locked.
+          * @param[in,out] objB Pointer to the second object that is to be locked.
+          * @param[in,out] objC Pointer to the third object that is to be locked.
+        **/
+        void reset( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept;
+
+
+private:
+
+        /* ===============================================
+         * === Private Members                         ===
+         * ===============================================
+        */
+
+        CLockable* l_a = nullptr;
+        CLockable* l_b = nullptr;
+        CLockable* l_c = nullptr;
 };
 
 
 } // namespace pwx
 
 #endif // PWX_LIBPWX_PWX_TYPES_CLOCKGUARD_H_INCLUDED
-

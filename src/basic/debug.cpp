@@ -1,4 +1,4 @@
-/**
+/** @file
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c) 2007 - 2019 PrydeWorX
@@ -37,37 +37,45 @@
 #  include "basic/pwx_compiler.h"
 #endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 #include "basic/pwx_debug.h"
+#include "basic/pwx_types.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
-// The central log needs a log lock:
-std::atomic_flag _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
+/// @namespace _internal_
+namespace _internal_ {
+
+
+/// @brief The central log needs a log lock:
+aflag_t _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
 
 static void debug_log_out( _IO_FILE* target, char const* fmt, va_list ap ) {
-    while ( _pwx_internal_LOG_output_lock.test_and_set( PWX_MEMORDER_ACQUIRE ) )
-        std::this_thread::yield();
+        while ( _pwx_internal_LOG_output_lock.test_and_set( PWX_MEMORDER_ACQUIRE ) )
+                std::this_thread::yield();
 
-    vfprintf ( target, fmt, ap );
+        vfprintf ( target, fmt, ap );
 
-    _pwx_internal_LOG_output_lock.clear( PWX_MEMORDER_RELEASE );
+        _pwx_internal_LOG_output_lock.clear( PWX_MEMORDER_RELEASE );
 }
 
+} // namespace _internal_
+
 void debug_log( char const* fmt, ... ) {
-    va_list ap;
-    va_start ( ap, fmt );
-    debug_log_out( stdout, fmt, ap );
-    va_end( ap );
+        va_list ap;
+        va_start ( ap, fmt );
+        _internal_::debug_log_out( stdout, fmt, ap );
+        va_end( ap );
 }
 
 void debug_err( char const* fmt, ... ) {
-    va_list ap;
-    va_start ( ap, fmt );
-    debug_log_out( stderr, fmt, ap );
-    va_end( ap );
+        va_list ap;
+        va_start ( ap, fmt );
+        _internal_::debug_log_out( stderr, fmt, ap );
+        va_end( ap );
 }
 
 

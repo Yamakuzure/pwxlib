@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_GENERAL_TYPES_H_INCLUDED
-#define PWX_LIBPWX_PWX_GENERAL_TYPES_H_INCLUDED
+#define PWX_LIBPWX_PWX_GENERAL_TYPES_H_INCLUDED 1
+#pragma once
 
 /** @file pwx_types.h
   *
@@ -38,6 +39,7 @@
 #include <memory>
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -49,5 +51,7 @@ typedef std::memory_order         mord_t;  //!< Shortcut to std::memory_order
 
 
 } // namespace pwx
+
+
 #endif // PWX_LIBPWX_PWX_GENERAL_TYPES_H_INCLUDED
 

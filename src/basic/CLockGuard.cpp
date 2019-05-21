@@ -1,4 +1,4 @@
-/**
+/** @file
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c) 2007 - 2019 PrydeWorX
@@ -35,94 +35,68 @@
 #include "basic/CLockGuard.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
-/** @brief CLockGuard
-  *
-  * @todo: document this function
-  */
-CLockGuard::CLockGuard( const CLockable* objA ) noexcept {
-    reset( objA, nullptr, nullptr );
+CLockGuard::CLockGuard( CLockable const* objA ) noexcept {
+        reset( objA, nullptr, nullptr );
 }
 
-/** @brief CLockGuard
-  *
-  * @todo: document this function
-  */
-CLockGuard::CLockGuard( const CLockable* objA, const CLockable* objB ) noexcept {
-    reset( objA, objB, nullptr );
+CLockGuard::CLockGuard( CLockable const* objA, CLockable const* objB ) noexcept {
+        reset( objA, objB, nullptr );
 }
 
-/** @brief CLockGuard
-  *
-  * @todo: document this function
-  */
-CLockGuard::CLockGuard( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept {
-    reset( objA, objB, objC );
+CLockGuard::CLockGuard( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept {
+        reset( objA, objB, objC );
 }
 
-/** @brief CLockGuard
-  *
-  * @todo: document this function
-  */
-CLockGuard::CLockGuard( const CLockGuard& src ) noexcept {
-    reset( src.l_a, src.l_b, src.l_c );
+CLockGuard::CLockGuard( CLockGuard const &src ) noexcept {
+        l_a = src.l_a;
+        l_b = src.l_b;
+        l_c = src.l_c;
+        const_cast<CLockGuard &>( src ).reset( nullptr, nullptr, nullptr ); // Causes it to unlock
+        reset( l_a, l_b, l_c );
 }
 
-/** @brief ~CLockGuard
-  *
-  * @todo: document this function
-  */
 CLockGuard::~CLockGuard() noexcept {
-    reset( nullptr, nullptr, nullptr );
+        reset( nullptr, nullptr, nullptr );
 }
 
-
-/** @brief operator=
-  *
-  * @todo: document this function
-  */
-CLockGuard& CLockGuard::operator=( const CLockGuard& src ) noexcept {
-    reset( src.l_a, src.l_b, src.l_c );
-    return *this;
+CLockGuard &CLockGuard::operator=( CLockGuard const &src ) noexcept {
+        if ( &src != this ) {
+                l_a = src.l_a;
+                l_b = src.l_b;
+                l_c = src.l_c;
+                const_cast<CLockGuard &>( src ).reset( nullptr, nullptr, nullptr ); // Causes it to unlock
+                reset( l_a, l_b, l_c );
+        }
+        return *this;
 }
 
-/** @brief reset
-  *
-  * @todo: document this function
-  */
-void CLockGuard::reset( const CLockable* objA ) noexcept {
-    reset( objA, l_b, l_c );
+void CLockGuard::reset( CLockable const* objA ) noexcept {
+        reset( objA, l_b, l_c );
 }
 
-/** @brief reset
-  *
-  * @todo: document this function
-  */
-void CLockGuard::reset( const CLockable* objA, const CLockable* objB ) noexcept {
-    reset( objA, objB, l_c );
+void CLockGuard::reset( CLockable const* objA, CLockable const* objB ) noexcept {
+        reset( objA, objB, l_c );
 }
 
-/** @brief reset
-  *
-  * @todo: document this function
-  */
-void CLockGuard::reset( const CLockable* objA, const CLockable* objB, const CLockable* objC ) noexcept {
-    if ( l_a ) l_a->unlock();
-    if ( l_b ) l_b->unlock();
-    if ( l_c ) l_c->unlock();
+void CLockGuard::reset( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept {
+        if ( l_a ) l_a->unlock();
+        if ( l_b ) l_b->unlock();
+        if ( l_c ) l_c->unlock();
 
-    l_a = const_cast<CLockable*>( objA );
-    l_b = const_cast<CLockable*>( objB );
-    l_c = const_cast<CLockable*>( objC );
+        l_a = const_cast<CLockable*>( objA );
+        l_b = const_cast<CLockable*>( objB );
+        l_c = const_cast<CLockable*>( objC );
 
-    while ( !try_locks( l_a, l_b, l_c ) ) {
-        std::this_thread::yield();
-        if ( l_a && l_a->destroyed() ) l_a = nullptr;
-        if ( l_b && l_b->destroyed() ) l_b = nullptr;
-        if ( l_c && l_c->destroyed() ) l_c = nullptr;
-    }
+        while ( !try_locks( l_a, l_b, l_c ) ) {
+                std::this_thread::yield();
+                if ( l_a && l_a->destroyed() ) l_a = nullptr;
+                if ( l_b && l_b->destroyed() ) l_b = nullptr;
+                if ( l_c && l_c->destroyed() ) l_c = nullptr;
+        }
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED
-#define PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED
+#define PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED 1
 #pragma once
 
 /** @file pwx_compiler.h
@@ -39,7 +39,7 @@
  * --- pwxLib needs C++17 features. Sorry, no way around this!         ---
 */
 #if (!defined(__cplusplus)) || (__cplusplus < 201703L)
-   #pragma error "pwxLib needs at least C++17!" 
+#pragma error "pwxLib needs at least C++17!"
 #endif // __cplusplus defined and large enough?
 
 
@@ -108,9 +108,17 @@
   * @brief defines to set the right modifier for library export/import
 */
 #ifdef PWX_EXPORTS
-#  define PWX_API __attribute__((visibility("default")))
+#  if PWX_IS_MSC
+#    define PWX_API __declspec(dllexport)
+#  else
+#    define PWX_API __attribute__((visibility("default")))
+#  endif
 #else
-#  define PWX_API
+#  if PWX_IS_MSC
+#    define PWX_API __declspec(dllimport)
+#  else
+#    define PWX_API
+#  endif
 #endif
 
 
@@ -134,11 +142,12 @@
 #ifndef PWX_NODOX
 #define PWX_DEFAULT      =default
 #define PWX_DELETE       =delete
-#define PWX_PURE         __attribute__ ((pure))
-#define PWX_UNUSED       __attribute__ ((unused))
-#define PWX_USED         __attribute__ ((used))
 #define PWX_VIRTUAL_PURE =0
-#define PWX_WARNUNUSED   __attribute__ ((warn_unused_result))
+#if PWX_IS_MSC
+#  define PWX_WARNUNUSED _Check_return_
+#else
+#  define PWX_WARNUNUSED __attribute__ ((warn_unused_result))
+#endif // Difference for MSVC
 #endif // ignored by doxygen
 
 #endif // PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED

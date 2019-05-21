@@ -1,6 +1,6 @@
-#pragma once
 #ifndef PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED
-#define PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED
+#define PWX_LIBPWX_PWX_TYPES_CEXCEPTION_H_INCLUDED 1
+#pragma once
 
 /** @file CException.h
   *
@@ -46,6 +46,7 @@
 #include "basic/pwx_compiler.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
@@ -54,69 +55,132 @@ namespace pwx {
   *
   * This class is meant to provide a tracing exception to get as much information as possible.
   *
-  * To make the most out of this system, the file "pwxlib/pwx_macros.h" provides many macros
+  * To make the most out of this system, the file `basic/pwx_macros.h` provides many macros
   * to try, catch and throw further exceptions with tracing information.
   *
-  * name() : Return the name of the thrown exception.
-  * what() : Return information about what went wrong
-  * where(): Return the name of the method that threw the exception in the style "file:line - method name"
-  * desc() : Return a description that possibly contains data about what happened
-  * pfunc(): Return the full function name and type of template parameters if applicable
-  * trace(): Return a trace of all methods this exceptions passed through. If it didn't pass through anywhere,
-  *          the trace is empty.
+  * | Getter    | Returns...                                                         |
+  * |:--------- |:------------------------------------------------------------------ |
+  * | `name()`  | The name of the thrown exception                                   |
+  * | `what()`  | Information about what went wrong                                  |
+  * | `where()` | The origin of the exception in the style "file:line - method name" |
+  * | `desc()`  | A description that possibly contains data about what happened      |
+  * | `pfunc()` | Full function name (and template parameters if applicable)         |
+  * | `trace()` | A trace of the exception path if it was filled on its way          |
 **/
 class PWX_API CException : public std::exception {
 
-  public:
+public:
 
-    /* ===============================================
-     * === Public Constructors and destructor      ===
-     * ===============================================
-    */
+        /* ===============================================
+         * === Public Constructors and destructor      ===
+         * ===============================================
+        */
 
-    explicit
-    CException ( char const* const name_, char const* const what_, char const* const where_,
-                 char const* const func_, char const* const desc_ ) noexcept;
-    CException ( const CException& src ) noexcept;
-    CException () PWX_DELETE;          // No empty ctor!
-    virtual ~CException() noexcept;
-
-
-    /* ===============================================
-     * === Public methods                          ===
-     * ===============================================
-    */
-
-    char const* name       ()                   const noexcept;
-    char const* what       ()                   const noexcept;
-    char const* where      ()                   const noexcept;
-    char const* desc       ()                   const noexcept;
-    char const* pfunc      ()                   const noexcept;
-    char const* trace      ()                   const noexcept;
-    void        addToTrace ( char const* trace_ )       noexcept;
-
-
-    /* ===============================================
-     * === Public operators                        ===
-     * ===============================================
-    */
-
-    CException& operator= ( const CException& e ) PWX_DELETE; // No assignment
+        /** @brief explicit constructor
+          *
+          * This constructor is to be used to create a pwx::CException. All relevant data
+          * is set exactly once with this constructor and must not be changed apart from
+          * the trace.
+          *
+          * You can use the macro `PWX_THROW()` from `basic/pwx_macros.h` to throw this
+          * kind of exceptions in a very convenient way. It'll fill in the positional
+          * information for you. The macro `PWX_THROW_STD_FURTHER()` from the same file
+          * can be used to convert an `std::exception` into a `pwx::CException` with
+          * tracing information.
+          *
+          * @param[in] name_ The name of the exception.
+          * @param[in] what_ The text that is to be returned by the what() method.
+          * @param[in] where_ The positional information where it was thrown.
+          * @param[in] func_ Name of the function where this was thrown.
+          * @param[in] desc_ Description of what wnet wrong.
+          */
+        explicit
+        CException ( char const* const name_, char const* const what_, char const* const where_,
+                     char const* const func_, char const* const desc_ ) noexcept;
 
 
-  private:
+        /** @brief copy constructor
+          *
+          * @param[in] src the exception to copy
+          */
+        CException ( const CException &src ) noexcept;
 
-    /* ===============================================
-     * === Private members                         ===
-     * ===============================================
-    */
 
-    char const* const txtName;  //!< the name of the exception
-    char const* const txtWhat;  //!< the classic what() text
-    char const* const txtWhere; //!< A malloc'd C-String with "file:line - method"
-    char const* const txtFunc;  //!< The result of __PRETTY_FUNC__
-    char const* const txtDesc;  //!< Optional description
-    std::string txtTrace;     //!< A trace, that can hopefully be added together
+        CException () PWX_DELETE; // No empty ctor!
+
+
+        /** @brief destructor
+          *
+          * As all C-Strings are malloc'd they have to be freed.
+          */
+        virtual ~CException() noexcept;
+
+
+        /* ===============================================
+         * === Public methods                          ===
+         * ===============================================
+        */
+
+        /// @brief Return the name of the exception
+        char const* name () const noexcept;
+
+
+        /// @brief Return the exception reason
+        char const* what () const noexcept;
+
+
+        /// @brief Return the original throwing position
+        char const* where () const noexcept;
+
+
+        /// @brief Return the exception description
+        char const* desc () const noexcept;
+
+
+        /// @brief Return the pretty function where the original throw occurred.
+        char const* pfunc () const noexcept;
+
+
+        /// @brief Return the trace of the exceptions path
+        char const* trace () const noexcept;
+
+
+        /** @brief addToTrace
+          *
+          * This function adds a line break and then @a trace_ to
+          * the exception trace. Exceptions from string operations
+          * are ignored. It is better to have a broken trace than
+          * a broken unwinding.
+          *
+          * The `PWX_THROW()` macro family in `basic/pwx_macros.h`
+          * makes extensive use of this.
+          *
+          * @param[in] trace_ Trace information to append
+          */
+        void addToTrace ( char const* trace_ ) noexcept;
+
+
+        /* ===============================================
+         * === Public operators                        ===
+         * ===============================================
+        */
+
+        CException &operator= ( const CException &e ) PWX_DELETE; // No assignment
+
+
+private:
+
+        /* ===============================================
+         * === Private members                         ===
+         * ===============================================
+        */
+
+        char const* const txtName;  //!< the name of the exception
+        char const* const txtWhat;  //!< the classic what() text
+        char const* const txtWhere; //!< A malloc'd C-String with "file:line - method"
+        char const* const txtFunc;  //!< The result of __PRETTY_FUNC__
+        char const* const txtDesc;  //!< Optional description
+        std::string txtTrace;       //!< A trace, that can hopefully be added together
 };
 
 
