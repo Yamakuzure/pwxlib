@@ -146,7 +146,7 @@ bool private_dispatchAlmostEqual( const Tf& lhs, const Tf& rhs ) noexcept {
   *
   * @param[in] lhs left hand side value
   * @param[in] rhs right hand side value
-  * @return true if bot values can be considered equal although their representation might differ
+  * @return true if both values can be considered equal although their representation might differ
 **/
 bool areAlmostEqual( const float lhs, const float rhs ) noexcept {
     return private_::private_dispatchAlmostEqual<float>( lhs, rhs );
@@ -161,7 +161,7 @@ bool areAlmostEqual( const float lhs, const float rhs ) noexcept {
   *
   * @param[in] lhs left hand side value
   * @param[in] rhs right hand side value
-  * @return true if bot values can be considered equal although their representation might differ
+  * @return true if both values can be considered equal although their representation might differ
 **/
 bool areAlmostEqual( const double lhs, const double rhs ) noexcept {
     return private_::private_dispatchAlmostEqual<double>( lhs, rhs );
@@ -176,7 +176,7 @@ bool areAlmostEqual( const double lhs, const double rhs ) noexcept {
   *
   * @param[in] lhs left hand side value
   * @param[in] rhs right hand side value
-  * @return true if bot values can be considered equal although their representation might differ
+  * @return true if both values can be considered equal although their representation might differ
 **/
 bool areAlmostEqual( const long double lhs, const long double rhs ) noexcept {
     return private_::private_dispatchAlmostEqual<long double>( lhs, rhs );
