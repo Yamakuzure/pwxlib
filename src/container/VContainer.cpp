@@ -1,4 +1,4 @@
-/**
+/** @file
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c) 2007 - 2019 PrydeWorX
@@ -30,25 +30,24 @@
 **/
 
 
-#include "container/CThreadElementStore.h"
 #include "container/VContainer.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
-/// @brief VContainer default constructor.
 VContainer::VContainer() noexcept
 { }
 
-/// @brief VContainer copy constructor.
+
 VContainer::VContainer( const VContainer& src ) noexcept :
-    base_t( src ),
-    doRenumber( src.doRenumber.load( memOrdLoad ) )
-    // eCount is maintained when deriving copy ctors copy elements
+	base_t( src ),
+	doRenumber( src.doRenumber.load( memOrdLoad ) )
+	// eCount is maintained when deriving copy ctors copy elements
 { }
 
-/// @brief ~VContainer default destructor.
+
 VContainer::~VContainer() noexcept
 { }
 
