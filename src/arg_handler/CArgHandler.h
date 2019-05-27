@@ -712,9 +712,9 @@ private:
 	 * ===============================================
 	 */
 
-	/// @brief do nothing with the element.
-	/// (or cleaning short args, destroys targets of long args!)
-	static void do_not_destroy( data_t* ) { }
+        /// @brief do nothing with the element.
+        /// (or cleaning short args, destroys targets of long args!)
+        static void do_not_destroy( data_t * ) { }
 
 
 	/// @brief get target for short/long arg @arg or return nullptr if not found

@@ -77,9 +77,11 @@
   * @param[in] desc char const message to be returned by the exceptions desc() method
 **/
 #define PWX_THROW(name, msg, desc) { \
+                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
+                                     &::pwx::private_::_pwx_internal_trace_lock); \
                 sprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
                         "%s:%d %s", basename(__FILE__), __LINE__, __FUNCTION__); \
-                throw(pwx::CException(strlen(name) ? name : "no name", strlen(msg) ? msg : "no message", \
+                throw(::pwx::CException(strlen(name) ? name : "no name", strlen(msg) ? msg : "no message", \
                                       ::pwx::private_::_pwx_internal_debug_trace_info, \
                                       __PRETTY_FUNCTION__, strlen(desc) ? desc : "no description")); \
         }
@@ -93,6 +95,8 @@
   * *Prerequisites*: pwx/types/CException.h
 **/
 #define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) { \
+                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
+                                     &::pwx::private_::_pwx_internal_trace_lock); \
                 sprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
                         "--> Called by %s:%d %s", basename(__FILE__), __LINE__, __FUNCTION__); \
                 e.addToTrace(::pwx::private_::_pwx_internal_debug_trace_info); \
@@ -272,7 +276,7 @@
 **/
 #define PWX_NAMED_LOCK_GUARD(Name, object) \
         DEBUG_LOCK_STATE("TLockGuard", this, object) \
-        pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object); \
+        ::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object); \
         LOG_LOCK_GUARD(object)
 
 
@@ -343,7 +347,7 @@
 #define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB) \
         DEBUG_LOCK_STATE("CLockGuard A", this, objA) \
         DEBUG_LOCK_STATE("CLockGuard B", this, objB) \
-        pwx::CLockGuard pwx_libpwx_double_lock_guard_##Name(objA, objB); \
+        ::pwx::CLockGuard pwx_libpwx_double_lock_guard_##Name(objA, objB); \
         LOG_DOUBLE_LOCK_GUARD(objA, objB)
 
 
@@ -396,7 +400,7 @@
         DEBUG_LOCK_STATE("CLockGuard A", this, objA) \
         DEBUG_LOCK_STATE("CLockGuard B", this, objB) \
         DEBUG_LOCK_STATE("CLockGuard C", this, objC) \
-        pwx::CLockGuard pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
+        ::pwx::CLockGuard pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
         LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
 
 
@@ -660,5 +664,28 @@
   * @return true if @a is readable and writable
 **/
 #define pwx_file_isRW(f) (0 == access(f, W_OK | W_OK))
+
+
+#include "basic/CLockable.h"
+#include "basic/CLockGuard.h"
+
+
+/// @namespace pwx
+namespace pwx {
+
+/** @namespace private_
+  * @internal
+**/
+namespace private_ {
+
+/// @brief static trace buffer, also used for the tracing macros
+[[maybe_unused]] static char _pwx_internal_debug_trace_info[1024] = { 0x0 };
+
+/// @brief static lock to not bash the buffer
+[[maybe_unused]] static ::pwx::CLockable _pwx_internal_trace_lock;
+
+} // private_
+} // pwx
+
 
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED
