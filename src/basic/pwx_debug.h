@@ -77,13 +77,15 @@
 namespace pwx {
 
 
-/// @internal _internal_ namespace
-namespace _internal_ {
+/** @namespace private_
+  * @internal
+**/
+namespace private_ {
 
 /// @internal external trace buffer, also used for the tracing macros
 [[maybe_unused]] static char _pwx_internal_debug_trace_info[1024] = { 0x0 };
 
-} // _internal_
+} // private_
 
 
 // If any debugging mode is activated, a central logging functions is needed:
@@ -95,16 +97,16 @@ void PWX_API debug_err( char const* fmt, ... ); //!< internal debug logging func
 
 // And the main wrapper:
 # define DEBUG_LOG(part, fmt, ...) { \
-                snprintf(::pwx::_internal_::_pwx_internal_debug_trace_info, \
+                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
                          1023, ">> [%8s] %s:%d - %s : %s\n", part, \
                          basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_log(::pwx::_internal_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
+                pwx::debug_log(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
         }
 # define DEBUG_ERR(part, fmt, ...) { \
-                snprintf(::pwx::_internal_::_pwx_internal_debug_trace_info, \
+                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
                          1023, ">> [%8s] %s:%d - %s : %s\n", part, \
                          basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_err(::pwx::_internal_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
+                pwx::debug_err(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
         }
 #else
 # define DEBUG_LOG(...) {}
@@ -129,18 +131,18 @@ void PWX_API debug_err( char const* fmt, ... ); //!< internal debug logging func
 // Specialized logging macros for mutex locking/unlocking
 #ifdef PWX_THREADDEBUG
 # define THREAD_LOG(part, fmt, ...) { \
-                snprintf(::pwx::_internal_::_pwx_internal_debug_trace_info, 1023, \
+                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, 1023, \
                          ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
                          CURRENT_THREAD_ID, part, \
                          basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_log(::pwx::_internal_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
+                pwx::debug_log(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
         }
 # define THREAD_ERR(part, fmt, ...) { \
-                snprintf(::pwx::_internal_::_pwx_internal_debug_trace_info, 1023, \
+                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, 1023, \
                          ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
                          CURRENT_THREAD_ID, part, \
                          basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_err(::pwx::_internal_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
+                pwx::debug_err(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
         }
 # define DEBUG_LOCK_STATE(action, locker, to_lock) { \
                 if ((to_lock)->is_locking()) { \

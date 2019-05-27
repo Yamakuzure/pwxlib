@@ -34,12 +34,16 @@
 #include "random/CRandomTHash.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
+/** @namespace private_
+  * @internal
+**/
 namespace private_ {
 
 
-/// @internal hash handler for strings. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+/// @brief hash handler for strings. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 uint32_t private_hash_str( char const* key, size_t keyLen ) noexcept {
     uint32_t part  = 0, sum = 0;
     size_t   len   = keyLen ? keyLen : strlen( key );
@@ -78,7 +82,7 @@ uint32_t private_hash_str( char const* key, size_t keyLen ) noexcept {
 }
 
 
-/// @internal generate a hash out of an uint8_t buffer. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+/// @brief generate a hash out of an uint8_t buffer. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 uint32_t private_hash_buf( const uint8_t* key, size_t keyLen ) noexcept {
     uint32_t xHash = 0, part = 0;
     size_t   phase = 0, tgtPos = 24;

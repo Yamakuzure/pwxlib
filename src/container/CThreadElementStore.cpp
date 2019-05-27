@@ -33,13 +33,16 @@
 #include "container/CThreadElementStore.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
+/** @namespace private_
+  * @internal
+**/
 namespace private_ {
 
 
-/** @internal
-  * @brief do nothing with the given element
+/** @brief do nothing with the given element
   * This is just a little "nothing-to-see-here"-function
   * that is used by the CThreadElementStore below as
   * a deleter for shared_ptr.

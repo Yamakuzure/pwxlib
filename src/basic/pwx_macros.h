@@ -77,10 +77,10 @@
   * @param[in] desc char const message to be returned by the exceptions desc() method
 **/
 #define PWX_THROW(name, msg, desc) { \
-                sprintf(::pwx::_internal_::_pwx_internal_debug_trace_info, \
+                sprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
                         "%s:%d %s", basename(__FILE__), __LINE__, __FUNCTION__); \
                 throw(pwx::CException(strlen(name) ? name : "no name", strlen(msg) ? msg : "no message", \
-                                      ::pwx::_internal_::_pwx_internal_debug_trace_info, \
+                                      ::pwx::private_::_pwx_internal_debug_trace_info, \
                                       __PRETTY_FUNCTION__, strlen(desc) ? desc : "no description")); \
         }
 
@@ -93,9 +93,9 @@
   * *Prerequisites*: pwx/types/CException.h
 **/
 #define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) { \
-                sprintf(::pwx::_internal_::_pwx_internal_debug_trace_info, \
+                sprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
                         "--> Called by %s:%d %s", basename(__FILE__), __LINE__, __FUNCTION__); \
-                e.addToTrace(::pwx::_internal_::_pwx_internal_debug_trace_info); \
+                e.addToTrace(::pwx::private_::_pwx_internal_debug_trace_info); \
                 throw; \
         }
 

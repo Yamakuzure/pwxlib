@@ -42,10 +42,11 @@
 #include "math_helpers/MathHelpers.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
-/** @internal
-  * @namespace private_
+/** @namespace private_
+  * @internal
   * @brief all private functions, that are to be used in library compilation units only, reside here
 **/
 namespace private_ {

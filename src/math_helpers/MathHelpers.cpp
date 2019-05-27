@@ -33,14 +33,17 @@
 #include "math_helpers/MathHelpers.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
-// Internal functions to do the checking
+/** @namespace private_
+  * @internal
+**/
 namespace private_ {
 
 
-/// @internal check floating point values using Ulps and abs diff
+/// @brief check floating point values using Ulps and abs diff
 template<typename Tf, typename Ti>
 bool private_areAlmostEqualUlpsAndAbs(
     const Tf& lhs, const Tf& rhs,
@@ -66,7 +69,7 @@ bool private_areAlmostEqualUlpsAndAbs(
     return false;
 }
 
-/// @internal check floating point values using relative and diff
+/// @brief check floating point values using relative and diff
 template<typename Tf>
 bool private_areAlmostEqualRelativeAndAbs(
     const Tf& lhs, const Tf& rhs,
@@ -96,7 +99,7 @@ bool private_areAlmostEqualRelativeAndAbs(
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 
 
-/// @internal template to dispatch to the correct AlmostEqual function
+/// @brief template to dispatch to the correct AlmostEqual function
 template<typename Tf>
 bool private_dispatchAlmostEqual( const Tf& lhs, const Tf& rhs ) noexcept {
     typedef typename pwx::sFloatPoint<Tf>::Ti Ti;

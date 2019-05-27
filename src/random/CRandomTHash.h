@@ -43,12 +43,17 @@
 #include "random/CRandomConstants.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
+/** @namespace private_
+  * @internal
+**/
 namespace private_ {
 
 
-/* ================================================================================================
+/** @verbatim
+===================================================================================================
 Statistics with 10M Hashes (65535 for (u)int16_t) :
    ------------+------------+----------+------------+----------+--------------------------------------
    Type        | Unique rand|    Quota | Unique Hash|    Quota | Result
@@ -155,7 +160,9 @@ that to get integer representations.
           the open addressed hash container when using floating point keys.
           (Although, why would anyone use floating point types for hash keys anyway?)
 
-   ================================================================================================ */
+===================================================================================================
+  @endverbatim
+**/
 
 uint32_t private_hash_str( char const* key, size_t keyLen ) noexcept;
 uint32_t private_hash_buf( const uint8_t* key, size_t keyLen ) noexcept;

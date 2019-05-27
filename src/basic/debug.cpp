@@ -46,8 +46,10 @@ namespace pwx {
 
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
-/// @namespace _internal_
-namespace _internal_ {
+/** @namespace private_
+  * @internal
+**/
+namespace private_ {
 
 
 /// @brief The central log needs a log lock:
@@ -62,19 +64,19 @@ static void debug_log_out( _IO_FILE* target, char const* fmt, va_list ap ) {
         _pwx_internal_LOG_output_lock.clear( PWX_MEMORDER_RELEASE );
 }
 
-} // namespace _internal_
+} // namespace private_
 
 void debug_log( char const* fmt, ... ) {
         va_list ap;
         va_start ( ap, fmt );
-        _internal_::debug_log_out( stdout, fmt, ap );
+        private_::debug_log_out( stdout, fmt, ap );
         va_end( ap );
 }
 
 void debug_err( char const* fmt, ... ) {
         va_list ap;
         va_start ( ap, fmt );
-        _internal_::debug_log_out( stderr, fmt, ap );
+        private_::debug_log_out( stderr, fmt, ap );
         va_end( ap );
 }
 

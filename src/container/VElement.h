@@ -41,11 +41,15 @@
 #include "container/TVarDeleter.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
 
-// Forward CThreadElementStore, there is a circular dependency.
+/** @namespace private_
+  * @internal
+**/
 namespace private_ {
+/// Forward CThreadElementStore, there is a circular dependency.
 class CThreadElementStore;
 }
 

@@ -37,8 +37,12 @@
 #include "container/TOpenHash.h"
 
 
+/// @namespace pwx
 namespace pwx {
 
+/** @namespace private_
+  * @internal
+**/
 namespace private_ {
 
 
