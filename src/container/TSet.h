@@ -465,9 +465,7 @@ class PWX_API TSet : public TDoubleList<data_t> {
             if ( insPre ) {
                 if ( tail() == insPre ) {
                     // Case 3: A new tail is to be set
-                    insElem->eNr.store(
-                        tail()->eNr.load( memOrdLoad ) + 1,
-                        memOrdStore );
+                    insElem->nr( tail()->nr() + 1 );
                     PWX_TRY_PWX_FURTHER( tail()->insertNext( insElem, &currStore ) )
                     tail( insElem );
                 } else {

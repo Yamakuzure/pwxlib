@@ -1216,9 +1216,7 @@ class PWX_API TSingleList : public VContainer {
                 this->doRenumber.store( true, memOrdStore );
             } else if ( ( insPrev == tail() ) || insPrev->destroyed() ) {
                 // Case 3: A new tail is to be set
-                insElem->eNr.store(
-                    tail()->eNr.load( memOrdLoad ) + 1,
-                    memOrdStore );
+                insElem->nr( tail()->nr() + 1 );
                 PWX_TRY_PWX_FURTHER( tail()->insertNext( insElem, &currStore ) )
                 tail( insElem );
             } else {
@@ -1250,7 +1248,7 @@ class PWX_API TSingleList : public VContainer {
             bool              isDone = false;
 
             while ( xCurr && !isDone ) {
-                xCurr->eNr.store( xNr++, memOrdStore );
+                xCurr->nr( xNr++ );
                 if ( xCurr == tail() )
                     isDone = true;
                 else
@@ -1365,7 +1363,7 @@ class PWX_API TSingleList : public VContainer {
 
         if ( locCnt ) {
             elem_t* xCurr = curr();
-            uint32_t xNr = xCurr ? xCurr->eNr.load( memOrdLoad ) : 0;
+            uint32_t xNr = xCurr ? xCurr->nr() : 0;
             if ( nullptr == xCurr )
                 xCurr = head();
 
