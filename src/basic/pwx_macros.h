@@ -209,7 +209,7 @@
 #define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
 
 
-/** @brief Use object->lock if @a object is not nullptr
+/** @brief Use `object->lock()` if @a object is not nullptr
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
@@ -223,7 +223,7 @@
         }
 
 
-/** @brief Use object->lock, @a object will be asserted
+/** @brief Use `object->lock()`, @a object will be asserted
   *
   * The background for this slightly changed macro is gcc-7
   * throwing out warnings if the address of a local value or
@@ -254,7 +254,7 @@
 #define PWX_TRY_LOCK(object) ((object) ? (object)->try_lock() : false)
 
 
-/** @brief Use object->unlock if @a object is defined.
+/** @brief Use `object->unlock()` if @a object is defined.
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
@@ -267,6 +267,21 @@
         }
 
 
+/** @brief Use `object->unlock()` and then `object->lock()` for a relock cycle
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to cycle the lock.
+**/
+#define PWX_RELOCK(object) { \
+                assert(object); \
+                (object)->unlock(); \
+                LOG_UNLOCK(object) \
+                (object)->lock(); \
+                LOG_LOCK(object) \
+        }
+        
+        
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
