@@ -45,7 +45,20 @@ namespace pwx {
   *
   * @brief Chained hash container for variable types
   *
-  * @todo describe properly
+  * This is a standard chained hash container.
+  *
+  * In a chained hash container each bucket is not a singular place, but a singly
+  * linked list. This means, that upon reaching the correct bucket, the correct
+  * item still has to be searched by traversing the list.
+  *
+  * In an optimal situation each bucket has only one item at most and the retrieval
+  * is simple and fast.
+  * But if either a bad hash algorithm or a too low hash size is chosen, items can
+  * pile up in few buckets.
+  *
+  * The hash algorithms used within the PrydeWorX library already offer a very high
+  * level of distribution. For keys not handled by these, or if you think you have
+  * a better hash algorithm, you can set your own hash function with the constructor.
 **/
 template<typename key_t, typename data_t, typename elem_t = THashElement<key_t, data_t> >
 class PWX_API TChainHash : public VTHashBase<key_t, data_t, elem_t> {

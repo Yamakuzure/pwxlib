@@ -67,7 +67,7 @@ namespace pwx {
   *
   * Further the PrydeWorX Library Open Hash container uses "Robin Hood Hashing". This
   * means, that if an item is to be inserted and reaches a bucket that is taken, item
-  * in there is moved further if it has fewer hops than the new item.
+  * in there is moved further if it has fewer hops than the new item. 
   *
   * The hash algorithms used within the PrydeWorX library already offer a very high
   * level of distribution. For keys not handled by these, or if you think you have
