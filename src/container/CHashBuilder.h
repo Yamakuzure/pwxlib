@@ -1,5 +1,6 @@
 #ifndef PWX_LIBPWX_PWX_TYPES_THASHBUILDER_H_INCLUDED
 #define PWX_LIBPWX_PWX_TYPES_THASHBUILDER_H_INCLUDED
+#pragma once
 
 /** @file CHashBuilder.h
   *
@@ -55,192 +56,195 @@ namespace pwx {
   * the value to hash.
   *
   * Currently RNG supports 8, 16, 32 and 64 bit signed and unsigned
-  * integers, float, double, C-Strings (char*) and std::string.
+  * integers, float, double, C-Strings (char*) and `std::string`.
   * Further a key length can be set when using either a user defined
   * hashing function that supports a key length, or when using char*
-  * or std::string with RNG.hash().
+  * or `std::string` with `RNG.hash()`.
+  *
+  * *Note*: You might want to take a look at `std::hash` before
+  * using the `CHashBuilder`.
   *
 **/
 class PWX_API CHashBuilder {
-  public:
-    /* ===============================================
-     * === Public types                            ===
-     * ===============================================
-    */
+public:
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
 
 
-    /* ===============================================
-     * === Public Constructors and destructors     ===
-     * ===============================================
-    */
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
 
 
-    /** @brief key length constructor
-      *
-      * If your key is a C-String or std::string, you can set
-      * an optional key length. The hashing done by RNG, or
-      * a provided hash method, will then be limited to this
-      * maximum key length; or whatever a provided hash method
-      * does with the key length.
-      *
-      * @param[in] keyLen_ optional key length
-    **/
-    CHashBuilder( uint32_t keyLen_ ) noexcept :
-        keyLen( keyLen_ )
-    { }
+	/** @brief key length constructor
+	  *
+	  * If your key is a C-String or std::string, you can set
+	  * an optional key length. The hashing done by RNG, or
+	  * a provided hash method, will then be limited to this
+	  * maximum key length; or whatever a provided hash method
+	  * does with the key length.
+	  *
+	  * @param[in] keyLen_ optional key length
+	**/
+	CHashBuilder( uint32_t keyLen_ ) noexcept
+		: keyLen( keyLen_ )
+	{ }
 
 
-    /** @brief empty constructor
-      *
-      * The empty constructor uses the default constructor to
-      * set the key length to zero.
-    **/
-    CHashBuilder() noexcept :
-        CHashBuilder( 0 )
-    { }
+	/** @brief empty constructor
+	  *
+	  * The empty constructor uses the default constructor to
+	  * set the key length to zero.
+	**/
+	CHashBuilder() noexcept
+		: CHashBuilder( 0 )
+	{ }
 
 
-    /** @brief copy constructor copying the key length
-      * @param[in] src source reference
-    **/
-    CHashBuilder( const CHashBuilder& src ) :
-        keyLen( src.keyLen )
-    { }
+	/** @brief copy constructor copying the key length
+	  * @param[in] src source reference
+	**/
+	CHashBuilder( const CHashBuilder& src )
+		: keyLen( src.keyLen )
+	{ }
 
 
-    /// @brief default dtor
-    virtual ~CHashBuilder() noexcept
-    { }
+	/// @brief default dtor
+	virtual ~CHashBuilder() noexcept
+	{ }
 
 
-    /* ===============================================
-     * === Public methods                          ===
-     * ===============================================
-    */
+	/* ===============================================
+	 * === Public methods                          ===
+	 * ===============================================
+	*/
 
-    /** @brief get the current key length
-      *
-      * @return the currently set key length
-      */
-    uint32_t getKeyLen() const noexcept;
-
-    /** @brief set a new key length
-      *
-      * @param[in] keyLen_ the key length to use in the future
-      */
-    void setKeyLen( uint32_t keyLen_ ) noexcept;
+	/** @brief get the current key length
+	  *
+	  * @return the currently set key length
+	  */
+	uint32_t getKeyLen() const noexcept;
 
 
-    /* ===============================================
-     * === Public operators                        ===
-     * ===============================================
-    */
-
-    /** @brief operator() to build a hash from a key
-      *
-      * This operator serves as a dispatcher. The default is
-      * to use RNG.hash() on the provided key, but a user defined
-      * hashing method can be used instead.
-      *
-      * Please note that RNG.hash can only handle [u]int16_t,
-      * [u]int32_t, [u]int64_t, float, double, char* and std::string
-      * keys. You must provide your own hashing method on any other
-      * types or the application will be forced to terminate.
-      *
-      * The operator has two optional parameters. The first is a pointer
-      * to a general hash method, the second to a hash method taking
-      * a second uint32_t argument called keyLen; although it is up to
-      * the method what it uses the key length for.
-      *
-      * @param[in] key pointer to the key to hash
-      * @param[in] hash_user a user defined method to hash a single key (default: nullptr)
-      * @param[in] hash_limited a user defined method to hash a single key with keyLen argument (default: nullptr)
-      * @return the hash result as an unsigned 32 bit integer.
-    **/
-    template<typename key_t>
-    uint32_t operator()( const key_t* key,
-                         uint32_t ( *hash_user )    ( const key_t* key )                  = nullptr,
-                         uint32_t ( *hash_limited ) ( const key_t* key, uint32_t keyLen ) = nullptr
-                       ) const {
-        if ( hash_user )
-            return hash_user( key );
-        if ( hash_limited )
-            return hash_limited( key, keyLen );
-        return this->hash_pwx( key );
-    }
+	/** @brief set a new key length
+	  *
+	  * @param[in] keyLen_ the key length to use in the future
+	  */
+	void setKeyLen( uint32_t keyLen_ ) noexcept;
 
 
+	/* ===============================================
+	 * === Public operators                        ===
+	 * ===============================================
+	*/
 
-  protected:
-
-    /* ===============================================
-     * === Protected methods                       ===
-     * ===============================================
-    */
-
-    /** @brief internal hash method for type RNG can handle
-      *
-      * If a type not supported is used, an exception is thrown
-      * triggering std::terminate(). This is done because the
-      * condition implies a serious bug. Either because the user
-      * has not provided a hashing function or because operator()
-      * is faulty.
-      *
-      * @param[in] key pointer to the key to hash
-      * @return the hash modded to the hash size
-    **/
-    template<typename key_t>
-    uint32_t hash_pwx( const key_t* key ) const {
-        compAssert( (
-                        isIntType( key_t )
-                        ||	isFloatType( key_t )
-                        ||	isSameType( key_t, char )
-                        ||	isSameType( key_t, std::string ) )
-                    && "ERROR: unsupported type used in CHashBuilder::hash_pwx(key* key)" );
-        if ( isIntType( key_t )
-                || isFloatType( key_t )
-                || isSameType( key_t, char )
-                || isSameType( key_t, std::string ) )
-            return this->hash_rng( key );
-        else
-            PWX_THROW( "abort", "Illegal type in hash_pwx()", "hash_pwx() was called with a type unsupported by RNG!" )
-        }
-
-
-    /* ===============================================
-     * === Protected members                       ===
-     * ===============================================
-    */
+	/** @brief operator() to build a hash from a key
+	  *
+	  * This operator serves as a dispatcher. The default is
+	  * to use RNG.hash() on the provided key, but a user defined
+	  * hashing method can be used instead.
+	  *
+	  * Please note that RNG.hash can only handle [u]int16_t,
+	  * [u]int32_t, [u]int64_t, float, double, char* and std::string
+	  * keys. You must provide your own hashing method on any other
+	  * types or the application will be forced to terminate.
+	  *
+	  * The operator has two optional parameters. The first is a pointer
+	  * to a general hash method, the second to a hash method taking
+	  * a second uint32_t argument called keyLen; although it is up to
+	  * the method what it uses the key length for.
+	  *
+	  * @param[in] key pointer to the key to hash
+	  * @param[in] hash_user a user defined method to hash a single key (default: nullptr)
+	  * @param[in] hash_limited a user defined method to hash a single key with keyLen argument (default: nullptr)
+	  * @return the hash result as an unsigned 32 bit integer.
+	**/
+	template<typename key_t>
+	uint32_t operator()( const key_t* key,
+	                     uint32_t ( *hash_user )    ( const key_t* key )                  = nullptr,
+	                     uint32_t ( *hash_limited ) ( const key_t* key, uint32_t keyLen ) = nullptr
+	                   ) const {
+		if ( hash_user )
+			return hash_user( key );
+		if ( hash_limited )
+			return hash_limited( key, keyLen );
+		return this->hash_pwx( key );
+	}
 
 
-  private:
+protected:
 
-    /* ===============================================
-     * === Private methods                         ===
-     * ===============================================
-    */
+	/* ===============================================
+	 * === Protected methods                       ===
+	 * ===============================================
+	*/
 
-    uint32_t hash_rng( const int16_t*     key ) const noexcept;
-    uint32_t hash_rng( const uint16_t*    key ) const noexcept;
-    uint32_t hash_rng( const int32_t*     key ) const noexcept;
-    uint32_t hash_rng( const uint32_t*    key ) const noexcept;
-    uint32_t hash_rng( const int64_t*     key ) const noexcept;
-    uint32_t hash_rng( const uint64_t*    key ) const noexcept;
-    uint32_t hash_rng( const float*       key ) const noexcept;
-    uint32_t hash_rng( const double*      key ) const noexcept;
-    uint32_t hash_rng( const long double* key ) const noexcept;
-    uint32_t hash_rng( char const*        key ) const noexcept;
-    uint32_t hash_rng( const std::string* key ) const noexcept;
-    template<typename key_t>
-    uint32_t hash_rng( key_t* key );
+	/** @brief internal hash method for type RNG can handle
+	  *
+	  * If a type not supported is used, an exception is thrown
+	  * triggering `std::terminate()`. This is done because the
+	  * condition implies a serious bug. Either because the user
+	  * has not provided a hashing function or because operator()
+	  * is faulty.
+	  *
+	  * @param[in] key pointer to the key to hash
+	  * @return the hash modded to the hash size
+	**/
+	template<typename key_t>
+	uint32_t hash_pwx( const key_t* key ) const {
+		compAssert( (  isIntType( key_t )
+		               || isFloatType( key_t )
+		               || isSameType( key_t, char )
+		               || isSameType( key_t, std::string )
+		            ) && "ERROR: unsupported type used in CHashBuilder::hash_pwx(key* key)" );
+		if ( isIntType( key_t )
+		                || isFloatType( key_t )
+		                || isSameType( key_t, char )
+		                || isSameType( key_t, std::string ) )
+			return this->hash_rng( key );
+		else
+			PWX_THROW( "abort", "Illegal type in hash_pwx()",
+			           "hash_pwx() was called with a type unsupported by RNG!" );
+	}
 
 
-    /* ===============================================
-     * === Private members                         ===
-     * ===============================================
-    */
+	/* ===============================================
+	 * === Protected members                       ===
+	 * ===============================================
+	*/
 
-    uint32_t keyLen = 0; //!< optional key length for C-String and std::string keys (0 = use strlen() on C-Strings)
+
+private:
+
+	/* ===============================================
+	 * === Private methods                         ===
+	 * ===============================================
+	*/
+
+	uint32_t hash_rng( const int16_t*     key ) const noexcept;
+	uint32_t hash_rng( const uint16_t*    key ) const noexcept;
+	uint32_t hash_rng( const int32_t*     key ) const noexcept;
+	uint32_t hash_rng( const uint32_t*    key ) const noexcept;
+	uint32_t hash_rng( const int64_t*     key ) const noexcept;
+	uint32_t hash_rng( const uint64_t*    key ) const noexcept;
+	uint32_t hash_rng( const float*       key ) const noexcept;
+	uint32_t hash_rng( const double*      key ) const noexcept;
+	uint32_t hash_rng( const long double* key ) const noexcept;
+	uint32_t hash_rng( char const*        key ) const noexcept;
+	uint32_t hash_rng( const std::string* key ) const noexcept;
+	template<typename key_t>
+	uint32_t hash_rng( key_t* key );
+
+
+	/* ===============================================
+	 * === Private members                         ===
+	 * ===============================================
+	*/
+
+	uint32_t keyLen = 0; //!< optional key length for C-String and std::string keys (0 = use strlen() on C-Strings)
 
 
 }; // class CHashBuilder
