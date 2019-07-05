@@ -43,6 +43,33 @@
 #endif // __cplusplus defined and large enough?
 
 
+#if defined(_MSC_VER)
+#  if (_MSC_VER < 1914)
+#    pragma error "You need at least Visual Studio version 15.7.1 / VC++ 14.14 to build pwxLib!"
+#  endif // version check
+#  define PWX_IS_CLANG 0
+#  define PWX_IS_GCC   0
+#  define PWX_IS_MSC   1
+#elif defined(__GNUC__)
+#  define PWX_IS_CLANG 0
+#  define PWX_IS_GCC   1
+#  define PWX_IS_MSC   0
+#  if (__GNUC__ < 7)
+#    pragma error "You need at least gcc-7.1 to build pwxLib!"
+#  endif
+#elif defined(__clang__)
+#  define PWX_IS_CLANG 1
+#  define PWX_IS_GCC   0
+#  define PWX_IS_MSC   0
+#  if (__clang_major__ < 5)
+#    pragma error "You need at least clang-5 to build pwxLib!"
+#  endif
+#else
+#  define PWX_IS_CLANG 0
+#  define PWX_IS_GCC   0
+#  define PWX_IS_MSC   0
+#  pragma error "Currently only Microsoft Visual C++, GNU gcc and Clang are supported"
+#endif // Visual C++ versus GNU gcc versus Clang
 /** @def PWX_IS_MSC
   * @brief 1 if Visual C++ is used, 0 otherwise
   *  Microsoft Visual C++ is C++17 feature complete enough since:
@@ -50,43 +77,15 @@
   *  * VC++ version : 14.14
   *  * _MSC_VER     : 1914
   *  * _MSC_FULL_VER: 191426428
-**/
-#if defined(_MSC_VER)
-#  if (_MSC_VER < 1914)
-#    pragma error "You need at least Visual Studio version 15.7.1 / VC++ 14.14 to build pwxLib!"
-#  endif // version check
-#  define PWX_IS_MSC 1
-#else
-#  define PWX_IS_MSC 0
-#endif // _MSC_VER is defined
-
-
-/** @def PWX_IS_GCC
+  *
+  * @def PWX_IS_GCC
   * @brief 1 if GNU gcc is used, 0 otherwise
   *  GNU gcc is C++17 feature complete enough since gcc-7.1.0
-**/
-#if defined(__GNUC__)
-#  define PWX_IS_GCC 1
-#  if (__GNUC__ < 7)
-#    pragma error "You need at least gcc-7.1 to build pwxLib!"
-#  endif
-#else
-#  define PWX_IS_GCC 0
-#endif // __GNUC__
-
-
-/** @def PWX_IS_CLANG
+  *
+  * @def PWX_IS_CLANG
   * @brief 1 if LLVM clang is used, 0 otherwise
   *  LLVM clang is C++17 feature complete enough since clang-5
 **/
-#if defined(__clang__)
-#  define PWX_IS_CLANG 1
-#  if (__clang_major__ < 5)
-#    pragma error "You need at least clang-5 to build pwxLib!"
-#  endif
-#else
-#  define PWX_IS_CLANG 0
-#endif // __clang__
 
 
 /* --- some shortcuts --- */
@@ -149,5 +148,24 @@
 #  define PWX_WARNUNUSED __attribute__ ((warn_unused_result))
 #endif // Difference for MSVC
 #endif // ignored by doxygen
+
+
+/** @def PWX_CURRENT_FUNC
+  * @brief macro/identifier for the current function name
+  *
+  * To be sure to have a valid macro/identifier for the current function,
+  * `PWX_CURRENT_FUNC` is set to what hopefully is the correct macro on
+  * the used compiler and standard.
+**/
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)) || (defined(__cplusplus) && (__cplusplus >= 201103))
+#  define PWX_CURRENT_FUNC  __func__
+#elif (defined(__IBMCPP__) && (__IBMCPP__ >= 500)) || (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600))
+#  define PWX_CURRENT_FUNC __FUNCTION__
+#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+#  define PWX_CURRENT_FUNC __FUNC__
+#else
+#  define PWX_CURRENT_FUNC "(unknown)"
+#endif
+
 
 #endif // PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED

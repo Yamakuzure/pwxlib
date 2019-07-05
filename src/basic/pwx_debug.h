@@ -83,29 +83,30 @@ namespace pwx {
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
 
 // The main logging function:
-void PWX_API debug_log( char const* fmt, ... ); //!< internal debug logging function to stdout
-void PWX_API debug_err( char const* fmt, ... ); //!< internal debug logging function to stderr
+void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stdout
+	void debug_err( char const * fmt, ... ) PWX_API; //!< internal debug logging function to stderr
 
 // And the main wrapper:
-# define DEBUG_LOG(part, fmt, ...) { \
-                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
-                                     &::pwx::private_::_pwx_internal_trace_lock); \
-                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
-                         1023, ">> [%8s] %s:%d - %s : %s\n", part, \
-                         basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_log(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
-        }
-# define DEBUG_ERR(part, fmt, ...) { \
-                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
-                                     &::pwx::private_::_pwx_internal_trace_lock); \
-                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
-                         1023, ">> [%8s] %s:%d - %s : %s\n", part, \
-                         basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_err(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
-        }
+# define DEBUG_LOG(part, fmt, ...)                   \
+	::pwx::debug_log( ">> [%8s] %s : " fmt,      \
+	                  part,                      \
+	                  ::pwx::get_trace_info(     \
+	                          __FILE__,          \
+	                          __LINE__,          \
+	                          PWX_CURRENT_FUNC), \
+	                  __VA_ARGS__ )
+
+# define DEBUG_ERR(part, fmt, ...)                   \
+	::pwx::debug_err( ">> [%8s] %s : " fmt,      \
+	                  part,                      \
+	                  ::pwx::get_trace_info(     \
+	                          __FILE__,          \
+	                          __LINE__,          \
+	                          PWX_CURRENT_FUNC), \
+	                  __VA_ARGS__ )
 #else
-# define DEBUG_LOG(...) {}
-# define DEBUG_ERR(...) {}
+# define DEBUG_LOG(...) 
+# define DEBUG_ERR(...) 
 /* debug_log() and debug_err() are not defined here, because they would cause
  *   pwx::debug_log(...);
  * to become
@@ -125,106 +126,82 @@ void PWX_API debug_err( char const* fmt, ... ); //!< internal debug logging func
 
 // Specialized logging macros for mutex locking/unlocking
 #ifdef PWX_THREADDEBUG
-# define THREAD_LOG(part, fmt, ...) { \
-                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
-                                     &::pwx::private_::_pwx_internal_trace_lock); \
-                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, 1023, \
-                         ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
-                         CURRENT_THREAD_ID, part, \
-                         basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_log(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
-        }
-# define THREAD_ERR(part, fmt, ...) { \
-                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
-                                     &::pwx::private_::_pwx_internal_trace_lock); \
-                snprintf(::pwx::private_::_pwx_internal_debug_trace_info, 1023, \
-                         ">> tid 0x%lx;[%8s] %s:%d - %s : %s\n", \
-                         CURRENT_THREAD_ID, part, \
-                         basename(__FILE__), __LINE__, __FUNCTION__, fmt); \
-                pwx::debug_err(::pwx::private_::_pwx_internal_debug_trace_info, __VA_ARGS__); \
-        }
-# define DEBUG_LOCK_STATE(action, locker, to_lock) { \
-                if ((to_lock)->is_locking()) { \
-                        THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks (state \"%s\") owned by tid 0x%lx", \
-                                   #locker, action, #to_lock, #to_lock, \
-                                   (to_lock)->lock_count(), \
-                                   (to_lock)->is_locked() ? "locked" : "unlocked", \
-                                   (to_lock)->owner_thread_id() ) \
-                } }
-# define LOG_LOCK(obj)       if ((obj)->is_locking()) \
-                THREAD_LOG("LOCK", "Locked %s (has %d locks now)", #obj, \
-                           (obj)->lock_count())
-# define LOG_UNLOCK(obj)     if ((obj)->is_locking()) \
-                THREAD_LOG("UNLOCK", "Unlocked %s (has %d locks now)", #obj, \
-                           (obj)->lock_count())
+# define THREAD_LOG(part, fmt, ...)                       \
+	::pwx::debug_log( ">> tid 0x%lx;[%8s] %s : " fmt, \
+	                  CURRENT_THREAD_ID, part,        \
+	                  ::pwx::get_trace_info(          \
+	                          __FILE__,               \
+	                          __LINE__,               \
+	                          PWX_CURRENT_FUNC),      \
+	                  __VA_ARGS__ )
 
+# define THREAD_ERR(part, fmt, ...) {                                   \
+	::pwx::debug_err( ">> tid 0x%lx;[%8s] %s : " fmt, \
+	                  CURRENT_THREAD_ID, part,        \
+	                  ::pwx::get_trace_info(          \
+	                          __FILE__,               \
+	                          __LINE__,               \
+	                          PWX_CURRENT_FUNC),      \
+	                  __VA_ARGS__ )
+
+# define DEBUG_LOCK_STATE(action, locker, to_lock)      \
+	THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks"  \
+		   "(state \"%s\") owned by tid 0x%lx", \
+		   #locker, action, #to_lock, #to_lock, \
+		   (to_lock)->lock_count(),             \
+		   (to_lock)->is_locked()               \
+			? "locked" : "unlocked",        \
+		   (to_lock)->owner_thread_id() )
+
+# define LOG_LOCK(obj) if ( (obj)->is_locking() )  \
+	THREAD_LOG("LOCK",                         \
+		   "Locked %s (has %d locks now)", \
+		   #obj, (obj)->lock_count() )
+
+# define LOG_UNLOCK(obj) if ((obj)->is_locking())    \
+	THREAD_LOG("UNLOCK",                         \
+		   "Unlocked %s (has %d locks now)", \
+		   #obj, (obj)->lock_count() )
+
+		           
 // Lock guard one object
 # define LOG_LOCK_GUARD(obj) if ((obj)->is_locking()) \
-                THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, \
-                           (obj)->lock_count())
+	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, (obj)->lock_count())
+
+
 # define LOG_UNLOCK_GUARD(obj) if ((obj)->is_locking()) \
-                THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #obj, \
-                           (obj)->lock_count())
+	THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #obj, (obj)->lock_count())
+
 
 // Lock guard two objects
-# define LOG_DOUBLE_LOCK_GUARD(objA, objB) \
-        if ((objA)->is_locking()) { \
-                THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objA, \
-                           (objA)->lock_count()) \
-                if ((objB)->is_locking()) { \
-                        THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objB, \
-                                   (objB)->lock_count()) \
-                } \
-        }
+# define LOG_DOUBLE_LOCK_GUARD(objA, objB)   \
+	LOG_LOCK_GUARD(objA);                \
+	LOG_LOCK_GUARD(objB);
 # define LOG_DOUBLE_UNLOCK_GUARD(objA, objB) \
-        if ((objA)->is_locking()) { \
-                THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objA, \
-                           (objA)->lock_count()) \
-                if ((objB)->is_locking()) { \
-                        THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objB, \
-                                   (objB)->lock_count()) \
-                } \
-        }
+	LOG_UNLOCK_GUARD(objA);              \
+	LOG_UNLOCK_GUARD(objB);
 
 // Lock guard three objects
 # define LOG_TRIPLE_LOCK_GUARD(objA, objB, objC) \
-        if ((objA)->is_locking()) { \
-                THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objA, \
-                           (objA)->lock_count()) \
-                if ((objB)->is_locking()) { \
-                        THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objB, \
-                                   (objB)->lock_count()) \
-                        if ((objC)->is_locking()) { \
-                                THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #objC, \
-                                           (objC)->lock_count()) \
-                        } \
-                } \
-        }
+	LOG_LOCK_GUARD(objA);                    \
+	LOG_LOCK_GUARD(objB);                    \
+	LOG_LOCK_GUARD(objC);
 # define LOG_TRIPLE_UNLOCK_GUARD(objA, objB, objC) \
-        if ((objA)->is_locking()) { \
-                THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objA, \
-                           (objA)->lock_count()) \
-                if ((objB)->is_locking()) { \
-                        THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objB, \
-                                   (objB)->lock_count()) \
-                        if ((objC)->is_locking()) { \
-                                THREAD_LOG("GUARD", "Un-guarding %s (has %d locks now)", #objC, \
-                                           (objC)->lock_count()) \
-                        } \
-                } \
-        }
+	LOG_UNLOCK_GUARD(objA);                    \
+	LOG_UNLOCK_GUARD(objB);                    \
+	LOG_UNLOCK_GUARD(objC);
 #else
-# define THREAD_LOG(...) {}
-# define THREAD_ERR(...) {}
-# define DEBUG_LOCK_STATE(action, locker, to_lock) {}
-# define LOG_LOCK(...) {}
-# define LOG_UNLOCK(...) {}
-# define LOG_LOCK_GUARD(...) {}
-# define LOG_UNLOCK_GUARD(...) {}
-# define LOG_DOUBLE_LOCK_GUARD(...) {}
-# define LOG_DOUBLE_UNLOCK_GUARD(...) {}
-# define LOG_TRIPLE_LOCK_GUARD(...) {}
-# define LOG_TRIPLE_UNLOCK_GUARD(...) {}
+# define THREAD_LOG(...) 
+# define THREAD_ERR(...) 
+# define DEBUG_LOCK_STATE(action, locker, to_lock)
+# define LOG_LOCK(...) 
+# define LOG_UNLOCK(...) 
+# define LOG_LOCK_GUARD(...) 
+# define LOG_UNLOCK_GUARD(...) 
+# define LOG_DOUBLE_LOCK_GUARD(...) 
+# define LOG_DOUBLE_UNLOCK_GUARD(...) 
+# define LOG_TRIPLE_LOCK_GUARD(...) 
+# define LOG_TRIPLE_UNLOCK_GUARD(...) 
 #endif // PWX_THREADDEBUG
 
 /** @def  THREAD_LOG

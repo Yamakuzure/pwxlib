@@ -56,28 +56,28 @@ namespace private_ {
 aflag_t _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
 
 static void debug_log_out( _IO_FILE* target, char const* fmt, va_list ap ) {
-        while ( _pwx_internal_LOG_output_lock.test_and_set( PWX_MEMORDER_ACQUIRE ) )
-                std::this_thread::yield();
+	while ( _pwx_internal_LOG_output_lock.test_and_set( PWX_MEMORDER_ACQUIRE ) )
+		std::this_thread::yield();
 
-        vfprintf ( target, fmt, ap );
+	vfprintf ( target, fmt, ap );
 
-        _pwx_internal_LOG_output_lock.clear( PWX_MEMORDER_RELEASE );
+	_pwx_internal_LOG_output_lock.clear( PWX_MEMORDER_RELEASE );
 }
 
 } // namespace private_
 
 void debug_log( char const* fmt, ... ) {
-        va_list ap;
-        va_start ( ap, fmt );
-        private_::debug_log_out( stdout, fmt, ap );
-        va_end( ap );
+	va_list ap;
+	va_start ( ap, fmt );
+	private_::debug_log_out( stdout, fmt, ap );
+	va_end( ap );
 }
 
 void debug_err( char const* fmt, ... ) {
-        va_list ap;
-        va_start ( ap, fmt );
-        private_::debug_log_out( stderr, fmt, ap );
-        va_end( ap );
+	va_list ap;
+	va_start ( ap, fmt );
+	private_::debug_log_out( stderr, fmt, ap );
+	va_end( ap );
 }
 
 

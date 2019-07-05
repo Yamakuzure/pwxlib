@@ -38,7 +38,8 @@
 **/
 
 
-#include "basic/pwx_debug.h"
+#include "pwx_compiler.h"
+#include "pwx_debug.h"
 
 
 /** @brief Return the sign as -1 or +1 of an expression
@@ -61,14 +62,14 @@
   * @param[in] func the function body within the try {} statement without final semicolon.
 **/
 #define PWX_TRY(func) \
-        try { \
-                func; \
-        }
+	try {         \
+		func; \
+	}
 
 
-/** @brief throw wrapper to throw a pwx::CException with trace information
+/** @brief throw wrapper to throw a `pwx::CException` with trace information
   *
-  * This macro fills in positional information before throwing pwx::CException.
+  * This macro fills in positional information before throwing `pwx::CException`.
   *
   * *Prerequisites*: pwx/types/CException.h
   *
@@ -76,116 +77,113 @@
   * @param[in] msg char const message to be returned by the exceptions what() method
   * @param[in] desc char const message to be returned by the exceptions desc() method
 **/
-#define PWX_THROW(name, msg, desc) { \
-                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
-                                     &::pwx::private_::_pwx_internal_trace_lock); \
-                sprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
-                        "%s:%d %s", basename(__FILE__), __LINE__, __FUNCTION__); \
-                throw(::pwx::CException(strlen(name) ? name : "no name", strlen(msg) ? msg : "no message", \
-                                      ::pwx::private_::_pwx_internal_debug_trace_info, \
-                                      __PRETTY_FUNCTION__, strlen(desc) ? desc : "no description")); \
-        }
+#define PWX_THROW(name, msg, desc) {                                      \
+	::pwx::CException _pwx_exception(                                 \
+	                        strlen(name) ? name : "no name",          \
+	                        strlen(msg)  ? msg  : "no message",       \
+	                        ::pwx::get_trace_info(__FILE__, __LINE__, \
+	                                              PWX_CURRENT_FUNC),  \
+	                        __PRETTY_FUNCTION__,                      \
+	                        strlen(desc) ? desc : "no description");  \
+	throw(_pwx_exception);                                            \
+}
 
 
 /** @brief catch wrapper to add positional information and re-throw the caught exception
   *
-  * This macro catches any pwx::CException exception derivate, adds positional
+  * This macro catches any `pwx::CException exception`, adds positional
   * data to the trace, and re-throws the exception.
   *
   * *Prerequisites*: pwx/types/CException.h
 **/
-#define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) { \
-                PWX_NAMED_LOCK_GUARD(pwx_internal_trace_lock, \
-                                     &::pwx::private_::_pwx_internal_trace_lock); \
-                sprintf(::pwx::private_::_pwx_internal_debug_trace_info, \
-                        "--> Called by %s:%d %s", basename(__FILE__), __LINE__, __FUNCTION__); \
-                e.addToTrace(::pwx::private_::_pwx_internal_debug_trace_info); \
-                throw; \
-        }
+#define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) {  \
+	e.addToTrace(::pwx::get_trace_msg("--> Called by",   \
+	             __FILE__, __LINE__, PWX_CURRENT_FUNC)); \
+	throw e;                                             \
+}
 
 
-/** @brief catch wrapper for std::exception to add positional information and throw a pwx::CException
+/** @brief catch wrapper for std::exception to add positional information and throw a `pwx::CException`
   *
-  * This macro can be used where an std::exception is to be caught to transform it into
-  * a tracking pwx::CException. The message will always be the return value of the
+  * This macro can be used where an `std::exception` is to be caught to transform it into
+  * a tracking `pwx::CException`. The message will always be the return value of the
   * caught exceptions what() method.
   *
   * *Prerequisites*: pwx/types/CException.h
   *
   * @param[in] name char const name of the exception
-  * @param[in] desc char const message to be returned by the exceptions desc() method
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method
 **/
-#define PWX_THROW_STD_FURTHER(name, desc) catch(std::exception &e) { \
-                PWX_THROW(name, e.what(), desc) \
-        }
+#define PWX_THROW_STD_FURTHER(name, desc)       \
+	catch(std::exception &e) {              \
+		PWX_THROW(name, e.what(), desc) \
+	}
 
 
 /** @brief catch wrapper for pwx::CException and std::exception
   *
-  * This macro can be used where both a pwx::CException or an std::exception can
-  * be caught. The latter is transformed it into a tracking pwx::CException.
-  * If an std::exception is caught, the message will always be the return value
-  * of the caught exceptions what() method.
+  * This macro can be used where both a `pwx::CExceptioǹ` or an `std::exception` can
+  * be caught. The latter is transformed it into a tracking `pwx::CException`.
+  * If an `std::exception` is caught, the message will always be the return value
+  * of the caught exceptions `what()` method.
   *
   * *Prerequisites*: pwx/types/CException.h
   *
-  * @param[in] name char const name of the exception for std::exception
-  * @param[in] desc char const message to be returned by the exceptions desc() method if an std::exception is caught.
+  * @param[in] name char const name of the exception for `std::exception`
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method if an `std::exception` is caught.
 **/
 #define PWX_THROW_PWXSTD_FURTHER(name, desc) \
-        PWX_THROW_PWX_FURTHER \
-        PWX_THROW_STD_FURTHER(name, desc)
+	PWX_THROW_PWX_FURTHER                \
+	PWX_THROW_STD_FURTHER(name, desc)
 
 
-/** @brief try and throw pwx::CExceptions further
+/** @brief try and throw `pwx::CExceptions` further
   *
-  * This macro is a convenience wrapper to have a try and
-  * a delegation of a possibly thrown pwx::CException
-  * in one call.
+  * This macro is a convenience wrapper to have a try and a delegation
+  * of a possibly thrown `pwx::CException` in one call.
   *
   * *Prerequisites*: pwx/types/CException.h
   *
-  * @param[in] func the function body within the try {} statement without final semicolon.
+  * @param[in] func the function body within the `try{}` statement without final semicolon.
 **/
-#define PWX_TRY_PWX_FURTHER(func) { \
-                PWX_TRY(func) \
-                PWX_THROW_PWX_FURTHER \
-        }
+#define PWX_TRY_PWX_FURTHER(func)     \
+	PWX_TRY(func)         \
+	PWX_THROW_PWX_FURTHER \
 
-/** @brief try and throw std::exception as pwx::CExceptions further
+
+/** @brief try and throw `std::exception` as `pwx::CExceptions` further
   *
-  * This macro is a convenience wrapper to have a try and
-  * a delegation of a possibly thrown std::exception, that is
-  * transformed into a pwx::CException, further in one call
+  * This macro is a convenience wrapper to have a try and a delegation
+  * of a possibly thrown `std::exception`, that is transformed into a
+  * `pwx::CException`, further in one call
   *
   * *Prerequisites*: pwx/types/CException.h
   *
-  * @param[in] func the function body within the try {} statement without final semicolon.
+  * @param[in] func the function body within the `try{}` statement without final semicolon.
   * @param[in] name char const name of the exception.
-  * @param[in] desc char const message to be returned by the exceptions desc() method.
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method.
 **/
-#define PWX_TRY_STD_FURTHER(func, name, desc) { \
-                PWX_TRY(func) \
-                PWX_THROW_STD_FURTHER(name, desc) \
-        }
+#define PWX_TRY_STD_FURTHER(func, name, desc)     \
+	PWX_TRY(func)                     \
+	PWX_THROW_STD_FURTHER(name, desc) \
+		
 
-/** @brief try and throw both std::exception or pwx::CExceptions further
+/** @brief try and throw both `std::exception` and `pwx::CExceptions` further
   *
-  * This macro is a convenience wrapper to have a try and
-  * a delegation of a possibly thrown pwx::CException, that
-  * can be a transformation of an std::exception, in one call
+  * This macro is a convenience wrapper to have a try and a delegation
+  * of a possibly thrown `pwx::CException`, that can be a transformation
+  * of an `std::exception`, in one call
   *
   * *Prerequisites*: pwx/types/CException.h
   *
-  * @param[in] func the function body within the try {} statement without final semicolon.
-  * @param[in] name char const name of the exception for std::exception
-  * @param[in] desc char const message to be returned by the exceptions desc() method if an std::exception is caught.
+  * @param[in] func the function body within the `try{}` statement without final semicolon.
+  * @param[in] name char const name of the exception for `std::exception`.
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method if an `std::exception` is caught.
 **/
-#define PWX_TRY_PWXSTD_FURTHER(func, name, desc) { \
-                PWX_TRY(func) \
-                PWX_THROW_PWX_FURTHER \
-                PWX_THROW_STD_FURTHER(name, desc) \
-        }
+#define PWX_TRY_PWXSTD_FURTHER(func, name, desc)   \
+	PWX_TRY(func)                      \
+	PWX_THROW_PWX_FURTHER              \
+	PWX_THROW_STD_FURTHER(name, desc)  \
 
 
 /** @brief This catches and ignores an exception.
@@ -200,51 +198,53 @@
 #define PWX_CATCH_AND_FORGET(except) catch(except&) { }
 
 
-/** @brief Alias for the current threads get_id()
+/** @brief Alias for the current threads `get_id()`
   *
   * *Prerequisites*: thread
   *
-  * @return The std::thread::id of the current thread.
+  * @return The `std::thread::id` of the current thread.
 **/
-#define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
+#if PWX_IS_MSC
+#  define CURRENT_THREAD_ID _Thrd_id()
+#else
+#  define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
+#endif /// MSC versus gcc/clang
 
 
-/** @brief Use `object->lock()` if @a object is not nullptr
+/** @brief Use `object->lock()` if @a object is not `nullptr`
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
-#define PWX_LOCK(object) { \
-                if (nullptr != (object) ) { \
-                        (object)->lock(); \
-                        LOG_LOCK(object) \
-                } \
-        }
+#define PWX_LOCK(object)    \
+if (nullptr != (object) ) { \
+	(object)->lock();   \
+	LOG_LOCK(object);   \
+}
 
 
 /** @brief Use `object->lock()`, @a object will be asserted
   *
   * The background for this slightly changed macro is gcc-7
   * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a nonnull-comparison.
+  * the 'this'-pointer is used in a non-null-comparison.
   *
-  * If your compiler freaks out with PWX_LOCK(foo), and you
-  * are very certain that 'foo' can never be nullptr, then
-  * just use PWX_LOCK_OBJ(foo) instead.
+  * If your compiler freaks out with `PWX_LOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `PWX_LOCK_OBJ(foo);` instead.
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
 **/
-#define PWX_LOCK_OBJ(object) { \
-                assert (object); \
-                (object)->lock(); \
-                LOG_LOCK(object) \
-        }
+#define PWX_LOCK_OBJ(object) \
+	assert (object);     \
+	(object)->lock();    \
+	LOG_LOCK(object)
 
 
-/** @brief Use object->try_lock if @a object is defined
+/** @brief Use `object->try_lock89` if @a object is defined
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
@@ -260,49 +260,103 @@
   *
   * @param object pointer to the object to unlock.
 **/
-#define PWX_UNLOCK(object) { \
-                assert(object); \
-                (object)->unlock(); \
-                LOG_UNLOCK(object) \
-        }
+#define PWX_UNLOCK(object)  \
+if (object) {               \
+	(object)->unlock(); \
+	LOG_UNLOCK(object); \
+}                           \
 
 
-/** @brief Use `object->unlock()` and then `object->lock()` for a relock cycle
+/** @brief Use `object->unlock()`, @a object is asserted.
+  *
+  * The background for this slightly changed macro is gcc-7
+  * throwing out warnings if the address of a local value or
+  * the 'this'-pointer is used in a non-null-comparison.
+  *
+  * If your compiler freaks out with `PWX_UNLOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `PWX_UNLOCK_OBJ(foo);` instead.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to unlock.
+**/
+#define PWX_UNLOCK_OBJ(object) { \
+	assert(object);          \
+	(object)->unlock();      \
+	LOG_UNLOCK(object);      \
+}
+
+
+/** @brief Do an `object->unlock()`, `object->lock()` cycle if @a object is defined.
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to cycle the lock.
 **/
-#define PWX_RELOCK(object) { \
-                assert(object); \
-                (object)->unlock(); \
-                LOG_UNLOCK(object) \
-                (object)->lock(); \
-                LOG_LOCK(object) \
-        }
-        
-        
+#define PWX_RELOCK(object)  \
+if (object) {               \
+	(object)->unlock(); \
+	LOG_UNLOCK(object); \
+	(object)->lock();   \
+	LOG_LOCK(object);   \
+}
+
+
+/** @brief Do an `object->unlock()`, `object->lock()` cycle, @a object is asserted.
+  *
+  * The background for this slightly changed macro is gcc-7
+  * throwing out warnings if the address of a local value or
+  * the 'this'-pointer is used in a non-null-comparison.
+  *
+  * If your compiler freaks out with `PWX_RELOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `PWX_RELOCK_OBJ(foo);` instead.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to cycle the lock.
+**/
+#define PWX_RELOCK_OBJ(object) { \
+	assert(object);          \
+	(object)->unlock();      \
+	LOG_UNLOCK(object);      \
+	(object)->lock();        \
+	LOG_LOCK(object);        \
+}
+
+
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
+  *
+  * If you only need exactly one lock guard in your function/method, you can
+  * use `PWX_LOCK_GUARD()`. It will use the function name.
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to lock
 **/
-#define PWX_NAMED_LOCK_GUARD(Name, object) \
-        DEBUG_LOCK_STATE("TLockGuard", this, object) \
-        ::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object); \
-        LOG_LOCK_GUARD(object)
+#define PWX_NAMED_LOCK_GUARD(Name, object)                      \
+	DEBUG_LOCK_STATE("TLockGuard", this, object);           \
+	::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object); \
+	LOG_LOCK_GUARD(object)
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
+  *
+  * If you need more than one lock guard, you have to use
+  * `PWX_NAMED_LOCK_GUARD()` for any additional ones.
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
   *
   * @param object pointer to the object to lock
 **/
-#define PWX_LOCK_GUARD(object) \
-        PWX_NAMED_LOCK_GUARD(__FUNCTION__, object)
+#define PWX_LOCK_GUARD(object) PWX_NAMED_LOCK_GUARD(PWX_CURRENT_FUNC, object)
+
+
+/// @brief Helper for a nullptr CLockable
+#define NULL_LOCK static_cast<CLockable*>(nullptr)
+
 
 /** @brief Clear a named lock guard, unlocking all currently locked objects
   *
@@ -310,18 +364,18 @@
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
-#define PWX_NAMED_LOCK_GUARD_CLEAR(Name) \
-        THREAD_LOG("TLockGuard", "LockGuard %s clearing...", #Name) \
-        pwx_libpwx_lock_guard_##Name.reset(nullptr, nullptr, nullptr); \
-        THREAD_LOG("TLockGuard", "LockGuard %s cleared!", #Name)
+#define PWX_NAMED_LOCK_GUARD_CLEAR(Name) {                             \
+	THREAD_LOG("TLockGuard", "LockGuard %s clearing...", #Name);   \
+	pwx_libpwx_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
+	THREAD_LOG("TLockGuard", "LockGuard %s cleared!", #Name);      \
+}
 
 
-/** @brief Clear the __FUNCTION__ named lock guard, unlocking all currently held objects
+/** @brief Clear the lock guard named after the enclosing function, unlocking all currently held objects
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
 **/
-#define PWX_LOCK_GUARD_CLEAR() \
-        PWX_NAMED_LOCK_GUARD_CLEAR(__FUNCTION__)
+#define PWX_LOCK_GUARD_CLEAR() PWX_NAMED_LOCK_GUARD_CLEAR(PWX_CURRENT_FUNC)
 
 
 /** @brief Reset a lock guard to a new value
@@ -333,10 +387,11 @@
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to reset the lock guard to
 **/
-#define PWX_NAMED_LOCK_GUARD_RESET(Name, object) \
-        LOG_UNLOCK_GUARD(object) \
-        pwx_libpwx_lock_guard_##Name.reset(object); \
-        LOG_LOCK_GUARD(object)
+#define PWX_NAMED_LOCK_GUARD_RESET(Name, object) {  \
+	LOG_UNLOCK_GUARD(object);                   \
+	pwx_libpwx_lock_guard_##Name.reset(object); \
+	LOG_LOCK_GUARD(object);                     \
+}
 
 
 /** @brief Reset a lock guard to a new value
@@ -347,8 +402,7 @@
   *
   * @param object pointer to the object to reset the lock guard to
 **/
-#define PWX_LOCK_GUARD_RESET(object) \
-        PWX_NAMED_LOCK_GUARD_RESET(__FUNCTION__, object)
+#define PWX_LOCK_GUARD_RESET(object) PWX_NAMED_LOCK_GUARD_RESET(PWX_CURRENT_FUNC, object)
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
@@ -359,11 +413,12 @@
   * @param objA pointer to the first object to lock
   * @param objB pointer to the second object to lock
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB) \
-        DEBUG_LOCK_STATE("CLockGuard A", this, objA) \
-        DEBUG_LOCK_STATE("CLockGuard B", this, objB) \
-        ::pwx::CLockGuard pwx_libpwx_double_lock_guard_##Name(objA, objB); \
-        LOG_DOUBLE_LOCK_GUARD(objA, objB)
+#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB)    \
+	DEBUG_LOCK_STATE("CLockGuard A", this, objA);   \
+	DEBUG_LOCK_STATE("CLockGuard B", this, objB);    \
+	::pwx::CLockGuard                                \
+	pwx_libpwx_double_lock_guard_##Name(objA, objB); \
+	LOG_DOUBLE_LOCK_GUARD(objA, objB)                \
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
@@ -373,8 +428,7 @@
   * @param objA pointer to the first object to lock
   * @param objB pointer to the second object to lock
 **/
-#define PWX_DOUBLE_LOCK_GUARD(objA, objB) \
-        PWX_NAMED_DOUBLE_LOCK_GUARD(__FUNCTION__, objA, objB)
+#define PWX_DOUBLE_LOCK_GUARD(objA, objB) PWX_NAMED_DOUBLE_LOCK_GUARD(PWX_CURRENT_FUNC, objA, objB)
 
 
 /** @brief Reset a double lock guard to two new values
@@ -385,10 +439,11 @@
   * @param objA pointer to the first object to reset the lock guard to
   * @param objB pointer to the second object to reset the lock guard to
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(Name, objA, objB) \
-        LOG_DOUBLE_UNLOCK_GUARD(objA, objB) \
-        pwx_libpwx_double_lock_guard_##Name.reset(objA, objB); \
-        LOG_DOUBLE_LOCK_GUARD(objA, objB)
+#define PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(Name, objA, objB) {  \
+	LOG_DOUBLE_UNLOCK_GUARD(objA, objB);                   \
+	pwx_libpwx_double_lock_guard_##Name.reset(objA, objB); \
+	LOG_DOUBLE_LOCK_GUARD(objA, objB);                     \
+}
 
 
 /** @brief Reset a double lock guard to two new values
@@ -399,7 +454,7 @@
   * @param objB pointer to the second object to reset the lock guard to
 **/
 #define PWX_DOUBLE_LOCK_GUARD_RESET(objA, objB) \
-        PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(__FUNCTION__, objA, objB)
+	PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(PWX_CURRENT_FUNC, objA, objB)
 
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
@@ -411,12 +466,13 @@
   * @param objB pointer to the second object to lock
   * @param objC pointer to the second object to lock
 **/
-#define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, objA, objB, objC) \
-        DEBUG_LOCK_STATE("CLockGuard A", this, objA) \
-        DEBUG_LOCK_STATE("CLockGuard B", this, objB) \
-        DEBUG_LOCK_STATE("CLockGuard C", this, objC) \
-        ::pwx::CLockGuard pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
-        LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
+#define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, objA, objB, objC)    \
+	DEBUG_LOCK_STATE("CLockGuard A", this, objA);          \
+	DEBUG_LOCK_STATE("CLockGuard B", this, objB);          \
+	DEBUG_LOCK_STATE("CLockGuard C", this, objC);          \
+	::pwx::CLockGuard                                      \
+	pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
+	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
 
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
@@ -428,7 +484,7 @@
   * @param objC pointer to the second object to lock
 **/
 #define PWX_TRIPLE_LOCK_GUARD(objA, objB, objC) \
-        PWX_NAMED_TRIPLE_LOCK_GUARD(__FUNCTION__, objA, objB, objC)
+	PWX_NAMED_TRIPLE_LOCK_GUARD(PWX_CURRENT_FUNC, objA, objB, objC)
 
 
 /** @brief Reset a triple lock guard to two new values
@@ -440,10 +496,11 @@
   * @param objB pointer to the second object to reset the lock guard to
   * @param objC pointer to the third object to reset the lock guard to
 **/
-#define PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(Name, objA, objB, objC) \
-        LOG_TRIPLE_UNLOCK_GUARD(objA, objB, objC) \
-        pwx_libpwx_triple_lock_guard_##Name.reset(objA, objB, objC); \
-        LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
+#define PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(Name, objA, objB, objC) {  \
+	LOG_TRIPLE_UNLOCK_GUARD(objA, objB, objC);                   \
+	pwx_libpwx_triple_lock_guard_##Name.reset(objA, objB, objC); \
+	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC);                     \
+}
 
 
 /** @brief Reset a triple lock guard to two new values
@@ -455,15 +512,15 @@
   * @param objC pointer to the third object to reset the lock guard to
 **/
 #define PWX_TRIPLE_LOCK_GUARD_RESET(objA, objB, objC) \
-        PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(__FUNCTION__, objA, objB, objC)
+	PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(PWX_CURRENT_FUNC, objA, objB, objC)
 
 
 /** @brief return true if two C-Strings are equal ignoring case
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being false.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `false`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -476,8 +533,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being true.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `true`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -490,8 +547,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being true if @a a is nullptr or false if @a b is nullptr.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `true` if @a a is `nullptr` or `false` if @a b is `nullptr`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -504,8 +561,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being false if @a a is nullptr and true if @a b is nullptr.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `false` if @a a is `nullptr` or `true` if @a b is `nullptr`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -518,8 +575,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being false.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `false`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -532,8 +589,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being true.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `true`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -546,8 +603,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being true if @a a is nullptr or false if @a b is nullptr.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `true` if @a a is `nullptr` or `false` if @a b is `nullptr`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -560,8 +617,8 @@
   *
   * *Prerequisites*: cstring
   *
-  * Note: nullptr @a a and/or nullptr @a b are handled and cause
-  * the result being false if @a a is nullptr and true if @a b is nullptr.
+  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
+  * the result being `false` if @a a is `nullptr` or `true` if @a b is `nullptr`.
   *
   * @param a left hand C-String
   * @param b right hand C-String
@@ -683,24 +740,7 @@
 
 #include "basic/CLockable.h"
 #include "basic/CLockGuard.h"
-
-
-/// @namespace pwx
-namespace pwx {
-
-/** @namespace private_
-  * @internal
-**/
-namespace private_ {
-
-/// @brief static trace buffer, also used for the tracing macros
-[[maybe_unused]] static char _pwx_internal_debug_trace_info[1024] = { 0x0 };
-
-/// @brief static lock to not bash the buffer
-[[maybe_unused]] static ::pwx::CLockable _pwx_internal_trace_lock;
-
-} // private_
-} // pwx
+#include "basic/pwx_trace_info.h"
 
 
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED
