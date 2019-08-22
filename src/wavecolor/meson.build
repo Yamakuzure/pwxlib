@@ -1,13 +1,13 @@
 wavecolor_sources = '''
-        CWaveColor.cpp
+	CWaveColor.cpp
 '''.split()
 
 wavecolor_headers = '''
-        CWaveColor.h
+	CWaveColor.h
 '''.split()
 
 libpwx_external_sources += files(wavecolor_sources)
 
 install_headers(
-        wavecolor_headers,
-        subdir : 'pwxlib/wavecolor')
+	wavecolor_headers,
+	subdir : 'pwxlib/wavecolor')
