@@ -39,32 +39,32 @@ namespace pwx {
 
 /// @brief pre-increment for the source type
 eNameSourceType& operator++( eNameSourceType& type ) {
-    if ( type < NST_NUM_TYPES )
-        type = static_cast<eNameSourceType>( 1 + static_cast<uint32_t>( type ) );
+	if ( type < NST_NUM_TYPES )
+		type = static_cast<eNameSourceType>( 1 + static_cast<uint32_t>( type ) );
 
-    return type;
+	return type;
 }
 
 /// @brief post-increment for the source type
 eNameSourceType operator++( eNameSourceType& type, int ) {
-    eNameSourceType tmp = type;
-    ++type;
-    return tmp;
+	eNameSourceType tmp = type;
+	++type;
+	return tmp;
 }
 
 /// @brief pre-decrement for the source type
 eNameSourceType& operator--( eNameSourceType& type ) {
-    if ( type > NST_NAMES_DE )
-        type = static_cast<eNameSourceType>( -1 + static_cast<uint32_t>( type ) );
+	if ( type > NST_NAMES_DE )
+		type = static_cast<eNameSourceType>( -1 + static_cast<uint32_t>( type ) );
 
-    return type;
+	return type;
 }
 
 /// @brief post-decrement for the source type
 eNameSourceType operator--( eNameSourceType& type, int ) {
-    eNameSourceType tmp = type;
-    --type;
-    return tmp;
+	eNameSourceType tmp = type;
+	--type;
+	return tmp;
 }
 
 } // namespace pwx

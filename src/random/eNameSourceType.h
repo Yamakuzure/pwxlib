@@ -48,19 +48,19 @@ namespace pwx {
   * Note: The type "texts" includes everything from the type "names"
 **/
 enum eNameSourceType {
-    NST_NAMES_DE  = 0, // 1 file analyzed
-    NST_NAMES_EN  = 1, // 8 files analyzed
-    NST_NAMES_ALL = 2, // merged from all names
-    NST_TEXTS_DE  = 3, // 729 files analyzed
-    NST_TEXTS_EN  = 4, // 2975 files analyzed
-    NST_TEXTS_ALL = 5, // merged from all texts
-    NST_NUM_TYPES = 6  // End-of-list marker! No valid source type!
+	NST_NAMES_DE  = 0, // 1 file analyzed
+	NST_NAMES_EN  = 1, // 8 files analyzed
+	NST_NAMES_ALL = 2, // merged from all names
+	NST_TEXTS_DE  = 3, // 729 files analyzed
+	NST_TEXTS_EN  = 4, // 2975 files analyzed
+	NST_TEXTS_ALL = 5, // merged from all texts
+	NST_NUM_TYPES = 6  // End-of-list marker! No valid source type!
 };
 
-eNameSourceType PWX_API& operator++( eNameSourceType& type );
-eNameSourceType PWX_API  operator++( eNameSourceType& type, int );
-eNameSourceType PWX_API& operator--( eNameSourceType& type );
-eNameSourceType PWX_API  operator--( eNameSourceType& type, int );
+eNameSourceType& operator++( eNameSourceType& type      ) PWX_API;
+eNameSourceType  operator++( eNameSourceType& type, int ) PWX_API;
+eNameSourceType& operator--( eNameSourceType& type      ) PWX_API;
+eNameSourceType  operator--( eNameSourceType& type, int ) PWX_API;
 
 } // namespace pwx
 
