@@ -3,23 +3,22 @@ want_torture  = get_option('torture')
 install_tests = get_option('install-tests')
 
 if not want_test
-        install_tests = false
+	install_tests = false
 endif
 
 generate_sym_test_py = find_program('generate-sym-test.py')
 
 path = run_command('sh', ['-c', 'echo "$PATH"']).stdout()
 test_env = environment()
-test_env.set('PATH', path)
-test_env.prepend('PATH', meson.build_root())
+test_env.set('PATH', meson.build_root(), path)
 
 test_libpwx_sym_cpp = custom_target(
-        'test-libpwx-sym.cpp',
-        input : [libpwx_sym_path] + pwxlib_h,
-        output : 'test-libpwx-sym.cpp',
-        command : [generate_sym_test_py, libpwx_sym_path,
-                   debug.to_string()] + pwxlib_h,
-        capture : true)
+	'test-libpwx-sym.cpp',
+	input : [libpwx_sym_path] + pwxlib_h,
+	output : 'test-libpwx-sym.cpp',
+	command : [generate_sym_test_py, libpwx_sym_path,
+		   debug.to_string()] + pwxlib_h,
+	capture : true)
 
 if want_test
 	tests += [
@@ -28,7 +27,7 @@ if want_test
 		[files('''
 			cluster_check.cpp
 			cluster_check.h
-         '''.split())],
+		 '''.split())],
 		['manual'],
 		[]],
 
@@ -36,14 +35,14 @@ if want_test
 		[files('''
 			hash_builder.cpp
 			hash_builder.h
-         '''.split())],
+		 '''.split())],
 		['manual'],
 		[]],
 
 		[['test_name'],
 		[files('''
 			namegen.cpp
-         '''.split())],
+		 '''.split())],
 		['manual'],
 		[]],
 
@@ -70,7 +69,7 @@ if want_test
 			testSpeed.h
 			testStackQueue.h
 			testThreads.h
-         '''.split())],
+		 '''.split())],
 		['automatic'],
 		[threads]]
 	]

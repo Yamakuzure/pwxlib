@@ -8,7 +8,7 @@ for header in sys.argv[3:]:
         hfile = match.group(1)
         check = re.search('fwd', hfile)
         if not check:
-            print('#include <{}>'.format(header.split('/')[-1]))
+            print('#include "{}"'.format(header.split('/')[-1]))
 
 has_debug = sys.argv[2];
 
