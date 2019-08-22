@@ -44,6 +44,8 @@ global:
         pwx::debug_log*;
         pwx::debug_err*;
         pwx::forwardTo*;
+        pwx::get_trace_info*;
+        pwx::get_trace_msg*;
         pwx::ltrim*;
         pwx::makeTemp*;
         pwx::readNextValue*;
