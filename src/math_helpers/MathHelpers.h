@@ -74,138 +74,138 @@ namespace pwx {
 **/
 template<typename Tf>
 struct sFloatPoint {
-    typedef size_t Ti; //!< Raw integer representation is in size_t per default
+	typedef size_t Ti; //!< Raw integer representation is in size_t per default
 
-    /// @brief The base ctor sets the initial value and does nothing else
-    /// @param[in] num Initial value
-    explicit sFloatPoint( Tf num ) : f( num ) {}
+	/// @brief The base ctor sets the initial value and does nothing else
+	/// @param[in] num Initial value
+	explicit sFloatPoint( Tf num ) : f( num ) {}
 
-    /// @brief The empty ctor sets the initial value to zero
-    sFloatPoint() : f( static_cast<Tf>( 0 ) ) {}
+	/// @brief The empty ctor sets the initial value to zero
+	sFloatPoint() : f( static_cast<Tf>( 0 ) ) {}
 
-    /// @return always false
-    bool Negative()    const { return false; }
+	/// @return always false
+	bool Negative()    const { return false; }
 
-    /// @return always zero
-    Ti   RawMantissa() const { return static_cast<Ti>( 0 ); }
+	/// @return always zero
+	Ti   RawMantissa() const { return static_cast<Ti>( 0 ); }
 
-    /// @return always zero
-    Ti   RawExponent() const { return static_cast<Ti>( 0 ); }
+	/// @return always zero
+	Ti   RawExponent() const { return static_cast<Ti>( 0 ); }
 
-    union {
-        Ti i;
-        Tf f;
-    };
+	union {
+		Ti i;
+		Tf f;
+	};
 
-    static const int digits = 0; //!< Always zero in this base struct
+	static const int digits = 0; //!< Always zero in this base struct
 
-    /// @return always zero
-    static       Tf  epsilon() noexcept { return static_cast<Ti>( 0 ); }
+	/// @return always zero
+	static       Tf  epsilon() noexcept { return static_cast<Ti>( 0 ); }
 };
 
 
 /// @brief Specialized helper to handle floats
 template<>
 struct sFloatPoint<float> {
-    typedef int32_t Ti; //!< Raw integer representation is in int32_t
+	typedef int32_t Ti; //!< Raw integer representation is in int32_t
 
-    /// @brief The default ctor sets the initial value and does nothing else
-    /// @param[in] num Initial value
-    explicit sFloatPoint( float num ) : f( num ) {}
+	/// @brief The default ctor sets the initial value and does nothing else
+	/// @param[in] num Initial value
+	explicit sFloatPoint( float num ) : f( num ) {}
 
-    /// @brief The empty ctor sets the initial value to zero
-    sFloatPoint() : f( static_cast<float>( 0 ) ) {}
+	/// @brief The empty ctor sets the initial value to zero
+	sFloatPoint() : f( static_cast<float>( 0 ) ) {}
 
-    /// @return true if the integer representation is negative
-    bool Negative()    const { return ( i >> 31 ) != 0; }
+	/// @return true if the integer representation is negative
+	bool Negative()    const { return ( i >> 31 ) != 0; }
 
-    /// @return The integer representation of the mantissa
-    Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 23 ) - 1 ); }
+	/// @return The integer representation of the mantissa
+	Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 23 ) - 1 ); }
 
-    /// @return The integer representation of the exponent
-    Ti   RawExponent() const { return ( i >> 23 ) & 0xff; }
+	/// @return The integer representation of the exponent
+	Ti   RawExponent() const { return ( i >> 23 ) & 0xff; }
 
-    union {
-        Ti    i; //!< Integer representation
-        float f; //!< Float representation
-    };
+	union {
+		Ti    i; //!< Integer representation
+		float f; //!< Float representation
+	};
 
-    static const int   digits  = std::numeric_limits<float>::digits; //!< Number of digits of the float type
+	static const int   digits  = std::numeric_limits<float>::digits; //!< Number of digits of the float type
 
-    /// @return the epsilon of the float type
-    static       float epsilon() noexcept {
-        return std::numeric_limits<float>::epsilon();
-    }
+	/// @return the epsilon of the float type
+	static       float epsilon() noexcept {
+		return std::numeric_limits<float>::epsilon();
+	}
 };
 
 
 /// @brief Specialized helper to handle doubles
 template<>
 struct sFloatPoint<double> {
-    typedef int64_t Ti; //!< Raw integer representation is in int64_t
+	typedef int64_t Ti; //!< Raw integer representation is in int64_t
 
-    /// @brief The default ctor sets the initial value and does nothing else
-    /// @param[in] num Initial value
-    explicit sFloatPoint( double num ) : f( num ) {}
+	/// @brief The default ctor sets the initial value and does nothing else
+	/// @param[in] num Initial value
+	explicit sFloatPoint( double num ) : f( num ) {}
 
-    /// @brief The empty ctor sets the initial value to zero
-    sFloatPoint() : f( static_cast<double>( 0 ) ) {}
+	/// @brief The empty ctor sets the initial value to zero
+	sFloatPoint() : f( static_cast<double>( 0 ) ) {}
 
-    /// @return true if the integer representation is negative
-    bool Negative()    const { return ( i >> 63 ) != 0; }
+	/// @return true if the integer representation is negative
+	bool Negative()    const { return ( i >> 63 ) != 0; }
 
-    /// @return The integer representation of the mantissa
-    Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 52 ) - 1 ); }
+	/// @return The integer representation of the mantissa
+	Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 52 ) - 1 ); }
 
-    /// @return The integer representation of the exponent
-    Ti   RawExponent() const { return ( i >> 52 ) & 0xffff; }
+	/// @return The integer representation of the exponent
+	Ti   RawExponent() const { return ( i >> 52 ) & 0xffff; }
 
-    union {
-        Ti     i; //!< Integer representation
-        double f; //!< Double representation
-    };
+	union {
+		Ti     i; //!< Integer representation
+		double f; //!< Double representation
+	};
 
-    static const int    digits  = std::numeric_limits<double>::digits; //!< Number of digits of the double type
-    
-    /// @return the epsilon of the double type
-    static       double epsilon() noexcept {
-        return std::numeric_limits<double>::epsilon();
-    }
+	static const int    digits  = std::numeric_limits<double>::digits; //!< Number of digits of the double type
+
+	/// @return the epsilon of the double type
+	static       double epsilon() noexcept {
+		return std::numeric_limits<double>::epsilon();
+	}
 };
 
 
 /// @brief Specialized helper to handle long doubles
 template<>
 struct sFloatPoint<long double> {
-    typedef __int128_t Ti; //!< Raw integer representation is in __int128_t
+	typedef __int128_t Ti; //!< Raw integer representation is in __int128_t
 
-    /// @brief The default ctor sets the initial value and does nothing else
-    /// @param[in] num Initial value
-    explicit sFloatPoint( long double num ) : f( num ) {}
+	/// @brief The default ctor sets the initial value and does nothing else
+	/// @param[in] num Initial value
+	explicit sFloatPoint( long double num ) : f( num ) {}
 
-    /// @brief The empty ctor sets the initial value to zero
-    sFloatPoint() : f( static_cast<long double>( 0 ) ) {}
+	/// @brief The empty ctor sets the initial value to zero
+	sFloatPoint() : f( static_cast<long double>( 0 ) ) {}
 
-    /// @return true if the integer representation is negative
-    bool Negative()    const { return ( i >> 127 ) != 0; }
+	/// @return true if the integer representation is negative
+	bool Negative()    const { return ( i >> 127 ) != 0; }
 
-    /// @return The integer representation of the mantissa
-    Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 63 ) - 1 ); }
+	/// @return The integer representation of the mantissa
+	Ti   RawMantissa() const { return i & ( ( static_cast<Ti>( 1 ) << 63 ) - 1 ); }
 
-    /// @return The integer representation of the exponent
-    Ti   RawExponent() const { return ( i >> 63 ) & 0xffffffffffffffff; }
+	/// @return The integer representation of the exponent
+	Ti   RawExponent() const { return ( i >> 63 ) & 0xffffffffffffffff; }
 
-    union {
-        Ti          i; //!< Integer representation
-        long double f; //!< Long double representation
-    };
+	union {
+		Ti          i; //!< Integer representation
+		long double f; //!< Long double representation
+	};
 
-    static const int         digits  = std::numeric_limits<long double>::digits; //!< Number of digits of the long double type
-    
-    /// @return the epsilon of the long double type
-    static       long double epsilon() noexcept {
-        return std::numeric_limits<long double>::epsilon();
-    }
+	static const int         digits  = std::numeric_limits<long double>::digits; //!< Number of digits of the long double type
+
+	/// @return the epsilon of the long double type
+	static       long double epsilon() noexcept {
+		return std::numeric_limits<long double>::epsilon();
+	}
 };
 
 
@@ -213,13 +213,13 @@ struct sFloatPoint<long double> {
  * === Functions that compare floating type values ===
  * ===================================================
 */
-bool PWX_API areAlmostEqual( const float lhs, const float rhs ) noexcept;
-bool PWX_API areAlmostEqual( const double lhs, const double rhs ) noexcept;
-bool PWX_API areAlmostEqual( const long double lhs, const long double rhs ) noexcept;
+bool areAlmostEqual( const float       lhs, const float       rhs ) noexcept PWX_API;
+bool areAlmostEqual( const double      lhs, const double      rhs ) noexcept PWX_API;
+bool areAlmostEqual( const long double lhs, const long double rhs ) noexcept PWX_API;
 /// @brief template dummy to enable areAlmostEqual() to be used with type_traits conditions
 template<typename T>
-bool PWX_API areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
-    return lhs == rhs;
+bool areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
+	return lhs == rhs;
 }
 
 
@@ -239,12 +239,12 @@ bool PWX_API areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
  * This method returns the distance between two points.
 **/
 template<typename T>
-inline T PWX_API absDistance( const T x1, const T y1, const T x2, const T y2 ) {
-    if ( isIntType( T ) || isFloatType( T ) )
-        // Do nothing if this isn't a type we can calculate with
-        return ( static_cast<T>( std::sqrt( std::pow( x2 - x1, 2.0 ) + std::pow( y2 - y1, 2.0 ) ) ) );
-    else
-        return ( ( T )0 );
+inline T absDistance( const T x1, const T y1, const T x2, const T y2 ) {
+	if ( isIntType( T ) || isFloatType( T ) )
+		// Do nothing if this isn't a type we can calculate with
+		return ( static_cast<T>( std::sqrt( std::pow( x2 - x1, 2.0 ) + std::pow( y2 - y1, 2.0 ) ) ) );
+	else
+		return ( ( T )0 );
 }
 
 
@@ -261,13 +261,13 @@ inline T PWX_API absDistance( const T x1, const T y1, const T x2, const T y2 ) {
  * This method returns the distance between two points.
 **/
 template<typename T>
-inline T PWX_API absDistance( const T x1, const T y1, const T z1,
-                              const T x2, const T y2, const T z2 ) {
-    if ( isIntType( T ) || isFloatType( T ) )
-        // Do nothing if this isn't a type we can calculate with
-        return ( static_cast<T>( std::sqrt( std::pow( x2 - x1, 2.0 ) + std::pow( y2 - y1, 2.0 ) + std::pow( z2 - z1, 2.0 ) ) ) );
-    else
-        return ( ( T )0 );
+inline T absDistance( const T x1, const T y1, const T z1,
+                      const T x2, const T y2, const T z2 ) {
+	if ( isIntType( T ) || isFloatType( T ) )
+		// Do nothing if this isn't a type we can calculate with
+		return ( static_cast<T>( std::sqrt( std::pow( x2 - x1, 2.0 ) + std::pow( y2 - y1, 2.0 ) + std::pow( z2 - z1, 2.0 ) ) ) );
+	else
+		return ( ( T )0 );
 }
 
 
@@ -285,8 +285,8 @@ inline T PWX_API absDistance( const T x1, const T y1, const T z1,
   * @return the resulting radiant as a double
   *
 **/
-template<typename T> double PWX_API degToRad( T degree ) {
-    return ( static_cast<double>( degree ) * M_PIl / 180. );
+template<typename T> double degToRad( T degree ) {
+	return ( static_cast<double>( degree ) * M_PIl / 180. );
 }
 
 
@@ -307,28 +307,28 @@ template<typename T> double PWX_API degToRad( T degree ) {
   * @return the equivalent degree in a range between 0 and 360 as a double
   *
 **/
-template<typename T> double PWX_API getNormalizedDegree( const T degree ) {
-    double result = static_cast<double>( degree );
+template<typename T> double getNormalizedDegree( const T degree ) {
+	double result = static_cast<double>( degree );
 
-    if ( ( result >= 360. ) || ( result < 0. ) ) {
-        // We have to mod here, but in a split
-        if ( result <  0.  ) {
-            int32_t modVal = static_cast<int32_t>( result / 360. );
-            double  reduct = SIGN( modVal ) * 360. * modVal;
-            result  = 360. - ( -result - reduct );
-        }
-        // The reason for the split is, that the result can be
-        // exactly 360.0 now while reduct is higher than 360
-        if ( result >= 360. ) {
-            int32_t modVal = static_cast<int32_t>( result / 360. );
-            double  reduct = SIGN( modVal ) * 360. * modVal;
-            result -= reduct;
-        }
-    }
+	if ( ( result >= 360. ) || ( result < 0. ) ) {
+		// We have to mod here, but in a split
+		if ( result <  0.  ) {
+			int32_t modVal = static_cast<int32_t>( result / 360. );
+			double  reduct = SIGN( modVal ) * 360. * modVal;
+			result  = 360. - ( -result - reduct );
+		}
+		// The reason for the split is, that the result can be
+		// exactly 360.0 now while reduct is higher than 360
+		if ( result >= 360. ) {
+			int32_t modVal = static_cast<int32_t>( result / 360. );
+			double  reduct = SIGN( modVal ) * 360. * modVal;
+			result -= reduct;
+		}
+	}
 
-    assert ( ( result >= 0. ) && ( result < 360. ) && "getNormalizedDegree() double mod failed!" );
+	assert ( ( result >= 0. ) && ( result < 360. ) && "getNormalizedDegree() double mod failed!" );
 
-    return ( result );
+	return ( result );
 }
 
 

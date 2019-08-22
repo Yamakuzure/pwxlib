@@ -46,47 +46,47 @@ namespace private_ {
 /// @brief check floating point values using Ulps and abs diff
 template<typename Tf, typename Ti>
 bool private_areAlmostEqualUlpsAndAbs(
-    const Tf& lhs, const Tf& rhs,
-    Tf maxDiff, Ti maxUlpsDiff ) noexcept {
-    // Check if the numbers are really close -- needed
-    // when comparing numbers near zero.
-    Tf absDiff = std::fabs( lhs - rhs );
-    if ( absDiff <= maxDiff )
-        return true;
+        const Tf& lhs, const Tf& rhs,
+        Tf maxDiff, Ti maxUlpsDiff ) noexcept {
+	// Check if the numbers are really close -- needed
+	// when comparing numbers near zero.
+	Tf absDiff = std::fabs( lhs - rhs );
+	if ( absDiff <= maxDiff )
+		return true;
 
-    sFloatPoint<Tf> uLhs( lhs );
-    sFloatPoint<Tf> uRhs( rhs );
+	sFloatPoint<Tf> uLhs( lhs );
+	sFloatPoint<Tf> uRhs( rhs );
 
-    // Different signs means they do not match.
-    if ( uLhs.Negative() != uRhs.Negative() )
-        return false;
+	// Different signs means they do not match.
+	if ( uLhs.Negative() != uRhs.Negative() )
+		return false;
 
-    // Find the difference in ULPs.
-    Ti ulpsDiff = abs( uLhs.i - uRhs.i );
-    if ( ulpsDiff <= maxUlpsDiff )
-        return true;
+	// Find the difference in ULPs.
+	Ti ulpsDiff = abs( uLhs.i - uRhs.i );
+	if ( ulpsDiff <= maxUlpsDiff )
+		return true;
 
-    return false;
+	return false;
 }
 
 /// @brief check floating point values using relative and diff
 template<typename Tf>
 bool private_areAlmostEqualRelativeAndAbs(
-    const Tf& lhs, const Tf& rhs,
-    Tf maxDiff, Tf maxRelDiff ) noexcept {
-    // Check if the numbers are really close -- needed
-    // when comparing numbers near zero.
-    Tf diff = std::fabs( lhs - rhs );
-    if ( diff <= maxDiff )
-        return true;
+        const Tf& lhs, const Tf& rhs,
+        Tf maxDiff, Tf maxRelDiff ) noexcept {
+	// Check if the numbers are really close -- needed
+	// when comparing numbers near zero.
+	Tf diff = std::fabs( lhs - rhs );
+	if ( diff <= maxDiff )
+		return true;
 
-    Tf flhs = fabs( lhs );
-    Tf frhs = fabs( rhs );
-    Tf largest = ( frhs > flhs ) ? frhs : flhs;
+	Tf flhs = fabs( lhs );
+	Tf frhs = fabs( rhs );
+	Tf largest = ( frhs > flhs ) ? frhs : flhs;
 
-    if ( diff <= largest * maxRelDiff )
-        return true;
-    return false;
+	if ( diff <= largest * maxRelDiff )
+		return true;
+	return false;
 }
 
 
@@ -102,36 +102,36 @@ bool private_areAlmostEqualRelativeAndAbs(
 /// @brief template to dispatch to the correct AlmostEqual function
 template<typename Tf>
 bool private_dispatchAlmostEqual( const Tf& lhs, const Tf& rhs ) noexcept {
-    typedef typename pwx::sFloatPoint<Tf>::Ti Ti;
+	typedef typename pwx::sFloatPoint<Tf>::Ti Ti;
 
-    // return at once if the sign differs, but use
-    // operator== to catch -0 versus +0
-    if ( SIGN( lhs ) != SIGN( rhs ) )
-        return lhs == rhs;
+	// return at once if the sign differs, but use
+	// operator== to catch -0 versus +0
+	if ( SIGN( lhs ) != SIGN( rhs ) )
+		return lhs == rhs;
 
-    Tf fLhs = std::fabs( lhs );
-    Tf fRhs = std::fabs( rhs );
+	Tf fLhs = std::fabs( lhs );
+	Tf fRhs = std::fabs( rhs );
 
-    // With very small numbers, the relative check is used
-    if ( ( fLhs <= 1.0 ) && ( fRhs <= 1.0 ) )
-        return private_areAlmostEqualRelativeAndAbs<Tf>(
-                   lhs, rhs, 0.f, pwx::sFloatPoint<Tf>::epsilon() );
+	// With very small numbers, the relative check is used
+	if ( ( fLhs <= 1.0 ) && ( fRhs <= 1.0 ) )
+		return private_areAlmostEqualRelativeAndAbs<Tf>(
+		               lhs, rhs, 0.f, pwx::sFloatPoint<Tf>::epsilon() );
 
-    // If both numbers are equal or larger than 4, we need to find the magnitude
-    if ( ( fLhs >= 4.0 ) && ( fRhs >= 4.0 ) ) {
-        Tf mag = std::fmin( std::log2( fLhs ), std::log2( fLhs ) );
-        return private_areAlmostEqualUlpsAndAbs<Tf, Ti>(
-                   lhs, rhs, pwx::sFloatPoint<Tf>::epsilon() * mag,
-                   static_cast<Ti>( mag * 2 ) );
-    }
+	// If both numbers are equal or larger than 4, we need to find the magnitude
+	if ( ( fLhs >= 4.0 ) && ( fRhs >= 4.0 ) ) {
+		Tf mag = std::fmin( std::log2( fLhs ), std::log2( fLhs ) );
+		return private_areAlmostEqualUlpsAndAbs<Tf, Ti>(
+		               lhs, rhs, pwx::sFloatPoint<Tf>::epsilon() * mag,
+		               static_cast<Ti>( mag * 2 ) );
+	}
 
-    // With numbers between 1.0 and 4.0 a normal ULPS check is in order
-    if ( ( fLhs >= 1.0 ) && ( fRhs >= 1.0 ) && ( fLhs <= 4.0 ) && ( fRhs <= 4.0 ) )
-        return private_areAlmostEqualUlpsAndAbs<Tf, Ti>(
-                   lhs, rhs, pwx::sFloatPoint<Tf>::epsilon(), 2 );
+	// With numbers between 1.0 and 4.0 a normal ULPS check is in order
+	if ( ( fLhs >= 1.0 ) && ( fRhs >= 1.0 ) && ( fLhs <= 4.0 ) && ( fRhs <= 4.0 ) )
+		return private_areAlmostEqualUlpsAndAbs<Tf, Ti>(
+		               lhs, rhs, pwx::sFloatPoint<Tf>::epsilon(), 2 );
 
-    // If none of these valid, the numbers are simply different.
-    return false;
+	// If none of these valid, the numbers are simply different.
+	return false;
 }
 
 
@@ -152,7 +152,7 @@ bool private_dispatchAlmostEqual( const Tf& lhs, const Tf& rhs ) noexcept {
   * @return true if both values can be considered equal although their representation might differ
 **/
 bool areAlmostEqual( const float lhs, const float rhs ) noexcept {
-    return private_::private_dispatchAlmostEqual<float>( lhs, rhs );
+	return private_::private_dispatchAlmostEqual<float>( lhs, rhs );
 }
 
 
@@ -167,7 +167,7 @@ bool areAlmostEqual( const float lhs, const float rhs ) noexcept {
   * @return true if both values can be considered equal although their representation might differ
 **/
 bool areAlmostEqual( const double lhs, const double rhs ) noexcept {
-    return private_::private_dispatchAlmostEqual<double>( lhs, rhs );
+	return private_::private_dispatchAlmostEqual<double>( lhs, rhs );
 }
 
 
@@ -182,7 +182,7 @@ bool areAlmostEqual( const double lhs, const double rhs ) noexcept {
   * @return true if both values can be considered equal although their representation might differ
 **/
 bool areAlmostEqual( const long double lhs, const long double rhs ) noexcept {
-    return private_::private_dispatchAlmostEqual<long double>( lhs, rhs );
+	return private_::private_dispatchAlmostEqual<long double>( lhs, rhs );
 }
 
 } // namespace pwx
