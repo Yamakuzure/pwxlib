@@ -55,90 +55,89 @@ namespace private_ {
   * @internal
   * For this to work there is an important rule:
   * Any container methods that removes an element from the container
-  * using this storage <B>must</B> report this to their element
-  * store instance using its invalidate() method.
-  * The default elements already handle this if their insert() and
-  * remove() methods are used. But if an element is inserted manually,
+  * using this storage **must** report this to their element
+  * store instance using its `invalidate()` method.
+  * The default elements already handle this if their `insert()` and
+  * `remove()` methods are used. But if an element is inserted manually,
   * and no store is registered, or if an element is removed manually,
   * the invalidation must be done, too.
   * Failure to do so might result in a thread trying to work with
   * an element that has been moved to a different container, or
   * worse, has been deleted.
   *
-  * The other methods are curr(), which will return the currently
-  * stored element for the calling thread and curr(elem) which will
+  * The other methods are `curr()`, which will return the currently
+  * stored element for the calling thread and `curr(elem)` which will
   * store a new element for the calling thread.
   *
-  * If beThreadSafe(false) is called, the storage will no longer
+  * If `beThreadSafe(false)` is called, the storage will no longer
   * use the internal hash table but simply change/retrieve on general
-  * curr pointer. This can be reversed using beThreadSafe(true).
+  * `curr` pointer. This can be reversed using `beThreadSafe(true)`.
 **/
 class CThreadElementStore : public CLockable {
-  public:
+public:
 
-    /* ===============================================
-     * === Public types                            ===
-     * ===============================================
-    */
+	/* ===============================================
+	 * === Public types                            ===
+	 * ===============================================
+	*/
 
-    typedef CLockable                    base_t;  //!< Base type of CThreadElementStore
-    typedef CThreadElementStore          store_t; //!< Storage type, thus CThreadElementStore itself
-    typedef VElement                     curr_t;  //!< Type of the 'curr' element to handle
-    typedef TOpenHash<size_t, curr_t>    hash_t;  //!< Hash container type with size_t and curr_t
-    typedef THashElement<size_t, curr_t> elem_t;  //!< Hash element type with size_t and curr_t
-
-
-    /* ===============================================
-     * === Public Constructors and destructors     ===
-     * ===============================================
-    */
-
-    explicit
-    CThreadElementStore( uint32_t initial_size ) PWX_API;
-    CThreadElementStore()             noexcept PWX_API;
-    virtual ~CThreadElementStore()    noexcept PWX_API;
+	typedef CLockable                    base_t;  //!< Base type of `CThreadElementStore`
+	typedef CThreadElementStore          store_t; //!< Storage type, thus `CThreadElementStore` itself
+	typedef VElement                     curr_t;  //!< Type of the `curr` element to handle
+	typedef TOpenHash<size_t, curr_t>    hash_t;  //!< Hash container type with `size_t` and `curr_t`
+	typedef THashElement<size_t, curr_t> elem_t;  //!< Hash element type with `size_t` and `curr_t`
 
 
-    // No copying:
-    CThreadElementStore( CThreadElementStore& ) PWX_DELETE;
-    CThreadElementStore& operator=( const CThreadElementStore& ) PWX_DELETE;
+	/* ===============================================
+	 * === Public Constructors and destructors     ===
+	 * ===============================================
+	*/
+
+	explicit
+	CThreadElementStore( uint32_t initial_size ) PWX_API;
+	CThreadElementStore()               noexcept PWX_API;
+	virtual ~CThreadElementStore()      noexcept PWX_API;
 
 
-    /* ===============================================
-     * === Public Methods                          ===
-     * ===============================================
-    */
-
-    void    clear()                                  noexcept PWX_API;
-    curr_t* curr()                             const noexcept PWX_API;
-    curr_t* curr()                                   noexcept PWX_API;
-    void    curr( const curr_t* new_curr )       const noexcept PWX_API;
-    void    curr( curr_t* new_curr )                   noexcept PWX_API;
-    void    disable_thread_safety()                  noexcept PWX_API;
-    void    enable_thread_safety()                   noexcept PWX_API;
-    void    invalidate( const curr_t* old_curr ) const noexcept PWX_API;
-    void    invalidate( curr_t* old_curr )             noexcept PWX_API;
+	// No copying:
+	CThreadElementStore( CThreadElementStore& )  PWX_DELETE;
+	CThreadElementStore( CThreadElementStore&& ) PWX_DELETE;
+	CThreadElementStore& operator=( CThreadElementStore const&  ) PWX_DELETE;
+	CThreadElementStore& operator=( CThreadElementStore const&& ) PWX_DELETE;
 
 
-  protected:
+	/* ===============================================
+	 * === Public Methods                          ===
+	 * ===============================================
+	*/
 
-    using base_t::memOrdLoad;
-    using base_t::memOrdStore;
+	void    clear()                                    noexcept PWX_API;
+	curr_t* curr()                               const noexcept PWX_API;
+	curr_t* curr()                                     noexcept PWX_API;
+	void    curr( const curr_t* new_curr )       const noexcept PWX_API;
+	void    curr( curr_t* new_curr )                   noexcept PWX_API;
+	void    disable_thread_safety()                    noexcept PWX_API;
+	void    enable_thread_safety()                     noexcept PWX_API;
+	void    invalidate( const curr_t* old_curr ) const noexcept PWX_API;
+	void    invalidate( curr_t* old_curr )             noexcept PWX_API;
 
 
-  private:
+protected:
 
-    /* ===============================================
-     * === Private Members                         ===
-     * ===============================================
-    */
+	using base_t::memOrdLoad;
+	using base_t::memOrdStore;
 
-    mutable
-    hash_t  currs;                                 //!< Used when thread saftey is enabled (default)
-    mutable
-    abool_t invalidating = ATOMIC_VAR_INIT( false ); //!< If set to true by invalidate(), curr() wait for a lock
-    mutable
-    curr_t* oneCurr      = nullptr;                //!< Used when thread safety is disabled
+
+private:
+
+	/* ===============================================
+	 * === Private Members                         ===
+	 * ===============================================
+	*/
+
+	mutable hash_t  currs;                                   //!< Used when thread safety is enabled (default)
+	mutable abool_t invalidating = ATOMIC_VAR_INIT( false ); //!< If set to true by `invalidate()`, `curr()` will wait for a lock
+	mutable curr_t* oneCurr      = nullptr;                  //!< Used when thread safety is disabled
 };
 
 
