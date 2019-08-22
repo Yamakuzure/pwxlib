@@ -47,27 +47,27 @@ template<typename data_t> class TSet;
 
 // --- Function Prototypes ---
 template<typename data_t>
-TSet<data_t> PWX_API* set_difference  ( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs );
+TSet<data_t>* set_difference  ( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs ) PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API  set_difference  ( const TSet<data_t>& lhs, const TSet<data_t>& rhs );
+TSet<data_t>  set_difference  ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API* set_intersection( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs );
+TSet<data_t>* set_intersection( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs ) PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API  set_intersection( const TSet<data_t>& lhs, const TSet<data_t>& rhs );
+TSet<data_t>  set_intersection( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API* set_union       ( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs );
+TSet<data_t>* set_union       ( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs ) PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API  set_union       ( const TSet<data_t>& lhs, const TSet<data_t>& rhs );
+TSet<data_t>  set_union       ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) PWX_API;
 
 // --- operator prototypes ---
 template<typename data_t>
-bool         PWX_API  operator==( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept;
+bool          operator==( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept PWX_API;
 template<typename data_t>
-bool         PWX_API  operator!=( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept;
+bool          operator!=( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API  operator+ ( const TSet<data_t>& lhs, const TSet<data_t>& rhs );
+TSet<data_t>  operator+ ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) PWX_API;
 template<typename data_t>
-TSet<data_t> PWX_API  operator- ( const TSet<data_t>& lhs, const TSet<data_t>& rhs );
+TSet<data_t>  operator- ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) PWX_API;
 
 } // namespace pwx
 #endif // PWX_PWXLIB_PWX_FUNCTIONS_SET_FWD_H_INCLUDED

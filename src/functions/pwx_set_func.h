@@ -65,46 +65,46 @@ namespace pwx {
 **/
 template<typename data_t>
 TSet<data_t>* set_difference( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs ) {
-    typedef TSet<data_t> list_t;
+	typedef TSet<data_t> list_t;
 
-    list_t* newSet = nullptr;
+	list_t* newSet = nullptr;
 
-    // Build an empty set and copy destroy method from lhs:
-    PWX_TRY( newSet = new list_t() )
-    PWX_THROW_STD_FURTHER( "SetCreationFailed", "set_difference() could not create the difference set!" )
-    newSet->reset( *lhs );
+	// Build an empty set and copy destroy method from lhs:
+	PWX_TRY( newSet = new list_t() )
+	PWX_THROW_STD_FURTHER( "SetCreationFailed", "set_difference(); could not create the difference set!" );
+	newSet->reset( *lhs );
 
-    // Actions is only needed if lhs is not the empty
-    // set and lhs and rhs are not the same set
-    if ( lhs->size() && ( lhs != rhs ) ) {
-        PWX_DOUBLE_LOCK_GUARD( lhs, rhs )
+	// Actions is only needed if lhs is not the empty
+	// set and lhs and rhs are not the same set
+	if ( lhs->size() && ( lhs != rhs ) ) {
+		PWX_DOUBLE_LOCK_GUARD( lhs, rhs );
 
-        /* Two possibilities:
-         * 1.: rhs is the empty set. Then newSet is a simple copy of lhs
-         * 2.: rhs has elements. Then we have to traverse lhs and add
-         *     all elements that are no member of rhs
-        */
-        if ( rhs->empty() )
-            // This is possibility 1
-            *newSet = *lhs;
-        else {
-            // This is possibility 2
-            auto xHead  = lhs->get( 0 );
-            auto xTail  = lhs->get( -1 );
-            auto xCurr  = xHead;
-            bool isDone = false;
-            while ( xCurr && !isDone ) {
-                if ( !rhs->hasMember( *xCurr ) )
-                    newSet->push( *xCurr );
-                if ( xCurr == xTail )
-                    isDone = true;
-                else
-                    xCurr = xCurr->getNext();
-            } // end of traversing lhs
-        } // End of building possibility 2
-    } // End of having a combination requiring action
+		/* Two possibilities:
+		 * 1.: rhs is the empty set. Then newSet is a simple copy of lhs
+		 * 2.: rhs has elements. Then we have to traverse lhs and add
+		 *     all elements that are no member of rhs
+		*/
+		if ( rhs->empty() )
+			// This is possibility 1
+			*newSet = *lhs;
+		else {
+			// This is possibility 2
+			auto xHead  = lhs->get( 0 );
+			auto xTail  = lhs->get( -1 );
+			auto xCurr  = xHead;
+			bool isDone = false;
+			while ( xCurr && !isDone ) {
+				if ( !rhs->hasMember( *xCurr ) )
+					newSet->push( *xCurr );
+				if ( xCurr == xTail )
+					isDone = true;
+				else
+					xCurr = xCurr->getNext();
+			} // end of traversing lhs
+		} // End of building possibility 2
+	} // End of having a combination requiring action
 
-    return newSet;
+	return newSet;
 }
 
 
@@ -132,11 +132,11 @@ TSet<data_t>* set_difference( const TSet<data_t>* const lhs, const TSet<data_t>*
 **/
 template<typename data_t>
 TSet<data_t> set_difference( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
-    TSet<data_t>* ptrSet = nullptr;
-    PWX_TRY_PWX_FURTHER( ptrSet = set_difference( &lhs, &rhs ) )
-    TSet<data_t> newSet( *ptrSet );
-    delete ptrSet;
-    return newSet;
+	TSet<data_t>* ptrSet = nullptr;
+	PWX_TRY_PWX_FURTHER( ptrSet = set_difference( &lhs, &rhs ) )
+	TSet<data_t> newSet( *ptrSet );
+	delete ptrSet;
+	return newSet;
 }
 
 
@@ -162,45 +162,45 @@ TSet<data_t> set_difference( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) 
 **/
 template<typename data_t>
 TSet<data_t>* set_intersection( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs ) {
-    typedef TSet<data_t> list_t;
+	typedef TSet<data_t> list_t;
 
-    list_t* newSet = nullptr;
+	list_t* newSet = nullptr;
 
-    // Build an empty set and copy sorted switch and destroy method from lhs:
-    PWX_TRY( newSet = new list_t() )
-    PWX_THROW_STD_FURTHER( "SetCreationFailed", "set_intersection() could not create the intersection set!" )
-    newSet->reset( *lhs );
+	// Build an empty set and copy sorted switch and destroy method from lhs:
+	PWX_TRY( newSet = new list_t() )
+	PWX_THROW_STD_FURTHER( "SetCreationFailed", "set_intersection(); could not create the intersection set!" );
+	newSet->reset( *lhs );
 
-    // Action is only needed if neither is the empty set
-    if ( lhs->size() && rhs->size() ) {
-        PWX_DOUBLE_LOCK_GUARD( lhs, rhs )
+	// Action is only needed if neither is the empty set
+	if ( lhs->size() && rhs->size() ) {
+		PWX_DOUBLE_LOCK_GUARD( lhs, rhs );
 
-        /* Two possibilities:
-         * 1.: rhs and lhs are equal, then we simply copy lhs
-         * 2.: Otherwise we have to traverse lhs and add
-         *     all elements that are a member of rhs.
-        */
-        if ( lhs == rhs )
-            // This is possibility 1
-            *newSet = *lhs;
-        else {
-            // This is possibility 2
-            auto xHead  = lhs->get( 0 );
-            auto xTail  = lhs->get( -1 );
-            auto xCurr  = xHead;
-            bool isDone = false;
-            while ( xCurr && !isDone ) {
-                if ( rhs->hasMember( *xCurr ) )
-                    newSet->push( *xCurr );
-                if ( xCurr == xTail )
-                    isDone = true;
-                else
-                    xCurr = xCurr->getNext();
-            } // end of traversing lhs
-        } // End of building possibility 2
-    } // End of having a combination requiring action
+		/* Two possibilities:
+		 * 1.: rhs and lhs are equal, then we simply copy lhs
+		 * 2.: Otherwise we have to traverse lhs and add
+		 *     all elements that are a member of rhs.
+		*/
+		if ( lhs == rhs )
+			// This is possibility 1
+			*newSet = *lhs;
+		else {
+			// This is possibility 2
+			auto xHead  = lhs->get( 0 );
+			auto xTail  = lhs->get( -1 );
+			auto xCurr  = xHead;
+			bool isDone = false;
+			while ( xCurr && !isDone ) {
+				if ( rhs->hasMember( *xCurr ) )
+					newSet->push( *xCurr );
+				if ( xCurr == xTail )
+					isDone = true;
+				else
+					xCurr = xCurr->getNext();
+			} // end of traversing lhs
+		} // End of building possibility 2
+	} // End of having a combination requiring action
 
-    return newSet;
+	return newSet;
 }
 
 
@@ -229,11 +229,11 @@ TSet<data_t>* set_intersection( const TSet<data_t>* const lhs, const TSet<data_t
 **/
 template<typename data_t>
 TSet<data_t> set_intersection( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
-    TSet<data_t>* ptrSet = nullptr;
-    PWX_TRY_PWX_FURTHER( ptrSet = set_intersection( &lhs, &rhs ) )
-    TSet<data_t> newSet( *ptrSet );
-    delete ptrSet;
-    return newSet;
+	TSet<data_t>* ptrSet = nullptr;
+	PWX_TRY_PWX_FURTHER( ptrSet = set_intersection( &lhs, &rhs ) )
+	TSet<data_t> newSet( *ptrSet );
+	delete ptrSet;
+	return newSet;
 }
 
 
@@ -257,31 +257,31 @@ TSet<data_t> set_intersection( const TSet<data_t>& lhs, const TSet<data_t>& rhs 
 **/
 template<typename data_t>
 TSet<data_t>* set_union( const TSet<data_t>* const lhs, const TSet<data_t>* const rhs ) {
-    typedef TSet<data_t> list_t;
+	typedef TSet<data_t> list_t;
 
-    list_t* newSet = nullptr;
+	list_t* newSet = nullptr;
 
-    // Build an empty set:
-    PWX_TRY( newSet = new list_t() )
-    PWX_THROW_STD_FURTHER( "SetCreationFailed", "set_union() could not create the union set!" )
+	// Build an empty set:
+	PWX_TRY( newSet = new list_t() )
+	PWX_THROW_STD_FURTHER( "SetCreationFailed", "set_union(); could not create the union set!" );
 
-    // If lhs has elements, we can begin with adding them.
-    if ( lhs->size() ) {
-        PWX_LOCK_GUARD( lhs )
-        newSet->reset( *lhs );
-        PWX_TRY_PWX_FURTHER( *newSet += *lhs )
-    }
+	// If lhs has elements, we can begin with adding them.
+	if ( lhs->size() ) {
+		PWX_LOCK_GUARD( lhs );
+		newSet->reset( *lhs );
+		PWX_TRY_PWX_FURTHER( *newSet += *lhs );
+	}
 
-    // If rhs has elements, we can add them (, too)
-    if ( rhs->size() ) {
-        PWX_LOCK_GUARD( rhs )
-        if ( newSet->empty() )
-            // We still need isSorted and destroy!
-            newSet->reset( *rhs );
-        PWX_TRY_PWX_FURTHER( *newSet += *rhs )
-    }
+	// If rhs has elements, we can add them (, too)
+	if ( rhs->size() ) {
+		PWX_LOCK_GUARD( rhs );
+		if ( newSet->empty() )
+			// We still need isSorted and destroy!
+			newSet->reset( *rhs );
+		PWX_TRY_PWX_FURTHER( *newSet += *rhs );
+	}
 
-    return newSet;
+	return newSet;
 }
 
 
@@ -308,11 +308,11 @@ TSet<data_t>* set_union( const TSet<data_t>* const lhs, const TSet<data_t>* cons
 **/
 template<typename data_t>
 TSet<data_t> set_union( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
-    TSet<data_t>* ptrSet = nullptr;
-    PWX_TRY_PWX_FURTHER( ptrSet = set_union( &lhs, &rhs ) )
-    TSet<data_t> newSet( *ptrSet );
-    delete ptrSet;
-    return newSet;
+	TSet<data_t>* ptrSet = nullptr;
+	PWX_TRY_PWX_FURTHER( ptrSet = set_union( &lhs, &rhs ) )
+	TSet<data_t> newSet( *ptrSet );
+	delete ptrSet;
+	return newSet;
 }
 
 
@@ -329,16 +329,16 @@ TSet<data_t> set_union( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
 **/
 template<typename data_t>
 bool operator==( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept {
-    bool result = true;
+	bool result = true;
 
-    if ( &lhs != &rhs ) {
-        if ( lhs.size() != rhs.size() )
-            result = false;
-        else
-            result = lhs.isSubsetOf( rhs );
-    }
+	if ( &lhs != &rhs ) {
+		if ( lhs.size() != rhs.size() )
+			result = false;
+		else
+			result = lhs.isSubsetOf( rhs );
+	}
 
-    return result;
+	return result;
 }
 
 
@@ -353,7 +353,7 @@ bool operator==( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept {
 **/
 template<typename data_t>
 bool operator!=( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept {
-    return !operator==( lhs, rhs );
+	return !operator==( lhs, rhs );
 }
 
 
@@ -380,7 +380,7 @@ bool operator!=( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) noexcept {
 **/
 template<typename data_t>
 TSet<data_t> operator+ ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
-    PWX_TRY_PWX_FURTHER( return set_union( lhs, rhs ) )
+	PWX_TRY_PWX_FURTHER( return set_union( lhs, rhs ) )
 }
 
 
@@ -408,7 +408,7 @@ TSet<data_t> operator+ ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
 **/
 template<typename data_t>
 TSet<data_t> operator- ( const TSet<data_t>& lhs, const TSet<data_t>& rhs ) {
-    PWX_TRY_PWX_FURTHER( return set_difference( lhs, rhs ) )
+	PWX_TRY_PWX_FURTHER( return set_difference( lhs, rhs ) )
 }
 
 
