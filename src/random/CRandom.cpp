@@ -798,7 +798,7 @@ int32_t CRandom::doubToInt ( double val ) const noexcept {
 * to lastRndValue. The seed and Simplex data are initialized as well.
 **/
 CRandom::CRandom() noexcept
-	:	nst( NST_NAMES_EN ),
+	: nst( NST_NAMES_EN ),
 	  seed ( ( private_::private_get_random() - ( private_::randomValueRange / 2 ) ) / 100 ) {
 	// Initialize Simplex values:
 	for ( int32_t i = 0; i < 5; i++ ) {
@@ -817,7 +817,6 @@ CRandom::CRandom() noexcept
 				spxOffs[i][j] = 0;
 		}
 	}
-	DEBUG_LOG( "RNG ctor", "RNG initialized with seed %d", seed );
 }
 
 
