@@ -84,11 +84,11 @@ namespace pwx {
 
 // The main logging function:
 void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stdout
-	void debug_err( char const * fmt, ... ) PWX_API; //!< internal debug logging function to stderr
+void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stderr
 
 // And the main wrapper:
 # define DEBUG_LOG(part, fmt, ...)                   \
-	::pwx::debug_log( ">> [%8s] %s : " fmt,      \
+	::pwx::debug_log( ">> [%8s] %s : " fmt "\n", \
 	                  part,                      \
 	                  ::pwx::get_trace_info(     \
 	                          __FILE__,          \
@@ -96,8 +96,15 @@ void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 	                          PWX_CURRENT_FUNC), \
 	                  __VA_ARGS__ )
 
+# define DEBUG_LOG_CAUGHT_STD(part)                  \
+	catch (::std::exception &e) {                \
+		DEBUG_LOG(part,                      \
+		        "Caught std::exception: %s", \
+		        e.what());                   \
+	}
+
 # define DEBUG_ERR(part, fmt, ...)                   \
-	::pwx::debug_err( ">> [%8s] %s : " fmt,      \
+	::pwx::debug_err( ">> [%8s] %s : " fmt "\n", \
 	                  part,                      \
 	                  ::pwx::get_trace_info(     \
 	                          __FILE__,          \
@@ -106,6 +113,7 @@ void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 	                  __VA_ARGS__ )
 #else
 # define DEBUG_LOG(...) 
+# define DEBUG_LOG_CAUGHT_STD(...)
 # define DEBUG_ERR(...) 
 /* debug_log() and debug_err() are not defined here, because they would cause
  *   pwx::debug_log(...);
@@ -118,6 +126,11 @@ void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 /** @def DEBUG_LOG
   * @brief Print a debugging information message with automatic location information.
   * This is a macro that gets removed in release builds.
+  *
+  * @def DEBUG_LOG_CAUGHT_STD
+  * @brief catch an `std::exception` and log its `what()`.
+  * This macro can be used to log an exception that is normally ignored, but might
+  * be somewhat interesting for debugging purposes.
   *
   * @def DEBUG_ERR
   * @brief Print a debugging error message with automatic location information.

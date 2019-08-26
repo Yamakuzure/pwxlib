@@ -527,7 +527,7 @@ public:
 	*/
 
 	key_t      key;                               //!< The key that identifies this element
-	share_t    data;                                                      //!< The data this list element points to, wrapped in a shared_ptr.
+	share_t    data;                              //!< The data this list element points to, wrapped in a shared_ptr.
 	neighbor_t next = ATOMIC_VAR_INIT( nullptr ); //!< The next element in the list or nullptr if this is the tail.
 	uint32_t   hops = 0;                          //!< Counts hops when inserting an element
 
@@ -569,6 +569,7 @@ THashElement<key_t, data_t>::~THashElement() noexcept {
 		isDestroyed.store( true );
 
 	if ( 1 == data.use_count() ) {
+
 		if ( beThreadSafe() ) {
 			// Lock the element before checking again.
 			DEBUG_LOCK_STATE( "PWX_LOCK", this, this )
@@ -578,7 +579,9 @@ THashElement<key_t, data_t>::~THashElement() noexcept {
 			// have made a copy in the mean time before "isDestroyed"
 			// was finished setting to true.
 			if ( 1 == data.use_count() ) {
+
 				PWX_TRY( if ( data ) { data.reset(); } ) // the shared_ptr will delete the data now
+				DEBUG_LOG_CAUGHT_STD( "THashElement" )
 				catch( ... ) { }
 
 				// Do a lock cycle, so that threads having had to wait while the data
@@ -594,6 +597,7 @@ THashElement<key_t, data_t>::~THashElement() noexcept {
 		} else {
 			// No thread safety? Then just do it!
 			PWX_TRY( if ( data ) { data.reset(); } )
+			DEBUG_LOG_CAUGHT_STD( "THashElement" )
 			catch( ... ) { }
 		}
 	}

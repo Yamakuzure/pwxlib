@@ -503,8 +503,6 @@ public:
 
 		HASH_START_CLEAR
 
-		assert( ( eCount.load( memOrdLoad ) < 1000000 ) && "ERROR: eCount overflow!" );
-
 		while ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) {
 			toDel = hashTable[pos];
 			if ( toDel && ( toDel != vacated ) && toDel->try_lock() ) {
@@ -530,7 +528,7 @@ public:
 				// delete this element
 				if ( !toDel->destroyed() ) {
 					--eCount;
-					delete delNext;
+					delete toDel;
 				}
 			} // End of gaining lock on an element
 
@@ -1490,14 +1488,16 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 	// Delete hash table
 	if ( hashTable ) {
 		PWX_TRY( delete [] hashTable )
-		PWX_CATCH_AND_FORGET( std::exception ); // Can't do anything about that!
+		DEBUG_LOG_CAUGHT_STD("delete hashTable")
+		catch(...) { /* Can't do anything about that! */ }
 	}
 
 	// Delete "vacated" sentry
 	vacated = nullptr;
 	if ( vacChar ) {
 		PWX_TRY( delete vacChar )
-		PWX_CATCH_AND_FORGET( std::exception ); // dito
+		DEBUG_LOG_CAUGHT_STD("delete vacChar")
+		catch(...) { /* Can't do anything about that! */ }
 	}
 }
 
