@@ -196,6 +196,7 @@
 		<Unit filename="../test/test_lib.h" />
 		<Unit filename="../test/torture.cpp" />
 		<Unit filename="../test/torture.h" />
+		<Unit filename="rebuild_all.sh" />
 		<Extensions>
 			<code_completion />
 			<envvars />

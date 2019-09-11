@@ -6,3 +6,6 @@ clean:
 
 install:
 	DESTDIR=$(DESTDIR) ninja -C build install
+
+test:
+	ninja -C build test

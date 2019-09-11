@@ -81,7 +81,7 @@ if want_torture
 		[files('''
 			torture.cpp
 			torture.h'''.split())],
-		['automatic'],
+		['manual'],
 		[threads]]
 	]
 endif
