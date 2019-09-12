@@ -188,7 +188,7 @@ void CThreadElementStore::invalidate( const CThreadElementStore::curr_t* old_cur
 	if ( beThreadSafe() ) {
 		// Only do anything if there are any elements stored:
 		if ( currs.size() && !invalidating.load( memOrdLoad ) ) {
-			invalidating.store( true, memOrdLoad );
+			invalidating.store( true, memOrdStore );
 			PWX_LOCK_GUARD( this );
 
 			// Do a double check, maybe the invalidating is no longer needed
