@@ -9,7 +9,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="all">
-				<Option output="../pwxLib" prefix_auto="1" extension_auto="1" />
+				<Option output="../build/test_lib" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../build/" />
 				<Option type="1" />
 				<Option compiler="gcc" />

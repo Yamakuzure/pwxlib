@@ -60,6 +60,7 @@ annotations = get_option('annotations')
 debug       = get_option('debug')
 debugthread = get_option('debug-thread')
 profile     = get_option('profile')
+small_tests = get_option('small_tests')
 spinlocks   = get_option('spinlocks')
 yielding    = get_option('yielding')
 
@@ -93,6 +94,12 @@ endif
 if debugthread
 	debug = true
 	conf.set('PWX_THREADDEBUG', true)
+endif
+
+if small_tests
+	conf.set('PWX_SMALL_TESTS', 1)
+else
+	conf.set('PWX_SMALL_TESTS', 0)
 endif
 
 #####################################################################

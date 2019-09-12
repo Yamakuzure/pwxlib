@@ -78,3 +78,6 @@ option('install-tests', type : 'boolean', value : false,
 option('torture', type : 'boolean', value : false,
        description : '''Build "torture", a multi threading container burner
 					      (Default: false)''')
+
+option('small_tests', type : 'boolean', value : false,
+       description : 'Test only 1/10th elements in test_lib (Default: false)')

@@ -32,7 +32,7 @@ elif [[ "lsan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=1
 	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address"
 elif [[ "tsan" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread -Dsmall_tests=true"
 else
         echo "Type \"$xType\" is unknown"
         exit 1
