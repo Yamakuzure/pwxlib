@@ -60,7 +60,7 @@ namespace pwx {
 	growing.fetch_add(1, memOrdStore); \
 	PWX_LOCK_GUARD(this); \
 	while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
-		std::this_thread::yield(); \
+		PWX_LOCK_GUARD_RESET(this); \
 	}
 
 
@@ -76,7 +76,7 @@ namespace pwx {
 	while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
 		PWX_LOCK_GUARD_RESET(this); \
 	} \
-	inserting.fetch_add(1, memOrdStore);
+	inserting.fetch_add(1, memOrdStore)
 
 
 /// @brief Support macro to stop inserting an element
@@ -91,7 +91,7 @@ namespace pwx {
 	while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
 		PWX_LOCK_GUARD_RESET(this); \
 	}  \
-	removing.fetch_add(1, memOrdStore);
+	removing.fetch_add(1, memOrdStore)
 
 
 /// @brief Support macro to stop removing an element
@@ -121,7 +121,7 @@ namespace pwx {
 
 /// @brief Support macro to notifiy other threads that the container is cleared
 #define HASH_STOP_CLEAR \
-	clearing.fetch_sub(1, memOrdStore);
+	clearing.fetch_sub(1, memOrdStore)
 
 
 /** @brief two-type enum determining the hashing type
@@ -424,12 +424,12 @@ public:
 		// not found in the first run
 		if ( !this->privGet( src.key ) ) {
 
-			HASH_START_INSERT
+			HASH_START_INSERT;
 
 			if ( !this->privGet( src.key ) ) {
 				double newSize = 0.;
 				PWX_TRY_PWX_FURTHER( newSize = privAdd( src ) )
-				HASH_STOP_INSERT
+				HASH_STOP_INSERT;
 
 				// Grow if needed
 				double maxSize = sizeMax();
@@ -439,7 +439,7 @@ public:
 				}
 
 			} else
-				HASH_STOP_INSERT
+				HASH_STOP_INSERT;
 			}
 
 		return this->size();
@@ -460,12 +460,12 @@ public:
 		// not found in the first run
 		if ( !this->privGet( key ) ) {
 
-			HASH_START_INSERT
+			HASH_START_INSERT;
 
 			if ( !this->privGet( key ) ) {
 				double newSize = 0.;
 				PWX_TRY_PWX_FURTHER( newSize = privAdd( key, data ) )
-				HASH_STOP_INSERT
+				HASH_STOP_INSERT;
 
 				// Grow if needed
 				double maxSize = sizeMax();
@@ -475,7 +475,7 @@ public:
 				}
 
 			} else
-				HASH_STOP_INSERT
+				HASH_STOP_INSERT;
 			}
 
 		return this->size();
@@ -501,7 +501,7 @@ public:
 
 		if ( !hashTable ) return; // Should never happen
 
-		HASH_START_CLEAR
+		HASH_START_CLEAR;
 
 		while ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) {
 			toDel = hashTable[pos];
@@ -537,7 +537,7 @@ public:
 				pos = 0;
 		} // end of looping the hash table
 
-		HASH_STOP_CLEAR
+		HASH_STOP_CLEAR;
 	}
 
 
@@ -557,10 +557,16 @@ public:
 	  * @return The number of elements after the operation.
 	**/
 	virtual uint32_t delElem( elem_t& elem ) {
-		HASH_START_REMOVE
-		elem_t* toDelete = privRemoveKey( elem.key );
-		HASH_STOP_REMOVE
-		PWX_TRY_PWX_FURTHER( return protDelete( toDelete ) );
+		HASH_START_REMOVE;
+		
+		uint32_t remaining = 0;
+		elem_t*  toDelete  = privRemoveKey( elem.key );
+
+		PWX_TRY_PWX_FURTHER( remaining = protDelete( toDelete ) );
+
+		HASH_STOP_REMOVE;
+
+		return remaining;
 	}
 
 
@@ -579,10 +585,16 @@ public:
 	  * @return The number of elements after the operation.
 	**/
 	virtual uint32_t delKey( const key_t& key ) {
-		HASH_START_REMOVE
-		elem_t* toDelete = privRemoveKey( key );
-		HASH_STOP_REMOVE
-		PWX_TRY_PWX_FURTHER( return protDelete( toDelete ) );
+		HASH_START_REMOVE;
+
+		uint32_t remaining = 0;
+		elem_t*  toDelete  = privRemoveKey( key );
+
+		PWX_TRY_PWX_FURTHER( remaining = protDelete( toDelete ) );
+
+		HASH_STOP_REMOVE;
+
+		return remaining;
 	}
 
 
@@ -600,7 +612,7 @@ public:
 	  * lot of elements stored is therefore rather costly!
 	  */
 	virtual void disable_thread_safety() noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 
 		// Turn off first
 		this->beThreadSafe( false );
@@ -627,7 +639,7 @@ public:
 
 	/// @brief return true if this container is empty
 	virtual bool empty() const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return !eCount.load( memOrdLoad );
 	}
 
@@ -645,7 +657,7 @@ public:
 	virtual void enable_thread_safety() noexcept {
 		this->beThreadSafe( true );
 
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 
 		uint32_t  pos       = 0;
 		uint32_t  tabSize   = this->sizeMax();
@@ -665,7 +677,7 @@ public:
 
 	/// @brief return true if an element with @a key exists
 	virtual bool exists( const key_t& key ) const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return this->privGet( key ) ? true : false;
 	}
 
@@ -676,7 +688,7 @@ public:
 	  * @return a const pointer to the element or nullptr if the key could not be found.
 	**/
 	virtual elem_t* get( const key_t& key ) const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return this->privGet( key );
 	}
 
@@ -687,7 +699,7 @@ public:
 	  * @return a pointer to the element or nullptr if the key could not be found.
 	**/
 	virtual elem_t* get( const key_t& key ) noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return const_cast<elem_t*>( this->privGet( key ) );
 	}
 
@@ -729,7 +741,7 @@ public:
 	  * @return number of hops needed.
 	**/
 	virtual uint32_t getHops( const key_t& key ) const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		elem_t* elem = privGet( key );
 		if ( elem )
 			return elem->hops;
@@ -754,7 +766,7 @@ public:
 		 */
 		if ( targetSize > sizeMax() ) {
 
-			HASH_START_GROW
+			HASH_START_GROW;
 
 			// --- store old size ---
 			uint32_t oldSize = hashSize.load( memOrdLoad );
@@ -792,8 +804,7 @@ public:
 						xNext  = toMove->getNext();
 
 						// Add the old element to the new table and delete the old one:
-						PWX_TRY_PWX_FURTHER(
-						        privAdd( toMove->key, toMove->data.get() ) )
+						PWX_TRY_PWX_FURTHER( privAdd( toMove->key, toMove->data.get() ) );
 
 						// Now maintain the old table:
 						oldTab[pos] = xNext != toMove ? xNext : nullptr;
@@ -812,7 +823,7 @@ public:
 			} // End of inner size check
 
 			// --- Growing is finished: ---
-			HASH_STOP_GROW
+			HASH_STOP_GROW;
 
 		} // End of outer size check
 
@@ -850,7 +861,7 @@ public:
 	virtual elem_t* pop_back() noexcept {
 		if ( eCount.load( memOrdLoad ) > 0 ) {
 
-			HASH_START_REMOVE
+			HASH_START_REMOVE;
 
 			uint32_t maxPos = sizeMax();
 			uint32_t pos    = maxPos;
@@ -865,7 +876,7 @@ public:
 				}
 			}
 
-			HASH_STOP_REMOVE
+			HASH_STOP_REMOVE;
 		}
 
 		return nullptr;
@@ -888,7 +899,7 @@ public:
 	virtual elem_t* pop_front() noexcept {
 		if ( eCount.load( memOrdLoad ) > 0 ) {
 
-			HASH_START_REMOVE
+			HASH_START_REMOVE;
 
 			uint32_t maxPos = sizeMax();
 			uint32_t pos    = 0;
@@ -903,7 +914,7 @@ public:
 				}
 			}
 
-			HASH_STOP_REMOVE
+			HASH_STOP_REMOVE;
 		}
 
 		return nullptr;
@@ -959,9 +970,9 @@ public:
 	  * @return the given pointer or nullptr if the element does not exist
 	**/
 	virtual elem_t* remElem( elem_t& elem ) noexcept {
-		HASH_START_REMOVE
+		HASH_START_REMOVE;
 		elem_t* result = privRemoveKey( elem.key );
-		HASH_STOP_REMOVE
+		HASH_STOP_REMOVE;
 		return result;
 	}
 
@@ -979,9 +990,9 @@ public:
 	  * @return a pointer to the element with the key @a key or nullptr
 	**/
 	virtual elem_t* remKey( const key_t& key ) noexcept {
-		HASH_START_REMOVE
+		HASH_START_REMOVE;
 		elem_t* result = privRemoveKey( key );
-		HASH_STOP_REMOVE
+		HASH_STOP_REMOVE;
 		return result;
 	}
 
@@ -994,14 +1005,14 @@ public:
 
 	/// @brief return the number of stored elements
 	uint32_t size() const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return eCount.load( memOrdLoad );
 	}
 
 
 	/// @brief return the maximum number of places (elements for open, buckets for chained hashes)
 	uint32_t sizeMax() const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return this->hashSize.load( memOrdLoad );
 	}
 
@@ -1034,7 +1045,7 @@ public:
 	**/
 	virtual hash_t& operator= ( const hash_t& rhs ) {
 		if ( &rhs != this ) {
-			HASH_WAIT_FOR_CLEAR_AND_GROW
+			HASH_WAIT_FOR_CLEAR_AND_GROW;
 			PWX_DOUBLE_LOCK_GUARD( this, &rhs );
 			clear();
 			destroy      = rhs.destroy;
@@ -1067,7 +1078,7 @@ public:
 	**/
 	virtual hash_t& operator+= ( const hash_t& rhs ) {
 		if ( &rhs != this ) {
-			HASH_WAIT_FOR_CLEAR_AND_GROW
+			HASH_WAIT_FOR_CLEAR_AND_GROW;
 			PWX_DOUBLE_LOCK_GUARD( this, &rhs );
 
 			// --- grow this table if needed ---
@@ -1108,7 +1119,7 @@ public:
 	**/
 	virtual hash_t& operator-= ( const hash_t& rhs ) {
 		if ( &rhs != this ) {
-			HASH_WAIT_FOR_CLEAR_AND_GROW
+			HASH_WAIT_FOR_CLEAR_AND_GROW;
 			PWX_DOUBLE_LOCK_GUARD( this, &rhs );
 
 			uint32_t rhsSize = rhs.sizeMax();
@@ -1156,7 +1167,7 @@ public:
 	  * @return read-only pointer to the element, or nullptr if there is no element with the specific index.
 	**/
 	virtual const elem_t* operator[] ( const int64_t index ) const noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return privGetByIndex( index );
 	}
 
@@ -1180,7 +1191,7 @@ public:
 	  * @return read/write pointer to the element, or nullptr if the hash is empty.
 	**/
 	virtual elem_t* operator[] ( int64_t index ) noexcept {
-		HASH_WAIT_FOR_CLEAR_AND_GROW
+		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return const_cast<elem_t* > ( privGetByIndex( index ) );
 	}
 
