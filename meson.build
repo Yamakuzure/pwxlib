@@ -149,11 +149,11 @@ if debug
 	conf.set('LIBPWX_DEBUG', true)
 	possible_cxx_flags += [
 		'-ggdb3',
-		'-Og'
+		'-O0'
 	]
 	possible_link_flags += [
 		'-ggdb3',
-		'-Og'
+		'-O0'
 	]
 endif
 
