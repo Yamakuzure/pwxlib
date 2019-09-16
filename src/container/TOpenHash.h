@@ -67,7 +67,7 @@ namespace pwx {
   *
   * Further the PrydeWorX Library Open Hash container uses "Robin Hood Hashing". This
   * means, that if an item is to be inserted and reaches a bucket that is taken, item
-  * in there is moved further if it has fewer hops than the new item. 
+  * in there is moved further if it has fewer hops than the new item.
   *
   * The hash algorithms used within the PrydeWorX library already offer a very high
   * level of distribution. For keys not handled by these, or if you think you have
@@ -316,7 +316,13 @@ protected:
 	}
 
 
+	using base_t::protIsEmpty;
+	using base_t::protIsUnused;
 	using base_t::protIsVacated;
+	using base_t::table_key_equals;
+	using base_t::table_get;
+	using base_t::table_set;
+	using base_t::table_vacate;
 
 
 	/* ===============================================
@@ -328,10 +334,8 @@ protected:
 	using base_t::eCount;
 	using base_t::hashBuilder;
 	using base_t::hashSize;
-	using base_t::hashTable;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
-	using base_t::vacated;
 
 private:
 
@@ -388,22 +392,25 @@ private:
 
 		// Now probe the table until we are done or have found the key
 		bool     isFound     = false;
+		bool     isEmpty     = false;
 		bool     isVacated   = false;
 		bool     beRobinHood = allowVacated && hops;
 		uint32_t pos         = idxBase;
 		for ( uint32_t i = 0; !isFound && ( i < tabSize ); ++i ) {
-			isVacated = hashTable[pos] == vacated;
+			isEmpty   = protIsEmpty( pos );
+			isVacated = protIsVacated( pos );
 
 			// we are done if ...
-			if (        // a) the hashTable has a nullptr at pos or
-			        ( nullptr == hashTable[pos] )
-			        // b) the hashTable has an element with the same key
-			        ||      ( !isVacated && ( *hashTable[pos] == key ) )
-			        // c) allowVacated is true and the position is vacated
-			        ||      ( isVacated && allowVacated )
+			if ( // a) the hashTable is empty at pos
+			        isEmpty
+			        // b) the hashTable is vacated at pos and allowVacated is true or
+			        || ( isVacated && allowVacated )
+			        // c) the hashTable has an element with the same key
+			        || table_key_equals( pos, key )
 			        // d) beRobinHood is true and the position is taken, but the element has fewer hops
 			        //    with hops being greater than 1 and the resident has at least two less.
-			        ||  ( beRobinHood && !isVacated && ( *hops > 1 ) && ( hashTable[pos]->hops < ( *hops - 1 ) ) ) )
+			        || ( beRobinHood && !isVacated && ( *hops > 1 )
+			             && ( table_get( pos )->hops < ( *hops - 1 ) ) ) )
 				isFound = true;
 			else {
 				pos = ( pos + idxStep ) % tabSize;
@@ -536,21 +543,21 @@ private:
 			PWX_THROW( "out of bounds", "Index too large",
 			           "The index returned by privGetIndex() is larger than the table size" );
 		}
-		if ( ( nullptr != hashTable[idx] )
-		                && ( hashTable[idx] != vacated )
-		                && ( ( hashTable[idx]->hops >= elem->hops )
-		                     || ( *hashTable[idx] == elem->key ) ) ) {
-			if ( *hashTable[idx] == elem->key ) {
+		if ( ( nullptr != table_get( idx ) )
+		                && ( !protIsVacated( idx ) )
+		                && ( ( table_get( idx )->hops >= elem->hops )
+		                     || ( table_key_equals( idx, elem->key ) ) ) ) {
+			if ( table_key_equals( idx, elem->key ) ) {
 				DEBUG_ERR( "open hash",
 				           "privInsert called with key \"%s\", already found at index %u",
 				           pwx::to_string( elem->key ).c_str(), idx );
 				DEBUG_ERR( "open hash", " -> table size %u, hops performed %u", tabSize, elem->hops );
 				PWX_THROW( "illegal index", "key already exists",
 				           "privInsert called with an already stored key!" );
-			} else if ( hashTable[idx]->hops >= elem->hops ) {
+			} else if ( table_get( idx )->hops >= elem->hops ) {
 				DEBUG_ERR( "open hash",
 				           "Robin Hood failed and delivered %u hops when we have %u",
-				           hashTable[idx]->hops, elem->hops );
+				           table_get( idx )->hops, elem->hops );
 				DEBUG_ERR( "open hash", " -> table size %u", tabSize );
 				PWX_THROW( "illegal index", "not enough hops",
 				           "An element to replace has more or equal hops" );
@@ -567,10 +574,10 @@ private:
 		 *    -> insert new element here
 		*/
 		elem_t* oldElem = nullptr;
-		if ( hashTable[idx] && ( hashTable[idx] != vacated ) )
+		if ( !protIsUnused( idx ) )
 			// This is situation a)
 			oldElem = this->privRemoveIdx( idx );
-		hashTable[idx] = elem; // Fulfills both situations
+		table_set( idx, elem ); // Fulfills both situations
 		elem->insertAsFirst();
 		eCount.fetch_add( 1, memOrdStore );
 
@@ -579,11 +586,15 @@ private:
 			elem       = oldElem;
 			oldElem    = nullptr;
 			elem->hops = 0;
+
+			// A quick note: privGetIndex already takes care of counting and comparing hops.
+			// So the index returned points to a vacated position or one with fewer hops than
+			// needed to get there.
 			idx = privGetIndex( elem->key, true, &( elem->hops ) );
-			if ( hashTable[idx] && ( hashTable[idx] != vacated ) )
+			if ( !protIsUnused( idx ) )
 				// This is situation a) again
 				oldElem = this->privRemoveIdx( idx );
-			hashTable[idx] = elem; // Item is moved
+			table_set( idx, elem ); // Item is moved
 			elem->insertAsFirst();
 			eCount.fetch_add( 1, memOrdStore );
 		}
@@ -603,11 +614,8 @@ private:
 	**/
 	virtual elem_t* privRemoveIdx ( uint32_t index ) noexcept {
 		elem_t* result = nullptr;
-		if ( ( index < this->hashSize.load( memOrdLoad ) ) && hashTable[index] && !protIsVacated( index ) ) {
-
-			// Note: Open Hashes mark empty positions with the "vacated" sentry
-			result = hashTable[index];
-			hashTable[index] = vacated;
+		if ( ( index < this->hashSize.load( memOrdLoad ) ) && ( result = table_get( index ) ) ) {
+			table_vacate( index );
 			result->remove();
 			--eCount;
 		} // End of outer check

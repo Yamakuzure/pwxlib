@@ -292,6 +292,8 @@ protected:
 	 */
 
 	using base_t::protGetHash;
+	using base_t::table_get;
+	using base_t::table_set;
 
 
 	/* ===============================================
@@ -302,7 +304,6 @@ protected:
 	using base_t::CHMethod;
 	using base_t::eCount;
 	using base_t::hashSize;
-	using base_t::hashTable;
 	using base_t::memOrdLoad;
 	using base_t::memOrdStore;
 
@@ -351,7 +352,7 @@ private:
 	/// @brief private insertion doing bucket filling to resolve collisions
 	virtual uint32_t privInsert( elem_t* elem ) {
 		uint32_t idx  = privGetIndex( elem->key );
-		elem_t*  root = this->hashTable[idx];
+		elem_t*  root = table_get( idx );
 		if ( root ) {
 			elem_t* next = root->getNext();
 			elem->hops   = 1;
@@ -362,7 +363,7 @@ private:
 			}
 			root->insertNext( elem );
 		} else {
-			this->hashTable[idx] = elem;
+			table_set( idx, elem );
 			elem->insertAsFirst();
 		}
 
@@ -383,13 +384,13 @@ private:
 	**/
 	virtual elem_t* privRemoveIdx ( uint32_t index ) noexcept {
 		elem_t* result = index < this->hashSize.load( memOrdLoad )
-		                 ? hashTable[index]
+		                 ? table_get( index )
 		                 : nullptr;
 
 		if ( result ) {
 			// Note: Chained Hashes do not use "vacated" sentries, no check needed.
 			elem_t* xNext = result->getNext();
-			hashTable[index] = xNext != result ? xNext : nullptr;
+			table_set( index, xNext != result ? xNext : nullptr );
 			result->remove();
 			eCount.fetch_sub( 1, memOrdStore );
 		} // End of outer check
@@ -405,7 +406,7 @@ private:
 	**/
 	virtual elem_t* privRemoveKey ( const key_t& key ) noexcept {
 		uint32_t index   = privGetIndex( key );
-		elem_t* result = hashTable[index];
+		elem_t* result = table_get( index );
 		elem_t* prev   = nullptr;
 
 		while ( result && ( *result != key ) && ( result != prev ) ) {
@@ -420,7 +421,7 @@ private:
 				prev->removeNext();
 			else {
 				elem_t* xNext = result->getNext();
-				hashTable[index] = xNext != result ? xNext : nullptr;
+				table_set( index, xNext != result ? xNext : nullptr );
 				result->remove();
 			}
 			eCount.fetch_sub( 1, memOrdStore );

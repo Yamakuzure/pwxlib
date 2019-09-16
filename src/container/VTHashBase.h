@@ -88,6 +88,7 @@ namespace pwx {
 /// @brief Support macro to start removing an element only when it is save to do so
 #define HASH_START_REMOVE \
 	PWX_LOCK_GUARD(this); \
+	if (this->isDestroyed.load()) return 0; \
 	while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
 		PWX_LOCK_GUARD_RESET(this); \
 	}  \
@@ -188,17 +189,29 @@ public:
 	**/
 	VTHashBase( uint32_t initSize, uint32_t keyLen_,
 	            double maxLoad_, double dynGrow_ )
-		: hashBuilder ( keyLen_ )
-		, hashSize ( initSize )
-		, hashTable ( nullptr )
+		: hashBuilder  ( keyLen_ )
+		, hashSize     ( initSize )
+		, dynGrowFactor( dynGrow_ )
 		, maxLoadFactor( maxLoad_ )
-		, dynGrowFactor( dynGrow_ ) {
+		, hashTable    ( nullptr )
+		, hashTableLock()
+		, vacChar      ( nullptr )
+		, vacated      ( nullptr ) {
 
 		// Generate the hash table
 		try {
 			hashTable = new elem_t* [hashSize];
 			for ( size_t i = 0; i < hashSize; ++i )
+				// We can do this directly in a ctor. No other thread here, yet
 				hashTable[i] = nullptr;
+			/* Why do we not set this to 'vacated'?
+			 * If an open hash element needs more than one hop, and an element that caused
+			 * one of the hops gets removed, it's bucket is marked as being 'vacated'. This is
+			 * done so the search for an element can jump 'vacated' buckets, but stops if it
+			 * hits a `nullptr` bucket. If we initialized every bucket with 'vacated', the
+			 * search for an element would endlessly circle the table as it never knows where to
+			 * stop.
+			 */
 		}
 		PWX_THROW_STD_FURTHER( "VTHashBase failure", "HashTable could not be created" );
 
@@ -389,7 +402,9 @@ public:
 		try {
 			hashTable = new elem_t* [hashSize];
 			for ( uint32_t i = 0; i < hashSize; ++i )
+				// We can do this directly in a copy ctor. No other thread here, yet
 				hashTable[i] = nullptr;
+			/* Why do we not set this to 'vacated'? See main ctor why. */
 		}
 		PWX_THROW_STD_FURTHER( "VTHashBaseCopyFailure", "HashTable could not be created" );
 
@@ -440,7 +455,7 @@ public:
 
 			} else
 				HASH_STOP_INSERT;
-			}
+		}
 
 		return this->size();
 	}
@@ -476,7 +491,7 @@ public:
 
 			} else
 				HASH_STOP_INSERT;
-			}
+		}
 
 		return this->size();
 	}
@@ -504,8 +519,8 @@ public:
 		HASH_START_CLEAR;
 
 		while ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) {
-			toDel = hashTable[pos];
-			if ( toDel && ( toDel != vacated ) && toDel->try_lock() ) {
+			toDel = table_get( pos );
+			if ( toDel && toDel->try_lock() ) {
 				// This thread has exclusive access, but it
 				// must be ensured that no other thread is
 				// in the destructor unlock cycle:
@@ -514,7 +529,7 @@ public:
 					continue;
 				}
 
-				hashTable[pos] = nullptr;
+				table_set( pos, nullptr );
 
 				// remove a possible chain:
 				while ( ( delNext = toDel->removeNext() )
@@ -558,7 +573,7 @@ public:
 	**/
 	virtual uint32_t delElem( elem_t& elem ) {
 		HASH_START_REMOVE;
-		
+
 		uint32_t remaining = 0;
 		elem_t*  toDelete  = privRemoveKey( elem.key );
 
@@ -625,8 +640,8 @@ public:
 		uint32_t  tabSize   = this->sizeMax();
 		elem_t*   xCurr     = nullptr;
 		while ( pos < tabSize ) {
-			xCurr = hashTable[pos];
-			if ( !protIsVacated( pos ) ) {
+			xCurr = table_get( pos );
+			if ( xCurr ) {
 				while ( xCurr ) {
 					xCurr->disable_thread_safety();
 					xCurr = xCurr->getNext();
@@ -663,8 +678,8 @@ public:
 		uint32_t  tabSize   = this->sizeMax();
 		elem_t*   xCurr     = nullptr;
 		while ( pos < tabSize ) {
-			xCurr = hashTable[pos];
-			if ( !protIsVacated( pos ) ) {
+			xCurr = table_get( pos );
+			if ( xCurr ) {
 				while ( xCurr ) {
 					xCurr->enable_thread_safety();
 					xCurr = xCurr->getNext();
@@ -773,7 +788,9 @@ public:
 
 			if ( targetSize > oldSize ) {
 				DEBUG_LOG( "Hash Grow", "Growing hash table from %u top %u", oldSize, targetSize );
+
 				// --- Create a new larger table ---
+				PWX_NAMED_LOCK_GUARD( table_lock, &hashTableLock );
 				elem_t** oldTab = hashTable;
 				try {
 					hashTable = new elem_t* [targetSize];
@@ -783,7 +800,7 @@ public:
 
 					// --- "nullify" the new table ---
 					for ( uint32_t i = 0; i < targetSize; ++i )
-						hashTable[i] = nullptr;
+						table_set( i, nullptr );
 				}
 				PWX_THROW_STD_FURTHER( "GrowFailure", "Larger HashTable could not be created" );
 
@@ -799,6 +816,7 @@ public:
 				uint32_t  pos       = 0;
 
 				while ( pos < oldSize ) {
+					// Note: hashTableLock is still locked, so we can directly edit the tables
 					while ( oldTab[pos] && ( oldTab[pos] != vacated ) ) {
 						toMove = oldTab[pos];
 						xNext  = toMove->getNext();
@@ -868,8 +886,8 @@ public:
 			elem_t*  elem   = nullptr;
 
 			while ( pos && ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) ) {
-				elem = hashTable[--pos];
-				if ( elem && ( elem != vacated ) && elem->inserted() && !elem->destroyed() ) {
+				elem = table_get( --pos );
+				if ( elem && elem->inserted() && !elem->destroyed() ) {
 					PWX_NAMED_LOCK_GUARD( ElemRemover, elem );
 					if ( elem->inserted() && !elem->destroyed() )
 						return privRemoveIdx( pos );
@@ -906,8 +924,8 @@ public:
 			elem_t*  elem   = nullptr;
 
 			while ( ( pos < maxPos ) && ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) ) {
-				elem = hashTable[pos++];
-				if ( elem && ( elem != vacated ) && elem->inserted() && !elem->destroyed() ) {
+				elem = table_get( pos++ );
+				if ( elem && elem->inserted() && !elem->destroyed() ) {
 					PWX_NAMED_LOCK_GUARD( ElemRemover, elem );
 					if ( elem->inserted() && !elem->destroyed() )
 						return privRemoveIdx( pos );
@@ -1094,8 +1112,8 @@ public:
 			bool     isTS    = this->beThreadSafe();
 
 			while ( rhsPos < rhsSize ) {
-				if ( !rhs.protIsVacated( rhsPos ) ) {
-					rhsCurr = rhs.hashTable[rhsPos];
+				if ( !rhs.protIsUnused( rhsPos ) ) {
+					rhsCurr = rhs.table_get( rhsPos );
 					while ( rhsCurr ) {
 						PWX_TRY_PWX_FURTHER( this->add( *rhsCurr ) )
 						if ( !isTS )
@@ -1128,7 +1146,7 @@ public:
 			uint32_t  rhsPos  = 0;
 
 			while ( rhsPos < rhsSize ) {
-				if ( !rhs.protIsVacated( rhsPos ) ) {
+				if ( !rhs.table_elem_equals( rhsPos, vacated ) ) {
 					rhsCurr = rhs.hashTable[rhsPos];
 					while ( rhsCurr ) {
 						lhsCurr = remKey( rhsCurr->key );
@@ -1259,15 +1277,237 @@ protected:
 	}
 
 
+	/** @brief return true if the specified position is empty (aka `nullptr`)
+	  *
+	  * WARNING: This method does **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx the index to check
+	  * @return true if the position is empty, false otherwise.
+	**/
+	bool protIsEmpty( const uint32_t idx ) const noexcept {
+		return table_elem_equals( idx, nullptr );
+	}
+
+
+	/** @brief return true if the specified position is empty or vacated
+	  *
+	  * WARNING: This method does **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx the index to check
+	  * @return true if the position is unused, false otherwise.
+	**/
+	bool protIsUnused( const uint32_t idx ) const noexcept {
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		bool result = ( hashTable[idx] == nullptr ) || ( hashTable[idx] == vacated );
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return result;
+	}
+
+
 	/** @brief return true if the specified position is vacated
 	  *
-	  * If @a index is out of range, false is returned.
+	  * WARNING: This method does **NOT** check @a idx! Check it beforehand!
 	  *
-	  * @param[in] index the index to check
+	  * @param[in] idx the index to check
 	  * @return true if the position is marked as vacated, false otherwise.
 	**/
-	bool protIsVacated( const uint32_t index ) const noexcept {
-		return index < this->hashSize.load( memOrdLoad ) ? hashTable[index] == vacated : false;
+	bool protIsVacated( const uint32_t idx ) const noexcept {
+		return table_elem_equals( idx, vacated );
+	}
+
+
+	/** @brief return true if the data at index @a idx is @a data
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx  Index at which the data to compare
+	  * @param[in] data The data to compare.
+	  * @return return true if the data at index @a idx equals @a data
+	**/
+	bool table_data_equals( uint32_t idx, data_t const& data ) const noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() )
+			return false;
+
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		bool result = *( hashTable[idx] ) == data;
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return result;
+	}
+
+
+	/** @brief return true if the element at index @a idx is @a elem
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx  Index at which the element to compare
+	  * @param[in] elem Pointer to the element to compare. `vacated` is compared if this is `nullptr`.
+	  * @return return true if the element at index @a idx is @a elem
+	**/
+	bool table_elem_equals( uint32_t idx, elem_t const* elem ) const noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() )
+			return false;
+
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		bool result = hashTable[idx] == elem;
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return result;
+	}
+
+
+	/** @brief return true if the data at index @a idx has the key @a key
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx  Index at which the key to compare
+	  * @param[in] key The key to compare.
+	  * @return return true if the data at index @a idx has the key @a key
+	**/
+	bool table_key_equals( uint32_t idx, key_t const& key ) const noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() )
+			return false;
+
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		bool result = hashTable[idx]->key == key;
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return result;
+	}
+
+
+	/** @brief return the element at index @a idx
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * Note: Vacated buckets are always returned as `nullptr`
+	  *
+	  * @param[in] idx  Index from which the element to get
+	  * @return return the element at index @a idx
+	**/
+	elem_t* table_get( uint32_t idx ) noexcept {
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		elem_t* result = hashTable[idx];
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return result == vacated ? nullptr : result;
+	}
+
+
+	/** @brief return the element at index @a idx const variant
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * Note: Vacated buckets are always returned as `nullptr`
+	  *
+	  * @param[in] idx  Index from which the element to get
+	  * @return return the element at index @a idx
+	**/
+	elem_t* table_get( uint32_t idx ) const noexcept {
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		elem_t* result = hashTable[idx];
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return result == vacated ? nullptr : result;
+	}
+
+
+	/** @brief Set hashTable element to @a elem
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx  Index at which the element to set
+	  * @param[in] elem Pointer to the element to set.
+	  * @return Pointer of the previous element
+	**/
+	elem_t* table_set( uint32_t idx, elem_t* elem ) noexcept {
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		elem_t* oldElem = hashTable[idx];
+		hashTable[idx]  = elem;
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return oldElem;
+	}
+
+
+	/** @brief Set hashTable element to `vacated`
+	  *
+	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
+	  *
+	  * @param[in] idx  Index at which to set to `vacated`
+	  * @return Pointer of the previous element
+	**/
+	elem_t* table_vacate( uint32_t idx ) noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() )
+			return nullptr;
+
+		bool doLocking = beThreadSafe();
+
+		if ( doLocking )
+			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
+			hashTableLock.lock();
+
+		elem_t* oldElem = hashTable[idx];
+		hashTable[idx]  = vacated;
+
+		if ( doLocking )
+			hashTableLock.unlock();
+
+		return oldElem;
 	}
 
 
@@ -1283,15 +1523,8 @@ protected:
 	aui32_t          growing   = ATOMIC_VAR_INIT( 0 ); //!< Needed by the control macros
 	CHashBuilder     hashBuilder;                      //!< instance that will handle the key generation
 	aui32_t          hashSize;                         //!< number of places to maintain
-	elem_t**         hashTable;                        //!< the central array that is our hash
 	aui32_t          inserting = ATOMIC_VAR_INIT( 0 ); //!< Needed by the control macros
 	aui32_t          removing  = ATOMIC_VAR_INIT( 0 ); //!< Needed by the control macros
-	char*            vacChar;                          //!< alias pointer to get around the empty elem_t ctor restriction
-	elem_t*          vacated;                          //!< The Open Hash sets empty places to point at this.
-	// Note: vacated is placed here, so clear(), disable_thread_safety() and
-	//       enable_thread_safety() can be unified here as well. Otherwise
-	//       the hashes would need individual functions that only differ
-	//       in one compare.
 
 
 private:
@@ -1368,12 +1601,12 @@ private:
 	**/
 	virtual elem_t* privGet( const key_t& key ) const noexcept {
 		uint32_t  keyIdx = privGetIndex( key );
-		elem_t* xCurr  = hashTable[keyIdx];
+		elem_t* xCurr   = table_get( keyIdx );
 
-		while ( xCurr && ( xCurr != vacated ) && ( *xCurr != key ) )
+		while ( xCurr && ( *xCurr != key ) )
 			xCurr = xCurr->getNext();
 
-		return xCurr != vacated ? xCurr : nullptr;
+		return xCurr;
 	}
 
 
@@ -1394,7 +1627,7 @@ private:
 		if ( xIdx >= xSize )
 			xIdx %= xSize;
 
-		return protIsVacated( xIdx ) ? nullptr : hashTable[xIdx];
+		return table_get( xIdx );
 	}
 
 
@@ -1478,8 +1711,17 @@ private:
 	 * ===============================================
 	*/
 
-	const double maxLoadFactor; //!< When the load factor reaches this, the table is grown.
-	const double dynGrowFactor; //!< When the table is automatically grown, it is grown by this factor.
+	double const dynGrowFactor; //!< When the table is automatically grown, it is grown by this factor.
+	double const maxLoadFactor; //!< When the load factor reaches this, the table is grown.
+	elem_t**     hashTable;     //!< the central array that is our hash
+	mutable
+	CLockable    hashTableLock; //!< the table_*() methods use this to secure access to the table
+	char*        vacChar;       //!< alias pointer to get around the empty elem_t ctor restriction
+	elem_t*      vacated;       //!< The Open Hash sets empty places to point at this.
+	// Note: vacated is placed here, so clear(), disable_thread_safety() and
+	//       enable_thread_safety() can be unified here as well. Otherwise
+	//       the hashes would need individual functions that only differ
+	//       in one compare.
 }; // class VTHashBase
 
 
@@ -1499,16 +1741,16 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 	// Delete hash table
 	if ( hashTable ) {
 		PWX_TRY( delete [] hashTable )
-		DEBUG_LOG_CAUGHT_STD("delete hashTable")
-		catch(...) { /* Can't do anything about that! */ }
+		DEBUG_LOG_CAUGHT_STD( "delete hashTable" )
+		catch( ... ) { /* Can't do anything about that! */ }
 	}
 
 	// Delete "vacated" sentry
 	vacated = nullptr;
 	if ( vacChar ) {
 		PWX_TRY( delete vacChar )
-		DEBUG_LOG_CAUGHT_STD("delete vacChar")
-		catch(...) { /* Can't do anything about that! */ }
+		DEBUG_LOG_CAUGHT_STD( "delete vacChar" )
+		catch( ... ) { /* Can't do anything about that! */ }
 	}
 }
 

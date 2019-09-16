@@ -1323,8 +1323,9 @@ private:
 			}
 			if ( xHead && size() ) {
 				eCount.store( 0, memOrdStore );
+				if ( !currStore.destroyed() )
+					curr( nullptr );
 				head( nullptr );
-				curr( nullptr );
 				tail( nullptr );
 				PWX_UNLOCK( xHead );
 			}
