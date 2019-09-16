@@ -78,6 +78,8 @@ CThreadElementStore::CThreadElementStore() noexcept : store_t( 47 ) { }
 
 /// @brief default dtor
 CThreadElementStore::~CThreadElementStore() noexcept {
+	PWX_LOCK_GUARD(this);
+	isDestroyed.store(true);
 	this->clear();
 }
 
@@ -137,13 +139,19 @@ CThreadElementStore::curr_t* CThreadElementStore::curr() noexcept {
 void CThreadElementStore::curr( const CThreadElementStore::curr_t* new_curr ) const noexcept {
 	if ( beThreadSafe() ) {
 		bool needLock = invalidating.load( memOrdLoad );
-		if ( needLock ) const_cast<CThreadElementStore*>( this )->lock();
-		currs.delKey( CURRENT_THREAD_ID );
-		if ( new_curr ) {
-			PWX_TRY( currs.add( CURRENT_THREAD_ID, const_cast<curr_t*>( new_curr ) ) )
-			PWX_CATCH_AND_FORGET( CException );
+		if ( needLock )
+			const_cast<CThreadElementStore*>( this )->lock();
+
+		if (!isDestroyed.load()) {
+			currs.delKey( CURRENT_THREAD_ID );
+			if ( new_curr ) {
+				PWX_TRY( currs.add( CURRENT_THREAD_ID, const_cast<curr_t*>( new_curr ) ) )
+				PWX_CATCH_AND_FORGET( CException );
+			}
 		}
-		if ( needLock ) const_cast<CThreadElementStore*>( this )->unlock();
+
+		if ( needLock )
+			const_cast<CThreadElementStore*>( this )->unlock();
 	} else
 		oneCurr = const_cast<curr_t*>( new_curr );
 }
@@ -153,13 +161,19 @@ void CThreadElementStore::curr( const CThreadElementStore::curr_t* new_curr ) co
 void CThreadElementStore::curr( CThreadElementStore::curr_t* new_curr ) noexcept {
 	if ( beThreadSafe() ) {
 		bool needLock = invalidating.load( memOrdLoad );
-		if ( needLock ) lock();
-		currs.delKey( CURRENT_THREAD_ID );
-		if ( new_curr ) {
-			PWX_TRY( currs.add( CURRENT_THREAD_ID, new_curr ) )
-			PWX_CATCH_AND_FORGET( CException );
+		if ( needLock )
+			lock();
+
+		if (!isDestroyed.load()) {
+			currs.delKey( CURRENT_THREAD_ID );
+			if ( new_curr ) {
+				PWX_TRY( currs.add( CURRENT_THREAD_ID, new_curr ) )
+				PWX_CATCH_AND_FORGET( CException );
+			}
 		}
-		if ( needLock ) unlock();
+
+		if ( needLock )
+			unlock();
 	} else
 		oneCurr = new_curr;
 }
