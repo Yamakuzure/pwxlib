@@ -1297,6 +1297,10 @@ protected:
 	  * @return true if the position is unused, false otherwise.
 	**/
 	bool protIsUnused( const uint32_t idx ) const noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+			return false;
+
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking )
@@ -1334,7 +1338,7 @@ protected:
 	**/
 	bool table_data_equals( uint32_t idx, data_t const& data ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
 			return false;
 
 		bool doLocking = beThreadSafe();
@@ -1362,7 +1366,7 @@ protected:
 	**/
 	bool table_elem_equals( uint32_t idx, elem_t const* elem ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
 			return false;
 
 		bool doLocking = beThreadSafe();
@@ -1390,7 +1394,7 @@ protected:
 	**/
 	bool table_key_equals( uint32_t idx, key_t const& key ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
 			return false;
 
 		bool doLocking = beThreadSafe();
@@ -1412,12 +1416,17 @@ protected:
 	  *
 	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
 	  *
-	  * Note: Vacated buckets are always returned as `nullptr`
+	  * Note: Vacated buckets are always returned as `nullptr`. Use `protIsVacated() if you
+	  * need to know whether this bucket is vacated or not.
 	  *
 	  * @param[in] idx  Index from which the element to get
 	  * @return return the element at index @a idx
 	**/
 	elem_t* table_get( uint32_t idx ) noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+			return nullptr;
+
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking )
@@ -1437,12 +1446,17 @@ protected:
 	  *
 	  * WARNING: The protected hashTable methods do **NOT** check @a idx! Check it beforehand!
 	  *
-	  * Note: Vacated buckets are always returned as `nullptr`
+	  * Note: Vacated buckets are always returned as `nullptr`. Use `protIsVacated()` if you
+	  * need to know whether this bucket is vacated or not.
 	  *
 	  * @param[in] idx  Index from which the element to get
 	  * @return return the element at index @a idx
 	**/
 	elem_t* table_get( uint32_t idx ) const noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+			return nullptr;
+
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking )
@@ -1467,6 +1481,10 @@ protected:
 	  * @return Pointer of the previous element
 	**/
 	elem_t* table_set( uint32_t idx, elem_t* elem ) noexcept {
+		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+			return nullptr;
+
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking )
@@ -1492,7 +1510,7 @@ protected:
 	**/
 	elem_t* table_vacate( uint32_t idx ) noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
 			return nullptr;
 
 		bool doLocking = beThreadSafe();
@@ -1732,7 +1750,7 @@ private:
 **/
 template<typename key_t, typename data_t, typename elem_t>
 VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
-	PWX_LOCK_GUARD( this );
+	PWX_DOUBLE_LOCK_GUARD( this, &hashTableLock );
 
 	// Wipe hash table
 	this->isDestroyed.store( true, memOrdStore );
@@ -1740,9 +1758,15 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 
 	// Delete hash table
 	if ( hashTable ) {
+		// clear() does **not** eliminate vacated buckets, so we have to nullify them, too
+		memset( hashTable, 0, sizeof( elem_t* ) * hashSize.load() );
+
+		// now delete it.
 		PWX_TRY( delete [] hashTable )
 		DEBUG_LOG_CAUGHT_STD( "delete hashTable" )
 		catch( ... ) { /* Can't do anything about that! */ }
+		hashTable = nullptr;
+		hashSize.store( 0 );
 	}
 
 	// Delete "vacated" sentry
@@ -1751,6 +1775,7 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 		PWX_TRY( delete vacChar )
 		DEBUG_LOG_CAUGHT_STD( "delete vacChar" )
 		catch( ... ) { /* Can't do anything about that! */ }
+		vacChar = nullptr;
 	}
 }
 
