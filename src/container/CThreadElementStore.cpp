@@ -78,9 +78,17 @@ CThreadElementStore::CThreadElementStore() noexcept : store_t( 47 ) { }
 
 /// @brief default dtor
 CThreadElementStore::~CThreadElementStore() noexcept {
-	PWX_LOCK_GUARD(this);
-	isDestroyed.store(true);
-	this->clear();
+	invalidating.store( true );
+	PWX_DOUBLE_LOCK_GUARD( this, &currs );
+
+	isDestroyed.store( true );
+	currs.clear();
+
+	// Reset locks so that other threads may notice that this is gone
+	PWX_DOUBLE_LOCK_GUARD_CLEAR();
+
+	invalidating.store( false );
+	PWX_DOUBLE_LOCK_GUARD_RESET( this, &currs );
 }
 
 
@@ -138,20 +146,15 @@ CThreadElementStore::curr_t* CThreadElementStore::curr() noexcept {
 /// @brief delete old element and add a new one unless @a new_curr is nullptr
 void CThreadElementStore::curr( const CThreadElementStore::curr_t* new_curr ) const noexcept {
 	if ( beThreadSafe() ) {
-		bool needLock = invalidating.load( memOrdLoad );
-		if ( needLock )
-			const_cast<CThreadElementStore*>( this )->lock();
+		PWX_DOUBLE_LOCK_GUARD( const_cast<CThreadElementStore*>( this ), &currs );
 
-		if (!isDestroyed.load()) {
+		if ( !isDestroyed.load() && !currs.destroyed() ) {
 			currs.delKey( CURRENT_THREAD_ID );
 			if ( new_curr ) {
 				PWX_TRY( currs.add( CURRENT_THREAD_ID, const_cast<curr_t*>( new_curr ) ) )
 				PWX_CATCH_AND_FORGET( CException );
 			}
 		}
-
-		if ( needLock )
-			const_cast<CThreadElementStore*>( this )->unlock();
 	} else
 		oneCurr = const_cast<curr_t*>( new_curr );
 }
@@ -160,20 +163,15 @@ void CThreadElementStore::curr( const CThreadElementStore::curr_t* new_curr ) co
 /// @brief delete old element and add a new one unless @a new_curr is nullptr
 void CThreadElementStore::curr( CThreadElementStore::curr_t* new_curr ) noexcept {
 	if ( beThreadSafe() ) {
-		bool needLock = invalidating.load( memOrdLoad );
-		if ( needLock )
-			lock();
+		PWX_DOUBLE_LOCK_GUARD( this, &currs );
 
-		if (!isDestroyed.load()) {
+		if ( !isDestroyed.load() && !currs.destroyed() ) {
 			currs.delKey( CURRENT_THREAD_ID );
 			if ( new_curr ) {
 				PWX_TRY( currs.add( CURRENT_THREAD_ID, new_curr ) )
 				PWX_CATCH_AND_FORGET( CException );
 			}
 		}
-
-		if ( needLock )
-			unlock();
 	} else
 		oneCurr = new_curr;
 }

@@ -431,6 +431,26 @@ if (object) {               \
 #define PWX_DOUBLE_LOCK_GUARD(objA, objB) PWX_NAMED_DOUBLE_LOCK_GUARD(PWX_CURRENT_FUNC, objA, objB)
 
 
+/** @brief Clear a named double lock guard, unlocking all currently locked objects
+  *
+  * *Prerequisites*: pwx/types/CLockGuard.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+**/
+#define PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(Name) {                             \
+	THREAD_LOG("TLockGuard", "Double LockGuard %s clearing...", #Name);   \
+	pwx_libpwx_double_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
+	THREAD_LOG("TLockGuard", "Double LockGuard %s cleared!", #Name);      \
+}
+
+
+/** @brief Clear the double lock guard named after the enclosing function, unlocking all currently held objects
+  *
+  * *Prerequisites*: pwx/types/CLockGuard.h
+**/
+#define PWX_DOUBLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_CURRENT_FUNC)
+
+
 /** @brief Reset a double lock guard to two new values
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
@@ -485,6 +505,26 @@ if (object) {               \
 **/
 #define PWX_TRIPLE_LOCK_GUARD(objA, objB, objC) \
 	PWX_NAMED_TRIPLE_LOCK_GUARD(PWX_CURRENT_FUNC, objA, objB, objC)
+
+
+/** @brief Clear a named triple lock guard, unlocking all currently locked objects
+  *
+  * *Prerequisites*: pwx/types/CLockGuard.h
+  *
+  * @param Name a string to add to the local variable name to be able to use more than one guard
+**/
+#define PWX_NAMED_TRIPLE_LOCK_GUARD_CLEAR(Name) {                             \
+	THREAD_LOG("TLockGuard", "Triple LockGuard %s clearing...", #Name);   \
+	pwx_libpwx_triple_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
+	THREAD_LOG("TLockGuard", "Triple LockGuard %s cleared!", #Name);      \
+}
+
+
+/** @brief Clear the triple lock guard named after the enclosing function, unlocking all currently held objects
+  *
+  * *Prerequisites*: pwx/types/CLockGuard.h
+**/
+#define PWX_TRIPLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_CURRENT_FUNC)
 
 
 /** @brief Reset a triple lock guard to two new values

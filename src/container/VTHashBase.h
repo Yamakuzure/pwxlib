@@ -519,8 +519,12 @@ public:
 		HASH_START_CLEAR;
 
 		while ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) {
+			// We have to use a temporary "grand lock" for cases where multiple threads
+			// call this method. Otherwise, no matter what we do, the destruction of elements
+			// will cause data races.
+			lock();
 			toDel = table_get( pos );
-			if ( toDel && toDel->try_lock() ) {
+			if ( toDel && !toDel->destroyed() && toDel->try_lock() ) {
 				// This thread has exclusive access, but it
 				// must be ensured that no other thread is
 				// in the destructor unlock cycle:
@@ -530,6 +534,7 @@ public:
 				}
 
 				table_set( pos, nullptr );
+				unlock(); // exclusive enough, now.
 
 				// remove a possible chain:
 				while ( ( delNext = toDel->removeNext() )
@@ -545,7 +550,8 @@ public:
 					--eCount;
 					delete toDel;
 				}
-			} // End of gaining lock on an element
+			} else
+				unlock();
 
 			// Advance and wrap:
 			if ( ++pos >= tabSize )
@@ -1303,9 +1309,14 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return false;
+			}
+		}
 
 		bool result = ( hashTable[idx] == nullptr ) || ( hashTable[idx] == vacated );
 
@@ -1343,11 +1354,16 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return false;
+			}
+		}
 
-		bool result = *( hashTable[idx] ) == data;
+		bool result = hashTable[idx] ? *( hashTable[idx] ) == data : false;
 
 		if ( doLocking )
 			hashTableLock.unlock();
@@ -1371,11 +1387,16 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return false;
+			}
+		}
 
-		bool result = hashTable[idx] == elem;
+		bool result = hashTable[idx] ? hashTable[idx] == elem : (elem ? false : true);
 
 		if ( doLocking )
 			hashTableLock.unlock();
@@ -1399,11 +1420,16 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return false;
+			}
+		}
 
-		bool result = hashTable[idx]->key == key;
+		bool result = hashTable[idx] ? hashTable[idx]->key == key : false;
 
 		if ( doLocking )
 			hashTableLock.unlock();
@@ -1429,9 +1455,14 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return nullptr;
+			}
+		}
 
 		elem_t* result = hashTable[idx];
 
@@ -1459,9 +1490,14 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return nullptr;
+			}
+		}
 
 		elem_t* result = hashTable[idx];
 
@@ -1487,9 +1523,14 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return nullptr;
+			}
+		}
 
 		elem_t* oldElem = hashTable[idx];
 		hashTable[idx]  = elem;
@@ -1515,9 +1556,14 @@ protected:
 
 		bool doLocking = beThreadSafe();
 
-		if ( doLocking )
+		if ( doLocking ) {
 			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
+			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
+				hashTableLock.unlock();
+				return nullptr;
+			}
+		}
 
 		elem_t* oldElem = hashTable[idx];
 		hashTable[idx]  = vacated;
@@ -1753,7 +1799,6 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 	PWX_DOUBLE_LOCK_GUARD( this, &hashTableLock );
 
 	// Wipe hash table
-	this->isDestroyed.store( true, memOrdStore );
 	this->clear();
 
 	// Delete hash table
@@ -1769,6 +1814,9 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 		hashSize.store( 0 );
 	}
 
+	// Mark as destroyed
+	this->isDestroyed.store( true, memOrdStore );
+
 	// Delete "vacated" sentry
 	vacated = nullptr;
 	if ( vacChar ) {
@@ -1777,6 +1825,9 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 		catch( ... ) { /* Can't do anything about that! */ }
 		vacChar = nullptr;
 	}
+
+	// Re-lock to let waiting threads detect that we are gone
+	PWX_DOUBLE_LOCK_GUARD_RESET( this, &hashTableLock );
 }
 
 

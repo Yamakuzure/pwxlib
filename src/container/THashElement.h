@@ -565,34 +565,29 @@ private:
 **/
 template<typename key_t, typename data_t>
 THashElement<key_t, data_t>::~THashElement() noexcept {
-	if ( beThreadSafe() )
-		isDestroyed.store( true );
-
 	if ( 1 == data.use_count() ) {
 
 		if ( beThreadSafe() ) {
 			// Lock the element before checking again.
-			DEBUG_LOCK_STATE( "PWX_LOCK", this, this )
-			PWX_LOCK_OBJ( this );
+			PWX_LOCK_GUARD( this );
 			// So the lock is only generated if there is a possibility
 			// that we have to delete data, but another thread might
 			// have made a copy in the mean time before "isDestroyed"
 			// was finished setting to true.
-			if ( 1 == data.use_count() ) {
+			if ( (1 == data.use_count()) && !isDestroyed.load() ) {
+				isDestroyed.store( true );
+
+				// Do a lock cycle, so threads that locked before isDestroyed was set by
+				// us here can get the chance to get out before it is too late
+				PWX_LOCK_GUARD_RESET( this );
 
 				PWX_TRY( if ( data ) { data.reset(); } ) // the shared_ptr will delete the data now
 				DEBUG_LOG_CAUGHT_STD( "THashElement" )
 				catch( ... ) { }
 
-				// Do a lock cycle, so that threads having had to wait while the data
+				// Do another lock cycle, so that threads having had to wait while the data
 				// was destroyed have a chance now to react before the object is gone.
-				DEBUG_LOCK_STATE( "PWX_UNLOCK", this, this )
-				PWX_UNLOCK_OBJ( this );
-				DEBUG_LOCK_STATE( "PWX_LOCK_GUARD", this, this )
-				PWX_LOCK_GUARD( this );
-			} else {
-				DEBUG_LOCK_STATE( "PWX_UNLOCK", this, this )
-				PWX_UNLOCK_OBJ( this );
+				PWX_LOCK_GUARD_RESET( this );
 			}
 		} else {
 			// No thread safety? Then just do it!

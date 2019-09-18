@@ -46,11 +46,11 @@ substs.set('includedir',      includedir)
 
 #####################################################################
 
-cxx		  = meson.get_compiler('cpp')
-cxx_id	       = cxx.get_id()
-pkgconfig	    = import('pkgconfig')
+cxx		     = meson.get_compiler('cpp')
+cxx_id	             = cxx.get_id()
+pkgconfig	     = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
-buildtype	    = get_option('buildtype')
+buildtype	     = get_option('buildtype')
 sanitize	     = get_option('b_sanitize')
 
 ############################################################

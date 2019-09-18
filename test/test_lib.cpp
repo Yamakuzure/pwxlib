@@ -21,9 +21,9 @@
 
 #if PWX_SMALL_TESTS
 /// Default number of elements to use with all mass and speed tests (but hashes and sets)
-uint32_t maxElements = 25000;
+uint32_t maxElements = 2500;
 /// Default number of elements to use with all mass and speed tests (hashes and sets ONLY)
-uint32_t maxHashVals = 74139;
+uint32_t maxHashVals = 7439;
 #else
 /// Default number of elements to use with all mass and speed tests (but hashes and sets)
 uint32_t maxElements = 250000;
