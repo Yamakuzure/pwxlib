@@ -73,10 +73,24 @@ CSinCosTable::CSinCosTable( int32_t initial_precision ) :
 
 /// @brief CSinCosTable default dtor
 CSinCosTable::~CSinCosTable() noexcept {
+	// Make sure the coast is clear before destroying data
+	PWX_LOCK_GUARD( this );
+	isDestroyed.store( true );
+
+	// Reset locks so that other threads may notice that this is gone
+	while ( waiting() ) {
+		PWX_LOCK_GUARD_RESET( this );
+	}
+
 	if ( tableCos ) delete [] tableCos;
 	if ( tableSin ) delete [] tableSin;
 	tableCos = nullptr;
 	tableSin = nullptr;
+
+	// Reset locks again before finishing the destructor
+	while ( waiting() ) {
+		PWX_LOCK_GUARD_RESET( this );
+	}
 }
 
 
@@ -101,6 +115,8 @@ int32_t CSinCosTable::getPrecision() const noexcept {
 void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 	if ( newPrecision != precision ) {
 		PWX_LOCK_GUARD( this );
+		if (isDestroyed.load())
+			return;
 
 		/* New tables are not needed when:
 		 * a) This is a switch to live calculation or
