@@ -518,13 +518,13 @@ public:
 
 		HASH_START_CLEAR;
 
-		while ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) {
+		while ( ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) && hashTable ) {
 			// We have to use a temporary "grand lock" for cases where multiple threads
 			// call this method. Otherwise, no matter what we do, the destruction of elements
 			// will cause data races.
-			lock();
-			toDel = table_get( pos );
-			if ( toDel && !toDel->destroyed() && toDel->try_lock() ) {
+			PWX_DOUBLE_LOCK_GUARD( this, &hashTableLock );
+			toDel = hashTable[ pos ];
+			if ( toDel && (toDel != vacated) && !toDel->destroyed() && toDel->try_lock() ) {
 				// This thread has exclusive access, but it
 				// must be ensured that no other thread is
 				// in the destructor unlock cycle:
@@ -533,8 +533,8 @@ public:
 					continue;
 				}
 
-				table_set( pos, nullptr );
-				unlock(); // exclusive enough, now.
+				hashTable[ pos ] = nullptr;
+				PWX_DOUBLE_LOCK_GUARD_CLEAR(); // exclusive enough, now.
 
 				// remove a possible chain:
 				while ( ( delNext = toDel->removeNext() )
@@ -550,8 +550,7 @@ public:
 					--eCount;
 					delete toDel;
 				}
-			} else
-				unlock();
+			};
 
 			// Advance and wrap:
 			if ( ++pos >= tabSize )
@@ -1798,6 +1797,14 @@ template<typename key_t, typename data_t, typename elem_t>
 VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 	PWX_DOUBLE_LOCK_GUARD( this, &hashTableLock );
 
+	// Mark as destroyed
+	isDestroyed.store( true, memOrdStore );
+
+	// Be sure everybody waiting for a lock can react on isDestroyed:
+	while ( waiting() ) {
+		PWX_DOUBLE_LOCK_GUARD_RESET( this, &hashTableLock );
+	}
+
 	// Wipe hash table
 	this->clear();
 
@@ -1814,9 +1821,6 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 		hashSize.store( 0 );
 	}
 
-	// Mark as destroyed
-	this->isDestroyed.store( true, memOrdStore );
-
 	// Delete "vacated" sentry
 	vacated = nullptr;
 	if ( vacChar ) {
@@ -1826,8 +1830,10 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 		vacChar = nullptr;
 	}
 
-	// Re-lock to let waiting threads detect that we are gone
-	PWX_DOUBLE_LOCK_GUARD_RESET( this, &hashTableLock );
+	// Be sure everybody waiting for a lock can react on this being destroyed:
+	while ( waiting() ) {
+		PWX_DOUBLE_LOCK_GUARD_RESET( this, &hashTableLock );
+	}
 }
 
 
