@@ -82,13 +82,22 @@ CThreadElementStore::~CThreadElementStore() noexcept {
 	PWX_DOUBLE_LOCK_GUARD( this, &currs );
 
 	isDestroyed.store( true );
-	currs.clear();
 
 	// Reset locks so that other threads may notice that this is gone
-	PWX_DOUBLE_LOCK_GUARD_CLEAR();
+	while ( waiting() ) {
+		PWX_DOUBLE_LOCK_GUARD_RESET( this, &currs );
+	}
+
+	// Now the coast is clear
+	currs.clear();
+
 
 	invalidating.store( false );
-	PWX_DOUBLE_LOCK_GUARD_RESET( this, &currs );
+
+	// Reset locks again before finishing the destructor eventually
+	while ( waiting() ) {
+		PWX_DOUBLE_LOCK_GUARD_RESET( this, &currs );
+	}
 }
 
 
