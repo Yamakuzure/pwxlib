@@ -149,7 +149,8 @@ public:
 	  * operator.
 	**/
 	virtual void clear() noexcept {
-		this->privClear();
+		if ( !destroyed() )
+			this->privClear();
 	}
 
 
@@ -1316,7 +1317,9 @@ private:
 			xHead = head();
 			PWX_LOCK( xHead );
 			while ( xHead && ( xHead->removed() || xHead->destroyed() ) ) {
-				PWX_RELOCK_OBJ( this );
+				while ( waiting () ) {
+					PWX_RELOCK_OBJ( this );
+				}
 				PWX_UNLOCK( xHead );
 				xHead = head();
 				PWX_LOCK( xHead ); // Note: Won't do anything if xHead is nullptr
@@ -1760,7 +1763,21 @@ private:
 
 template<typename data_t, typename elem_t>
 TSingleList<data_t, elem_t>::~TSingleList() noexcept {
-	clear();
+	PWX_LOCK_GUARD( this );
+	isDestroyed.store( true );
+
+	// Before clearing, make sure the queue waiting for a lock is empty
+	while ( waiting() ) {
+		PWX_LOCK_GUARD_RESET( this );
+	}
+
+	// Now go ahead, but directly. The public method cancels on isDestroyed.
+	this->privClear();
+
+	// Do another lock queue emptying before finishing this destructor.
+	while ( waiting() ) {
+		PWX_LOCK_GUARD_RESET( this );
+	}
 }
 
 
