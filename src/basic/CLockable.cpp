@@ -221,6 +221,7 @@ void CLockable::lock() noexcept {
 		// is only taken if this object is not already
 		// locked by this thread
 		if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
+			CL_Waiting++;
 			#ifdef PWX_USE_FLAGSPIN
 			while ( CL_Lock.test_and_set() ) {
 				# ifdef PWX_USE_FLAGSPIN_YIELD
@@ -235,6 +236,7 @@ void CLockable::lock() noexcept {
 			CL_Is_Locked.store( true, PWX_MEMORDER_RELEASE );
 			CL_Thread_ID.store( ctid, PWX_MEMORDER_RELAXED );
 			CL_Lock_Count.store( 1, PWX_MEMORDER_RELAXED );
+			CL_Waiting--;
 		} else
 			// If this thread already has a lock, the call is just counted
 			CL_Lock_Count.fetch_add( 1, PWX_MEMORDER_RELAXED );
@@ -264,6 +266,7 @@ bool CLockable::try_lock() noexcept {
 		// Same as with locking: Only try if this thread does
 		// not already own the lock
 		if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
+			CL_Waiting++;
 			#ifdef PWX_USE_FLAGSPIN
 			if ( !CL_Lock.test_and_set() ) {
 			#else
@@ -273,8 +276,10 @@ bool CLockable::try_lock() noexcept {
 				CL_Is_Locked.store( true, PWX_MEMORDER_RELEASE );
 				CL_Thread_ID.store( ctid, PWX_MEMORDER_RELAXED );
 				CL_Lock_Count.store( 1, PWX_MEMORDER_RELAXED );
+				CL_Waiting--;
 				return true;
 			}
+			CL_Waiting--;
 			return false; // Nope, and only condition for a no-no.
 		} // end of really having to try
 	}
@@ -347,7 +352,7 @@ bool try_locks( CLockable const* objA, CLockable const* objB ) noexcept {
 }
 
 
-		bool try_locks( CLockable const * objA, CLockable const * objB, CLockable const * objC ) noexcept {
+bool try_locks( CLockable const * objA, CLockable const * objB, CLockable const * objC ) noexcept {
 	CLockable* xObjA = const_cast<CLockable*>( objA );
 	CLockable* xObjB = const_cast<CLockable*>( objB );
 	CLockable* xObjC = const_cast<CLockable*>( objC );

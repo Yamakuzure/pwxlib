@@ -246,6 +246,14 @@ public:
 	void unlock() noexcept;
 
 
+	/** @brief How many threads are waiting for a lock.
+	  * @return The number of threads currently waiting for a lock.
+	**/
+	uint32_t waiting() {
+		return CL_Waiting.load( memOrdLoad );
+	}
+
+
 	/* ===============================================
 	 * === Public operators                        ===
 	 * ===============================================
@@ -296,6 +304,7 @@ private:
 
 	aui32_t CL_Lock_Count = ATOMIC_VAR_INIT( 0 );     //!< How many times the current thread has locked.
 	asize_t CL_Thread_ID  = ATOMIC_VAR_INIT( 0 );     //!< The owning thread of a lock
+	aui32_t CL_Waiting    = ATOMIC_VAR_INIT( 0 );     //!< How many threads are waiting for a lock.
 }; // class CLockable
 
 
@@ -401,7 +410,7 @@ bool unlock_all( CLockable const* objA, CLockable const* objB ) noexcept PWX_API
   * @param[in] objC the third object to unlock
   * @return true if all three could be unlocked, false if at least one was not locked
 **/
-	bool unlock_all( CLockable const * objA, CLockable const * objB, CLockable const * objC ) noexcept PWX_API;
+bool unlock_all( CLockable const * objA, CLockable const * objB, CLockable const * objC ) noexcept PWX_API;
 
 // Note: A RAII-based class that uses these helpers is pwx::CLockGuard in basic/CLockGuard.h
 
