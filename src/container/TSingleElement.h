@@ -618,37 +618,37 @@ private:
 
 template<typename data_t>
 TSingleElement<data_t>::~TSingleElement() noexcept {
-	if ( beThreadSafe() )
-		isDestroyed.store( true );
+	PWX_LOCK_GUARD( this );
+	isDestroyed.store( true );
 
 	if ( 1 == data.use_count() ) {
 		if ( beThreadSafe() ) {
-			// Lock the element before checking again.
-			DEBUG_LOCK_STATE( "PWX_LOCK", this, this )
-			PWX_LOCK_OBJ( this );
+
+			// Do a lock reset until nobody is still waiting for a lock
+			while ( waiting() ) {
+				PWX_LOCK_GUARD_RESET( this );
+			}
+
 			// So the lock is only generated if there is a possibility
 			// that we have to delete data, but another thread might
-			// have made a copy in the mean time before "isDestroyed"
-			// was finished setting to true.
+			// have made a copy in the mean time before the queue for a
+			// lock was emptied.
 			if ( 1 == data.use_count() ) {
 				PWX_TRY( data.reset() ) // the shared_ptr will delete the data now
+				DEBUG_LOG_CAUGHT_STD( "TSingleElement" )
 				catch( ... ) { }
-
-				// Do a lock cycle, so that threads having had to wait while the data
-				// was destroyed have a chance now to react before the object is gone.
-				DEBUG_LOCK_STATE( "PWX_UNLOCK", this, this )
-				PWX_UNLOCK_OBJ( this );
-				DEBUG_LOCK_STATE( "PWX_LOCK_GUARD", this, this )
-				PWX_LOCK_GUARD( this );
-			} else {
-				DEBUG_LOCK_STATE( "PWX_UNLOCK", this, this )
-				PWX_UNLOCK_OBJ( this );
 			}
 		} else {
 			// No thread safety? Then just do it!
 			PWX_TRY( data.reset() )
+			DEBUG_LOG_CAUGHT_STD( "TSingleElement" )
 			catch( ... ) { }
 		}
+	}
+
+	// Do another "queue clearing" before finishing this destructor
+	while ( waiting() ) {
+		PWX_LOCK_GUARD_RESET( this );
 	}
 }
 
