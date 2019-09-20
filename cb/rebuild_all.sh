@@ -27,10 +27,10 @@ elif [[ "dbgthread" == "$xType" ]]; then
 	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=true"
 elif [[ "asan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=0
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true"
 elif [[ "lsan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=1
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true"
 elif [[ "tsan" == "$xType" ]]; then
 	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread -Dsmall_tests=true"
 else
