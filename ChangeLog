@@ -1,14 +1,49 @@
 pwxLib Revision History
------------------------
+=======================
+
+0.9.0 - 2019-09-20
+------------------
+
+This is a major overhaul with many fixes and changes!
+_Note_: The automatic micro-locking is (intentionally) overdoing right now, but this will be fixed for the next release.
+
+### Changes and additions ###
+* The API has been completely overhauled and should now have reached its final form. From here on the API may be
+  extended, but changes shall be rare and removals non-existent.
+* The stupid `pwx_` prefixes for header names are gone. Instead, generalized `<PFoo>` headers have been added, inspired
+  by the `<QFoo>` headers of Qt. (some minor headers still have a `pwx_` prefix to not clash with other headers, like
+  `<basic/pwx_debug.h>` for example.)
+* Thread safety has been greatly improved, and gcc-9.2.0 ThreadSanitizer does not find anything any more in test_lib.
+* The API documentation, although not fully complete, yet, has been overhauled and fixed.
+* The library now has a Travis account and a `.travis.yml` file for automatic building on push.
+* `test_lib` now also tests the automatic growing of `TOpenHash`.
+* `TOpenHash` and `TChainHash` are now properly described.
+* Removed the artificial limit for insertions of 1000000 elements from VTHashBase.
+* Most tool macros now support, some even enforce, to be ended with a semicolon.
+* Container and element destructors now wait until no other thread is waiting for a lock, before finalizing the dtor.
+* The hash table in `VTHashBase` is now private and the accessors take care that nobody wreaks havoc.
+
+
+### Fixes ###
+* Fixed a possible access error in THashElement
+* Fixed several possible access errors in VTHashBase
+* Found amnd fixed a memory leak due to a typo in VTHashBase->clear()
+* The trace information eventually works correct
+* Fixed an error in `CThreadElementStore` where an atomic store used loading memory order.
+
+
 
 0.8.9 - 2018-12-13
+------------------
 The library is a real library now, utilizes the meson+ninja build system, and has been moved to GitHub.
-Most of the old stuff has been ported and moderniced. The CCnfFileHandler is still missing, though.
+Most of the old stuff has been ported and modernized. The CCnfFileHandler is still missing, though.
 
 0.8.7 - 0.8.8 
+------------------
 The exact history is sadly lost due to lack of time and a lot of refactoring, reordering and rewriting.
 
 0.8.6 - 2012-04-??
+------------------
 * CCnfFileHandler.h: Fixed a memory leak - CCnfFileHandler::contInterface was not deleted.
                      Fixed a bug that caused the removal of data flags from a file to remove all flags.
 * CMemRingFactory.h: Fixed a memory leak that could show up when the name map is used.
@@ -18,15 +53,16 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 * tools/getrn      : Fixed a memory leak introduced with version 0.7.0.2.
 * tools/gravMat    : Saving is now done every minute or before a new gravitation calculation is needed.
                      Units are no longer cleaned up unless a frame has been drawn.
-                     Added an option --dyncam to have the camera being moved dynamically towards the scene with the original
-                     distance being the maximum distance.
+                     Added an option --dyncam to have the camera being moved dynamically towards the scene with the
+                     original distance being the maximum distance.
 
 
 0.8.5 - 2012-03-01
+------------------
 * CCnfFileHandler.h: Fixed the sorting issue.
                      Added the possibility to change the dataFlags of a configuration file on the fly.
-                     Cleaned up the API, it is no longer possible (and never was necessary) to have added/changed data to be
-                     sorted - the flags are responsible for that.
+                     Cleaned up the API, it is no longer possible (and never was necessary) to have added/changed data
+                     to be sorted - the flags are responsible for that.
                      Fixed some minor issues cppcheck moaned about.
 * CMemRingFactory.h: Eventually cleaned up some old code that made cppcheck to croak loudly and wasn't needed anyway.
 * Args.h           : min/max members renamed to minVal/maxVal, it is much clearer like that.
@@ -38,22 +74,25 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
                      Fixed initial offset calculation and eventually got the shockwave mode right.
                      Switched from blind values to kg/m (MKS system of units).
                      Fixed the work loop, it never calculated collisions correctly after loading a later state.
-                     The window now refreshes after being minimized or overlapped, stats are now displayed fully everywhere.
+                     The window now refreshes after being minimized or overlapped, stats are now displayed fully
+                     everywhere.
                      Finally got the maxZ calculation right and eventually silenced the moaning of cppcheck.
                      Changed the colormap to use the new pwxLib component CWaveColor.
                      Dust Spheres span fully around the masses now.
-                     Applied time scaling in a way the calculations can be stayed being done each second. Further the saving
-                     between cycles is possible now without losing information.
+                     Applied time scaling in a way the calculations can be stayed being done each second. Further the
+                     saving between cycles is possible now without losing information.
 * tools/mkst       : Corrected the help text, the default file extension is png now, not tif.
 
 
 0.8.3 - 2011-10-16
+------------------
 * tools/gravMat    : Some fixes and corrections
                      Added a new pause mode to pause the processing
                      The rendering has been completely rewritten
 
 
 0.8.2 - 2011-10-07
+------------------
 * CMemRingFactory.h: The interfaces now reassigns the currently handled item if the container size
                      changed before the interface is reattached.
 * DefaultDefines.h : Added undefs plus warnings if min/max macros are found.
@@ -64,6 +103,7 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.8.1 - 2011-09-30
+------------------
 * pwxLib           : The pwxLib is now thread save, if used after defining PWX_THREADS. Either  by
                      defining it before including the first pwxLib file or by using the -D option
                      of gcc or /D option of MSVC++.
@@ -116,6 +156,7 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.8.0 - 2011-07-14
+------------------
 * pwxLib           : Added CCnfFileHandler, a system to open, create, manage and save configuration
                      file with presets for Ini-, Config- and RC-files. The global instance is
                      pwx::CFH.
@@ -137,12 +178,14 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.7.2 - 2011-04-07
+------------------
 * pwxLib          : Overhauled (and somewhat corrected) the documentation. The documentation target
                     should produce a more clear api documentation now.
                     Cleared up some code.
 
 
 0.7.1 - 2011-03-28
+------------------
 * pwxLib          : Added pwxArgs, a program argument parsing system in the
                     namespace pwx::args, added by including <pwxLib/tools/Args.h>
 * CRandom.h       : Corrected issues with 32bit compilers, and a problem with random(int64_t)
@@ -184,6 +227,7 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.7.0 - 2010-11-19
+------------------
 * pwxLib          : Added MRF (CMemRingFactory.h), the re-write of pwxMemRing
                     Changed versioning: All parts reflect the library release version
                     by major and minor number, and only increase their revision.
@@ -216,6 +260,7 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.6.2 - 2010-07-13
+------------------
 * pwxLib    : Added PWX_NO_*_INSTANCE defines with * being RNG or SCT to let
               developers chose to not automatically instantiate the respective
               class.
@@ -233,12 +278,14 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.6.1 - 2010-06-11
+------------------
 * pwxLib    : Changed the Makefile to allow to compile the tools without
               the need to first install the library
 * mkst      : Added sequences and modifier options for z and w coordinates
 
 
 0.6.0 - 2010-05-28
+------------------
 * CRandom.h : RNG.rndName has new versions which take individual maximum
               numbers of characters, syllables and parts to generate.
 * pwxLib    : Various additions to make linkers happy.
@@ -250,5 +297,6 @@ The exact history is sadly lost due to lack of time and a lot of refactoring, re
 
 
 0.5.5 - 2010-05-16
+------------------
 * Initial public release
 

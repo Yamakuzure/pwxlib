@@ -20,3 +20,6 @@ To build the library do:
 
 To install the library do:
 > `ninja -C build install` or `make install`
+
+To run the tests do:
+> `ninja -C build test` or `make test`
