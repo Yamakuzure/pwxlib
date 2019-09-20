@@ -35,7 +35,7 @@ lib_wrap    = '''
 	PContainers
 	PTools
 	PUtils
-	PWXlib
+	PWXLib
 	PWorkers
 	RNG
 	SCT

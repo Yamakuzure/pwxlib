@@ -66,7 +66,7 @@
 		<Unit filename="../src/PStreamHelpers" />
 		<Unit filename="../src/PTools" />
 		<Unit filename="../src/PUtils" />
-		<Unit filename="../src/PWXlib" />
+		<Unit filename="../src/PWXLib" />
 		<Unit filename="../src/PWaveColor" />
 		<Unit filename="../src/PWorkers" />
 		<Unit filename="../src/RNG" />

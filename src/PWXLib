@@ -3,7 +3,7 @@
 #define PWX_PWXLIB_SRC_PWXLIB_INCLUDED
 
 
-/** @file PWXlib
+/** @file PWXLib
   * @brief Include everything at once. (See: pwxlib.h)
 **/
 #include "pwxlib.h"
