@@ -80,4 +80,4 @@ option('torture', type : 'boolean', value : false,
 					      (Default: false)''')
 
 option('small_tests', type : 'boolean', value : false,
-       description : 'Test only 1/10th elements in test_lib (Default: false)')
+       description : 'Test only 1/100th elements in test_lib (Default: false)')
