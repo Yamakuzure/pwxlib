@@ -7,7 +7,7 @@ before_install:
 - docker ps
 install:
 - docker exec -t build_img sh -c "
-   xbps-install -Suy m4 pkg-config meson base-devel valgrind-devel doxygen"
+   xbps-install -Suy m4 pkg-config meson base-devel valgrind-devel doxygen graphviz"
 script:
 - docker exec -t build_img sh -c "
    cd /travis &&
