@@ -28,23 +28,23 @@ if want_test
 			cluster_check.cpp
 			cluster_check.h
 		 '''.split())],
-		['manual'],
-		[]],
+		[],
+		'manual'],
 
 		[['test_hash'],
 		[files('''
 			hash_builder.cpp
 			hash_builder.h
 		 '''.split())],
-		['manual'],
-		[]],
+		[],
+		'manual'],
 
 		[['test_name'],
 		[files('''
 			namegen.cpp
 		 '''.split())],
-		['manual'],
-		[]],
+		[],
+		'manual'],
 
 		[['test_lib'],
 		[files('''
@@ -70,8 +70,8 @@ if want_test
 			testStackQueue.h
 			testThreads.h
 		 '''.split())],
-		['automatic'],
-		[threads]]
+		[threads],
+		'timeout=600']
 	]
 endif
 
@@ -81,7 +81,7 @@ if want_torture
 		[files('''
 			torture.cpp
 			torture.h'''.split())],
-		['manual'],
-		[threads]]
+		[threads],
+		'manual'],
 	]
 endif

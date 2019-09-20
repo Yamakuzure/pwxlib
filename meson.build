@@ -294,10 +294,17 @@ test('test-libpwx-sym',
 foreach tuple : tests
 	name    = tuple[0]
 	sources = tuple[1]
-	type    = tuple[2]
-	deps    = tuple[3]
+	deps    = tuple[2]
+	type    = tuple.length() >= 4 ? tuple[3] : ''
 
-	exe = executable(
+	timeout = 30
+
+	if type.startswith('timeout=')
+		timeout = type.split('=')[1].to_int()
+		type = ''
+	endif
+
+        exe = executable(
 		name,
 		sources,
 		dependencies : deps,
@@ -307,12 +314,12 @@ foreach tuple : tests
 		install : install_tests,
 		install_dir : testsdir)
 
-	if type == ['manual']
+	if type == 'manual'
 		message('@0@ is a manual test'.format(name))
 	else
 		test(name, exe,
 			env : test_env,
-			timeout : 30)
+			timeout : timeout)
 	endif
 endforeach
 

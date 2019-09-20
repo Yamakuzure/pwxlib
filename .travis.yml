@@ -13,6 +13,7 @@ script:
    cd /travis &&
    meson --buildtype=debug -Ddebug=true -Ddebug-thread=false
          --prefix=/usr -Dtests=true -Dinstall-tests=true
-         -Dtorture=true -Dhtml=true _build &&
+         -Dtorture=true -Dhtml=true -Dsmall_tests=true _build &&
    ninja -C _build &&
+   ninja -C _build test &&
    env DESTDIR=$(pwd)/install ninja -C _build install"
