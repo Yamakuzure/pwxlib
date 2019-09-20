@@ -1151,7 +1151,7 @@ public:
 			uint32_t  rhsPos  = 0;
 
 			while ( rhsPos < rhsSize ) {
-				if ( !rhs.table_elem_equals( rhsPos, vacated ) ) {
+				if ( !rhs.table_elem_equals( rhsPos, rhs.vacated ) ) {
 					rhsCurr = rhs.hashTable[rhsPos];
 					while ( rhsCurr ) {
 						lhsCurr = remKey( rhsCurr->key );
@@ -1362,7 +1362,7 @@ protected:
 			}
 		}
 
-		bool result = hashTable[idx] ? *( hashTable[idx] ) == data : false;
+		bool result = hashTable[idx] ? ( hashTable[idx] != vacated ? *( hashTable[idx] ) == data : false ) : false;
 
 		if ( doLocking )
 			hashTableLock.unlock();
@@ -1428,7 +1428,7 @@ protected:
 			}
 		}
 
-		bool result = hashTable[idx] ? hashTable[idx]->key == key : false;
+		bool result = hashTable[idx] ? ( hashTable[idx] != vacated ? hashTable[idx]->key == key : false ) : false;
 
 		if ( doLocking )
 			hashTableLock.unlock();
