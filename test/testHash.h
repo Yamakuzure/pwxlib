@@ -275,10 +275,14 @@ int32_t testHash ( sEnv& env ) {
 		keydata_t  new_key = keys[4];
 		hashval_t* new_val = nullptr;
 
-		for ( size_t i = 0; i < 500; ++i ) {
+		// Note: The keys 1 to 5 are already reserved by our array above
+		// Further the container sets a 'do_not_destroy' fucntion as the Deleter,
+		// which we can not use here, so we have to create the elements ourselves
+		for ( size_t i = 5; i < 505; ++i ) {
 			new_key += pwx::RNG.random( 1, 10 );
 			new_val  = new hashval_t( pwx::RNG.random( 999999.999999 ) );
-			ifHash.push( new_key, new_val );
+			elem_t elem(new_key, new_val);
+			ifHash.push( elem );
 		}
 
 		size_t hash_size = ifHash.size();
