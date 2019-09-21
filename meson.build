@@ -1,5 +1,5 @@
 project('pwxlib', 'cpp',
-	version : '0.8.9',
+	version : '0.9.0',
 	license : 'MIT',
 	default_options: [
 		'cpp_std=gnu++17',
