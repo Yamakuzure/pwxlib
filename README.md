@@ -19,7 +19,7 @@ Usage
 ---------------------------------------
 The only thing needed to use the library is to place
 
-> `#include <pwxlib.h>`
+> `#include <PWXLib>` or `#include <pwxlib.h>`
 
 in any file you wish to use any of its workers, tools or utilities in.
 Alternatively you can include the relevant header for the worker, tool or
@@ -29,12 +29,12 @@ header.
 
 Everything is placed in the namespace `pwx`.
 
-### Advantages of including pwxlib.h
+### Advantages of including PWXLib
 If you include this one-for-all header, you do not have to care about anything.
 Everything is simply available through the `pwx` namespace.
 
 ### Advantages of including individual headers
-Including `pwxlib.h` adds over 60k lines through the preprocessor. This is not
+Including `PWXLib` adds over 60k lines through the preprocessor. This is not
 exactly the best method to increase compiler speed. All containers and many
 tools are template based, therefore things tend to get lengthy.
 
@@ -52,6 +52,18 @@ For the correct compiler flags, use
 
 For the correct linker flags, use
 > `pkg-config --libs pwxlib`.
+
+### Using the convenience wrappers
+There are convenience wrappers for the tools and workers. So instead of doing
+`#include <container/TOpenHash.h>`
+you can use
+`#include <POpenHash.h>`
+instead.
+Apart from being shorter, this convenient wrapper also imports `TOpenHash` into
+the namespace from where it is called under the alias `POpenHash`.
+
+But this only counts for actual types like the containers and their elements.
+This is explained in more detail below.
 
 
 Naming
@@ -88,6 +100,9 @@ To build the library do:
 To install the library do:
 > `ninja -C build install` or `make install`
 
+To run the tests do:
+> `ninja -C build test` or `make test`
+
 
 Contributing
 ---------------------------------------
@@ -102,22 +117,29 @@ on github.
 
 Basics
 ---------------------------------------
-> `#include <pwxlib/pwx_basic.h>`
+> `#include <PBasic>`
 
 This file adds all basic types, classes and functions that are used throughout
 the library. The following few might be useful for you, too.
 
+Note: This does **not** include the P-Wrappers. Those are strictly opt-in as
+they import types from the `pwx` namespace into your namespace.
+
 ### CException
-> `#include <pwxCException.h>`
+> `#include <PException>` or `#include <basic/CException.h>`
 
 This is a basic exception class with tracing functionality. It is meant to
 provide a tracing exception to get as much information as possible.
 
-To make the most out of this system, the file `pwxlib/pwx_macros.h` provides many
-macros to try, catch and throw further exceptions with tracing information.
+To make the most out of this system, the file `basic/pwx_macros.h` provides
+many macros to try, catch and throw further exceptions with tracing
+information.
+
+The `<PException>` wrapper imports `pwx::CException` into your namespace under
+the alias `PException`.
 
 ### CLockable
-> `#include <pwxCLockable.h>`
+> `#include <PLockable>` or `#include <basic/CLockable.h>`
 
 This is a base class to make objects lockable via atomic_flag and lock counting.  
 `CLockable` implements a recursive behavior. Every call to `lock()` by the
@@ -135,8 +157,11 @@ impossible techniques:
 Please keep in mind, that your design might be flawed if you find yourself in a
 situation in which you really need either method.
 
+The `<PLockable>` wrapper imports `pwx::CLockable` into your namespace under
+the alias `PLockable`.
+
 ### CLockGuard
-> `#include <pwxCLockGuard.h>`
+> `#include <PLockGuard>` or `#include <basic/CLockGuard.h>`
 
 This is a RAII lock guard to lock/unlock one, two or three objects within its
 constructor/destructor.  
@@ -149,8 +174,11 @@ directly:
 4. If it is not possible to wait for the destructor, the lock(s) can be unlocked
    by resetting to nullptr.
 
+The `<PLockGuard>` wrapper imports `pwx::CLockGuard` into your namespace under
+the alias `PLockGuard`.
+
 ### Debug logging
-> `#include <pwx_debug.h>`
+> `#include <basic/pwx_debug.h>`
 
 Besides many useful macros for debugging possible multi-threading issues, this
 header also declares the `debug_log()` and `debug_err()` functions.
@@ -160,7 +188,7 @@ defined, so they can be used everywhere and stay out of the way in release
 builds.
 
 ### General purpose macros
-> `#include <pwx_macros.h>`
+> `#include <basic/pwx_macros.h>`
 
 In here are a lot useful macros for various tasks. All of these are prefixed
 with "`PWX_`". The four most prominent groups are the following:
@@ -185,7 +213,7 @@ Please have a look at the header for more information.
 
 Containers
 ---------------------------------------
-> `#include <pwxlib/pwx_containers.h>`
+> `#include <PContainers>`
 
 This file adds all containers provided by the library. As all containers are
 template based, you might wish to limit the inclusion to what you actually use.
@@ -201,7 +229,8 @@ use a global lock via mutex or semaphore whenever a thread wanted to actually
 work with the shared container.
 
 For this reason all pwxLib containers do micro-locking using spinlocks by
-themselves. Global "grand" locks are not needed.
+themselves. Global "grand" locks are only rarely needed and automatically
+applied where they must be.
 
 The first reason for using the pwxLib containers is void these days, as we have
 move semantics. The performance difference should be minimal.
@@ -215,65 +244,80 @@ threads to be able to work with a shared container without imposing global
 locks. And only then you should use the pwxLib containers, as you will surely
 miss the extra features the standard containers offer; more so since C++14.
 
+Note: This does **not** include the P-Wrappers. Those are strictly opt-in as
+they import types from the `pwx` namespace into your namespace.
+
 The containers are, in alphabetical order:
 
 ### TChainHash
-> `#include <pwxTChainHash.h>`
+> `#include <PChainHash>` or `#include <container/TChainHash.h>`
 
 A chained hash container for variable types.
+`<PChainHash>` imports `pwx::TChainHash` into your namespace as `PChainHash`.
 
 ### TDoubleList
-> `#include  "pwxTDoubleList.h"`
+> `#include <PDoubleList>` or `#include <container/TDoublList.h>`
 
 A simple doubly linked list for variable types.
+`<PDoublList>` imports `pwx::TDoublList` into your namespace as `PDoublList`.
 
 ### TDoubleRing
-> `#include  "pwxTDoubleRing.h"`
+> `#include <PDoubleRing>` or `#include <container/TDoubleRing.h>`
 
 A simple doubly linked ring (head and tail are connected) for variable types.
+`<PDoubleRing>` imports `pwx::TDoubleRing` into your namespace as
+`PDoubleRing`.
 
 ### TOpenHash
-> `#include  "pwxTOpenHash.h"`
+> `#include <POpenHash>` or `#include <container/TOpenHash.h>`
 
 An open hash container for variable types. This container features "Robin Hood
 Hashing", which greatly reduces secondary clustering.
+`<POpenHash>` imports `pwx::TOpenHash` into your namespace as `POpenHash`.
 
 ### TQueue
-> `#include  "pwxTQueue.h"`
+> `#include <PQueue>` or `#include <container/TQueue.h>`
 
 A queue container, pushes to tail, pops from head.
+`<PQueue>` imports `pwx::TQueue` into your namespace as `PQueue`.
 
 ### TSet
-> `#include  "pwxTSet.h"`
+> `#include <PSet>` or `#include <container/TSet.h>`
 
-A set is a group of elements, where each element exists exactly once. Common set
-arithmetics like detecting subsets, building intersections, differences and
-unions are supported.
+A set is a group of elements, where each element exists exactly once. Common
+set arithmetics like detecting subsets, building intersections, differences
+and unions are supported.
+`<PSet>` imports `pwx::TSet` into your namespace as `PSet`.
 
 ### TSingleList
-> `#include  "pwxTSingleList.h"`
+> `#include <PSingleList>` or `#include <container/TSingleList.h>`
 
 A simple singly linked list for variable types.
+`<PSingleList>` imports `pwx::TSingleList` into your namespace as
+`PSingleList`.
 
 ### TSingleRing
-> `#include  "pwxTSingleRing.h"`
+> `#include <PSingleRing>` or `#include <container/TSingleRing.h>`
 
 A simple singly linked ring (head and tail are connected) for variable types.
+`<PSingleRing>` imports `pwx::TSingleRing` into your namespace as
+`PSingleRing`.
 
 ### TStack
-> `#include  "pwxTStack.h"`
+> `#include <PStack>` or `#include <container/TStack.h>`
 
 A stack container, pushes to tail, pops from tail.
+`<PStack>` imports `pwx::TStack` into your namespace as `PStack`.
 
 
 Tools
 ---------------------------------------
-> `#include <pwxlib/pwx_tools.h>`
+> `#include <PTools>`
 
 Here you can find various tools helping with small tasks.
 
 ### Math Helpers
-> `#include <pwxlib/pwxMathHelpers.h>`
+> `#include <PMath>`
 
 This file adds some tools for various mathematical tasks like handling floating
 point comparison, calculating distances and working with degrees.
@@ -302,7 +346,7 @@ Bruce Dawson's article
    Simple function to normalize any degree into 0 <= result < 360.
 
 ### Stream Helpers
-> `#include <pwxlib/pwxStreamHelpers.h>`
+> `#include <PStreamHelpers>`
 
 This file adds some tools to make working with streams easier.
 
@@ -348,12 +392,15 @@ This file adds some tools to make working with streams easier.
 
 Utilities
 ---------------------------------------
-> `#include <pwxlib/pwx_utils.h`
+> `#include <PUtils>`
 
 Currently only one utility class exists, but more are planned.
 
+Note: This does **not** include the P-Wrappers. Those are strictly opt-in as
+they import types from the `pwx` namespace into your namespace.
+
 ### CWaveColor
-> `#include <pwxlib/pwxCWaveColor.h>`
+> `#include <PWaveColor>` or `#include <wavecolor/CWaveColor.h>`
 
 This is a utility class to work with the frequencies any RGB color is made of.
 
@@ -367,22 +414,30 @@ colors or set to a specific wavelength or frequency.
 Important: Wavelengths are considered to be nanometers and frequencies are
 considered to be gigahertz by the methods of this class.
 
+`<PWaveColor>` imports `pwx::CWaveColor` into your namespace as `PWaveColor`.
+
 
 Workers
 ---------------------------------------
-> `#include <pwxlib/pwx_workers.h`
+> `#include <PWorkers>`
 
 When starting your program, the library will instantiate the following global
 workers. You can use them from anywhere in your program.
 
+Note: This does **not** include the P-Wrappers. Those are strictly opt-in as
+they import types from the `pwx` namespace into your namespace.
+
 ### pwx::PAH - The [P]rogram [A]rgument [H]andler
-> `#include <pwxlib/pwx_worker_PAH.h`
+> `#include <PAH>`
 
 This is a handler for command line arguments.
 The usage is quite simple.
 
 You can instantiate your own instance using the `CArgHandler` class yourself.
-> `#include <pwxLib/pwxCArgHandler.h>`
+> `#include <PArgHandler>` or `#include <arg_handler/CArgHandler.h>`.
+
+Including `<PArgHandler>` imports `pwx::CArgHandler` into your namespace as
+`PArgHandler`.
 
 #### PAH usage overview
 Call `addArg()` for each argument your program should support. Use
@@ -453,13 +508,15 @@ line parameter(s) that follow(s) the argument as a `const char*`.
 
 
 ### pwx::RNG - The [R]andom [N]-Value [G]enerator
-> `#include <pwxlib/pwx_worker_RNG.h`
+> `#include <RNG>`
 
 This worker can be used to produce unique or pseudo random numbers, hashes and
 names.
 
 You can instantiate your own instance using the `CRandom` class yourself.
-> `#include <pwxLib/pwxCRandom.h>`
+> `#include <PRandom>` or `#include <random/CRandom.h>`
+
+Including `<PRandom>` imports `pwx::CRandom` into your namespace as `PRandom`.
 
 The following sets of functions are available.
 
@@ -494,7 +551,7 @@ free it after usage!
 
 
 ### pwx::SCT - The [S]ine-/[C]osine-[T]able
-> `#include <pwxlib/pwx_worker_SCT.h`
+> `#include <SCT>`
 
 This is exactly what it says, a simple "Sine-/Cosine-Table".
 
@@ -503,7 +560,11 @@ of -1, define `PWX_INITIAL_SCT_PRECISION` to the desired value when compiling
 pwxlib.
 
 You can instantiate your own instance using the `CSinCosTable` class yourself.
-> `#include <pwxLib/pwxCSinCosTable.h>`
+> `#include <PSinCos>` or `#include <math_helpers/CSinCosTable.h>` (Yes, that's
+lengthy...)
+
+Including `<PSinCos>` imports `pwx::CSinCosTable` into your namespace as
+`PSinCos`.
 
 Calculating sine and cosine values does not take much time nowadays as FPUs get
 stronger every other day. On the other hand, if you need these values for
