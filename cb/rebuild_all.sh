@@ -3,12 +3,11 @@
 xType="$1"
 
 if [[ "x" == "x$xType" ]]; then
-	echo "Usage: $0 <type> [extra options for meson]" 
+	echo "Usage: $0 <type> [extra options for meson]"
 	echo
 	echo "Type can be one of:"
 	echo "  release - Release build"
 	echo "  debug   - Debug build"
-	echo "  dbgthread - thread-debug build (many messages about)"
 	echo "  asan      - Use address sanitizer (enables debug) (disables lsan)"
 	echo "  lsan      - Use leak sanitizer    (enables debug) (also enables asan)"
 	echo "  tsan      - Use thread sanitizer  (enables debug)"
@@ -20,19 +19,17 @@ xExtra="$@"
 
 base_opts=""
 if [[ "release" == "$xType" ]]; then
-	base_opts="--buildtype=release -Ddebug=false -Ddebug-thread=false"
+	base_opts="--buildtype=release -Ddebug=false -Ddebug-thread=false -Doptimization=2"
 elif [[ "debug" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false"
-elif [[ "dbgthread" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=true"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Doptimization=g"
 elif [[ "asan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=0
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
 elif [[ "lsan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=1
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
 elif [[ "tsan" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread -Dsmall_tests=true"
+	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread -Dsmall_tests=true -Doptimization=0"
 else
         echo "Type \"$xType\" is unknown"
         exit 1
@@ -45,6 +42,7 @@ meson $base_opts             \
         -Dtests=true         \
         -Dinstall-tests=true \
         -Dtorture=true       \
+        -Dwarning_level=3    \
         $xExtra              \
         build
 

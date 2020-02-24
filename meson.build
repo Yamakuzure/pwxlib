@@ -105,9 +105,6 @@ endif
 #####################################################################
 
 possible_cxx_flags = [
-	'-Wextra',
-	'-pedantic',
-	'-Wpedantic',
 	'-Werror=missing-declarations',
 	'-Werror=return-type',
 	'-Werror=format=2',
@@ -147,14 +144,6 @@ endif
 
 if debug
 	conf.set('LIBPWX_DEBUG', true)
-	possible_cxx_flags += [
-		'-ggdb3',
-		'-O0'
-	]
-	possible_link_flags += [
-		'-ggdb3',
-		'-O0'
-	]
 endif
 
 add_project_arguments(cxx.get_supported_arguments(possible_cxx_flags), language : 'cpp')
