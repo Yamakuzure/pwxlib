@@ -40,6 +40,7 @@
 #endif // PWX_USE_FLAGSPIN
 
 #include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 #include "basic/pwx_types.h"
 
 

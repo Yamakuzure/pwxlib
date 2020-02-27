@@ -44,6 +44,7 @@
 #include <string>
 
 #include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 
 
 /// @namespace pwx

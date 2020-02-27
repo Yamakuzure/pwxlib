@@ -1,18 +1,21 @@
 /// @file
 
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 #include "basic/pwx_trace_info.h"
 
 
-#if PWX_IS_MSVC
-#  include <cstdlib>
-#else
+#if PWX_IS_LINUX
 #  include <linux/limits.h>
-#endif // MSVC or not
-
-
-#include <cstdio>
-#include <cstring>
+#endif // Only for Linux, MSVC has it in cstdlib
 
 
 /// @namespace pwx

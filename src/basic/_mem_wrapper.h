@@ -40,6 +40,10 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+
+
 #ifndef PWX_NODOX
 
 /* --- Internal helper macros --- */

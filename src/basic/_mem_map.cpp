@@ -30,6 +30,13 @@
 **/
 
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <map>
+
 #include "basic/_mem_map.h"
 #include "basic/alloc_utils.h"
 #include "basic/mem_utils.h"
@@ -38,9 +45,6 @@
 #include "basic/pwx_macros.h"
 
 
-#include <cassert>
-#include <cstring>
-#include <map>
 
 
 /// @namespace pwx

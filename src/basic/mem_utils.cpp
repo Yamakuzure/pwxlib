@@ -30,14 +30,16 @@
 **/
 
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+
 #include "basic/_mem_map.h"
 #include "basic/alloc_utils.h"
 #include "basic/mem_utils.h"
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_debug.h"
-
-
-#include <cstddef>
 
 
 /// @namespace pwx

@@ -41,6 +41,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <strings.h>
 
 
 /** @brief return `true` if two C-Strings are equal ignoring case
@@ -90,7 +91,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if both C-Strings are not equal ignoring case
 **/
-#define STRNCNE(a,b) ((nullptr == (a)) || (nullptr == (b)) || (strncasecmp(a,b,n) != 0))
+#define STRNCNE(a,b,n) ((nullptr == (a)) || (nullptr == (b)) || (strncasecmp(a,b,n) != 0))
 
 
 /** @brief `true` if @a a is "lower" than @a b ignoring case
@@ -215,7 +216,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if @a a is "lower" than @a b
 **/
-#define STRNLT(a,b) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strncmp(a,b,n) < 0))
+#define STRNLT(a,b,n) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strncmp(a,b,n) < 0))
 
 
 /** @brief `true` if @a a is "greater" than @a b

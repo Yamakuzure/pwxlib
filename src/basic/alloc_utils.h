@@ -43,10 +43,7 @@
 #include "basic/pwx_macros.h"
 
 
-#include <cstddef>
-#include <cstdint>
 #include <cstdlib>
-#include <cstring>
 
 
 /** @brief Allocator with overflow detection (like `malloc`)
@@ -110,7 +107,7 @@ static inline void* mfree( void* p ) {
 
 #ifndef PWX_NODOX
 static inline bool size_multiply_overflow( size_t s, size_t n ) {
-	return _unlikely_( n && (s > ( SIZE_MAX / n ) ) );
+	return PWX_UNLIKELY( n && (s > ( SIZE_MAX / n ) ) );
 }
 #endif // No doc
 
@@ -120,7 +117,7 @@ static inline bool size_multiply_overflow( size_t s, size_t n ) {
   * @param[in]  n  Number of elements of type @a s to allocate
   * @return A pointer to the allocated space or nullptr if the allocation failed.
 **/
-_malloc_  _alloc_( 1, 2 ) static inline void* malloc_multiply( size_t s, size_t n ) {
+PWX_MALLOC PWX_ALLOC( 1, 2 ) static inline void* malloc_multiply( size_t s, size_t n ) {
 	if ( size_multiply_overflow( s, n ) )
 		return nullptr;
 

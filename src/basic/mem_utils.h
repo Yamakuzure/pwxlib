@@ -39,9 +39,12 @@
 **/
 
 
-#include "basic/_mem_wrapper.h"
+#include <cstring>
+
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+
+#include "basic/_mem_wrapper.h"
 
 
 /* --- Memory helper macros --- */
