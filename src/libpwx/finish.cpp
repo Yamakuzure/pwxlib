@@ -30,9 +30,14 @@
 **/
 
 
-#include "basic/mem_utils.h"
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_debug.h"
+
+#include "basic/mem_utils.h"
 #include "libpwx/finish.h"
 
 
