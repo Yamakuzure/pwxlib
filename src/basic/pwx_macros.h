@@ -38,9 +38,107 @@
 **/
 
 
-#include "pwx_compiler.h"
-#include "pwx_debug.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
 
+
+#if PWX_IS_LINUX
+#  include <sys/param.h>
+#  include <sys/sysmacros.h>
+#endif // Linux only
+#include <sys/types.h>
+
+
+/* -----------------------------------------------------------------------
+ * --- Various attributes and functions that are not universal         ---
+ * -------------------------------------------------------------------- */
+
+#ifndef PWX_NODOX
+#if PWX_IS_MSVC
+// Attributes
+#  define _printf_(...)
+#  define _alloc_(...)
+#  define _unused_       [[maybe_unused]]
+#  define _deprecated_   [[deprecated]]
+#  define _packed_
+#  define _malloc_
+#  define _weak_
+#  define _likely_(x)    (x)
+#  define _unlikely_(x)  (x)
+#  define _public_
+#  define _hidden_
+#  define _alignas_(x)   __attribute__((aligned(__alignof(x))))
+#  define _cleanup_(x)   __attribute__((cleanup(x)))
+// Functions
+#  define strcasecmp          _stricmp
+#  define strdup              _strdup
+#  define strerror_r(n, b, l) ( strerror_s(b, l, n) ? b : "strerror_s failed" )
+#  define strncasecmp         _strnicmp
+#else
+#  define _printf_(a,b) __attribute__ ((format (printf, a, b)))
+#  if PWX_IS_CLANG
+#    define _alloc_(...)
+#  else
+#    define _alloc_(...) __attribute__ ((alloc_size(__VA_ARGS__)))
+#  endif // CLang does not know this attribute, yet.
+#  define _unused_       __attribute__ ((unused))
+#  define _deprecated_   __attribute__ ((deprecated))
+#  define _packed_       __attribute__ ((packed))
+#  define _malloc_       __attribute__ ((malloc))
+#  define _weak_         __attribute__ ((weak))
+#  define _likely_(x)   (__builtin_expect(!!(x),1))
+#  define _unlikely_(x) (__builtin_expect(!!(x),0))
+#  define _public_       __attribute__ ((visibility("default")))
+#  define _hidden_       __attribute__ ((visibility("hidden")))
+#  define _alignas_(x)   __attribute__((aligned(__alignof(x))))
+#  define _cleanup_(x)   __attribute__((cleanup(x)))
+#endif // Macros only for gcc/clang
+
+
+#if PWX_IS_GCC && __GNUC__ >= 7
+#  define _fallthrough_  __attribute__((fallthrough))
+#else
+#  define _fallthrough_
+#endif
+
+
+#if PWX_IS_MSVC || (PWX_IS_GCC && __GNUC__ >= 9)
+#  define _maybe_unused_  [[maybe_unused]]
+#else
+#  define _maybe_unused_
+#endif
+
+
+#define VOID_0 ((void)0)
+#define ELEMENTSOF(x) ({                              \
+	static_assert( std::rank<typeof(x)>::value ); \
+	size_t _res_ = sizeof(x)/sizeof((x)[0]);      \
+	_res_;                                        \
+})
+
+
+#define PWX_FUNC  __func__
+
+
+#endif // ignored by doxygen
+
+
+/** @brief Alias for the current threads get_id()
+  *
+  * *Prerequisites*: thread
+  *
+  * @return The std::thread::id of the current thread.
+**/
+#if PWX_IS_MSVC
+#  define CURRENT_THREAD_ID _Thrd_id()
+#else
+#  define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
+#endif // MSVC vs gcc/clang
+
+
+/* -----------------------------------------------------------------------
+ * --- General purpose macros with documentation                       ---
+ * -------------------------------------------------------------------- */
 
 /** @brief Return the sign as -1 or +1 of an expression
   *
@@ -82,7 +180,7 @@
 	                        strlen(name) ? name : "no name",          \
 	                        strlen(msg)  ? msg  : "no message",       \
 	                        ::pwx::get_trace_info(__FILE__, __LINE__, \
-	                                              PWX_CURRENT_FUNC),  \
+	                                              PWX_FUNC),          \
 	                        __PRETTY_FUNCTION__,                      \
 	                        strlen(desc) ? desc : "no description");  \
 	throw(_pwx_exception);                                            \
@@ -98,7 +196,7 @@
 **/
 #define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) {  \
 	e.addToTrace(::pwx::get_trace_msg("--> Called by",   \
-	             __FILE__, __LINE__, PWX_CURRENT_FUNC)); \
+	             __FILE__, __LINE__, PWX_FUNC));         \
 	throw e;                                             \
 }
 
@@ -166,7 +264,7 @@
 #define PWX_TRY_STD_FURTHER(func, name, desc)     \
 	PWX_TRY(func)                     \
 	PWX_THROW_STD_FURTHER(name, desc) \
-		
+
 
 /** @brief try and throw both `std::exception` and `pwx::CExceptions` further
   *
@@ -196,19 +294,6 @@
   * @param[in] except anything that can be "caught".
 **/
 #define PWX_CATCH_AND_FORGET(except) catch(except&) { }
-
-
-/** @brief Alias for the current threads `get_id()`
-  *
-  * *Prerequisites*: thread
-  *
-  * @return The `std::thread::id` of the current thread.
-**/
-#if PWX_IS_MSC
-#  define CURRENT_THREAD_ID _Thrd_id()
-#else
-#  define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
-#endif /// MSC versus gcc/clang
 
 
 /** @brief Use `object->lock()` if @a object is not `nullptr`
@@ -351,7 +436,7 @@ if (object) {               \
   *
   * @param object pointer to the object to lock
 **/
-#define PWX_LOCK_GUARD(object) PWX_NAMED_LOCK_GUARD(PWX_CURRENT_FUNC, object)
+#define PWX_LOCK_GUARD(object) PWX_NAMED_LOCK_GUARD(PWX_FUNC, object)
 
 
 /// @brief Helper for a nullptr CLockable
@@ -375,7 +460,7 @@ if (object) {               \
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
 **/
-#define PWX_LOCK_GUARD_CLEAR() PWX_NAMED_LOCK_GUARD_CLEAR(PWX_CURRENT_FUNC)
+#define PWX_LOCK_GUARD_CLEAR() PWX_NAMED_LOCK_GUARD_CLEAR(PWX_FUNC)
 
 
 /** @brief Reset a lock guard to a new value
@@ -402,7 +487,7 @@ if (object) {               \
   *
   * @param object pointer to the object to reset the lock guard to
 **/
-#define PWX_LOCK_GUARD_RESET(object) PWX_NAMED_LOCK_GUARD_RESET(PWX_CURRENT_FUNC, object)
+#define PWX_LOCK_GUARD_RESET(object) PWX_NAMED_LOCK_GUARD_RESET(PWX_FUNC, object)
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
@@ -414,7 +499,7 @@ if (object) {               \
   * @param objB pointer to the second object to lock
 **/
 #define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB)    \
-	DEBUG_LOCK_STATE("CLockGuard A", this, objA);   \
+	DEBUG_LOCK_STATE("CLockGuard A", this, objA);    \
 	DEBUG_LOCK_STATE("CLockGuard B", this, objB);    \
 	::pwx::CLockGuard                                \
 	pwx_libpwx_double_lock_guard_##Name(objA, objB); \
@@ -428,7 +513,7 @@ if (object) {               \
   * @param objA pointer to the first object to lock
   * @param objB pointer to the second object to lock
 **/
-#define PWX_DOUBLE_LOCK_GUARD(objA, objB) PWX_NAMED_DOUBLE_LOCK_GUARD(PWX_CURRENT_FUNC, objA, objB)
+#define PWX_DOUBLE_LOCK_GUARD(objA, objB) PWX_NAMED_DOUBLE_LOCK_GUARD(PWX_FUNC, objA, objB)
 
 
 /** @brief Clear a named double lock guard, unlocking all currently locked objects
@@ -437,10 +522,10 @@ if (object) {               \
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(Name) {                             \
-	THREAD_LOG("TLockGuard", "Double LockGuard %s clearing...", #Name);   \
+#define PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(Name) {                                   \
+	THREAD_LOG("TLockGuard", "Double LockGuard %s clearing...", #Name);         \
 	pwx_libpwx_double_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-	THREAD_LOG("TLockGuard", "Double LockGuard %s cleared!", #Name);      \
+	THREAD_LOG("TLockGuard", "Double LockGuard %s cleared!", #Name);            \
 }
 
 
@@ -448,7 +533,7 @@ if (object) {               \
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
 **/
-#define PWX_DOUBLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_CURRENT_FUNC)
+#define PWX_DOUBLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_FUNC)
 
 
 /** @brief Reset a double lock guard to two new values
@@ -474,7 +559,7 @@ if (object) {               \
   * @param objB pointer to the second object to reset the lock guard to
 **/
 #define PWX_DOUBLE_LOCK_GUARD_RESET(objA, objB) \
-	PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(PWX_CURRENT_FUNC, objA, objB)
+	PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(PWX_FUNC, objA, objB)
 
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
@@ -504,7 +589,7 @@ if (object) {               \
   * @param objC pointer to the second object to lock
 **/
 #define PWX_TRIPLE_LOCK_GUARD(objA, objB, objC) \
-	PWX_NAMED_TRIPLE_LOCK_GUARD(PWX_CURRENT_FUNC, objA, objB, objC)
+	PWX_NAMED_TRIPLE_LOCK_GUARD(PWX_FUNC, objA, objB, objC)
 
 
 /** @brief Clear a named triple lock guard, unlocking all currently locked objects
@@ -524,7 +609,7 @@ if (object) {               \
   *
   * *Prerequisites*: pwx/types/CLockGuard.h
 **/
-#define PWX_TRIPLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_CURRENT_FUNC)
+#define PWX_TRIPLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_FUNC)
 
 
 /** @brief Reset a triple lock guard to two new values
@@ -552,180 +637,7 @@ if (object) {               \
   * @param objC pointer to the third object to reset the lock guard to
 **/
 #define PWX_TRIPLE_LOCK_GUARD_RESET(objA, objB, objC) \
-	PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(PWX_CURRENT_FUNC, objA, objB, objC)
-
-
-/** @brief return true if two C-Strings are equal ignoring case
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `false`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if both C-Strings are equal ignoring case
-**/
-#define STRCEQ(a,b) (a && b && (strcasecmp(a,b) == 0))
-
-
-/** @brief return true if two C-Strings are not equal ignoring case
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `true`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if both C-Strings are not equal ignoring case
-**/
-#define STRCNE(a,b) ((nullptr == (a)) || (nullptr == (b)) || (strcasecmp(a,b) != 0))
-
-
-/** @brief true if @a a is "lower" than @a b ignoring case
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `true` if @a a is `nullptr` or `false` if @a b is `nullptr`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if @a a is "lower" than @a b ignoring case
-**/
-#define STRCLT(a,b) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (strcasecmp(a,b) < 0))
-
-
-/** @brief true if @a a is "greater" than @a b ignoring case
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `false` if @a a is `nullptr` or `true` if @a b is `nullptr`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if @a a is "greater" than @a b ignoring case
-**/
-#define STRCGT(a,b) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (strcasecmp(a,b) > 0))
-
-
-/** @brief return true if two C-Strings are equal
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `false`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if both C-Strings are equal
-**/
-#define STREQ(a,b) ((a) && (b) && (std::strcmp(a,b) == 0))
-
-
-/** @brief return true if two C-Strings are not equal
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `true`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if both C-Strings are not equal
-**/
-#define STRNE(a,b) ((nullptr == (a)) || (nullptr == (b)) || (std::strcmp(a,b) != 0))
-
-
-/** @brief true if @a a is "lower" than @a b
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `true` if @a a is `nullptr` or `false` if @a b is `nullptr`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if @a a is "lower" than @a b
-**/
-#define STRLT(a,b) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strcmp(a,b) < 0))
-
-
-/** @brief true if @a a is "greater" than @a b
-  *
-  * *Prerequisites*: cstring
-  *
-  * Note: `nullptr` @a a and/or `nullptr` @a b are handled and cause
-  * the result being `false` if @a a is `nullptr` or `true` if @a b is `nullptr`.
-  *
-  * @param a left hand C-String
-  * @param b right hand C-String
-  * @return true if @a a is "greater" than @a b
-**/
-#define STRGT(a,b) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (std::strcmp(a,b) > 0))
-
-
-/** @brief true if @a a is of the same type as @a b
-  *
-  * *Prerequisites*: type_traits
-  *
-  * @param a left type
-  * @param b right type
-  * @return true if @a and @a b are of the same type
-**/
-#define isSameType(a, b) (std::is_same<a, b>::value)
-
-
-/** @brief true if @a a is a pointer
-  *
-  * *Prerequisites*: type_traits
-  *
-  * @param a type to check
-  * @return true if @a is a pointer
-**/
-#define isPointer(a) (std::is_pointer<a>::value)
-
-
-/** @brief true if @a a is an integral type
-  *
-  * *Prerequisites*: type_traits
-  *
-  * @param a type to check
-  * @return true if @a is an integral type
-**/
-#define isIntType(a) (std::is_integral<a>::value)
-
-
-/** @brief true if @a a is a floating point type
-  *
-  * *Prerequisites*: type_traits
-  *
-  * @param a type to check
-  * @return true if @a is a floating point type
-**/
-#define isFloatType(a) (std::is_floating_point<a>::value)
-
-
-/** @brief true if @a is either int or float type
-  *
-  * *Prerequisites*: type_traits
-  *
-  * @param a type to check
-  * @return true if @a is either an integer or a floating point type
-**/
-#define isNumericType(a) (isIntType(a) || isFloatType(a))
-
-
-/** @brief true if @a a is an array
-  *
-  * *Prerequisites*: type_traits
-  *
-  * @param a type to check
-  * @return true if @a is an array
-**/
-#define isArrayType(a) (std::is_array<a>::value)
+	PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(PWX_FUNC, objA, objB, objC)
 
 
 /** @brief Check whether file @a f exists

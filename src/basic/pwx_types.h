@@ -34,9 +34,59 @@
   * History and change log are maintained in pwxlib.h
 **/
 
-#include <cstdint>
 #include <atomic>
+#include <cstdint>
 #include <memory>
+#include <type_traits>
+
+
+/** @brief true if @a a is of the same type as @a b
+  *
+  * @param a left type
+  * @param b right type
+  * @return true if @a and @a b are of the same type
+**/
+#define isSameType(a, b) (std::is_same<a, b>::value)
+
+
+/** @brief true if @a a is a pointer
+  *
+  * @param a type to check
+  * @return true if @a is a pointer
+**/
+#define isPointer(a) (std::is_pointer<a>::value)
+
+
+/** @brief true if @a a is an integral type
+  *
+  * @param a type to check
+  * @return true if @a is an integral type
+**/
+#define isIntType(a) (std::is_integral<a>::value)
+
+
+/** @brief true if @a a is a floating point type
+  *
+  * @param a type to check
+  * @return true if @a is a floating point type
+**/
+#define isFloatType(a) (std::is_floating_point<a>::value)
+
+
+/** @brief true if @a is either int or float type
+  *
+  * @param a type to check
+  * @return true if @a is either an integer or a floating point type
+**/
+#define isNumericType(a) (isIntType(a) || isFloatType(a))
+
+
+/** @brief true if @a a is an array
+  *
+  * @param a type to check
+  * @return true if @a is an array
+**/
+#define isArrayType(a) (std::is_array<a>::value)
 
 
 /// @namespace pwx
