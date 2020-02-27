@@ -30,6 +30,12 @@
 **/
 
 
+#include <cstddef>
+#include <cstdint>
+
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+
 #include "container/CThreadElementStore.h"
 
 
