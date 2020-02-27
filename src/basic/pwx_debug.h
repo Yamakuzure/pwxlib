@@ -39,9 +39,12 @@
 **/
 
 
-#include "basic/CLockGuard.h"
 #include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
+
+
+#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
+# include "basic/pwx_trace_info.h"
+#endif // LIB or THREAD debug mode
 
 
 #if defined(PWX_ANNOTATIONS)
@@ -67,20 +70,13 @@
 # include <valgrind/helgrind.h>
 #endif // ANNOTATIONS
 
-// Handle includes and defines
-#if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
-# include <cstdio>
-# include <cstring>
-# include <atomic>
-#endif // LIBPWX_DEBUG || PWX_THREADDEBUG
-
-
 /// @namespace pwx
 namespace pwx {
 
 
 // If any debugging mode is activated, a central logging functions is needed:
 #if defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
+# include "basic/pwx_trace_info.h"
 
 // The main logging function:
 void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stdout

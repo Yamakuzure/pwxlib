@@ -39,14 +39,6 @@
 
 
 #include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
-
-
-#if PWX_IS_LINUX
-#  include <sys/param.h>
-#  include <sys/sysmacros.h>
-#endif // Linux only
-#include <sys/types.h>
 
 
 /* -----------------------------------------------------------------------
@@ -56,54 +48,48 @@
 #ifndef PWX_NODOX
 #if PWX_IS_MSVC
 // Attributes
-#  define _printf_(...)
-#  define _alloc_(...)
-#  define _unused_       [[maybe_unused]]
-#  define _deprecated_   [[deprecated]]
-#  define _packed_
-#  define _malloc_
-#  define _weak_
-#  define _likely_(x)    (x)
-#  define _unlikely_(x)  (x)
-#  define _public_
-#  define _hidden_
-#  define _alignas_(x)   __attribute__((aligned(__alignof(x))))
-#  define _cleanup_(x)   __attribute__((cleanup(x)))
+#  define PWX_PRINTF(...)
+#  define PWX_ALLOC(...)
+#  define PWX_UNUSED          [[maybe_unused]]
+#  define PWX_DEPRECATED      [[deprecated]]
+#  define PWX_PACKED
+#  define PWX_MALLOC
+#  define PWX_WEAK
+#  define PWX_LIKELY(x)       (x)
+#  define PWX_UNLIKELY(x)     (x)
+#  define PWX_WARNUNUSED      _Check_return_
 // Functions
 #  define strcasecmp          _stricmp
 #  define strdup              _strdup
 #  define strerror_r(n, b, l) ( strerror_s(b, l, n) ? b : "strerror_s failed" )
 #  define strncasecmp         _strnicmp
 #else
-#  define _printf_(a,b) __attribute__ ((format (printf, a, b)))
+#  define PWX_PRINTF(a,b) __attribute__ ((format (printf, a, b)))
 #  if PWX_IS_CLANG
-#    define _alloc_(...)
+#    define PWX_ALLOC(...)
 #  else
-#    define _alloc_(...) __attribute__ ((alloc_size(__VA_ARGS__)))
+#    define PWX_ALLOC(...) __attribute__ ((alloc_size(__VA_ARGS__)))
 #  endif // CLang does not know this attribute, yet.
-#  define _unused_       __attribute__ ((unused))
-#  define _deprecated_   __attribute__ ((deprecated))
-#  define _packed_       __attribute__ ((packed))
-#  define _malloc_       __attribute__ ((malloc))
-#  define _weak_         __attribute__ ((weak))
-#  define _likely_(x)   (__builtin_expect(!!(x),1))
-#  define _unlikely_(x) (__builtin_expect(!!(x),0))
-#  define _public_       __attribute__ ((visibility("default")))
-#  define _hidden_       __attribute__ ((visibility("hidden")))
-#  define _alignas_(x)   __attribute__((aligned(__alignof(x))))
-#  define _cleanup_(x)   __attribute__((cleanup(x)))
+#  define PWX_UNUSED       __attribute__ ((unused))
+#  define PWX_DEPRECATED   __attribute__ ((deprecated))
+#  define PWX_PACKED       __attribute__ ((packed))
+#  define PWX_MALLOC       __attribute__ ((malloc))
+#  define PWX_WEAK         __attribute__ ((weak))
+#  define PWX_LIKELY(x)   (__builtin_expect(!!(x),1))
+#  define PWX_UNLIKELY(x) (__builtin_expect(!!(x),0))
+#  define PWX_WARNUNUSED  __attribute__ ((warn_unused_result))
 #endif // Macros only for gcc/clang
 
 
 #if PWX_IS_GCC && __GNUC__ >= 7
-#  define _fallthrough_  __attribute__((fallthrough))
+#  define PWX_FALLTHROUGH   __attribute__((fallthrough))
 #else
-#  define _fallthrough_
+#  define PWX_FALLTHROUGH
 #endif
 
 
 #if PWX_IS_MSVC || (PWX_IS_GCC && __GNUC__ >= 9)
-#  define _maybe_unused_  [[maybe_unused]]
+#  define _maybe_unused  [[maybe_unused]]
 #else
 #  define _maybe_unused_
 #endif
@@ -688,11 +674,6 @@ if (object) {               \
   * @return true if @a is readable and writable
 **/
 #define pwx_file_isRW(f) (0 == access(f, W_OK | W_OK))
-
-
-#include "basic/CLockable.h"
-#include "basic/CLockGuard.h"
-#include "basic/pwx_trace_info.h"
 
 
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED

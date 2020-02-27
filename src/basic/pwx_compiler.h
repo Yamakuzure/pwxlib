@@ -46,7 +46,7 @@
 /* -----------------------------------------------------------------------
  * --- Already prepare Windows specific settings if needed.            ---
  * -------------------------------------------------------------------- */
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #  define PWX_IS_LINUX   0
 #  define PWX_IS_WINDOWS 1
 #  define WIN32_LEAN_AND_MEAN
@@ -169,11 +169,6 @@
 #define PWX_DEFAULT      =default
 #define PWX_DELETE       =delete
 #define PWX_VIRTUAL_PURE =0
-#if PWX_IS_MSVC
-#  define PWX_WARNUNUSED _Check_return_
-#else
-#  define PWX_WARNUNUSED __attribute__ ((warn_unused_result))
-#endif // Difference for MSVC
 #endif // ignored by doxygen
 
 

@@ -34,10 +34,8 @@
   * History and change log are maintained in pwxlib.h
 **/
 
+
 #include <atomic>
-#include <cstdint>
-#include <memory>
-#include <type_traits>
 
 
 /** @brief true if @a a is of the same type as @a b

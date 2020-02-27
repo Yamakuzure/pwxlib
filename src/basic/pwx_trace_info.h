@@ -4,9 +4,7 @@
 
 
 #include "basic/pwx_compiler.h"
-
-
-#include <cstddef>
+#include "basic/pwx_macros.h"
 
 
 /// @namespace pwx

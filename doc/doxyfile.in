@@ -2,7 +2,7 @@ DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = @PACKAGE_NAME@
 PROJECT_NUMBER         = @PACKAGE_VERSION@
 PROJECT_BRIEF          = "Tools Library for C++ Development"
-PROJECT_LOGO           = 
+PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = @OUTPUT_PATH@
 CREATE_SUBDIRS         = YES
 ABBREVIATE_BRIEF       = "The $name class" \
@@ -64,7 +64,7 @@ PREDEFINED             = PWX_API= \
                          PWX_TRY= \
                          PWX_CATCH_AND_FORGET= \
                          PWX_THROW_FURTHER= \
-                         PWX_DEFAULT==default \ 
+                         PWX_DEFAULT==default \
                          PWX_DELETE==delete  \
                          PWX_PURE= \
                          PWX_UNUSED= \
@@ -72,22 +72,42 @@ PREDEFINED             = PWX_API= \
                          PWX_VIRTUAL_PURE==0 \
                          PWX_WARNUNUSED= \
                          PWX_NODOX=1 \
-                         PWX_USE_FLAGSPIN=
+                         PWX_USE_FLAGSPIN= \
+                         PWX_PRINTF(...)= \
+                         PWX_ALLOC(...)= \
+                         PWX_UNUSED= \
+                         PWX_DEPRECATED= \
+                         PWX_PACKED= \
+                         PWX_MALLOC= \
+                         PWX_WEAK= \
+                         PWX_LIKELY(x)= \
+                         PWX_UNLIKELY(x)=
 EXPAND_AS_DEFINED      = PWX_API \
                          PWX_INTERNAL \
                          PWX_VISIBLE \
-                         PWX_INLINEinline \
+                         PWX_INLINE \
                          PWX_THROW \
                          PWX_TRY \
                          PWX_CATCH_AND_FORGET \
                          PWX_THROW_FURTHER \
-                         PWX_DEFAULT \ 
+                         PWX_DEFAULT \
                          PWX_DELETE  \
                          PWX_PURE \
                          PWX_UNUSED \
                          PWX_USED \
                          PWX_VIRTUAL_PURE \
-                         PWX_WARNUNUSED
+                         PWX_WARNUNUSED \
+                         PWX_NODOX \
+                         PWX_USE_FLAGSPIN \
+                         PWX_PRINTF(...) \
+                         PWX_ALLOC(...) \
+                         PWX_UNUSED \
+                         PWX_DEPRECATED \
+                         PWX_PACKED \
+                         PWX_MALLOC \
+                         PWX_WEAK \
+                         PWX_LIKELY(x) \
+                         PWX_UNLIKELY(x)
 HAVE_DOT               = YES
 UML_LOOK               = YES
 TEMPLATE_RELATIONS     = YES
