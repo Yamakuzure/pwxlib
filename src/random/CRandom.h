@@ -35,6 +35,11 @@
 **/
 
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <string>
+
 #include "basic/CLockable.h"
 #include "basic/pwx_compiler.h"
 #include "random/eNameSourceType.h"
