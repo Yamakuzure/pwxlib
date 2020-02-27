@@ -435,7 +435,7 @@ private:
 		#if defined(LIBPWX_DEBUG)
 		if ( hops && ( *hops == tabSize ) ) {
 			// This is really bad!
-			DEBUG_ERR( "open hash", "\n---\nHash table seems to be full or %s is screwed:", PWX_CURRENT_FUNC );
+			DEBUG_ERR( "open hash", "\n---\nHash table seems to be full or %s is screwed:", PWX_FUNC );
 			DEBUG_ERR( "open hash", "  Table size : %u", tabSize );
 			DEBUG_ERR( "open hash", "  Elements   : %u", this->eCount.load( memOrdLoad ) );
 			DEBUG_ERR( "open hash", "  Hops done  : %u", *hops ); // Trivial, but the if() is not part of the output

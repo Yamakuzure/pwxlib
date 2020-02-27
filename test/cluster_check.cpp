@@ -29,7 +29,11 @@
   * History and change log are maintained in pwxlib.h
 **/
 
+
 #include "cluster_check.h"
+
+#include "basic/string_utils.h"
+
 
 /// @internal build a numerical hash list
 template<typename T>

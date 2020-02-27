@@ -287,7 +287,7 @@ static int print_type( nst_t type ) {
 			cout << " === NST_TEXTS_EN ===" << endl;
 			break;
 		default:
-			cerr << "unknown type " << type << " in " << PWX_CURRENT_FUNC << endl;
+			cerr << "unknown type " << type << " in " << PWX_FUNC << endl;
 			result = EXIT_FAILURE;
 	}
 

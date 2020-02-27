@@ -28,9 +28,9 @@ int32_t printDescription( sEnv& env, uint32_t threadCount, bool sorted ) {
 		cout << " Singly linked rings   ";
 	else if ( isSameType ( cont_t, double_ring_t ) )
 		cout << " Doubly linked rings   ";
-	else if ( isSameType ( cont_t, stack_t ) )
+	else if ( isSameType ( cont_t, pstack_t ) )
 		cout << " Stacks                ";
-	else if ( isSameType ( cont_t, queue_t ) )
+	else if ( isSameType ( cont_t, pqueue_t ) )
 		cout << " Queues                ";
 	else if ( isSameType ( cont_t, set_t ) )
 		cout << " Sets                  ";

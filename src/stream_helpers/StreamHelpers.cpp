@@ -36,6 +36,7 @@
 #include <vector>
 
 #include "basic/pwx_macros.h"
+#include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
 
 

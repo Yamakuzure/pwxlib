@@ -88,7 +88,7 @@ pwx::CLockable outLock; //!< Just lock before c[out|err]ing anything and unlock 
 		cerr << "Where: \"" << e.where() << "\"" << endl; \
 		cerr << "pFunc: \"" << e.pfunc() << "\"" << endl; \
 		cerr << "\nTrace:\n" << e.trace() << "\n-----" << endl; \
-		fprintf(stderr, "Caught at %s:%d %s\n", basename(__FILE__), __LINE__, PWX_CURRENT_FUNC); \
+		fprintf(stderr, "Caught at %s:%d %s\n", basename(__FILE__), __LINE__, PWX_FUNC); \
 		cerr.flush(); \
 		outLock.unlock(); \
 		isKilled = true; \

@@ -17,8 +17,8 @@
 #include "test_lib.h" // This is here for IDE Parsers to find the other stuff
 
 /// Typedefs for the specific stack/queue:
-typedef PStack<keydata_t> stack_t;
-typedef PQueue<keydata_t> queue_t;
+typedef PStack<keydata_t> pstack_t;
+typedef PQueue<keydata_t> pqueue_t;
 
 /** @brief test a stack or queue type template
   *
@@ -38,9 +38,9 @@ int32_t testStackQueue ( sEnv& env ) {
 	int32_t result = EXIT_SUCCESS;
 
 	cout << "Test ";
-	if ( isSameType ( list_t, stack_t ) )
+	if ( isSameType ( list_t, pstack_t ) )
 		cout << "stacks" << endl;
-	else if ( isSameType ( list_t, queue_t ) )
+	else if ( isSameType ( list_t, pqueue_t ) )
 		cout << "queues" << endl;
 	else {
 		cout << " : nothing - the type is unknown!" << endl;
@@ -96,7 +96,7 @@ int32_t testStackQueue ( sEnv& env ) {
 	***************************************************************************/
 	if ( EXIT_SUCCESS == result ) {
 		cout << adjRight ( 4, 0 ) << ++env.testCount << " C) Pop three elements (";
-		if ( isSameType ( list_t, queue_t ) )
+		if ( isSameType ( list_t, pqueue_t ) )
 			cout << "1, 2, 3";
 		else
 			cout << "5, 4, 3";
@@ -105,7 +105,7 @@ int32_t testStackQueue ( sEnv& env ) {
 		auto elemB = intCont.pop();
 		auto elemC = intCont.pop();
 		cout << **elemA << ", " << **elemB << ", " << **elemC << " - ";
-		if ( ( isSameType ( list_t, queue_t )
+		if ( ( isSameType ( list_t, pqueue_t )
 		                && ( 1 == **elemA ) && ( 2 == **elemB ) && ( 3 == **elemC ) )
 		                || ( ( 5 == **elemA ) && ( 4 == **elemB ) && ( 3 == **elemC ) ) ) {
 			cout << "Success" << endl;
@@ -125,7 +125,7 @@ int32_t testStackQueue ( sEnv& env ) {
 	***************************************************************************/
 	if ( EXIT_SUCCESS == result ) {
 		cout << adjRight ( 4, 0 ) << ++env.testCount << " D) Shift two elements (";
-		if ( isSameType ( list_t, queue_t ) )
+		if ( isSameType ( list_t, pqueue_t ) )
 			cout << "5, 4";
 		else
 			cout << "1, 2";
@@ -133,7 +133,7 @@ int32_t testStackQueue ( sEnv& env ) {
 		auto elemA = intCont.shift();
 		auto elemB = intCont.shift();
 		cout << **elemA << ", " << **elemB << " - ";
-		if ( ( isSameType ( list_t, queue_t )
+		if ( ( isSameType ( list_t, pqueue_t )
 		                && ( 5 == **elemA ) && ( 4 == **elemB ) )
 		                || ( ( 1 == **elemA ) && ( 2 == **elemB ) ) ) {
 			cout << "Success" << endl;

@@ -123,10 +123,10 @@ int32_t main( int argc, char* argv[] ) {
 				PWX_TRY_PWX_FURTHER ( result = testListRing<double_ring_t> ( env ) )
 			}
 			if ( EXIT_SUCCESS == result ) {
-				PWX_TRY_PWX_FURTHER ( result = testStackQueue<stack_t> ( env ) )
+				PWX_TRY_PWX_FURTHER ( result = testStackQueue<pstack_t> ( env ) )
 			}
 			if ( EXIT_SUCCESS == result ) {
-				PWX_TRY_PWX_FURTHER ( result = testStackQueue<queue_t> ( env ) )
+				PWX_TRY_PWX_FURTHER ( result = testStackQueue<pqueue_t> ( env ) )
 			}
 			if ( EXIT_SUCCESS == result ) {
 				PWX_TRY_PWX_FURTHER ( result = testSet<set_t> ( env ) )
@@ -215,17 +215,17 @@ int32_t main( int argc, char* argv[] ) {
 			}
 			// Stacks
 			if ( EXIT_SUCCESS == result ) {
-				stack_t testCont( do_not_destroy );
-				do_testSpeed( stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false );
+				pstack_t testCont( do_not_destroy );
+				do_testSpeed( pstack_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false );
 				if ( EXIT_SUCCESS == result )
-					do_testSpeed( stack_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false );
+					do_testSpeed( pstack_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false );
 			}
 			// Queues
 			if ( EXIT_SUCCESS == result ) {
-				queue_t testCont( do_not_destroy );
-				do_testSpeed( queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false );
+				pqueue_t testCont( do_not_destroy );
+				do_testSpeed( pqueue_t, keydata_t, keydata_t, thAdderList, thSearcherList, 1, &values, &retrieves, false );
 				if ( EXIT_SUCCESS == result )
-					do_testSpeed( queue_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false );
+					do_testSpeed( pqueue_t, keydata_t, keydata_t, thAdderList, thSearcherList, maxThreads, &values, &retrieves, false );
 			}
 
 			// Delete the values, as hashes search for more. Otherwise the
