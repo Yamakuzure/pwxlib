@@ -33,6 +33,7 @@
 #include <string>
 
 #include "arg_handler/CArgHandler.h"
+#include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
 
 

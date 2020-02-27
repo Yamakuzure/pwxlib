@@ -32,10 +32,12 @@
 
 #include <cstring>
 
-#include "arg_handler/CArgCallback.h"
-#include "basic/CException.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
 #include "basic/pwx_macros.h"
 
+#include "arg_handler/CArgCallback.h"
+#include "basic/CException.h"
 
 /// @namespace pwx
 namespace pwx {

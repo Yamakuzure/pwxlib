@@ -1,6 +1,7 @@
 arg_sources = files('''
 	CArgCallback.cpp
 	CArgHandler.cpp
+	sArg.cpp
 	sArgError.cpp
 	TArgTarget.cpp
 	VArgTargetBase.cpp
@@ -14,6 +15,7 @@ arg_headers = '''
 	eArgErrorNumber.h
 	eArgSetType.h
 	eArgTargetType.h
+	sArg.h
 	sArgError.h
 '''.split()
 

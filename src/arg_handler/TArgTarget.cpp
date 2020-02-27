@@ -30,6 +30,13 @@
 **/
 
 
+#include <cstddef>
+#include <cstdint>
+
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
+
 #include "arg_handler/TArgTarget.h"
 #include "stream_helpers/StreamHelpers.h"
 
