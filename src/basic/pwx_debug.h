@@ -86,15 +86,18 @@ namespace pwx {
 void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stdout
 void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stderr
 
-// And the main wrapper:
+// And the main wrappers:
 # define DEBUG_LOG(part, fmt, ...)                   \
 	::pwx::debug_log( ">> [%8s] %s : " fmt "\n", \
 	                  part,                      \
 	                  ::pwx::get_trace_info(     \
 	                          __FILE__,          \
 	                          __LINE__,          \
-	                          PWX_CURRENT_FUNC), \
-	                  __VA_ARGS__ )
+	                          PWX_FUNC), __VA_ARGS__ )
+
+# define DEBUG_LOG_THERE(location, part, fmt, ...)    \
+	::pwx::debug_log( ">> [%8s] %s : " fmt "\n",  \
+	                  part, location, __VA_ARGS__ )
 
 # define DEBUG_LOG_CAUGHT_STD(part)                  \
 	catch (::std::exception &e) {                \
@@ -109,12 +112,17 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 	                  ::pwx::get_trace_info(     \
 	                          __FILE__,          \
 	                          __LINE__,          \
-	                          PWX_CURRENT_FUNC), \
-	                  __VA_ARGS__ )
+	                          PWX_FUNC), __VA_ARGS__ )
+
+# define DEBUG_ERR_THERE(location, part, fmt, ...)    \
+	::pwx::debug_err( ">> [%8s] %s : " fmt "\n",  \
+	                  part, location, __VA_ARGS__ )
 #else
-# define DEBUG_LOG(...) 
-# define DEBUG_LOG_CAUGHT_STD(...)
-# define DEBUG_ERR(...) 
+# define DEBUG_LOG(...)            do{}while(0)
+# define DEBUG_LOG_THERE(...)      do{}while(0)
+# define DEBUG_LOG_CAUGHT_STD(...) do{}while(0)
+# define DEBUG_ERR(...)            do{}while(0)
+# define DEBUG_ERR_THERE(...)      do{}while(0)
 /* debug_log() and debug_err() are not defined here, because they would cause
  *   pwx::debug_log(...);
  * to become
@@ -127,6 +135,10 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
   * @brief Print a debugging information message with automatic location information.
   * This is a macro that gets removed in release builds.
   *
+  * @def DEBUG_LOG_THERE
+  * @brief Print a debugging information message with manual location information.
+  * This is a macro that gets removed in release builds.
+  *
   * @def DEBUG_LOG_CAUGHT_STD
   * @brief catch an `std::exception` and log its `what()`.
   * This macro can be used to log an exception that is normally ignored, but might
@@ -134,6 +146,10 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
   *
   * @def DEBUG_ERR
   * @brief Print a debugging error message with automatic location information.
+  * This is a macro that gets removed in release builds.
+
+  * @def DEBUG_ERR_THERE
+  * @brief Print a debugging error message with manual location information.
   * This is a macro that gets removed in release builds.
 **/
 
@@ -145,17 +161,15 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 	                  ::pwx::get_trace_info(          \
 	                          __FILE__,               \
 	                          __LINE__,               \
-	                          PWX_CURRENT_FUNC),      \
-	                  __VA_ARGS__ )
+	                          PWX_FUNC), __VA_ARGS__ )
 
-# define THREAD_ERR(part, fmt, ...) {                                   \
+# define THREAD_ERR(part, fmt, ...) {                     \
 	::pwx::debug_err( ">> tid 0x%lx;[%8s] %s : " fmt, \
 	                  CURRENT_THREAD_ID, part,        \
 	                  ::pwx::get_trace_info(          \
 	                          __FILE__,               \
 	                          __LINE__,               \
-	                          PWX_CURRENT_FUNC),      \
-	                  __VA_ARGS__ )
+	                          PWX_FUNC), __VA_ARGS__ )
 
 # define DEBUG_LOCK_STATE(action, locker, to_lock)      \
 	THREAD_LOG("DLS", "%s->%s(%s) %s has %u locks"  \
@@ -176,7 +190,7 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 		   "Unlocked %s (has %d locks now)", \
 		   #obj, (obj)->lock_count() )
 
-		           
+
 // Lock guard one object
 # define LOG_LOCK_GUARD(obj) if ((obj)->is_locking()) \
 	THREAD_LOG("GUARD", "Guarded %s (has %d locks now)", #obj, (obj)->lock_count())
@@ -204,17 +218,17 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 	LOG_UNLOCK_GUARD(objB);                    \
 	LOG_UNLOCK_GUARD(objC);
 #else
-# define THREAD_LOG(...) 
-# define THREAD_ERR(...) 
+# define THREAD_LOG(...)
+# define THREAD_ERR(...)
 # define DEBUG_LOCK_STATE(action, locker, to_lock)
-# define LOG_LOCK(...) 
-# define LOG_UNLOCK(...) 
-# define LOG_LOCK_GUARD(...) 
-# define LOG_UNLOCK_GUARD(...) 
-# define LOG_DOUBLE_LOCK_GUARD(...) 
-# define LOG_DOUBLE_UNLOCK_GUARD(...) 
-# define LOG_TRIPLE_LOCK_GUARD(...) 
-# define LOG_TRIPLE_UNLOCK_GUARD(...) 
+# define LOG_LOCK(...)
+# define LOG_UNLOCK(...)
+# define LOG_LOCK_GUARD(...)
+# define LOG_UNLOCK_GUARD(...)
+# define LOG_DOUBLE_LOCK_GUARD(...)
+# define LOG_DOUBLE_UNLOCK_GUARD(...)
+# define LOG_TRIPLE_LOCK_GUARD(...)
+# define LOG_TRIPLE_UNLOCK_GUARD(...)
 #endif // PWX_THREADDEBUG
 
 /** @def  THREAD_LOG
