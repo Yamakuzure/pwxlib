@@ -83,6 +83,8 @@
 		<Unit filename="../src/arg_handler/eArgSetType.h" />
 		<Unit filename="../src/arg_handler/eArgTargetType.h" />
 		<Unit filename="../src/arg_handler/meson.build" />
+		<Unit filename="../src/arg_handler/sArg.cpp" />
+		<Unit filename="../src/arg_handler/sArg.h" />
 		<Unit filename="../src/arg_handler/sArgError.cpp" />
 		<Unit filename="../src/arg_handler/sArgError.h" />
 		<Unit filename="../src/basic/CException.cpp" />
@@ -91,8 +93,13 @@
 		<Unit filename="../src/basic/CLockGuard.h" />
 		<Unit filename="../src/basic/CLockable.cpp" />
 		<Unit filename="../src/basic/CLockable.h" />
+		<Unit filename="../src/basic/_mem_map.cpp" />
+		<Unit filename="../src/basic/_mem_map.h" />
+		<Unit filename="../src/basic/_mem_wrapper.h" />
+		<Unit filename="../src/basic/alloc_utils.h" />
 		<Unit filename="../src/basic/debug.cpp" />
-		<Unit filename="../src/basic/macros.cpp" />
+		<Unit filename="../src/basic/mem_utils.cpp" />
+		<Unit filename="../src/basic/mem_utils.h" />
 		<Unit filename="../src/basic/meson.build" />
 		<Unit filename="../src/basic/pwx_compiler.h" />
 		<Unit filename="../src/basic/pwx_debug.h" />
@@ -100,6 +107,7 @@
 		<Unit filename="../src/basic/pwx_templates.h" />
 		<Unit filename="../src/basic/pwx_trace_info.h" />
 		<Unit filename="../src/basic/pwx_types.h" />
+		<Unit filename="../src/basic/string_utils.h" />
 		<Unit filename="../src/basic/trace_info.cpp" />
 		<Unit filename="../src/container/CHashBuilder.cpp" />
 		<Unit filename="../src/container/CHashBuilder.h" />
@@ -129,6 +137,8 @@
 		<Unit filename="../src/functions/pwx_set_fwd.h" />
 		<Unit filename="../src/libpwx/basic.h" />
 		<Unit filename="../src/libpwx/containers.h" />
+		<Unit filename="../src/libpwx/finish.cpp" />
+		<Unit filename="../src/libpwx/finish.h" />
 		<Unit filename="../src/libpwx/meson.build" />
 		<Unit filename="../src/libpwx/pwxlib.pc.in" />
 		<Unit filename="../src/libpwx/pwxlib.sym" />
@@ -140,7 +150,6 @@
 		<Unit filename="../src/libpwx/worker_RNG.h" />
 		<Unit filename="../src/libpwx/worker_SCT.cpp" />
 		<Unit filename="../src/libpwx/worker_SCT.h" />
-		<Unit filename="../src/libpwx/workers.cpp" />
 		<Unit filename="../src/libpwx/workers.h" />
 		<Unit filename="../src/math_helpers/CSinCosTable.cpp" />
 		<Unit filename="../src/math_helpers/CSinCosTable.h" />
@@ -198,11 +207,8 @@
 		<Unit filename="../test/torture.h" />
 		<Unit filename="rebuild_all.sh" />
 		<Extensions>
-			<code_completion />
-			<envvars />
-			<lib_finder disable_auto="1" />
-			<debugger />
 			<editor_config active="1" use_tabs="1" tab_indents="1" tab_width="8" indent="8" eol_mode="2" />
+			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

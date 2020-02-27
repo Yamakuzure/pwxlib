@@ -44,6 +44,19 @@
   * | `stream_helpers/` | Tools helping with handling streams, like alignment           |
   * | `wavecolor/`      |  Helper for using wavelengths to describe RGB                 |
   *
+  * @section unotes Usage Notes
+  * You should always call pwx::finish() before your program ends. This will
+  * clear up any allocated resources and has some special meaning when the
+  * library is built in debugging mode.
+  *
+  * In debugging mode, all memory allocations and de-allocations done with the
+  * functions from basic/mem_utils.h are recorded. When you call pwx::finish()
+  * these records are processed. Everything you forgot to free will issue an
+  * error message. Further the memory will be freed.
+  *
+  * But please be aware that this **only** happens in debugging mode. This is
+  * **not** a garbage collector, but a debugging tool!
+  *
   * @section ghLinks GitHub
   * You can find additional information on the [GitHub project page][pgpp].
   *
@@ -97,7 +110,7 @@
   *
   * @subsection contTools Tools
   * Apart from the workers and the containers, there are some tools that might be
-  * helpful. 
+  * helpful.
   * @subsection contTypes Types
   * @todo write
   * @subsection contGeneral General
@@ -126,7 +139,7 @@
   * Later I added name generation, which I needed for another project. And as
   * both &quot;Name&quot; and &quot;Noise&quot; start with an 'N', everything
   * was fine. Now it also includes hash generation, so it is *N*Value now.
-  * 
+  *
   * To speed things up in a game, I added the SCT worker, the *S*ine *C*osine
   * *T*able. And as I do not want to write the same stuff again and again, the
   * PAH worker, the *P*rogram *A*rgument *H*andler followed.
@@ -146,7 +159,7 @@
   * now and so often, as I have very limited spare time, and am maintaining
   * other projects as well. But the pwxLib is still an active project, and will
   * remain to be so for a long time.
-  * 
+  *
   * @section CopyLic Copyright and license
   *
   * (c) 2007 - 2019 PrydeWorX
