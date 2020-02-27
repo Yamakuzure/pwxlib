@@ -35,10 +35,13 @@
 **/
 
 
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <sstream>
 
 #include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 
 
 namespace pwx {
