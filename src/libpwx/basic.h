@@ -19,7 +19,7 @@
   *   three objects within its ctor/dtor</TD><TD>CLockGuard.h</TD></TR>
   * <TR><TD>General preprocessor macros and defines that are compiler dependent</TD>
   *   <TD>compiler.h</TD></TR>
-  * <TR><TD>Debugging utilities that do nothing unless LIBPWX_DEBUG is defined</TD>
+  * <TR><TD>Debugging utilities that do nothing unless LIBPWX_DEBUG is not 0</TD>
   *   <TD>debug.h</TD></TR>
   * <TR><TD>Preprocessor macros for general usage</TD><TD>macros.h</TD></TR>
   * <TR><TD>Helper templates and macros for various little issues</TD>

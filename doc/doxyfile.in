@@ -72,7 +72,7 @@ PREDEFINED             = PWX_API= \
                          PWX_VIRTUAL_PURE==0 \
                          PWX_WARNUNUSED= \
                          PWX_NODOX=1 \
-                         PWX_USE_FLAGSPIN= \
+                         PWX_USE_FLAGSPIN=1 \
                          PWX_PRINTF(...)= \
                          PWX_ALLOC(...)= \
                          PWX_UNUSED= \

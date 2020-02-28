@@ -19,19 +19,15 @@ prefixdir = get_option('prefix')
 if not prefixdir.startswith('/')
 	error('Prefix is not absolute: "@0@"'.format(prefixdir))
 endif
-bindir = join_paths(prefixdir, get_option('bindir'))
-libdir = join_paths(prefixdir, get_option('libdir'))
-testsdir = join_paths(libdir, 'pwx')
-
-includedir = join_paths(prefixdir, get_option('includedir'))
-datadir = join_paths(prefixdir, get_option('datadir'))
-
+bindir          = join_paths(prefixdir, get_option('bindir'))
+libdir          = join_paths(prefixdir, get_option('libdir'))
+testsdir        = join_paths(libdir, 'pwx')
+includedir      = join_paths(prefixdir, get_option('includedir'))
+datadir         = join_paths(prefixdir, get_option('datadir'))
 pkgconfiglibdir = get_option('pkgconfiglibdir') == '' ? join_paths(libdir, 'pkgconfig') : get_option('pkgconfiglibdir')
-pkgincludedir = join_paths(includedir, 'pwxlib')
-pkgdatadir = join_paths(datadir, 'pwxlib')
-
-docdir = '-'.join([join_paths(datadir, 'doc/pwxLib'),
-			     meson.project_version()])
+pkgincludedir   = join_paths(includedir, 'pwxlib')
+pkgdatadir      = join_paths(datadir, 'pwxlib')
+docdir          = '-'.join([join_paths(datadir, 'doc/pwxLib'), meson.project_version()])
 
 #####################################################################
 
@@ -39,19 +35,19 @@ substs = configuration_data()
 substs.set('PACKAGE_NAME',    meson.project_name())
 substs.set('PACKAGE_URL',     'https://prydeworx.com/pwxlib')
 substs.set('PACKAGE_VERSION', meson.project_version())
-substs.set('prefix',	  prefixdir)
+substs.set('prefix',          prefixdir)
 substs.set('exec_prefix',     prefixdir)
-substs.set('libdir',	  libdir)
+substs.set('libdir',          libdir)
 substs.set('includedir',      includedir)
 
 #####################################################################
 
-cxx		     = meson.get_compiler('cpp')
-cxx_id	             = cxx.get_id()
-pkgconfig	     = import('pkgconfig')
+cxx                  = meson.get_compiler('cpp')
+cxx_id               = cxx.get_id()
+pkgconfig            = import('pkgconfig')
 check_compilation_sh = find_program('meson/check_compilation.sh')
-buildtype	     = get_option('buildtype')
-sanitize	     = get_option('b_sanitize')
+buildtype            = get_option('buildtype')
+sanitizer            = get_option('b_sanitize')
 
 ############################################################
 
@@ -62,6 +58,11 @@ profile     = get_option('profile')
 small_tests = get_option('small_tests')
 spinlocks   = get_option('spinlocks')
 yielding    = get_option('yielding')
+
+if sanitizer == 'thread'
+	spinlocks = false
+	yielding  = false
+endif
 
 if buildtype != 'debug'
 	annotations = false
@@ -76,23 +77,20 @@ if profile
 endif
 
 if annotations
-	debug = true
-	conf.set('PWX_ANNOTATIONS', true)
+	debug     = true
+	spinlocks = false
+	yielding  = false
 else
 	if yielding
-		conf.set('PWX_USE_FLAGSPIN_YIELD', true)
 		spinlocks = true
-	endif
-	if spinlocks
-		conf.set('PWX_USE_FLAGSPIN', true)
 	endif
 endif
 
-if small_tests
-	conf.set('PWX_SMALL_TESTS', 1)
-else
-	conf.set('PWX_SMALL_TESTS', 0)
-endif
+conf.set10('LIBPWX_DEBUG',           debug)
+conf.set10('PWX_ANNOTATIONS',        annotations)
+conf.set10('PWX_SMALL_TESTS',        small_tests)
+conf.set10('PWX_USE_FLAGSPIN_YIELD', yielding)
+conf.set10('PWX_USE_FLAGSPIN',       spinlocks)
 
 #####################################################################
 
@@ -125,17 +123,13 @@ if cxx.get_id() == 'clang'
 	]
 endif
 
-if get_option('buildtype') != 'debug'
+if false == debug
 	possible_cxx_flags += [
 		'-ffunction-sections',
 		'-fdata-sections',
 	]
 
 	possible_link_flags += '-Wl,--gc-sections'
-endif
-
-if debug
-	conf.set('LIBPWX_DEBUG', true)
 endif
 
 add_project_arguments(cxx.get_supported_arguments(possible_cxx_flags), language : 'cpp')
@@ -329,6 +323,6 @@ status = [
 	'lib dir:     @0@'.format(libdir),
 	'bin dir:     @0@'.format(bindir),
 	'data dir:    @0@'.format(datadir),
-	'sanitizer:   @0@'.format(sanitize)]
+	'sanitizer:   @0@'.format(sanitizer)]
 
 message('\n	 '.join(status))

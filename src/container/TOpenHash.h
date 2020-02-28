@@ -37,7 +37,7 @@
 
 #include "basic/pwx_compiler.h"
 
-#if defined(LIBPWX_DEBUG)
+#if LIBPWX_DEBUG
 #  include "stream_helpers/StreamHelpers.h"
 #endif // LIBPWX_DEBUG
 #include "container/VTHashBase.h"
@@ -434,7 +434,7 @@ private:
 			}
 		} // end of traversing the table
 
-		#if defined(LIBPWX_DEBUG)
+		#if LIBPWX_DEBUG
 		if ( hops && ( *hops == tabSize ) ) {
 			// This is really bad!
 			DEBUG_ERR( "open hash", "\n---\nHash table seems to be full or %s is screwed:", PWX_FUNC );
@@ -445,7 +445,7 @@ private:
 			DEBUG_ERR( "open hash", "  Stepping   : %u", idxStep );
 			DEBUG_ERR( "open hash", "  1st Hash   : %u\n---", priHash );
 		}
-		#endif // defined(LIBPWX_DEBUG)
+		#endif // LIBPWX_DEBUG
 
 		// Now "pos" points at the first nullptr place found,
 		// the first vacated position if accepted or to an
@@ -534,7 +534,7 @@ private:
 	virtual uint32_t privInsert( elem_t* elem ) {
 		uint32_t  idx  = privGetIndex( elem->key, true, &( elem->hops ) );
 
-		#if defined(LIBPWX_DEBUG)
+		#if LIBPWX_DEBUG
 		// The position must not be occupied unless the hop count is smaller
 		// Note: This used to be an assert, but the checks are too flat then.
 		uint32_t tabSize  = this->hashSize.load( memOrdLoad );
@@ -565,7 +565,7 @@ private:
 				           "An element to replace has more or equal hops" );
 			}
 		}
-		#endif // defined(LIBPWX_DEBUG)
+		#endif // LIBPWX_DEBUG
 
 		/* There are two possible situations now:
 		 * a) the position is occupied, but the element

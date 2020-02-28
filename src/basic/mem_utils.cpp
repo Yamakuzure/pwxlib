@@ -143,7 +143,7 @@ bool mem_map_report() {
  * --- (de)allocator in basic/pwx_compiler.h. Here are the definitions. ---
  * --------------------------------------------------------------------- */
 #ifndef PWX_NODOX
-#if defined(PWX_EXPORTS) && defined(LIBPWX_DEBUG) && defined(PWX_HAVE_DEBUG_NEW_DELETE)
+#if defined(PWX_EXPORTS) && LIBPWX_DEBUG && defined(PWX_HAVE_DEBUG_NEW_DELETE)
 void *operator new     (decltype(sizeof(0)) s) { return (void*)pwx_calloc(uint8_t, s); }
 void *operator new[]   (decltype(sizeof(0)) s) { return (void*)pwx_calloc(uint8_t, s); }
 void  operator delete  (void* ptr)                       noexcept { pwx_free(ptr); }

@@ -80,7 +80,7 @@ CLockable::CLockable ( CLockable const& src ) noexcept
 
 CLockable::~CLockable() noexcept {
 	isDestroyed.store( true, memOrdStore );
-	#ifdef PWX_USE_FLAGSPIN
+	#if PWX_USE_FLAGSPIN
 	// Simply move the id to this thread:
 	CL_Thread_ID.store( CURRENT_THREAD_ID, PWX_MEMORDER_RELAXED );
 	#else
@@ -120,7 +120,7 @@ bool CLockable::clear_locks() noexcept {
 			CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
 			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
 			CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
-			#ifdef PWX_USE_FLAGSPIN
+			#if PWX_USE_FLAGSPIN
 			CL_Lock.clear( memOrdStore ); // This *must* be last!
 			#else
 			CL_Lock.unlock();
@@ -162,9 +162,9 @@ void CLockable::do_locking( bool doLock ) noexcept {
 				 * to CL_Do_Locking and that has to be false by now.
 				 */
 				std::this_thread::yield(); // to be sure this thread is last
-				#ifdef PWX_USE_FLAGSPIN
+				#if PWX_USE_FLAGSPIN
 				while ( CL_Lock.test_and_set() ) {
-					# ifdef PWX_USE_FLAGSPIN_YIELD
+					# if PWX_USE_FLAGSPIN_YIELD
 					std::this_thread::yield();
 					# endif // PWX_USE_FLAGSPIN_YIELD
 				}
@@ -176,7 +176,7 @@ void CLockable::do_locking( bool doLock ) noexcept {
 			// Nuke all data:
 			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
 			CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
-			#ifdef PWX_USE_FLAGSPIN
+			#if PWX_USE_FLAGSPIN
 			// Note: Here it is in order to clear relaxed, as no
 			//       other thread should be waitng right now.
 			CL_Lock.clear( PWX_MEMORDER_RELAXED );
@@ -215,9 +215,9 @@ void CLockable::lock() noexcept {
 		// locked by this thread
 		if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
 			CL_Waiting++;
-			#ifdef PWX_USE_FLAGSPIN
+			#if PWX_USE_FLAGSPIN
 			while ( CL_Lock.test_and_set() ) {
-				# ifdef PWX_USE_FLAGSPIN_YIELD
+				# if PWX_USE_FLAGSPIN_YIELD
 				std::this_thread::yield();
 				# endif // PWX_USE_FLAGSPIN_YIELD
 			}
@@ -256,7 +256,7 @@ bool CLockable::try_lock() noexcept {
 		// not already own the lock
 		if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
 			CL_Waiting++;
-			#ifdef PWX_USE_FLAGSPIN
+			#if PWX_USE_FLAGSPIN
 			if ( !CL_Lock.test_and_set() ) {
 			#else
 			if ( CL_Lock.try_lock() ) {
@@ -286,7 +286,7 @@ void CLockable::unlock() noexcept {
 			// The lock will go away now:
 			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
 			CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
-			#ifdef PWX_USE_FLAGSPIN
+			#if PWX_USE_FLAGSPIN
 			CL_Lock.clear( PWX_MEMORDER_RELEASE );
 			#else
 			CL_Lock.unlock();

@@ -35,7 +35,7 @@
 **/
 
 
-#ifndef PWX_USE_FLAGSPIN
+#if !PWX_USE_FLAGSPIN
 #  include <mutex>
 #endif // PWX_USE_FLAGSPIN
 
@@ -120,7 +120,7 @@ public:
 	 * ===============================================
 	*/
 
-	#ifndef PWX_USE_FLAGSPIN
+	#if !PWX_USE_FLAGSPIN
 	typedef std::mutex lock_t; //!< Use standard mutex if no spinlocks are used.
 	#endif // !PWX_USE_FLAGSPIN
 
@@ -291,7 +291,7 @@ private:
 	abool_t CL_Do_Locking = ATOMIC_VAR_INIT( true );  //!< If set to false with do_locking(false), no real locking is done.
 	abool_t CL_Is_Locked  = ATOMIC_VAR_INIT( false ); //!< Set to true if a lock is imposed, atomic_flag can't do it.
 
-	#ifdef PWX_USE_FLAGSPIN
+	#if PWX_USE_FLAGSPIN
 	aflag_t CL_Lock       = ATOMIC_FLAG_INIT;         //!< Instead of a costly mutex atomic_flag spinlocks are used.
 	#else
 	lock_t CL_Lock;                                   //!< Use standard mutex to handle locking

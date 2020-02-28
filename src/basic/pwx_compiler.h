@@ -153,7 +153,7 @@
   * @brief Private methods of the worker classes can be inlined, unless
   *        this is a debugging build
 **/
-#if defined(LIBPWX_DEBUG) || !defined(PWX_EXPORTS)
+#if LIBPWX_DEBUG || !defined(PWX_EXPORTS)
 # define PWX_PRIVATE_INLINE
 #else
 # define PWX_PRIVATE_INLINE inline
@@ -178,7 +178,7 @@
  * --- ( The operators are defined in basic/mem_utils.cpp )          ---
  * ------------------------------------------------------------------ */
 #ifndef PWX_NODOX
-#if defined(PWX_EXPORTS) && defined(LIBPWX_DEBUG) && !defined(PWX_HAVE_DEBUG_NEW_DELETE)
+#if defined(PWX_EXPORTS) && LIBPWX_DEBUG && !defined(PWX_HAVE_DEBUG_NEW_DELETE)
 #  include <cstddef>
 #  include <cstdint>
 #  include "basic/pwx_macros.h"

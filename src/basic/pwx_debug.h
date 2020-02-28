@@ -42,19 +42,19 @@
 #include "basic/pwx_compiler.h"
 
 
-#if defined(LIBPWX_DEBUG)
+#if LIBPWX_DEBUG
 # include "basic/pwx_trace_info.h"
 #endif // LIB or THREAD debug mode
 
 
-#if defined(PWX_ANNOTATIONS)
+#if PWX_ANNOTATIONS
 // In short: If LIBPWX_DEBUG is defined, the annotations are re-defined so the
 // compiler gives information about the include chain that is wrong. Otherwise
 // only notify and undef.
 # ifdef _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE
 #   pragma message "_GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE already defined!"
 #   pragma message "Annotations might not work correctly, please check your include order."
-#   ifndef LIBPWX_DEBUG
+#   if !LIBPWX_DEBUG
 #     undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_BEFORE
 #   endif
 # endif
@@ -62,7 +62,7 @@
 # ifdef _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER
 #   pragma message "_GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER already defined!"
 #   pragma message "Annotations might not work correctly, please check your include order."
-#   ifndef LIBPWX_DEBUG
+#   if !LIBPWX_DEBUG
 #     undef _GLIBCXX_SYNCHRONIZATION_HAPPENS_AFTER
 #   endif
 # endif
@@ -75,7 +75,7 @@ namespace pwx {
 
 
 // If any debugging mode is activated, a central logging functions is needed:
-#if defined(LIBPWX_DEBUG)
+#if LIBPWX_DEBUG
 # include "basic/pwx_trace_info.h"
 
 // The main logging function:

@@ -30,14 +30,14 @@
 **/
 
 
-#if defined(LIBPWX_DEBUG)
+#if LIBPWX_DEBUG
 #  include <cstdarg>
 #  include <thread>
 
 #  include "basic/pwx_compiler.h"
 #  include "basic/pwx_macros.h"
 #  include "basic/pwx_types.h"
-#endif // defined(LIBPWX_DEBUG)
+#endif // LIBPWX_DEBUG
 
 #include "basic/pwx_debug.h"
 
@@ -46,7 +46,7 @@
 namespace pwx {
 
 
-#if defined(LIBPWX_DEBUG)
+#if LIBPWX_DEBUG
 
 /** @namespace private_
   * @internal
