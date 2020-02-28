@@ -108,9 +108,9 @@ namespace pwx {
   * testlib program.
   *
   * #### Thread debugging versus spinlocks ####
-  * If you enable thread debugging with the `-Ddebug-thread=true` configuration
+  * If you enable annotations with the `-Dannotations=true` configuration
   * option, `std::mutex` is enforced. Using spinlocks here would lead to an
-  * avalanche of false positives.
+  * avalanche of false positives in Helgrind and DND.
 **/
 class PWX_API CLockable {
 public:
@@ -266,12 +266,6 @@ public:
 	  * Only the state whether to actually do the locking is copied.
 	  */
 	CLockable& operator= ( CLockable const& src ) noexcept;
-
-
-	// If the DEBUG_LOCK_STATE is enabled, the owner thread ID must be questionable
-	#ifdef PWX_THREADDEBUG
-	asize_t owner_thread_id() const noexcept { return CL_Thread_ID.load(); }
-	#endif // PWX_THREADDEBUG
 
 
 protected:

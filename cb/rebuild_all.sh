@@ -19,17 +19,17 @@ xExtra="$@"
 
 base_opts=""
 if [[ "release" == "$xType" ]]; then
-	base_opts="--buildtype=release -Ddebug=false -Ddebug-thread=false -Doptimization=2"
+	base_opts="--buildtype=release -Ddebug=false -Doptimization=2"
 elif [[ "debug" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Doptimization=g"
+	base_opts="--buildtype=debug -Ddebug=true -Doptimization=g"
 elif [[ "asan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=0
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
+	base_opts="--buildtype=debug -Ddebug=true -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
 elif [[ "lsan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=1
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
+	base_opts="--buildtype=debug -Ddebug=true -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
 elif [[ "tsan" == "$xType" ]]; then
-	base_opts="--buildtype=debug -Ddebug=true -Ddebug-thread=false -Db_sanitize=thread -Dsmall_tests=true -Doptimization=0"
+	base_opts="--buildtype=debug -Ddebug=true -Db_sanitize=thread -Dsmall_tests=true -Doptimization=0"
 else
         echo "Type \"$xType\" is unknown"
         exit 1

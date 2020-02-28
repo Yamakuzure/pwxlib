@@ -52,7 +52,6 @@ public:
 			this->timeMS = duration_cast<milliseconds>( hrClock::now() - startTime ).count();
 		}
 
-		DEBUG_LOCK_STATE( "clear_locks", thAdderBase, cont )
 		uint32_t remaining = 0;
 		if ( ( remaining = cont->lock_count() ) ) {
 			cerr << "ERROR: " << remaining << " locks upon thAdderBase exit!" << endl;
@@ -241,7 +240,6 @@ public:
 				cerr << "ERROR: " << ( part - found ) << " values not found in the container!" << endl;
 		}
 
-		DEBUG_LOCK_STATE( "clear_locks", thSearcher, cont )
 		uint32_t remaining = 0;
 		if ( ( remaining = cont->lock_count() ) ) {
 			cerr << "ERROR: " << remaining << " locks upon thSearcher exit!" << endl;
@@ -381,7 +379,6 @@ public:
 			this->timeMS = duration_cast<milliseconds>( hrClock::now() - startTime ).count();
 		}
 
-		DEBUG_LOCK_STATE( "clear_locks", thClearer, cont )
 		uint32_t remaining = 0;
 		if ( ( remaining = cont->lock_count() ) ) {
 			cerr << "ERROR: " << remaining << " locks upon thClearer exit!" << endl;

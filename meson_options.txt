@@ -1,12 +1,5 @@
 option('pkgconfiglibdir', type : 'string', value : '', description : 'directory for pkg-config')
 
-option('debug-thread', type : 'boolean', value : false,
-       description : '''Enabling this produces massive output and should not be
-					      enabled lightly.
-					      Make sure to disable it before running tools like
-					      helgrind or DRD on any program that uses pwxLib!
-					      (Default: false, Implies debug-extra=true)''')
-
 option('annotations', type : 'boolean', value : false,
        description : '''If this is enabled, glibc is told to annotate inter
 					      thread synchronization events. This is needed if you do
@@ -14,7 +7,7 @@ option('annotations', type : 'boolean', value : false,
 					      You must have valgrind installed on your system and
 					      valgrind/helgrind.h somewhere it can be found (like
 					      /usr/include) (Default: false, Implies
-					      debug-extra=true)''')
+					      debug=true)''')
 
 option('profile', type : 'boolean', value : false,
        description : '''Enable profiling output.

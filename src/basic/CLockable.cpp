@@ -79,8 +79,6 @@ CLockable::CLockable ( CLockable const& src ) noexcept
 
 
 CLockable::~CLockable() noexcept {
-//	DEBUG_LOCK_STATE( "~CLockable", this, this );
-{ } struct i_am_useless_754;
 	isDestroyed.store( true, memOrdStore );
 	#ifdef PWX_USE_FLAGSPIN
 	// Simply move the id to this thread:
@@ -119,10 +117,6 @@ void CLockable::beThreadSafe( bool doLock ) noexcept {
 bool CLockable::clear_locks() noexcept {
 	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
 		if ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
-			THREAD_LOG( "base", "clear_locks(), Owner id 0x%08lx, %u locks [%s]",
-			            CL_Thread_ID.load( PWX_MEMORDER_RELAXED ),
-			            CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
-			            CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" );
 			CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
 			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
 			CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
@@ -215,9 +209,6 @@ void CLockable::lock() noexcept {
 
 	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
 		size_t ctid = CURRENT_THREAD_ID;
-		THREAD_LOG( "base", "lock(), Owner id 0x%08lx, %u locks [%s]",
-		            ctid, CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
-		            CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" );
 
 		// For both the spinlock and the mutex an action
 		// is only taken if this object is not already
@@ -260,10 +251,6 @@ bool CLockable::try_lock() noexcept {
 
 	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
 		size_t ctid = CURRENT_THREAD_ID;
-		THREAD_LOG( "base", "try_lock(), Owner id 0x%08lx, %u locks [%s]",
-		            CL_Thread_ID.load( PWX_MEMORDER_RELAXED ),
-		            CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
-		            CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" );
 
 		// Same as with locking: Only try if this thread does
 		// not already own the lock
@@ -293,11 +280,7 @@ bool CLockable::try_lock() noexcept {
 
 void CLockable::unlock() noexcept {
 	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED )
-	                && ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) ) {
-		THREAD_LOG( "base", "unlock(), Owner id 0x%08lx, %u locks [%s]",
-		            CL_Thread_ID.load( PWX_MEMORDER_RELAXED ),
-		            CL_Lock_Count.load( PWX_MEMORDER_RELAXED ),
-		            CL_Is_Locked.load( PWX_MEMORDER_ACQUIRE ) ? "locked" : "not locked" );
+	  && ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) ) {
 
 		if ( 1 == CL_Lock_Count.fetch_sub( 1, PWX_MEMORDER_RELAXED ) ) {
 			// The lock will go away now:

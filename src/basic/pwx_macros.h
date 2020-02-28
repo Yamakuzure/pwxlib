@@ -291,7 +291,6 @@
 #define PWX_LOCK(object)    \
 if (nullptr != (object) ) { \
 	(object)->lock();   \
-	LOG_LOCK(object);   \
 }
 
 
@@ -311,8 +310,7 @@ if (nullptr != (object) ) { \
 **/
 #define PWX_LOCK_OBJ(object) \
 	assert (object);     \
-	(object)->lock();    \
-	LOG_LOCK(object)
+	(object)->lock();
 
 
 /** @brief Use `object->try_lock89` if @a object is defined
@@ -334,8 +332,7 @@ if (nullptr != (object) ) { \
 #define PWX_UNLOCK(object)  \
 if (object) {               \
 	(object)->unlock(); \
-	LOG_UNLOCK(object); \
-}                           \
+}
 
 
 /** @brief Use `object->unlock()`, @a object is asserted.
@@ -355,7 +352,6 @@ if (object) {               \
 #define PWX_UNLOCK_OBJ(object) { \
 	assert(object);          \
 	(object)->unlock();      \
-	LOG_UNLOCK(object);      \
 }
 
 
@@ -368,9 +364,7 @@ if (object) {               \
 #define PWX_RELOCK(object)  \
 if (object) {               \
 	(object)->unlock(); \
-	LOG_UNLOCK(object); \
 	(object)->lock();   \
-	LOG_LOCK(object);   \
 }
 
 
@@ -391,9 +385,7 @@ if (object) {               \
 #define PWX_RELOCK_OBJ(object) { \
 	assert(object);          \
 	(object)->unlock();      \
-	LOG_UNLOCK(object);      \
 	(object)->lock();        \
-	LOG_LOCK(object);        \
 }
 
 
@@ -408,9 +400,7 @@ if (object) {               \
   * @param object pointer to the object to lock
 **/
 #define PWX_NAMED_LOCK_GUARD(Name, object)                      \
-	DEBUG_LOCK_STATE("TLockGuard", this, object);           \
-	::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object); \
-	LOG_LOCK_GUARD(object)
+	::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object);
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
@@ -435,10 +425,8 @@ if (object) {               \
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
-#define PWX_NAMED_LOCK_GUARD_CLEAR(Name) {                             \
-	THREAD_LOG("TLockGuard", "LockGuard %s clearing...", #Name);   \
+#define PWX_NAMED_LOCK_GUARD_CLEAR(Name) {                                   \
 	pwx_libpwx_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-	THREAD_LOG("TLockGuard", "LockGuard %s cleared!", #Name);      \
 }
 
 
@@ -459,9 +447,7 @@ if (object) {               \
   * @param object pointer to the object to reset the lock guard to
 **/
 #define PWX_NAMED_LOCK_GUARD_RESET(Name, object) {  \
-	LOG_UNLOCK_GUARD(object);                   \
 	pwx_libpwx_lock_guard_##Name.reset(object); \
-	LOG_LOCK_GUARD(object);                     \
 }
 
 
@@ -485,11 +471,8 @@ if (object) {               \
   * @param objB pointer to the second object to lock
 **/
 #define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB)    \
-	DEBUG_LOCK_STATE("CLockGuard A", this, objA);    \
-	DEBUG_LOCK_STATE("CLockGuard B", this, objB);    \
 	::pwx::CLockGuard                                \
-	pwx_libpwx_double_lock_guard_##Name(objA, objB); \
-	LOG_DOUBLE_LOCK_GUARD(objA, objB)                \
+	pwx_libpwx_double_lock_guard_##Name(objA, objB);
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
@@ -509,9 +492,7 @@ if (object) {               \
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
 #define PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(Name) {                                   \
-	THREAD_LOG("TLockGuard", "Double LockGuard %s clearing...", #Name);         \
 	pwx_libpwx_double_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-	THREAD_LOG("TLockGuard", "Double LockGuard %s cleared!", #Name);            \
 }
 
 
@@ -531,9 +512,7 @@ if (object) {               \
   * @param objB pointer to the second object to reset the lock guard to
 **/
 #define PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(Name, objA, objB) {  \
-	LOG_DOUBLE_UNLOCK_GUARD(objA, objB);                   \
 	pwx_libpwx_double_lock_guard_##Name.reset(objA, objB); \
-	LOG_DOUBLE_LOCK_GUARD(objA, objB);                     \
 }
 
 
@@ -558,12 +537,8 @@ if (object) {               \
   * @param objC pointer to the second object to lock
 **/
 #define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, objA, objB, objC)    \
-	DEBUG_LOCK_STATE("CLockGuard A", this, objA);          \
-	DEBUG_LOCK_STATE("CLockGuard B", this, objB);          \
-	DEBUG_LOCK_STATE("CLockGuard C", this, objC);          \
 	::pwx::CLockGuard                                      \
-	pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC); \
-	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC)
+	pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC);
 
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
@@ -585,9 +560,7 @@ if (object) {               \
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
 #define PWX_NAMED_TRIPLE_LOCK_GUARD_CLEAR(Name) {                             \
-	THREAD_LOG("TLockGuard", "Triple LockGuard %s clearing...", #Name);   \
 	pwx_libpwx_triple_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-	THREAD_LOG("TLockGuard", "Triple LockGuard %s cleared!", #Name);      \
 }
 
 
@@ -608,9 +581,7 @@ if (object) {               \
   * @param objC pointer to the third object to reset the lock guard to
 **/
 #define PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(Name, objA, objB, objC) {  \
-	LOG_TRIPLE_UNLOCK_GUARD(objA, objB, objC);                   \
 	pwx_libpwx_triple_lock_guard_##Name.reset(objA, objB, objC); \
-	LOG_TRIPLE_LOCK_GUARD(objA, objB, objC);                     \
 }
 
 

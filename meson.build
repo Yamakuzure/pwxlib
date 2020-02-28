@@ -58,7 +58,6 @@ sanitize	     = get_option('b_sanitize')
 # Set debug options
 annotations = get_option('annotations')
 debug       = get_option('debug')
-debugthread = get_option('debug-thread')
 profile     = get_option('profile')
 small_tests = get_option('small_tests')
 spinlocks   = get_option('spinlocks')
@@ -67,13 +66,11 @@ yielding    = get_option('yielding')
 if buildtype != 'debug'
 	annotations = false
 	debug       = false
-	debugthread = false
 endif
 
 if profile
 	annotations = false
 	debug       = false
-	debugthread = false
 	add_project_arguments('-pg', language : 'cpp')
 	add_project_link_arguments('-pg', language : 'cpp')
 endif
@@ -89,11 +86,6 @@ else
 	if spinlocks
 		conf.set('PWX_USE_FLAGSPIN', true)
 	endif
-endif
-
-if debugthread
-	debug = true
-	conf.set('PWX_THREADDEBUG', true)
 endif
 
 if small_tests
