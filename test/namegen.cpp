@@ -215,6 +215,8 @@ int main( int argc, char* argv[] ) {
 		} // End of having a legal type;
 	} // End of looping name source types
 
+	pwx::finish();
+
 	return result;
 }
 

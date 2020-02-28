@@ -44,6 +44,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "wavecolor/CWaveColor.h"
 
 

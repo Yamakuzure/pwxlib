@@ -44,6 +44,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "math_helpers/MathHelpers.h"
 #include "stream_helpers/StreamHelpers.h"
 

@@ -37,6 +37,8 @@
 
 #include <string>
 
+#include "basic/pwx_compiler.h"
+
 #include "arg_handler/CArgCallback.h"
 #include "arg_handler/sArgError.h"
 #include "arg_handler/TArgTarget.h"

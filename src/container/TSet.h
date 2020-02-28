@@ -35,8 +35,10 @@
 **/
 
 
-#include "basic/CLockable.h"
+#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+
+#include "basic/CLockable.h"
 #include "container/TDoubleList.h"
 #include "container/TChainHash.h"
 #include "functions/pwx_set_fwd.h"

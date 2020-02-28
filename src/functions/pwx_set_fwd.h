@@ -38,6 +38,8 @@
 # error "Do not include pwx_set_fwd.h, include pwx/container/TSet.h!"
 #endif // Check for main file
 
+#include "basic/pwx_compiler.h"
+
 #include "container/TSet.h" // Make IDE-Parsers happy
 
 namespace pwx {

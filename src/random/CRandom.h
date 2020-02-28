@@ -40,8 +40,9 @@
 #include <cstring>
 #include <string>
 
-#include "basic/CLockable.h"
 #include "basic/pwx_compiler.h"
+
+#include "basic/CLockable.h"
 #include "random/eNameSourceType.h"
 
 

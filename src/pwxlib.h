@@ -232,6 +232,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "PBasic"
 #include "PContainers"
 #include "PTools"

@@ -304,6 +304,7 @@ int32_t main( int32_t argc, char** argv ) {
 		result = build_hash_list_char( destfile, argMax );
 	}
 
+	pwx::finish();
 
 	return result;
 }

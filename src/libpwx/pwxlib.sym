@@ -108,3 +108,10 @@ local:
        *;
     };
 };
+
+LIBPWX_0_9_0 {
+global:
+    extern "C++" {
+        pwx::finish*;
+    };
+} LIBPWX_0_8_99;

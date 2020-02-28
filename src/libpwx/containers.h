@@ -51,6 +51,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "container/TChainHash.h"
 #include "container/TDoubleList.h"
 #include "container/TDoubleRing.h"

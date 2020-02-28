@@ -37,6 +37,8 @@
   * History and change log are maintained in pwxlib.h
 **/
 
+#include "basic/pwx_compiler.h"
+
 namespace pwx {
 
 /** @namespace pwx::NameConstants

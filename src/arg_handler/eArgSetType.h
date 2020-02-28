@@ -35,6 +35,9 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
+
 /// @namespace pwx
 namespace pwx {
 

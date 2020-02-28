@@ -35,6 +35,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #if defined(LIBPWX_DEBUG)
 #  include "stream_helpers/StreamHelpers.h"
 #endif // LIBPWX_DEBUG

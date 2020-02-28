@@ -38,7 +38,9 @@
 
 #include <type_traits>
 
+#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+
 #include "math_helpers/MathHelpers.h"
 #include "random/CRandomConstants.h"
 

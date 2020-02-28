@@ -313,5 +313,7 @@ int32_t main( int argc, char* argv[] ) {
 	cout << " Tests successful: " << env.testSuccess << endl;
 	cout << " Tests failed    : " << env.testFail << endl;
 
+	pwx::finish();
+
 	return result;
 }

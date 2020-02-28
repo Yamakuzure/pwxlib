@@ -36,6 +36,9 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
+
 /// @namespace pwx
 namespace pwx {
 
@@ -54,7 +57,7 @@ namespace pwx {
   * **Also Important**: The memory allocation cleanup and reporting is only done in debugging mode, as it
   *                     needs quite some overhead, which would cripple programs needing lots of allocations.
 **/
-void finish();
+void PWX_API finish();
 
 
 } // namespace pwx

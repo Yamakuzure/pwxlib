@@ -35,6 +35,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "basic/CLockable.h"
 #include "basic/pwx_types.h"
 

@@ -47,6 +47,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include <libpwx/worker_PAH.h>
 #include <libpwx/worker_RNG.h>
 #include <libpwx/worker_SCT.h>

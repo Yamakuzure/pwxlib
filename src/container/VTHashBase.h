@@ -47,6 +47,7 @@
 
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+
 #include "container/CHashBuilder.h"
 #include "container/THashElement.h"
 #include "container/VContainer.h"

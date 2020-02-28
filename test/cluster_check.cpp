@@ -385,6 +385,8 @@ int32_t main( int32_t argc, char** argv ) {
 		result = EXIT_FAILURE;
 	}
 
+	pwx::finish();
+
 	return result;
 }
 

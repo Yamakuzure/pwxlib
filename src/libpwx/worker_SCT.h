@@ -37,6 +37,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "math_helpers/CSinCosTable.h"
 
 

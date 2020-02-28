@@ -39,6 +39,8 @@
 #include <atomic>
 #include <random>
 
+#include "basic/pwx_compiler.h"
+
 #include "math_helpers/MathHelpers.h"
 
 

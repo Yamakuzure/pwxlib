@@ -35,6 +35,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "container/TSingleList.h"
 #include "container/TDoubleElement.h"
 

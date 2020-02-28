@@ -35,6 +35,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "container/TVarDeleter.h"
 #include "container/VElement.h"
 #include "math_helpers/MathHelpers.h"

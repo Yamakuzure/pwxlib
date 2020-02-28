@@ -38,6 +38,8 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+
 #include "random/CRandom.h"
 
 

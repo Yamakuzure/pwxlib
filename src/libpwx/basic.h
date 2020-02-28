@@ -57,14 +57,15 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "basic/CException.h"
 #include "basic/CLockable.h"
 #include "basic/CLockGuard.h"
 #include "basic/alloc_utils.h"
 #include "basic/mem_utils.h"
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
-#include "basic/pwx_macros.h"
 #include "basic/pwx_templates.h"
 #include "basic/pwx_types.h"
 #include "basic/string_utils.h"

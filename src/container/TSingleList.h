@@ -35,7 +35,9 @@
 **/
 
 
+#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+
 #include "container/CThreadElementStore.h"
 #include "container/TSingleElement.h"
 #include "container/VContainer.h"

@@ -37,6 +37,7 @@
 
 #include <limits>
 
+#include "basic/pwx_compiler.h"
 #include "basic/pwx_types.h"
 
 
