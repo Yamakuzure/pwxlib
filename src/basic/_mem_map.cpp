@@ -37,12 +37,13 @@
 #include <cstring>
 #include <map>
 
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "basic/_mem_map.h"
 #include "basic/alloc_utils.h"
 #include "basic/mem_utils.h"
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
-#include "basic/pwx_macros.h"
 
 
 

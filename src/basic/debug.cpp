@@ -35,9 +35,11 @@
 #  include <thread>
 
 #  include "basic/pwx_compiler.h"
+#  include "basic/pwx_macros.h"
+#  include "basic/pwx_types.h"
 #endif // defined(LIBPWX_DEBUG) || defined(PWX_THREADDEBUG)
+
 #include "basic/pwx_debug.h"
-#include "basic/pwx_types.h"
 
 
 /// @namespace pwx

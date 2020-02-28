@@ -36,8 +36,9 @@
 #include <string>
 
 #include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
 #include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "random/CRandom.h"
 #include "random/CRandomTHash.h"
 #include "random/CRandomTRandom.h"

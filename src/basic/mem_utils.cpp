@@ -35,12 +35,13 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "basic/_mem_map.h"
 #include "basic/alloc_utils.h"
 #include "basic/mem_utils.h"
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
-
 
 /// @namespace pwx
 namespace pwx {
@@ -135,3 +136,19 @@ bool mem_map_report() {
 
 } // namespace pwx
 
+
+/* ------------------------------------------------------------------------
+ * --- If this is a build of the library in debugging mode, then we     ---
+ * --- have overriden the global new/delete to use our memory mapping   ---
+ * --- (de)allocator in basic/pwx_compiler.h. Here are the definitions. ---
+ * --------------------------------------------------------------------- */
+#ifndef PWX_NODOX
+#if defined(PWX_EXPORTS) && defined(LIBPWX_DEBUG) && defined(PWX_HAVE_DEBUG_NEW_DELETE)
+void *operator new     (decltype(sizeof(0)) s) { return (void*)pwx_calloc(uint8_t, s); }
+void *operator new[]   (decltype(sizeof(0)) s) { return (void*)pwx_calloc(uint8_t, s); }
+void  operator delete  (void* ptr)                       noexcept { pwx_free(ptr); }
+void  operator delete  (void* ptr, decltype(sizeof(0)) ) noexcept { pwx_free(ptr); }
+void  operator delete[](void* ptr)                       noexcept { pwx_free(ptr); }
+void  operator delete[](void* ptr, decltype(sizeof(0)) ) noexcept { pwx_free(ptr); }
+#endif // exports in debugging mode
+#endif // NODOX

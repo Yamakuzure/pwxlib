@@ -35,7 +35,10 @@
 #include <unistd.h>
 #include <vector>
 
+#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
 

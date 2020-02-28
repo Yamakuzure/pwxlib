@@ -32,8 +32,11 @@
 
 #include <thread>
 
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "basic/CLockGuard.h"
-#include "basic/pwx_macros.h" 
 
 
 /// @namespace pwx

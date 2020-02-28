@@ -33,6 +33,10 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
+#include "basic/pwx_debug.h"
+
 #include "arg_handler/sArgError.h"
 
 

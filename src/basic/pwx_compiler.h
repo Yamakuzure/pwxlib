@@ -172,4 +172,26 @@
 #endif // ignored by doxygen
 
 
+/* ---------------------------------------------------------------------
+ * --- If this is a build of the library in debugging mode, override ---
+ * --- global new/delete to use our memory mapping (de)allocator.    ---
+ * --- ( The operators are defined in basic/mem_utils.cpp )          ---
+ * ------------------------------------------------------------------ */
+#ifndef PWX_NODOX
+#if defined(PWX_EXPORTS) && defined(LIBPWX_DEBUG) && !defined(PWX_HAVE_DEBUG_NEW_DELETE)
+#  include <cstddef>
+#  include <cstdint>
+#  include "basic/pwx_macros.h"
+#  include "basic/pwx_debug.h"
+#  include "basic/mem_utils.h"
+void *operator new     (decltype(sizeof(0)) s);
+void *operator new[]   (decltype(sizeof(0)) s);
+void  operator delete  (void* ptr)                      noexcept;
+void  operator delete  (void* ptr, decltype(sizeof(0))) noexcept;
+void  operator delete[](void* ptr)                      noexcept;
+void  operator delete[](void* ptr, decltype(sizeof(0))) noexcept;
+#  define PWX_HAVE_DEBUG_NEW_DELETE 1
+#endif // exports in debugging mode
+#endif // NODOX
+
 #endif // PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED
