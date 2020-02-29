@@ -52,31 +52,39 @@ template<>
 eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
 	eArgErrorNumber argErrno = AEN_OK;
 
-	switch( this->type ) {
-		case ATT_FALSE:
-		case ATT_TRUE:
-		case ATT_INC:
-		case ATT_DEC:
-		case ATT_ADD:
-		case ATT_SUB:
-			PWX_THROW( "IllegalTargetType", "std::string is only supported with ATT_CB and ATT_SET", "" )
-			break;
-		case ATT_SET:
-			// This needs handling for all three set types:
-			if ( ( STT_OVERWRITE == this->setType )
-			                || ( !this->gotParameter ) ) {
-				target->assign( param );
-				this->gotParameter = true;
-			} else if ( STT_ERROR == this->setType )
-				argErrno = AEN_MULTIPLE_SET_PARAM;
-			// Last possibility is STT_IGNORE, which is, well, ignored. ;)
-			break;
-		case ATT_CB:
-			PWX_THROW( "UnhandledTargetType", "ATT_CB not supported, use CArgCallback instead!", "" )
-			break;
-		default:
-			PWX_THROW( "UnhandledTargetType", "The given target type is not implemented, yet!", "" )
+	if ( param ) {
+		switch( this->arg_type ) {
+			case ATT_FALSE:
+			case ATT_TRUE:
+			case ATT_INC:
+			case ATT_DEC:
+			case ATT_ADD:
+			case ATT_SUB:
+				PWX_THROW( "IllegalTargetType",
+				           "std::string is only supported with ATT_CB and ATT_SET", "" )
+				break;
+			case ATT_SET:
+				if ( ( (AT_ZERO_OR_ONE == this->set_type )
+				    || (AT_EXACTLY_ONE == this->set_type ) )
+				  && this->gotParameter ) {
+					argErrno = AEN_MULTIPLE_SET_PARAM;
+				} else {
+					target->assign( param );
+					this->gotParameter = true;
+				}
+				break;
+			case ATT_CB:
+				/* is handled below */
+				break;
+			default:
+				PWX_THROW( "UnhandledTargetType",
+				           "The given target type is not implemented, yet!", "" )
+		}
 	}
+
+	// If we have a callback function, process it now
+	if ( AEN_OK == argErrno )
+		argErrno = process_cb( param );
 
 	return argErrno;
 }
@@ -87,7 +95,7 @@ eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
 
 // --- bool ---
 template<>
-void TArgTarget<bool>::par_to_val( bool*    tgt, char const* param ) noexcept {
+void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept {
 	if ( tgt )
 		*tgt = to_bool  ( param );
 }

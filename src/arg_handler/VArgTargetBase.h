@@ -40,7 +40,7 @@
 #include "basic/pwx_compiler.h"
 
 #include "arg_handler/eArgTargetType.h"
-#include "arg_handler/eArgSetType.h"
+#include "arg_handler/eArgType.h"
 #include "arg_handler/eArgErrorNumber.h"
 
 
@@ -48,90 +48,110 @@
 namespace pwx {
 
 
+/** @brief Callback function the parameter of the option is given to
+  *
+  * The callback function will get two arguments.
+  * The first will be the long
+  * or short name of the argument encountered, or an empty string if neither
+  * is set.
+  * The second will be the parameter encountered, or an empty string if
+  * no parameter was defined for this argument.
+**/
+typedef void ( *arg_cb_t )( char const*, char const* );
+
+
 /** @struct VArgTargetBase
   * @brief data collection of non-templated values for TArgTarget
 **/
 struct VArgTargetBase {
 	// Members
-	std::string    aShort;   //!< Short argument (one character) variant
-	std::string    aLong;    //!< Long argument (multiple characters) variant
-	std::string    desc;     //!< Description of the argument
-	std::string    pName;    //!< Parameter name/description
-	eArgTargetType type;     //!< eArgTargetType describing what to do with the target
-	eArgSetType    setType;  //!< eArgSetType describing what to do with ATT_SET targets
+	std::string    arg_short;    //!< Short argument (one character) variant
+	std::string    arg_long;     //!< Long argument (multiple characters) variant
+	std::string    description;  //!< Description of the argument
+	std::string    param_name;   //!< Parameter name/description
+	arg_cb_t       arg_callback; //!< Optional callback function to use
+	eArgTargetType arg_type;     //!< eArgTargetType describing what to do with the target
+	eArgType       set_type;     //!< eArgType describing what to do with multiple occurances
 
 
 	/** @brief default ctor
 	  *
 	  * No parameter check, the caller must ensure consistent
-	  * values that make the instance usable. If @a arg_type
-	  * is type ATT_SET, the behaviour defaults to STT_OVERWRITE.
-	  *
-	  * @see pwx::CArgHandler::addArg()
-	  *
-	  * @param[in] arg_short Short argument like "-a" or "x".
-	  * @param[in] arg_long Long argument like "--foo" or "-bar".
-	  * @param[in] arg_type Determines what to do with the target.
-	  * @param[in] arg_desc Help text for this argument.
-	  * @param[in] param_name Name shown in <> int the help text.
-	**/
-	explicit VArgTargetBase( char const* arg_short, char const* arg_long,
-	                         eArgTargetType arg_type,
-	                         char const* arg_desc, char const* param_name )
-	noexcept;
-
-
-	/** brief alternative ctor to alter ATT_SET behaviour.
-	  *
-	  * No parameter check, the caller must ensure consistent
 	  * values that make the instance usable.
-	  * This is a special constructor that produces an ATT_SET
-	  * target with variable behaviour when more than one parameter
-	  * is to be processed.
 	  *
-	  * Note: The default is to overwrite the set paraemeter on each
-	  * processing(). If you do not want to change this, the default
-	  * constructor should be used instead. It will be called by this
-	  * one anyway.
+	  * If neither @a short_ nor @a long_ are given, the argument is considered to be positional.
+	  * If @a cb_ is set, @a name_ determines whether a parameter is expected or not.
 	  *
-	  * @see pwx::CArgHandler::addArg()
-	  * @see pwx::eArgSetType
-	  *
-	  * @param[in] arg_short Short argument like "-a" or "x".
-	  * @param[in] arg_long Long argument like "--foo" or "-bar".
-	  * @param[in] set_type Determines what to do if more than one parameter is processed.
-	  * @param[in] arg_desc Help text for this argument.
-	  * @param[in] param_name Name shown in <> int the help text.
+	  * @param[in] short_ Short argument like "-a" or "x".       (optional)
+	  * @param[in] long_  Long argument like "--foo" or "-bar".  (optional)
+	  * @param[in] type_  Determines what to do with the target.
+	  * @param[in] set_   Rules for zero to multiple occurances
+	  * @param[in] cb_    Callback function to call when the argument is processed (optional)
+	  * @param[in] desc_  Help text for this argument.           (optional)
+	  * @param[in] name_  Name shown in <> int the help text.    (optional)
 	**/
-	VArgTargetBase( char const* arg_short, char const* arg_long,
-	                eArgSetType set_type,
-	                char const* arg_desc, char const* param_name )
-	noexcept;
+	explicit VArgTargetBase( char const* short_, char const* long_,
+	                         eArgTargetType type_, eArgType set_,
+	                         arg_cb_t cb_,
+	                         char const* desc_, char const* name_ ) noexcept;
 
+
+	// no empty ctor
+	VArgTargetBase() PWX_DELETE;
 
 	/// @brief The destructor has nothing to do.
 	virtual ~VArgTargetBase() noexcept;
+
+
+	/// @brief Copy constructor
+	VArgTargetBase( VArgTargetBase const &rhs ) noexcept;
+
+
+	/// @brief Move constructor
+	VArgTargetBase( VArgTargetBase &&rhs ) noexcept;
+
 
 	/// @brief Must be defined by TArgTarget:
 	virtual eArgErrorNumber process( char const* ) PWX_VIRTUAL_PURE;
 
 
-	// Public methods that do not need a templated value:
+	// ==== Public methods that do not need a templated value ====
+
 
 	/** @brief returns true if at least one parameter was processed
 	  * @return true if at least one parameter was processed, false otherwise.
 	  */
-	bool hasParameter  () const noexcept;
+	bool hasParameter  () const noexcept { return gotParameter; };
 
 
 	/** @brief return true if a parameter is needed according type
-	  * @return true if the type needs a aprameter, false otehrwise
+	  * @return true if the type needs a parameter, false otherwise
 	  */
 	bool needsParameter() const noexcept;
+
+
+	/// @brief Copying assignment operator
+	VArgTargetBase& operator=( VArgTargetBase const &rhs ) noexcept;
+
+
+	/// @brief Moving assignment operator
+	VArgTargetBase& operator=( VArgTargetBase &&rhs ) noexcept;
+
 
 protected:
 
 	bool gotParameter = false; //!< Must be set to true by process() if a parameter was processed
+
+
+	/** @brief process an argument parameter via callback function
+	  *
+	  * Simple method that calls the stored callback function with arg_short/arg_long and @a param.
+	  *
+	  * If no callback function was installed, then this method does silently nothing.
+	  *
+	  * @return AEN_OK if no exception occured.
+	**/
+	virtual eArgErrorNumber process_cb( char const* param );
 };
 
 

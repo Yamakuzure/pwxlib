@@ -80,11 +80,9 @@
 		<Unit filename="../src/arg_handler/VArgTargetBase.cpp" />
 		<Unit filename="../src/arg_handler/VArgTargetBase.h" />
 		<Unit filename="../src/arg_handler/eArgErrorNumber.h" />
-		<Unit filename="../src/arg_handler/eArgSetType.h" />
 		<Unit filename="../src/arg_handler/eArgTargetType.h" />
+		<Unit filename="../src/arg_handler/eArgType.h" />
 		<Unit filename="../src/arg_handler/meson.build" />
-		<Unit filename="../src/arg_handler/sArg.cpp" />
-		<Unit filename="../src/arg_handler/sArg.h" />
 		<Unit filename="../src/arg_handler/sArgError.cpp" />
 		<Unit filename="../src/arg_handler/sArgError.h" />
 		<Unit filename="../src/basic/CException.cpp" />

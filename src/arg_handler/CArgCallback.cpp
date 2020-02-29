@@ -43,11 +43,11 @@
 namespace pwx {
 
 
-CArgCallback::CArgCallback( char const* arg_short, char const* arg_long,
-                            void ( *arg_cb )( char const*, char const* ),
-                            char const* arg_desc, char const* param_name ) noexcept
-	: VArgTargetBase( arg_short, arg_long, ATT_CB, arg_desc, param_name )
-	, cb( arg_cb ) {
+CArgCallback::CArgCallback( char const* _short, char const* _long,
+	                       arg_cb_t _cb,
+	                       char const* _desc, char const* _name ) noexcept
+	: VArgTargetBase( _short, _long, ATT_CB, AT_ZERO_OR_MANY, _cb, _desc, _name )
+	, cb( _cb ) {
 	/* nothing to do here */
 }
 
@@ -60,7 +60,7 @@ CArgCallback::~CArgCallback() noexcept {
 eArgErrorNumber CArgCallback::process( char const* param ) {
 	if ( cb ) {
 		try {
-			cb( aLong.size() ? aLong.c_str() : aShort.c_str(), param );
+			cb( arg_long.size() ? arg_long.c_str() : arg_short.c_str(), param );
 			this->gotParameter = true;
 		}
 		PWX_THROW_STD_FURTHER( "ArgCbException", "" )

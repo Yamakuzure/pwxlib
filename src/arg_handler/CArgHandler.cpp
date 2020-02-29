@@ -58,7 +58,7 @@ namespace pwx {
   * @param[in] arg_cb Callback function to install
   * @param[in] arg_desc Help text for this argument.
   * @param[in] param_name Name shown in <> in the help text.
-  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
   * @param[out] tgtShort The CArgHandler::hash_t to store short arguments in
   * @param[out] tgtLong The CArgHandler::hash_t to store long arguments in
   * @param[out] maxLongLen Receives the length of @a arg_long if greater than @a maxLongLen
@@ -69,7 +69,7 @@ namespace pwx {
 template<typename T>
 static bool internalAddArg( char const* arg_short, char const* arg_long,
                             eArgTargetType arg_type,
-                            eArgSetType set_type,
+                            eArgType set_type,
                             T* arg_target,
                             void ( *arg_cb )( char const*, char const* ),
                             char const* arg_desc, char const* param_name,
@@ -137,10 +137,8 @@ static bool internalAddArg( char const* arg_short, char const* arg_long,
 	try {
 		if ( ATT_CB == arg_type )
 			new_target = new CArgCallback( arg_short, arg_long, arg_cb, arg_desc, param_name );
-		else if ( ATT_SET == arg_type )
-			new_target = new TArgTarget<T>( arg_short, arg_long, set_type, arg_target, arg_desc, param_name );
 		else
-			new_target = new TArgTarget<T>( arg_short, arg_long, arg_type, arg_target, arg_desc, param_name );
+			new_target = new TArgTarget<T>( arg_short, arg_long, arg_type, set_type, arg_target, arg_cb, arg_desc, param_name );
 	} catch( std::bad_alloc& e )
 		PWX_THROW( "ArgTargetCreationFailed", e.what(), "The creation of a new argument target failed!" )
 
@@ -206,7 +204,7 @@ CArgHandler::~CArgHandler() noexcept {
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, bool* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg(
 	                                    arg_short, arg_long, arg_type, set_type,
 	                                    arg_target, nullptr, arg_desc, param_name,
@@ -218,7 +216,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int8_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -229,7 +227,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint8_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -240,7 +238,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int16_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -251,7 +249,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint16_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -262,7 +260,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int32_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -273,7 +271,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint32_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -284,7 +282,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, int64_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -295,7 +293,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, uint64_t* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -306,7 +304,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, float* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -317,7 +315,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, double* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -328,7 +326,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, long double* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -339,7 +337,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           eArgTargetType arg_type, std::string* arg_target,
                           char const* arg_desc, char const* param_name,
-                          eArgSetType set_type ) {
+                          eArgType set_type ) {
 	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, set_type,
 	                            arg_target, nullptr, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
@@ -352,7 +350,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           void ( *arg_cb )( char const*, char const* ),
                           char const* arg_desc, char const* param_name ) {
 	assert( ATT_CB == arg_type );
-	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, STT_OVERWRITE,
+	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, arg_type, AT_ZERO_OR_MANY,
 	                            ( uint8_t* )nullptr, arg_cb, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
 	                            this->maxLongLen, this->maxParamLen, this->maxShortLen ) );
@@ -362,7 +360,7 @@ bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
                           void ( *arg_cb )( char const*, char const* ),
                           char const* arg_desc, char const* param_name ) {
-	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, ATT_CB, STT_OVERWRITE,
+	PWX_TRY_PWX_FURTHER( return internalAddArg( arg_short, arg_long, ATT_CB, AT_ZERO_OR_MANY,
 	                            ( uint8_t* )nullptr, arg_cb, arg_desc, param_name,
 	                            this->shortArgs, this->longArgs,
 	                            this->maxLongLen, this->maxParamLen, this->maxShortLen ) );
@@ -442,9 +440,9 @@ std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t
 	assert( target && "ERROR: Couldn't find given argument!" );
 
 	if ( target ) {
-		size_t shortSize = target->aShort.size();
-		size_t longSize  = target->aLong.size();
-		size_t paramSize = target->pName.size();
+		size_t shortSize = target->arg_short.size();
+		size_t longSize  = target->arg_long.size();
+		size_t paramSize = target->param_name.size();
 		size_t paramNeed = paramSize ? paramSize + 2 : 0;
 		bool   addArgSpc = autoSpace && argSep && ( 0x20 != argSep );
 		bool   addParSpc = autoSpace && paramSep && ( 0x20 != paramSep );
@@ -463,7 +461,7 @@ std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t
 			if ( emptyLine )
 				result.append( shortSize, ' ' );
 			else
-				result.append( target->aShort );
+				result.append( target->arg_short );
 
 			// c) Add possible separator
 			if ( argSep ) {
@@ -491,7 +489,7 @@ std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t
 			if ( emptyLine )
 				result.append( longSize, ' ' );
 			else
-				result.append( target->aLong );
+				result.append( target->arg_long );
 
 			// b) insert spaces to left align the long arg
 			if ( longSize < maxLongLen )
@@ -523,7 +521,7 @@ std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t
 			if ( emptyLine || !paramSize )
 				result.append( paramNeed, ' ' );
 			else
-				result += "<" + target->pName + ">";
+				result += "<" + target->param_name + ">";
 
 			// c) insert spaces to left align the parameter
 			if ( paramNeed < ( maxParamLen + 2 ) )
@@ -555,14 +553,14 @@ std::string CArgHandler::getHelpDesc( char const* argument, size_t* pos,
 	std::string result;
 
 	if ( target ) {
-		size_t descSize = target->desc.size();
+		size_t descSize = target->description.size();
 		size_t xPos     = pos ? *pos : 0;
 
 		// Exit now if length is zero, it means the
 		// whole (or remainder) of the description
 		// is to be returned.
 		if ( !length )
-			return xPos < descSize ? target->desc.substr( xPos ) : "";
+			return xPos < descSize ? target->description.substr( xPos ) : "";
 
 		// If xPos is too large, the method can return now, too
 		if ( xPos >= descSize )
@@ -587,18 +585,18 @@ std::string CArgHandler::getHelpDesc( char const* argument, size_t* pos,
 		// the last space before xPos+length must be found to
 		// build the substring to return.
 		if ( ( xPos + length ) <= descSize ) {
-			size_t endpos = target->desc.find_last_of( ' ', xPos + length );
+			size_t endpos = target->description.find_last_of( ' ', xPos + length );
 
 			if ( endpos > xPos ) {
-				result += target->desc.substr( xPos, endpos - xPos );
+				result += target->description.substr( xPos, endpos - xPos );
 				if ( pos ) *pos += endpos + 1;
 			} else {
-				result += target->desc.substr( xPos, length - 1 );
+				result += target->description.substr( xPos, length - 1 );
 				if ( pos ) *pos += length;
 			}
 		} else {
-			result += target->desc.substr( xPos );
-			if ( pos ) *pos = target->desc.size();
+			result += target->description.substr( xPos );
+			if ( pos ) *pos = target->description.size();
 		}
 	} else {
 		result = "Unknown argument: ";
@@ -630,7 +628,7 @@ std::string CArgHandler::getHelpStr( char const* argument, size_t length, size_t
 		**/
 		size_t leftSize  = maxShortLen + maxLongLen + maxParamLen + 2 + indent;
 		size_t rightSize = length > ( leftSize + 8 ) ? length - leftSize : 8;
-		size_t descSize  = target->desc.size();
+		size_t descSize  = target->description.size();
 		size_t pos       = 0;
 		std::string desc;
 
@@ -721,9 +719,9 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 					                && ( false == lastTarget->hasParameter() ) ) {
 						// This is situation c)
 						std::string param_error = "Argument "
-						                          + ( lastTarget->aLong.size() ? lastTarget->aLong : lastTarget->aShort )
+						                          + ( lastTarget->arg_long.size() ? lastTarget->arg_long : lastTarget->arg_short )
 						                          + " needs a parameter \""
-						                          + lastTarget->pName
+						                          + lastTarget->param_name
 						                          + "\"";
 						sArgError* argError = new sArgError( AEN_PARAMETER_MISSING, param_error.c_str() );
 						errlist.push( argError );
@@ -796,7 +794,7 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 							default:
 								process_error += "Unhandled errno " + to_string( ( int )argErrno ) + " for argument ";
 						}
-						process_error += ( lastTarget->aLong.size() ? lastTarget->aLong : lastTarget->aShort );
+						process_error += ( lastTarget->arg_long.size() ? lastTarget->arg_long : lastTarget->arg_short );
 						process_error += "\"";
 						sArgError* argError = new sArgError( argErrno, process_error.c_str() );
 						errlist.push( argError );

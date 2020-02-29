@@ -57,7 +57,7 @@ enum eArgTargetType {
 	ATT_SUB   = 4, //!< Substract parameter from target
 	ATT_DEC   = 5, //!< Decrease target by 1
 	ATT_SET   = 6, //!< Set target to the value of the parameter
-	ATT_CB    = 7  //!< The target is a callback function of the type void (*cb)(char const*, T*)
+	ATT_CB    = 7  //!< The target is a callback function of the type void ( *arg_cb_t )( char const*, char const* )
 };
 
 

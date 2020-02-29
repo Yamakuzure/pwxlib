@@ -12,9 +12,8 @@
 
 #include "testPAH.h"
 using pwx::PAH;
-using pwx::eArgSetType::STT_ERROR;
-using pwx::eArgSetType::STT_IGNORE;
-using pwx::eArgSetType::STT_OVERWRITE;
+using pwx::eArgType::AT_ZERO_OR_ONE;
+using pwx::eArgType::AT_ZERO_OR_MANY;
 
 // array to test callback function arguments
 static std::string cbtarget[5] = {"", "", "", "", ""};
@@ -179,7 +178,7 @@ int32_t testPAH ( sEnv& env ) {
 	double      tgt_sub     = 0.0;
 	uint32_t    tgt_set_err = 0; // set type STT_ERROR
 	long double tgt_set_ign = 0.0; // set type STT_IGNORE
-	int64_t     tgt_set_ovw = 0; // set type STT_OVERWRITE
+	int64_t     tgt_set_ovw = 0; // set type AT_ZERO_OR_MANY
 
 	// Pass through targets:
 	// char const* init_arg, int32_t* pass_argc, char*** pass_argv
@@ -196,11 +195,11 @@ int32_t testPAH ( sEnv& env ) {
 		PAH.addArg( "-i", "--inc", pwx::eArgTargetType::ATT_INC, &tgt_inc,
 		            "Increase tgt_inc by 1", nullptr );
 		PAH.addArg( "-E", "--set_err", pwx::eArgTargetType::ATT_SET, &tgt_set_err,
-		            "Set tgt_set_err to num", "num", STT_ERROR );
+		            "Set tgt_set_err to num", "num", AT_ZERO_OR_ONE );
 		PAH.addArg( "-I", "--set_ign", pwx::eArgTargetType::ATT_SET, &tgt_set_ign,
-		            "Set tgt_set_ign to num", "num", STT_IGNORE );
+		            "Set tgt_set_ign to num", "num", AT_ZERO_OR_MANY );
 		PAH.addArg( "-O", "--set_ovw", pwx::eArgTargetType::ATT_SET, &tgt_set_ovw,
-		            "Set tgt_set_ovw to num", "num" ); // STT_OVERWRITE is default!
+		            "Set tgt_set_ovw to num", "num" ); // AT_ZERO_OR_MANY is default!
 		PAH.addArg( "-s", "--sub", pwx::eArgTargetType::ATT_SUB, &tgt_sub,
 		            "Substract num from tgt_sub", "num" );
 		// add callbacks

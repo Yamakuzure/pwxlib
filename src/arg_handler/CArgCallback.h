@@ -67,9 +67,9 @@ public:
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> int the help text.
 	**/
-	explicit CArgCallback( char const* arg_short, char const* arg_long,
-	                       void ( *arg_cb )( char const*, char const* ),
-	                       char const* arg_desc, char const* param_name ) noexcept;
+	explicit CArgCallback( char const* _short, char const* _long,
+	                       arg_cb_t _cb,
+	                       char const* _desc, char const* _name ) noexcept;
 
 	/// @brief The destructor has nothing to do.
 	virtual ~CArgCallback() noexcept;

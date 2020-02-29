@@ -177,13 +177,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, bool* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an int8_t target
@@ -196,13 +196,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, int8_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an uint8_t target
@@ -215,13 +215,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, uint8_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an int16_t target
@@ -234,13 +234,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, int16_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an uint16_t target
@@ -253,13 +253,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, uint16_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an int32_t target
@@ -272,13 +272,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, int32_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an uint32_t target
@@ -291,13 +291,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, uint32_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an int64_t target
@@ -310,13 +310,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, int64_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an uint64_t target
@@ -329,13 +329,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, uint64_t* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for a float target
@@ -348,13 +348,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, float* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for a double target
@@ -367,13 +367,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, double* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for a long double target
@@ -386,13 +386,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, long double* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument for an std::string target
@@ -405,13 +405,13 @@ public:
 	  * @param[in] arg_target Pointer to the value to handle.
 	  * @param[in] arg_desc Help text for this argument.
 	  * @param[in] param_name Name shown in <> in the help text.
-	  * @param[in] set_type Determines the type of a set target, default is STT_OVERWRITE.
+	  * @param[in] set_type Determines the type of a set target, default is AT_ZERO_OR_MANY.
 	  * @return true if an argument was added, false otherwise.
 	**/
 	bool		addArg		  ( char const* arg_short, char const* arg_long,
 	                                    eArgTargetType arg_type, std::string* arg_target,
 	                                    char const* arg_desc, char const* param_name,
-	                                    eArgSetType set_type = STT_OVERWRITE );
+	                                    eArgType set_type = AT_ZERO_OR_MANY );
 
 
 	/** @brief Add an argument that uses a callback function - convenience wrapper

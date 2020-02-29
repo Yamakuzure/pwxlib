@@ -2,7 +2,7 @@
 #define PWX_LIBPWX_PWX_TYPES_EARGSETTYPE_H_INCLUDED 1
 #pragma once
 
-/** @file eArgSetType.h
+/** @file eArgType.h
   *
   * @brief enum to describe what PAH should do when an ATT_SET target receives more than one parameter
   *
@@ -42,17 +42,14 @@
 namespace pwx {
 
 
-/** @enum eArgSetType
-  * @brief determine what to do when multiple parameters are submitted to an ATT_SET target.
-  *
-  * This enum only applies to ATT_SET targets to be able to change the
-  * default behaviour of the ATT_SET target, which is to overwrite the
-  * set value on each call to process().
+/** @enum eArgType
+  * @brief determine what to do when multiple parameters of one type are submitted.
 **/
-enum eArgSetType {
-	STT_ERROR     = 0, //!< Receiving more than one parameter is an error.
-	STT_OVERWRITE = 1, //!< Overwrite the set value (default)
-	STT_IGNORE    = 2  //!< Only set the value once, silently ignore all further parameters.
+enum eArgType {
+	AT_ZERO_OR_ONE  = 0, //!< The option is optional but must not be given more than once
+	AT_ZERO_OR_MANY = 1, //!< The option is optional and can be given multiple times
+	AT_EXACTLY_ONE  = 2, //!< The option is mandatory and must be given exactly once
+	AT_ONE_OR_MANY  = 3  //!< The option is mandatory and can be given multiple times
 };
 
 
