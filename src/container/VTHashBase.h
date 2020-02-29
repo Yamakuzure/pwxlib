@@ -520,7 +520,7 @@ public:
 
 		HASH_START_CLEAR;
 
-		while ( ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) && hashTable ) {
+		while ( ( eCount.load( std::memory_order_relaxed ) > 0 ) && hashTable ) {
 			// We have to use a temporary "grand lock" for cases where multiple threads
 			// call this method. Otherwise, no matter what we do, the destruction of elements
 			// will cause data races.
@@ -892,7 +892,7 @@ public:
 			uint32_t pos    = maxPos;
 			elem_t*  elem   = nullptr;
 
-			while ( pos && ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) ) {
+			while ( pos && ( eCount.load( std::memory_order_relaxed ) > 0 ) ) {
 				elem = table_get( --pos );
 				if ( elem && elem->inserted() && !elem->destroyed() ) {
 					PWX_NAMED_LOCK_GUARD( ElemRemover, elem );
@@ -930,7 +930,7 @@ public:
 			uint32_t pos    = 0;
 			elem_t*  elem   = nullptr;
 
-			while ( ( pos < maxPos ) && ( eCount.load( PWX_MEMORDER_RELAXED ) > 0 ) ) {
+			while ( ( pos < maxPos ) && ( eCount.load( std::memory_order_relaxed ) > 0 ) ) {
 				elem = table_get( pos++ );
 				if ( elem && elem->inserted() && !elem->destroyed() ) {
 					PWX_NAMED_LOCK_GUARD( ElemRemover, elem );

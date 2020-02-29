@@ -74,7 +74,7 @@ CLockable::CLockable() noexcept
 CLockable::CLockable ( CLockable const& src ) noexcept
 	:   memOrdLoad( src.memOrdLoad ),
 	    memOrdStore( src.memOrdStore ),
-	    CL_Do_Locking( ATOMIC_VAR_INIT( src.CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) )
+	    CL_Do_Locking( ATOMIC_VAR_INIT( src.CL_Do_Locking.load( std::memory_order_relaxed ) ) )
 { /* --- nothing to do here. ---*/ }
 
 
@@ -82,7 +82,7 @@ CLockable::~CLockable() noexcept {
 	isDestroyed.store( true, memOrdStore );
 	#if PWX_USE_FLAGSPIN
 	// Simply move the id to this thread:
-	CL_Thread_ID.store( CURRENT_THREAD_ID, PWX_MEMORDER_RELAXED );
+	CL_Thread_ID.store( CURRENT_THREAD_ID, std::memory_order_relaxed );
 	#else
 	// Otherwise we have to wait for a real lock.
 	lock();
@@ -94,7 +94,7 @@ CLockable::~CLockable() noexcept {
 
 
 CLockable& CLockable::operator= ( CLockable const& src ) noexcept {
-	do_locking( src.CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) );
+	do_locking( src.CL_Do_Locking.load( std::memory_order_relaxed ) );
 	return *this;
 }
 
@@ -105,7 +105,7 @@ CLockable& CLockable::operator= ( CLockable const& src ) noexcept {
 
 
 bool CLockable::beThreadSafe() const noexcept {
-	return CL_Do_Locking.load( PWX_MEMORDER_RELAXED );
+	return CL_Do_Locking.load( std::memory_order_relaxed );
 }
 
 
@@ -115,11 +115,11 @@ void CLockable::beThreadSafe( bool doLock ) noexcept {
 
 
 bool CLockable::clear_locks() noexcept {
-	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
-		if ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
-			CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
-			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
-			CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
+	if ( CL_Do_Locking.load( std::memory_order_relaxed ) ) {
+		if ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) ) {
+			CL_Lock_Count.store( 0, std::memory_order_relaxed );
+			CL_Thread_ID.store( 0, std::memory_order_relaxed );
+			CL_Is_Locked.store( false, std::memory_order_relaxed );
 			#if PWX_USE_FLAGSPIN
 			CL_Lock.clear( memOrdStore ); // This *must* be last!
 			#else
@@ -140,16 +140,16 @@ bool CLockable::destroyed() const noexcept {
 
 
 void CLockable::do_locking( bool doLock ) noexcept {
-	if ( doLock != CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+	if ( doLock != CL_Do_Locking.load( std::memory_order_relaxed ) ) {
 		// If locking is enabled, change memory order now to strict
 		if ( doLock ) {
-			memOrdLoad  = PWX_MEMORDER_ACQUIRE;
-			memOrdStore = PWX_MEMORDER_RELEASE;
+			memOrdLoad  = std::memory_order_acquire;
+			memOrdStore = std::memory_order_release;
 		}
 
 		// Switch now, so other threads stop locking
 		// If this is a switch "on", it is finished anyway.
-		CL_Do_Locking.store( doLock, PWX_MEMORDER_RELEASE );
+		CL_Do_Locking.store( doLock, std::memory_order_release );
 
 		if ( !doLock ) {
 			/* If this is not locked by the calling thread, it
@@ -157,7 +157,7 @@ void CLockable::do_locking( bool doLock ) noexcept {
 			 * In any case before disabling locking, this very
 			 * thread must be the exclusive user.
 			 */
-			if ( CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) != CURRENT_THREAD_ID ) {
+			if ( CL_Thread_ID.load( std::memory_order_relaxed ) != CURRENT_THREAD_ID ) {
 				/* Sorry for the code doubling, but lock() would listen
 				 * to CL_Do_Locking and that has to be false by now.
 				 */
@@ -174,19 +174,19 @@ void CLockable::do_locking( bool doLock ) noexcept {
 			} // end of having to gain the lock
 
 			// Nuke all data:
-			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
-			CL_Lock_Count.store( 0, PWX_MEMORDER_RELAXED );
+			CL_Thread_ID.store( 0, std::memory_order_relaxed );
+			CL_Lock_Count.store( 0, std::memory_order_relaxed );
 			#if PWX_USE_FLAGSPIN
 			// Note: Here it is in order to clear relaxed, as no
 			//       other thread should be waitng right now.
-			CL_Lock.clear( PWX_MEMORDER_RELAXED );
+			CL_Lock.clear( std::memory_order_relaxed );
 			#else
 			CL_Lock.unlock();
 			#endif // PWX_USE_FLAGSPIN
-			CL_Is_Locked.store( false, PWX_MEMORDER_RELEASE );
+			CL_Is_Locked.store( false, std::memory_order_release );
 			// The memory order is relaxed last
-			memOrdLoad  = PWX_MEMORDER_RELAXED;
-			memOrdStore = PWX_MEMORDER_RELAXED;
+			memOrdLoad  = std::memory_order_relaxed;
+			memOrdStore = std::memory_order_relaxed;
 		} // End of switching locking off
 	} // End of having a change
 }
@@ -198,7 +198,7 @@ bool CLockable::is_locked() const noexcept {
 
 
 bool CLockable::is_locking() const noexcept {
-	return CL_Do_Locking.load( PWX_MEMORDER_RELAXED );
+	return CL_Do_Locking.load( std::memory_order_relaxed );
 }
 
 
@@ -207,13 +207,13 @@ void CLockable::lock() noexcept {
 	if ( isDestroyed.load( memOrdLoad ) )
 		return;
 
-	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+	if ( CL_Do_Locking.load( std::memory_order_relaxed ) ) {
 		size_t ctid = CURRENT_THREAD_ID;
 
 		// For both the spinlock and the mutex an action
 		// is only taken if this object is not already
 		// locked by this thread
-		if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
+		if ( ctid != CL_Thread_ID.load( std::memory_order_relaxed ) ) {
 			CL_Waiting++;
 			#if PWX_USE_FLAGSPIN
 			while ( CL_Lock.test_and_set() ) {
@@ -226,20 +226,20 @@ void CLockable::lock() noexcept {
 			#endif // PWX_USE_FLAGSPIN
 
 			// Got it now, so note it:
-			CL_Is_Locked.store( true, PWX_MEMORDER_RELEASE );
-			CL_Thread_ID.store( ctid, PWX_MEMORDER_RELAXED );
-			CL_Lock_Count.store( 1, PWX_MEMORDER_RELAXED );
+			CL_Is_Locked.store( true, std::memory_order_release );
+			CL_Thread_ID.store( ctid, std::memory_order_relaxed );
+			CL_Lock_Count.store( 1, std::memory_order_relaxed );
 			CL_Waiting--;
 		} else
 			// If this thread already has a lock, the call is just counted
-			CL_Lock_Count.fetch_add( 1, PWX_MEMORDER_RELAXED );
+			CL_Lock_Count.fetch_add( 1, std::memory_order_relaxed );
 	} // End of doing locking
 }
 
 
 uint32_t CLockable::lock_count() const noexcept {
-	if ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) )
-		return CL_Lock_Count.load( PWX_MEMORDER_RELAXED );
+	if ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) )
+		return CL_Lock_Count.load( std::memory_order_relaxed );
 	return 0;
 }
 
@@ -249,12 +249,12 @@ bool CLockable::try_lock() noexcept {
 	if ( isDestroyed.load( memOrdLoad ) )
 		return false;
 
-	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED ) ) {
+	if ( CL_Do_Locking.load( std::memory_order_relaxed ) ) {
 		size_t ctid = CURRENT_THREAD_ID;
 
 		// Same as with locking: Only try if this thread does
 		// not already own the lock
-		if ( ctid != CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) {
+		if ( ctid != CL_Thread_ID.load( std::memory_order_relaxed ) ) {
 			CL_Waiting++;
 			#if PWX_USE_FLAGSPIN
 			if ( !CL_Lock.test_and_set() ) {
@@ -262,9 +262,9 @@ bool CLockable::try_lock() noexcept {
 			if ( CL_Lock.try_lock() ) {
 			#endif // PWX_USE_FLAGSPIN
 				// Got it now, so note it:
-				CL_Is_Locked.store( true, PWX_MEMORDER_RELEASE );
-				CL_Thread_ID.store( ctid, PWX_MEMORDER_RELAXED );
-				CL_Lock_Count.store( 1, PWX_MEMORDER_RELAXED );
+				CL_Is_Locked.store( true, std::memory_order_release );
+				CL_Thread_ID.store( ctid, std::memory_order_relaxed );
+				CL_Lock_Count.store( 1, std::memory_order_relaxed );
 				CL_Waiting--;
 				return true;
 			}
@@ -279,15 +279,15 @@ bool CLockable::try_lock() noexcept {
 
 
 void CLockable::unlock() noexcept {
-	if ( CL_Do_Locking.load( PWX_MEMORDER_RELAXED )
-	  && ( CURRENT_THREAD_ID == CL_Thread_ID.load( PWX_MEMORDER_RELAXED ) ) ) {
+	if ( CL_Do_Locking.load( std::memory_order_relaxed )
+	  && ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) ) ) {
 
-		if ( 1 == CL_Lock_Count.fetch_sub( 1, PWX_MEMORDER_RELAXED ) ) {
+		if ( 1 == CL_Lock_Count.fetch_sub( 1, std::memory_order_relaxed ) ) {
 			// The lock will go away now:
-			CL_Thread_ID.store( 0, PWX_MEMORDER_RELAXED );
-			CL_Is_Locked.store( false, PWX_MEMORDER_RELAXED );
+			CL_Thread_ID.store( 0, std::memory_order_relaxed );
+			CL_Is_Locked.store( false, std::memory_order_relaxed );
 			#if PWX_USE_FLAGSPIN
-			CL_Lock.clear( PWX_MEMORDER_RELEASE );
+			CL_Lock.clear( std::memory_order_release );
 			#else
 			CL_Lock.unlock();
 			#endif // PWX_USE_FLAGSPIN

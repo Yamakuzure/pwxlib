@@ -39,7 +39,7 @@ public:
 	 */
 	virtual void operator()( cont_t* cont_, value_t* values, size_t start, key_t part ) {
 		cont = cont_;
-		while ( !this->isRunning.load( PWX_MEMORDER_ACQUIRE ) ) {
+		while ( !this->isRunning.load( std::memory_order_acquire ) ) {
 			std::this_thread::yield();
 		}
 
@@ -60,8 +60,8 @@ public:
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while ( this->isRunning.load( PWX_MEMORDER_ACQUIRE ) )
-			this->isRunning.store( false, PWX_MEMORDER_RELEASE );
+		while ( this->isRunning.load( std::memory_order_acquire ) )
+			this->isRunning.store( false, std::memory_order_release );
 	}
 
 	/* ======================
@@ -225,7 +225,7 @@ public:
 	 */
 	virtual void operator()( cont_t* cont_, value_t* retrieves, size_t start, key_t part ) {
 		cont = cont_;
-		while ( !this->isRunning.load( PWX_MEMORDER_ACQUIRE ) ) { }
+		while ( !this->isRunning.load( std::memory_order_acquire ) ) { }
 
 		if ( cont ) {
 			size_t   stop      = start + part;
@@ -248,8 +248,8 @@ public:
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while ( this->isRunning.load( PWX_MEMORDER_ACQUIRE ) )
-			this->isRunning.store( false, PWX_MEMORDER_RELEASE );
+		while ( this->isRunning.load( std::memory_order_acquire ) )
+			this->isRunning.store( false, std::memory_order_release );
 	}
 
 	/* ======================
@@ -371,7 +371,7 @@ public:
 	 */
 	virtual void operator()( cont_t* cont_ ) {
 		cont = cont_;
-		while ( !this->isRunning.load( PWX_MEMORDER_ACQUIRE ) ) { }
+		while ( !this->isRunning.load( std::memory_order_acquire ) ) { }
 
 		if ( cont ) {
 			hrTime_t startTime = hrClock::now();
@@ -387,8 +387,8 @@ public:
 
 		// Set thread to not running in a loop to be absolutely sure
 		// this operator does not exit until isRunning is false.
-		while ( this->isRunning.load( PWX_MEMORDER_ACQUIRE ) )
-			this->isRunning.store( false, PWX_MEMORDER_RELEASE );
+		while ( this->isRunning.load( std::memory_order_acquire ) )
+			this->isRunning.store( false, std::memory_order_release );
 	}
 
 	/* ======================

@@ -176,7 +176,7 @@ template <
 	 * ---------------------------------------------------------
 	 */
 	for ( size_t nr = 0; nr < threadCount; ++nr )
-		adders[nr].isRunning.store( true, PWX_MEMORDER_RELEASE );
+		adders[nr].isRunning.store( true, std::memory_order_release );
 
 	/* ----------------------------------------
 	 * --- 1 C) Join the adder threads back ---
@@ -186,7 +186,7 @@ template <
 	while ( !isFinished ) {
 		isFinished = true;
 		for ( size_t nr = 0; isFinished && ( nr < threadCount ); ++nr ) {
-			if ( adders[nr].isRunning.load( PWX_MEMORDER_ACQUIRE ) )
+			if ( adders[nr].isRunning.load( std::memory_order_acquire ) )
 				isFinished = false;
 		}
 		if ( isFinished ) {
@@ -251,7 +251,7 @@ template <
 	 * ------------------------------------------------------------
 	 */
 	for ( size_t nr = 0; nr < threadCount; ++nr )
-		searchers[nr].isRunning.store( true, PWX_MEMORDER_RELEASE );
+		searchers[nr].isRunning.store( true, std::memory_order_release );
 
 	/* -------------------------------------------
 	 * --- 3 C) Join the searcher threads back ---
@@ -262,7 +262,7 @@ template <
 	while ( !isFinished ) {
 		isFinished = true;
 		for ( size_t nr = 0; isFinished && ( nr < threadCount ); ++nr ) {
-			if ( searchers[nr].isRunning.load( PWX_MEMORDER_ACQUIRE ) )
+			if ( searchers[nr].isRunning.load( std::memory_order_acquire ) )
 				isFinished = false;
 		}
 		if ( isFinished ) {

@@ -40,9 +40,9 @@
 /// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
 pwx::private_::rand_t pwx::private_::private_get_random() noexcept {
 	rand_t randVal = privRandDev_();
-	while ( randVal == lastRndValue.load( PWX_MEMORDER_ACQUIRE ) )
+	while ( randVal == lastRndValue.load( std::memory_order_acquire ) )
 		randVal = privRandDev_();
-	lastRndValue.store( randVal, PWX_MEMORDER_RELEASE );
+	lastRndValue.store( randVal, std::memory_order_release );
 	return randVal;
 }
 

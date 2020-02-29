@@ -116,21 +116,6 @@
 **/
 
 
-/* --- some shortcuts --- */
-/// @brief More distinct shortcut to std::memory_order_relaxed
-#define PWX_MEMORDER_RELAXED std::memory_order_relaxed
-/// @brief More distinct shortcut to std::memory_order_consume
-#define PWX_MEMORDER_CONSUME std::memory_order_consume
-/// @brief More distinct shortcut to std::memory_order_acquire
-#define PWX_MEMORDER_ACQUIRE std::memory_order_acquire
-/// @brief More distinct shortcut to std::memory_order_release
-#define PWX_MEMORDER_RELEASE std::memory_order_release
-/// @brief More distinct shortcut to std::memory_order_acq_rel
-#define PWX_MEMORDER_ACQ_REL std::memory_order_acq_rel
-/// @brief More distinct shortcut to std::memory_order_seq_cst
-#define PWX_MEMORDER_ACQ_CST std::memory_order_seq_cst
-
-
 /** @def PWX_API
   * @brief defines to set the right modifier for library export/import
 */

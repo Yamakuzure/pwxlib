@@ -277,8 +277,8 @@ protected:
 
 	mutable
 	abool_t isDestroyed  = ATOMIC_VAR_INIT( false ); //!< Should be set to true by the destructors of deriving classes.
-	mord_t  memOrdLoad   = PWX_MEMORDER_ACQUIRE;     //!< to be used with atomic::load()
-	mord_t  memOrdStore  = PWX_MEMORDER_RELEASE;     //!< to be used with atomic::store()
+	mord_t  memOrdLoad   = std::memory_order_acquire;     //!< to be used with atomic::load()
+	mord_t  memOrdStore  = std::memory_order_release;     //!< to be used with atomic::store()
 
 
 private:
