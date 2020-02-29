@@ -89,6 +89,21 @@ public:
 	{ /* nothing to do here */ }
 
 
+	/// @brief Copy ctor
+	TArgTarget( TArgTarget const& rhs ) noexcept
+		: VArgTargetBase( rhs )
+		, target( rhs.target )
+	{ }
+
+
+	/// @brief Move ctor
+	TArgTarget( TArgTarget&& rhs ) noexcept
+		: VArgTargetBase( rhs )
+		, target( rhs.target ) {
+		rhs.target = nullptr;
+	}
+
+
 	// no empty ctor
 	TArgTarget() PWX_DELETE;
 
@@ -109,6 +124,25 @@ public:
 	  * @param[in] param The parameter found or nullptr if no parameter is needed.
 	**/
 	virtual eArgErrorNumber process( char const* param );
+
+
+	/// @brief Copying assignment operator
+	TArgTarget& operator=( TArgTarget const &rhs ) noexcept {
+		if ( &rhs != this ) {
+			VArgTargetBase::operator=( rhs );
+			target = rhs.target;
+		}
+	}
+
+
+	/// @brief Moving assignment operator
+	TArgTarget& operator=( TArgTarget &&rhs ) noexcept {
+		if ( &rhs != this ) {
+			VArgTargetBase::operator=( rhs );
+			target     = rhs.target;
+			rhs.target = nullptr;
+		}
+	}
 
 
 private:

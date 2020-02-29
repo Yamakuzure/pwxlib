@@ -38,6 +38,7 @@
 #include <string>
 
 #include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 
 #include "arg_handler/sArgError.h"
 #include "arg_handler/TArgTarget.h"
@@ -140,13 +141,14 @@ public:
 	 * ===============================================
 	 */
 
-	typedef VArgTargetBase            data_t;     //!< Default data type is VArgTargetBase - handles all derivates
-	typedef std::string               key_t;      //!< Default key type is std::string
-	typedef TChainHash<key_t, data_t> hash_t;     //!< Shortcut to TChainhash with key_t and data_t
-	typedef sArgError                 error_t;    //!< Shortcut to sArgError
-	typedef TQueue<error_t>           errlist_t;  //!< Shortcut to TQueue for error_t
-	typedef TQueue<data_t>            arg_list_t; //!< Shortcut to TQueue for data_t
-	typedef arg_list_t::elem_t        arg_elem_t; //!< Shortcut to the arg_list_t element type
+	typedef VArgTargetBase              data_t;     //!< Default data type is VArgTargetBase - handles all derivates
+	typedef std::string                 key_t;      //!< Default key type is std::string
+	typedef THashElement<key_t, data_t> elem_t;     //!< The element for the hash containers
+	typedef TChainHash<key_t, data_t>   hash_t;     //!< Shortcut to TChainhash with key_t and data_t
+	typedef sArgError                   error_t;    //!< Shortcut to sArgError
+	typedef TQueue<error_t>             errlist_t;  //!< Shortcut to TQueue for error_t
+	typedef TQueue<data_t>              arg_list_t; //!< Shortcut to TQueue for data_t
+	typedef arg_list_t::elem_t          arg_elem_t; //!< Shortcut to the arg_list_t element type
 
 
 	/* ===============================================
@@ -165,6 +167,98 @@ public:
 	 * === Public methods                          ===
 	 * ===============================================
 	 */
+
+	/** @brief Add a predefined TArgTarget as pointer
+	  *
+	  * @param[in] arg  The TArgTarget instance to add
+	  * @return true if an argument was added, false otherwise.
+	**/
+	template<typename T>
+	bool addArg( TArgTarget<T>* arg ) {
+		assert( arg && "arg is nullptr" );
+
+		if ( nullptr == arg )
+			PWX_THROW("ArgTargetCreationFailed", "arg is nullptr",
+			          "addArg( arg ) called with nullptr argument");
+
+		bool hasLong    = arg->arg_long.length();
+		bool hasShort   = arg->arg_short.length();
+		bool isLongNew  = hasLong  ? !longArgs.exists( arg->arg_long )   : true;
+		bool isShortNew = hasShort ? !shortArgs.exists( arg->arg_short ) : true;
+
+		if ( !(isLongNew && isShortNew) )
+			PWX_THROW("ArgTargetCreationFailed", "arg exists",
+			          "Short and/or long argument is already registered");
+
+
+		// If we have both short and long argumens, the target must be copied.
+		// Otherwise clearing one list later will invalidate the pointer in the
+		// other and kaboom.
+		if ( hasLong || hasShort ) {
+			if ( hasLong )
+				PWX_TRY_PWX_FURTHER( longArgs.add( arg->arg_long, arg ) );
+
+			if ( hasShort ) {
+				if ( hasLong ) {
+					elem_t new_element( *( longArgs.get( arg->arg_long ) ) );
+					new_element.key = arg->arg_short;
+					PWX_TRY_PWX_FURTHER( shortArgs.add( new_element ) );
+				} else {
+					PWX_TRY_PWX_FURTHER( shortArgs.add( arg->arg_short, arg ) );
+				}
+			}
+		} else
+			PWX_TRY_PWX_FURTHER( posQueue.push( arg ) );
+
+		// === Finally record length if a new maximum is found ===
+		if ( arg->arg_long.size() > maxLongLen )
+			maxLongLen = arg->arg_long.size();
+		if ( arg->param_name.size() > maxParamLen )
+			maxParamLen = arg->param_name.size();
+		if ( arg->arg_short.size() > maxShortLen )
+			maxShortLen = arg->arg_short.size();
+
+		return true;
+	}
+
+
+	/** @brief Add a predefined TArgTarget by copying
+	  *
+	  * @param[in] arg  The TArgTarget instance to add
+	  * @return true if an argument was added, false otherwise.
+	**/
+	template<typename T>
+	bool addArg( TArgTarget<T> const& arg ) {
+		TArgTarget<T>* new_target = nullptr;
+
+		try {
+			new_target = new TArgTarget<T>( arg );
+		} catch( std::bad_alloc& e )
+			PWX_THROW( "ArgTargetCreationFailed", e.what(),
+			          "The creation of a new argument target failed!" );
+
+		return addArg( new_target );
+	}
+
+
+	/** @brief Add a predefined TArgTarget by moving
+	  *
+	  * @param[in] arg  The TArgTarget instance to move in
+	  * @return true if an argument was added, false otherwise.
+	**/
+	template<typename T>
+	bool addArg( TArgTarget<T>&& arg ) {
+		TArgTarget<T>* new_target = nullptr;
+
+		try {
+			new_target = new TArgTarget<T>( arg );
+		} catch( std::bad_alloc& e )
+			PWX_THROW( "ArgTargetCreationFailed", e.what(),
+			          "The creation of a new argument target failed!" );
+
+		return addArg( new_target );
+	}
+
 
 	/** @brief Add an argument for a bool target
 	  *
@@ -738,16 +832,17 @@ private:
 	 * ===============================================
 	 */
 
-	errlist_t errlist;     //!< stores generated error messages
-	hash_t    longArgs;    //!< stores targets using their long argument as key
-	size_t    maxLongLen;  //!< longest "long" argument size
-	size_t    maxParamLen; //!< longest parameter name size
-	size_t    maxShortLen; //!< longest "short" argument size
-	char***   pass_args;   //!< The target to store arguments to pass through
-	char*     pass_init;   //!< The character sequence starting the pass through distribution
-	int32_t*  pass_cnt;    //!< The target to store the number of passed through arguments
-	char*     prgCall;     //!< If set, argv[0] containing the program call is stored in here.
-	hash_t    shortArgs;   //!< stores targets using their short argument as key
+	errlist_t  errlist;     //!< stores generated error messages
+	hash_t     longArgs;    //!< stores targets using their long argument as key
+	size_t     maxLongLen;  //!< longest "long" argument size
+	size_t     maxParamLen; //!< longest parameter name size
+	size_t     maxShortLen; //!< longest "short" argument size
+	char***    pass_args;   //!< The target to store arguments to pass through
+	char*      pass_init;   //!< The character sequence starting the pass through distribution
+	int32_t*   pass_cnt;    //!< The target to store the number of passed through arguments
+	arg_list_t posQueue;    //!< Queue of positional arguments
+	char*      prgCall;     //!< If set, argv[0] containing the program call is stored in here.
+	hash_t     shortArgs;   //!< stores targets using their short argument as key
 
 };
 

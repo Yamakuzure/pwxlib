@@ -137,15 +137,16 @@ static bool internalAddArg( char const* arg_short, char const* arg_long,
 	try {
 		new_target = new TArgTarget<T>( arg_short, arg_long, arg_type, set_type, arg_target, arg_cb, arg_desc, param_name );
 	} catch( std::bad_alloc& e )
-		PWX_THROW( "ArgTargetCreationFailed", e.what(), "The creation of a new argument target failed!" )
+		PWX_THROW( "ArgTargetCreationFailed", e.what(), "The creation of a new argument target failed!" );
 
-		// Before adding the new_target, a simple fact:
-		// If the pointer is added twice, the first clear() will delete
-		// it so the second crashes. We therefore must be sure to actually
-		// *copy* the hash element into tgtShort if tgtLong has been
-		// filled with a target.
-		if ( hasArgLong )
-			PWX_TRY_PWX_FURTHER( tgtLong.add( key_long, new_target ) );
+	// Before adding the new_target, a simple fact:
+	// If the pointer is added twice, the first clear() will delete
+	// it so the second crashes. We therefore must be sure to actually
+	// *copy* the hash element into tgtShort if tgtLong has been
+	// filled with a target.
+	if ( hasArgLong )
+		PWX_TRY_PWX_FURTHER( tgtLong.add( key_long, new_target ) );
+
 	if ( hasArgShort ) {
 		if ( hasArgLong ) {
 			elem_t new_element( *( tgtLong.get( key_long ) ) );
@@ -195,7 +196,7 @@ CArgHandler::~CArgHandler() noexcept {
 }
 
 
-// === The bitter evil addArg() legion === ( ;-) )
+// === The bitter evil addArg() legion === ( ;-) ) [deprecated!]
 
 
 bool CArgHandler::addArg( char const* arg_short, char const* arg_long,
@@ -380,6 +381,7 @@ void CArgHandler::addPassthrough( char const* init_arg, int32_t* pass_argc, char
 void CArgHandler::clearArgs() noexcept {
 	errlist.clear();
 	longArgs.clear();
+	posQueue.clear();
 	shortArgs.clear();
 
 	if ( pass_init )
