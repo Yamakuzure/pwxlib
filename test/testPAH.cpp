@@ -453,10 +453,9 @@ int32_t testPAH ( sEnv& env ) {
 	cb_clrstr();
 	if ( pass_argv ) {
 		for ( int32_t i = 0; i < pass_argc; ++i ) {
-			if ( pass_argv[i] )
-				free( pass_argv[i] );
+			pwx_free( pass_argv[i] );
 		}
-		free( pass_argv );
+		pwx_free( pass_argv );
 	}
 
 	return result;

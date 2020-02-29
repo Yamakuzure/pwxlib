@@ -37,6 +37,7 @@
 #include "basic/pwx_debug.h"
 
 #include "arg_handler/CArgHandler.h"
+#include "basic/mem_utils.h"
 #include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
 
@@ -192,7 +193,7 @@ CArgHandler::CArgHandler() noexcept
 CArgHandler::~CArgHandler() noexcept {
 	this->clearArgs();
 	if ( prgCall )
-		free( prgCall );
+		pwx_free( prgCall );
 }
 
 
@@ -385,14 +386,14 @@ void CArgHandler::clearArgs() noexcept {
 	shortArgs.clear();
 
 	if ( pass_init )
-		free( pass_init );
+		pwx_free( pass_init );
 
 	pass_args = nullptr;
 	pass_init = nullptr;
 	pass_cnt  = nullptr;
 
 	if ( prgCall )
-		free( prgCall );
+		pwx_free( prgCall );
 	prgCall = nullptr;
 }
 
@@ -854,7 +855,7 @@ char const* CArgHandler::getPrgCall() const noexcept {
 
 void CArgHandler::passThrough( const int32_t argc, char const** argv ) noexcept {
 	if ( argc > 0 ) {
-		*pass_args = ( char** )calloc( argc, sizeof( char* ) );
+		*pass_args = pwx_calloc(char*, argc);
 		for ( int32_t i = 0; *pass_args && ( i < argc ); ++i )
 			( *pass_args )[i] = strdup( argv[i] );
 		*pass_cnt = argc;

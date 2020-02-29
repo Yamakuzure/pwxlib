@@ -52,7 +52,7 @@ sArgError::sArgError( eArgErrorNumber errno_, char const* error_ ) noexcept
 
 
 sArgError::~sArgError() noexcept {
-	if ( arg_error ) free( const_cast<char*>( arg_error ) );
+	pwx_free( arg_error );
 }
 
 

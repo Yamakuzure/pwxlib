@@ -104,7 +104,7 @@ void testRNG_name( sEnv& env, bool longName, bool multiWord ) {
 		name = RNG.rndName( x, y, z, longName, multiWord );
 		if ( name ) {
 			cout << "  " << adjRight( 4, 0 ) << i << ".: \"" << name << "\"" << endl;
-			free( name );
+			pwx_free( name );
 		} else {
 			cerr << "ERROR: rndName(" << x << ", " << y << ", " << z << ", ";
 			cerr << ( longName ? "true, " : "false, " );

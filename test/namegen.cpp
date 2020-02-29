@@ -205,10 +205,10 @@ int main( int argc, char* argv[] ) {
 				} // End of having four names
 
 				// Remove C-Strings if any
-				if ( single_short ) free( single_short );
-				if ( single_long )  free( single_long );
-				if ( multi_short )  free( multi_short );
-				if ( multi_long )   free( multi_long );
+				pwx_free( single_short );
+				pwx_free( single_long );
+				pwx_free( multi_short );
+				pwx_free( multi_long );
 			} // End of printing names loop
 
 			print_table( do_ss, do_sl, do_ms, do_ml );

@@ -42,7 +42,9 @@
 
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+#include "basic/pwx_types.h"
 
+#include <type_traits>
 
 #ifndef PWX_NODOX
 
@@ -58,8 +60,8 @@
 			::pwx::deallocate( ::pwx::get_trace_info(__FILE__, \
 			                                        __LINE__,  \
 			                                        PWX_FUNC), \
-			                   (_p_) );                        \
-			(_p_) = nullptr; } }
+			                   (void*)(_p_) );                 \
+		} }
 
 #define PWX_realloc_internal(_p_, _s_) \
 	::pwx::reallocate( ::pwx::get_trace_info(__FILE__, __LINE__, PWX_FUNC), (_p_), (_s_) );                         \

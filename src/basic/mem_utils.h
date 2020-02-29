@@ -88,7 +88,7 @@ namespace pwx {
   * @param[in] new_size The size in bytes
   * @return void pointer to the allocated memory or nullptr on error.
 **/
-void* allocate( char const* location, size_t new_size );
+void* allocate( char const* location, size_t new_size ) PWX_API;
 
 
 /** @brief Simple helper to already nullify the memory allocated with `allocate()`
@@ -118,7 +118,7 @@ void* callocate( char const* location, size_t new_size ) {
   * @param[in] location The location in the form &lt;filename&gt;:&lt;lineno&gt;:&lt;function&gt;
   * @param[in] mem The pointer to the memory to be freed.
 **/
-void deallocate( char const* location, void*  mem );
+void deallocate( char const* location, void*  mem ) PWX_API;
 
 
 /** @brief Central memory reallocation function
@@ -136,7 +136,7 @@ void deallocate( char const* location, void*  mem );
   * @param[in] new_size The size in bytes
   * @return void pointer to the reallocated memory or nullptr on error.
 **/
-void* reallocate( char const* location, void*  mem, size_t new_size );
+void* reallocate( char const* location, void*  mem, size_t new_size ) PWX_API;
 
 
 /** @brief walk the memory map and report all entries as errors.
@@ -145,7 +145,7 @@ void* reallocate( char const* location, void*  mem, size_t new_size );
   *
   * All entries are logged as errors!
 **/
-bool mem_map_report();
+bool mem_map_report() PWX_API;
 
 
 } // namespace pwx

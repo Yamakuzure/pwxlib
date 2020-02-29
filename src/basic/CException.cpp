@@ -78,11 +78,11 @@ void CException::addToTrace ( char const* trace_ ) noexcept {
 
 
 CException::~CException() noexcept {
-	if ( txtName )  free( const_cast<char*>( txtName ) );
-	if ( txtWhat )  free( const_cast<char*>( txtWhat ) );
-	if ( txtWhere ) free( const_cast<char*>( txtWhere ) );
-	if ( txtFunc )  free( const_cast<char*>( txtFunc ) );
-	if ( txtDesc )  free( const_cast<char*>( txtDesc ) );
+	pwx_free( txtName  );
+	pwx_free( txtWhat  );
+	pwx_free( txtWhere );
+	pwx_free( txtFunc  );
+	pwx_free( txtDesc  );
 }
 
 
