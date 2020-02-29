@@ -38,6 +38,7 @@
 #include "basic/pwx_debug.h"
 
 #include "arg_handler/sArgError.h"
+#include "basic/mem_utils.h"
 
 
 /// @namespace pwx

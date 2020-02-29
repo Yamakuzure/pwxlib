@@ -88,7 +88,7 @@ namespace pwx {
   * @param[in] new_size The size in bytes
   * @return void pointer to the allocated memory or nullptr on error.
 **/
-void* allocate( char const* location, size_t new_size ) PWX_API;
+void* allocate( [[maybe_unused]] char const* location, size_t new_size ) PWX_API;
 
 
 /** @brief Simple helper to already nullify the memory allocated with `allocate()`
@@ -98,7 +98,7 @@ void* allocate( char const* location, size_t new_size ) PWX_API;
   * @return void pointer to the allocated memory or nullptr on error.
 **/
 static inline
-void* callocate( char const* location, size_t new_size ) {
+void* callocate( [[maybe_unused]] char const* location, size_t new_size ) {
 	void* new_mem = allocate( location, new_size );
 	if ( new_mem )
 		memset( new_mem, 0, new_size );
@@ -118,7 +118,7 @@ void* callocate( char const* location, size_t new_size ) {
   * @param[in] location The location in the form &lt;filename&gt;:&lt;lineno&gt;:&lt;function&gt;
   * @param[in] mem The pointer to the memory to be freed.
 **/
-void deallocate( char const* location, void*  mem ) PWX_API;
+void deallocate( [[maybe_unused]] char const* location, void*  mem ) PWX_API;
 
 
 /** @brief Central memory reallocation function
@@ -136,7 +136,7 @@ void deallocate( char const* location, void*  mem ) PWX_API;
   * @param[in] new_size The size in bytes
   * @return void pointer to the reallocated memory or nullptr on error.
 **/
-void* reallocate( char const* location, void*  mem, size_t new_size ) PWX_API;
+void* reallocate( [[maybe_unused]] char const* location, void*  mem, size_t new_size ) PWX_API;
 
 
 /** @brief walk the memory map and report all entries as errors.

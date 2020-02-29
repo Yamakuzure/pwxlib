@@ -81,7 +81,8 @@ PREDEFINED             = PWX_API= \
                          PWX_MALLOC= \
                          PWX_WEAK= \
                          PWX_LIKELY(x)= \
-                         PWX_UNLIKELY(x)=
+                         PWX_UNLIKELY(x)= \
+                         [[maybe_unused]]=
 EXPAND_AS_DEFINED      = PWX_API \
                          PWX_INTERNAL \
                          PWX_VISIBLE \
@@ -107,7 +108,8 @@ EXPAND_AS_DEFINED      = PWX_API \
                          PWX_MALLOC \
                          PWX_WEAK \
                          PWX_LIKELY(x) \
-                         PWX_UNLIKELY(x)
+                         PWX_UNLIKELY(x) \
+                         [[maybe_unused]]
 HAVE_DOT               = YES
 UML_LOOK               = YES
 TEMPLATE_RELATIONS     = YES

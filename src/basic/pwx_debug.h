@@ -76,7 +76,6 @@ namespace pwx {
 
 // If any debugging mode is activated, a central logging functions is needed:
 #if LIBPWX_DEBUG
-# include "basic/pwx_trace_info.h"
 
 // The main logging function:
 void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stdout
@@ -116,7 +115,7 @@ void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging func
 #else
 # define DEBUG_LOG(...)            do{}while(0)
 # define DEBUG_LOG_THERE(...)      do{}while(0)
-# define DEBUG_LOG_CAUGHT_STD(...) do{}while(0)
+# define DEBUG_LOG_CAUGHT_STD(...)
 # define DEBUG_ERR(...)            do{}while(0)
 # define DEBUG_ERR_THERE(...)      do{}while(0)
 /* debug_log() and debug_err() are not defined here, because they would cause

@@ -647,4 +647,8 @@ if (object) {               \
 #define pwx_file_isRW(f) (0 == access(f, W_OK | W_OK))
 
 
+// Many of them are useless without our trace info getter
+#include "basic/pwx_trace_info.h"
+
+
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED

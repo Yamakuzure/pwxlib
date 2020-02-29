@@ -3,6 +3,10 @@
 #pragma once
 
 
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
 

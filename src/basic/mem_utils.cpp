@@ -55,7 +55,7 @@ namespace pwx {
 *** Public functions implementations ***
 ***************************************/
 
-void* allocate( char const* location, size_t new_size ) {
+void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
 	void* result = nullptr;
 
 	DEBUG_LOG_THERE( location, "allocate", "allocating %lu bytes", new_size );
@@ -74,7 +74,7 @@ void* allocate( char const* location, size_t new_size ) {
 }
 
 
-void deallocate( char const* location, void*  mem ) {
+void deallocate( [[maybe_unused]] char const* location, void*  mem ) {
 	if ( mem ) {
 		DEBUG_LOG_THERE( location, "deallocate", "freeing memory at 0x%08lx", mem );
 
@@ -87,7 +87,7 @@ void deallocate( char const* location, void*  mem ) {
 }
 
 
-void* reallocate( char const* location, void* mem, size_t new_size ) {
+void* reallocate( [[maybe_unused]] char const* location, void* mem, size_t new_size ) {
 
 	// Reroute at once if mem is nullptr
 	if ( nullptr == mem )
