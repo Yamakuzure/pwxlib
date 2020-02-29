@@ -71,8 +71,6 @@
 		<Unit filename="../src/PWorkers" />
 		<Unit filename="../src/RNG" />
 		<Unit filename="../src/SCT" />
-		<Unit filename="../src/arg_handler/CArgCallback.cpp" />
-		<Unit filename="../src/arg_handler/CArgCallback.h" />
 		<Unit filename="../src/arg_handler/CArgHandler.cpp" />
 		<Unit filename="../src/arg_handler/CArgHandler.h" />
 		<Unit filename="../src/arg_handler/TArgTarget.cpp" />

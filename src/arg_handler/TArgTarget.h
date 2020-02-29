@@ -53,8 +53,7 @@ namespace pwx {
 /** @struct TArgTarget
   * @brief Definition of one command line argument using a templated member
   *
-  * This is meant to be used with a target pointer. If a callback function
-  * is to be used, use CArgCallback instead.
+  * You can use a target, a callback function, or both.
 **/
 template<typename T>
 class TArgTarget : public VArgTargetBase {
@@ -177,7 +176,8 @@ eArgErrorNumber TArgTarget<T>::process( char const* param ) {
 				/* is handled below */
 				break;
 			default:
-				PWX_THROW( "UnhandledTargetType", "The given target type is not implemented, yet!", "" )
+				PWX_THROW( "UnhandledTargetType",
+				           "The given target type is not implemented, yet!", "" )
 		}
 	} // Have parameter
 

@@ -135,10 +135,7 @@ static bool internalAddArg( char const* arg_short, char const* arg_long,
 	// === Now create a new target and add it to the hashes ===
 	data_t* new_target = nullptr;
 	try {
-		if ( ATT_CB == arg_type )
-			new_target = new CArgCallback( arg_short, arg_long, arg_cb, arg_desc, param_name );
-		else
-			new_target = new TArgTarget<T>( arg_short, arg_long, arg_type, set_type, arg_target, arg_cb, arg_desc, param_name );
+		new_target = new TArgTarget<T>( arg_short, arg_long, arg_type, set_type, arg_target, arg_cb, arg_desc, param_name );
 	} catch( std::bad_alloc& e )
 		PWX_THROW( "ArgTargetCreationFailed", e.what(), "The creation of a new argument target failed!" )
 
