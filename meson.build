@@ -180,9 +180,12 @@ conf.set('__SANE_USERSPACE_TYPES__', true)
 decl_headers = '''
 #include <cuchar>
 '''
-foreach decl : ['char16_t',
-		'char32_t',
-	       ]
+foreach decl : ['__int128_t',
+                '__uint128_t',
+                'char16_t',
+                'char32_t',
+                'wchar_t'
+               ]
 
 	# We get -1 if the size cannot be determined
 	have = cxx.sizeof(decl, prefix : decl_headers) > 0
@@ -221,17 +224,13 @@ libpwx_wrapper_list      = []
 
 subdir('src')
 
-libpwx_sym_path = '@0@/@1@'.format(meson.current_source_dir(), libpwx_sym)
-libpwx = shared_library(
-	'pwx',
+libpwx_static = static_library(
+        'pwx_static',
 	libpwx_internal_sources,
 	libpwx_external_sources,
-	version : meson.project_version(),
-	include_directories : includes,
+        install : false,
+        include_directories : includes,
 	cpp_args : ['-DPWX_EXPORTS'],
-	link_args : ['-shared',
-		     '-Wl,--version-script=' + libpwx_sym_path],
-	dependencies : [threads],
 	link_with : [
 		libarghandler,
 		libbasic,
@@ -239,7 +238,19 @@ libpwx = shared_library(
 		libmathhelpers,
 		librandom
 	],
-	link_depends : [ libpwx_sym ],
+        dependencies : [threads])
+
+libpwx_sym_path = '@0@/@1@'.format(meson.current_source_dir(), libpwx_sym)
+libpwx = shared_library(
+	'pwx',
+	version : meson.project_version(),
+	include_directories : includes,
+	cpp_args : ['-DPWX_EXPORTS'],
+	link_args : ['-shared',
+		     '-Wl,--version-script=' + libpwx_sym_path],
+	dependencies : [threads],
+	link_whole : [libpwx_static],
+	link_depends : [ libpwx_static, libpwx_sym ],
 	install : true,
 	install_dir : libdir)
 
@@ -257,7 +268,7 @@ test_libpwx_sym = executable(
 	'test-libpwx-sym',
 	test_libpwx_sym_cpp,
 	include_directories : includes,
-	link_with : libpwx,
+	link_with : libpwx_static,
 	install : false)
 test('test-libpwx-sym',
 	test_libpwx_sym,
@@ -284,7 +295,7 @@ foreach tuple : tests
 		sources,
 		dependencies : deps,
 		include_directories : includes,
-		link_with : libpwx,
+		link_with : libpwx_static,
 		install_rpath : libdir,
 		install : install_tests,
 		install_dir : testsdir)
