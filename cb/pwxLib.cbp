@@ -35,6 +35,7 @@
 		</Compiler>
 		<Unit filename="../Makefile" />
 		<Unit filename="../TODO.md" />
+		<Unit filename="../build/config.h" />
 		<Unit filename="../build/test/test-libpwx-sym.cpp" />
 		<Unit filename="../configure" />
 		<Unit filename="../doc/doxyfile.in" />
