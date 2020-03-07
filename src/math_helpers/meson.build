@@ -11,6 +11,7 @@ mathhelpers_headers = '''
 libmathhelpers = static_library(
 	'mathhelpers',
 	mathhelpers_sources,
+	mathhelpers_headers,
 	cpp_args : ['-DPWX_EXPORTS'],
 	include_directories : includes,
 	install : false)

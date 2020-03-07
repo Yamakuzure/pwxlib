@@ -7,6 +7,7 @@ stream_helpers_headers = '''
 '''.split()
 
 libpwx_external_sources += files(stream_helpers_sources)
+libpwx_external_sources += files(stream_helpers_headers)
 
 install_headers(
 	stream_helpers_headers,

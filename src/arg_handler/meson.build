@@ -18,6 +18,7 @@ arg_headers = '''
 libarghandler = static_library(
 	'arghandler',
 	arg_sources,
+	arg_headers,
 	cpp_args : ['-DPWX_EXPORTS'],
 	include_directories : includes,
 	install : false)

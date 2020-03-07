@@ -17,6 +17,7 @@ random_headers = '''
 librandom = static_library(
 	'random',
 	random_sources,
+	random_headers,
 	cpp_args : ['-DPWX_EXPORTS'],
 	include_directories : includes,
 	install : false)

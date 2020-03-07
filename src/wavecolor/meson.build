@@ -7,6 +7,7 @@ wavecolor_headers = '''
 '''.split()
 
 libpwx_external_sources += files(wavecolor_sources)
+libpwx_external_sources += files(wavecolor_headers)
 
 install_headers(
 	wavecolor_headers,

@@ -27,6 +27,7 @@ basic_headers = '''
 libbasic = static_library(
 	'basic',
 	basic_sources,
+	basic_headers,
 	cpp_args : ['-DPWX_EXPORTS'],
 	include_directories : includes,
 	dependencies : [ threads ],

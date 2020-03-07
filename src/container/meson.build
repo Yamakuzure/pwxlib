@@ -29,6 +29,7 @@ container_headers = '''
 libcontainer = static_library(
 	'container',
 	container_sources,
+	container_headers,
 	funcs_sources,
 	cpp_args : ['-DPWX_EXPORTS'],
 	include_directories : includes,
