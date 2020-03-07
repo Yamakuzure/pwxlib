@@ -1,7 +1,8 @@
 /** @file
-  * This file is part of the PrydeWorX Library (pwxLib).
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * Implementations of the specialized methods of the TArgTarget class template
+  *
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -32,14 +33,14 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <type_traits>
 
 #include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
-#include "basic/pwx_macros.h"
+#include "basic/pwx_types.h"
 
 #include "arg_handler/TArgTarget.h"
 #include "stream_helpers/StreamHelpers.h"
-
 
 /// @namespace pwx
 namespace pwx {
@@ -48,8 +49,7 @@ namespace pwx {
 // === Specialized processing handlers ===
 
 
-template<>
-eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
+template <> eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
 	eArgErrorNumber argErrno = AEN_OK;
 
 	if ( param ) {
@@ -64,9 +64,9 @@ eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
 				           "std::string is only supported with ATT_CB and ATT_SET", "" )
 				break;
 			case ATT_SET:
-				if ( ( (AT_ZERO_OR_ONE == this->set_type )
-				    || (AT_EXACTLY_ONE == this->set_type ) )
-				  && this->gotParameter ) {
+				if ( ( ( AT_ZERO_OR_ONE  == this->set_type )
+				                || ( AT_EXACTLY_ONCE == this->set_type ) )
+				                && this->gotParameter ) {
 					argErrno = AEN_MULTIPLE_SET_PARAM;
 				} else {
 					target->assign( param );
@@ -94,81 +94,94 @@ eArgErrorNumber TArgTarget<std::string>::process( char const* param ) {
 
 
 // --- bool ---
-template<>
-void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept {
-	if ( tgt )
+template <> void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept {
+	if ( tgt ) {
 		*tgt = to_bool  ( param );
+	}
 }
 
 
 // --- integers ---
-template<>
-void TArgTarget<int8_t>::par_to_val( int8_t*  tgt, char const* param ) noexcept {
-	if ( tgt )
+template <> void TArgTarget<int8_t>::par_to_val( int8_t*  tgt, char const* param ) noexcept {
+	if ( tgt ) {
 		*tgt = to_int8  ( param );
+	}
 }
 
-template<>
-void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept {
-	if ( tgt )
+template <> void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
 		*tgt = to_int16 ( param );
+	}
 }
 
-template<>
-void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept {
-	if ( tgt )
+template <> void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
 		*tgt = to_int32 ( param );
+	}
 }
 
-template<>
-void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept {
-	if ( tgt )
+template <> void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
 		*tgt = to_int64 ( param );
+
+	}
 }
 
-template<>
-void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept {
+#ifdef HAVE___INT128_T
+template <> void TArgTarget<__int128_t>::par_to_val( __int128_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
+		*tgt = to_int128 ( param );
+	}
+}
+#endif // HAVE___INT128_T
+
+template <> void TArgTarget<uint8_t>::par_to_val( uint8_t*  tgt, char const* param ) noexcept {
 	if ( tgt )
-		*tgt = to_uint8 ( param );
+		*tgt = to_uint8  ( param );
 }
 
-template<>
-void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept {
-	if ( tgt )
-		*tgt = to_uint16( param );
+template <> void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
+		*tgt = to_uint16 ( param );
+	}
 }
 
-template<>
-void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept {
-	if ( tgt )
-		*tgt = to_uint32( param );
+template <> void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
+		*tgt = to_uint32 ( param );
+	}
 }
 
-template<>
-void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept {
-	if ( tgt )
-		*tgt = to_uint64( param );
+template <> void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
+		*tgt = to_uint64 ( param );
+	}
 }
+
+#ifdef HAVE___UINT128_T
+template <> void TArgTarget<__uint128_t>::par_to_val( __uint128_t* tgt, char const* param ) noexcept {
+	if ( tgt ) {
+		*tgt = to_uint128 ( param );
+	}
+}
+#endif // HAVE___UINT128_T
 
 // --- floats ---
-template<>
-void TArgTarget<float>::par_to_val( float*      tgt, char const* param ) noexcept {
+template <> void TArgTarget<float>::par_to_val( float*      tgt, char const* param ) noexcept {
 	if ( tgt )
 		*tgt = to_float ( param );
 }
 
-template<>
-void TArgTarget<double>::par_to_val( double*     tgt, char const* param ) noexcept {
+template <> void TArgTarget<double>::par_to_val( double*     tgt, char const* param ) noexcept {
 	if ( tgt )
 		*tgt = to_double( param );
 }
 
-template<>
-void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept {
+template <> void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept {
 	if ( tgt )
 		*tgt = to_long_double( param );
 }
 
 
-
 } // namespace pwx
+

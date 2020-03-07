@@ -6,7 +6,7 @@
   *
   * @brief Declaration of the TArgTarget class template
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -35,15 +35,17 @@
 **/
 
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
 #include "basic/pwx_debug.h"
 
+#include "arg_handler/eArgErrorNumber.h"
 #include "arg_handler/VArgTargetBase.h"
 #include "basic/CException.h"
-#include "basic/pwx_macros.h"
 
 
 /// @namespace pwx
@@ -56,7 +58,7 @@ namespace pwx {
   * You can use a target, a callback function, or both.
 **/
 template<typename T>
-class TArgTarget : public VArgTargetBase {
+class PWX_API TArgTarget : public VArgTargetBase {
 
 public:
 
@@ -84,28 +86,28 @@ public:
 	                     eArgTargetType type_, eArgType set_,
 	                     T* target_, arg_cb_t cb_,
 	                     char const* desc_, char const* name_ ) noexcept
-		: VArgTargetBase(short_, long_, type_, set_, cb_, desc_, name_ )
+		: VArgTargetBase( short_, long_, type_, set_, cb_, desc_, name_ )
 		, target( target_ )
 	{ /* nothing to do here */ }
 
 
 	/// @brief Copy ctor
-	TArgTarget( TArgTarget const& rhs ) noexcept
+	TArgTarget( TArgTarget<T> const& rhs ) noexcept
 		: VArgTargetBase( rhs )
 		, target( rhs.target )
 	{ }
 
 
+	// No empty ctor
+	TArgTarget() PWX_DELETE;
+
+
 	/// @brief Move ctor
-	TArgTarget( TArgTarget&& rhs ) noexcept
+	TArgTarget( TArgTarget<T>&& rhs ) noexcept
 		: VArgTargetBase( rhs )
 		, target( rhs.target ) {
 		rhs.target = nullptr;
 	}
-
-
-	// no empty ctor
-	TArgTarget() PWX_DELETE;
 
 
 	/** @brief destructor
@@ -127,21 +129,23 @@ public:
 
 
 	/// @brief Copying assignment operator
-	TArgTarget& operator=( TArgTarget const &rhs ) noexcept {
+	TArgTarget& operator=( TArgTarget const& rhs ) noexcept {
 		if ( &rhs != this ) {
 			VArgTargetBase::operator=( rhs );
 			target = rhs.target;
 		}
+		return *this;
 	}
 
 
 	/// @brief Moving assignment operator
-	TArgTarget& operator=( TArgTarget &&rhs ) noexcept {
+	TArgTarget& operator=( TArgTarget&& rhs ) noexcept {
 		if ( &rhs != this ) {
 			VArgTargetBase::operator=( rhs );
 			target     = rhs.target;
 			rhs.target = nullptr;
 		}
+		return *this;
 	}
 
 
@@ -164,12 +168,12 @@ private:
 
 /// @brief Specialization for std::string targets
 template<>
-eArgErrorNumber TArgTarget<std::string>::process( char const* param );
+eArgErrorNumber PWX_API TArgTarget<std::string>::process( char const* param );
 
 
 /// @brief Generic non-specialized handler
 template<typename T>
-eArgErrorNumber TArgTarget<T>::process( char const* param ) {
+eArgErrorNumber PWX_API TArgTarget<T>::process( char const* param ) {
 	eArgErrorNumber argErrno = AEN_OK;
 
 	if ( target ) {
@@ -177,7 +181,7 @@ eArgErrorNumber TArgTarget<T>::process( char const* param ) {
 		if ( param && param[0] )
 			this->par_to_val( &val, param );
 
-		switch( this->arg_type ) {
+		switch( arg_type ) {
 			case ATT_FALSE:
 				*target = ( T )false;
 				break;
@@ -197,9 +201,9 @@ eArgErrorNumber TArgTarget<T>::process( char const* param ) {
 				*target  -= val;
 				break;
 			case ATT_SET:
-				if ( ( (AT_ZERO_OR_ONE == this->set_type )
-				    || (AT_EXACTLY_ONE == this->set_type ) )
-				  && this->gotParameter ) {
+				if ( ( ( AT_ZERO_OR_ONE == this->set_type )
+				                || ( AT_EXACTLY_ONCE == this->set_type ) )
+				                && this->gotParameter ) {
 					argErrno = AEN_MULTIPLE_SET_PARAM;
 				} else {
 					*target = val;
@@ -225,55 +229,35 @@ eArgErrorNumber TArgTarget<T>::process( char const* param ) {
 
 // === par_to_val specializations prototypes ===
 
-/// @brief Specialization for bool targets
-template<>
-void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept;
+#ifndef PWX_NODOX
 
-/// @brief Specialization for int8_t targets
-template<>
-void TArgTarget<int8_t>::par_to_val( int8_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<float>::par_to_val( float* tgt, char const* param ) noexcept;
+template <> void TArgTarget<double>::par_to_val( double* tgt, char const* param ) noexcept;
+template <> void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept;
 
-/// @brief Specialization for int16_t targets
-template<>
-void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<bool>::par_to_val( bool* tgt, char const* param ) noexcept;
+template <> void TArgTarget<int8_t>::par_to_val( int8_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<int16_t>::par_to_val( int16_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept;
+template <> void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept;
 
-/// @brief Specialization for int32_t targets
-template<>
-void TArgTarget<int32_t>::par_to_val( int32_t* tgt, char const* param ) noexcept;
+#ifdef HAVE___INT128_T
+template <> void TArgTarget<__int128_t>::par_to_val( __int128_t* tgt, char const* param ) noexcept;
+#endif // HAVE___INT128_T
 
-/// @brief Specialization for int64_t targets
-template<>
-void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* param ) noexcept;
+#ifdef HAVE___UINT128_T
+template <> void TArgTarget<__uint128_t>::par_to_val( __uint128_t* tgt, char const* param ) noexcept;
+#endif // HAVE___UINT128_T
 
-/// @brief Specialization for uint8_t targets
-template<>
-void TArgTarget<uint8_t>::par_to_val( uint8_t* tgt, char const* param ) noexcept;
+#endif // PWX_NODOX
 
-/// @brief Specialization for uint16_t targets
-template<>
-void TArgTarget<uint16_t>::par_to_val( uint16_t* tgt, char const* param ) noexcept;
-
-/// @brief Specialization for uint32_t targets
-template<>
-void TArgTarget<uint32_t>::par_to_val( uint32_t* tgt, char const* param ) noexcept;
-
-/// @brief Specialization for uint64_t targets
-template<>
-void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* param ) noexcept;
-
-/// @brief Specialization for float targets
-template<>
-void TArgTarget<float>::par_to_val( float* tgt, char const* param ) noexcept;
-
-/// @brief Specialization for double targets
-template<>
-void TArgTarget<double>::par_to_val( double* tgt, char const* param ) noexcept;
-
-/// @brief Specialization for long double targets
-template<>
-void TArgTarget<long double>::par_to_val( long double* tgt, char const* param ) noexcept;
 
 } // namespace pwx
+
 
 #endif // PWX_LIBPWX_PWX_TYPES_TARGTARGET_H_INCLUDED
 
