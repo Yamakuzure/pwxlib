@@ -42,7 +42,8 @@ for line in open(sys.argv[1]):
 
     # Templates
     match = re.search('^ +pwx::(T[a-zA-Z0-9_]+)[:;]', line)
-    if match:
+    argt  = re.search('TArgTarget', line)
+    if match and None == argt:
         tstr  = match.group(1)
         check = re.search('Hash', line)
         elem  = re.search('T.*Element', line)
@@ -162,7 +163,8 @@ for line in open(sys.argv[1]):
 print("{};\n\nint main(void) {}".format("}", "{"))
 for line in open(sys.argv[1]):
     match = re.search('^ +pwx::([CT][a-zA-Z0-9_]+)[*:;]', line)
-    if match:
+    argt  = re.search('TArgTarget', line)
+    if match and None == argt:
         print("\ttest_{}();".format(match.group(1)))
 
 # Step five : Add the function test loop
