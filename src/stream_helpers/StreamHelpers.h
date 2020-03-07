@@ -6,7 +6,7 @@
   *
   * @brief This file defines some tools to work with streams.
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -37,11 +37,19 @@
 
 #include <cstddef>
 #include <cstdint>
+
 #include <fstream>
 #include <sstream>
 
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
+#include "basic/pwx_types.h"
+#include "math_helpers/MathHelpers.h"
+
+#if defined(HAVE___INT128_T) || defined(HAVE___UINT128_T)
+#  include <cstring>
+#  include "basic/CException.h"
+#endif // to_[u]int128() can throw!
 
 
 namespace pwx {
@@ -227,13 +235,23 @@ bool readNextValue ( Tval& value, std::ifstream& is, char separator,
   * @return the resulting bool
 **/
 template <typename T>
-bool to_bool ( const T val ) noexcept {
+inline bool to_bool ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return ( 0 != val );
+	else if ( isFloatType( T ) )
+		return areAlmostEqual( val, ( T )0 );
+
 	bool result = false;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> bool to_bool( char const* const val ) noexcept;
+template<> bool to_bool( std::string& val ) noexcept;
+template<> inline bool to_bool( char* val ) noexcept { char const* const v = val; return to_bool( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to float
@@ -247,13 +265,21 @@ bool to_bool ( const T val ) noexcept {
   * @return the resulting float
 **/
 template <typename T>
-float to_float ( const T val ) noexcept {
-	float result = 0.;
+inline float to_float ( const T val ) noexcept {
+	if ( isIntType( T ) || isFloatType( T ) )
+		return static_cast<float>( val );
+
+	float result = 0.f;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> float to_float( char const* const val ) noexcept;
+template<> float to_float( std::string& val ) noexcept;
+template<> inline float to_float( char* val ) noexcept { char const* const v = val; return to_float( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to double
@@ -267,13 +293,22 @@ float to_float ( const T val ) noexcept {
   * @return the resulting double
 **/
 template <typename T>
-double to_double ( const T val ) noexcept {
+inline double to_double ( const T val ) noexcept {
+	if ( isIntType( T ) || isFloatType( T ) )
+		return static_cast<double>( val );
+
 	double result = 0.;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> double to_double( char const* const val ) noexcept;
+template<> double to_double( std::string& val ) noexcept;
+template<>
+inline double to_double( char* val ) noexcept {char const* const v = val; return to_double( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to long double
@@ -287,13 +322,22 @@ double to_double ( const T val ) noexcept {
   * @return the resulting long double
 **/
 template <typename T>
-long double to_long_double ( const T val ) noexcept {
+inline long double to_long_double ( const T val ) noexcept {
+	if ( isIntType( T ) || isFloatType( T ) )
+		return static_cast<long double>( val );
+
 	long double result = 0.;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> long double to_long_double( char const* const val ) noexcept;
+template<> long double to_long_double( std::string& val ) noexcept;
+template<>
+inline long double to_long_double( char* val ) noexcept { char const* const v = val; return to_long_double( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to int8_t
@@ -307,13 +351,24 @@ long double to_long_double ( const T val ) noexcept {
   * @return the resulting int8_t
 **/
 template <typename T>
-int8_t to_int8 ( const T val ) noexcept {
+inline int8_t to_int8 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<int8_t>( 0xff & val );
+	else if ( isFloatType( T ) )
+		return static_cast<int8_t>( 0xff & static_cast<int32_t>( val + .5f ) );
+
 	int8_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> int8_t to_int8( char const* const val ) noexcept;
+template<> int8_t to_int8( std::string& val ) noexcept;
+template<>
+inline int8_t to_int8( char* val ) noexcept { char const* const v = val; return to_int8( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to uint8_t
@@ -327,13 +382,24 @@ int8_t to_int8 ( const T val ) noexcept {
   * @return the resulting uint8_t
 **/
 template <typename T>
-uint8_t to_uint8 ( const T val ) noexcept {
+inline uint8_t to_uint8 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<uint8_t>( 0xff & val );
+	else if ( isFloatType( T ) )
+		return static_cast<uint8_t>( 0xff & static_cast<uint32_t>( val + .5f ) );
+
 	uint8_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> uint8_t to_uint8( char const* const val ) noexcept;
+template<> uint8_t to_uint8( std::string& val ) noexcept;
+template<>
+inline uint8_t to_uint8( char* val ) noexcept { char const* const v = val; return to_uint8( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to int16_t
@@ -347,13 +413,24 @@ uint8_t to_uint8 ( const T val ) noexcept {
   * @return the resulting int16_t
 **/
 template <typename T>
-int16_t to_int16 ( const T val ) noexcept {
+inline int16_t to_int16 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<int16_t>( 0xffff & val );
+	else if ( isFloatType( T ) )
+		return static_cast<int16_t>( 0xffff & static_cast<int32_t>( val + .5f ) );
+
 	int16_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> int16_t to_int16( char const* const val ) noexcept;
+template<> int16_t to_int16( std::string& val ) noexcept;
+template<>
+inline int16_t to_int16( char* val ) noexcept { char const* const v = val; return to_int16( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to uint16_t
@@ -367,13 +444,24 @@ int16_t to_int16 ( const T val ) noexcept {
   * @return the resulting uint16_t
 **/
 template <typename T>
-uint16_t to_uint16 ( const T val ) noexcept {
+inline uint16_t to_uint16 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<uint16_t>( 0xffff & val );
+	else if ( isFloatType( T ) )
+		return static_cast<uint16_t>( 0xffff & static_cast<uint32_t>( val + .5f ) );
+
 	uint16_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> uint16_t to_uint16( char const* const val ) noexcept;
+template<> uint16_t to_uint16( std::string& val ) noexcept;
+template<>
+inline uint16_t to_uint16( char* val ) noexcept { char const* const v = val; return to_uint16( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to int32_t
@@ -387,13 +475,24 @@ uint16_t to_uint16 ( const T val ) noexcept {
   * @return the resulting int32_t
 **/
 template <typename T>
-int32_t to_int32 ( const T val ) noexcept {
+inline int32_t to_int32 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<int32_t>( 0xffffffff & val );
+	else if ( isFloatType( T ) )
+		return ( 0xffffffff & static_cast<int32_t>( val + .5f ) );
+
 	int32_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> int32_t to_int32( char const* const val ) noexcept;
+template<> int32_t to_int32( std::string& val ) noexcept;
+template<>
+inline int32_t to_int32( char* val ) noexcept { char const* const v = val; return to_int32( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to uint32_t
@@ -407,13 +506,24 @@ int32_t to_int32 ( const T val ) noexcept {
   * @return the resulting uint32_t
 **/
 template <typename T>
-uint32_t to_uint32 ( const T val ) noexcept {
+inline uint32_t to_uint32 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<uint32_t>( 0xffffffff & val );
+	else if ( isFloatType( T ) )
+		return ( 0xffffffff & static_cast<uint32_t>( val + .5f ) );
+
 	uint32_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> uint32_t to_uint32( char const* const val ) noexcept;
+template<> uint32_t to_uint32( std::string& val ) noexcept;
+template<>
+inline uint32_t to_uint32( char* val ) noexcept { char const* const v = val; return to_uint32( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to int64_t
@@ -427,13 +537,24 @@ uint32_t to_uint32 ( const T val ) noexcept {
   * @return the resulting int64_t
 **/
 template <typename T>
-int64_t to_int64 ( const T val ) noexcept {
+inline int64_t to_int64 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<int64_t>( val );
+	else if ( isFloatType( T ) )
+		return static_cast<int64_t>( val + .5f );
+
 	int64_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> int64_t to_int64( char const* const val ) noexcept;
+template<> int64_t to_int64( std::string& val ) noexcept;
+template<>
+inline int64_t to_int64( char* val ) noexcept { char const* const v = val; return to_int64( v ); }
+#endif // PWX_NODOX
 
 
 /** @brief convert a value to uint64_t
@@ -447,31 +568,105 @@ int64_t to_int64 ( const T val ) noexcept {
   * @return the resulting uint64_t
 **/
 template <typename T>
-uint64_t to_uint64 ( const T val ) noexcept {
+inline uint64_t to_uint64 ( const T val ) noexcept {
+	if ( isIntType( T ) )
+		return static_cast<int64_t>( val );
+	else if ( isFloatType( T ) )
+		return static_cast<int64_t>( val + .5f );
+
 	uint64_t result = 0;
 	std::stringstream ss;
 	ss << val;
 	ss >> result;
 	return result;
 }
+#ifndef PWX_NODOX
+template<> uint64_t to_uint64( char const* const val ) noexcept;
+template<> uint64_t to_uint64( std::string& val ) noexcept;
+template<>
+inline uint64_t to_uint64( char* val ) noexcept { char const* const v = val; return to_uint64( v ); }
+#endif // PWX_NODOX
 
+
+#ifdef HAVE___INT128_T
+/** @brief convert a value to __int128_t
+  *
+  * This function can cast integer and float types to __int128_t.
+  *
+  * If something else is found, that is not handled by the char array or
+  * std::string specializations, a pwx::CException with the name "UnsupportedType"
+  * is thrown.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting __int128_t
+**/
+template <typename T>
+inline __int128_t to_int128 ( const T val ) {
+	if ( isIntType( T ) )
+		return static_cast<__int128_t>( val );
+	else if ( isFloatType( T ) )
+		return static_cast<__int128_t>( val + .5f );
+
+	// We can't do anything here
+	PWX_THROW( "UnsupportedType", "unsupported type for conversion to __int128_t", "" );
+}
+#ifndef PWX_NODOX
+template<> __int128_t to_int128( char const* const val );
+template<> __int128_t to_int128( std::string& val );
+template<>
+inline __int128_t to_int128( char* val ) { char const* const v = val; return to_int128( v ); }
+#endif // PWX_NODOX
+#endif // HAVE___INT128_T
+
+
+#ifdef HAVE___UINT128_T
+/** @brief convert a value to __uint128_t
+  *
+  * This function can cast integer and float types to __uint128_t.
+  *
+  * If something else is found, that is not handled by the char array or
+  * std::string specializations, a pwx::CException with the name "UnsupportedType"
+  * is thrown.
+  *
+  * @param[in] val the value to be converted
+  * @return the resulting __uint128_t
+**/
+template <typename T>
+inline __uint128_t to_uint128 ( const T val ) {
+	if ( isIntType( T ) )
+		return static_cast<__uint128_t>( val );
+	else if ( isFloatType( T ) )
+		return static_cast<__uint128_t>( val + .5f );
+
+	// We can't do anything here
+	PWX_THROW( "UnsupportedType", "unsupported type for conversion to __uint128_t", "" );
+}
+#ifndef PWX_NODOX
+template<> __uint128_t to_uint128( char const* const val );
+template<> __uint128_t to_uint128( std::string& val );
+template<>
+inline __uint128_t to_uint128( char* val ) { char const* const v = val; return to_uint128( v ); }
+#endif // PWX_NODOX
+#endif // HAVE___UINT128_T
 
 /** @brief convert a value to a string
   *
-  * This function uses a stringstream to convert @a val to a string.
-  * The value will not be type-checked, so it is the users responsibility
-  * to use a type that is compatible with stringstream. Of course the
-  * compiler will error out if the type is incompatible.
+  * This function uses std::string::to_string() to convert @a val to a string.
   *
   * @param[in] val the value to be converted
   * @return the resulting int64_t
 **/
 template <typename T>
-std::string to_string ( const T val ) noexcept {
-	std::stringstream ss;
-	ss << val;
-	return ss.str();
+inline std::string to_string ( const T val ) noexcept {
+	return std::to_string( val );
 }
+#ifndef PWX_NODOX
+template<> inline std::string to_string( char const* const  val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( char*               val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( std::string  const val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( std::string  const& val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( std::string  const&& val ) noexcept { return std::string( val ); }
+#endif // PWX_NODOX
 
 
 } // End of namespace pwx

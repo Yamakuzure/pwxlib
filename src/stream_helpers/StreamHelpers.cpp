@@ -1,7 +1,7 @@
 /**
   * This file is part of the PrydeWorX Library (pwxLib).
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -30,8 +30,10 @@
 **/
 
 
+#include <charconv>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include <unistd.h>
 #include <vector>
 
@@ -373,5 +375,202 @@ CAdjRight::CAdjRight ( int32_t left_, int32_t right_ ) noexcept :
   */
 CAdjRight::CAdjRight() noexcept
 { }
+
+// === Static helpers for the conversion from std::string ===
+template<typename T>
+static inline T _get_int_from_String( std::string &str )
+{
+	auto const tail = str.find_last_not_of(' ');
+	if ( tail == std::string::npos )
+		return (T)0;
+
+	auto const st_end = str.data() + tail + 1; // End of data to be converted
+	T num;
+
+	return ( std::from_chars( str.data() + str.find_first_not_of(' '), st_end, num, 10).ptr == st_end )
+	       ? num : (T)0;
+}
+
+#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+template<typename T>
+static inline T _get_flt_from_String( std::string &str )
+{
+	auto const tail = str.find_last_not_of(' ');
+	if ( tail == std::string::npos )
+		return (T)0;
+
+	auto const st_end = str.data() + tail + 1; // End of data to be converted
+	T num;
+
+	return ( std::from_chars( str.data() + str.find_first_not_of(' '), st_end, num, std::chars_format::general).ptr == st_end )
+	       ? num : (T)0;
+}
+#endif // HAVE_STD__CHARS_FORMAT__GENERAL
+
+// === Specializations of the to_*() functions ===
+
+#ifndef PWX_NODOX
+template<> bool to_bool( char const * const val ) noexcept {
+	return (  val
+	       && val[0]
+	       && (  STRNCEQ( val, "true", 4 )
+	          || STRNCEQ( val, "yes",  3 )
+	          || STRNNE(  val, "0",    1 ) ) );
+}
+
+template<> bool to_bool( std::string &val ) noexcept {
+	return to_bool( val.c_str() );
+}
+
+template<> float to_float( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return strtof(val, nullptr);
+	return 0.f;
+}
+
+template<> float to_float( std::string &val ) noexcept {
+#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+	return _get_flt_from_String<float>( val );
+#else
+	return to_float( val.c_str() );
+#endif // HAVE_STD__CHARS_FORMAT__GENERAL
+}
+
+
+template<> double to_double( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return strtod(val, nullptr);
+	return 0.;
+}
+
+template<> double to_double( std::string &val ) noexcept {
+#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+	return _get_flt_from_String<double>( val );
+#else
+	return to_double( val.c_str() );
+#endif // HAVE_STD__CHARS_FORMAT__GENERAL
+}
+
+template<> long double to_long_double( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return strtold(val, nullptr);
+	return 0.;
+}
+
+template<> long double to_long_double( std::string &val ) noexcept {
+#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+	return _get_flt_from_String<long double>( val );
+#else
+	return to_long_double( val.c_str() );
+#endif // HAVE_STD__CHARS_FORMAT__GENERAL
+}
+
+template<> int8_t to_int8( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<int8_t>( 0xff && std::strtol(val, nullptr, 10) );
+	return 0;
+}
+
+template<> int8_t to_int8( std::string &val ) noexcept {
+	return _get_int_from_String<int8_t>( val );
+}
+
+template<> uint8_t to_uint8( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<uint8_t>( 0xff && std::strtoul(val, nullptr, 10) );
+	return 0;
+}
+
+
+template<> uint8_t to_uint8( std::string &val ) noexcept {
+	return _get_int_from_String<uint8_t>( val );
+}
+
+template<> int16_t to_int16( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<int16_t>( 0xffff && std::strtol(val, nullptr, 10) );
+	return 0;
+}
+
+template<> int16_t to_int16( std::string &val ) noexcept {
+	return _get_int_from_String<int16_t>( val );
+}
+
+template<> uint16_t to_uint16( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<uint16_t>( 0xffff && std::strtoul(val, nullptr, 10) );
+	return 0;
+}
+
+template<> uint16_t to_uint16( std::string &val ) noexcept {
+	return _get_int_from_String<uint16_t>( val );
+}
+
+template<> int32_t to_int32( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<int32_t>( 0xffffffff && std::strtol(val, nullptr, 10) );
+	return 0;
+}
+
+template<> int32_t to_int32( std::string &val ) noexcept {
+	return _get_int_from_String<int32_t>( val );
+}
+
+template<> uint32_t to_uint32( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<uint32_t>( 0xffffffff && std::strtoul(val, nullptr, 10) );
+	return 0;
+}
+
+template<> uint32_t to_uint32( std::string &val ) noexcept {
+	return _get_int_from_String<uint32_t>( val );
+}
+
+template<> int64_t to_int64( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<int64_t>( std::strtol(val, nullptr, 10) );
+	return 0;
+}
+
+template<> int64_t to_int64( std::string &val ) noexcept {
+	return _get_int_from_String<int64_t>( val );
+}
+
+template<> uint64_t to_uint64( char const * const val ) noexcept {
+	if ( val && val[0] )
+		return static_cast<uint64_t>( std::strtoul(val, nullptr, 10) );
+	return 0;
+}
+
+template<> uint64_t to_uint64( std::string &val ) noexcept {
+	return _get_int_from_String<uint64_t>( val );
+}
+
+#ifdef HAVE___INT128_T
+template<> __int128_t to_int128( char const * const val )  {
+	if ( val && val[0] )
+		return static_cast<__int128_t>( std::strtoll(val, nullptr, 10) );
+	return 0;
+}
+
+template<> __int128_t to_int128( std::string &val )  {
+	return _get_int_from_String<__int128_t>( val );
+}
+
+#endif // HAVE___INT128_T
+#ifdef HAVE___UINT128_T
+template<> __uint128_t to_uint128( char const * const val )  {
+	if ( val && val[0] )
+		return static_cast<__uint128_t>( std::strtoull(val, nullptr, 10) );
+	return 0;
+}
+
+template<> __uint128_t to_uint128( std::string &val )  {
+	return _get_int_from_String<__uint128_t>( val );
+}
+
+#endif // HAVE___UINT128_T
+
+#endif // PWX_NODOX
 
 } // namespace pwx
