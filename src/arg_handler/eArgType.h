@@ -48,7 +48,7 @@ namespace pwx {
 enum eArgType {
 	AT_ZERO_OR_ONE  = 0, //!< The option is optional but must not be given more than once
 	AT_ZERO_OR_MANY = 1, //!< The option is optional and can be given multiple times
-	AT_EXACTLY_ONE  = 2, //!< The option is mandatory and must be given exactly once
+	AT_EXACTLY_ONCE = 2, //!< The option is mandatory and must be given exactly once
 	AT_ONE_OR_MANY  = 3  //!< The option is mandatory and can be given multiple times
 };
 
