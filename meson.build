@@ -179,12 +179,14 @@ conf.set('__SANE_USERSPACE_TYPES__', true)
 
 decl_headers = '''
 #include <cuchar>
+#include <charconv>
 '''
 foreach decl : ['__int128_t',
                 '__uint128_t',
                 'char16_t',
                 'char32_t',
-                'wchar_t'
+                'wchar_t',
+                'std::chars_format::general'
                ]
 
 	# We get -1 if the size cannot be determined
