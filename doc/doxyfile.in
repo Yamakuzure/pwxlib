@@ -59,7 +59,6 @@ PREDEFINED             = PWX_API= \
                          PWX_VISIBLE= \
                          _GLIBCXX_TR1_TYPE_TRAITS=1 \
                          _GLIBCXX_CMATH=1 \
-                         PWX_INLINE=inline \
                          PWX_THROW= \
                          PWX_TRY= \
                          PWX_CATCH_AND_FORGET= \
@@ -86,7 +85,6 @@ PREDEFINED             = PWX_API= \
 EXPAND_AS_DEFINED      = PWX_API \
                          PWX_INTERNAL \
                          PWX_VISIBLE \
-                         PWX_INLINE \
                          PWX_THROW \
                          PWX_TRY \
                          PWX_CATCH_AND_FORGET \
