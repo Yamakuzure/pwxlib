@@ -112,11 +112,15 @@ local:
 LIBPWX_0_9_0 {
 global:
     extern "C++" {
+        /* Templates */
+        pwx::TArgTarget::*;
+
+        /* Functions */
         pwx::allocate*;
         pwx::callocate*;
         pwx::deallocate*;
+        pwx::finish*;
         pwx::mem_map_report*;
         pwx::reallocate*;
-        pwx::finish*;
     };
 } LIBPWX_0_8_99;
