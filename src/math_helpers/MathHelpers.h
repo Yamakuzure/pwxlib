@@ -241,7 +241,7 @@ bool areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
 **/
 template<typename T>
 inline T absDistance( const T x1, const T y1, const T x2, const T y2 ) {
-	if ( isIntType( T ) || isFloatType( T ) )
+	if ( isNumericType( T ) )
 		// Do nothing if this isn't a type we can calculate with
 		return ( static_cast<T>( std::sqrt( std::pow( x2 - x1, 2.0 ) + std::pow( y2 - y1, 2.0 ) ) ) );
 	else
@@ -264,7 +264,7 @@ inline T absDistance( const T x1, const T y1, const T x2, const T y2 ) {
 template<typename T>
 inline T absDistance( const T x1, const T y1, const T z1,
                       const T x2, const T y2, const T z2 ) {
-	if ( isIntType( T ) || isFloatType( T ) )
+	if ( isNumericType( T ) )
 		// Do nothing if this isn't a type we can calculate with
 		return ( static_cast<T>( std::sqrt( std::pow( x2 - x1, 2.0 ) + std::pow( y2 - y1, 2.0 ) + std::pow( z2 - z1, 2.0 ) ) ) );
 	else

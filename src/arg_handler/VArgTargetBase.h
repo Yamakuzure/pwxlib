@@ -6,7 +6,7 @@
   *
   * @brief Simple basic struct holding all non-templated members for TArgTarget
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -104,11 +104,11 @@ struct VArgTargetBase {
 
 
 	/// @brief Copy constructor
-	VArgTargetBase( VArgTargetBase const &rhs ) noexcept;
+	VArgTargetBase( VArgTargetBase const& rhs ) noexcept;
 
 
 	/// @brief Move constructor
-	VArgTargetBase( VArgTargetBase &&rhs ) noexcept;
+	VArgTargetBase( VArgTargetBase&& rhs ) noexcept;
 
 
 	/// @brief Must be defined by TArgTarget:
@@ -131,11 +131,11 @@ struct VArgTargetBase {
 
 
 	/// @brief Copying assignment operator
-	VArgTargetBase& operator=( VArgTargetBase const &rhs ) noexcept;
+	VArgTargetBase& operator=( VArgTargetBase const& rhs ) noexcept;
 
 
 	/// @brief Moving assignment operator
-	VArgTargetBase& operator=( VArgTargetBase &&rhs ) noexcept;
+	VArgTargetBase& operator=( VArgTargetBase&& rhs ) noexcept;
 
 
 protected:
