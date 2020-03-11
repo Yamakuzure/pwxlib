@@ -52,6 +52,7 @@
 #define pwx_calloc( type_,       nmem_) (type_*)PWX_calloc_internal(       sizeof(type_) * (nmem_))
 #define pwx_free(          mem_       )         PWX_dealloc_internal(mem_                         )
 #define pwx_realloc(type_, mem_, nmem_) (type_*)PWX_realloc_internal(mem_, sizeof(type_) * (nmem_))
+#define pwx_strdup(        src_       )         PWX_strdup_internal( src_                         )
 /** @def pwx_alloc
   * @brief Convenient wrapper to call pwx::allocate() with automatic location
   * Makes use of an internal memory map to detect leaks in debug mode. (@see pwx::finish())
@@ -67,6 +68,10 @@
   * @def pwx_realloc
   * @brief Convenient wrapper to call pwx::reallocate() with automatic location
   * Makes use of an internal memory map to detect leaks in debug mode. (@see pwx::finish())
+  *
+  * @def pwx_strdup
+  * @brief Convenient wrapper to call pwx::strdup() with automatic location
+  * Alternative string duplication using internal memory mapping in debug mode. (@see pwx::finish())
 **/
 
 /// @namespace pwx
@@ -137,6 +142,21 @@ void deallocate( [[maybe_unused]] char const* location, void*  mem ) PWX_API;
   * @return void pointer to the reallocated memory or nullptr on error.
 **/
 void* reallocate( [[maybe_unused]] char const* location, void*  mem, size_t new_size ) PWX_API;
+
+
+/** @brief Central string duplication function
+  *
+  * This function duplicates a C-string with an extra when built in debugging mode:
+  *
+  * If the memory was not recorded, it will be now and the incident is logged.
+  *
+  * Please use the helper macro `pwx_strdup()`, which already fills in the `location`.
+  *
+  * @param[in] location The location in the form &lt;filename&gt;:&lt;lineno&gt;:&lt;function&gt;
+  * @param[in] src Pointer to the C-string to be duplicated
+  * @return Pointer to the duplicated C-String or nullptr on error.
+**/
+char* strdup( [[maybe_unused]] char const* location, char const* src ) PWX_API;
 
 
 /** @brief walk the memory map and report all entries as errors.

@@ -58,8 +58,6 @@ namespace pwx {
 void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
 	void* result = nullptr;
 
-	DEBUG_LOG_THERE( location, "allocate", "allocating %lu bytes", new_size );
-
 	result = malloc_multiply( 1, new_size );
 
 	#if defined(PWXLIB_DEBUG)
@@ -76,7 +74,6 @@ void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
 
 void deallocate( [[maybe_unused]] char const* location, void*  mem ) {
 	if ( mem ) {
-		DEBUG_LOG_THERE( location, "deallocate", "freeing memory at 0x%08lx", mem );
 
 		#if defined(PWXLIB_DEBUG)
 		private_::mem_map_del( mem );
@@ -95,8 +92,6 @@ void* reallocate( [[maybe_unused]] char const* location, void* mem, size_t new_s
 
 	// Fine, it is a reallocation.
 	void* result = nullptr;
-
-	DEBUG_LOG_THERE( location, "reallocate", "reallocating to %lu bytes", new_size );
 
 	#if defined(PWXLIB_DEBUG)
 	// Warn if the reallocation makes no sense
@@ -124,6 +119,19 @@ void* reallocate( [[maybe_unused]] char const* location, void* mem, size_t new_s
 	if ( !result )
 		DEBUG_ERR_THERE( location, "Reallocation failed!",
 		                 "Unable to reallocate to %ul bytes at %s", new_size );
+
+	return result;
+}
+
+
+char* strdup( [[maybe_unused]] char const* location, char const* src ) {
+	size_t nmem   = src ? strlen(src) : 0;
+	char*  result = nmem ? (char*)allocate( location, (nmem + 1) * sizeof( char) ) : nullptr;
+
+	if ( result  ) {
+		memcpy( result, src, nmem * sizeof( char ) );
+		result[ nmem ] = 0x0;
+	}
 
 	return result;
 }

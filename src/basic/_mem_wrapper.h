@@ -67,6 +67,9 @@
 	::pwx::reallocate( ::pwx::get_trace_info(__FILE__, __LINE__, PWX_FUNC), (_p_), (_s_) );                         \
 
 
+#define PWX_strdup_internal(_s_) \
+	::pwx::strdup( ::pwx::get_trace_info(__FILE__, __LINE__, PWX_FUNC), (_s_) )
+
 
 #endif // None of Doxygens business.
 
