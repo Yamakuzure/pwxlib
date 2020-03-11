@@ -43,8 +43,10 @@
 
 #include "basic/_mem_map.h"
 #include "basic/alloc_utils.h"
+#include "basic/CLockable.h"
+#include "basic/CLockGuard.h"
 #include "basic/mem_utils.h"
-
+#include "basic/pwx_macros.h"
 
 
 
@@ -57,6 +59,9 @@ namespace pwx {
 namespace private_ {
 
 
+::pwx::CLockable map_lock; //!< std::map isn't thread safe, so we lock ourselves.
+
+
 /// @brief information struct with location and size of a map entry
 struct map_item_t {
 	char const* location = nullptr;
@@ -64,7 +69,7 @@ struct map_item_t {
 
 	explicit
 	map_item_t( char const* loc, size_t siz )
-		: location( strdup( loc ? loc : "<nowhere>" ) )
+		: location( ::strdup( loc ? loc : "<nowhere>" ) ) /* use regular strdup to circumvent circular dependencies */
 		, mem_size( siz )
 	{ }
 	map_item_t( const map_item_t &rhs ) {
@@ -99,8 +104,7 @@ struct map_item_t {
 };
 
 // some shortcuts
-typedef std::map<void const*, map_item_t>                 map_t;
-typedef std::map<void const*, map_item_t>::const_iterator citer_t;
+typedef std::map<void const*, map_item_t> map_t;
 
 /** @brief global memory map
   * We are using the std::map here to have something neutral.
@@ -113,8 +117,10 @@ void mem_map_add( char const* location, size_t mem_size, void const* memory ) {
 	assert ( mem_size );
 	assert ( memory );
 
+	PWX_LOCK_GUARD( &map_lock );
+
 	// First check whether the key exists:
-	citer_t iter = mem_map.find( memory );
+	auto const iter = mem_map.find( memory );
 	if ( iter != mem_map.cend() ) {
 		DEBUG_ERR( "Memory Map Addition Error!",
 		           "The address 0x%08lx is already registered with size %lu from %s",
@@ -130,7 +136,9 @@ void mem_map_add( char const* location, size_t mem_size, void const* memory ) {
 void mem_map_del( void const* memory ) {
 	assert ( memory );
 
-	citer_t citer = mem_map.find( memory );
+	PWX_LOCK_GUARD( &map_lock );
+
+	auto const citer = mem_map.find( memory );
 	if ( citer == mem_map.cend() ) {
 		DEBUG_ERR( "Memory Map Deletion Error!",
 		           "The address 0x%08lx is _NOT_ recorded in the memory map!",
@@ -145,15 +153,17 @@ void mem_map_del( void const* memory ) {
 bool mem_map_report() {
 	bool result = true;
 
+	PWX_LOCK_GUARD( &map_lock );
+
 	// A simple loop will do
-	for ( citer_t iter = mem_map.cbegin(); iter != mem_map.cend(); iter++ ) {
+	for ( auto &[address, item] : mem_map) {
 		result = false;
 		DEBUG_ERR( "Memory Map Leak Error!",
 		           "The address 0x%08lx is *STILL* registered with size %lu from %s",
-		           iter->first, iter->second.mem_size, iter->second.location );
+		           address, item.mem_size, item.location );
 		// The final clearing of the memory map does not touch the pointers,
 		// so it is safe to free the key here.
-		mfree( const_cast<void*>( iter->first ) );
+		freep( const_cast<void*>( address ) );
 	}
 
 	// Now clear the map and we are done
@@ -167,7 +177,9 @@ bool mem_map_sizeof( void const* memory, size_t* old_size ) {
 	assert ( memory );
 	assert ( old_size );
 
-	citer_t iter = mem_map.find( memory );
+	PWX_LOCK_GUARD( &map_lock );
+
+	auto const iter = mem_map.find( memory );
 	if ( iter != mem_map.cend() ) {
 		if ( old_size )
 			*old_size = iter->second.mem_size;
