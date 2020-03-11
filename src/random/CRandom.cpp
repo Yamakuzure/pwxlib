@@ -39,6 +39,7 @@
 #include "basic/pwx_macros.h"
 #include "basic/pwx_debug.h"
 
+#include "basic/mem_utils.h"
 #include "random/CRandom.h"
 #include "random/CRandomTHash.h"
 #include "random/CRandomTRandom.h"
@@ -1559,7 +1560,7 @@ char* CRandom::rndName ( double x, double y, double z, double w, int32_t chars, 
 			genState = NameConstants::genFinished;
 	} while ( genState != NameConstants::genFinished );
 
-	return ( strdup ( name.c_str() ) );
+	return ( pwx_strdup ( name.c_str() ) );
 }
 
 

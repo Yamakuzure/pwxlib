@@ -46,11 +46,11 @@ namespace pwx {
 CException::CException ( char const* const name_, char const* const what_, char const* const where_,
                          char const* const func_, char const* const desc_ ) noexcept
 	: std::exception()
-	, txtName  ( strdup ( name_ ) )
-	, txtWhat  ( strdup ( what_ ) )
-	, txtWhere ( strdup ( where_ ) )
-	, txtFunc  ( strdup ( func_ ) )
-	, txtDesc  ( strdup ( desc_ ) )
+	, txtName  ( pwx_strdup ( name_ ) )
+	, txtWhat  ( pwx_strdup ( what_ ) )
+	, txtWhere ( pwx_strdup ( where_ ) )
+	, txtFunc  ( pwx_strdup ( func_ ) )
+	, txtDesc  ( pwx_strdup ( desc_ ) )
 	, txtTrace ( "Thrown from :\n\t" ) {
 	PWX_TRY ( txtTrace += where_ )
 	PWX_CATCH_AND_FORGET ( std::exception );
@@ -59,11 +59,11 @@ CException::CException ( char const* const name_, char const* const what_, char 
 
 CException::CException ( const CException& src ) noexcept
 	: std::exception ( src )
-	, txtName  ( strdup ( src.txtName ) )
-	, txtWhat  ( strdup ( src.txtWhat ) )
-	, txtWhere ( strdup ( src.txtWhere ) )
-	, txtFunc  ( strdup ( src.txtFunc ) )
-	, txtDesc  ( strdup ( src.txtDesc ) )
+	, txtName  ( pwx_strdup ( src.txtName ) )
+	, txtWhat  ( pwx_strdup ( src.txtWhat ) )
+	, txtWhere ( pwx_strdup ( src.txtWhere ) )
+	, txtFunc  ( pwx_strdup ( src.txtFunc ) )
+	, txtDesc  ( pwx_strdup ( src.txtDesc ) )
 	, txtTrace ( src.txtTrace )
 { /* nothing to be done here */ }
 

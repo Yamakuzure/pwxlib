@@ -41,6 +41,7 @@
 #include "basic/pwx_macros.h"
 #include "basic/pwx_debug.h"
 
+#include "basic/mem_utils.h"
 #include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
 
@@ -208,7 +209,7 @@ char const* makeTemp ( char const* aPath, char const* aTemplate, char const* aSu
 
 			ofs.open ( fileName.c_str(), mode );
 			close ( fd );
-			return ( strdup ( fileName.c_str() ) );
+			return ( pwx_strdup ( fileName.c_str() ) );
 		}
 	}
 	PWX_CATCH_AND_FORGET ( std::exception )
