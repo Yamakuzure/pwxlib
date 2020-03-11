@@ -118,10 +118,16 @@ struct VArgTargetBase {
 	// ==== Public methods that do not need a templated value ====
 
 
-	/** @brief returns true if at least one parameter was processed
+	/** @brief Return true if at least one parameter was processed
 	  * @return true if at least one parameter was processed, false otherwise.
 	  */
 	bool hasParameter  () const noexcept { return gotParameter; };
+
+
+	/** @brief Return true if this ArgTarget must be found at least once
+	  * @return true if `set_type` is AT_EXACTLY_ONCE or AT_ONE_OR_MANY, false otherwise
+	  */
+	bool isMandatory   () const noexcept { return ( (AT_EXACTLY_ONCE == set_type) || (AT_ONE_OR_MANY == set_type) ); }
 
 
 	/** @brief return true if a parameter is needed according type
