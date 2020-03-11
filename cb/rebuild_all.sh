@@ -8,9 +8,10 @@ if [[ "x" == "x$xType" ]]; then
 	echo "Type can be one of:"
 	echo "  release - Release build"
 	echo "  debug   - Debug build"
-	echo "  asan      - Use address sanitizer (enables debug) (disables lsan)"
-	echo "  lsan      - Use leak sanitizer    (enables debug) (also enables asan)"
-	echo "  tsan      - Use thread sanitizer  (enables debug)"
+	echo "  dev     - Debug build with small tests"
+	echo "  asan    - Use address sanitizer (enables debug) (disables lsan)"
+	echo "  lsan    - Use leak sanitizer    (enables debug) (also enables asan)"
+	echo "  tsan    - Use thread sanitizer  (enables debug)"
 	exit 0
 fi
 
@@ -22,6 +23,8 @@ if [[ "release" == "$xType" ]]; then
 	base_opts="--buildtype=release -Ddebug=false -Doptimization=2"
 elif [[ "debug" == "$xType" ]]; then
 	base_opts="--buildtype=debug -Ddebug=true -Doptimization=g"
+elif [[ "dev" == "$xType" ]]; then
+	base_opts="--buildtype=debug -Ddebug=true -Dsmall_tests=true -Doptimization=g"
 elif [[ "asan" == "$xType" ]]; then
 	export ASAN_OPTIONS=detect_leaks=0
 	base_opts="--buildtype=debug -Ddebug=true -Db_sanitize=address -Dsmall_tests=true -Doptimization=g"
