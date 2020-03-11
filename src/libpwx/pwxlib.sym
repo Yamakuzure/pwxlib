@@ -122,5 +122,6 @@ global:
         pwx::finish*;
         pwx::mem_map_report*;
         pwx::reallocate*;
+        pwx::strdup*;
     };
 } LIBPWX_0_8_99;
