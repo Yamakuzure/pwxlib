@@ -29,180 +29,704 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="test_lib">
+				<Option output="../build/test_lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="$make -f $makefile test" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile test" />
+					<SilentBuild command="$make -f $makefile test &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../Makefile" />
-		<Unit filename="../TODO.md" />
-		<Unit filename="../build/config.h" />
-		<Unit filename="../build/test/test-libpwx-sym.cpp" />
-		<Unit filename="../configure" />
-		<Unit filename="../doc/doxyfile.in" />
-		<Unit filename="../doc/meson.build" />
-		<Unit filename="../meson.build" />
-		<Unit filename="../meson/check_compilation.sh" />
-		<Unit filename="../meson/find_source.sh" />
-		<Unit filename="../meson/link_test.cpp" />
-		<Unit filename="../meson_options.txt" />
-		<Unit filename="../src/PAH" />
-		<Unit filename="../src/PArgHandler" />
-		<Unit filename="../src/PBasic" />
-		<Unit filename="../src/PChainHash" />
-		<Unit filename="../src/PContainers" />
-		<Unit filename="../src/PDoubleList" />
-		<Unit filename="../src/PDoubleRing" />
-		<Unit filename="../src/PException" />
-		<Unit filename="../src/PLockGuard" />
-		<Unit filename="../src/PLockable" />
-		<Unit filename="../src/PMath" />
-		<Unit filename="../src/POpenHash" />
-		<Unit filename="../src/PQueue" />
-		<Unit filename="../src/PRandom" />
-		<Unit filename="../src/PSet" />
-		<Unit filename="../src/PSinCos" />
-		<Unit filename="../src/PSingleList" />
-		<Unit filename="../src/PSingleRing" />
-		<Unit filename="../src/PStack" />
-		<Unit filename="../src/PStreamHelpers" />
-		<Unit filename="../src/PTools" />
-		<Unit filename="../src/PUtils" />
-		<Unit filename="../src/PWXLib" />
-		<Unit filename="../src/PWaveColor" />
-		<Unit filename="../src/PWorkers" />
-		<Unit filename="../src/RNG" />
-		<Unit filename="../src/SCT" />
-		<Unit filename="../src/arg_handler/CArgHandler.cpp" />
-		<Unit filename="../src/arg_handler/CArgHandler.h" />
-		<Unit filename="../src/arg_handler/TArgTarget.cpp" />
-		<Unit filename="../src/arg_handler/TArgTarget.h" />
-		<Unit filename="../src/arg_handler/VArgTargetBase.cpp" />
-		<Unit filename="../src/arg_handler/VArgTargetBase.h" />
-		<Unit filename="../src/arg_handler/eArgErrorNumber.h" />
-		<Unit filename="../src/arg_handler/eArgTargetType.h" />
-		<Unit filename="../src/arg_handler/eArgType.h" />
-		<Unit filename="../src/arg_handler/meson.build" />
-		<Unit filename="../src/arg_handler/sArgError.cpp" />
-		<Unit filename="../src/arg_handler/sArgError.h" />
-		<Unit filename="../src/basic/CException.cpp" />
-		<Unit filename="../src/basic/CException.h" />
-		<Unit filename="../src/basic/CLockGuard.cpp" />
-		<Unit filename="../src/basic/CLockGuard.h" />
-		<Unit filename="../src/basic/CLockable.cpp" />
-		<Unit filename="../src/basic/CLockable.h" />
-		<Unit filename="../src/basic/_mem_map.cpp" />
-		<Unit filename="../src/basic/_mem_map.h" />
-		<Unit filename="../src/basic/_mem_wrapper.h" />
-		<Unit filename="../src/basic/alloc_utils.h" />
-		<Unit filename="../src/basic/debug.cpp" />
-		<Unit filename="../src/basic/mem_utils.cpp" />
-		<Unit filename="../src/basic/mem_utils.h" />
-		<Unit filename="../src/basic/meson.build" />
-		<Unit filename="../src/basic/pwx_compiler.h" />
-		<Unit filename="../src/basic/pwx_debug.h" />
-		<Unit filename="../src/basic/pwx_macros.h" />
-		<Unit filename="../src/basic/pwx_templates.h" />
-		<Unit filename="../src/basic/pwx_trace_info.h" />
-		<Unit filename="../src/basic/pwx_types.h" />
-		<Unit filename="../src/basic/string_utils.h" />
-		<Unit filename="../src/basic/trace_info.cpp" />
-		<Unit filename="../src/container/CHashBuilder.cpp" />
-		<Unit filename="../src/container/CHashBuilder.h" />
-		<Unit filename="../src/container/CThreadElementStore.cpp" />
-		<Unit filename="../src/container/CThreadElementStore.h" />
-		<Unit filename="../src/container/TChainHash.h" />
-		<Unit filename="../src/container/TDoubleElement.h" />
-		<Unit filename="../src/container/TDoubleList.h" />
-		<Unit filename="../src/container/TDoubleRing.h" />
-		<Unit filename="../src/container/THashElement.h" />
-		<Unit filename="../src/container/TOpenHash.h" />
-		<Unit filename="../src/container/TQueue.h" />
-		<Unit filename="../src/container/TSet.h" />
-		<Unit filename="../src/container/TSingleElement.h" />
-		<Unit filename="../src/container/TSingleList.h" />
-		<Unit filename="../src/container/TSingleRing.h" />
-		<Unit filename="../src/container/TStack.h" />
-		<Unit filename="../src/container/TVarDeleter.h" />
-		<Unit filename="../src/container/VContainer.cpp" />
-		<Unit filename="../src/container/VContainer.h" />
-		<Unit filename="../src/container/VElement.cpp" />
-		<Unit filename="../src/container/VElement.h" />
-		<Unit filename="../src/container/VTHashBase.h" />
-		<Unit filename="../src/container/meson.build" />
-		<Unit filename="../src/functions/meson.build" />
-		<Unit filename="../src/functions/pwx_set_func.h" />
-		<Unit filename="../src/functions/pwx_set_fwd.h" />
-		<Unit filename="../src/libpwx/basic.h" />
-		<Unit filename="../src/libpwx/containers.h" />
-		<Unit filename="../src/libpwx/finish.cpp" />
-		<Unit filename="../src/libpwx/finish.h" />
-		<Unit filename="../src/libpwx/meson.build" />
-		<Unit filename="../src/libpwx/pwxlib.pc.in" />
-		<Unit filename="../src/libpwx/pwxlib.sym" />
-		<Unit filename="../src/libpwx/tools.h" />
-		<Unit filename="../src/libpwx/utils.h" />
-		<Unit filename="../src/libpwx/worker_PAH.cpp" />
-		<Unit filename="../src/libpwx/worker_PAH.h" />
-		<Unit filename="../src/libpwx/worker_RNG.cpp" />
-		<Unit filename="../src/libpwx/worker_RNG.h" />
-		<Unit filename="../src/libpwx/worker_SCT.cpp" />
-		<Unit filename="../src/libpwx/worker_SCT.h" />
-		<Unit filename="../src/libpwx/workers.h" />
-		<Unit filename="../src/math_helpers/CSinCosTable.cpp" />
-		<Unit filename="../src/math_helpers/CSinCosTable.h" />
-		<Unit filename="../src/math_helpers/MathHelpers.cpp" />
-		<Unit filename="../src/math_helpers/MathHelpers.h" />
-		<Unit filename="../src/math_helpers/meson.build" />
-		<Unit filename="../src/meson.build" />
-		<Unit filename="../src/pwxlib.h" />
-		<Unit filename="../src/random/CRandom.cpp" />
-		<Unit filename="../src/random/CRandom.h" />
-		<Unit filename="../src/random/CRandomConstants.h" />
-		<Unit filename="../src/random/CRandomTHash.cpp" />
-		<Unit filename="../src/random/CRandomTHash.h" />
-		<Unit filename="../src/random/CRandomTRandom.cpp" />
-		<Unit filename="../src/random/CRandomTRandom.h" />
-		<Unit filename="../src/random/CRandomWordConstants.h" />
-		<Unit filename="../src/random/eNameSourceType.cpp" />
-		<Unit filename="../src/random/eNameSourceType.h" />
-		<Unit filename="../src/random/meson.build" />
-		<Unit filename="../src/stream_helpers/StreamHelpers.cpp" />
-		<Unit filename="../src/stream_helpers/StreamHelpers.h" />
-		<Unit filename="../src/stream_helpers/meson.build" />
-		<Unit filename="../src/wavecolor/CWaveColor.cpp" />
-		<Unit filename="../src/wavecolor/CWaveColor.h" />
-		<Unit filename="../src/wavecolor/meson.build" />
-		<Unit filename="../test/cluster_check.cpp" />
-		<Unit filename="../test/cluster_check.h" />
-		<Unit filename="../test/destroy.cpp" />
-		<Unit filename="../test/destroy.h" />
-		<Unit filename="../test/env.h" />
-		<Unit filename="../test/generate-sym-test.py" />
-		<Unit filename="../test/hash_builder.cpp" />
-		<Unit filename="../test/hash_builder.h" />
-		<Unit filename="../test/meson.build" />
-		<Unit filename="../test/namegen.cpp" />
-		<Unit filename="../test/testColor.cpp" />
-		<Unit filename="../test/testColor.h" />
-		<Unit filename="../test/testHash.h" />
-		<Unit filename="../test/testListRing.h" />
-		<Unit filename="../test/testPAH.cpp" />
-		<Unit filename="../test/testPAH.h" />
-		<Unit filename="../test/testRNG.cpp" />
-		<Unit filename="../test/testRNG.h" />
-		<Unit filename="../test/testRNG_func.cpp" />
-		<Unit filename="../test/testRNG_func.h" />
-		<Unit filename="../test/testSCT.cpp" />
-		<Unit filename="../test/testSCT.h" />
-		<Unit filename="../test/testSet.h" />
-		<Unit filename="../test/testSpeed.h" />
-		<Unit filename="../test/testStackQueue.h" />
-		<Unit filename="../test/testThreads.h" />
-		<Unit filename="../test/test_lib.cpp" />
-		<Unit filename="../test/test_lib.h" />
-		<Unit filename="../test/torture.cpp" />
-		<Unit filename="../test/torture.h" />
-		<Unit filename="rebuild_all.sh" />
+		<Unit filename="../Makefile">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../TODO.md">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../build/config.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../build/test/test-libpwx-sym.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../configure">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../doc/doxyfile.in">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../doc/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../meson/check_compilation.sh">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../meson/find_source.sh">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../meson/link_test.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../meson_options.txt">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PAH">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PArgHandler">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PBasic">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PChainHash">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PContainers">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PDoubleList">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PDoubleRing">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PException">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PLockGuard">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PLockable">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PMath">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/POpenHash">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PQueue">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PRandom">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PSet">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PSinCos">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PSingleList">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PSingleRing">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PStack">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PStreamHelpers">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PTools">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PUtils">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PWXLib">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PWaveColor">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/PWorkers">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/RNG">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/SCT">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/CArgHandler.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/CArgHandler.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/TArgTarget.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/TArgTarget.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/VArgTargetBase.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/VArgTargetBase.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/eArgErrorNumber.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/eArgTargetType.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/eArgType.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/sArgError.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/arg_handler/sArgError.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/CException.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/CException.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/CLockGuard.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/CLockGuard.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/CLockable.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/CLockable.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/_mem_map.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/_mem_map.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/_mem_wrapper.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/alloc_utils.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/debug.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/mem_utils.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/mem_utils.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/pwx_compiler.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/pwx_debug.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/pwx_macros.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/pwx_templates.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/pwx_trace_info.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/pwx_types.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/string_utils.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/basic/trace_info.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/CHashBuilder.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/CHashBuilder.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/CThreadElementStore.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/CThreadElementStore.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TChainHash.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TDoubleElement.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TDoubleList.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TDoubleRing.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/THashElement.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TOpenHash.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TQueue.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TSet.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TSingleElement.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TSingleList.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TSingleRing.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TStack.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/TVarDeleter.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/VContainer.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/VContainer.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/VElement.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/VElement.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/VTHashBase.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/container/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/functions/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/functions/pwx_set_func.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/functions/pwx_set_fwd.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/basic.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/containers.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/finish.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/finish.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/pwxlib.pc.in">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/pwxlib.sym">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/tools.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/utils.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/worker_PAH.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/worker_PAH.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/worker_RNG.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/worker_RNG.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/worker_SCT.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/worker_SCT.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/libpwx/workers.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/math_helpers/CSinCosTable.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/math_helpers/CSinCosTable.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/math_helpers/MathHelpers.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/math_helpers/MathHelpers.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/math_helpers/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/pwxlib.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandom.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandom.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandomConstants.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandomTHash.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandomTHash.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandomTRandom.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandomTRandom.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/CRandomWordConstants.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/eNameSourceType.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/eNameSourceType.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/random/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/stream_helpers/StreamHelpers.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/stream_helpers/StreamHelpers.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/stream_helpers/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/wavecolor/CWaveColor.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/wavecolor/CWaveColor.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../src/wavecolor/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/cluster_check.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/cluster_check.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/destroy.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/destroy.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/env.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/generate-sym-test.py">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/hash_builder.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/hash_builder.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/meson.build">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/namegen.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testColor.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testColor.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testHash.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testListRing.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testPAH.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testPAH.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testRNG.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testRNG.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testRNG_func.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testRNG_func.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testSCT.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testSCT.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testSet.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testSpeed.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testStackQueue.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/testThreads.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/test_lib.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/test_lib.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/torture.cpp">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="../test/torture.h">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
+		<Unit filename="rebuild_all.sh">
+			<Option target="all" />
+			<Option target="clean" />
+		</Unit>
 		<Extensions>
 			<editor_config active="1" use_tabs="1" tab_indents="1" tab_width="8" indent="8" eol_mode="2" />
 			<lib_finder disable_auto="1" />
