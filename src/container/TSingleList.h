@@ -981,11 +981,11 @@ protected:
 			return nullptr;
 
 		// Rule 1: Lock for the basic tests.
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) )
+		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
 
 		// Exit if the list has been emptied while we waited for the lock
 		if ( empty() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return nullptr;
 		}
 
@@ -1056,10 +1056,10 @@ protected:
 			return nullptr;
 
 		// Rule 1
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) )
+		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
 
 		if ( empty() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return nullptr;
 		}
 
@@ -1130,10 +1130,10 @@ protected:
 			return nullptr;
 
 		// Rule 1
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) )
+		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
 
 		if ( empty() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return nullptr;
 		}
 
@@ -1635,11 +1635,11 @@ private:
 	/// @brief preparation method to insert data before the first greater element
 	virtual uint32_t privInsElemSorted( elem_t const& src ) {
 		// 1: Check source:
-		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) )
+		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) )
+			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
 			           "An element used as source for insertion is destroyed." );
 		}

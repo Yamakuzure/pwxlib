@@ -391,7 +391,7 @@ public:
 	**/
 	virtual list_t& operator= ( const list_t& rhs ) {
 		if ( &rhs != this ) {
-			PWX_DOUBLE_LOCK_GUARD ( this, const_cast<list_t*> ( &rhs ) )
+			PWX_DOUBLE_LOCK_GUARD ( this, const_cast<list_t*> ( &rhs ) );
 			clear();
 			destroy = rhs.destroy;
 			PWX_TRY_PWX_FURTHER ( *this += rhs )

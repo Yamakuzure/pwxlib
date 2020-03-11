@@ -1614,11 +1614,11 @@ private:
 	**/
 	virtual uint32_t privAdd( const elem_t& src ) {
 		// 1: Check source:
-		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) )
+		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) )
+			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
 			           "An element used as source for insertion is destroyed." );
 		}

@@ -232,7 +232,7 @@
 **/
 #define PWX_TRY_PWX_FURTHER(func)     \
 	PWX_TRY(func)         \
-	PWX_THROW_PWX_FURTHER \
+	PWX_THROW_PWX_FURTHER
 
 
 /** @brief try and throw `std::exception` as `pwx::CExceptions` further
@@ -249,7 +249,7 @@
 **/
 #define PWX_TRY_STD_FURTHER(func, name, desc)     \
 	PWX_TRY(func)                     \
-	PWX_THROW_STD_FURTHER(name, desc) \
+	PWX_THROW_STD_FURTHER(name, desc)
 
 
 /** @brief try and throw both `std::exception` and `pwx::CExceptions` further
@@ -267,7 +267,7 @@
 #define PWX_TRY_PWXSTD_FURTHER(func, name, desc)   \
 	PWX_TRY(func)                      \
 	PWX_THROW_PWX_FURTHER              \
-	PWX_THROW_STD_FURTHER(name, desc)  \
+	PWX_THROW_STD_FURTHER(name, desc)
 
 
 /** @brief This catches and ignores an exception.
@@ -310,7 +310,7 @@ if (nullptr != (object) ) { \
 **/
 #define PWX_LOCK_OBJ(object) \
 	assert (object);     \
-	(object)->lock();
+	(object)->lock()
 
 
 /** @brief Use `object->try_lock89` if @a object is defined
@@ -399,8 +399,7 @@ if (object) {               \
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to lock
 **/
-#define PWX_NAMED_LOCK_GUARD(Name, object)                      \
-	::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object);
+#define PWX_NAMED_LOCK_GUARD(Name, object) ::pwx::CLockGuard pwx_libpwx_lock_guard_##Name(object)
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope
@@ -425,9 +424,7 @@ if (object) {               \
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
-#define PWX_NAMED_LOCK_GUARD_CLEAR(Name) {                                   \
-	pwx_libpwx_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-}
+#define PWX_NAMED_LOCK_GUARD_CLEAR(Name) pwx_libpwx_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK)
 
 
 /** @brief Clear the lock guard named after the enclosing function, unlocking all currently held objects
@@ -446,9 +443,7 @@ if (object) {               \
   * @param Name a string to add to the local variable name to be able to use more than one guard
   * @param object pointer to the object to reset the lock guard to
 **/
-#define PWX_NAMED_LOCK_GUARD_RESET(Name, object) {  \
-	pwx_libpwx_lock_guard_##Name.reset(object); \
-}
+#define PWX_NAMED_LOCK_GUARD_RESET(Name, object) pwx_libpwx_lock_guard_##Name.reset(object)
 
 
 /** @brief Reset a lock guard to a new value
@@ -470,9 +465,8 @@ if (object) {               \
   * @param objA pointer to the first object to lock
   * @param objB pointer to the second object to lock
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB)    \
-	::pwx::CLockGuard                                \
-	pwx_libpwx_double_lock_guard_##Name(objA, objB);
+#define PWX_NAMED_DOUBLE_LOCK_GUARD(Name, objA, objB) \
+	::pwx::CLockGuard pwx_libpwx_double_lock_guard_##Name(objA, objB)
 
 
 /** @brief Create a lock guard on two given objects, which are unlocked when leaving the current scope
@@ -491,9 +485,9 @@ if (object) {               \
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(Name) {                                   \
-	pwx_libpwx_double_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-}
+#define PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(Name) \
+	pwx_libpwx_double_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK)
+
 
 
 /** @brief Clear the double lock guard named after the enclosing function, unlocking all currently held objects
@@ -511,9 +505,8 @@ if (object) {               \
   * @param objA pointer to the first object to reset the lock guard to
   * @param objB pointer to the second object to reset the lock guard to
 **/
-#define PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(Name, objA, objB) {  \
-	pwx_libpwx_double_lock_guard_##Name.reset(objA, objB); \
-}
+#define PWX_NAMED_DOUBLE_LOCK_GUARD_RESET(Name, objA, objB) \
+	pwx_libpwx_double_lock_guard_##Name.reset(objA, objB)
 
 
 /** @brief Reset a double lock guard to two new values
@@ -537,8 +530,7 @@ if (object) {               \
   * @param objC pointer to the second object to lock
 **/
 #define PWX_NAMED_TRIPLE_LOCK_GUARD(Name, objA, objB, objC)    \
-	::pwx::CLockGuard                                      \
-	pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC);
+	::pwx::CLockGuard pwx_libpwx_triple_lock_guard_##Name(objA, objB, objC)
 
 
 /** @brief Create a lock guard on three given objects, which are unlocked when leaving the current scope
@@ -559,9 +551,8 @@ if (object) {               \
   *
   * @param Name a string to add to the local variable name to be able to use more than one guard
 **/
-#define PWX_NAMED_TRIPLE_LOCK_GUARD_CLEAR(Name) {                             \
-	pwx_libpwx_triple_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK); \
-}
+#define PWX_NAMED_TRIPLE_LOCK_GUARD_CLEAR(Name) \
+	pwx_libpwx_triple_lock_guard_##Name.reset(NULL_LOCK, NULL_LOCK, NULL_LOCK)
 
 
 /** @brief Clear the triple lock guard named after the enclosing function, unlocking all currently held objects
@@ -580,9 +571,8 @@ if (object) {               \
   * @param objB pointer to the second object to reset the lock guard to
   * @param objC pointer to the third object to reset the lock guard to
 **/
-#define PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(Name, objA, objB, objC) {  \
-	pwx_libpwx_triple_lock_guard_##Name.reset(objA, objB, objC); \
-}
+#define PWX_NAMED_TRIPLE_LOCK_GUARD_RESET(Name, objA, objB, objC) \
+	pwx_libpwx_triple_lock_guard_##Name.reset(objA, objB, objC)
 
 
 /** @brief Reset a triple lock guard to two new values
