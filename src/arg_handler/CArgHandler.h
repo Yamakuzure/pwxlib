@@ -183,15 +183,21 @@ public:
 
 		bool hasLong    = arg->arg_long.length();
 		bool hasShort   = arg->arg_short.length();
+		bool hasParam   = arg->param_name.length();
 		bool isLongNew  = hasLong  ? !longArgs.exists( arg->arg_long )   : true;
 		bool isShortNew = hasShort ? !shortArgs.exists( arg->arg_short ) : true;
 
+		assert( ( hasLong || hasParam || hasShort ) && "Either short, long or param must be set!");
+		if ( !(hasLong || hasParam || hasShort) )
+			PWX_THROW( "ArgTargetCreationFailed", "arg empty",
+			           "Neither short nor long argument or a parameter name were given" );
+
 		if ( !(isLongNew && isShortNew) )
-			PWX_THROW("ArgTargetCreationFailed", "arg exists",
-			          "Short and/or long argument is already registered");
+			PWX_THROW( "ArgTargetCreationFailed", "arg exists",
+			           "Short and/or long argument is already registered" );
 
 
-		// If we have both short and long argumens, the target must be copied.
+		// If we have both short and long arguments, the target must be copied.
 		// Otherwise clearing one list later will invalidate the pointer in the
 		// other and kaboom.
 		if ( hasLong || hasShort ) {
@@ -610,7 +616,7 @@ public:
 	char const* getErrorStr   ( const int32_t nr ) const noexcept;
 
 
-	/** @brief get Help string with short/long argument plus parameter
+	/** @brief get Help string for a short/long argument without description
 	  *
 	  * This method returns a string of the form
 	  * "<[short arg] [long arg]> [parameter]" for the argument identified
@@ -623,46 +629,38 @@ public:
 	  * If @a argument is nullptr or an empty string, an error message will
 	  * be returned. This condition is tested with an assert, too.
 	  *
-	  * In the default configuration the returned string is simply both
-	  * arguments and the possible parameter concatenated together.
-	  * Several optional parameters can be used to configure the output:
-	  * <BR />
-	  * The optional parameter @a length can be used to set a minimum
-	  * length. If this is set to a value different than 0, the string
-	  * returned will be filled with preceeding spaces.<BR />
-	  * The parameter @a argSep defines a separator character, defaulting
-	  * to ' ', that is placed between the short and long argument.<BR />
-	  * The parameter @a paramSep defines a separator character, defaulting
-	  * to ' ', that is placed between the argument(s) and the parameter.
-	  * <BR />
+	  * You can change the way the string is formatted with the `setHelpParams()`
+	  * method.
+	  *
 	  * If @a emptyLine is set to true, the string will consist of spaces
-	  * and possibly the separators, according to @a autoSep, only.<BR />
-	  * This parameter @a autoSep, that defaults to true, can be changed
-	  * to false to have @a argSep added in any way. By default separators
-	  * are only added if @a emptyLine is false. But even if @a emptyLine
-	  * is false, @a argSep is only added if there are both a short and
-	  * long version of the argument, and @a paramSep if there is a
-	  * parameter. If @a autoSep is false, @a argSep is placed in any way
-	  * and @a paramSep if there is at least one argument known that has
-	  * a parameter.<BR />
-	  * The last parameter @a autoSpace defaults to false and causes, if
-	  * changed to true, that extra space characters are placed around the
-	  * separators if they are something else than a space character.
+	  * and possibly the separators.
 	  *
 	  * @param[in] argument Either short or long argument to search for.
-	  * @param[in] length Minimum length of each line.
-	  * @param[in] indent Prefix these number of spaces. Default: 0
-	  * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
-	  * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
 	  * @param[in] emptyLine If set to true, a blank line with possible separators is returned.
-	  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
-	  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
 	  * @return a string with the help text or an error message if @a argument could not be found.
 	  */
-	std::string getHelpArg    ( char const* argument, size_t length = 0, size_t indent = 0,
-	                            char argSep = 0x20, char paramSep = 0x20,
-	                            bool emptyLine = false, bool autoSep = true,
-	                            bool autoSpace = false ) const noexcept;
+	std::string& getHelpArg( char const* argument, bool emptyLine = false ) const noexcept;
+
+
+	/** @brief get Help string for a positional parameter without description
+	  *
+	  * This method returns a string of the form "<parameter>" for the parameter
+	  * identified by @a position.
+	  *
+	  * If @a position is out of bounds, an error message will be returned.
+	  * This condition is tested with an assert, too.
+	  *
+	  * You can change the way the string is formatted with the `setHelpParams()`
+	  * method.
+	  *
+	  * If @a emptyLine is set to true, the string will consist of spaces
+	  * and possibly the separators.
+	  *
+	  * @param[in] position The position of the parameter, starting with 1.
+	  * @param[in] emptyLine If set to true, a blank line with possible separators is returned.
+	  * @return a string with the help text or an error message if @a parameter could not be found.
+	  */
+	std::string& getHelpArg( uint32_t position, bool emptyLine = false ) const noexcept;
 
 
 	/** @brief get Help string with the description of an argument
@@ -677,91 +675,91 @@ public:
 	  * If @a argument is nullptr or an empty string, an error message will
 	  * be returned. This condition is tested with an assert, too.
 	  *
-	  * In the default configuration the description string is simply
-	  * returned in whole. Several optional parameters can be used to
-	  * configure the output:<BR />
-	  * The optional parameter @a pos can be used to define a different
-	  * starting position. If @a pos is larger than the size of the
-	  * description, an empty string is returned.<BR />
-	  * The optional parameter @a length can be used to set a maximum
-	  * length. If this is set to a value different than 0, the string
-	  * returned will be constructed from @a pos forward to the last
-	  * space character found before @a length is reached, or up to
-	  * @a length if either the next character is a space, or no space
-	  * could be found before @a length was reached.<BR />
-	  * With @a descSep a separator character, that defaults to ' ',
-	  * can be set to be added in front of the description returned.
-	  * <BR />
-	  * The parameter @a autoSep, that defaults to true, can be changed
-	  * to false to have @a descSep added in any way. By default the
-	  * separator character is only added as is on the first line, that
-	  * is @a pos is set to 0, and is substituted with a space character
-	  * on all other lines.<BR />
-	  * The last parameter @a autoSpace defaults to false and causes, if
-	  * changed to true, that extra space characters are placed around the
-	  * @a descSep separator if it is set to something else than a space
-	  * character.
+	  * You can change the way the string is formatted with the `setHelpParams()`
+	  * method.
 	  *
 	  * @param[in] argument Either short or long argument to search for.
-	  * @param[in,out] pos Pointer to the starting position of the description, receives end position, default nullptr.
-	  * @param[in] length Maximum length of the description, default all.
-	  * @param[in] descSep Optional separator before the description. Default: ' '
-	  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
-	  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
+	  * @param[in,out] pos Get string from this position on, or all if *pos is zero. Writes final position into *pos.
+	  * @param[in] length How long the resulting string is allowed to be as a maximum.
 	  * @return a string with the description or an error message if @a argument could not be found.
 	  */
-	std::string getHelpDesc   ( char const* argument, size_t* pos = nullptr, size_t length = 0,
-	                            char descSep = 0x20, bool autoSep = true,
-	                            bool autoSpace = false ) const noexcept;
+	std::string& getHelpDesc ( char const* argument, size_t* pos, size_t length ) const noexcept;
 
 
-	/** @brief get a formatted help string
+	/** @brief get Help string with the description of a positional parameter
+	  *
+	  * This method returns the description of the parameter identified by @a position.
+	  *
+	  * If no such parameter exists, the returned string will contain a
+	  * message that the parameter could not be found. This condition is
+	  * tested with an assert.
+	  *
+	  * If @a position is out of bounds, an error message will be returned.
+	  * This condition is tested with an assert, too.
+	  *
+	  * You can change the way the string is formatted with the `setHelpParams()`
+	  * method.
+	  *
+	  * @param[in] position The position of the parameter, starting with 1.
+	  * @param[in,out] pos Get string from this position on, or all if *pos is zero. Writes final position into *pos.
+	  * @param[in] length How long the resulting string is allowed to be as a maximum.
+	  * @return a string with the description or an error message if @a position could not be found.
+	  */
+	std::string& getHelpDesc( uint32_t position, size_t* pos, size_t length ) const noexcept;
+
+
+	/** @brief get a formatted help string for a long or short argument
 	  *
 	  * This method returns a formatted help string with both
-	  * the short and long argument plus parameter are
-	  * formatted according to the found maximum lengths of all
-	  * arguments and parameters.
+	  * the short and long argument plus parameter formatted according to
+	  * the found maximum lengths of all arguments and parameters.
 	  *
-	  * If the full string does not fit into a line of the length
-	  * @a length, the description will be broken into several
-	  * lines. The minimum number of description characters, however,
-	  * is eight, even if this results in lines longer than @a length.
+	  * You can change the way the string is formatted with the `setHelpParams()`
+	  * method.
+	  *
+	  * If the full string does not fit into a line of the set line length, the
+	  * description will be broken into several lines. The minimum number of
+	  * description characters, however, is eight, even if this results in lines
+	  * longer than @a length.
 	  *
 	  * If no such argument exists, the returned string will contain a
-	  * message that the argument couldn't be found. This condition is
+	  * message that the argument could not be found. This condition is
 	  * tested with an assert.
 	  *
 	  * If @a argument is nullptr or an empty string, an error message will
 	  * be returned. This condition is tested with an assert, too.
 	  *
-	  * With the three characters @a argSep, @a paramSep and @a
-	  * descSep a seperator between the short and long argument,
-	  * the argument(s) and the parameter, and between the argument
-	  * string and the description can be set.
-	  *
-	  * If a description is long enough to cause line breakse, the set
-	  * separators are not displayed and substituted by a space
-	  * character. If the separators shall be displayed on every line,
-	  * @a autoSep can be set to false.
-	  *
-	  * The last parameter @a autoSpace defaults to false and causes, if
-	  * changed to true, that extra space characters are placed around the
-	  * separators if they are something else than a space character.
-	  *
 	  * @param[in] argument Either short or long argument to search for.
-	  * @param[in] length Maximum length of each line.
-	  * @param[in] indent Prefix these number of spaces. Default: 0
-	  * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
-	  * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
-	  * @param[in] descSep Optional separator before the description. Default: ' '
-	  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
-	  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
 	  * @return a string with the description or an error message if @a argument could not be found.
 	  */
-	std::string getHelpStr    ( char const* argument, size_t length, size_t indent = 0,
-	                            char argSep = 0x20, char paramSep = 0x20,
-	                            char descSep = 0x20, bool autoSep = true,
-	                            bool autoSpace = false ) const noexcept;
+	std::string& getHelpStr( char const* argument ) const noexcept;
+
+
+	/** @brief get a formatted help string for a positional parameter
+	  *
+	  * This method returns a formatted help string with the positional parameter
+	  * formatted according to the found maximum lengths of all arguments and
+	  * parameters.
+	  *
+	  * You can change the way the string is formatted with the `setHelpParams()`
+	  * method.
+	  *
+	  * If the full string does not fit into a line of the set line length, the
+	  * description will be broken into several lines. The minimum number of
+	  * description characters, however, is eight, even if this results in lines
+	  * longer than @a length.
+	  *
+	  * If no such parameter exists, the returned string will contain a
+	  * message that the parameter could not be found. This condition is
+	  * tested with an assert.
+	  *
+	  * If @a parameter is out of bounds, an error message will be returned.
+	  * This condition is tested with an assert, too.
+	  *
+	  * @param[in] position The position of the parameter, starting with 1.
+	  * @return a string with the description or an error message if @a position could not be found.
+	  */
+	std::string& getHelpStr( uint32_t position ) const noexcept;
 
 
 	/// @return the program call, if <I>parseArgs()</I> has found one, nullptr otherwise.
@@ -800,6 +798,46 @@ public:
 	int32_t     parseArgs     ( const int32_t argc, char const* argv[] ) noexcept;
 
 
+	/** @brief Set help string parameters parameter
+	  *
+	  * This method sets new display parameters after which the methods
+	  * `getHelpArg()`, `getHelpDesc()` and `getHelpStr()` format their
+	  * output.
+	  *
+	  * The parameter @a length can be used to set a minimum length. It's
+	  * default value is 80 characters.
+	  * If this is set to a value different than 0, the string returned by
+	  * the mentioned methods will be filled with preceeding spaces.<BR />
+	  * The parameter @a argSep defines a separator character, defaulting
+	  * to ' ', that is placed between the short and long argument.<BR />
+	  * The parameter @a paramSep defines a separator character, defaulting
+	  * to ' ', that is placed between the argument(s) and the parameter.
+	  *
+	  * The parameter @a autoSep, that defaults to true, can be changed
+	  * to false to have @a argSep added in any way, even if one of the
+	  * get methods is asked to return an empty line. By default separators
+	  * are only added on not empty lines. But even if an empty line is
+	  * requested, @a argSep is only added if there are both a short and
+	  * long version of the argument, and @a paramSep if there is a
+	  * parameter. If @a autoSep is false, @a argSep is placed in any way
+	  * and @a paramSep if there is at least one argument known that has
+	  * a parameter.<BR />
+	  * The last parameter @a autoSpace defaults to false and causes, if
+	  * changed to true, that extra space characters are placed around the
+	  * separators if they are something else than a space character.
+	  *
+	  * @param[in] length Minimum length of each line.
+	  * @param[in] indent Prefix these number of spaces. Default: 0
+	  * @param[in] argSep Optional separator between the short and the long argument. Default: ' '
+	  * @param[in] descSep Optional separator between the argument display and its description. Default: ' '
+	  * @param[in] paramSep Optional separator between the arguments and the description. Default: ' '
+	  * @param[in] autoSep Only display a separator if there is a value on each side. Default: true
+	  * @param[in] autoSpace If set to true, extra spaces will be added around the separators if they are not spaces. Default: false
+	  */
+	void setHelpParams( size_t length, size_t indent = 0,
+	                    char argSep = 0x20, char descSep = 0x20, char paramSep = 0x20,
+	                    bool autoSep = true, bool autoSpace = false ) noexcept;
+
 private:
 
 	/* ===============================================
@@ -812,19 +850,39 @@ private:
         static void do_not_destroy( data_t * ) { }
 
 
-	/// @brief get target for short/long arg @arg or return nullptr if not found
-	data_t* getTarget  ( char const* arg )                       const noexcept;
+        /// @brief Internal helper to format the left side of an argument help string
+        std::string& formatHelpArg( data_t* target, bool emptyLine ) const noexcept;
+
+
+        /// @brief Internal helper to format the right side of an argument help string
+        std::string& formatHelpDesc( data_t* target, size_t* pos, size_t length ) const noexcept;
+
+
+        /// @brief Internal helper to format the full help string
+        std::string& formatHelpStr( data_t* target ) const noexcept;
+
+
+	/// @brief get target for short/long argument @a arg or return nullptr if not found
+	data_t* getTarget( char const* arg ) const noexcept;
+
+
+	/// @brief get target for position @a pos or return nullptr if not found
+	data_t* getTarget( uint32_t pos ) const noexcept;
 
 
 	/// @brief store argc/argv in pass_cnt/pass_args values
-	void    passThrough( const int32_t argc, char const** argv )       noexcept;
+	void passThrough( const int32_t argc, char const** argv ) noexcept;
 
 
 	/** @brief try to split @a arg into short arguments and push on @a arg_list.
 	  * arg_list will be empty if false is returned.
 	  * @return true if all characters could be found, false otherwise.
 	**/
-	bool    uncombine  ( char const* arg, arg_list_t& arg_list );
+	bool uncombine( char const* arg, arg_list_t& arg_list );
+
+
+	/// @brief Update left/right side of help strings according to what was recorded
+	void updateLayout( void ) const noexcept;
 
 
 	/* ===============================================
@@ -832,18 +890,28 @@ private:
 	 * ===============================================
 	 */
 
-	errlist_t  errlist;     //!< stores generated error messages
-	hash_t     longArgs;    //!< stores targets using their long argument as key
-	size_t     maxLongLen;  //!< longest "long" argument size
-	size_t     maxParamLen; //!< longest parameter name size
-	size_t     maxShortLen; //!< longest "short" argument size
-	char***    pass_args;   //!< The target to store arguments to pass through
-	char*      pass_init;   //!< The character sequence starting the pass through distribution
-	int32_t*   pass_cnt;    //!< The target to store the number of passed through arguments
-	arg_list_t posQueue;    //!< Queue of positional arguments
-	char*      prgCall;     //!< If set, argv[0] containing the program call is stored in here.
-	hash_t     shortArgs;   //!< stores targets using their short argument as key
-
+	errlist_t  errlist;                 //!< stores generated error messages
+	char       helpArgSep    = 0x20;    //!< Separator between the short and the long argument.
+	bool       helpAutoSep   = true;    //!< Only display a separator if there is a value on each side.
+	bool       helpAutoSpace = false;   //!< Add extra spaces around separators if they are not spaces.
+	char       helpDescSep   = 0x20;    //!< Separator between argument display and description.
+	size_t     helpIndent    = 0;       //!< Prefix each help line with this number of spaces.
+	size_t     helpLength    = 80;      //!< Minimum length of each help line length
+	char       helpParSep    = 0x20;    //!< Separator between the arguments and the description.
+	mutable
+	size_t     helpSizeLeft  = 0;       //!< Size of the left size of argument/parameter help strings
+	mutable
+	size_t     helpSizeRight = 0;       //!< Size of the right size of argument/parameter help strings
+	hash_t     longArgs;                //!< stores targets using their long argument as key
+	size_t     maxLongLen    = 0;       //!< longest "long" argument size
+	size_t     maxParamLen   = 0;       //!< longest parameter name size
+	size_t     maxShortLen   = 0;       //!< longest "short" argument size
+	char***    pass_args     = nullptr; //!< The target to store arguments to pass through
+	int32_t*   pass_cnt      = nullptr; //!< The target to store the number of passed through arguments
+	char*      pass_init     = nullptr; //!< The character sequence starting the pass through distribution
+	arg_list_t posQueue;                //!< Queue of positional arguments
+	char*      prgCall       = nullptr; //!< If set, argv[0] containing the program call is stored in here.
+	hash_t     shortArgs;               //!< stores targets using their short argument as key
 };
 
 } // namespace pwx

@@ -37,6 +37,8 @@
 #include "basic/pwx_debug.h"
 
 #include "arg_handler/CArgHandler.h"
+#include "arg_handler/eArgTargetType.h"
+#include "arg_handler/eArgType.h"
 #include "basic/mem_utils.h"
 #include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
@@ -175,18 +177,12 @@ static bool internalAddArg( char const* arg_short, char const* arg_long,
 
 CArgHandler::CArgHandler() noexcept
 	: longArgs ( 37, 64, 4.0, 1.733 )
-	, maxLongLen( 0 )
-	, maxParamLen( 0 )
-	, maxShortLen( 0 )
-	, pass_args( nullptr )
-	, pass_init( nullptr )
-	, pass_cnt( nullptr )
-	, prgCall( nullptr )
 	, shortArgs( 37, 64, 4.0, 1.733 ) {
 	/* Turn of thread safety for the hashes and the error list.
 	 * Multithreading does not make any sense, here! */
 	errlist.disable_thread_safety();
 	longArgs.disable_thread_safety();
+	posQueue.disable_thread_safety();
 	shortArgs.disable_thread_safety();
 }
 
@@ -375,7 +371,7 @@ void CArgHandler::addPassthrough( char const* init_arg, int32_t* pass_argc, char
 		           "CArgHandler::addPassthrough must not be called with any parameter being nullptr!" )
 		pass_args = pass_argv;
 	pass_cnt  = pass_argc;
-	pass_init = strdup( init_arg );
+	pass_init = pwx_strdup( init_arg );
 }
 
 
@@ -395,6 +391,212 @@ void CArgHandler::clearArgs() noexcept {
 	if ( prgCall )
 		pwx_free( prgCall );
 	prgCall = nullptr;
+}
+
+
+std::string& CArgHandler::formatHelpArg( data_t* target, bool emptyLine ) const noexcept {
+	static std::string result = "";
+
+	size_t shortSize = target->arg_short.size();
+	size_t longSize  = target->arg_long.size();
+	size_t paramSize = target->param_name.size();
+	size_t paramNeed = paramSize ? paramSize + 2 :target->needsParameter() ? 3 : 0;
+	bool   addArgSpc = helpAutoSpace && helpArgSep && ( 0x20 != helpArgSep );
+	bool   addParSpc = helpAutoSpace && helpParSep && ( 0x20 != helpParSep );
+
+	// Start with indentation if set
+	if ( helpIndent )
+		result.assign( helpIndent, ' ' );
+	else
+		result.assign("");
+
+	// === First: short argument ===
+	if ( shortSize ) {
+		// a) insert spaces to right align the short arg
+		if ( shortSize < maxShortLen )
+			result.append( maxShortLen - shortSize, ' ' );
+
+		// b) Add short arg or blanks
+		if ( emptyLine )
+			result.append( shortSize, ' ' );
+		else
+			result.append( target->arg_short );
+
+		// c) Add possible separator
+		if ( helpArgSep ) {
+			if ( addArgSpc ) result += ' ';
+
+			if ( !helpAutoSep || ( !emptyLine && longSize ) )
+				result += helpArgSep;
+			else
+				result += ' ';
+
+			if ( addArgSpc ) result += ' ';
+		}
+	} else if ( longSize ) {
+		result.append( maxShortLen + ( helpArgSep && helpAutoSep ? addArgSpc ? 3 : 1 : 0 ), ' ' );
+		if ( helpArgSep && !helpAutoSep ) {
+			if ( addArgSpc ) result += ' ';
+			result += helpArgSep;
+			if ( addArgSpc ) result += ' ';
+		}
+	} // end of handling short argument
+
+	// === Second: long argument ===
+	if ( longSize ) {
+		// a) Add long arg or blanks
+		if ( emptyLine )
+			result.append( longSize, ' ' );
+		else
+			result.append( target->arg_long );
+
+		// b) insert spaces to left align the long arg
+		if ( longSize < maxLongLen )
+			result.append( maxLongLen - longSize, ' ' );
+	} else if ( shortSize ) {
+		result.append( maxLongLen + ( helpParSep && helpAutoSep && maxParamLen ? addParSpc ? 3 : 1 : 0 ), ' ' );
+		if ( helpParSep && !helpAutoSep && maxParamLen ) {
+			if ( addParSpc ) result += ' ';
+			result += helpParSep;
+			if ( addParSpc ) result += ' ';
+		}
+	} // end of handling long argument
+
+	// === Third: argument parameter ===
+	if ( (shortSize || longSize) && maxParamLen ) {
+		// a) Add possible separator
+		if ( helpParSep && longSize ) {
+			if ( addParSpc ) result += ' ';
+
+			if ( !helpAutoSep || ( !emptyLine && paramSize ) )
+				result += helpParSep;
+			else
+				result += ' ';
+
+			if ( addParSpc ) result += ' ';
+		}
+
+		// b) Add parameter or blanks
+		if ( emptyLine || !target->needsParameter() )
+			result.append( paramNeed, ' ' );
+		else {
+			result.append("<");
+			result.append( paramSize ? target->param_name : "x" );
+			result.append(">");
+		}
+
+		// c) insert spaces to left align the parameter
+		if ( paramNeed < ( maxParamLen + 2 ) )
+			result.append( maxParamLen + 2 - paramNeed, ' ' );
+	} else if ( paramSize ) {
+		if ( target->isMandatory() )
+			result.append( "<" );
+		else
+			result.append( "[" );
+
+		result.append( target->param_name );
+
+		if ( target->isMandatory() )
+			result.append( ">" );
+		else
+			result.append( "]" );
+
+		if ( result.size() < helpSizeLeft )
+			result.append( helpSizeLeft - result.size(), ' ' );
+	} // End of handling parameters
+
+	// Fourth: Before the result can be returned, it might need to be indented:
+	if ( result.size() < helpSizeLeft )
+		result.insert( 0, helpSizeLeft - result.size(), ' ' );
+
+	return result;
+}
+
+
+std::string& CArgHandler::formatHelpDesc( data_t* target, size_t* pos, size_t length ) const noexcept {
+	static std::string result;
+
+	size_t descSize = target->description.size();
+	size_t xPos     = pos ? *pos : 0;
+
+	result.assign("");
+
+	// Exit now if length is zero, it means the whole (or remainder) of the description
+	// is to be returned, or when there isn't enough left for any further formatting.
+	if ( !length || ( (target->description.size() - xPos) < length) ) {
+		if (xPos < descSize)
+			result.assign(target->description.substr( xPos ));
+		if ( pos ) *pos = target->description.size();
+		return result;
+	}
+
+	// If xPos is too large, the method can return now, too
+	if ( xPos >= descSize )
+		return result;
+
+	// Are extra spaces needed ?
+	bool addDescSpc = helpAutoSpace && helpDescSep && ( 0x20 != helpDescSep );
+
+	// The result is a substring, possibly trimmed at a space
+	// character, preceded by either helpDescSep or a ' ' according
+	// to the autoSep setting.
+	if ( helpDescSep ) {
+		if ( addDescSpc ) result.append( 1, ' ' );
+		if ( xPos && helpAutoSep )
+			result.append( 1, ' ' );
+		else
+			result.append( 1, helpDescSep );
+		if ( addDescSpc ) result.append( 1, ' ' );
+	}
+
+	// If the next character at xPos+length is not a space,
+	// the last space before xPos+length must be found to
+	// build the substring to return.
+	if ( ( xPos + length ) <= descSize ) {
+		size_t endpos = target->description.find_last_of( ' ', xPos + length );
+
+		if ( endpos > xPos ) {
+			result += target->description.substr( xPos, endpos - xPos );
+			if ( pos ) *pos += endpos + 1;
+		} else {
+			result += target->description.substr( xPos, length - 1 );
+			if ( pos ) *pos += length;
+		}
+	} else {
+		result += target->description.substr( xPos );
+		if ( pos ) *pos = target->description.size();
+	}
+
+	return result;
+}
+
+
+std::string& CArgHandler::formatHelpStr( data_t* target ) const noexcept {
+	static std::string result;
+
+	size_t descSize  = target->description.size();
+	size_t pos       = 0;
+	size_t remaining = descSize;
+	std::string desc;
+
+	result.assign("");
+
+	while ( pos < descSize ) {
+		// Add left side:
+		result.append( formatHelpArg( target, pos ? true : false ) );
+
+		// Add right side
+		desc.assign( formatHelpDesc( target, &pos, remaining < helpSizeRight ? 0 : helpSizeRight ) );
+		result.append( desc );
+
+		// Any characters left, then add a line break:
+		if ( pos < descSize )
+			result += '\n';
+
+		remaining -= desc.size();
+	}
+
+	return result;
 }
 
 
@@ -427,10 +629,8 @@ char const* CArgHandler::getErrorStr( const int32_t nr ) const noexcept {
 }
 
 
-std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t indent,
-                                     char argSep, char paramSep,
-                                     bool emptyLine, bool autoSep, bool autoSpace ) const noexcept {
-	std::string result = "";
+std::string& CArgHandler::getHelpArg( char const* argument, bool emptyLine ) const noexcept {
+	static std::string errstr = "";
 
 	assert ( argument && strlen( argument )
 	         && "ERROR: getHelpArg called with nullptr/empty argument!" );
@@ -440,219 +640,112 @@ std::string CArgHandler::getHelpArg( char const* argument, size_t length, size_t
 	assert( target && "ERROR: Couldn't find given argument!" );
 
 	if ( target ) {
-		size_t shortSize = target->arg_short.size();
-		size_t longSize  = target->arg_long.size();
-		size_t paramSize = target->param_name.size();
-		size_t paramNeed = paramSize ? paramSize + 2 : 0;
-		bool   addArgSpc = autoSpace && argSep && ( 0x20 != argSep );
-		bool   addParSpc = autoSpace && paramSep && ( 0x20 != paramSep );
-
-		// Start with indentation if set
-		if ( indent )
-			result.assign( indent, ' ' );
-
-		// === First: short argument ===
-		if ( shortSize ) {
-			// a) insert spaces to right align the short arg
-			if ( shortSize < maxShortLen )
-				result.append( maxShortLen - shortSize, ' ' );
-
-			// b) Add short arg or blanks
-			if ( emptyLine )
-				result.append( shortSize, ' ' );
-			else
-				result.append( target->arg_short );
-
-			// c) Add possible separator
-			if ( argSep ) {
-				if ( addArgSpc ) result += ' ';
-
-				if ( !autoSep || ( !emptyLine && longSize ) )
-					result += argSep;
-				else
-					result += ' ';
-
-				if ( addArgSpc ) result += ' ';
-			}
-		} else {
-			result.append( maxShortLen + ( argSep && autoSep ? addArgSpc ? 3 : 1 : 0 ), ' ' );
-			if ( argSep && !autoSep ) {
-				if ( addArgSpc ) result += ' ';
-				result += argSep;
-				if ( addArgSpc ) result += ' ';
-			}
-		} // end of handling short argument
-
-		// === Second: long argument ===
-		if ( longSize ) {
-			// a) Add long arg or blanks
-			if ( emptyLine )
-				result.append( longSize, ' ' );
-			else
-				result.append( target->arg_long );
-
-			// b) insert spaces to left align the long arg
-			if ( longSize < maxLongLen )
-				result.append( maxLongLen - longSize, ' ' );
-		} else {
-			result.append( maxLongLen + ( paramSep && autoSep && maxParamLen ? addParSpc ? 3 : 1 : 0 ), ' ' );
-			if ( paramSep && !autoSep && maxParamLen ) {
-				if ( addParSpc ) result += ' ';
-				result += paramSep;
-				if ( addParSpc ) result += ' ';
-			}
-		} // end of handling long argument
-
-		// === Third: argument parameter ===
-		if ( maxParamLen ) {
-			// a) Add possible separator
-			if ( paramSep && longSize ) {
-				if ( addParSpc ) result += ' ';
-
-				if ( !autoSep || ( !emptyLine && paramSize ) )
-					result += paramSep;
-				else
-					result += ' ';
-
-				if ( addParSpc ) result += ' ';
-			}
-
-			// b) Add parameter or blanks
-			if ( emptyLine || !paramSize )
-				result.append( paramNeed, ' ' );
-			else
-				result += "<" + target->param_name + ">";
-
-			// c) insert spaces to left align the parameter
-			if ( paramNeed < ( maxParamLen + 2 ) )
-				result.append( maxParamLen + 2 - paramNeed, ' ' );
-		} // End of handling parameters
-
-		// Fourth: Before the result can be returned, it might need to be indented:
-		if ( result.size() < length )
-			result.insert( 0, length - result.size(), ' ' );
-	} else {
-		result = "Unknown argument: ";
-		result += argument;
+		updateLayout();
+		return formatHelpArg( target, emptyLine );
 	}
 
-	return result;
+	errstr.assign( "Unknown argument: " );
+	errstr.append( argument );
+	return errstr;
 }
 
 
-std::string CArgHandler::getHelpDesc( char const* argument, size_t* pos,
-                                      size_t length, char descSep,
-                                      bool autoSep, bool autoSpace ) const noexcept {
-	assert ( argument && strlen( argument )
-	         && "ERROR: getHelpArg called with nullptr/empty argument!" );
+std::string& CArgHandler::getHelpArg(uint32_t position, bool emptyLine ) const noexcept {
+	static std::string errstr = "";
 
-	data_t* target = getTarget( argument );
+	assert ( position && "ERROR: getHelpArg called with zero position!" );
+
+	data_t* target = getTarget( position );
 
 	assert( target && "ERROR: Couldn't find given argument!" );
 
-	std::string result;
-
 	if ( target ) {
-		size_t descSize = target->description.size();
-		size_t xPos     = pos ? *pos : 0;
-
-		// Exit now if length is zero, it means the
-		// whole (or remainder) of the description
-		// is to be returned.
-		if ( !length )
-			return xPos < descSize ? target->description.substr( xPos ) : "";
-
-		// If xPos is too large, the method can return now, too
-		if ( xPos >= descSize )
-			return "";
-
-		// Are extra spaces needed ?
-		bool addDescSpc = autoSpace && descSep && ( 0x20 != descSep );
-
-		// The result is a substring, possibly trimmed at a space
-		// character, preceded by either descSep or a ' ' according
-		// to the autoSep setting.
-		if ( descSep ) {
-			if ( addDescSpc ) result.append( 1, ' ' );
-			if ( xPos && autoSep )
-				result.append( 1, ' ' );
-			else
-				result.append( 1, descSep );
-			if ( addDescSpc ) result.append( 1, ' ' );
-		}
-
-		// If the next character at xPos+length is not a space,
-		// the last space before xPos+length must be found to
-		// build the substring to return.
-		if ( ( xPos + length ) <= descSize ) {
-			size_t endpos = target->description.find_last_of( ' ', xPos + length );
-
-			if ( endpos > xPos ) {
-				result += target->description.substr( xPos, endpos - xPos );
-				if ( pos ) *pos += endpos + 1;
-			} else {
-				result += target->description.substr( xPos, length - 1 );
-				if ( pos ) *pos += length;
-			}
-		} else {
-			result += target->description.substr( xPos );
-			if ( pos ) *pos = target->description.size();
-		}
-	} else {
-		result = "Unknown argument: ";
-		result += argument;
+		updateLayout();
+		return formatHelpArg( target, emptyLine );
 	}
 
-	return result;
+	errstr.assign( "Unknown parameter for position " + std::to_string( position ) );
+	return errstr;
 }
 
 
-std::string CArgHandler::getHelpStr( char const* argument, size_t length, size_t indent,
-                                     char argSep, char paramSep, char descSep,
-                                     bool autoSep, bool autoSpace ) const noexcept {
-	std::string result;
+std::string& CArgHandler::getHelpDesc( char const* argument, size_t* pos, size_t length ) const noexcept {
+	static std::string errstr = "";
 
 	assert ( argument && strlen( argument )
-	         && "ERROR: getHelpArg called with nullptr/empty argument!" );
+	         && "ERROR: getHelpDesc called with nullptr/empty argument!" );
 
 	data_t* target = getTarget( argument );
 
 	assert( target && "ERROR: Couldn't find given argument!" );
 
 	if ( target ) {
-		/** @todo : The three methods do the checking all the time.
-		  * This should be done differently, with private non-checking
-		  * methods doing the work, and the public versions only check
-		  * and delegate.
-		  * Priority: Low.
-		**/
-		size_t leftSize  = maxShortLen + maxLongLen + maxParamLen + 2 + indent;
-		size_t rightSize = length > ( leftSize + 8 ) ? length - leftSize : 8;
-		size_t descSize  = target->description.size();
-		size_t pos       = 0;
-		std::string desc;
-
-		while ( pos < descSize ) {
-			// Add left side:
-			result.append( getHelpArg( argument, leftSize, indent,
-			                           argSep, paramSep,
-			                           pos ? true : false, autoSep, autoSpace ) );
-
-			// Add right side
-			desc.assign( getHelpDesc( argument, &pos, rightSize, descSep, autoSep, autoSpace ) );
-			result.append( desc );
-
-			// Any characters left, then add a line break:
-			if ( pos < descSize )
-				result += '\n';
-		}
-
-	} else {
-		result = "Unknown argument: ";
-		result += argument;
+		updateLayout();
+		return formatHelpDesc( target, pos, length );
 	}
 
-	return result;
+	errstr.assign( "Unknown argument: " );
+	errstr.append( argument );
+	return errstr;
+}
+
+
+std::string& CArgHandler::getHelpDesc( uint32_t position, size_t* pos, size_t length ) const noexcept {
+	static std::string errstr = "";
+
+	assert ( position && "ERROR: getHelpDesc called with zero position!" );
+
+	data_t* target = getTarget( position );
+
+	assert( target && "ERROR: Couldn't find given argument!" );
+
+	if ( target ) {
+		updateLayout();
+		return formatHelpDesc( target, pos, length );
+	}
+
+	errstr.assign( "Unknown parameter for position " + std::to_string( position ) );
+	return errstr;
+}
+
+
+std::string& CArgHandler::getHelpStr( char const* argument ) const noexcept {
+	static std::string errstr = "";
+
+	assert ( argument && strlen( argument )
+	         && "ERROR: getHelpStr called with nullptr/empty argument!" );
+
+	data_t* target = getTarget( argument );
+
+	assert( target && "ERROR: Couldn't find given argument!" );
+
+	if ( target ) {
+		updateLayout();
+		return formatHelpStr( target );
+	}
+
+	errstr.assign( "Unknown argument: " );
+	errstr.append( argument );
+	return errstr;
+}
+
+
+std::string& CArgHandler::getHelpStr( uint32_t position ) const noexcept {
+	static std::string errstr = "";
+
+	assert ( position && "ERROR: getHelpStr called with zero position!" );
+
+	data_t* target = getTarget( position );
+
+	assert( target && "ERROR: Couldn't find given argument!" );
+
+	if ( target ) {
+		updateLayout();
+		return formatHelpStr( target );
+	}
+
+	errstr.assign( "Unknown parameter for position " + std::to_string( position ) );
+	return errstr;
 }
 
 
@@ -668,7 +761,7 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 
 	if ( ( argc > 0 ) && argv && argv[0] && ( !prgCall || !strlen( prgCall ) ) )
 		/* Store argv[0] in prgCall */
-		prgCall = strdup( argv[0] );
+		prgCall = pwx_strdup( argv[0] );
 
 	if ( ( argc > 1 ) && argv && argv[1] ) {
 
@@ -848,6 +941,16 @@ CArgHandler::data_t* CArgHandler::getTarget( char const* arg ) const noexcept {
 }
 
 
+CArgHandler::data_t* CArgHandler::getTarget( uint32_t pos ) const noexcept {
+	data_t* target = nullptr;
+
+	if ( (pos > 0) && (pos <= posQueue.size()) )
+		target = posQueue[pos]->data.get();
+
+	return target;
+}
+
+
 char const* CArgHandler::getPrgCall() const noexcept {
 	return prgCall;
 }
@@ -857,9 +960,21 @@ void CArgHandler::passThrough( const int32_t argc, char const** argv ) noexcept 
 	if ( argc > 0 ) {
 		*pass_args = pwx_calloc(char*, argc);
 		for ( int32_t i = 0; *pass_args && ( i < argc ); ++i )
-			( *pass_args )[i] = strdup( argv[i] );
+			( *pass_args )[i] = pwx_strdup( argv[i] );
 		*pass_cnt = argc;
 	}
+}
+
+
+void CArgHandler::setHelpParams( size_t length, size_t indent, char argSep, char descSep,
+                                 char paramSep, bool autoSep, bool autoSpace ) noexcept {
+	helpLength    = length;
+	helpIndent    = indent;
+	helpArgSep    = argSep;
+	helpDescSep   = descSep;
+	helpParSep    = paramSep;
+	helpAutoSep   = autoSep;
+	helpAutoSpace = autoSpace;
 }
 
 
@@ -888,6 +1003,12 @@ bool CArgHandler::uncombine( char const* arg, arg_list_t& arg_list ) {
 	}
 
 	return allFound;
+}
+
+
+void CArgHandler::updateLayout( void ) const noexcept {
+		helpSizeLeft  = maxShortLen + maxLongLen + maxParamLen + 2 + helpIndent;
+		helpSizeRight = helpLength > ( helpSizeLeft + 8 ) ? helpLength - helpSizeLeft : 8;
 }
 
 
