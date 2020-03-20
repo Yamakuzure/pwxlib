@@ -468,7 +468,7 @@ template<> long double to_long_double( std::string &val ) noexcept {
 
 template<> int8_t to_int8( char const * const val ) noexcept {
 	if ( val && val[0] )
-		return static_cast<int8_t>( 0xff && std::strtol(val, nullptr, 10) );
+		return static_cast<int8_t>( 0xff & std::strtol(val, nullptr, 10) );
 	return 0;
 }
 
@@ -478,7 +478,7 @@ template<> int8_t to_int8( std::string &val ) noexcept {
 
 template<> uint8_t to_uint8( char const * const val ) noexcept {
 	if ( val && val[0] )
-		return static_cast<uint8_t>( 0xff && std::strtoul(val, nullptr, 10) );
+		return static_cast<uint8_t>( 0xff & std::strtoul(val, nullptr, 10) );
 	return 0;
 }
 
@@ -489,7 +489,7 @@ template<> uint8_t to_uint8( std::string &val ) noexcept {
 
 template<> int16_t to_int16( char const * const val ) noexcept {
 	if ( val && val[0] )
-		return static_cast<int16_t>( 0xffff && std::strtol(val, nullptr, 10) );
+		return static_cast<int16_t>( 0xffff & std::strtol(val, nullptr, 10) );
 	return 0;
 }
 
@@ -499,7 +499,7 @@ template<> int16_t to_int16( std::string &val ) noexcept {
 
 template<> uint16_t to_uint16( char const * const val ) noexcept {
 	if ( val && val[0] )
-		return static_cast<uint16_t>( 0xffff && std::strtoul(val, nullptr, 10) );
+		return static_cast<uint16_t>( 0xffff & std::strtoul(val, nullptr, 10) );
 	return 0;
 }
 
@@ -509,7 +509,7 @@ template<> uint16_t to_uint16( std::string &val ) noexcept {
 
 template<> int32_t to_int32( char const * const val ) noexcept {
 	if ( val && val[0] )
-		return static_cast<int32_t>( 0xffffffff && std::strtol(val, nullptr, 10) );
+		return static_cast<int32_t>( 0xffffffff & std::strtol(val, nullptr, 10) );
 	return 0;
 }
 
@@ -519,7 +519,7 @@ template<> int32_t to_int32( std::string &val ) noexcept {
 
 template<> uint32_t to_uint32( char const * const val ) noexcept {
 	if ( val && val[0] )
-		return static_cast<uint32_t>( 0xffffffff && std::strtoul(val, nullptr, 10) );
+		return static_cast<uint32_t>( 0xffffffff & std::strtoul(val, nullptr, 10) );
 	return 0;
 }
 
