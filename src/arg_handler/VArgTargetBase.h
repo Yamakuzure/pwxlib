@@ -130,6 +130,12 @@ struct VArgTargetBase {
 	bool isMandatory   () const noexcept { return ( (AT_EXACTLY_ONCE == set_type) || (AT_ONE_OR_MANY == set_type) ); }
 
 
+	/** @brief return true if this argument was processed successfully
+	  * @return true if processing succeeded, false if it failed or did not happen.
+	**/
+	bool isProcessed() const noexcept { return wasProcessed; }
+
+
 	/** @brief return true if a parameter is needed according type
 	  * @return true if the type needs a parameter, false otherwise
 	  */
@@ -147,6 +153,7 @@ struct VArgTargetBase {
 protected:
 
 	bool gotParameter = false; //!< Must be set to true by process() if a parameter was processed
+	bool wasProcessed = false; //!< Must be set to true by process() if processing succeeded.
 
 
 	/** @brief process an argument parameter via callback function
