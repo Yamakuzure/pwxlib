@@ -141,14 +141,16 @@ public:
 	 * ===============================================
 	 */
 
-	typedef VArgTargetBase              data_t;     //!< Default data type is VArgTargetBase - handles all derivates
-	typedef std::string                 key_t;      //!< Default key type is std::string
-	typedef THashElement<key_t, data_t> elem_t;     //!< The element for the hash containers
-	typedef TChainHash<key_t, data_t>   hash_t;     //!< Shortcut to TChainhash with key_t and data_t
-	typedef sArgError                   error_t;    //!< Shortcut to sArgError
-	typedef TQueue<error_t>             errlist_t;  //!< Shortcut to TQueue for error_t
-	typedef TQueue<data_t>              arg_list_t; //!< Shortcut to TQueue for data_t
-	typedef arg_list_t::elem_t          arg_elem_t; //!< Shortcut to the arg_list_t element type
+	typedef VArgTargetBase              data_t;        //!< Default data type is VArgTargetBase - handles all derivates
+	typedef std::string                 key_t;         //!< Default key type is std::string
+	typedef THashElement<key_t, data_t> elem_t;        //!< The element for the hash containers
+	typedef TChainHash<key_t, data_t>   hash_t;        //!< Shortcut to TChainhash with key_t and data_t
+	typedef sArgError                   error_t;       //!< Shortcut to sArgError
+	typedef TQueue<error_t>             errlist_t;     //!< Shortcut to TQueue for error_t
+	typedef TQueue<data_t>              arg_queue_t;   //!< Shortcut to TQueue for data_t
+	typedef arg_queue_t::elem_t         arg_elem_t;    //!< Shortcut to the arg_queue_t element type
+	typedef TQueue<std::string>         param_queue_t; //!< Shortcut to TQueue for std::string
+	typedef param_queue_t::elem_t       param_elem_t;  //!< Shortcut to the param_queue_t element type
 
 
 	/* ===============================================
@@ -874,11 +876,14 @@ private:
 	void passThrough( const int32_t argc, char const** argv ) noexcept;
 
 
+	/// @brief Helper to process one target, noting down caught errors.
+	void procTarget( data_t* target, char const* param );
+
 	/** @brief try to split @a arg into short arguments and push on @a arg_list.
 	  * arg_list will be empty if false is returned.
 	  * @return true if all characters could be found, false otherwise.
 	**/
-	bool uncombine( char const* arg, arg_list_t& arg_list );
+	bool uncombine( char const* arg, arg_queue_t& arg_list, uint32_t& dash_count );
 
 
 	/// @brief Update left/right side of help strings according to what was recorded
@@ -890,28 +895,28 @@ private:
 	 * ===============================================
 	 */
 
-	errlist_t  errlist;                 //!< stores generated error messages
-	char       helpArgSep    = 0x20;    //!< Separator between the short and the long argument.
-	bool       helpAutoSep   = true;    //!< Only display a separator if there is a value on each side.
-	bool       helpAutoSpace = false;   //!< Add extra spaces around separators if they are not spaces.
-	char       helpDescSep   = 0x20;    //!< Separator between argument display and description.
-	size_t     helpIndent    = 0;       //!< Prefix each help line with this number of spaces.
-	size_t     helpLength    = 80;      //!< Minimum length of each help line length
-	char       helpParSep    = 0x20;    //!< Separator between the arguments and the description.
+	errlist_t   errlist;                 //!< stores generated error messages
+	char        helpArgSep    = 0x20;    //!< Separator between the short and the long argument.
+	bool        helpAutoSep   = true;    //!< Only display a separator if there is a value on each side.
+	bool        helpAutoSpace = false;   //!< Add extra spaces around separators if they are not spaces.
+	char        helpDescSep   = 0x20;    //!< Separator between argument display and description.
+	size_t      helpIndent    = 0;       //!< Prefix each help line with this number of spaces.
+	size_t      helpLength    = 80;      //!< Minimum length of each help line length
+	char        helpParSep    = 0x20;    //!< Separator between the arguments and the description.
 	mutable
-	size_t     helpSizeLeft  = 0;       //!< Size of the left size of argument/parameter help strings
+	size_t      helpSizeLeft  = 0;       //!< Size of the left size of argument/parameter help strings
 	mutable
-	size_t     helpSizeRight = 0;       //!< Size of the right size of argument/parameter help strings
-	hash_t     longArgs;                //!< stores targets using their long argument as key
-	size_t     maxLongLen    = 0;       //!< longest "long" argument size
-	size_t     maxParamLen   = 0;       //!< longest parameter name size
-	size_t     maxShortLen   = 0;       //!< longest "short" argument size
-	char***    pass_args     = nullptr; //!< The target to store arguments to pass through
-	int32_t*   pass_cnt      = nullptr; //!< The target to store the number of passed through arguments
-	char*      pass_init     = nullptr; //!< The character sequence starting the pass through distribution
-	arg_list_t posQueue;                //!< Queue of positional arguments
-	char*      prgCall       = nullptr; //!< If set, argv[0] containing the program call is stored in here.
-	hash_t     shortArgs;               //!< stores targets using their short argument as key
+	size_t      helpSizeRight = 0;       //!< Size of the right size of argument/parameter help strings
+	hash_t      longArgs;                //!< stores targets using their long argument as key
+	size_t      maxLongLen    = 0;       //!< longest "long" argument size
+	size_t      maxParamLen   = 0;       //!< longest parameter name size
+	size_t      maxShortLen   = 0;       //!< longest "short" argument size
+	char***     pass_args     = nullptr; //!< The target to store arguments to pass through
+	int32_t*    pass_cnt      = nullptr; //!< The target to store the number of passed through arguments
+	char*       pass_init     = nullptr; //!< The character sequence starting the pass through distribution
+	arg_queue_t posQueue;                //!< Queue of positional arguments
+	char*       prgCall       = nullptr; //!< If set, argv[0] containing the program call is stored in here.
+	hash_t      shortArgs;               //!< stores targets using their short argument as key
 };
 
 } // namespace pwx

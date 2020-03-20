@@ -763,165 +763,184 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 		/* Store argv[0] in prgCall */
 		prgCall = pwx_strdup( argv[0] );
 
-	if ( ( argc > 1 ) && argv && argv[1] ) {
+	// Early exit if there is nothing to parse
+	if ( !(( argc > 1 ) && argv && argv[1]) )
+		return 0;
 
-		data_t*    lastTarget = nullptr; // holds the last target expecting a parameter
-		int32_t    idx        = 1;
-		arg_list_t arg_list( do_not_destroy );
+	/***************************************************************************************************
+	 * The scedule for our parsing is rather simple.
+	 *
+	 * 1) Walk through argv and prepare each entry:
+	 *   a: If the entry leads to a stored target, add it to the arg_queue and proceed with 2)
+	 *   b: Otherwise check whether we can 'unpack' the string, process the result and proceed with 2)
+	 *   c: If no unpacking is possible, add an error if the entry starts with a dash
+	 *   d: If the entry does not start with a dash, add it to param_queue
+	 *
+	 * 2) Walk through the arg_queue and process every target.
+	 *   a: If the target needs a parameter, pop it from param_queue
+	 *   b: Process the target with or without a parameter from a
+	 *
+	 * 3) When the regular arguments are processed, check left over items in the param queue
+	 *    against the positional targets queue.
+	 *
+	 * 4) Eventually walk through our target queues and add an error for each mandatory arguments that
+	 *    was not met in 1/2/3.
+	 **************************************************************************************************/
 
-		// The argument list does not need thread saftey:
-		arg_list.disable_thread_safety();
+	arg_queue_t   arg_queue(   do_not_destroy ); //!< Queue of found arguments
+	arg_queue_t   comb_queue(  do_not_destroy ); //!< Helper for uncombining clusters
+	int32_t       idx(1);                        //!< The position in argv we are at
+	std::string   param;                         //!< One parameter
+	param_queue_t param_queue;                   //!< Queue of found argument parameters
+	std::string   process_error;                 //!< Helper for building error messages
+	data_t*       target;                        //!< TargTarget on VArgTargetBase pointer
 
-		/* Move through argv until
-		 * a) argc is reached or
-		 * b) pass_init is reached.
-		 */
-		while ( ( idx < argc ) && argv[idx] && STRNE( argv[idx], pass_init ) ) {
-			data_t*     target      = nullptr;
-			arg_elem_t* arg_elem    = nullptr;
-			bool        callProcess = false;
+	// The queues do not need thread saftey:
+	arg_queue.disable_thread_safety();
+	comb_queue.disable_thread_safety();
+	param_queue.disable_thread_safety();
 
-			// The target is either the current argv[idx] or
-			// the oldest queued argument.
-			if ( arg_list.empty() )
-				target = getTarget( argv[idx] );
-			else {
-				arg_elem = arg_list.pop();
-				target   = arg_elem->data.get();
+
+	/// === 1) Walk through argv and prepare each entry until argc or pass_init is reached ===
+	/// --------------------------------------------------------------------------------------
+	for ( ; ( idx < argc ) && argv[idx] && STRNE( argv[idx], pass_init ) ; ++idx ) {
+		bool        isUncombined;
+		uint32_t    dashCount;
+
+		/* a: If the entry leads to a stored target, add it to the arg_queue *
+		 * ----------------------------------------------------------------- */
+		target = getTarget( argv[idx] );
+
+		if ( target ) {
+			arg_queue.push( target );
+			continue;
+		}
+
+		/* b: Otherwise check whether we can 'unpack' the string, process the result *
+		 * ------------------------------------------------------------------------- */
+		isUncombined = uncombine( argv[idx], comb_queue, dashCount );
+		if ( isUncombined ) {
+			arg_queue += comb_queue;
+			comb_queue.clear();
+			continue;
+		}
+
+		/* c: If the entry has no leading dash, assume it to be an argument parameter *
+		 * ---------------------------------------------------------------------------- */
+		if ( 0 == dashCount ) {
+			param_queue.push( new std::string( argv[idx] ) );
+			continue;
+		}
+
+		// d: Oh, an error...
+		process_error = "Unknown argument ";
+		process_error += argv[idx];
+		sArgError* argError = new sArgError( AEN_ARGUMENT_UNKNOWN, process_error.c_str() );
+		errlist.push( argError );
+	} // End of Step 1
+
+
+	/// === 2) Walk through arg_queue and process what we found                            ===
+	/// --------------------------------------------------------------------------------------
+	arg_elem_t* arg_elem = nullptr;
+	while ( (arg_elem = arg_queue.pop()) ) {
+		param = "";
+
+		target = arg_elem->data.get();
+
+		/* a: If the target needs a parameter, pop it from param_queue *
+		 * ----------------------------------------------------------- */
+		if ( target->needsParameter() && param_queue.size() ) {
+			param_elem_t* param_elem = param_queue.pop();
+			param.assign( *(param_elem->data.get()) );
+			delete param_elem;
+		}
+
+		/* b: Process the target with or without a parameter from (a) *
+		 * ---------------------------------------------------------- */
+		procTarget( target, param.size() ? param.c_str() : nullptr );
+
+		delete arg_elem;
+	} // End of processing the argument queue
+
+
+	/// === 3) When the regular arguments are processed, check left over items in the param queue ===
+	/// ===    against the positional targets queue.                                              ===
+	/// ---------------------------------------------------------------------------------------------
+	while ( param_queue.size() ) {
+		param_elem_t* param_elem = param_queue.pop();
+		param.assign( *(param_elem->data.get()) );
+		delete param_elem;
+
+		if ( posQueue.size() ) {
+			arg_elem = posQueue.pop();
+			target = arg_elem->data.get();
+
+			procTarget( target, param.c_str() );
+			PWX_TRY( posQueue.push( target ) )
+			PWX_CATCH_AND_FORGET( CException )
+
+			continue;
+		}
+
+		process_error  = "Unknown argument \"";
+		process_error += param + "\"";
+		sArgError* argError = new sArgError( AEN_ARGUMENT_UNKNOWN, process_error.c_str() );
+		errlist.push( argError );
+	}
+
+	/// === 4) Eventually walk through our target queues and add an error for each mandatory ===
+	/// ===    arguments that was not met in 1/2                                             ===
+	/// ----------------------------------------------------------------------------------------
+	size_t hash_size = shortArgs.size();
+	for ( size_t i = 0; i < hash_size ; ++i ) {
+		elem_t const* elem = shortArgs[i];
+
+		while ( elem ) {
+			elem_t* next = elem->getNext();
+			target = elem->data.get();
+
+			if ( target->isMandatory() && !target->isProcessed() ) {
+				process_error  = "Mandatory argument \"";
+				process_error += ( target->arg_long.size() ? target->arg_long : target->arg_short );
+				process_error += "\" not found in command line!";
+				sArgError* argError = new sArgError( AEN_MANDATORY_MISSING, process_error.c_str() );
+				errlist.push( argError );
 			}
 
+			elem = next;
+		}
+	} // End of walking the short args list
 
-			/* Now there are four possibilities:
-			 * 1.: target is set and will be processed.
-			 * 2.: target is not set, but a parameter is waited for.
-			 * 3.: argv[idx] is a combination of short args.
-			 * 4.: This argv[idx] is unknown.
-			*/
-			if ( target ) {
-				// === 1.: target is set and will be processed. ===
-				/* There are three possible conditions here:
-				 * a) The target does not need a parameter:
-				 *    -> call process(nullptr)
-				 * b) The target needs an argument:
-				 *    -> substitute lastTarget after it has been checked for c)
-				 * c) lastTarget did not get a parameter
-				 *    -> Add error message about that
-				*/
-				if ( target->needsParameter() ) {
-					if ( lastTarget && lastTarget->needsParameter()
-					                && ( false == lastTarget->hasParameter() ) ) {
-						// This is situation c)
-						std::string param_error = "Argument "
-						                          + ( lastTarget->arg_long.size() ? lastTarget->arg_long : lastTarget->arg_short )
-						                          + " needs a parameter \""
-						                          + lastTarget->param_name
-						                          + "\"";
-						sArgError* argError = new sArgError( AEN_PARAMETER_MISSING, param_error.c_str() );
-						errlist.push( argError );
-					} else
-						// Situation b) after checking c)
-						lastTarget = target;
-				} else
-					// Situation a)
-					callProcess = true;
+	hash_size = longArgs.size();
+	for ( size_t i = 0; i < hash_size ; ++i ) {
+		elem_t const* elem = longArgs[i];
 
-			} else if ( lastTarget && lastTarget->needsParameter() ) {
-				// === 2.: target is not set, but a parameter is waited for. ===
-				callProcess = true;
-			} else {
-				// === 3.: argv[idx] is a combination of short args. ? ===
-				bool isCombined = false;
-				try {
-					isCombined = uncombine( argv[idx], arg_list );
+		while ( elem ) {
+			elem_t* next = elem->getNext();
+			target = elem->data.get();
 
-					if ( !isCombined ) {
-						// === 4.: This argv[idx] is unknown. ===
-						std::string parse_error = "Unknown argument ";
-						parse_error += argv[idx];
-						sArgError* argError = new sArgError( AEN_ARGUMENT_UNKNOWN, parse_error.c_str() );
-						errlist.push( argError );
-					}
-				} catch ( CException& e ) {
-					// This must be noted, too!
-					std::string parse_error = "Exception \"";
-					parse_error += e.name();
-					parse_error += "\" occurred while parsing \"";
-					parse_error += argv[idx];
-					parse_error += "\"\nWhat : \"";
-					parse_error += e.what();
-					parse_error += "\"\nWhere: \"";
-					parse_error += e.where();
-					parse_error += "\"\npFunc: \"";
-					parse_error += e.pfunc();
-					parse_error += "\"\nTrace: ";
-					parse_error += e.trace();
-					parse_error += "\n--------";
-					sArgError* argError = new sArgError( AEN_PROCESSING_ERROR, parse_error.c_str() );
-					errlist.push( argError );
-					arg_list.clear();
-				}
-			} // End of argv tests
-
-			// Final Step: Call process
-			if ( callProcess ) {
-				eArgErrorNumber argErrno = AEN_OK;
-				try {
-					argErrno = target ? target->process( nullptr ) :
-					           lastTarget ? lastTarget->process( argv[idx] ) :
-					           AEN_PROCESSING_ERROR;
-
-					if ( AEN_OK != argErrno ) {
-						std::string process_error = "Parameter \"";
-						process_error += argv[idx];
-						process_error += "\" error: \"";
-						switch ( argErrno ) {
-							case AEN_PARAM_TYPE_MISMATCH:
-								process_error += "Wrong type for argument ";
-								break;
-							case AEN_PROCESSING_ERROR:
-								process_error += "Processing error for argument ";
-								break;
-							case AEN_MULTIPLE_SET_PARAM:
-								process_error += "More than one parameter for set argument ";
-								break;
-							default:
-								process_error += "Unhandled errno " + to_string( ( int )argErrno ) + " for argument ";
-						}
-						process_error += ( lastTarget->arg_long.size() ? lastTarget->arg_long : lastTarget->arg_short );
-						process_error += "\"";
-						sArgError* argError = new sArgError( argErrno, process_error.c_str() );
-						errlist.push( argError );
-					}
-				} catch( CException& e ) {
-					std::string process_error = e.name();
-					process_error += ": ";
-					process_error += e.what();
-					sArgError* argError = new sArgError( AEN_PROCESSING_ERROR, process_error.c_str() );
-					errlist.push( argError );
-				}
+			// Note: If the target has a short variant, it was already processed above.
+			if ( (0 == target->arg_short.size()) && target->isMandatory() && !target->isProcessed() ) {
+				process_error  = "Mandatory argument \"";
+				process_error += target->arg_long;
+				process_error += "\" not found in command line!";
+				sArgError* argError = new sArgError( AEN_MANDATORY_MISSING, process_error.c_str() );
+				errlist.push( argError );
 			}
 
-			// Clean up queued and processed element
-			if ( arg_elem ) {
-				delete arg_elem;
-				arg_elem = nullptr;
-			}
+			elem = next;
+		}
+	} // End of walking the long args list
 
-			// Advance the index if nothing is queued
-			if ( arg_list.empty() )
-				++idx;
-		} // End of looping argv
 
-		// At this point idx might be smaller than argc, which
-		// only means we have reached a passthrough condition.
-		if ( idx < ( argc - 1 ) )
-			// idx still points to the found pass_init, which is not passed.
-			passThrough( argc - idx - 1, &argv[idx + 1] );
+	// At this point idx might be smaller than argc, which
+	// only means we have reached a passthrough condition.
+	if ( (0 == errlist.size()) && (idx < ( argc - 1 )) )
+		// idx still points to the found pass_init, which is not passed.
+		passThrough( argc - idx - 1, &argv[idx + 1] );
 
-		return errlist.size();
-	} // End of having arguments to parse.
-
-	return 0;
+	return errlist.size();
 }
 
 
@@ -966,6 +985,64 @@ void CArgHandler::passThrough( const int32_t argc, char const** argv ) noexcept 
 }
 
 
+void CArgHandler::procTarget( data_t* target, char const* param ) {
+	std::string     process_error;
+
+	// Exit early if we are missing a needed parameter
+	if ( target->needsParameter() && ( nullptr == param ) ) {
+		process_error  = "Argument \"";
+		process_error +=  ( target->arg_long.size() ? target->arg_long : target->arg_short );
+		process_error += "\" needs a parameter <";
+		process_error += ( target->param_name.size() ? target->param_name : "x" );
+		process_error += ">";
+		sArgError* argError = new sArgError( AEN_PARAMETER_MISSING, process_error.c_str() );
+		errlist.push( argError );
+		return;
+	}
+
+	try {
+		eArgErrorNumber argErrno = target->process( param );
+
+		if ( AEN_OK != argErrno ) {
+			if ( param ) {
+				process_error  = "Parameter \"";
+				process_error += param ;
+				process_error += "\" error: ";
+			} else
+				process_error = "Processing failed: ";
+
+			switch ( argErrno ) {
+				case AEN_PARAM_TYPE_MISMATCH:
+					process_error += "Wrong type for argument \"";
+					break;
+				case AEN_PROCESSING_ERROR:
+					process_error += "Processing error for argument \"";
+					break;
+				case AEN_MULTIPLE_SET_PARAM:
+					process_error += "More than one parameter for set argument \"";
+					break;
+				default:
+					process_error += "Unhandled errno " + to_string( ( int )argErrno ) + " for argument \"";
+			}
+			process_error += ( target->arg_long.size()  ? target->arg_long
+			                 : target->arg_short.size() ? target->arg_short : target->param_name );
+			process_error += "\"";
+			sArgError* argError = new sArgError( argErrno, process_error.c_str() );
+			errlist.push( argError );
+		}
+	} catch( CException& e ) {
+		process_error  = "Exception caught while processing \"";
+		process_error += ( target->arg_long.size() ? target->arg_long : target->arg_short );
+		process_error += "\" [";
+		process_error += e.name();
+		process_error += "]: ";
+		process_error += e.what();
+		sArgError* argError = new sArgError( AEN_PROCESSING_ERROR, process_error.c_str() );
+		errlist.push( argError );
+	}
+}
+
+
 void CArgHandler::setHelpParams( size_t length, size_t indent, char argSep, char descSep,
                                  char paramSep, bool autoSep, bool autoSpace ) noexcept {
 	helpLength    = length;
@@ -978,16 +1055,18 @@ void CArgHandler::setHelpParams( size_t length, size_t indent, char argSep, char
 }
 
 
-bool CArgHandler::uncombine( char const* arg, arg_list_t& arg_list ) {
+bool CArgHandler::uncombine( char const* arg, arg_queue_t& arg_list, uint32_t &dash_count ) {
 	bool        allFound = true;
 	std::string dashes   = "";
 	char const* pChr     = arg;
 	data_t*     target   = nullptr;
 
 	// Step one: Get number of dashes
+	dash_count = 0;
 	while ( pChr && ( *pChr == '-' ) ) {
 		dashes += '-';
 		++pChr;
+		++dash_count;
 	}
 
 	// Step two, loop through the remaining characters:
