@@ -65,8 +65,8 @@ template <> eArgErrorNumber TArgTarget<std::string>::process( char const* param 
 				break;
 			case ATT_SET:
 				if ( ( ( AT_ZERO_OR_ONE  == this->set_type )
-				                || ( AT_EXACTLY_ONCE == this->set_type ) )
-				                && this->gotParameter ) {
+				    || ( AT_EXACTLY_ONCE == this->set_type ) )
+				  && this->gotParameter ) {
 					argErrno = AEN_MULTIPLE_SET_PARAM;
 				} else {
 					target->assign( param );
@@ -85,6 +85,10 @@ template <> eArgErrorNumber TArgTarget<std::string>::process( char const* param 
 	// If we have a callback function, process it now
 	if ( AEN_OK == argErrno )
 		argErrno = process_cb( param );
+
+	// note down if this was processed successfully
+	if ( AEN_OK == argErrno )
+		this->wasProcessed = true;
 
 	return argErrno;
 }

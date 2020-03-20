@@ -7,6 +7,7 @@
 		<Option execution_dir="../../pwxLib" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option virtualFolders="src/arg_handler/" />
 		<Build>
 			<Target title="all">
 				<Option output="../build/test_lib" prefix_auto="1" extension_auto="1" />
@@ -668,6 +669,7 @@
 			<Option target="clean" />
 		</Unit>
 		<Unit filename="../test/testRNG.cpp">
+			<Option virtualFolder="src/arg_handler/" />
 			<Option target="all" />
 			<Option target="clean" />
 		</Unit>
