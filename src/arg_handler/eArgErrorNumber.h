@@ -51,7 +51,8 @@ enum eArgErrorNumber {
 	AEN_PARAM_TYPE_MISMATCH = 0x00000002, //!< The type of the parameter doesn't match the target
 	AEN_PARAMETER_MISSING   = 0x00000004, //!< An argument that needs a parameter got none to process
 	AEN_PROCESSING_ERROR    = 0x00000008, //!< Set when target->process() threw an exception.
-	AEN_MULTIPLE_SET_PARAM  = 0x00000010  //!< More than one parameter provided for a STT_ERROR set target
+	AEN_MULTIPLE_SET_PARAM  = 0x00000010, //!< More than one parameter provided for a STT_ERROR set target
+	AEN_MANDATORY_MISSING   = 0x00000020  //!< A mandatory argument was not found on the command line
 };
 
 
