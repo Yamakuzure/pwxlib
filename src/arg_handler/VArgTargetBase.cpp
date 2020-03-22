@@ -101,6 +101,10 @@ bool VArgTargetBase::needsParameter() const noexcept {
 	return false;
 }
 
+void VArgTargetBase::reset() noexcept {
+	this->gotParameter = false;
+	this->wasProcessed = false;
+}
 
 VArgTargetBase& VArgTargetBase::operator=( VArgTargetBase const& rhs ) noexcept {
 	if (&rhs != this) {

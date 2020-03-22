@@ -800,6 +800,10 @@ public:
 	int32_t     parseArgs     ( const int32_t argc, char const* argv[] ) noexcept;
 
 
+	/// @brief reset all stored targets as if they were never processed.
+	void resetTargets() noexcept;
+
+
 	/** @brief Set help string parameters parameter
 	  *
 	  * This method sets new display parameters after which the methods

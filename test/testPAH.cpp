@@ -151,12 +151,11 @@ int32_t testPAH ( sEnv& env ) {
 	addFakeArg( 2, "-i" ); // Simple increase
 	addFakeArg( 3, "42" ); // Will be interpreted as positional, -a has the parameter
 	// -a is mandatory and missing.
-	PAH.parseArgs( xArgc, xArgv );
 
 	errCount = PAH.parseArgs( xArgc, xArgv );
 	cout << "  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3] << endl;
-	cout << "  -> Errors (must be 3) : " << errCount;
-	if ( 3 == errCount ) {
+	cout << "  -> Errors (must be 2) : " << errCount;
+	if ( 2 == errCount ) {
 		cout << " => Success" << endl;
 		cout << "  -> Errors found: " << endl;
 		++env.testSuccess;
@@ -177,13 +176,14 @@ int32_t testPAH ( sEnv& env ) {
 	/* 6) Eventually test with working parameters
 	-----------------------------------------------*/
 	++env.testCount;
+	PAH.resetTargets();
 	setFakeArg( 7 );
 	addFakePar( 1, "-a", "42" );
 	addFakeArg( 3, "-i" );
 	addFakePar( 4, "-s", "69" );
 	addFakeArg( 6, "/foo/bar/baz" );
 	errCount = PAH.parseArgs( xArgc, xArgv );
-	cout << "  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3]
+	cout << "\n  argv: " << xArgv[1] << ", " << xArgv[2] << ", " << xArgv[3]
 	     << ", "       << xArgv[4] << ", " << xArgv[5] << ", " << xArgv[6] << endl;
 	if ( errCount ) {
 		cout << "  -> Errors found: " << endl;
@@ -193,7 +193,8 @@ int32_t testPAH ( sEnv& env ) {
 			cout << PAH.getError( i ) << "]" << endl;
 		}
 		++env.testFail;
-	}
+	} else
+		++env.testSuccess;
 	cout << "tgt_add : " << tgt_add << endl;
 	cout << "tgt_inc : " << tgt_inc << endl;
 	cout << "tgt_str ; " << tgt_str << endl;

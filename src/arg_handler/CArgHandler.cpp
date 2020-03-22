@@ -768,7 +768,7 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 		return 0;
 
 	/***************************************************************************************************
-	 * The scedule for our parsing is rather simple.
+	 * The schedule for our parsing is rather simple.
 	 *
 	 * 1) Walk through argv and prepare each entry:
 	 *   a: If the entry leads to a stored target, add it to the arg_queue and proceed with 2)
@@ -778,7 +778,7 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 	 *
 	 * 2) Walk through the arg_queue and process every target.
 	 *   a: If the target needs a parameter, pop it from param_queue
-	 *   b: Process the target with or without a parameter from a
+	 *   b: Process the target with or without a parameter from a:
 	 *
 	 * 3) When the regular arguments are processed, check left over items in the param queue
 	 *    against the positional targets queue.
@@ -1039,6 +1039,43 @@ void CArgHandler::procTarget( data_t* target, char const* param ) {
 		process_error += e.what();
 		sArgError* argError = new sArgError( AEN_PROCESSING_ERROR, process_error.c_str() );
 		errlist.push( argError );
+	}
+}
+
+void CArgHandler::resetTargets() noexcept {
+	elem_t*     hash_elem;
+	size_t      hash_size = shortArgs.size();
+	elem_t*     hash_next;
+	arg_elem_t* pos_elem;
+	size_t      pos_size  = posQueue.size();
+	data_t*     target;
+
+	for ( size_t i = 0; i < hash_size; ++i ) {
+		hash_elem = shortArgs[i];
+
+		while ( hash_elem ) {
+			hash_next = hash_elem->getNext();
+			target    = hash_elem->data.get();
+			hash_elem = hash_next;
+			target->reset();
+		}
+	} // End of walking the short args list
+
+	hash_size = longArgs.size();
+	for ( size_t i = 0; i < hash_size; ++i ) {
+		hash_elem = longArgs[i];
+
+		while ( hash_elem ) {
+			hash_next = hash_elem->getNext();
+			target    = hash_elem->data.get();
+			hash_elem = hash_next;
+			target->reset();
+		}
+	} // End of walking the long args list
+
+	for ( size_t i = 0; i < pos_size; ++i ) {
+		pos_elem = posQueue[i];
+		pos_elem->data.get()->reset();
 	}
 }
 

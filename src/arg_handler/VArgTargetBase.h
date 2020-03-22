@@ -142,6 +142,10 @@ struct VArgTargetBase {
 	bool needsParameter() const noexcept;
 
 
+	/// @brief reset the target like it was never processed
+	void reset() noexcept;
+
+
 	/// @brief Copying assignment operator
 	VArgTargetBase& operator=( VArgTargetBase const& rhs ) noexcept;
 
