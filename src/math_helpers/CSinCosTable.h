@@ -5,7 +5,7 @@
   *
   * @brief Declaration of CSinCosTables
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

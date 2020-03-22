@@ -6,7 +6,7 @@
   *
   * @brief Helper templates and macros for various little issues
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -55,7 +55,7 @@
   * can be used to handle arguments to, and help texts from a program. Finally
   * `CFH` is a handler for configuration files of various styles like 'shell'
   * or 'ini'.
-  * 
+  *
   * *Note*: `CFH` has not been imported, yet!
   *
   * ### Thread safety ###

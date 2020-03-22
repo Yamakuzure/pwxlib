@@ -3,7 +3,7 @@
 #define PWX_LIBPWX_TEST_ENV_H_INCLUDED 1
 
 /** @file env.h
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

@@ -10,7 +10,7 @@
   * that can be read here:
   * http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
   *
-  * (c) 2007 - 2019 PrydeWorX
+  * (c) 2007 - 2020 PrydeWorX
   * @author Sven Eden, PrydeWorX - Bardowick, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
