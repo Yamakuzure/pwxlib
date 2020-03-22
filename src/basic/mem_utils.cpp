@@ -53,13 +53,16 @@ namespace pwx {
 
 /// @namespace private_
 namespace private_ {
-	#ifndef PWX_NODOX
-	#if defined(PWXLIB_DEBUG)
-	bool enable_memory_mapping = true;
-	#else
-	bool enable_memory_mapping = false;
-	#endif // PWXLIB_DEBUG
-	#endif // No doxygen on private globals!
+
+#ifndef PWX_NODOX
+
+#if defined(PWXLIB_DEBUG)
+bool enable_memory_mapping = true;
+#else
+bool enable_memory_mapping = false;
+#endif // PWXLIB_DEBUG
+
+#endif // No doxygen on private globals!
 }
 
 
@@ -67,7 +70,7 @@ namespace private_ {
 *** Public functions implementations ***
 ***************************************/
 
-void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
+void* allocate( char const* location, size_t new_size ) {
 	void* result = nullptr;
 
 	result = malloc_multiply( 1, new_size );
@@ -82,7 +85,7 @@ void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
 }
 
 
-void deallocate( [[maybe_unused]] char const* location, void*  mem ) {
+void deallocate( void*  mem ) {
 	if ( mem ) {
 
 		if ( private_::enable_memory_mapping )
@@ -93,7 +96,7 @@ void deallocate( [[maybe_unused]] char const* location, void*  mem ) {
 }
 
 
-void* reallocate( [[maybe_unused]] char const* location, void* mem, size_t new_size ) {
+void* reallocate( char const* location, void* mem, size_t new_size ) {
 
 	// Reroute at once if mem is nullptr
 	if ( nullptr == mem )
@@ -118,9 +121,11 @@ void* reallocate( [[maybe_unused]] char const* location, void* mem, size_t new_s
 }
 
 
-char* strdup( [[maybe_unused]] char const* location, char const* src ) {
-	size_t nmem   = src ? strlen(src) : 0;
-	char*  result = nmem ? (char*)allocate( location, (nmem + 1) * sizeof( char) ) : nullptr;
+char* strdup( char const* location, char const* src ) {
+	size_t nmem   = src ? strlen( src ) : 0;
+	char*  result;
+
+	result = nmem ? ( char* )allocate( location, ( nmem + 1 ) * sizeof( char ) ) : nullptr;
 
 	if ( result  ) {
 		memcpy( result, src, nmem * sizeof( char ) );
@@ -148,11 +153,11 @@ bool mem_map_report() {
  * --------------------------------------------------------------------- */
 #ifndef PWX_NODOX
 #if defined(PWX_EXPORTS) && LIBPWX_DEBUG && defined(PWX_HAVE_DEBUG_NEW_DELETE)
-void *operator new     (decltype(sizeof(0)) s) { return (void*)pwx_calloc(uint8_t, s); }
-void *operator new[]   (decltype(sizeof(0)) s) { return (void*)pwx_calloc(uint8_t, s); }
-void  operator delete  (void* ptr)                       noexcept { pwx_free(ptr); }
-void  operator delete  (void* ptr, decltype(sizeof(0)) ) noexcept { pwx_free(ptr); }
-void  operator delete[](void* ptr)                       noexcept { pwx_free(ptr); }
-void  operator delete[](void* ptr, decltype(sizeof(0)) ) noexcept { pwx_free(ptr); }
+void* operator new     ( decltype( sizeof( 0 ) ) s ) { return ( void* )pwx_calloc( uint8_t, s ); }
+void* operator new[]   ( decltype( sizeof( 0 ) ) s ) { return ( void* )pwx_calloc( uint8_t, s ); }
+void  operator delete  ( void* ptr )                       noexcept { pwx_free( ptr ); }
+void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+void  operator delete[]( void* ptr )                       noexcept { pwx_free( ptr ); }
+void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
 #endif // exports in debugging mode
 #endif // NODOX

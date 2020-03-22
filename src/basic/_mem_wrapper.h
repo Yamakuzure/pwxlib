@@ -57,10 +57,7 @@
 
 #define PWX_dealloc_internal(_p_) {                                        \
 		if ( (_p_) ) {                                             \
-			::pwx::deallocate( ::pwx::get_trace_info(__FILE__, \
-			                                        __LINE__,  \
-			                                        PWX_FUNC), \
-			                   (void*)(_p_) );                 \
+			::pwx::deallocate( (void*)(_p_) );                 \
 		} }
 
 #define PWX_realloc_internal(_p_, _s_) \
