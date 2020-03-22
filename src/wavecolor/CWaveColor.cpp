@@ -541,7 +541,7 @@ uint32_t CWaveColor::getRGB( uint8_t& r, uint8_t& g, uint8_t& b ) const noexcept
 	float     sumR   = 0, sumG  = 0, sumB = 0;
 	uint32_t  result = 0;
 
-	PWX_LOCK_GUARD(this);
+	PWX_LOCK_GUARD( this );
 	auto currWave = waves[0];
 
 	// Step one, walk through the waves and add up the colors they produce

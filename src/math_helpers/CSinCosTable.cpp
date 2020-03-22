@@ -115,7 +115,6 @@ int32_t CSinCosTable::getPrecision() const noexcept {
   */
 void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 	if ( newPrecision != precision ) {
-		PWX_LOCK_GUARD( this );
 		if (isDestroyed.load())
 			return;
 
@@ -124,10 +123,9 @@ void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 		 * b) This is a switch from live calculation
 		 *    but the precision was the same before.
 		 */
-
+		PWX_LOCK_GUARD( this );
 		if ( ( -1 != newPrecision ) // Not situation a)
-		                && ( ( newPrecision != precision_last )
-		                     || ( -1 != precision ) ) // Not situation b)
+		  && ( ( newPrecision != precision_last ) || ( -1 != precision ) ) // Not situation b)
 		   ) {
 			// Neither of the two, create new tables:
 			if ( tableCos ) delete [] tableCos;
