@@ -1311,7 +1311,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1356,7 +1355,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1389,7 +1387,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1422,7 +1419,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1457,7 +1453,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1492,7 +1487,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1525,7 +1519,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
@@ -1558,7 +1551,6 @@ protected:
 		bool doLocking = beThreadSafe();
 
 		if ( doLocking ) {
-			// No need to debug log this, so we do not use PWX_LOCK_OBJ() here.
 			hashTableLock.lock();
 			if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 				hashTableLock.unlock();
