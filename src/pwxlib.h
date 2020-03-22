@@ -19,6 +19,11 @@
   *
   * @tableofcontents
   *
+  * @section initfin Init/De-Init
+  * It is advisable to call `pwx::init()` first in your program, and `pwx::finish()`
+  * last. With the first you can enable/disable the memory allocation recording, the
+  * latter gives information about all memory allocations that were not freed.
+  *
   * @section overview Overview
   * The PrydeWorX Library is split into sections, which have their own
   * subdirectories. For simpler access all major API components have a wrapper
@@ -37,7 +42,7 @@
   * | Folder            | Content                                                       |
   * | ----------------- | ------------------------------------------------------------- |
   * | `arg_handler/`    | Components of PAH, the program argument handler               |
-  * | `basic/`          | Core tools for exception and thread lock handling             |
+  * | `basic/`          | Core tools for strings, memory, exception and locking         |
   * | `container/`      | Threadsafe containers from lists to hashes                    |
   * | `math_helpers/`   | Tools helping with angles, degrees and floating point numbers |
   * | `random/`         | Components of RNG, the Random NVal Generator                  |

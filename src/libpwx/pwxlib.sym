@@ -120,6 +120,7 @@ global:
         pwx::callocate*;
         pwx::deallocate*;
         pwx::finish*;
+        pwx::init*;
         pwx::mem_map_report*;
         pwx::reallocate*;
         pwx::strdup*;

@@ -188,4 +188,12 @@ void  operator delete[](void* ptr, decltype(sizeof(0))) noexcept;
 #include <libpwx/finish.h>
 
 
+/* ---------------------------------------------------------
+ * --- Every header has to make pwx::init() available. ---
+ * --- It does not include anything itself, so including ---
+ * --- it globally here is pretty safe.                  ---
+ * ------------------------------------------------------ */
+#include <libpwx/init.h>
+
+
 #endif // PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED

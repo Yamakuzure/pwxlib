@@ -51,6 +51,18 @@
 namespace pwx {
 
 
+/// @namespace private_
+namespace private_ {
+	#ifndef PWX_NODOX
+	#if defined(PWXLIB_DEBUG)
+	bool enable_memory_mapping = true;
+	#else
+	bool enable_memory_mapping = false;
+	#endif // PWXLIB_DEBUG
+	#endif // No doxygen on private globals!
+}
+
+
 /***************************************
 *** Public functions implementations ***
 ***************************************/
@@ -60,10 +72,8 @@ void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
 
 	result = malloc_multiply( 1, new_size );
 
-	#if defined(PWXLIB_DEBUG)
-	if ( result )
+	if ( result && private_::enable_memory_mapping )
 		private_::mem_map_add( location, new_size, result );
-	#endif // remember this allocation in debug mode
 
 	if ( !result )
 		DEBUG_ERR_THERE( location, "Allocation failed!", "Unable to allocate %ul bytes at %s", new_size );
@@ -75,9 +85,8 @@ void* allocate( [[maybe_unused]] char const* location, size_t new_size ) {
 void deallocate( [[maybe_unused]] char const* location, void*  mem ) {
 	if ( mem ) {
 
-		#if defined(PWXLIB_DEBUG)
-		private_::mem_map_del( mem );
-		#endif // remove this allocation
+		if ( private_::enable_memory_mapping )
+			private_::mem_map_del( mem );
 
 		FREE_PTR( mem );
 	}
@@ -91,30 +100,15 @@ void* reallocate( [[maybe_unused]] char const* location, void* mem, size_t new_s
 		return allocate( location, new_size );
 
 	// Fine, it is a reallocation.
-	void* result = nullptr;
-
-	#if defined(PWXLIB_DEBUG)
-	// Warn if the reallocation makes no sense
-	size_t old_size = 0;
-	if ( private_::mem_map_sizeof( mem, &old_size ) ) {
-		if ( old_size >= new_size ) {
-			DEBUG_ERR_THERE( location, "reallocate",
-			                 "Asked to reallocate from %ul to %ul bytes from %s",
-			                 old_size, new_size );
-		}
-	}
-	// Remember the old pointer, it might differ. (Size will anyway)
-	void* old_mem = mem;
-	#endif
+	void*  old_mem  = mem;
+	void*  result   = nullptr;
 
 	result = realloc( mem, new_size );
 
-	#if defined(PWXLIB_DEBUG)
-	if ( result ) {
+	if ( result && private_::enable_memory_mapping && ( old_mem != result ) ) {
 		private_::mem_map_del( old_mem );
 		private_::mem_map_add( location, new_size, result );
 	}
-	#endif // remember this allocation in debug mode
 
 	if ( !result )
 		DEBUG_ERR_THERE( location, "Reallocation failed!",
@@ -138,11 +132,9 @@ char* strdup( [[maybe_unused]] char const* location, char const* src ) {
 
 
 bool mem_map_report() {
-	#if defined(PWXLIB_DEBUG)
-	return private_::mem_map_report();
-	#else
+	if ( private_::enable_memory_mapping )
+		return private_::mem_map_report();
 	return true;
-	#endif // Debug Mode
 }
 
 
