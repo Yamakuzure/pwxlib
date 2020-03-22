@@ -140,6 +140,18 @@ private:
 	mutable hash_t  currs;                                   //!< Used when thread safety is enabled (default)
 	mutable abool_t invalidating = ATOMIC_VAR_INIT( false ); //!< If set to true by `invalidate()`, `curr()` will wait for a lock
 	mutable curr_t* oneCurr      = nullptr;                  //!< Used when thread safety is disabled
+
+
+/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
+#ifndef PWX_NODOX
+public:
+	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
+	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
+	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
+	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
+	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+#endif // NODOX
 };
 
 

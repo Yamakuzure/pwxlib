@@ -73,7 +73,7 @@ struct map_item_t {
 		, mem_size( siz )
 	{ }
 	map_item_t( const map_item_t &rhs ) {
-		location = rhs.location;
+		location = ::strdup(rhs.location ? rhs.location : "<nowhere>");
 		mem_size = rhs.mem_size;
 	}
 	map_item_t( map_item_t &&rhs ) {
@@ -84,7 +84,7 @@ struct map_item_t {
 	}
 	map_item_t &operator=( const map_item_t &rhs ) {
 		if ( &rhs != this ) {
-			location = rhs.location;
+			location = ::strdup(rhs.location ? rhs.location : "<nowhere>");
 			mem_size = rhs.mem_size;
 		}
 		return *this;
@@ -99,7 +99,8 @@ struct map_item_t {
 		return *this;
 	}
 	~map_item_t() {
-		FREE_PTR( location );
+		char* loc_ = const_cast<char*>(TAKE_PTR( location ));
+		FREE_PTR( loc_ );
 	}
 };
 
@@ -163,7 +164,7 @@ bool mem_map_report() {
 		           address, item.mem_size, item.location );
 		// The final clearing of the memory map does not touch the pointers,
 		// so it is safe to free the key here.
-		freep( const_cast<void*>( address ) );
+		//freep( const_cast<void*>( address ) );
 	}
 
 	// Now clear the map and we are done

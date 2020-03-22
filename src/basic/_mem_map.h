@@ -82,9 +82,8 @@ void mem_map_del( void const* memory );
 /** @brief walk the memory map and report all entries as errors.
   *
   * To not leak the memory although we know it isn't freed, all entries
-  * are regularly freed here. Please not, that this function always uses
-  * `free()`, so do **not** add and forget anything allocated with `new`
-  * here!
+  * are regularly freed here. Please note, that this function always uses
+  * `free()`.
   *
   * All entries are logged as errors!
 **/

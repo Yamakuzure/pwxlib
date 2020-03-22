@@ -39,6 +39,7 @@
 
 #include "basic/pwx_compiler.h"
 
+#include "basic/mem_utils.h"
 #include "arg_handler/eArgTargetType.h"
 #include "arg_handler/eArgType.h"
 #include "arg_handler/eArgErrorNumber.h"
@@ -169,6 +170,18 @@ protected:
 	  * @return AEN_OK if no exception occured.
 	**/
 	virtual eArgErrorNumber process_cb( char const* param );
+
+
+/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
+#ifndef PWX_NODOX
+public:
+	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
+	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
+	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
+	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
+	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+#endif // NODOX
 };
 
 

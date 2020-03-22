@@ -208,6 +208,17 @@ private:
 	mutable
 	abool_t  isRemoved = ATOMIC_VAR_INIT( true ); //!< Set to true by ctor and remove*(), set to false by insert*() methods.
 
+
+/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
+#ifndef PWX_NODOX
+public:
+	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
+	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
+	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
+	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
+	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
+#endif // NODOX
 }; // class VContainer
 
 

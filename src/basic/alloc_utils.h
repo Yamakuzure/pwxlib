@@ -90,7 +90,7 @@ namespace pwx {
   * @param[in,out] p  The pointer to free if it is set.
 **/
 static inline void freep( void* p ) {
-	if ( p ) free( *( void** ) p );
+	if ( p ) ::free( *( void** ) p );
 }
 
 
@@ -99,7 +99,7 @@ static inline void freep( void* p ) {
   * @return nullptr - This is a convenient function.
 **/
 static inline void* mfree( void* p ) {
-	if ( p ) free( p );
+	if ( p ) ::free( *( void** ) p );
 	return nullptr;
 }
 
