@@ -250,7 +250,7 @@ public:
 	/** @brief How many threads are waiting for a lock.
 	  * @return The number of threads currently waiting for a lock.
 	**/
-	uint32_t waiting() {
+	uint32_t waiting() const {
 		return CL_Waiting.load( memOrdLoad );
 	}
 
