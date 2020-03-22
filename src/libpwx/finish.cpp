@@ -40,6 +40,8 @@
 
 #include "basic/mem_utils.h"
 #include "libpwx/finish.h"
+#include "libpwx/worker_PAH.h"
+#include "libpwx/worker_SCT.h"
 
 
 /// @namespace pwx
@@ -47,6 +49,9 @@ namespace pwx {
 
 
 void finish() {
+
+	PAH.clearArgs();
+	SCT.clearTables();
 
 	// Let's see what the memory map has caught (if debugging is enabled)
 	if ( !mem_map_report() )

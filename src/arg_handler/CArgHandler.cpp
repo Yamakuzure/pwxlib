@@ -188,8 +188,6 @@ CArgHandler::CArgHandler() noexcept
 
 CArgHandler::~CArgHandler() noexcept {
 	this->clearArgs();
-	if ( prgCall )
-		pwx_free( prgCall );
 }
 
 

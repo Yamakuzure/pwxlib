@@ -1261,6 +1261,12 @@ protected:
 			if ( !doRenumber.load( memOrdLoad ) )
 				return;
 
+			// It is our turn, so tell all waiting threads, that they don't need to bother
+			this->doRenumber.store( false, memOrdStore );
+			while ( waiting() ) {
+				PWX_LOCK_GUARD_RESET( this );
+			}
+
 			elem_t*           xCurr  = head();
 			uint32_t          xNr    = 0;
 			bool              isDone = false;
@@ -1274,8 +1280,6 @@ protected:
 				else
 					xCurr = xCurr->getNext();
 			}
-
-			this->doRenumber.store( false, memOrdStore );
 		}
 	}
 

@@ -45,16 +45,6 @@
 namespace pwx {
 
 
-/** @brief CSinCosTable default ctor
-  *
-  * Default constructor that builds tables for precision
-  * @a initial_precision
-  *
-  * Note: If the memory allocation fails, the precision is changed
-  *       to -1 - live calculation.
-  *
-  * @param[in] initial_precision The precision to use initially
-  */
 CSinCosTable::CSinCosTable( int32_t initial_precision ) :
 	precision( -1 ),
 	precision_last( -1 ),
@@ -72,21 +62,18 @@ CSinCosTable::CSinCosTable( int32_t initial_precision ) :
 }
 
 
-/// @brief CSinCosTable default dtor
 CSinCosTable::~CSinCosTable() noexcept {
+	isDestroyed.store( true );
+
 	// Make sure the coast is clear before destroying data
 	PWX_LOCK_GUARD( this );
-	isDestroyed.store( true );
 
 	// Reset locks so that other threads may notice that this is gone
 	while ( waiting() ) {
 		PWX_LOCK_GUARD_RESET( this );
 	}
 
-	if ( tableCos ) delete [] tableCos;
-	if ( tableSin ) delete [] tableSin;
-	tableCos = nullptr;
-	tableSin = nullptr;
+	this->clearTables();
 
 	// Reset locks again before finishing the destructor
 	while ( waiting() ) {
@@ -95,24 +82,20 @@ CSinCosTable::~CSinCosTable() noexcept {
 }
 
 
-/** @brief get the currently used precision
-  * @return the currently used precision
-  */
+void CSinCosTable::clearTables() noexcept {
+	PWX_LOCK_GUARD( this );
+	if ( tableCos ) delete [] tableCos;
+	if ( tableSin ) delete [] tableSin;
+	tableCos = nullptr;
+	tableSin = nullptr;
+}
+
+
 int32_t CSinCosTable::getPrecision() const noexcept {
 	return precision;
 }
 
 
-/** @brief set a new precsion
-  *
-  * This method changes the precision that is used.
-  * New tables for the sine and cosine values are built,
-  * if neither the @ newPrecision is -1, nor @a newPrecision
-  * equals the last precision while the current precision is
-  * -1. In those cases the tables are saved/reused.
-  *
-  * @param newPrecision The precision to use from now on
-  */
 void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 	if ( newPrecision != precision ) {
 		if (isDestroyed.load())
@@ -128,8 +111,7 @@ void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 		  && ( ( newPrecision != precision_last ) || ( -1 != precision ) ) // Not situation b)
 		   ) {
 			// Neither of the two, create new tables:
-			if ( tableCos ) delete [] tableCos;
-			if ( tableSin ) delete [] tableSin;
+			this->clearTables();
 
 			tableMultiplier = std::pow( 10, newPrecision );
 			tableSize       = 360 * tableMultiplier;

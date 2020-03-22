@@ -582,7 +582,7 @@ public:
 	void        addPassthrough( char const* init_arg, int32_t* pass_argc, char*** pass_argv );
 
 
-	/// @brief releases allocated memory
+	/// @brief releases all allocated memory
 	void        clearArgs     () noexcept;
 
 

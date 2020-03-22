@@ -146,6 +146,7 @@ bool mem_map_report() {
 } // namespace pwx
 
 
+#if 0
 /* ------------------------------------------------------------------------
  * --- If this is a build of the library in debugging mode, then we     ---
  * --- have overriden the global new/delete to use our memory mapping   ---
@@ -161,3 +162,4 @@ void  operator delete[]( void* ptr )                       noexcept { pwx_free( 
 void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
 #endif // exports in debugging mode
 #endif // NODOX
+#endif // 0

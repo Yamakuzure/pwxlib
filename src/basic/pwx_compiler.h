@@ -156,7 +156,7 @@
 #define PWX_VIRTUAL_PURE =0
 #endif // ignored by doxygen
 
-
+#if 0
 /* ---------------------------------------------------------------------
  * --- If this is a build of the library in debugging mode, override ---
  * --- global new/delete to use our memory mapping (de)allocator.    ---
@@ -178,7 +178,7 @@ void  operator delete[](void* ptr, decltype(sizeof(0))) noexcept;
 #  define PWX_HAVE_DEBUG_NEW_DELETE 1
 #endif // exports in debugging mode
 #endif // NODOX
-
+#endif // 0
 
 /* ---------------------------------------------------------
  * --- Every header has to make pwx::finish() available. ---

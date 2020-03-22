@@ -92,7 +92,20 @@ public:
 	 * ===============================================
 	 */
 
+	/** @brief CSinCosTable default ctor
+	  *
+	  * Default constructor that builds tables for precision
+	  * @a initial_precision
+	  *
+	  * Note: If the memory allocation fails, the precision is changed
+	  *       to -1 - live calculation.
+	  *
+	  * @param[in] initial_precision The precision to use initially
+	  */
 	explicit CSinCosTable( const int32_t initial_precision );
+
+
+	/// @brief CSinCosTable default dtor
 	virtual ~CSinCosTable() noexcept;
 
 	CSinCosTable() PWX_DELETE;
@@ -102,7 +115,26 @@ public:
 	 * ===============================================
 	 */
 
+	/// @brief release all allocated memory
+	void clearTables() noexcept;
+
+
+	/** @brief get the currently used precision
+	  * @return the currently used precision
+	  */
 	int32_t getPrecision() const noexcept;
+
+
+	/** @brief set a new precsion
+	  *
+	  * This method changes the precision that is used.
+	  * New tables for the sine and cosine values are built,
+	  * if neither the @ newPrecision is -1, nor @a newPrecision
+	  * equals the last precision while the current precision is
+	  * -1. In those cases the tables are saved/reused.
+	  *
+	  * @param newPrecision The precision to use from now on
+	  */
 	void    setPrecision( const int32_t newPrecision );
 
 
