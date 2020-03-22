@@ -215,6 +215,8 @@ static int32_t build_cluster_string( string& outfile_chain, string& outfile_open
 int32_t main( int32_t argc, char** argv ) {
 	int32_t result = EXIT_SUCCESS;
 
+	pwx::init( true );
+
 	if ( ( argc < 3 ) || ( argc > 5 ) ) {
 		cerr << "Usage:\n  " << basename( argv[0] )
 		     << " <destination directory> <number of hashes> [type] [bighash]\n"

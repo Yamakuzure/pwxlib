@@ -39,6 +39,8 @@ int32_t main( int argc, char* argv[] ) {
 	int32_t result  = EXIT_SUCCESS;
 	sEnv env;
 
+	pwx::init( true );
+
 	// Handle arguments
 	uint32_t doWhichTests = 0;
 	bool     showHelp     = false;

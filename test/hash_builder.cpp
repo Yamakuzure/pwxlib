@@ -182,6 +182,8 @@ static int32_t build_hash_list_char( string& outfile, int32_t cnt_ ) {
 int32_t main( int32_t argc, char** argv ) {
 	int32_t result = EXIT_SUCCESS;
 
+	pwx::init( true );
+
 	if ( ( argc < 3 ) || ( argc > 4 ) ) {
 		cerr << "Usage:\n  " << basename( argv[0] ) << " <destination directory> <number of lines> [type]\n";
 		cerr << " type is one of:\n";
