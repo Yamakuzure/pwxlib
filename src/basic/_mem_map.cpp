@@ -99,8 +99,7 @@ struct map_item_t {
 		return *this;
 	}
 	~map_item_t() {
-		char* loc_ = const_cast<char*>(TAKE_PTR( location ));
-		FREE_PTR( loc_ );
+		FREE_PTR( location );
 	}
 };
 

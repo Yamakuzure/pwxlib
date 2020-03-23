@@ -50,7 +50,7 @@
   * @param[in] n  Number of bytes to allocate
   * @return A pointer to the allocated space, or `nullptr` if `sizeof(t) * n` is too large.
 **/
-#define pwx_new( t, n) ((t*)::pwx::malloc_multiply(sizeof(t), (n)))
+#define pwx_new(t, n) ((t*)::pwx::malloc_multiply(sizeof(t), (n)))
 
 
 /** @brief Nullifying allocator with overflow detection (like `calloc`)
@@ -75,11 +75,7 @@
   * @param[in] ptr  The pointer to take over, is set to `nullptr` after the transition
   * @return The address of `ptr`. It is not checked. If `ptr` is `nullptr`, that is what is returned.
 **/
-#define TAKE_PTR(ptr) ({                     \
-		decltype(ptr) _ptr_ = (ptr); \
-		(ptr) = nullptr;             \
-		_ptr_;                       \
-	})
+auto TAKE_PTR = [](auto &ptr) { decltype(ptr) _ptr_ = (ptr); (ptr) = nullptr; return _ptr_; };
 
 
 /// @namespace pwx
