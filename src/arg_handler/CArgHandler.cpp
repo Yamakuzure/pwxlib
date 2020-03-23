@@ -875,8 +875,9 @@ int32_t CArgHandler::parseArgs( const int32_t argc, char const* argv[] ) noexcep
 			target = arg_elem->data.get();
 
 			procTarget( target, param.c_str() );
-			PWX_TRY( posQueue.push( target ) )
+			PWX_TRY( posQueue.push( *arg_elem ) )
 			PWX_CATCH_AND_FORGET( CException )
+			delete arg_elem;
 
 			continue;
 		}
