@@ -43,8 +43,6 @@
 #include "basic/pwx_macros.h"
 #include "basic/pwx_types.h"
 
-#include "basic/mem_utils.h"
-
 
 /// @namespace pwx
 namespace pwx {
@@ -302,18 +300,6 @@ private:
 	aui32_t CL_Lock_Count = ATOMIC_VAR_INIT( 0 );     //!< How many times the current thread has locked.
 	asize_t CL_Thread_ID  = ATOMIC_VAR_INIT( 0 );     //!< The owning thread of a lock
 	aui32_t CL_Waiting    = ATOMIC_VAR_INIT( 0 );     //!< How many threads are waiting for a lock.
-
-
-/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
-#ifndef PWX_NODOX
-public:
-	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-#endif // NODOX
 }; // class CLockable
 
 

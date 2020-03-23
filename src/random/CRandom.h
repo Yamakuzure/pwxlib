@@ -253,18 +253,6 @@ private:
 	int32_t         spxOffs[3][4]; //!< Offsets for determining which vertice a dot is in
 	int32_t         spxPerms[4];   //!< Permutation table indices for x, y, z, w
 	int32_t         spxTab[512];   //!< A permutation table for simplex noise
-
-
-/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
-#ifndef PWX_NODOX
-public:
-	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-#endif // NODOX
 };
 
 } // namespace pwx

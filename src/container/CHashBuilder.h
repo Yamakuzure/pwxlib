@@ -251,16 +251,6 @@ private:
 	uint32_t keyLen = 0; //!< optional key length for C-String and std::string keys (0 = use strlen() on C-Strings)
 
 
-/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
-#ifndef PWX_NODOX
-public:
-	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-#endif // NODOX
 }; // class CHashBuilder
 
 

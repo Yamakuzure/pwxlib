@@ -43,7 +43,6 @@
 #include "arg_handler/sArgError.h"
 #include "arg_handler/TArgTarget.h"
 #include "basic/CException.h"
-#include "basic/mem_utils.h"
 #include "container/TChainHash.h"
 #include "container/TQueue.h"
 
@@ -922,18 +921,6 @@ private:
 	arg_queue_t posQueue;                //!< Queue of positional arguments
 	char*       prgCall       = nullptr; //!< If set, argv[0] containing the program call is stored in here.
 	hash_t      shortArgs;               //!< stores targets using their short argument as key
-
-
-/* --- Override new/delete, so we can do memory allocation recording if wanted --- */
-#ifndef PWX_NODOX
-public:
-	void* operator new     ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void* operator new[]   ( decltype( sizeof( 0 ) ) s )                   { return ( void* )pwx_calloc( uint8_t, s ); }
-	void  operator delete  ( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete  ( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr )                          noexcept { pwx_free( ptr ); }
-	void  operator delete[]( void* ptr, decltype( sizeof( 0 ) ) ) noexcept { pwx_free( ptr ); }
-#endif // NODOX
 };
 
 } // namespace pwx
