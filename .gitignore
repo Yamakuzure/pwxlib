@@ -53,3 +53,5 @@ rebuild.sh
 # Helper files and directories
 #------------------------------
 texts/
+*.cscope_file_list
+

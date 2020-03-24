@@ -478,8 +478,7 @@ protected:
 			} else {
 				// Case 2: A new head is to be set
 				PWX_TRY_PWX_FURTHER( head()->insertPrev( insElem, &currStore ) )
-				head( insElem );
-				this->doRenumber.store( true, memOrdStore );
+				head( insElem ); // Does the renumbering already
 			}
 		} else {
 			// Case 1: The list is empty
@@ -864,14 +863,14 @@ private:
 		*/
 		if ( head() == elem ) {
 			// Case 1
-			PWX_LOCK_OBJ( this );
+			PWX_LOCK_GUARD( this );
 			/* The reasons for the double check are the same as
 			 * with TSingleList::privRemoveNextElem()
 			 */
-			if ( head() == elem )
+			if ( head() == elem ) {
+				PWX_LOCK_GUARD_RESET( NULL_LOCK );
 				head( head()->getNext() );
-			this->doRenumber.store( true, memOrdStore );
-			PWX_UNLOCK_OBJ( this );
+			}
 		} else if ( tail() == elem ) {
 			// Case 2:
 			PWX_LOCK_OBJ( this );

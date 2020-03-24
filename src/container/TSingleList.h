@@ -911,7 +911,21 @@ protected:
 
 	/// @brief set head to @a new_head according to thread safety settings
 	void head( elem_t* new_head ) {
+		PWX_DOUBLE_LOCK_GUARD( new_head, new_head ? new_head->getNext() : nullptr );
+
+		new_head->nr( 0 );
 		head_.store( new_head, memOrdStore );
+
+		// Instead of waiting, we can directly move through the list an renumber here.
+		elem_t* xCurr = head();
+		elem_t* xNext = xCurr ? xCurr->getNext() : nullptr;
+
+		while ( xCurr && xNext && (xCurr != xNext ) ) {
+			xNext->nr( xCurr->nr() + 1 );
+			xNext = xCurr;
+			xCurr = xNext->getNext();
+			PWX_DOUBLE_LOCK_GUARD_RESET( xCurr, xNext );
+		}
 	}
 
 
@@ -1221,7 +1235,6 @@ protected:
 			this->doRenumber.store( true, memOrdStore );
 			PWX_TRY_PWX_FURTHER( insPrev->insertNext( insElem, &currStore ) );
 		} else {
-			PWX_LOCK_GUARD( this );
 			if ( empty() ) {
 				// Case 1: The list is empty
 				head( insElem );
@@ -1230,8 +1243,7 @@ protected:
 			} else if ( nullptr == insPrev ) {
 				// Case 2: A new head is to be set
 				PWX_TRY_PWX_FURTHER( insElem->insertBefore( head(), &currStore ) );
-				head( insElem );
-				this->doRenumber.store( true, memOrdStore );
+				head( insElem ); // Does direct renumbering
 			} else if ( ( insPrev == tail() ) || insPrev->destroyed() ) {
 				// Case 3: A new tail is to be set
 				insElem->nr( tail()->nr() + 1 );
@@ -1255,7 +1267,7 @@ protected:
 
 			// Do a big lock, so multiple threads calling this function
 			// won't renumber multiple times when once is enough.
-			PWX_LOCK_GUARD( this );
+			PWX_DOUBLE_LOCK_GUARD( this, NULL_LOCK );
 
 			// Check again, maybe this does not need any renumbering any more:
 			if ( !doRenumber.load( memOrdLoad ) )
@@ -1264,21 +1276,21 @@ protected:
 			// It is our turn, so tell all waiting threads, that they don't need to bother
 			this->doRenumber.store( false, memOrdStore );
 			while ( waiting() ) {
-				PWX_LOCK_GUARD_RESET( this );
+				PWX_DOUBLE_LOCK_GUARD_RESET( this, NULL_LOCK );
 			}
 
-			elem_t*           xCurr  = head();
-			uint32_t          xNr    = 0;
-			bool              isDone = false;
+			elem_t*  xCurr  = head();
+			elem_t*  xNext  = xCurr ? xCurr->getNext() : nullptr;
 
-			while ( xCurr && !isDone ) {
+			if ( xCurr )
+				xCurr->nr( 0 );
+
+			while ( xCurr && xNext && ( xCurr != xNext) ) {
 				// Lock guard xCurr, so inserting threads won't give us a headache
-				PWX_NAMED_LOCK_GUARD( ReNamer, xCurr );
-				xCurr->nr( xNr++ );
-				if ( xCurr == tail() )
-					isDone = true;
-				else
-					xCurr = xCurr->getNext();
+				PWX_DOUBLE_LOCK_GUARD_RESET( xCurr, xNext );
+				xNext->nr( xCurr->nr() );
+				xCurr = xNext;
+				xNext = xCurr->getNext();
 			}
 		}
 	}
@@ -1700,7 +1712,7 @@ private:
 		 */
 		if ( prev ) {
 			if ( tail() == prev->getNext() ) {
-				// This is possibility 2
+				// This is possibility b)
 				PWX_LOCK_OBJ( this );
 				removed = prev->removeNext();
 				if ( tail() == removed )
@@ -1718,7 +1730,7 @@ private:
 					 * The old prev->next is now lost.
 					 */
 					tail( prev );
-				else
+				else // Someone came and made this be c)
 					this->doRenumber.store( true, memOrdStore );
 				PWX_UNLOCK_OBJ( this );
 			} else {
@@ -1727,16 +1739,17 @@ private:
 				this->doRenumber.store( true, memOrdStore );
 			}
 		} else {
-			// This is possibility 1
-			PWX_LOCK_OBJ( this );
-			// Same reason for the lock as above
+			// This is possibility a)
 			removed = head();
 			if ( removed ) {
-				head( removed->getNext() );
+				// Small time big lock to prevent the same turning into c) as above with tail()
+				PWX_LOCK_GUARD( this );
+				if ( removed == head() ) {
+					PWX_LOCK_GUARD_RESET( NULL_LOCK );
+					head( removed->getNext() );
+				}
 				removed->remove();
-				this->doRenumber.store( true, memOrdStore );
 			}
-			PWX_UNLOCK_OBJ( this );
 		}
 
 		// If something was removed, the count must be decreased:
