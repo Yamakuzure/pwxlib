@@ -44,7 +44,7 @@ To help you with this, `doxygen` is utilized by default by the build system to
 create an HTML API documentation.  
 Further more the overviews in this README show which header to include for what.
 
-### Feeding you compiler/linker
+### Feeding your compiler/linker
 To get the correct compiler and linker flags, you can utilize pkg-config. The
 package is called pwxlib.  
 For the correct compiler flags, use
