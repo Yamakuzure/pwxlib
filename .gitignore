@@ -52,6 +52,7 @@ rebuild.sh
 
 # Helper files and directories
 #------------------------------
-texts/
+old/
+textAnalyzer/
 *.cscope_file_list
 
