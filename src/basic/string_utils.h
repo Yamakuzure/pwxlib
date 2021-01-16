@@ -36,8 +36,8 @@
 **/
 
 
-#include "pwx_compiler.h"
-#include "pwx_macros.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_macros.h"
 
 #include <cassert>
 #include <cstring>

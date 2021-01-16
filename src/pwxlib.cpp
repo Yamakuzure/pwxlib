@@ -1,14 +1,7 @@
-#ifndef PWX_PWXLIB_SRC_LIBPWX_INIT_H_INCLUDED
-#define PWX_PWXLIB_SRC_LIBPWX_INIT_H_INCLUDED 1
-#pragma once
-
-
-
-/** @file finish.h
+/** @file
+  * This file is part of the PrydeWorX Library (pwxLib).
   *
-  * @brief Function to clean up on programs end and to clear up in debugging mode. (see pwx::finish())
-  *
-  * (c) 2007 - 2020 PrydeWorX
+  * (c) 2007 - 2021 PrydeWorX
   * @author Sven Eden, PrydeWorX - Adendorf, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
@@ -37,27 +30,9 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
+#include "pwxlib.h"
 
 
-/// @namespace pwx
-namespace pwx {
-
-
-/** @brief Initialize pwxLib
-  *
-  * Call this function first in your program.
-  * If you set @a enable_memory_mapping_ to true, which is default in debugging mode, all allocations
-  * and deallocations done via the utilities in basic/mem_utils.h are recorded. Call `pwx::finish()`
-  * at the end of your program to get an analysis whether everything allocated was freed or not.
-  * @see pwx::finish()
-  *
-  * @param[in] enable_memory_mapping_  If set to true, all allocations/deallocations are recorded.
-**/
-void PWX_API init( bool enable_memory_mapping_, [[maybe_unused]] char const* log_file_path, [[maybe_unused]] int log_threads ) noexcept;
-
-
-} // namespace pwx
-
-
-#endif // PWX_PWXLIB_SRC_LIBPWX_INIT_H_INCLUDED
+void PWX_API pwx_init( bool enable_memory_mapping, char const* log_file_path, int log_threads ) noexcept {
+	::pwx::init( enable_memory_mapping, log_file_path, log_threads );
+}

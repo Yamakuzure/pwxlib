@@ -40,11 +40,9 @@
 #include "basic/pwx_debug.h"
 
 #include "basic/alloc_utils.h"
+#include "basic/_mem_map.h"
 #include "basic/mem_utils.h"
 
-#if LIBPWX_DEBUG
-#  include "basic/_mem_map.h"
-#endif // LIBPWX_DEBUG
 
 
 /// @namespace pwx

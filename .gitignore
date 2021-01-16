@@ -52,6 +52,8 @@ rebuild.sh
 
 # Helper files and directories
 #------------------------------
+cmake-build-*
+install/
 old/
 textAnalyzer/
 *.cscope_file_list

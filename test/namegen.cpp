@@ -65,7 +65,7 @@ int main( int argc, char* argv[] ) {
 	bool    do_ss = true, do_sl = true, do_ms = true, do_ml = true;
 	bool    len_short = true, len_long = true, type_single = true, type_multi = true;
 
-	pwx::init( true );
+	pwx::init( true, nullptr, 0 );
 
 	max_nc_len = 3;
 

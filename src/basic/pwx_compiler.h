@@ -35,6 +35,9 @@
 **/
 
 
+#include "pwx_config.h"
+
+
 /* -----------------------------------------------------------------------
  * --- pwxLib needs C++17 features. Sorry, no way around this!         ---
  * -------------------------------------------------------------------- */
@@ -162,7 +165,7 @@
  * --- It does not include anything itself, so including ---
  * --- it globally here is pretty safe.                  ---
  * ------------------------------------------------------ */
-#include <libpwx/finish.h>
+#include "libpwx/finish.h"
 
 
 /* ---------------------------------------------------------
@@ -170,7 +173,7 @@
  * --- It does not include anything itself, so including ---
  * --- it globally here is pretty safe.                  ---
  * ------------------------------------------------------ */
-#include <libpwx/init.h>
+#include "libpwx/init.h"
 
 
 #endif // PWX_LIBPWX_SRC_BASIC_PWX_COMPILER_H_INCLUDED

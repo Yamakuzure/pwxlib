@@ -16,7 +16,7 @@ int32_t main( int32_t argc, char** argv ) {
 	uint32_t  numThreads = 32;
 	eTestType testType   = E_TEST_ALL;
 
-	pwx::init( true );
+	pwx::init( true, nullptr, 0 );
 
 	// Check the arguments:
 	for ( int32_t i = 1; ( EXIT_SUCCESS == result ) && ( i < argc ); ++i ) {

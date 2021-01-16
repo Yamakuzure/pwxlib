@@ -45,7 +45,7 @@ extern bool enable_memory_mapping;
 } // namespace private_
 
 
-void init( bool enable_memory_mapping_ ) noexcept {
+void init( bool enable_memory_mapping_, [[maybe_unused]] char const* log_file_path, [[maybe_unused]] int log_threads ) noexcept {
 	private_::enable_memory_mapping = enable_memory_mapping_;
 }
 
