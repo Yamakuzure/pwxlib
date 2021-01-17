@@ -195,9 +195,9 @@ configure_file( src/pwx_config.h.in pwx_config.h )
 # --- Add proper defines according to build type ---
 # --------------------------------------------------
 set( CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG -DLIBPWX_DEBUG" )
-set( CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG -DLIBPWX_DEBUG" )
+set( CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG -DLIBPWX_DEBUG -fexceptions" )
 set( CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG" )
-set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG" )
+set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -fexceptions" )
 if ( UNIX )
 	set( CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fPIC" )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
