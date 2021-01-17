@@ -1,0 +1,278 @@
+# ===============================================================================================================
+# === The PrydeWorX Library is free software under MIT License ; See src/pwxlib.h                             ===
+# === ------------------------------------------------------------------------------------------------------- ===
+# === This Makefile can be included in any project and will take care of basic cmake, compiler and linker     ===
+# === flags and settings. If you are using cmake, it is recommended to use it directly. However, this file    ===
+# === can assist you in building a convenient wrapping Makefile for cmake.                                    ===
+# ===============================================================================================================
+# 
+# Before including this file, make sure that the following variables are set if needed:
+# AUTHORS           : Will be added to CPPFLAGS as -DAUTHORS=\"$(AUTHORS)\" Default: <empty>
+# CC                : Used C compiler                                       Default: gcc
+# CMAKE             : How to call 'cmake'                                   Default: $(shell which cmake)
+# CMAKE_DIR         : Where to put cmake build files                        Default: $(PROJECT_DIR)/cmake-build-<type>
+# CXX               : Used C++ compiler                                     Default: g++
+# CFLAGS            : C compiler flags set are appended after auto configuration
+# CPPFLAGS          : Preprocessor flags set are appended after auto configuration
+# CXXFLAGS          : C++ compiler flags set are appended after auto configuration
+# DEBUG             : Defaults to 'YES', set it to 'NO' to produce a release build
+# DEPDIR            : Where to store dependency files.                      Default: dep
+# LDFLAGS           : LD linker flags are appended after auto configuration
+# LN                : How to call 'ln'                                      Default: $(shell which ln) -s
+# MAKE              : How to call 'make'                                    Default: $(shell which make)
+# MKDIR             : How to call 'mkdir'                                   Default: $(shell which mkdir) -p
+# NINJA             : How to call 'ninja'                                   Default: $(shell which ninja)
+# OBJDIR            : Where to store object files.                          Default: obj
+#                      Depending on DEBUG, the subdirectory 'debug' or 'release' is appended.
+# PREFIX            : Where to install the project.                         Default: $(PROJECT_DIR)/install.
+# PROJECT_DIR       : Absolut path to where your including Makefile lies    Default: ${CURDIR}
+# RM                : How to call 'rm'                                      Default: $(shell which rm) -f
+# SANITIZE_ADDRESS  : Turn on address sanitizer with 'YES'                  Default: NO
+# SANITIZE_LEAK     : Turn on leak sanitizer with 'YES'                     Default: NO
+#                    These two are deaactivated if SANITIZE_THREAD is set to YES
+# SANITIZE_THREAD   : Turn on thread sanitizer, disables ADDRESS and LEAK   Default: NO
+# SANITIZE_UNDEFINED: Turn on undefined sanitizer                           Default: NO
+# SED               : How to call 'sed'                                     Default: $(shell which sed)
+# SUBDIRS_C         : List of subdirectories to be searched for *.c files   Default: $(PROJECT_DIR) $(PROJECT_DIR)/src
+# SUBDIRS_CXX       : List of subdirectories to be searched for *.cpp files Default: $(PROJECT_DIR) $(PROJECT_DIR)/src
+# SUBDIRS_INC       : List of include directories to be used                Default: $(SUBDIRS_C) $(SUBDIRS_CXX)
+# VERSION           : Will be added to CPPFLAGS as -DVERSION=\"$(VERSION)\" Default: <empty>
+#
+# The following variables are set to make utilization of cmake easier:
+# CMAKE_DIR        : The build type (debug, release, asan, lsan, tsan) is appended
+# CMAKE_STRIP      : --strip in release builds, empty in debug builds
+# CMAKE_SANITIZE   : OFF, adress, leak, thread or undefined, according to SANITIZE_* settings
+#                     If more than one sanitizer is combined, they are comma-separated.
+# CMAKE_TARGET     : Release or Debug
+# CMAKE_VERBOSE    : OFF in release builds, ON in debug builds
+#
+# Include this file right before your first regular target. (probably 'all:')
+# You can then use:
+# MODULES  : List of all object files to be generated
+# DEPENDS  : List of all dependency files to be generated
+# INCLUDES : List of all -I include paths generated for the preprocessor
+
+
+# -----------------------------------------------------------------------------
+# Basic switches and locations
+# -----------------------------------------------------------------------------
+AUTHORS            ?=
+DEBUG              ?= YES
+PROJECT_DIR        ?= ${CURDIR}
+PREFIX             ?= $(PROJEXT_DIR)/install
+CMAKE_DIR          ?= $(PROJECT_DIR)/cmake-build
+DEPDIR             ?= dep
+OBJDIR             ?= obj
+SANITIZE_ADDRESS   ?= NO
+SANITIZE_LEAK      ?= NO
+SANITIZE_THREAD    ?= NO
+SANITIZE_UNDEFINED ?= NO
+SUBDIRS_C          ?= $(PROJECT_DIR) $(PROJECT_DIR)/src
+SUBDIRS_CXX        ?= $(PROJECT_DIR) $(PROJECT_DIR)/src
+SUBDIRS_INC        ?= $(SUBDIRS_C) $(SUBDIRS_CXX)
+VERSION            ?=
+
+
+# -----------------------------------------------------------------------------
+# Store already set flags and append later
+# -----------------------------------------------------------------------------
+caller_CPPFLAGS := $(CPPFLAGS)
+caller_CFLAGS   := $(CFLAGS)
+caller_CXXFLAGS := $(CXXFLAGS)
+caller_LDFLAGS  := $(LDFLAGS)
+CPPFLAGS :=
+CFLAGS   :=
+CXXFLAGS :=
+LDFLAGS  :=
+
+
+# -----------------------------------------------------------------------------
+# Tools to use
+# The compiler can be overwritten with:
+#   "make <options> CC=clang" (or other)
+# -----------------------------------------------------------------------------
+AR    ?= $(shell which ar) r
+CC    ?= $(shell which gcc)
+CMAKE ?= $(shell which cmake)
+CXX   ?= $(shell which g++)
+LN    ?= $(shell which ln) -s
+MAKE  ?= $(shell which make)
+MKDIR ?= $(shell which mkdir) -p
+NINJA ?= $(shell which ninja)
+RM    ?= $(shell which rm) -f
+SED   ?= $(shell which sed)
+# Use the compiler as the linker.
+LD    ?= $(CC)
+
+
+# -----------------------------------------------------------------------------
+# Default flags for both C++ and C
+# -----------------------------------------------------------------------------
+CMAKE_STRIP   := --strip
+CMAKE_SANITIZE:= OFF
+CMAKE_TARGET  := Release
+CMAKE_VERBOSE := OFF
+COMMON_FLAGS  := -Wall -Wextra
+GCC_CSTD      := c99
+GCC_CXXSTD    := c++0x
+GCC_STACKPROT :=
+PEDANDIC_FLAG := -pedantic
+
+
+# -----------------------------------------------------------------------------
+# Add AUTHORS and/or VERSION to DEFINES if they are set
+# -----------------------------------------------------------------------------
+DEFINES :=
+ifneq (,${AUTHORS})
+  DEFINES := ${DEFINES} -DAUTHORS=\"${AUTHORS}\"
+endif
+ifneq (,${VERSION})
+  DEFINES := ${DEFINES} -DVERSION=\"${VERSION}\"
+endif
+
+
+# -----------------------------------------------------------------------------
+# Determine proper pedantic switch, and if and how stack protector works
+# -----------------------------------------------------------------------------
+GCCVERSGTEQ47 := 0
+GCCVERSGTEQ49 := 0
+GCCVERSGTEQ82 := 0
+
+ifeq (,$(findstring clang,$(CC)))
+  GCCVERSGTEQ47 := $(shell expr `$(CC) -dumpversion | cut -f1,2 -d. | tr -d '.'` \>= 47)
+  GCCVERSGTEQ49 := $(shell expr `$(CC) -dumpversion | cut -f1,2 -d. | tr -d '.'` \>= 49)
+  GCCVERSGTEQ82 := $(shell expr `$(CC) -dumpversion | cut -f1,2 -d. | tr -d '.'` \>= 82)
+endif
+
+ifeq "$(GCCVERSGTEQ47)" "1"
+  PEDANDIC_FLAG := -Wpedantic
+  ifeq "$(GCCVERSGTEQ49)" "1"
+    ifeq "$(GCCVERSGTEQ82)" "1"
+      GCC_CSTD    := c18
+      GCC_CXXSTD  := c++17
+    else
+      GCC_CSTD    := c11
+      GCC_CXXSTD  := c++11
+    endif
+    GCC_STACKPROT := -fstack-protector-strong
+  else
+    GCC_STACKPROT := -fstack-protector
+  endif
+endif
+COMMON_FLAGS += $(PEDANDIC_FLAG)
+
+
+# -----------------------------------------------------------------------------
+# Debug Mode settings
+# -----------------------------------------------------------------------------
+HAS_DEBUG_FLAG := NO
+OBJ_SUB_DIR    := release
+ifneq (,$(findstring -g,$(CFLAGS)))
+  ifneq (,$(findstring -ggdb,$(CFLAGS)))
+    HAS_DEBUG_FLAG := YES
+  endif
+  DEBUG := YES
+endif
+
+ifeq (YES,$(DEBUG))
+  ifeq (NO,$(HAS_DEBUG_FLAG))
+    COMMON_FLAGS := -ggdb ${COMMON_FLAGS} -Og
+  endif
+
+  CMAKE_STRIP    :=
+  CMAKE_TARGET   := Debug
+  CMAKE_VERBOSE  := ON
+  COMMON_FLAGS   := -march=core2 -mtune=generic ${COMMON_FLAGS} ${GCC_STACKPROT}
+  CPPFLAGS       := ${CPPFLAGS} -D_DEBUG
+  HAVE_SANITIZER := NO
+  
+  # Thread sanitizer activation (first, to disable address and leak sanitizers)
+  ifeq (YES,$(SANITIZE_THREAD))
+    # Note: If the thread sanitizer is used, do not use SpinLocks!
+    CMAKE_DIR        := ${CMAKE_DIR}-tsan
+    CMAKE_SANITIZE   := thread
+    COMMON_FLAGS     := ${COMMON_FLAGS} -fsanitize=thread
+    HAVE_SANITIZER   := YES
+    LDFLAGS          := ${LDFLAGS} -fsanitize=thread
+    OBJ_SUB_DIR      := tsan
+    SANITIZE_ADDRESS := NO
+    SANITIZE_LEAK    := NO
+  endif
+
+  # address sanitizer activition
+  ifeq (YES,$(SANITIZE_ADDRESS))
+    CMAKE_DIR       := ${CMAKE_DIR}-asan
+    CMAKE_SANITIZE  := address
+    COMMON_FLAGS    := ${COMMON_FLAGS} -fsanitize=address
+    HAVE_SANITIZER  := YES
+    LDFLAGS         := ${LDFLAGS} -fsanitize=address
+    OBJ_SUB_DIR     := asan
+  endif
+
+  # Leak detector activation
+  ifeq (YES,$(SANITIZE_LEAK))
+    CMAKE_DIR       := ${CMAKE_DIR}-lsan
+    CMAKE_SANITIZE  := ${CMAKE_SANITIZE},leak
+    COMMON_FLAGS    := ${COMMON_FLAGS} -fsanitize=leak
+    HAVE_SANITIZER  := YES
+    LDFLAGS         := ${LDFLAGS} -fsanitize=leak
+    OBJ_SUB_DIR     := lsan
+  endif
+
+  # Thread sanitizer activation
+  ifeq (YES,$(SANITIZE_UNDEFINED))
+    CMAKE_DIR      := ${CMAKE_DIR}-usan
+    CMAKE_SANITIZE := ${CMAKE_SANITIZE},undefined
+    COMMON_FLAGS   := ${COMMON_FLAGS} -fsanitize=undefined
+    HAVE_SANITIZER := YES
+    LDFLAGS        := ${LDFLAGS} -fsanitize=undefined
+    OBJ_SUB_DIR    := usan
+  endif
+
+  # Put objects in debug folder, if no sanitizer was selected
+  ifeq (NO,$(HAVE_SANITIZER))
+    CMAKE_DIR   := ${CMAKE_DIR}-debug
+    OBJ_SUB_DIR := debug
+  endif
+else
+  COMMON_FLAGS := -march=native ${COMMON_FLAGS} -O2
+  CPPFLAGS     := ${CPPFLAGS} -DNDEBUG
+  CMAKE_DIR    := ${CMAKE_DIR}-release
+endif
+OBJDIR     := ${OBJDIR}/${OBJ_SUB_DIR}
+DEPDIR     := ${DEPDIR}/${OBJ_SUB_DIR}
+CMAKE_CONF := ${CMAKE_DIR}/CMakeCache.txt
+
+
+# -----------------------------------------------------------------------------
+# Source files and directories
+# -----------------------------------------------------------------------------
+SRCS_C   := $(foreach SUBDIR,$(SUBDIRS_C),$(wildcard $(SUBDIR)/*.c))
+SRCS_CXX := $(foreach SUBDIR,$(SUBDIRS_CXX),$(wildcard $(SUBDIR)/*.cpp))
+SOURCES  := $(SRCS_C) $(SRCS_CXX)
+DPDS_C   := $(addprefix $(DEPDIR)/,$(subst $(PROJECT_DIR)/, ,$(SRCS_C:.c=.d)))
+DPDS_CXX := $(addprefix $(DEPDIR)/,$(subst $(PROJECT_DIR)/, ,$(SRCS_CXX:.cpp=.dpp)))
+DEPENDS  := $(DPDS_C) $(DPDS_CXX)
+INCLUDE  := $(foreach SUBDIR,$(SUBDIRS_INC),-I$(SUBDIR)) -I$(CMAKE_DIR)
+MODS_C   := $(addprefix $(OBJDIR)/,$(subst $(PROJECT_DIR)/, ,$(SRCS_C:.c=.o)))
+MODS_CXX := $(addprefix $(OBJDIR)/,$(subst $(PROJECT_DIR)/, ,$(SRCS_CXX:.cpp=.opp)))
+MODULES  := $(MODS_C) $(MODS_CXX)
+
+
+# -----------------------------------------------------------------------------
+# Flags for compiler and linker
+# -----------------------------------------------------------------------------
+CPPFLAGS := -fPIC ${CPPFLAGS} $(DEFINES) $(INCLUDE)
+CFLAGS   := $(COMMON_FLAGS) -std=$(GCC_CSTD)
+CXXFLAGS := $(COMMON_FLAGS) -std=$(GCC_CXXSTD)
+LDFLAGS  := -fPIE ${LDFLAGS}
+
+
+# -----------------------------------------------------------------------------
+# Eventually event caller flags for overrides
+# -----------------------------------------------------------------------------
+CPPFLAGS := ${CPPFLAGS} $(caller_CPPFLAGS)
+CFLAGS   := ${CFLAGS} $(caller_CFLAGS)
+CXXFLAGS := ${CXXFLAGS} $(caller_CXXFLAGS)
+LDFLAGS  := ${LDFLAGS} $(caller_LDFLAGS)
+
