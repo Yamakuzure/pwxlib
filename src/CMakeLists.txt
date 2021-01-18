@@ -27,11 +27,12 @@ set( pwx_obj_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/PWaveColor
      ${CMAKE_CURRENT_LIST_DIR}/PWorkers
      ${CMAKE_CURRENT_LIST_DIR}/PWXLib
-     ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h
      ${CMAKE_CURRENT_LIST_DIR}/RNG
      ${CMAKE_CURRENT_LIST_DIR}/SCT
+     ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h
      "${PROJECT_BINARY_DIR}/pwx_config.h"
      )
+
 add_library( pwx_obj OBJECT
              ${pwx_obj_HEADERS}
              pwxlib.cpp

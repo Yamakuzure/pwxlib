@@ -3,14 +3,14 @@
 #pragma once
 
 
-/** @file mem_utils.h
+/** @file alloc_utils.h
   *
   * @brief Memory utilities with extra perks
   *
   * For memory utilities that utilize the optional memory map debug tooling
   * @see mem_utils.h
   *
-  * (c) 2007 - 2020 PrydeWorX
+  * (c)  2007 - 2021 PrydeWorX
   * @author Sven Eden, PrydeWorX - Adendorf, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

@@ -11,7 +11,7 @@
   * The common hash template does not include any collision resolving,
   * this is implemented in the respective hash table container.
   *
-  * (c) 2007 - 2020 PrydeWorX
+  * (c)  2007 - 2021 PrydeWorX
   * @author Sven Eden, PrydeWorX - Adendorf, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com

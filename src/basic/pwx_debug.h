@@ -10,7 +10,7 @@
   * They are designed to be used everywhere appropriate, getting
   * out of the way when the needed mode is not set.
   *
-  * (c) 2007 - 2020 PrydeWorX
+  * (c)  2007 - 2021 PrydeWorX
   * @author Sven Eden, PrydeWorX - Adendorf, Germany
   *         sven.eden@prydeworx.com
   *         https://github.com/Yamakuzure/pwxlib ; https://pwxlib.prydeworx.com
