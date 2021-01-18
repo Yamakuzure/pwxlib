@@ -194,12 +194,12 @@ configure_file( src/pwx_config.h.in pwx_config.h )
 # --------------------------------------------------
 # --- Add proper defines according to build type ---
 # --------------------------------------------------
-set( CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG -DLIBPWX_DEBUG" )
-set( CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG -DLIBPWX_DEBUG -fexceptions" )
-set( CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG" )
+set( CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}     -D_DEBUG -DLIBPWX_DEBUG" )
+set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}   -D_DEBUG -DLIBPWX_DEBUG -fexceptions" )
+set( CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}   -DNDEBUG" )
 set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG -fexceptions" )
 if ( UNIX )
-	set( CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fPIC" )
+	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -fPIC" )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
 endif ()
 
@@ -263,3 +263,22 @@ if ( BUILD_SHARED_LIBS OR BUILD_STATIS_LIBS )
 		endif ()
 	endif ()
 endif ()
+
+
+# ----------------------------------------------------------------
+# --- Build documentation if wanted and if we have doxygen.    ---
+# ----------------------------------------------------------------
+if ( WITH_HTML )
+	find_package( Doxygen REQUIRED dot )
+	if ( DOXYGEN_FOUND )
+		configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doxyfile @ONLY )
+		add_custom_target( doc ALL
+		                   ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doxyfile
+		                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		                   COMMENT "Generating documentation with Doxygen" VERBATIM
+		                   )
+	else ()
+		message("Doxygen need to be installed to generate the doxygen documentation")
+	endif ()
+endif ()
+

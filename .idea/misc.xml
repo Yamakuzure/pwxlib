@@ -6,7 +6,10 @@
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
     <excludeRoots>
+      <file path="$PROJECT_DIR$/cb" />
       <file path="$PROJECT_DIR$/include" />
+      <file path="$PROJECT_DIR$/install" />
+      <file path="$PROJECT_DIR$/old" />
     </excludeRoots>
   </component>
 </project>
