@@ -36,8 +36,12 @@ set( CMAKE_DEBUG_POSTFIX "_d" )
 # ---------------------------------------------------
 if ( UNIX AND NOT APPLE )
 	include( GNUInstallDirs )
-elseif ( NOT DEFINED CMAKE_INSTALL_LIBDIR )
+endif ()
+if ( NOT DEFINED CMAKE_INSTALL_LIBDIR )
 	set( CMAKE_INSTALL_LIBDIR "lib" )
+endif ()
+if ( NOT DEFINED CMAKE_INSTALL_DOCDIR )
+	set( CMAKE_INSTALL_LIBDIR "doc" )
 endif ()
 
 
@@ -124,6 +128,7 @@ string( CONCAT HELP_ANNOTATIONS
         "(Default: OFF)"
         )
 option( WITH_ANNOTATIONS ${HELP_ANNOTATIONS} OFF )
+option( WITH_DOC "Install general documentation like README.md (Default: ON" ON )
 option( WITH_HTML "Use doxygen to build HTML documentation (Default: ON)" ON )
 option( WITH_TESTS "Build the pwxLib test programs (Default: OFF)" OFF )
 
@@ -243,7 +248,7 @@ if ( BUILD_STATIC_LIBS )
 	add_library( pwx_static STATIC "" )
 endif ()
 
-if ( BUILD_SHARED_LIBS OR BUILD_STATIS_LIBS )
+if ( BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS )
 	# ----------------------------------------------------------
 	# --- Include the src directory, the library lives there ---
 	# ----------------------------------------------------------
@@ -269,16 +274,21 @@ endif ()
 # --- Build documentation if wanted and if we have doxygen.    ---
 # ----------------------------------------------------------------
 if ( WITH_HTML )
-	find_package( Doxygen REQUIRED dot )
-	if ( DOXYGEN_FOUND )
-		configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doxyfile @ONLY )
-		add_custom_target( doc ALL
-		                   ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doxyfile
-		                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		                   COMMENT "Generating documentation with Doxygen" VERBATIM
-		                   )
-	else ()
-		message("Doxygen need to be installed to generate the doxygen documentation")
-	endif ()
+	add_subdirectory( doc )
+endif ()
+
+if ( WITH_DOC )
+	install( FILES
+	         AUTHORS
+	         ChangeLog
+	         code_of_conduct.md
+	         CONTRIBUTING.md
+	         INSTALL.md
+	         LICENSE
+	         NEWS.md
+	         README.md
+	         TODO.md
+	         DESTINATION ${CMAKE_INSTALL_DOCDIR} COMPONENT pwxlib
+	         )
 endif ()
 

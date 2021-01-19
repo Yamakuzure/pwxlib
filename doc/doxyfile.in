@@ -3,7 +3,7 @@ PROJECT_NAME           = @PROJECT_NAME@
 PROJECT_NUMBER         = @PROJECT_VERSION@
 PROJECT_BRIEF          = "@PROJECT_DESCRIPTION@"
 PROJECT_LOGO           =
-OUTPUT_DIRECTORY       = doc
+OUTPUT_DIRECTORY       =
 CREATE_SUBDIRS         = YES
 ABBREVIATE_BRIEF       = "The $name class" \
                          "The $name widget" \

@@ -10,7 +10,11 @@
 # === ------------------------------------------------------------------------------------------------------- ===
 # === The following aspects can be configured:   ( By issuing "make DEBUG=NO" for example )                   ===
 # === DEBUG             : Set to YES to enable debug build mode.                                              ===
+# === BUILD_DOC         : Build API documentation. Requires doxygen with dot.                                 ===
+# === BUILD_SHARED      : Build the shared libpwx, default is YES.                                            ===
+# === BUILD_STATIC      : Build the static libpwx, default is NO.                                             ===
 # === PREFIX            : Where to install the library. Default is to install in $(PROJECT_DIR)/install.      ===
+# === DESTDIR           : The root directory for the installation. Only useful for fake installs.             ===
 # === SANITIZE_ADDRESS  : Set to YES to use the address sanitizer. Ignored if the thread sanitizer is enabled.===
 # === SANITIZE_LEAK     : Set to YES to use the leak sanitizer. Ignored if the thread sanitizer is enabled.   ===
 # === SANITIZE_THREAD   : Set to YES to use the thread sanitizer. Disables both address and leak sanitizer.   ===
@@ -18,15 +22,20 @@
 # === ------------------------------------------------------------------------------------------------------- ===
 # === For more variables to configure, see Makefile.pwx. ( (c) Sven Eden ; PrydeWorX ; 2007 - 2021 )          ===
 # ===============================================================================================================
-.PHONY: all clean distclean veryclean
+.PHONY: all clean distclean doc install veryclean
 
 export
-DEBUG ?= NO
+DEBUG        ?= NO
+BUILD_DOC    ?= NO
+BUILD_SHARED ?= YES
+BUILD_STATIC ?= NO
 
-PROJECT_DIR := ${CURDIR}
-PREFIX      ?= ${PROJECT_DIR}/install
-TARGET_NAME := pwx
-TARGET      := pwxlib
+PROJECT_DIR   := ${CURDIR}
+PREFIX        ?= ${PROJECT_DIR}/install
+DESTDIR       ?=
+COMPONENT     := pwxlib
+TARGET        := pwx
+TARGET_static := pwx_static
 
 SANITIZE_ADDRESS   ?= NO
 SANITIZE_LEAK      ?= NO
@@ -51,33 +60,57 @@ NINJA := $(shell which ninja)
 RM    := $(shell which rm) -rf
 
 
-all: $(TARGET)
+# --------------------------------------------------------------------
+# --- If we do not build both libs, the targets have to be unified ---
+# --------------------------------------------------------------------
+ifeq (NO,$(BUILD_SHARED))
+	TARGET := ${TARGET_static}
+endif
+ifeq (NO,$(BUILD_STATIC))
+	TARGET_static := ${TARGET}
+endif
+
+
+all: $(TARGET) $(TARGET_static)
 
 
 $(CMAKE_DIR):
 	$(MKDIR) -p "$(CMAKE_DIR)"
 
 $(CMAKE_CONF): $(CMAKE_DIR) Makefile CMakeLists.txt
-	@( cd "$(CMAKE_DIR)" && \
+	( cd "$(CMAKE_DIR)" && \
 		$(CMAKE) -DCMAKE_BUILD_TYPE=$(CMAKE_TARGET) \
+		-DBUILD_SHARED_LIBS=$(BUILD_SHARED)         \
+		-DBUILD_STATIC_LIBS=$(BUILD_STATIC)         \
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX)            \
 		-DCMAKE_SANITIZE=$(CMAKE_SANITIZE)          \
 		-DCMAKE_VERBOSE_MAKEFILE=$(CMAKE_VERBOSE)   \
-		-DCPPFLAGS="$(CPPFLAGS)"                    \
-		-G Ninja $(PROJECT_DIR) -DCMAKE_INSTALL_PREFIX=$(PREFIX) )
-	@echo "CPPFLAGS    : $(CPPFLAGS)"
-	@echo "CFLAGS      : $(CFLAGS)"
-	@echo "CXXFLAGS    : $(CXXFLAGS)"
-	@echo "LDFLAGS     : $(LDFLAGS)"
+		-DWITH_DOC=$(BUILD_DOC)                     \
+		-DWITH_HTML=$(BUILD_DOC)                    \
+		-G Ninja $(PROJECT_DIR)                     \
+	)
 
-$(TARGET_NAME): $(CMAKE_CONF)
+$(TARGET): $(CMAKE_CONF)
 	@echo "Building $@ ..."
 	$(CMAKE) --build "$(CMAKE_DIR)" --target $@
 	@echo "$@ built"
 
-$(TARGET): $(TARGET_NAME)
+$(TARGET_static): $(CMAKE_CONF)
+	@echo "Building $@ ..."
+	$(CMAKE) --build "$(CMAKE_DIR)" --target $@
+	@echo "$@ built"
+
+doc: $(CMAKE_CONF)
+	@echo "Building $@ ..."
+	$(CMAKE) --build "$(CMAKE_DIR)" --target $@
+	@echo "$@ built"
+
+install: $(TARGET) $(TARGET_static)
 	@echo "Installing $@ ..."
-	$(CMAKE) -DCMAKE_BUILD_TYPE=$(CMAKE_TARGET) -DCOMPONENT=$@ \
-		-P "$(CMAKE_DIR)"/cmake_install.cmake $(CMAKE_STRIP)
+	( DESTDIR="$(DESTDIR)" \
+		$(CMAKE) -DCMAKE_BUILD_TYPE=$(CMAKE_TARGET) -DCOMPONENT=pwxlib \
+		-P "$(CMAKE_DIR)"/cmake_install.cmake $(CMAKE_STRIP) \
+	)
 	@echo "$@ installed"
 
 distcleantgt:
