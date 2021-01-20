@@ -13,6 +13,7 @@
 # === BUILD_DOC         : Build API documentation. Requires doxygen with dot.                                 ===
 # === BUILD_SHARED      : Build the shared libpwx, default is YES.                                            ===
 # === BUILD_STATIC      : Build the static libpwx, default is NO.                                             ===
+# === BUILD_TESTS       : Enable building of the automated tests, default is NO.                              ===
 # === PREFIX            : Where to install the library. Default is to install in $(PROJECT_DIR)/install.      ===
 # === DESTDIR           : The root directory for the installation. Only useful for fake installs.             ===
 # === SANITIZE_ADDRESS  : Set to YES to use the address sanitizer. Ignored if the thread sanitizer is enabled.===
@@ -22,13 +23,14 @@
 # === ------------------------------------------------------------------------------------------------------- ===
 # === For more variables to configure, see Makefile.pwx. ( (c) Sven Eden ; PrydeWorX ; 2007 - 2021 )          ===
 # ===============================================================================================================
-.PHONY: all clean distclean doc install veryclean
+.PHONY: all clean distclean doc install test veryclean
 
 export
 DEBUG        ?= NO
 BUILD_DOC    ?= NO
 BUILD_SHARED ?= YES
 BUILD_STATIC ?= NO
+BUILD_TESTS  ?= NO
 
 PROJECT_DIR   := ${CURDIR}
 PREFIX        ?= ${PROJECT_DIR}/install
@@ -50,6 +52,12 @@ SUBDIRS_INC :=
 # Now include the PrydeWorX tooling Makefile
 include $(PROJECT_DIR)/Makefile.pwx
 
+# Force building tests and the shared library if the test target was chosen
+ifneq (,$(findstring test,$(MAKECMDGOALS)))
+	WITH_TESTS   := YES
+	BUILD_SHARED := YES
+endif
+
 # -----------
 # Used tools
 # -----------
@@ -59,19 +67,23 @@ MKDIR := $(shell which mkdir)
 NINJA := $(shell which ninja)
 RM    := $(shell which rm) -rf
 
-
-# --------------------------------------------------------------------
-# --- If we do not build both libs, the targets have to be unified ---
-# --------------------------------------------------------------------
-ifeq (NO,$(BUILD_SHARED))
-	TARGET := ${TARGET_static}
+# -----------------------------------------------------------------
+# --- Set general target dependencies on which library to build ---
+# -----------------------------------------------------------------
+LIB_TARGETS :=
+ifeq (YES,$(BUILD_SHARED))
+	LIB_TARGETS := ${TARGET}
 endif
-ifeq (NO,$(BUILD_STATIC))
-	TARGET_static := ${TARGET}
+ifeq (YES,$(BUILD_STATIC))
+	LIB_TARGETS := ${LIB_TARGETS} ${TARGET_static}
 endif
 
 
-all: $(TARGET) $(TARGET_static)
+# -------------------------------
+# ---    The build targets    ---
+# -------------------------------
+
+all: $(LIB_TARGETS)
 
 
 $(CMAKE_DIR):
@@ -84,6 +96,7 @@ $(CMAKE_CONF): $(CMAKE_DIR) Makefile CMakeLists.txt
 		-DBUILD_STATIC_LIBS=$(BUILD_STATIC)         \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX)            \
 		-DCMAKE_SANITIZE=$(CMAKE_SANITIZE)          \
+		-DWITH_TESTS=$(WITH_TESTS)                  \
 		-DCMAKE_VERBOSE_MAKEFILE=$(CMAKE_VERBOSE)   \
 		-DWITH_DOC=$(BUILD_DOC)                     \
 		-DWITH_HTML=$(BUILD_DOC)                    \
@@ -105,13 +118,17 @@ doc: $(CMAKE_CONF)
 	$(CMAKE) --build "$(CMAKE_DIR)" --target $@
 	@echo "$@ built"
 
-install: $(TARGET) $(TARGET_static)
+install: $(LIB_TARGETS)
 	@echo "Installing $@ ..."
 	( DESTDIR="$(DESTDIR)" \
 		$(CMAKE) -DCMAKE_BUILD_TYPE=$(CMAKE_TARGET) -DCOMPONENT=pwxlib \
 		-P "$(CMAKE_DIR)"/cmake_install.cmake $(CMAKE_STRIP) \
 	)
 	@echo "$@ installed"
+
+test: $(TARGET)
+	$(CMAKE) --build "$(CMAKE_DIR)" --target all
+	$(CMAKE) --build "$(CMAKE_DIR)" --target $@
 
 distcleantgt:
 	@echo "Dist-Cleaning $(CMAKE_DIR)"
