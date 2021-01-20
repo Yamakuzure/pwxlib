@@ -13,6 +13,7 @@ set( PROJECT_NAME "pwxlib" )
 set( PROJECT_DESCRIPTION "PrydeWorX library of common C/C++ tools" )
 set( PROJECT_HOMEPAGE_URL "https://github.com/Yamakuzure/pwxlib" )
 set( PROJECT_VERSION 0.8.9.2 )
+set( PROJECT_SO_VERSION 0 )
 
 project( ${PROJECT_NAME}
          VERSION ${PROJECT_VERSION}

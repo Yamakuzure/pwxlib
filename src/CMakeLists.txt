@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------
 # --- List file for the library itself. Dependencies are handled here. ---
 # ------------------------------------------------------------------------
-set( pwx_obj_HEADERS
+set( pwx_WRAPPERS
      ${CMAKE_CURRENT_LIST_DIR}/PAH
      ${CMAKE_CURRENT_LIST_DIR}/PArgHandler
      ${CMAKE_CURRENT_LIST_DIR}/PBasic
@@ -29,6 +29,13 @@ set( pwx_obj_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/PWXLib
      ${CMAKE_CURRENT_LIST_DIR}/RNG
      ${CMAKE_CURRENT_LIST_DIR}/SCT
+     )
+
+string( REPLACE ";" " " pwx_WRAPPERS_STR "${pwx_WRAPPERS}" )
+set( PROJECT_WRAPPERS "${pwx_WRAPPERS_STR}" PARENT_SCOPE )
+
+set( pwx_obj_HEADERS
+     ${pwx_WRAPPERS}
      ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h
      "${PROJECT_BINARY_DIR}/pwx_config.h"
      )
@@ -80,7 +87,8 @@ add_subdirectory( wavecolor )
 # --- Definitions of the PrydeWorX library ---
 # --------------------------------------------
 if ( BUILD_SHARED_LIBS )
-	set_target_properties( pwx PROPERTIES VERSION ${PROJECT_VERSION} )
+	set_target_properties( pwx PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_SO_VERSION} )
+	target_link_options( pwx PRIVATE "-Wl,--version-script=${libpwx_SYM}" )
 	target_link_libraries( pwx PRIVATE pwx_obj
 	                       arg_handler
 	                       basic
