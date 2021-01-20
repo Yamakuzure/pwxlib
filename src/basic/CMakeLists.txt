@@ -29,6 +29,8 @@ target_sources( basic PRIVATE
                 mem_utils.cpp
                 trace_info.cpp
                 )
+target_compile_definitions(basic PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---

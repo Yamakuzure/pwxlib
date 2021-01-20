@@ -55,18 +55,18 @@
 namespace pwx {
 
 
-bool        cropShell    ( char const* key, std::string& data )  noexcept PWX_API;
-void        forwardTo    ( std::ifstream& is, char value )       noexcept PWX_API;
-void        ltrim        ( std::string& text, char extra = 0x0 ) noexcept PWX_API;
-char const* makeTemp     ( char const* aPath, char const* aTemplate,
-                           char const* aSuffix, std::ofstream& ofs,
-                           std::ios_base::openmode mode
-                           = std::ios_base::out | std::ios_base::trunc )
+bool cropShell( char const* key, std::string& data ) noexcept PWX_API;
+void forwardTo( std::ifstream& is, char value ) noexcept PWX_API;
+void ltrim( std::string& text, char extra = 0x0 ) noexcept PWX_API;
+char const* makeTemp( char const* aPath, char const* aTemplate,
+                      char const* aSuffix, std::ofstream& ofs,
+                      std::ios_base::openmode mode
+                      = std::ios_base::out | std::ios_base::trunc )
 noexcept PWX_WARNUNUSED PWX_API;
-void        rtrim        ( std::string& text, char extra = 0x0       ) noexcept PWX_API;
-bool        skipLineBreak( std::ifstream& is                         ) noexcept PWX_WARNUNUSED PWX_API;
-void        tabToSpace   ( std::string& text, size_t spacePerTab = 1 ) noexcept PWX_API;
-void        trim         ( std::string& text, char extra = 0x0       ) noexcept PWX_API;
+void rtrim( std::string& text, char extra = 0x0 ) noexcept PWX_API;
+bool skipLineBreak( std::ifstream& is ) noexcept PWX_WARNUNUSED PWX_API;
+void tabToSpace( std::string& text, size_t spacePerTab = 1 ) noexcept PWX_API;
+void trim( std::string& text, char extra = 0x0 ) noexcept PWX_API;
 
 // --- Classes for stream manipulation ---
 
@@ -89,7 +89,7 @@ public:
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	*/
-	CFormat ( int32_t left_, int32_t right_ ) noexcept;
+	CFormat( int32_t left_, int32_t right_ ) noexcept;
 	CFormat() noexcept;
 
 	virtual ~CFormat() noexcept PWX_DEFAULT;
@@ -98,7 +98,7 @@ public:
 	 * === Public methods                          ===
 	 * ===============================================
 	*/
-	void setFields ( std::ostream& os ) const noexcept;
+	void setFields( std::ostream& os ) const noexcept;
 protected:
 	/* ===============================================
 	 * === Protected members                       ===
@@ -115,13 +115,13 @@ protected:
   *
   * @see CFormat ctor for argument description
 **/
-class PWX_API CAdjLeft: public CFormat {
+class PWX_API CAdjLeft : public CFormat {
 public:
 	/* ===============================================
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	*/
-	CAdjLeft ( int32_t left_, int32_t right_ ) noexcept;
+	CAdjLeft( int32_t left_, int32_t right_ ) noexcept;
 	CAdjLeft() noexcept;
 
 	~CAdjLeft() noexcept PWX_DEFAULT;
@@ -135,21 +135,21 @@ public:
   *
   * @see CFormat ctor for argument description
 **/
-class PWX_API CAdjRight: public CFormat {
+class PWX_API CAdjRight : public CFormat {
 public:
 	/* ===============================================
 	 * === Public Constructors and destructors     ===
 	 * ===============================================
 	*/
-	CAdjRight ( int32_t left_, int32_t right_ ) noexcept;
+	CAdjRight( int32_t left_, int32_t right_ ) noexcept;
 	CAdjRight() noexcept;
 
 	~CAdjRight() noexcept PWX_DEFAULT;
 };
 
 
-std::ostream& operator<< ( std::ostream& os, const CAdjLeft& l ) noexcept PWX_API;
-std::ostream& operator<< ( std::ostream& os, const CAdjRight& r ) noexcept PWX_API;
+std::ostream& operator<<( std::ostream& os, const CAdjLeft& l ) noexcept PWX_API;
+std::ostream& operator<<( std::ostream& os, const CAdjRight& r ) noexcept PWX_API;
 
 
 /** @brief get the next seperated value
@@ -178,50 +178,59 @@ std::ostream& operator<< ( std::ostream& os, const CAdjRight& r ) noexcept PWX_A
   * @return true on success, false on error
   *
 **/
-template <typename Tval>
-bool readNextValue ( Tval& value, std::ifstream& is, char separator,
-                     bool search, bool emptyAllowed ) noexcept {
-	bool result   = false;
-	bool sepFound = true;
+template< typename Tval >
+	bool readNextValue( Tval& value, std::ifstream& is, char separator,
+	                    bool search, bool emptyAllowed ) noexcept {
+		bool result   = false;
+		bool sepFound = true;
 
-	if ( is.good() ) {
+		if ( is.good() ) {
 
-		// First check whether we have to jump behind a separator or not:
-		if ( separator ) {
-			// We need a separator
-			if ( search ) {
-				// How fortunate, we can fast forward if necessary
-				forwardTo ( is, separator );
-				if ( !is.good() )
-					sepFound = false;
-			} else {
-				// The next one must be a separator value:
-				if ( is.peek() == separator )
-					is.ignore ( 1 );
-				else
-					sepFound = false;
+			// First check whether we have to jump behind a separator or not:
+			if ( separator ) {
+				// We need a separator
+				if ( search ) {
+					// How fortunate, we can fast forward if necessary
+					forwardTo( is, separator );
+					if ( !is.good() ) {
+						sepFound = false;
+					}
+				} else {
+					// The next one must be a separator value:
+					if ( is.peek() == separator ) {
+						is.ignore( 1 );
+					} else {
+						sepFound = false;
+					}
+				}
+				// Now there could be the case of two separators:
+				if ( is.peek() == separator ) {
+					// Aha... so we either fail, or are finished:
+					sepFound = false; // Skip the reading part
+					if ( emptyAllowed ) {
+						result = true;
+					} // But it's alright
+				}
+			} // End of separator extraction
+			// Now we have succeeded if our separator is found or non needed:
+			if ( sepFound && !is.eof() ) {
+				result = true;
 			}
-			// Now there could be the case of two separators:
-			if ( is.peek() == separator ) {
-				// Aha... so we either fail, or are finished:
-				sepFound = false; // Skip the reading part
-				if ( emptyAllowed )
-					result = true; // But it's alright
-			}
-		} // End of separator extraction
-		// Now we have succeeded if our separator is found or non needed:
-		if ( sepFound && !is.eof() )
-			result = true;
+		}
+
+		if ( result && sepFound && is.good() ) {
+			is >> value;
+		}
+
+		if ( !is.good() ) {
+			result = false;
+		}
+
+		return ( result );
 	}
 
-	if ( result && sepFound && is.good() )
-		is >> value;
 
-	if ( !is.good() )
-		result = false;
-
-	return ( result );
-}
+typedef std::stringstream ss_t;
 
 
 /** @brief convert a value to bool
@@ -234,23 +243,27 @@ bool readNextValue ( Tval& value, std::ifstream& is, char separator,
   * @param[in] val the value to be converted
   * @return the resulting bool
 **/
-template <typename T>
-inline bool to_bool ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return ( 0 != val );
-	else if ( isFloatType( T ) )
-		return areAlmostEqual( val, ( T )0 );
+template< typename T >
+	inline bool to_bool( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return ( 0 != val );
+		} else if ( isFloatType( T ) ) {
+			return areAlmostEqual( val, (T) 0 );
+		}
 
-	bool result = false;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		bool result = false;
+		ss_t ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> bool to_bool( char const* const val ) noexcept;
+template<> bool to_bool( char const* val ) noexcept;
 template<> bool to_bool( std::string& val ) noexcept;
-template<> inline bool to_bool( char* val ) noexcept { char const* const v = val; return to_bool( v ); }
+template<> inline bool to_bool( char* val ) noexcept {
+	char const* v = val;
+	return to_bool( v );
+}
 #endif // PWX_NODOX
 
 
@@ -264,21 +277,25 @@ template<> inline bool to_bool( char* val ) noexcept { char const* const v = val
   * @param[in] val the value to be converted
   * @return the resulting float
 **/
-template <typename T>
-inline float to_float ( const T val ) noexcept {
-	if ( isIntType( T ) || isFloatType( T ) )
-		return static_cast<float>( val );
+template< typename T >
+	inline float to_float( const T val ) noexcept {
+		if ( isIntType( T ) || isFloatType( T ) ) {
+			return static_cast<float>( val );
+		}
 
-	float result = 0.f;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		float result = 0.f;
+		ss_t  ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> float to_float( char const* const val ) noexcept;
+template<> float to_float( char const* val ) noexcept;
 template<> float to_float( std::string& val ) noexcept;
-template<> inline float to_float( char* val ) noexcept { char const* const v = val; return to_float( v ); }
+template<> inline float to_float( char* val ) noexcept {
+	char const* v = val;
+	return to_float( v );
+}
 #endif // PWX_NODOX
 
 
@@ -292,22 +309,26 @@ template<> inline float to_float( char* val ) noexcept { char const* const v = v
   * @param[in] val the value to be converted
   * @return the resulting double
 **/
-template <typename T>
-inline double to_double ( const T val ) noexcept {
-	if ( isIntType( T ) || isFloatType( T ) )
-		return static_cast<double>( val );
+template< typename T >
+	inline double to_double( const T val ) noexcept {
+		if ( isIntType( T ) || isFloatType( T ) ) {
+			return static_cast<double>( val );
+		}
 
-	double result = 0.;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		double result = 0.;
+		ss_t   ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> double to_double( char const* const val ) noexcept;
+template<> double to_double( char const* val ) noexcept;
 template<> double to_double( std::string& val ) noexcept;
 template<>
-inline double to_double( char* val ) noexcept {char const* const v = val; return to_double( v ); }
+	inline double to_double( char* val ) noexcept {
+		char const* v = val;
+		return to_double( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -321,22 +342,26 @@ inline double to_double( char* val ) noexcept {char const* const v = val; return
   * @param[in] val the value to be converted
   * @return the resulting long double
 **/
-template <typename T>
-inline long double to_long_double ( const T val ) noexcept {
-	if ( isIntType( T ) || isFloatType( T ) )
-		return static_cast<long double>( val );
+template< typename T >
+	inline long double to_long_double( const T val ) noexcept {
+		if ( isIntType( T ) || isFloatType( T ) ) {
+			return static_cast<long double>( val );
+		}
 
-	long double result = 0.;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		long double result = 0.;
+		ss_t        ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> long double to_long_double( char const* const val ) noexcept;
+template<> long double to_long_double( char const* val ) noexcept;
 template<> long double to_long_double( std::string& val ) noexcept;
 template<>
-inline long double to_long_double( char* val ) noexcept { char const* const v = val; return to_long_double( v ); }
+	inline long double to_long_double( char* val ) noexcept {
+		char const* v = val;
+		return to_long_double( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -350,24 +375,28 @@ inline long double to_long_double( char* val ) noexcept { char const* const v = 
   * @param[in] val the value to be converted
   * @return the resulting int8_t
 **/
-template <typename T>
-inline int8_t to_int8 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<int8_t>( 0xff & val );
-	else if ( isFloatType( T ) )
-		return static_cast<int8_t>( 0xff & static_cast<int32_t>( val + .5f ) );
+template< typename T >
+	inline int8_t to_int8( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<int8_t>( 0xff & val );
+		} else if ( isFloatType( T ) ) {
+			return static_cast<int8_t>( 0xff & static_cast<int32_t>( val + .5f ) );
+		}
 
-	int8_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		int8_t result = 0;
+		ss_t   ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> int8_t to_int8( char const* const val ) noexcept;
+template<> int8_t to_int8( char const* val ) noexcept;
 template<> int8_t to_int8( std::string& val ) noexcept;
 template<>
-inline int8_t to_int8( char* val ) noexcept { char const* const v = val; return to_int8( v ); }
+	inline int8_t to_int8( char* val ) noexcept {
+		char const* v = val;
+		return to_int8( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -381,24 +410,28 @@ inline int8_t to_int8( char* val ) noexcept { char const* const v = val; return 
   * @param[in] val the value to be converted
   * @return the resulting uint8_t
 **/
-template <typename T>
-inline uint8_t to_uint8 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<uint8_t>( 0xff & val );
-	else if ( isFloatType( T ) )
-		return static_cast<uint8_t>( 0xff & static_cast<uint32_t>( val + .5f ) );
+template< typename T >
+	inline uint8_t to_uint8( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<uint8_t>( 0xff & val );
+		} else if ( isFloatType( T ) ) {
+			return static_cast<uint8_t>( 0xff & static_cast<uint32_t>( val + .5f ) );
+		}
 
-	uint8_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		uint8_t result = 0;
+		ss_t    ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> uint8_t to_uint8( char const* const val ) noexcept;
+template<> uint8_t to_uint8( char const* val ) noexcept;
 template<> uint8_t to_uint8( std::string& val ) noexcept;
 template<>
-inline uint8_t to_uint8( char* val ) noexcept { char const* const v = val; return to_uint8( v ); }
+	inline uint8_t to_uint8( char* val ) noexcept {
+		char const* v = val;
+		return to_uint8( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -412,24 +445,28 @@ inline uint8_t to_uint8( char* val ) noexcept { char const* const v = val; retur
   * @param[in] val the value to be converted
   * @return the resulting int16_t
 **/
-template <typename T>
-inline int16_t to_int16 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<int16_t>( 0xffff & val );
-	else if ( isFloatType( T ) )
-		return static_cast<int16_t>( 0xffff & static_cast<int32_t>( val + .5f ) );
+template< typename T >
+	inline int16_t to_int16( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<int16_t>( 0xffff & val );
+		} else if ( isFloatType( T ) ) {
+			return static_cast<int16_t>( 0xffff & static_cast<int32_t>( val + .5f ) );
+		}
 
-	int16_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		int16_t result = 0;
+		ss_t    ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> int16_t to_int16( char const* const val ) noexcept;
+template<> int16_t to_int16( char const* val ) noexcept;
 template<> int16_t to_int16( std::string& val ) noexcept;
 template<>
-inline int16_t to_int16( char* val ) noexcept { char const* const v = val; return to_int16( v ); }
+	inline int16_t to_int16( char* val ) noexcept {
+		char const* v = val;
+		return to_int16( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -443,24 +480,28 @@ inline int16_t to_int16( char* val ) noexcept { char const* const v = val; retur
   * @param[in] val the value to be converted
   * @return the resulting uint16_t
 **/
-template <typename T>
-inline uint16_t to_uint16 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<uint16_t>( 0xffff & val );
-	else if ( isFloatType( T ) )
-		return static_cast<uint16_t>( 0xffff & static_cast<uint32_t>( val + .5f ) );
+template< typename T >
+	inline uint16_t to_uint16( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<uint16_t>( 0xffff & val );
+		} else if ( isFloatType( T ) ) {
+			return static_cast<uint16_t>( 0xffff & static_cast<uint32_t>( val + .5f ) );
+		}
 
-	uint16_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		uint16_t result = 0;
+		ss_t     ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> uint16_t to_uint16( char const* const val ) noexcept;
+template<> uint16_t to_uint16( char const* val ) noexcept;
 template<> uint16_t to_uint16( std::string& val ) noexcept;
 template<>
-inline uint16_t to_uint16( char* val ) noexcept { char const* const v = val; return to_uint16( v ); }
+	inline uint16_t to_uint16( char* val ) noexcept {
+		char const* v = val;
+		return to_uint16( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -474,24 +515,28 @@ inline uint16_t to_uint16( char* val ) noexcept { char const* const v = val; ret
   * @param[in] val the value to be converted
   * @return the resulting int32_t
 **/
-template <typename T>
-inline int32_t to_int32 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<int32_t>( 0xffffffff & val );
-	else if ( isFloatType( T ) )
-		return ( 0xffffffff & static_cast<int32_t>( val + .5f ) );
+template< typename T >
+	inline int32_t to_int32( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<int32_t>( 0xffffffff & val );
+		} else if ( isFloatType( T ) ) {
+			return ( 0xffffffff & static_cast<int32_t>( val + .5f ) );
+		}
 
-	int32_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		int32_t result = 0;
+		ss_t    ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> int32_t to_int32( char const* const val ) noexcept;
-template<> int32_t to_int32( std::string& val ) noexcept;
+template<> int32_t to_int32( char const* val ) noexcept PWX_API;
+template<> int32_t to_int32( std::string& val ) noexcept PWX_API;
 template<>
-inline int32_t to_int32( char* val ) noexcept { char const* const v = val; return to_int32( v ); }
+	inline int32_t to_int32( char* val ) noexcept {
+		char const* v = val;
+		return to_int32( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -505,24 +550,28 @@ inline int32_t to_int32( char* val ) noexcept { char const* const v = val; retur
   * @param[in] val the value to be converted
   * @return the resulting uint32_t
 **/
-template <typename T>
-inline uint32_t to_uint32 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<uint32_t>( 0xffffffff & val );
-	else if ( isFloatType( T ) )
-		return ( 0xffffffff & static_cast<uint32_t>( val + .5f ) );
+template< typename T >
+	inline uint32_t to_uint32( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<uint32_t>( 0xffffffff & val );
+		} else if ( isFloatType( T ) ) {
+			return ( 0xffffffff & static_cast<uint32_t>( val + .5f ) );
+		}
 
-	uint32_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		uint32_t result = 0;
+		ss_t     ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> uint32_t to_uint32( char const* const val ) noexcept;
+template<> uint32_t to_uint32( char const* val ) noexcept;
 template<> uint32_t to_uint32( std::string& val ) noexcept;
 template<>
-inline uint32_t to_uint32( char* val ) noexcept { char const* const v = val; return to_uint32( v ); }
+	inline uint32_t to_uint32( char* val ) noexcept {
+		char const* v = val;
+		return to_uint32( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -536,24 +585,28 @@ inline uint32_t to_uint32( char* val ) noexcept { char const* const v = val; ret
   * @param[in] val the value to be converted
   * @return the resulting int64_t
 **/
-template <typename T>
-inline int64_t to_int64 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<int64_t>( val );
-	else if ( isFloatType( T ) )
-		return static_cast<int64_t>( val + .5f );
+template< typename T >
+	inline int64_t to_int64( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<int64_t>( val );
+		} else if ( isFloatType( T ) ) {
+			return static_cast<int64_t>( val + .5f );
+		}
 
-	int64_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		int64_t result = 0;
+		ss_t    ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> int64_t to_int64( char const* const val ) noexcept;
+template<> int64_t to_int64( char const* val ) noexcept;
 template<> int64_t to_int64( std::string& val ) noexcept;
 template<>
-inline int64_t to_int64( char* val ) noexcept { char const* const v = val; return to_int64( v ); }
+	inline int64_t to_int64( char* val ) noexcept {
+		char const* v = val;
+		return to_int64( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -567,24 +620,28 @@ inline int64_t to_int64( char* val ) noexcept { char const* const v = val; retur
   * @param[in] val the value to be converted
   * @return the resulting uint64_t
 **/
-template <typename T>
-inline uint64_t to_uint64 ( const T val ) noexcept {
-	if ( isIntType( T ) )
-		return static_cast<int64_t>( val );
-	else if ( isFloatType( T ) )
-		return static_cast<int64_t>( val + .5f );
+template< typename T >
+	inline uint64_t to_uint64( const T val ) noexcept {
+		if ( isIntType( T ) ) {
+			return static_cast<int64_t>( val );
+		} else if ( isFloatType( T ) ) {
+			return static_cast<int64_t>( val + .5f );
+		}
 
-	uint64_t result = 0;
-	std::stringstream ss;
-	ss << val;
-	ss >> result;
-	return result;
-}
+		uint64_t result = 0;
+		ss_t     ss;
+		ss << val;
+		ss >> result;
+		return result;
+	}
 #ifndef PWX_NODOX
-template<> uint64_t to_uint64( char const* const val ) noexcept;
+template<> uint64_t to_uint64( char const* val ) noexcept;
 template<> uint64_t to_uint64( std::string& val ) noexcept;
 template<>
-inline uint64_t to_uint64( char* val ) noexcept { char const* const v = val; return to_uint64( v ); }
+	inline uint64_t to_uint64( char* val ) noexcept {
+		char const* v = val;
+		return to_uint64( v );
+	}
 #endif // PWX_NODOX
 
 
@@ -611,10 +668,10 @@ inline __int128_t to_int128 ( const T val ) {
 	PWX_THROW( "UnsupportedType", "unsupported type for conversion to __int128_t", "" );
 }
 #ifndef PWX_NODOX
-template<> __int128_t to_int128( char const* const val );
+template<> __int128_t to_int128( char const* val );
 template<> __int128_t to_int128( std::string& val );
 template<>
-inline __int128_t to_int128( char* val ) { char const* const v = val; return to_int128( v ); }
+inline __int128_t to_int128( char* val ) { char const* v = val; return to_int128( v ); }
 #endif // PWX_NODOX
 #endif // HAVE___INT128_T
 
@@ -642,10 +699,10 @@ inline __uint128_t to_uint128 ( const T val ) {
 	PWX_THROW( "UnsupportedType", "unsupported type for conversion to __uint128_t", "" );
 }
 #ifndef PWX_NODOX
-template<> __uint128_t to_uint128( char const* const val );
+template<> __uint128_t to_uint128( char const* val );
 template<> __uint128_t to_uint128( std::string& val );
 template<>
-inline __uint128_t to_uint128( char* val ) { char const* const v = val; return to_uint128( v ); }
+inline __uint128_t to_uint128( char* val ) { char const* v = val; return to_uint128( v ); }
 #endif // PWX_NODOX
 #endif // HAVE___UINT128_T
 
@@ -656,16 +713,16 @@ inline __uint128_t to_uint128( char* val ) { char const* const v = val; return t
   * @param[in] val the value to be converted
   * @return the resulting int64_t
 **/
-template <typename T>
-inline std::string to_string ( const T val ) noexcept {
-	return std::to_string( val );
-}
+template< typename T >
+	inline std::string to_string( const T val ) noexcept {
+		return std::to_string( val );
+	}
 #ifndef PWX_NODOX
-template<> inline std::string to_string( char const* const  val ) noexcept { return std::string( val ); }
-template<> inline std::string to_string( char*               val ) noexcept { return std::string( val ); }
-template<> inline std::string to_string( std::string  const val ) noexcept { return std::string( val ); }
-template<> inline std::string to_string( std::string  const& val ) noexcept { return std::string( val ); }
-template<> inline std::string to_string( std::string  const&& val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( char const* val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( char* val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( std::string const val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( std::string const& val ) noexcept { return std::string( val ); }
+template<> inline std::string to_string( std::string const&& val ) noexcept { return std::string( val ); }
 #endif // PWX_NODOX
 
 

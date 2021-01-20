@@ -30,6 +30,8 @@ target_sources( container PRIVATE
                 CHashBuilder.cpp
                 CThreadElementStore.cpp
                 )
+target_compile_definitions(container PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---

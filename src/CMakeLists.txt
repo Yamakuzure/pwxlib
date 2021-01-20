@@ -46,6 +46,7 @@ add_library( pwx_obj OBJECT
              ${pwx_obj_HEADERS}
              pwxlib.cpp
              )
+target_compile_definitions(pwx_obj PRIVATE PWX_EXPORTS)
 
 # We need at least one file for the real libraries
 if ( BUILD_SHARED_LIBS )
@@ -92,7 +93,7 @@ set( libpwx_SYM ${libpwx_SYM} PARENT_SCOPE )
 # --------------------------------------------
 if ( BUILD_SHARED_LIBS )
 	set_target_properties( pwx PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_SO_VERSION} )
-	target_link_options( pwx PRIVATE "-Wl,--version-script=${libpwx_SYM}" )
+	target_compile_definitions(pwx PRIVATE PWX_EXPORTS)
 	target_link_libraries( pwx PRIVATE pwx_obj
 	                       arg_handler
 	                       basic
@@ -110,6 +111,7 @@ endif ()
 
 if ( BUILD_STATIC_LIBS )
 	set_target_properties( pwx_static PROPERTIES VERSION ${PROJECT_VERSION} )
+	target_compile_definitions(pwx_static PRIVATE PWX_EXPORTS)
 	target_link_libraries( pwx_static PRIVATE pwx_obj
 	                       arg_handler
 	                       basic

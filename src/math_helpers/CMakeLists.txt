@@ -12,6 +12,8 @@ target_sources( math_helpers PRIVATE
                 CSinCosTable.cpp
                 MathHelpers.cpp
                 )
+target_compile_definitions(math_helpers PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---

@@ -10,6 +10,8 @@ set( functions_HEADERS
 target_sources( functions PRIVATE
                 ${functions_HEADERS}
                 )
+target_compile_definitions(functions PRIVATE PWX_EXPORTS)
+
 
 set_target_properties( functions PROPERTIES LINKER_LANGUAGE CXX )
 

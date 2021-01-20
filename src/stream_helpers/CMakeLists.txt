@@ -10,6 +10,8 @@ target_sources( stream_helpers PRIVATE
                 ${stream_helpers_HEADERS}
                 StreamHelpers.cpp
                 )
+target_compile_definitions(stream_helpers PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---

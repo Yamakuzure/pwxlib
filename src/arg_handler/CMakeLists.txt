@@ -19,6 +19,8 @@ target_sources( arg_handler PRIVATE
                 VArgTargetBase.cpp
                 sArgError.cpp
                 )
+target_compile_definitions(arg_handler PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---

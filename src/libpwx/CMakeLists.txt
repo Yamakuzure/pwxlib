@@ -25,6 +25,8 @@ target_sources( libpwx PRIVATE
                 worker_RNG.cpp
                 worker_SCT.cpp
                 )
+target_compile_definitions(libpwx PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---

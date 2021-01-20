@@ -10,6 +10,8 @@ target_sources( wavecolor PRIVATE
                 ${wavecolor_HEADERS}
                 CWaveColor.cpp
                 )
+target_compile_definitions(wavecolor PRIVATE PWX_EXPORTS)
+
 
 # ------------------------------------------------
 # --- Add source directory to the include list ---
