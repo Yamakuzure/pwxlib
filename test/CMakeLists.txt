@@ -4,6 +4,8 @@
 if ( WITH_TESTS )
 	set( debug_arg 0 )
 
+	# === Generate the symbols test source file ===
+	# ---------------------------------------------
 	if ( CMAKE_BUILD_TYPE STREQUAL Debug )
 		set( debug_arg 1 )
 	endif ()
@@ -17,21 +19,29 @@ if ( WITH_TESTS )
 	                    VERBATIM USES_TERMINAL
 	                    )
 
+
+	# === Automatic tests, run with the test target via CTest ===
+	# -----------------------------------------------------------
 	add_executable( test-libpwx-sym
 	                test-libpwx-sym.cpp
 	                ${pwxlib_h}
 	                )
 	target_include_directories( test-libpwx-sym PRIVATE ${CMAKE_SOURCE_DIR}/src )
 	target_link_libraries( test-libpwx-sym PRIVATE pwx )
-	add_test( test-libpwx-sym COMMAND test-libpwx-sym )
+	add_test( NAME test-libpwx-sym
+	          COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test-libpwx-sym
+	          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	          )
 
+
+	# === Manual tests, installable, run by the user ===
+	# --------------------------------------------------
 	add_executable( test_cluster
 	                cluster_check.cpp
 	                cluster_check.h
 	                )
 	target_include_directories( test_cluster PRIVATE ${CMAKE_SOURCE_DIR}/src )
 	target_link_libraries( test_cluster PRIVATE pwx )
-	add_test( test_cluster COMMAND test_cluster )
 
 	add_executable( test_hash
 	                hash_builder.cpp
@@ -46,32 +56,6 @@ if ( WITH_TESTS )
 	target_include_directories( test_name PRIVATE ${CMAKE_SOURCE_DIR}/src )
 	target_link_libraries( test_name PRIVATE pwx )
 
-	add_executable( test_lib
-	                destroy.cpp
-	                destroy.h
-	                env.h
-	                test_lib.cpp
-	                test_lib.h
-	                testColor.cpp
-	                testColor.h
-	                testHash.h
-	                testListRing.h
-	                testPAH.cpp
-	                testPAH.h
-	                testRNG.cpp
-	                testRNG.h
-	                testRNG_func.cpp
-	                testRNG_func.h
-	                testSCT.cpp
-	                testSCT.h
-	                testSet.h
-	                testSpeed.h
-	                testStackQueue.h
-	                testThreads.h
-	                )
-	target_include_directories( test_lib PRIVATE ${CMAKE_SOURCE_DIR}/src )
-	target_link_libraries( test_lib PRIVATE pwx )
-
 	if ( ENABLE_TORTURE )
 		add_executable( torture
 		                torture.cpp
@@ -85,13 +69,11 @@ if ( WITH_TESTS )
 		# Prefix with pwx_ when installing
 		set_target_properties( test_cluster PROPERTIES OUTPUT_NAME pwx_test_cluster )
 		set_target_properties( test_hash PROPERTIES OUTPUT_NAME pwx_test_hash )
-		set_target_properties( test_lib PROPERTIES OUTPUT_NAME pwx_test_lib )
 		set_target_properties( test_name PROPERTIES OUTPUT_NAME pwx_test_name )
 
 		# Installations just moves to the bin subfolder
 		install( TARGETS test_cluster DESTINATION bin COMPONENT pwx )
 		install( TARGETS test_hash DESTINATION bin COMPONENT pwx )
-		install( TARGETS test_lib DESTINATION bin COMPONENT pwx )
 		install( TARGETS test_name DESTINATION bin COMPONENT pwx )
 
 		if ( ENABLE_TORTURE )
