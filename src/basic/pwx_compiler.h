@@ -41,7 +41,7 @@
 /* -----------------------------------------------------------------------
  * --- pwxLib needs C++17 features. Sorry, no way around this!         ---
  * -------------------------------------------------------------------- */
-#if (!defined(__cplusplus)) || (__cplusplus < 201703L)
+#if ( !defined(__cplusplus) ) || ( __cplusplus < 201703L )
 #pragma error "pwxLib needs at least C++17!"
 #endif // __cplusplus defined and large enough?
 
@@ -89,7 +89,7 @@
 #  define PWX_IS_GCC   0
 #  define PWX_IS_MSVC  1
 #elif defined(__GNUC__)
-#  if (__GNUC__ < 7)
+#  if ( __GNUC__ < 7 )
 #    pragma error "You need at least gcc-7.1 to build pwxLib!"
 #  endif
 #  define PWX_IS_CLANG 0
@@ -122,19 +122,31 @@
 /** @def PWX_API
   * @brief defines to set the right modifier for library export/import
 */
-#ifdef PWX_EXPORTS
-#  if PWX_IS_MSVC
-#    define PWX_API __declspec(dllexport)
-#  else
-#    define PWX_API __attribute__((visibility("default")))
-#  endif
-#else
-#  if PWX_IS_MSVC
-#    define PWX_API __declspec(dllimport)
-#  else
-#    define PWX_API
-#  endif
-#endif
+#if PWX_IS_MSVC || defined __CYGWIN__
+  #ifdef PWX_EXPORTS
+	#if PWX_IS_GCC || PWX_IS_CLANG
+	  #define PWX_API __attribute__ ((dllexport))
+	#else
+	  #define PWX_API __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+	#endif
+  #else
+	#ifdef PWX_IS_GCC || PWX_IS_CLANG
+	  #define PWX_API __attribute__ ((dllimport))
+	#else
+	  #define PWX_API __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+	#endif
+  #endif
+  #define PWX_LOCAL
+#else // not on windows
+	#define PWX_API    __attribute__ ((visibility ("default")))
+	#define PWX_LOCAL  __attribute__ ((visibility ("hidden")))
+#endif // windows versus unix
+/** @def PWX_API
+  * @brief Set the right modifier for library export/import
+*/
+/** @def PWX_LOCAL
+  * @brief Modifier to hide internal structures and members
+*/
 
 
 /** @def PWX_PRIVATE_INLINE
