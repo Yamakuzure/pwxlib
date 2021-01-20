@@ -12,7 +12,8 @@ target_sources( math_helpers PRIVATE
                 CSinCosTable.cpp
                 MathHelpers.cpp
                 )
-target_compile_definitions(math_helpers PRIVATE PWX_EXPORTS)
+target_compile_definitions( math_helpers PRIVATE PWX_EXPORTS )
+target_compile_options( math_helpers PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------

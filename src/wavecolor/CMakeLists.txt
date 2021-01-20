@@ -10,7 +10,8 @@ target_sources( wavecolor PRIVATE
                 ${wavecolor_HEADERS}
                 CWaveColor.cpp
                 )
-target_compile_definitions(wavecolor PRIVATE PWX_EXPORTS)
+target_compile_definitions( wavecolor PRIVATE PWX_EXPORTS )
+target_compile_options( wavecolor PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------

@@ -18,7 +18,8 @@ target_sources( random PRIVATE
                 CRandomTRandom.cpp
                 eNameSourceType.cpp
                 )
-target_compile_definitions(random PRIVATE PWX_EXPORTS)
+target_compile_definitions( random PRIVATE PWX_EXPORTS )
+target_compile_options( random PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------

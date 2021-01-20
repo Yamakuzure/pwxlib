@@ -19,7 +19,8 @@ target_sources( arg_handler PRIVATE
                 VArgTargetBase.cpp
                 sArgError.cpp
                 )
-target_compile_definitions(arg_handler PRIVATE PWX_EXPORTS)
+target_compile_definitions( arg_handler PRIVATE PWX_EXPORTS )
+target_compile_options( arg_handler PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------

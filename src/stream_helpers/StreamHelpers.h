@@ -258,8 +258,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> bool to_bool( char const* val ) noexcept;
-template<> bool to_bool( std::string& val ) noexcept;
+template<> bool to_bool( char const* val ) noexcept PWX_API;
+template<> bool to_bool( std::string& val ) noexcept PWX_API;
 template<> inline bool to_bool( char* val ) noexcept {
 	char const* v = val;
 	return to_bool( v );
@@ -290,8 +290,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> float to_float( char const* val ) noexcept;
-template<> float to_float( std::string& val ) noexcept;
+template<> float to_float( char const* val ) noexcept PWX_API;
+template<> float to_float( std::string& val ) noexcept PWX_API;
 template<> inline float to_float( char* val ) noexcept {
 	char const* v = val;
 	return to_float( v );
@@ -322,8 +322,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> double to_double( char const* val ) noexcept;
-template<> double to_double( std::string& val ) noexcept;
+template<> double to_double( char const* val ) noexcept PWX_API;
+template<> double to_double( std::string& val ) noexcept PWX_API;
 template<>
 	inline double to_double( char* val ) noexcept {
 		char const* v = val;
@@ -355,8 +355,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> long double to_long_double( char const* val ) noexcept;
-template<> long double to_long_double( std::string& val ) noexcept;
+template<> long double to_long_double( char const* val ) noexcept PWX_API;
+template<> long double to_long_double( std::string& val ) noexcept PWX_API;
 template<>
 	inline long double to_long_double( char* val ) noexcept {
 		char const* v = val;
@@ -390,8 +390,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> int8_t to_int8( char const* val ) noexcept;
-template<> int8_t to_int8( std::string& val ) noexcept;
+template<> int8_t to_int8( char const* val ) noexcept PWX_API;
+template<> int8_t to_int8( std::string& val ) noexcept PWX_API;
 template<>
 	inline int8_t to_int8( char* val ) noexcept {
 		char const* v = val;
@@ -425,8 +425,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> uint8_t to_uint8( char const* val ) noexcept;
-template<> uint8_t to_uint8( std::string& val ) noexcept;
+template<> uint8_t to_uint8( char const* val ) noexcept PWX_API;
+template<> uint8_t to_uint8( std::string& val ) noexcept PWX_API;
 template<>
 	inline uint8_t to_uint8( char* val ) noexcept {
 		char const* v = val;
@@ -460,8 +460,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> int16_t to_int16( char const* val ) noexcept;
-template<> int16_t to_int16( std::string& val ) noexcept;
+template<> int16_t to_int16( char const* val ) noexcept PWX_API;
+template<> int16_t to_int16( std::string& val ) noexcept PWX_API;
 template<>
 	inline int16_t to_int16( char* val ) noexcept {
 		char const* v = val;
@@ -495,8 +495,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> uint16_t to_uint16( char const* val ) noexcept;
-template<> uint16_t to_uint16( std::string& val ) noexcept;
+template<> uint16_t to_uint16( char const* val ) noexcept PWX_API;
+template<> uint16_t to_uint16( std::string& val ) noexcept PWX_API;
 template<>
 	inline uint16_t to_uint16( char* val ) noexcept {
 		char const* v = val;
@@ -565,8 +565,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> uint32_t to_uint32( char const* val ) noexcept;
-template<> uint32_t to_uint32( std::string& val ) noexcept;
+template<> uint32_t to_uint32( char const* val ) noexcept PWX_API;
+template<> uint32_t to_uint32( std::string& val ) noexcept PWX_API;
 template<>
 	inline uint32_t to_uint32( char* val ) noexcept {
 		char const* v = val;
@@ -600,8 +600,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> int64_t to_int64( char const* val ) noexcept;
-template<> int64_t to_int64( std::string& val ) noexcept;
+template<> int64_t to_int64( char const* val ) noexcept PWX_API;
+template<> int64_t to_int64( std::string& val ) noexcept PWX_API;
 template<>
 	inline int64_t to_int64( char* val ) noexcept {
 		char const* v = val;
@@ -635,8 +635,8 @@ template< typename T >
 		return result;
 	}
 #ifndef PWX_NODOX
-template<> uint64_t to_uint64( char const* val ) noexcept;
-template<> uint64_t to_uint64( std::string& val ) noexcept;
+template<> uint64_t to_uint64( char const* val ) noexcept PWX_API;
+template<> uint64_t to_uint64( std::string& val ) noexcept PWX_API;
 template<>
 	inline uint64_t to_uint64( char* val ) noexcept {
 		char const* v = val;
@@ -668,8 +668,8 @@ inline __int128_t to_int128 ( const T val ) {
 	PWX_THROW( "UnsupportedType", "unsupported type for conversion to __int128_t", "" );
 }
 #ifndef PWX_NODOX
-template<> __int128_t to_int128( char const* val );
-template<> __int128_t to_int128( std::string& val );
+template<> __int128_t to_int128( char const* val ) PWX_API;
+template<> __int128_t to_int128( std::string& val ) PWX_API;
 template<>
 inline __int128_t to_int128( char* val ) { char const* v = val; return to_int128( v ); }
 #endif // PWX_NODOX
@@ -699,8 +699,8 @@ inline __uint128_t to_uint128 ( const T val ) {
 	PWX_THROW( "UnsupportedType", "unsupported type for conversion to __uint128_t", "" );
 }
 #ifndef PWX_NODOX
-template<> __uint128_t to_uint128( char const* val );
-template<> __uint128_t to_uint128( std::string& val );
+template<> __uint128_t to_uint128( char const* val ) PWX_API;
+template<> __uint128_t to_uint128( std::string& val ) PWX_API;
 template<>
 inline __uint128_t to_uint128( char* val ) { char const* v = val; return to_uint128( v ); }
 #endif // PWX_NODOX

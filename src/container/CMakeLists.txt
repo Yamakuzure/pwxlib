@@ -30,7 +30,8 @@ target_sources( container PRIVATE
                 CHashBuilder.cpp
                 CThreadElementStore.cpp
                 )
-target_compile_definitions(container PRIVATE PWX_EXPORTS)
+target_compile_definitions( container PRIVATE PWX_EXPORTS )
+target_compile_options( container PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------

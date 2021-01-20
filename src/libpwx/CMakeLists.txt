@@ -2,7 +2,7 @@
 # --- Sources for the "libpwx" component        ---
 # -------------------------------------------------
 
-set( libpwx_SYM ${CMAKE_CURRENT_LIST_DIR}/pwxlib.sym PARENT_SCOPE)
+set( libpwx_SYM ${CMAKE_CURRENT_LIST_DIR}/pwxlib.sym PARENT_SCOPE )
 
 set( libpwx_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/basic.h
@@ -25,7 +25,8 @@ target_sources( libpwx PRIVATE
                 worker_RNG.cpp
                 worker_SCT.cpp
                 )
-target_compile_definitions(libpwx PRIVATE PWX_EXPORTS)
+target_compile_definitions( libpwx PRIVATE PWX_EXPORTS )
+target_compile_options( libpwx PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------

@@ -10,7 +10,8 @@ target_sources( stream_helpers PRIVATE
                 ${stream_helpers_HEADERS}
                 StreamHelpers.cpp
                 )
-target_compile_definitions(stream_helpers PRIVATE PWX_EXPORTS)
+target_compile_definitions( stream_helpers PRIVATE PWX_EXPORTS )
+target_compile_options( stream_helpers PRIVATE -fvisibility=hidden )
 
 
 # ------------------------------------------------
