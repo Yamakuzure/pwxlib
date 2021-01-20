@@ -2,6 +2,8 @@
 # --- Sources for the "libpwx" component        ---
 # -------------------------------------------------
 
+set( libpwx_SYM ${CMAKE_CURRENT_LIST_DIR}/pwxlib.sym PARENT_SCOPE)
+
 set( libpwx_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/basic.h
      ${CMAKE_CURRENT_LIST_DIR}/containers.h
