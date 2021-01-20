@@ -1,6 +1,8 @@
 # ------------------------------------------------------------------------
 # --- List file for the library itself. Dependencies are handled here. ---
 # ------------------------------------------------------------------------
+set( pwxlib_h ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h PARENT_SCOPE )
+
 set( pwx_WRAPPERS
      ${CMAKE_CURRENT_LIST_DIR}/PAH
      ${CMAKE_CURRENT_LIST_DIR}/PArgHandler
@@ -36,7 +38,7 @@ set( PROJECT_WRAPPERS "${pwx_WRAPPERS_STR}" PARENT_SCOPE )
 
 set( pwx_obj_HEADERS
      ${pwx_WRAPPERS}
-     ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h
+     ${pwxlib_h}
      "${PROJECT_BINARY_DIR}/pwx_config.h"
      )
 
@@ -82,6 +84,8 @@ add_subdirectory( random )
 add_subdirectory( stream_helpers )
 add_subdirectory( wavecolor )
 
+# Propagate the symbols file up
+set( libpwx_SYM ${libpwx_SYM} PARENT_SCOPE )
 
 # --------------------------------------------
 # --- Definitions of the PrydeWorX library ---

@@ -2,6 +2,29 @@
 # --- Test programs, all in one file.                                  ---
 # ------------------------------------------------------------------------
 if ( WITH_TESTS )
+	set( debug_arg 0 )
+
+	if ( CMAKE_BUILD_TYPE STREQUAL Debug )
+		set( debug_arg 1 )
+	endif ()
+
+	add_custom_command( OUTPUT test-libpwx-sym.cpp
+	                    COMMAND ${CMAKE_SOURCE_DIR}/test/generate-sym-test.py
+	                    ${libpwx_SYM} ${debug_arg} ${pwxlib_h} > test-libpwx-sym.cpp
+	                    MAIN_DEPENDENCY ${libpwx_SYM}
+	                    DEPENDS ${pwxlib_h}
+	                    COMMENT Generate a test for all API functions, calsses and structures.
+	                    VERBATIM USES_TERMINAL
+	                    )
+
+	add_executable( test-libpwx-sym
+	                test-libpwx-sym.cpp
+	                ${pwxlib_h}
+	                )
+	target_include_directories( test-libpwx-sym PRIVATE ${CMAKE_SOURCE_DIR}/src )
+	target_link_libraries( test-libpwx-sym PRIVATE pwx )
+	add_test( test-libpwx-sym COMMAND test-libpwx-sym )
+
 	add_executable( test_cluster
 	                cluster_check.cpp
 	                cluster_check.h

@@ -57,4 +57,4 @@ install/
 old/
 textAnalyzer/
 *.cscope_file_list
-
+venv/
