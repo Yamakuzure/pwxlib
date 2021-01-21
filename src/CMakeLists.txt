@@ -1,6 +1,9 @@
 # ------------------------------------------------------------------------
 # --- List file for the library itself. Dependencies are handled here. ---
 # ------------------------------------------------------------------------
+
+# Needed for the tests:
+set( libpwx_SYM ${CMAKE_CURRENT_LIST_DIR}/pwxlib.sym PARENT_SCOPE )
 set( pwxlib_h ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h PARENT_SCOPE )
 
 set( pwx_WRAPPERS
@@ -86,9 +89,6 @@ add_subdirectory( math_helpers )
 add_subdirectory( random )
 add_subdirectory( stream_helpers )
 add_subdirectory( wavecolor )
-
-# Propagate the symbols file up
-set( libpwx_SYM ${libpwx_SYM} PARENT_SCOPE )
 
 # --------------------------------------------
 # --- Definitions of the PrydeWorX library ---

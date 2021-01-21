@@ -281,7 +281,7 @@ if ( BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS )
 	# -----------------------------------------
 	# --- Configure and install our pc file ---
 	# -----------------------------------------
-	configure_file( src/libpwx/pwxlib.pc.in pwxlib.pc )
+	configure_file( src/pwxlib.pc.in pwxlib.pc )
 	install( FILES pwxlib.pc DESTINATION ${PKG_CONFIG_LIBDIR} COMPONENT pwxlib )
 
 endif ()
