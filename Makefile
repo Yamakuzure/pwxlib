@@ -94,6 +94,7 @@ $(CMAKE_CONF): $(CMAKE_DIR) Makefile CMakeLists.txt
 		$(CMAKE) -DCMAKE_BUILD_TYPE=$(CMAKE_TARGET) \
 		-DBUILD_SHARED_LIBS=$(BUILD_SHARED)         \
 		-DBUILD_STATIC_LIBS=$(BUILD_STATIC)         \
+		-DBUILD_TESTING=$(WITH_TESTS)               \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX)            \
 		-DCMAKE_SANITIZE=$(CMAKE_SANITIZE)          \
 		-DWITH_TESTS=$(WITH_TESTS)                  \
