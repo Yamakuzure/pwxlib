@@ -5,14 +5,13 @@
 #  License as published by the Free Software Foundation; either
 #  version 2.1 of the License, or (at your option) any later version.
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@/pwxlib
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=$${}{prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=$${}{prefix}/@CMAKE_INSTALL_INCLUDEDIR@/pwxlib
 
-Name: libpwx
-Description: PrydeWorX C++ Library
-URL: @PACKAGE_URL@
-Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lpwx
-Cflags: -I${includedir}
+Name: @PROJECT_NAME@
+Description: @PROJECT_DESCRIPTION@
+URL: @PROJECT_HOMEPAGE_URL@
+Version: @PROJECT_VERSION@
+Libs: -L$${}{libdir} -lpwx
+Cflags: -I$${}{includedir}

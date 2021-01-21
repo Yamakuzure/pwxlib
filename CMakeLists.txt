@@ -37,12 +37,19 @@ set( CMAKE_DEBUG_POSTFIX "_d" )
 # ---------------------------------------------------
 if ( UNIX AND NOT APPLE )
 	include( GNUInstallDirs )
+else ()
+	if ( NOT DEFINED CMAKE_INSTALL_DOCDIR )
+		set( CMAKE_INSTALL_DOCDIR "doc" )
+	endif ()
+	if ( NOT DEFINED CMAKE_INSTALL_INCLUDEDIR )
+		set( CMAKE_INSTALL_INCLUDEDIR "include" )
+	endif ()
+	if ( NOT DEFINED CMAKE_INSTALL_LIBDIR )
+		set( CMAKE_INSTALL_LIBDIR "lib" )
+	endif ()
 endif ()
-if ( NOT DEFINED CMAKE_INSTALL_LIBDIR )
-	set( CMAKE_INSTALL_LIBDIR "lib" )
-endif ()
-if ( NOT DEFINED CMAKE_INSTALL_DOCDIR )
-	set( CMAKE_INSTALL_LIBDIR "doc" )
+if ( NOT DEFINED PKG_CONFIG_LIBDIR )
+	set( PKG_CONFIG_LIBDIR "${CMAKE_INSTALL_LIBDIR}/pkgconfig" )
 endif ()
 
 
@@ -269,6 +276,14 @@ if ( BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS )
 		endif ()
 
 	endif ()
+
+
+	# -----------------------------------------
+	# --- Configure and install our pc file ---
+	# -----------------------------------------
+	configure_file( src/libpwx/pwxlib.pc.in pwxlib.pc )
+	install( FILES pwxlib.pc DESTINATION ${PKG_CONFIG_LIBDIR} COMPONENT pwxlib )
+
 endif ()
 
 
