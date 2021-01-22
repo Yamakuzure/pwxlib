@@ -1,32 +1,36 @@
 name: PrydeWorX Library CI
 
-on: 
-    push:
-        branches:
-            - master
-            - github-actions-test
-    pull_request:
-        branches:
-            - master
-            - github-actions-test
+on:
+  push:
+    branches:
+      - master
+      - github-actions-test
+  pull_request:
+    branches:
+      - master
+      - github-actions-test
+
+env:
+  CC: gcc-9
+  CXX: g++-9
 
 defaults:
-    run:
-        shell: bash
+  run:
+    shell: bash
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout library
-              uses: actions/checkout@v2
-            - name: Add Ninja and Doygen
-              run: sudo apt-get install -y ninja-build doxygen graphviz
-            - name: Build shared library
-              run: make DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES
-            - name: Run tests
-              run: make test DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES
-            - name: Install full SDK
-              run: make install DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES DESTDIR=$(pwd)/install
+    steps:
+      - name: Checkout library
+        uses: actions/checkout@v2
+      - name: Add Ninja and Doygen
+        run: sudo apt-get install -y ninja-build doxygen graphviz
+      - name: Build shared library
+        run: make DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES
+      - name: Run tests
+        run: make test DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES
+      - name: Install full SDK
+        run: make install DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES DESTDIR=$(pwd)/install
 
