@@ -7,13 +7,10 @@ before_install:
 - docker ps
 install:
 - docker exec -t build_img sh -c "
-   xbps-install -Suy m4 pkg-config meson base-devel valgrind-devel doxygen graphviz"
+   xbps-install -Suy m4 pkg-config base-devel cmake ninja valgrind-devel doxygen graphviz"
 script:
 - docker exec -t build_img sh -c "
    cd /travis &&
-   meson --buildtype=debug -Ddebug=true -Ddebug-thread=false
-         --prefix=/usr -Dtests=true -Dinstall-tests=true
-         -Dtorture=true -Dhtml=true -Dsmall_tests=true _build &&
-   ninja -C _build &&
-   ninja -C _build test &&
-   env DESTDIR=$(pwd)/install ninja -C _build install"
+   make DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES &&
+   make test DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES &&
+   make install DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES DESTDIR=$(pwd)/install"
