@@ -4,18 +4,18 @@
 
 set( random_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/CRandom.h
-     ${CMAKE_CURRENT_LIST_DIR}/CRandomConstants.h
-     ${CMAKE_CURRENT_LIST_DIR}/CRandomTHash.h
-     ${CMAKE_CURRENT_LIST_DIR}/CRandomTRandom.h
-     ${CMAKE_CURRENT_LIST_DIR}/CRandomWordConstants.h
      ${CMAKE_CURRENT_LIST_DIR}/eNameSourceType.h
      )
 
 target_sources( random PRIVATE
                 ${random_HEADERS}
                 CRandom.cpp
+                CRandomConstants.h
                 CRandomTHash.cpp
+                CRandomTHash.h
                 CRandomTRandom.cpp
+                CRandomTRandom.h
+                CRandomWordConstants.h
                 eNameSourceType.cpp
                 )
 target_compile_definitions( random PRIVATE PWX_EXPORTS )

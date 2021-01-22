@@ -4,7 +4,9 @@
 
 # Needed for the tests:
 set( libpwx_SYM ${CMAKE_CURRENT_LIST_DIR}/pwxlib.sym PARENT_SCOPE )
-set( pwxlib_h ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h PARENT_SCOPE )
+
+set( pwxlib_h ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h  )
+set( pwxlib_h ${pwxlib_h} PARENT_SCOPE )
 
 set( pwx_WRAPPERS
      ${CMAKE_CURRENT_LIST_DIR}/PAH
@@ -55,10 +57,10 @@ target_compile_options( pwx_obj PRIVATE -fvisibility=hidden )
 
 # We need at least one file for the real libraries
 if ( BUILD_SHARED_LIBS )
-	target_sources( pwx PRIVATE pwxlib.h )
+	target_sources( pwx PRIVATE ${pwxlib_h} )
 endif ()
 if ( BUILD_STATIC_LIBS )
-	target_sources( pwx_static PRIVATE pwxlib.h )
+	target_sources( pwx_static PRIVATE ${pwxlib_h} )
 endif ()
 
 
