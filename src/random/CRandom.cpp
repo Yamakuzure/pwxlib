@@ -58,7 +58,7 @@ namespace pwx {
 /** @brief checkRule - check state and character against followup matrix rules from namecon
   * Note: It is assumed, that all three characters are lowercase
 **/
-void CRandom::checkRule ( uint32_t& state, char const first, char const second, char const third ) noexcept {
+void CRandom::checkRule( uint32_t& state, char const first, char const second, char const third ) noexcept {
 	int32_t one   = FUM_IDX( first );
 	int32_t two   = FUM_IDX( second );
 	int32_t three = FUM_IDX( third );
@@ -67,34 +67,36 @@ void CRandom::checkRule ( uint32_t& state, char const first, char const second, 
 	         && "ERROR: checkRule() with at least one illegal character called!" );
 
 	if ( ( ( one == two ) && ( two == three ) ) // eliminate triple threats
-	                || ( 0 == ( FUM_IDX_RULE( nst, one, two ) & ( 1 << three ) ) ) ) {
+	     || ( 0 == ( FUM_IDX_RULE( nst, one, two ) & ( 1 << three ) ) ) ) {
 		// The desired character is not allowed to follow the set two chars
-		if ( state & NameConstants::genNextIsCon )
+		if ( state & NameConstants::genNextIsCon ) {
 			state ^= NameConstants::genNextIsCon;
-		if ( state & NameConstants::genNextIsVow )
+		}
+		if ( state & NameConstants::genNextIsVow ) {
 			state ^= NameConstants::genNextIsVow;
+		}
 	}
 }
 
 
 /** @brief generate a syllable out of various rules
 **/
-int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& state, char* lastChrs ) noexcept {
-	int32_t  charCount = 0;
-	int32_t  charIndex = 0;
-	char     nextCon   = 0;     // Shortcut to the next consonant
-	char     nextVow   = 0;     // Shortcut to the next vowel
-	uint32_t oldState  = state; // save state to revert if generation failed
+int32_t CRandom::genSyllable( double& idx, double step, char* syll, uint32_t& state, char* lastChrs ) noexcept {
+	int32_t  charCount  = 0;
+	int32_t  charIndex  = 0;
+	char     nextCon    = 0;     // Shortcut to the next consonant
+	char     nextVow    = 0;     // Shortcut to the next vowel
+	uint32_t oldState   = state; // save state to revert if generation failed
 	char     oldLstChrs[2];     // Save lastChar to revert back if generation fails
 	int32_t  oldWasLast = 0;    // Saves genLastIsVow(Con) to revert if the neding is illegal
-	int32_t  conCount  = 0;     // Count generated consonants
-	int32_t  vowCount  = 0;     // Count generated vowels
-	int32_t  genTries  = 8;     // Eight tries to generate a syllable. That should be enough!
-	double   endChance = 0.0;   // propability to end (early)
-	double   vowChance = 0.0;   // 50% if last was consonant, 25% if last was vowel
+	int32_t  conCount   = 0;     // Count generated consonants
+	int32_t  vowCount   = 0;     // Count generated vowels
+	int32_t  genTries   = 8;     // Eight tries to generate a syllable. That should be enough!
+	double   endChance  = 0.0;   // propability to end (early)
+	double   vowChance  = 0.0;   // 50% if last was consonant, 25% if last was vowel
 
 	// Initialize syll and state
-	memset ( syll, 0, 5 );
+	memset( syll, 0, 5 );
 	state |= NameConstants::genRoundA;
 
 	// save lastChrs
@@ -107,25 +109,26 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 		/*********************************************************************
 		 * 1) Determine charIndex and set shortcuts                          *
 		 *********************************************************************/
-		charIndex = static_cast<int32_t> ( round ( abs ( idx ) ) );
+		charIndex = static_cast<int32_t> ( round( abs( idx ) ) );
 		nextCon   = CL_CHR( nst, charIndex );
 		nextVow   = VL_CHR( nst, charIndex );
 		assert ( ( nextCon > 0x60 ) && ( nextCon < 0x7b )
 		         && ( ( ( nextVow > 0x60 ) && ( nextVow < 0x7b ) )
 		              || IS_UMLAUT_A( nextVow )
 		              || IS_UMLAUT_O( nextVow )
-		              || IS_UMLAUT_U( nextVow ) )
+		              || IS_UMLAUT_U( nextVow )
+		         )
 		         && "[C/V]L_CHR() returned illegal chars!" );
 
 		/*********************************************************************
 		 * 2) Set chance to select a vowel next                              *
 		 *********************************************************************/
 		if ( state & NameConstants::genLastIsVow ) {
-			state     ^= NameConstants::genLastIsVow;
+			state ^= NameConstants::genLastIsVow;
 			oldWasLast = NameConstants::genLastIsVow;
 			vowChance  = 0.5; // 25% chance of a double vowel
 		} else if ( state & NameConstants::genLastIsCon ) {
-			state     ^= NameConstants::genLastIsCon;
+			state ^= NameConstants::genLastIsCon;
 			oldWasLast = NameConstants::genLastIsCon;
 			vowChance  = 0.0; // 50% chance of a vowel to be next
 		} else {
@@ -136,21 +139,23 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 		/*********************************************************************
 		 * 3) Decide whether to go for a consonant or a vowel                *
 		 *********************************************************************/
-		if ( simplex3D ( idx, step, charCount ) >= vowChance )
+		if ( simplex3D( idx, step, charCount ) >= vowChance ) {
 			// Next shall be a vowel
 			state |= NameConstants::genNextIsVow;
-		else
+		} else {
 			// Next shall be consonant
 			state |= NameConstants::genNextIsCon;
+		}
 
 		/*********************************************************************
 		 * 4) Check lastChars + firstChar against nameFUM for Round A        *
 		 *********************************************************************/
 		if ( ( state & NameConstants::genRoundA ) && ( 0 == ( state & NameConstants::genPartStart ) ) ) {
-			if ( state & NameConstants::genNextIsCon )
-				checkRule ( state, lastChrs[0], lastChrs[1], nextCon );
-			else if ( state & NameConstants::genNextIsVow )
-				checkRule ( state, lastChrs[0], lastChrs[1], nextVow );
+			if ( state & NameConstants::genNextIsCon ) {
+				checkRule( state, lastChrs[0], lastChrs[1], nextCon );
+			} else if ( state & NameConstants::genNextIsVow ) {
+				checkRule( state, lastChrs[0], lastChrs[1], nextVow );
+			}
 		}
 
 		/*********************************************************************
@@ -161,28 +166,31 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 			if ( state & NameConstants::genPartStart ) {
 				// On a part start, we need to check against the position:
 				if ( ( state & NameConstants::genNextIsCon )
-				                && !FUM_ALLOW_START( nst, syll[0], nextCon ) )
+				     && !FUM_ALLOW_START( nst, syll[0], nextCon ) ) {
 					// What a pity, this combination is illegal on a part start
 					state ^= NameConstants::genNextIsCon;
-				else if ( ( state & NameConstants::genNextIsVow )
-				                && !FUM_ALLOW_START( nst, syll[0], nextVow ) )
+				} else if ( ( state & NameConstants::genNextIsVow )
+				            && !FUM_ALLOW_START( nst, syll[0], nextVow ) ) {
 					// Nope, this vowel isn't  creating a legal part start
 					state ^= NameConstants::genNextIsVow;
+				}
 			} else {
 				// Somewhere else this is a normal checkrule
 				if ( state & NameConstants::genNextIsCon ) {
-					if ( FUM_ALLOW_MIDDLE( nst, syll[0], nextCon ) )
-						checkRule ( state, lastChrs[1], syll[0], nextCon );
-					else
+					if ( FUM_ALLOW_MIDDLE( nst, syll[0], nextCon ) ) {
+						checkRule( state, lastChrs[1], syll[0], nextCon );
+					} else {
 						// What a pity, this combination is illegal in the middle of a part
 						state ^= NameConstants::genNextIsCon;
+					}
 				}
 				if ( state & NameConstants::genNextIsVow ) {
-					if ( FUM_ALLOW_MIDDLE( nst, syll[0], nextVow ) )
-						checkRule ( state, lastChrs[1], syll[0], nextVow );
-					else
+					if ( FUM_ALLOW_MIDDLE( nst, syll[0], nextVow ) ) {
+						checkRule( state, lastChrs[1], syll[0], nextVow );
+					} else {
 						// What a pity, this combination is illegal in the middle of a part
 						state ^= NameConstants::genNextIsCon;
+					}
 				}
 			}
 		}
@@ -191,10 +199,12 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 		 * 6) call checkRule() for Round C and D                             *
 		 *********************************************************************/
 		if ( state & ( NameConstants::genRoundC | NameConstants::genRoundD ) ) {
-			if ( state & NameConstants::genNextIsCon )
-				checkRule ( state, syll[charCount - 2], syll[charCount - 1], nextCon );
-			if ( state & NameConstants::genNextIsVow )
-				checkRule ( state, syll[charCount - 2], syll[charCount - 1], nextVow );
+			if ( state & NameConstants::genNextIsCon ) {
+				checkRule( state, syll[charCount - 2], syll[charCount - 1], nextCon );
+			}
+			if ( state & NameConstants::genNextIsVow ) {
+				checkRule( state, syll[charCount - 2], syll[charCount - 1], nextVow );
+			}
 		}
 
 		/*********************************************************************
@@ -210,9 +220,10 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 			state ^= NameConstants::genNextIsVow;
 			state |= NameConstants::genLastIsVow | NameConstants::genHasNextChar;
 			vowCount++;
-		} else
+		} else {
 			// We have nothing, so reduce our tries:
 			genTries--;
+		}
 
 		/*********************************************************************
 		 * 8) If we added a char, advance the round                          *
@@ -241,30 +252,41 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 			}
 
 			// If this is a single syll (both part start and end), the endChance has to be reduced:
-			if ( ( state & NameConstants::genPartStart ) && ( state & NameConstants::genPartEnd ) )
+			if ( ( state & NameConstants::genPartStart ) && ( state & NameConstants::genPartEnd ) ) {
 				endChance -= 0.3;
+			}
 			// so 45% (RoundC) or 10% (RoundB) chance. D is too high to be affected.
 
 			/*********************************************************************
 			 * 9) Check against chance to end this syllable                      *
 			 *********************************************************************/
-			if ( simplex3D ( idx, charIndex, ( charCount * conCount ) + ( genTries * vowCount ) ) <= endChance ) {
+			if ( simplex3D( idx, charIndex, ( charCount * conCount ) + ( genTries * vowCount ) ) <= endChance ) {
 				// We shall stop! But are we allowed to?
 				if ( ( ( state & NameConstants::genPartEnd )  // This part ends, so:
-				                // Is this combination allowed at a Parts end?
-				                && ( FUM_ALLOW_END( nst, syll[charCount - 2], syll[charCount - 1] ) ) )
-				                || ( ( 0 == ( state & NameConstants::genPartEnd ) ) // This part shall go on, so:
-				                     // Is this combination allowed in the middle?
-				                     && ( FUM_ALLOW_MIDDLE( nst, syll[charCount - 2], syll[charCount - 1] ) ) ) )
+				       // Is this combination allowed at a Parts end?
+				       && ( FUM_ALLOW_END( nst, syll[charCount - 2], syll[charCount - 1] ) )
+				     )
+				     || ( ( 0 == ( state & NameConstants::genPartEnd ) ) // This part shall go on, so:
+				          // Is this combination allowed in the middle?
+				          && ( FUM_ALLOW_MIDDLE( nst, syll[charCount - 2], syll[charCount - 1] ) )
+				     ) ) {
 					// Yeeees!
 					state |= NameConstants::genSyllEnd;
-				else if ( ( ( 0 == ( state & ( NameConstants::genRoundC | NameConstants::genRoundD ) ) )
-				                // If we do not have a fourth char, yet, a noise() chance is taken:
-				                || ( ( ( state & NameConstants::genRoundC || state & NameConstants::genRoundD )
-				                       && ( noise ( hash ( static_cast<int32_t> (
-				                                       step * ( idx + charIndex + charCount
-				                                                       + genTries + vowCount ) ) ) ) > 0 ) )
-				                   ) ) && --genTries ) {
+				} else if ( ( ( 0 == ( state & ( NameConstants::genRoundC | NameConstants::genRoundD ) ) )
+				              // If we do not have a fourth char, yet, a noise() chance is taken:
+				              || ( ( ( state & NameConstants::genRoundC || state & NameConstants::genRoundD )
+				                     && ( noise(
+					                       hash(
+							                     static_cast<int32_t> (
+								                       step * ( idx + charIndex + charCount
+								                                + genTries + vowCount
+								                       ) )
+					                       )
+				                     ) > 0
+				                     )
+				              )
+				              )
+				            ) && --genTries ) {
 					// We simply search for a new char:
 					syll[charCount--] = 0x0;
 					if ( state & NameConstants::genRoundC ) {
@@ -273,8 +295,9 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 					} else if ( state & NameConstants::genRoundD ) {
 						state ^= NameConstants::genRoundD;
 						state |= NameConstants::genRoundC;
-					} else
+					} else {
 						state |= NameConstants::genRoundD;
+					}
 
 					// Revert the counts:
 					if ( state & NameConstants::genLastIsCon ) {
@@ -310,30 +333,36 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 		// If this is not a part end, but the last chars do not allow
 		// follow up characters, we have to force an ending:
 		if ( ( 0 == ( state & NameConstants::genPartEnd ) )
-		                && FUM_MUST_FINISH( nst, syll[charCount - 2], syll[charCount - 1] ) )
+		     && FUM_MUST_FINISH( nst, syll[charCount - 2], syll[charCount - 1] ) ) {
 			// Yep, we have to
 			state |= NameConstants::genPartEnd;
+		}
 
 		// To continue the combination of the first two characters must be allowed
 		// if this is a part start, and the last two must be allowed if this is a
 		// part end.
 		if ( ( ( state & NameConstants::genPartStart ) // check part start
-		                && !FUM_ALLOW_START( nst, syll[0], syll[1] ) )
-		                || ( ( state & NameConstants::genPartEnd )   // check part end
-		                     && !FUM_ALLOW_END( nst, syll[charCount - 2], syll[charCount - 1] ) ) )
+		       && !FUM_ALLOW_START( nst, syll[0], syll[1] )
+		     )
+		     || ( ( state & NameConstants::genPartEnd )   // check part end
+		          && !FUM_ALLOW_END( nst, syll[charCount - 2], syll[charCount - 1] )
+		     ) ) {
 			genTries = 0;
-	} else
+		}
+	} else {
 		genTries = 0;
+	}
 
 
 	// Finally carry on if we have genTries left, no tries left indicate failure.
 	if ( genTries ) {
 		// great!
 		state ^= NameConstants::genSyllEnd;
-		if ( state & NameConstants::genRoundC )
+		if ( state & NameConstants::genRoundC ) {
 			state ^= NameConstants::genRoundC; // might have advanced from B, then ended
-		else if ( state & NameConstants::genRoundD )
-			state ^= NameConstants::genRoundD; // might have advanced from C, then ended
+		} else if ( state & NameConstants::genRoundD ) {
+			state ^= NameConstants::genRoundD;
+		} // might have advanced from C, then ended
 		// We don't end from A (advanced to B)
 
 		// We need to record the last two chars:
@@ -352,7 +381,7 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
 		state = oldState;
 		lastChrs[0] = oldLstChrs[0];
 		lastChrs[1] = oldLstChrs[1];
-		memset ( syll, 0, 5 );
+		memset( syll, 0, 5 );
 		charCount = 0;
 	}
 
@@ -364,27 +393,27 @@ int32_t CRandom::genSyllable ( double& idx, double step, char* syll, uint32_t& s
   *
   * i = index, cl = charsLeft, sl = syllsLeft, pl = partsLeft
 **/
-double CRandom::getStepping ( double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl ) noexcept {
-	double result = ( i * noise ( cl ) * noiseD ( x,    z ) )
-	                + ( i * noise ( sl ) * noiseD ( y,    w ) )
-	                + ( i * noise ( pl ) * noiseD ( x, y, z, w ) );
-	uint32_t ll = std::min( CL_LEN( nst ), VL_LEN( nst ) );
-	uint32_t ul = std::max( CL_LEN( nst ), VL_LEN( nst ) );
+double CRandom::getStepping( double i, double x, double y, double z, double w, int32_t cl, int32_t sl, int32_t pl ) noexcept {
+	double   result = ( i * noise( cl ) * noiseD( x, z ) )
+	                  + ( i * noise( sl ) * noiseD( y, w ) )
+	                  + ( i * noise( pl ) * noiseD( x, y, z, w ) );
+	uint32_t ll     = std::min( CL_LEN( nst ), VL_LEN( nst ) );
+	uint32_t ul     = std::max( CL_LEN( nst ), VL_LEN( nst ) );
 
-	if ( ( result <  0 ) && ( result > -1.0 ) ) result = -2.0 + noiseD ( i );
-	if ( ( result >= 0 ) && ( result <  1.0 ) ) result =  2.0 + noiseD ( i );
+	if ( ( result < 0 ) && ( result > -1.0 ) ) result = -2.0 + noiseD( i );
+	if ( ( result >= 0 ) && ( result < 1.0 ) ) result = 2.0 + noiseD( i );
 
 	// The result will be between the size of the vowel
 	// and the consonant array.
-	while ( static_cast<uint32_t>( abs ( result ) ) >= ul ) result /= 7.3673L;
-	while ( static_cast<uint32_t>( abs ( result ) ) <= ll ) result *= 1.7667L;
+	while ( static_cast<uint32_t>( abs( result ) ) >= ul ) result /= 7.3673L;
+	while ( static_cast<uint32_t>( abs( result ) ) <= ll ) result *= 1.7667L;
 	return ( result );
 }
 
 
 /** @brief get Simplex Dot for one dimension
 **/
-double CRandom::getSimpDot ( int32_t index, double x ) noexcept {
+double CRandom::getSimpDot( int32_t index, double x ) noexcept {
 	assert ( ( index >= 0 ) && ( index < 4 ) );
 	return ( ( constants::spxGrTab[index][0] * x ) );
 }
@@ -392,31 +421,34 @@ double CRandom::getSimpDot ( int32_t index, double x ) noexcept {
 
 /** @brief get Simplex Dot for second dimension
 **/
-double CRandom::getSimpDot ( int32_t index, double x, double y ) noexcept {
+double CRandom::getSimpDot( int32_t index, double x, double y ) noexcept {
 	assert ( ( index >= 0 ) && ( index < 8 ) );
 	return ( ( constants::spxGrTab[index][0] * x )
-	         + ( constants::spxGrTab[index][1] * y ) );
+	         + ( constants::spxGrTab[index][1] * y )
+	);
 }
 
 
 /** @brief get Simplex Dot for third dimension
 **/
-double CRandom::getSimpDot ( int32_t index, double x, double y, double z ) noexcept {
+double CRandom::getSimpDot( int32_t index, double x, double y, double z ) noexcept {
 	assert ( ( index >= 0 ) && ( index < 12 ) );
 	return ( ( constants::spxGrTab[index][0] * x )
 	         + ( constants::spxGrTab[index][1] * y )
-	         + ( constants::spxGrTab[index][2] * z ) );
+	         + ( constants::spxGrTab[index][2] * z )
+	);
 }
 
 
 /** @brief get Simplex Dot for fourth dimension
 **/
-double CRandom::getSimpDot ( int32_t index, double x, double y, double z, double w ) noexcept {
+double CRandom::getSimpDot( int32_t index, double x, double y, double z, double w ) noexcept {
 	assert ( ( index >= 0 ) && ( index < 32 ) );
 	return ( ( constants::spxGrTab[index][0] * x )
 	         + ( constants::spxGrTab[index][1] * y )
 	         + ( constants::spxGrTab[index][2] * z )
-	         + ( constants::spxGrTab[index][3] * w ) );
+	         + ( constants::spxGrTab[index][3] * w )
+	);
 }
 
 
@@ -427,25 +459,25 @@ double CRandom::getSimpDot ( int32_t index, double x, double y, double z, double
   * @param[in] x X-Coordinate of the simplex point
   * @return Noise value between -1.0 and 1.0
 **/
-double CRandom::getSpx1D ( double x ) noexcept {
+double CRandom::getSpx1D( double x ) noexcept {
 	double contrib = 0.0;
 
-	spxNorms[0] = static_cast<int32_t> ( std::floor ( x ) ); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> ( std::floor( x ) ); // Normalized X-Coordinate
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 
 	// Distances from left and right edge
-	spxDist[0][0] = x   - spxNorms[0];
+	spxDist[0][0] = x - spxNorms[0];
 	spxDist[1][0] = 1.0 - spxDist[0][0];
 
 	// Permuted numbers, normalized to a range of 0 to 3
-	spxGrads[0] = spxTab[spxPerms[0]]     % 4;
+	spxGrads[0] = spxTab[spxPerms[0]] % 4;
 	spxGrads[1] = spxTab[spxPerms[0] + 1] % 4;
 
 	// Calculate the contribution from the two edges
-	contrib = 0.75 - std::pow ( spxDist[0][0], 2 );
-	spxCorn[0] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[0], noiseD ( x ) ) : 0.0;
-	contrib = 0.75 - std::pow ( spxDist[1][0], 2 );
-	spxCorn[1] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[1], noiseD ( x + 1 ) ) : 0.0;
+	contrib = 0.75 - std::pow( spxDist[0][0], 2 );
+	spxCorn[0] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[0], noiseD( x ) ) : 0.0;
+	contrib = 0.75 - std::pow( spxDist[1][0], 2 );
+	spxCorn[1] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[1], noiseD( x + 1 ) ) : 0.0;
 
 
 	// Add contributions from each corner to get the final noise value.
@@ -453,7 +485,7 @@ double CRandom::getSpx1D ( double x ) noexcept {
 	double result = 3.16049383304737219191338226664811 * ( spxCorn[0] + spxCorn[1] );
 	// Note: This factor has been found by searching the factor needed
 	//       To get 1.0 with the largest result out of 100M iterations
-	if ( result >  1.0l ) result =  1.0l;
+	if ( result > 1.0l ) result  = 1.0l;
 	if ( result < -1.0l ) result = -1.0l;
 	return ( result );
 }
@@ -467,11 +499,11 @@ double CRandom::getSpx1D ( double x ) noexcept {
   * @param[in] y Y-Coordinate of the simplex point
   * @return Noise value between -1.0 and 1.0
 **/
-double CRandom::getSpx2D ( double x, double y ) noexcept {
+double CRandom::getSpx2D( double x, double y ) noexcept {
 	double contrib = x + ( ( x + y ) * constants::spxSkew[0][0] );
-	spxNorms[0] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized X-Coordinate
 	contrib = y + ( ( x + y ) * constants::spxSkew[0][0] );
-	spxNorms[1] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized Y-Coordinate
+	spxNorms[1] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized Y-Coordinate
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 	spxPerms[1] = spxNorms[1] & 0x000000ff; // Y-Coordinate factor for Permutation Table
 
@@ -496,12 +528,12 @@ double CRandom::getSpx2D ( double x, double y ) noexcept {
 	spxGrads[2] = spxTab[spxPerms[0] + 1 + spxTab[spxPerms[1] + 1]] % 8;
 
 	// Calculate the contribution from the three corners
-	contrib = 0.5 - std::pow ( spxDist[0][0], 2 ) - std::pow ( spxDist[0][1], 2 );
-	spxCorn[0] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[0], spxDist[0][0], spxDist[0][1] ) : 0.0;
-	contrib = 0.5 - std::pow ( spxDist[1][0], 2 ) - std::pow ( spxDist[1][1], 2 );
-	spxCorn[1] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[1], spxDist[1][0], spxDist[1][1] ) : 0.0;
-	contrib = 0.5 - std::pow ( spxDist[2][0], 2 ) - std::pow ( spxDist[2][1], 2 );
-	spxCorn[2] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[2], spxDist[2][0], spxDist[2][1] ) : 0.0;
+	contrib = 0.5 - std::pow( spxDist[0][0], 2 ) - std::pow( spxDist[0][1], 2 );
+	spxCorn[0] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[0], spxDist[0][0], spxDist[0][1] ) : 0.0;
+	contrib = 0.5 - std::pow( spxDist[1][0], 2 ) - std::pow( spxDist[1][1], 2 );
+	spxCorn[1] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[1], spxDist[1][0], spxDist[1][1] ) : 0.0;
+	contrib = 0.5 - std::pow( spxDist[2][0], 2 ) - std::pow( spxDist[2][1], 2 );
+	spxCorn[2] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[2], spxDist[2][0], spxDist[2][1] ) : 0.0;
 	// Note: This is not looped, because the loop would produce more overhead than it is worth to just have 3 less lines.
 
 	// Add contributions from each corner to get the final noise value.
@@ -509,7 +541,7 @@ double CRandom::getSpx2D ( double x, double y ) noexcept {
 	double result = 70.14805770653948968629265436902642 * ( spxCorn[0] + spxCorn[1] + spxCorn[2] );
 	// Note: This factor has been found by searching the factor needed
 	//       To get 1.0 with the largest result out of 100M iterations
-	if ( result >  1.0l ) result =  1.0l;
+	if ( result > 1.0l ) result  = 1.0l;
 	if ( result < -1.0l ) result = -1.0l;
 	return ( result );
 }
@@ -524,13 +556,13 @@ double CRandom::getSpx2D ( double x, double y ) noexcept {
   * @param[in] z Z-Coordinate of the simplex point
   * @return Noise value between -1.0 and 1.0
 **/
-double CRandom::getSpx3D ( double x, double y, double z ) noexcept {
+double CRandom::getSpx3D( double x, double y, double z ) noexcept {
 	double contrib = x + ( ( x + y + z ) * constants::spxSkew[1][0] );
-	spxNorms[0] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized X-Coordinate
+	spxNorms[0] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized X-Coordinate
 	contrib = y + ( ( x + y + z ) * constants::spxSkew[1][0] );
-	spxNorms[1] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized Y-Coordinate
+	spxNorms[1] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized Y-Coordinate
 	contrib = z + ( ( x + y + z ) * constants::spxSkew[1][0] );
-	spxNorms[2] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized Z-Coordinate
+	spxNorms[2] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized Z-Coordinate
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 	spxPerms[1] = spxNorms[1] & 0x000000ff; // Y-Coordinate factor for Permutation Table
 	spxPerms[2] = spxNorms[2] & 0x000000ff; // Z-Coordinate factor for Permutation Table
@@ -618,21 +650,21 @@ double CRandom::getSpx3D ( double x, double y, double z ) noexcept {
 	spxGrads[3] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + 1] + 1] + 1] % 12;
 
 	// Calculate the contribution from the four corners
-	contrib = 0.6 - std::pow ( spxDist[0][0], 2 ) - std::pow ( spxDist[0][1], 2 ) - std::pow ( spxDist[0][2], 2 );
-	spxCorn[0] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2] ) : 0.0;
-	contrib = 0.6 - std::pow ( spxDist[1][0], 2 ) - std::pow ( spxDist[1][1], 2 ) - std::pow ( spxDist[1][2], 2 );
-	spxCorn[1] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2] ) : 0.0;
-	contrib = 0.6 - std::pow ( spxDist[2][0], 2 ) - std::pow ( spxDist[2][1], 2 ) - std::pow ( spxDist[2][2], 2 );
-	spxCorn[2] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2] ) : 0.0;
-	contrib = 0.6 - std::pow ( spxDist[3][0], 2 ) - std::pow ( spxDist[3][1], 2 ) - std::pow ( spxDist[3][2], 2 );
-	spxCorn[3] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2] ) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[0][0], 2 ) - std::pow( spxDist[0][1], 2 ) - std::pow( spxDist[0][2], 2 );
+	spxCorn[0] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2] ) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[1][0], 2 ) - std::pow( spxDist[1][1], 2 ) - std::pow( spxDist[1][2], 2 );
+	spxCorn[1] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2] ) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[2][0], 2 ) - std::pow( spxDist[2][1], 2 ) - std::pow( spxDist[2][2], 2 );
+	spxCorn[2] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2] ) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[3][0], 2 ) - std::pow( spxDist[3][1], 2 ) - std::pow( spxDist[3][2], 2 );
+	spxCorn[3] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot( spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2] ) : 0.0;
 
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
 	double result = 36.11293688087369702088835765607655 * ( spxCorn[0] + spxCorn[1] + spxCorn[2] + spxCorn[3] );
 	// Note: This factor has been found by searching the factor needed
 	//       To get 1.0 with the largest result out of 100M iterations
-	if ( result >  1.0l ) result =  1.0l;
+	if ( result > 1.0l ) result  = 1.0l;
 	if ( result < -1.0l ) result = -1.0l;
 	return ( result );
 }
@@ -648,16 +680,16 @@ double CRandom::getSpx3D ( double x, double y, double z ) noexcept {
   * @param[in] w W-Coordinate of the simplex point
   * @return Noise value between -1.0 and 1.0
 **/
-double CRandom::getSpx4D ( double x, double y, double z, double w ) noexcept {
-	int32_t    traverse;
-	double contrib = x + ( ( x + y + z + w ) * constants::spxSkew[2][0] );
-	spxNorms[0] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized X-Coordinate
+double CRandom::getSpx4D( double x, double y, double z, double w ) noexcept {
+	int32_t traverse;
+	double  contrib = x + ( ( x + y + z + w ) * constants::spxSkew[2][0] );
+	spxNorms[0] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized X-Coordinate
 	contrib = y + ( ( x + y + z + w ) * constants::spxSkew[2][0] );
-	spxNorms[1] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized X-Coordinate
+	spxNorms[1] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized X-Coordinate
 	contrib = z + ( ( x + y + z + w ) * constants::spxSkew[2][0] );
-	spxNorms[2] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized X-Coordinate
+	spxNorms[2] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized X-Coordinate
 	contrib = w + ( ( x + y + z + w ) * constants::spxSkew[2][0] );
-	spxNorms[3] = static_cast<int32_t> ( std::floor ( contrib ) ); // Normalized X-Coordinate
+	spxNorms[3] = static_cast<int32_t> ( std::floor( contrib ) ); // Normalized X-Coordinate
 
 	spxPerms[0] = spxNorms[0] & 0x000000ff; // X-Coordinate factor for Permutation Table
 	spxPerms[1] = spxNorms[1] & 0x000000ff; // Y-Coordinate factor for Permutation Table
@@ -678,10 +710,10 @@ double CRandom::getSpx4D ( double x, double y, double z, double w ) noexcept {
 	// for an integer index.
 	traverse = ( ( spxDist[0][0] > spxDist[0][1] ) ? 32 : 0 )
 	           + ( ( spxDist[0][0] > spxDist[0][2] ) ? 16 : 0 )
-	           + ( ( spxDist[0][1] > spxDist[0][2] ) ?  8 : 0 )
-	           + ( ( spxDist[0][0] > spxDist[0][3] ) ?  4 : 0 )
-	           + ( ( spxDist[0][1] > spxDist[0][3] ) ?  2 : 0 )
-	           + ( ( spxDist[0][2] > spxDist[0][3] ) ?  1 : 0 );
+	           + ( ( spxDist[0][1] > spxDist[0][2] ) ? 8 : 0 )
+	           + ( ( spxDist[0][0] > spxDist[0][3] ) ? 4 : 0 )
+	           + ( ( spxDist[0][1] > spxDist[0][3] ) ? 2 : 0 )
+	           + ( ( spxDist[0][2] > spxDist[0][3] ) ? 1 : 0 );
 
 	// Now we can use constants::spxTrTab to set the coordinates in turn from the largest magnitude.
 	// The number 3 is at the position of the largest coordinate.
@@ -728,66 +760,76 @@ double CRandom::getSpx4D ( double x, double y, double z, double w ) noexcept {
 	// Permuted numbers, normalized to a range of 0 to 32
 	spxGrads[0] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3]]]]] % 32;
 	spxGrads[1] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + spxOffs[0][3]] + spxOffs[0][2]] +
-	                     spxOffs[0][1]] + spxOffs[0][0]] % 32;
+	                                          spxOffs[0][1]] + spxOffs[0][0]] % 32;
 	spxGrads[2] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + spxOffs[1][3]] + spxOffs[1][2]] +
-	                     spxOffs[1][1]] + spxOffs[1][0]] % 32;
+	                                          spxOffs[1][1]] + spxOffs[1][0]] % 32;
 	spxGrads[3] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + spxOffs[2][3]] + spxOffs[2][2]] +
-	                     spxOffs[2][1]] + spxOffs[2][0]] % 32;
+	                                          spxOffs[2][1]] + spxOffs[2][0]] % 32;
 	spxGrads[4] = spxTab[spxPerms[0] + spxTab[spxPerms[1] + spxTab[spxPerms[2] + spxTab[spxPerms[3] + 1] + 1] + 1] + 1] % 32;
 
 	// Calculate the contribution from the four corners
-	contrib = 0.6 - ::std::pow ( spxDist[0][0], 2 ) - std::pow ( spxDist[0][1], 2 ) - std::pow ( spxDist[0][2], 2 ) - std::pow ( spxDist[0][3], 2 );
-	spxCorn[0] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2],
-	                spxDist[0][3] ) : 0.0;
-	contrib = 0.6 - std::pow ( spxDist[1][0], 2 ) - std::pow ( spxDist[1][1], 2 ) - std::pow ( spxDist[1][2], 2 ) - std::pow ( spxDist[1][3], 2 );
-	spxCorn[1] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2],
-	                spxDist[1][3] ) : 0.0;
-	contrib = 0.6 - std::pow ( spxDist[2][0], 2 ) - std::pow ( spxDist[2][1], 2 ) - std::pow ( spxDist[2][2], 2 ) - std::pow ( spxDist[2][3], 2 );
-	spxCorn[2] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2],
-	                spxDist[2][3] ) : 0.0;
-	contrib = 0.6 - std::pow ( spxDist[3][0], 2 ) - std::pow ( spxDist[3][1], 2 ) - std::pow ( spxDist[3][2], 2 ) - std::pow ( spxDist[3][3], 2 );
-	spxCorn[3] = ( contrib > 0.0 ) ? std::pow ( contrib, 4 ) * getSimpDot ( spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2],
-	                spxDist[3][3] ) : 0.0;
+	contrib = 0.6 - ::std::pow( spxDist[0][0], 2 ) - std::pow( spxDist[0][1], 2 ) - std::pow( spxDist[0][2], 2 ) - std::pow( spxDist[0][3], 2 );
+	spxCorn[0] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot(
+		  spxGrads[0], spxDist[0][0], spxDist[0][1], spxDist[0][2],
+		  spxDist[0][3]
+	) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[1][0], 2 ) - std::pow( spxDist[1][1], 2 ) - std::pow( spxDist[1][2], 2 ) - std::pow( spxDist[1][3], 2 );
+	spxCorn[1] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot(
+		  spxGrads[1], spxDist[1][0], spxDist[1][1], spxDist[1][2],
+		  spxDist[1][3]
+	) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[2][0], 2 ) - std::pow( spxDist[2][1], 2 ) - std::pow( spxDist[2][2], 2 ) - std::pow( spxDist[2][3], 2 );
+	spxCorn[2] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot(
+		  spxGrads[2], spxDist[2][0], spxDist[2][1], spxDist[2][2],
+		  spxDist[2][3]
+	) : 0.0;
+	contrib = 0.6 - std::pow( spxDist[3][0], 2 ) - std::pow( spxDist[3][1], 2 ) - std::pow( spxDist[3][2], 2 ) - std::pow( spxDist[3][3], 2 );
+	spxCorn[3] = ( contrib > 0.0 ) ? std::pow( contrib, 4 ) * getSimpDot(
+		  spxGrads[3], spxDist[3][0], spxDist[3][1], spxDist[3][2],
+		  spxDist[3][3]
+	) : 0.0;
 
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
 	double result = 31.91239940056049206873467483092099 * ( spxCorn[0] + spxCorn[1] + spxCorn[2] + spxCorn[3] );
 	// Note: This factor has been found by searching the factor needed
 	//       To get 1.0 with the largest result out of 100M iterations
-	if ( result >  1.0l ) result =  1.0l;
+	if ( result > 1.0l ) result  = 1.0l;
 	if ( result < -1.0l ) result = -1.0l;
 	return ( result );
 }
 
 
-double CRandom::noiseD ( double x ) const noexcept {
-	return noise ( doubToInt ( x ) );
+double CRandom::noiseD( double x ) const noexcept {
+	return noise( doubToInt( x ) );
 }
 
-double CRandom::noiseD ( double x, double y ) const noexcept {
-	return noise ( doubToInt ( x ), doubToInt ( y ) );
+double CRandom::noiseD( double x, double y ) const noexcept {
+	return noise( doubToInt( x ), doubToInt( y ) );
 }
 
-double CRandom::noiseD ( double x, double y, double z ) const noexcept {
-	return noise ( doubToInt ( x ), doubToInt ( y ), doubToInt ( z ) );
+double CRandom::noiseD( double x, double y, double z ) const noexcept {
+	return noise( doubToInt( x ), doubToInt( y ), doubToInt( z ) );
 }
 
-double CRandom::noiseD ( double x, double y, double z, double w ) const noexcept {
-	return noise ( doubToInt ( x ), doubToInt ( y ), doubToInt ( z ), doubToInt ( w ) );
+double CRandom::noiseD( double x, double y, double z, double w ) const noexcept {
+	return noise( doubToInt( x ), doubToInt( y ), doubToInt( z ), doubToInt( w ) );
 }
 
-int32_t CRandom::doubToInt ( double val ) const noexcept {
+int32_t CRandom::doubToInt( double val ) const noexcept {
 	// Bring val in range if it is between -1000 and +1000
 	while ( ( ( val < 0. ) && ( val > -1000. ) ) // negative range
-	                || ( ( val > 0. ) && ( val <  1000. ) ) ) // positive range
+	        || ( ( val > 0. ) && ( val < 1000. ) ) ) { // positive range
 		val *= 1000.;
+	}
 
 	// Bring val in range if it is smaller than min int or larger than maval int
 	while ( ( val < static_cast<double> ( constants::fullMinInt ) ) // negative range
-	                || ( val > static_cast<double> ( constants::fullMaxInt ) ) ) // positive range
+	        || ( val > static_cast<double> ( constants::fullMaxInt ) ) ) { // positive range
 		val /= 10.;
+	}
 
-	return static_cast<int32_t> ( round ( val ) );
+	return static_cast<int32_t> ( round( val ) );
 }
 
 /* -------------------------------------- *
@@ -800,14 +842,20 @@ int32_t CRandom::doubToInt ( double val ) const noexcept {
 * to lastRndValue. The seed and Simplex data are initialized as well.
 **/
 CRandom::CRandom() noexcept
-	: nst( NST_NAMES_EN ),
-	  seed ( ( private_::private_get_random() - ( private_::randomValueRange / 2 ) ) / 100 ) {
+	  : nst( NST_NAMES_EN ) {
+
+	// Initialize Seed
+	static const auto randomValueRange = static_cast<long double>( std::random_device::max() ) -
+	                                     static_cast<long double>( std::random_device::min() );
+	seed = ( ( private_::private_get_random32() - ( randomValueRange / 2 ) ) / 100 );
+
 	// Initialize Simplex values:
-	for ( int32_t i = 0; i < 5; i++ ) {
-		spxCorn[i]    = 0.0;
-		spxGrads[i]   = 0;
-		for ( int32_t j = 0; j < 4; j++ )
+	for ( int32_t i = 0 ; i < 5 ; i++ ) {
+		spxCorn[i]  = 0.0;
+		spxGrads[i] = 0;
+		for ( int32_t j = 0 ; j < 4 ; j++ ) {
 			spxDist[i][j] = 0.0;
+		}
 
 		if ( i < 4 ) {
 			spxNorms[i] = 0;
@@ -815,8 +863,9 @@ CRandom::CRandom() noexcept
 		}
 
 		if ( i < 3 ) {
-			for ( int32_t j = 0; j < 4; j++ )
+			for ( int32_t j = 0 ; j < 4 ; j++ ) {
 				spxOffs[i][j] = 0;
+			}
 		}
 	}
 }
@@ -827,8 +876,7 @@ CRandom::CRandom() noexcept
 * Empty default dtor, nothing to be done.
 *
 **/
-CRandom::~CRandom() noexcept
-{ }
+CRandom::~CRandom() noexcept = default;
 
 
 /** @brief return current seed
@@ -848,8 +896,8 @@ int32_t CRandom::getSeed() const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( int16_t key ) const noexcept {
-	return private_::private_hash_int<int16_t>( key );
+uint32_t CRandom::hash( int16_t key ) const noexcept {
+	return private_::private_hash_int< int16_t >( key );
 }
 
 
@@ -858,8 +906,8 @@ uint32_t CRandom::hash ( int16_t key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( uint16_t key ) const noexcept {
-	return private_::private_hash_int<uint16_t>( key );
+uint32_t CRandom::hash( uint16_t key ) const noexcept {
+	return private_::private_hash_int< uint16_t >( key );
 }
 
 
@@ -868,8 +916,8 @@ uint32_t CRandom::hash ( uint16_t key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( int32_t key ) const noexcept {
-	return private_::private_hash_int<int32_t>( key );
+uint32_t CRandom::hash( int32_t key ) const noexcept {
+	return private_::private_hash_int< int32_t >( key );
 }
 
 
@@ -878,8 +926,8 @@ uint32_t CRandom::hash ( int32_t key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( uint32_t key ) const noexcept {
-	return private_::private_hash_int<uint32_t>( key );
+uint32_t CRandom::hash( uint32_t key ) const noexcept {
+	return private_::private_hash_int< uint32_t >( key );
 }
 
 
@@ -888,8 +936,8 @@ uint32_t CRandom::hash ( uint32_t key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( int64_t key ) const noexcept {
-	return private_::private_hash_int<int64_t>( key );
+uint32_t CRandom::hash( int64_t key ) const noexcept {
+	return private_::private_hash_int< int64_t >( key );
 }
 
 
@@ -898,8 +946,8 @@ uint32_t CRandom::hash ( int64_t key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( uint64_t key ) const noexcept {
-	return private_::private_hash_int<uint64_t>( key );
+uint32_t CRandom::hash( uint64_t key ) const noexcept {
+	return private_::private_hash_int< uint64_t >( key );
 }
 
 
@@ -908,8 +956,8 @@ uint32_t CRandom::hash ( uint64_t key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( float key ) const noexcept {
-	return private_::private_hash_flt<float>( &key );
+uint32_t CRandom::hash( float key ) const noexcept {
+	return private_::private_hash_flt< float >( &key );
 }
 
 
@@ -918,8 +966,8 @@ uint32_t CRandom::hash ( float key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( double key ) const noexcept {
-	return private_::private_hash_flt<double>( &key );
+uint32_t CRandom::hash( double key ) const noexcept {
+	return private_::private_hash_flt< double >( &key );
 }
 
 
@@ -928,8 +976,8 @@ uint32_t CRandom::hash ( double key ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( long double key ) const noexcept {
-	return private_::private_hash_flt<long double>( &key );
+uint32_t CRandom::hash( long double key ) const noexcept {
+	return private_::private_hash_flt< long double >( &key );
 }
 
 
@@ -939,7 +987,7 @@ uint32_t CRandom::hash ( long double key ) const noexcept {
   * @param[in] keyLen if omitted, a 0-terminated C-String is assumed
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( char const* key, size_t keyLen ) const noexcept {
+uint32_t CRandom::hash( char const* key, size_t keyLen ) const noexcept {
 	return private_::private_hash_str( key, keyLen );
 }
 
@@ -949,7 +997,7 @@ uint32_t CRandom::hash ( char const* key, size_t keyLen ) const noexcept {
   * @param[in] key The key to hash
   * @return unsigned 32 bit integer hash
 **/
-uint32_t CRandom::hash ( std::string& key ) const noexcept {
+uint32_t CRandom::hash( std::string& key ) const noexcept {
 	return private_::private_hash_str( key.c_str(), key.size() );
 }
 
@@ -970,7 +1018,7 @@ eNameSourceType CRandom::nextNST( void ) noexcept {
   * @param[in] x paramter to transform
   * @return double noise value between -1.0 and +1.0
 **/
-double CRandom::noise ( int32_t x ) const noexcept {
+double CRandom::noise( int32_t x ) const noexcept {
 	return ( 1.0 - ( static_cast<double>( hash( x ) ) / constants::noiseMod ) );
 }
 
@@ -983,11 +1031,13 @@ double CRandom::noise ( int32_t x ) const noexcept {
   * @param[in] y paramter to transform
   * @return double noise value between -1.0 and +1.0
 **/
-double CRandom::noise ( int32_t x, int32_t y ) const noexcept {
+double CRandom::noise( int32_t x, int32_t y ) const noexcept {
 	return ( 1.0 - ( static_cast<double> (
-	                         ( hash( x ) & constants::fullMaxInt )
-	                         + ( hash( y ) & constants::fullMaxInt )
-	                 ) / constants::noiseMod ) );
+		                   ( hash( x ) & constants::fullMaxInt )
+		                   + ( hash( y ) & constants::fullMaxInt )
+	                 ) / constants::noiseMod
+	)
+	);
 }
 
 
@@ -1000,12 +1050,14 @@ double CRandom::noise ( int32_t x, int32_t y ) const noexcept {
   * @param[in] z paramter to transform
   * @return double noise value between -1.0 and +1.0
 **/
-double CRandom::noise ( int32_t x, int32_t y, int32_t z ) const noexcept {
+double CRandom::noise( int32_t x, int32_t y, int32_t z ) const noexcept {
 	return ( 1.0 - ( static_cast<double> (
-	                         ( hash( x ) & constants::fullMaxInt )
-	                         + ( hash( y ) & constants::halfMaxInt )
-	                         + ( hash( z ) & constants::halfMaxInt )
-	                 ) / constants::noiseMod ) );
+		                   ( hash( x ) & constants::fullMaxInt )
+		                   + ( hash( y ) & constants::halfMaxInt )
+		                   + ( hash( z ) & constants::halfMaxInt )
+	                 ) / constants::noiseMod
+	)
+	);
 }
 
 
@@ -1019,13 +1071,15 @@ double CRandom::noise ( int32_t x, int32_t y, int32_t z ) const noexcept {
   * @param[in] w paramter to transform
   * @return double noise value between -1.0 and +1.0
 **/
-double CRandom::noise ( int32_t x, int32_t y, int32_t z, int32_t w ) const noexcept {
+double CRandom::noise( int32_t x, int32_t y, int32_t z, int32_t w ) const noexcept {
 	return ( 1.0 - ( static_cast<double> (
-	                         ( hash( x ) & constants::halfMaxInt )
-	                         + ( hash( y ) & constants::halfMaxInt )
-	                         + ( hash( z ) & constants::halfMaxInt )
-	                         + ( hash( w ) & constants::halfMaxInt )
-	                 ) / constants::noiseMod ) );
+		                   ( hash( x ) & constants::halfMaxInt )
+		                   + ( hash( y ) & constants::halfMaxInt )
+		                   + ( hash( z ) & constants::halfMaxInt )
+		                   + ( hash( w ) & constants::halfMaxInt )
+	                 ) / constants::noiseMod
+	)
+	);
 }
 
 
@@ -1045,8 +1099,8 @@ eNameSourceType CRandom::prevNST( void ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-int16_t CRandom::random ( int16_t max ) noexcept {
-	return private_::private_random<int16_t>( 0, max );
+int16_t CRandom::random( int16_t max ) noexcept {
+	return private_::private_random< int16_t >( 0, max );
 }
 
 
@@ -1058,8 +1112,8 @@ int16_t CRandom::random ( int16_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-int16_t CRandom::random ( int16_t min, int16_t max ) noexcept {
-	return private_::private_random<int16_t>( min, max );
+int16_t CRandom::random( int16_t min, int16_t max ) noexcept {
+	return private_::private_random< int16_t >( min, max );
 }
 
 
@@ -1070,8 +1124,8 @@ int16_t CRandom::random ( int16_t min, int16_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-uint16_t CRandom::random ( uint16_t max ) noexcept {
-	return private_::private_random<uint16_t>( 0, max );
+uint16_t CRandom::random( uint16_t max ) noexcept {
+	return private_::private_random< uint16_t >( 0, max );
 }
 
 
@@ -1083,8 +1137,8 @@ uint16_t CRandom::random ( uint16_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-uint16_t CRandom::random ( uint16_t min, uint16_t max ) noexcept {
-	return private_::private_random<uint16_t>( min, max );
+uint16_t CRandom::random( uint16_t min, uint16_t max ) noexcept {
+	return private_::private_random< uint16_t >( min, max );
 }
 
 
@@ -1095,8 +1149,8 @@ uint16_t CRandom::random ( uint16_t min, uint16_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-int32_t CRandom::random ( int32_t max ) noexcept {
-	return private_::private_random<int32_t>( 0, max );
+int32_t CRandom::random( int32_t max ) noexcept {
+	return private_::private_random< int32_t >( 0, max );
 }
 
 
@@ -1110,8 +1164,8 @@ int32_t CRandom::random ( int32_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-int32_t CRandom::random ( int32_t min, int32_t max ) noexcept {
-	return private_::private_random<int32_t>( min, max );
+int32_t CRandom::random( int32_t min, int32_t max ) noexcept {
+	return private_::private_random< int32_t >( min, max );
 }
 
 
@@ -1124,8 +1178,8 @@ int32_t CRandom::random ( int32_t min, int32_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-uint32_t CRandom::random ( uint32_t max ) noexcept {
-	return private_::private_random<uint32_t>( 0, max );
+uint32_t CRandom::random( uint32_t max ) noexcept {
+	return private_::private_random< uint32_t >( 0, max );
 }
 
 
@@ -1137,8 +1191,8 @@ uint32_t CRandom::random ( uint32_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-uint32_t CRandom::random ( uint32_t min, uint32_t max ) noexcept {
-	return private_::private_random<uint32_t>( min, max );
+uint32_t CRandom::random( uint32_t min, uint32_t max ) noexcept {
+	return private_::private_random< uint32_t >( min, max );
 }
 
 
@@ -1149,8 +1203,8 @@ uint32_t CRandom::random ( uint32_t min, uint32_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-int64_t CRandom::random ( int64_t max ) noexcept {
-	return private_::private_random<int64_t>( 0, max );
+int64_t CRandom::random( int64_t max ) noexcept {
+	return private_::private_random< int64_t >( 0, max );
 }
 
 
@@ -1162,8 +1216,8 @@ int64_t CRandom::random ( int64_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-int64_t CRandom::random ( int64_t min, int64_t max ) noexcept {
-	return private_::private_random<int64_t>( min, max );
+int64_t CRandom::random( int64_t min, int64_t max ) noexcept {
+	return private_::private_random< int64_t >( min, max );
 }
 
 
@@ -1174,8 +1228,8 @@ int64_t CRandom::random ( int64_t min, int64_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-uint64_t CRandom::random ( uint64_t max ) noexcept {
-	return private_::private_random<uint64_t>( 0, max );
+uint64_t CRandom::random( uint64_t max ) noexcept {
+	return private_::private_random< uint64_t >( 0, max );
 }
 
 
@@ -1187,8 +1241,8 @@ uint64_t CRandom::random ( uint64_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-uint64_t CRandom::random ( uint64_t min, uint64_t max ) noexcept {
-	return private_::private_random<uint64_t>( min, max );
+uint64_t CRandom::random( uint64_t min, uint64_t max ) noexcept {
+	return private_::private_random< uint64_t >( min, max );
 }
 
 
@@ -1199,8 +1253,8 @@ uint64_t CRandom::random ( uint64_t min, uint64_t max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-float CRandom::random ( float max ) noexcept {
-	return private_::private_random<float>( 0, max );
+float CRandom::random( float max ) noexcept {
+	return private_::private_random< float >( 0, max );
 }
 
 
@@ -1212,8 +1266,8 @@ float CRandom::random ( float max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-float CRandom::random ( float min, float max ) noexcept {
-	return private_::private_random<float>( min, max );
+float CRandom::random( float min, float max ) noexcept {
+	return private_::private_random< float >( min, max );
 }
 
 
@@ -1224,8 +1278,8 @@ float CRandom::random ( float min, float max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-double CRandom::random ( double max ) noexcept {
-	return private_::private_random<double>( 0, max );
+double CRandom::random( double max ) noexcept {
+	return private_::private_random< double >( 0, max );
 }
 
 
@@ -1237,8 +1291,8 @@ double CRandom::random ( double max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-double CRandom::random ( double min, double max ) noexcept {
-	return private_::private_random<double>( min, max );
+double CRandom::random( double min, double max ) noexcept {
+	return private_::private_random< double >( min, max );
 }
 
 
@@ -1249,8 +1303,8 @@ double CRandom::random ( double min, double max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-long double CRandom::random ( long double max ) noexcept {
-	return private_::private_random<long double>( 0, max );
+long double CRandom::random( long double max ) noexcept {
+	return private_::private_random< long double >( 0, max );
 }
 
 
@@ -1262,8 +1316,8 @@ long double CRandom::random ( long double max ) noexcept {
   * @param[in] max Maximum result.
   * @return A random value between 0 and @a max.
 **/
-long double CRandom::random ( long double min, long double max ) noexcept {
-	return private_::private_random<long double>( min, max );
+long double CRandom::random( long double min, long double max ) noexcept {
+	return private_::private_random< long double >( min, max );
 }
 
 
@@ -1283,7 +1337,7 @@ long double CRandom::random ( long double min, long double max ) noexcept {
   * @param[out] maxLen maximum length of the random character sequence.
   * @return number of characters actually written including the final zero-byte.
 **/
-size_t CRandom::random ( char* dest, size_t minLen, size_t maxLen ) noexcept {
+size_t CRandom::random( char* dest, size_t minLen, size_t maxLen ) noexcept {
 	return private_::private_random_str( dest, minLen, maxLen );
 }
 
@@ -1309,8 +1363,8 @@ size_t CRandom::random ( char* dest, size_t minLen, size_t maxLen ) noexcept {
   * @param[in] mW multiWord - allows the name to contain spaces (0-2)
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, bool lN, bool mW ) noexcept {
-	return ( rndName ( x, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1 ) );
+char* CRandom::rndName( double x, bool lN, bool mW ) noexcept {
+	return ( rndName( x, lN ? 20 : 12, lN ? 6 : 4, mW ? 3 : 1 ) );
 }
 
 
@@ -1327,9 +1381,9 @@ char* CRandom::rndName ( double x, bool lN, bool mW ) noexcept {
   * @param[in] parts set the maximum number of parts the resulting name consists of
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
-	double newY = x * noiseD ( x ) * ( abs ( x ) < 1.0 ? 1000.0 : abs ( x ) < 10.0 ? 100.0 : abs ( x ) < 100 ? 10.0 : 1.0 );
-	return ( rndName ( x, newY, chars, sylls, parts ) );
+char* CRandom::rndName( double x, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
+	double newY = x * noiseD( x ) * ( abs( x ) < 1.0 ? 1000.0 : abs( x ) < 10.0 ? 100.0 : abs( x ) < 100 ? 10.0 : 1.0 );
+	return ( rndName( x, newY, chars, sylls, parts ) );
 }
 
 
@@ -1355,8 +1409,8 @@ char* CRandom::rndName ( double x, int32_t chars, int32_t sylls, int32_t parts )
   * @param[in] mW multiWord - allows the name to contain spaces (0-2)
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, double y, bool lN, bool mW ) noexcept {
-	return ( rndName ( x, y, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1 ) );
+char* CRandom::rndName( double x, double y, bool lN, bool mW ) noexcept {
+	return ( rndName( x, y, lN ? 20 : 12, lN ? 6 : 4, mW ? 3 : 1 ) );
 }
 
 
@@ -1374,10 +1428,10 @@ char* CRandom::rndName ( double x, double y, bool lN, bool mW ) noexcept {
   * @param[in] parts set the maximum number of parts the resulting name consists of
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, double y, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
-	double newZ = ( x * noiseD ( y ) ) + ( y * noiseD ( x ) );
-	newZ *= abs ( newZ ) < 1 ? 1000.0 : abs ( newZ ) < 10.0 ? 100.0 : abs ( newZ ) < 100 ? 10.0 : 1.0;
-	return ( rndName ( x, y, newZ, chars, sylls, parts ) );
+char* CRandom::rndName( double x, double y, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
+	double newZ = ( x * noiseD( y ) ) + ( y * noiseD( x ) );
+	newZ *= abs( newZ ) < 1 ? 1000.0 : abs( newZ ) < 10.0 ? 100.0 : abs( newZ ) < 100 ? 10.0 : 1.0;
+	return ( rndName( x, y, newZ, chars, sylls, parts ) );
 }
 
 
@@ -1404,8 +1458,8 @@ char* CRandom::rndName ( double x, double y, int32_t chars, int32_t sylls, int32
   * @param[in] mW multiWord - allows the name to contain spaces (0-2)
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, double y, double z, bool lN, bool mW ) noexcept {
-	return ( rndName ( x, y, z,  lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1 ) );
+char* CRandom::rndName( double x, double y, double z, bool lN, bool mW ) noexcept {
+	return ( rndName( x, y, z, lN ? 20 : 12, lN ? 6 : 4, mW ? 3 : 1 ) );
 }
 
 
@@ -1424,10 +1478,10 @@ char* CRandom::rndName ( double x, double y, double z, bool lN, bool mW ) noexce
   * @param[in] parts set the maximum number of parts the resulting name consists of
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, double y, double z, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
-	double newW = ( x * noiseD ( y + z ) ) + ( y * noiseD ( x + z ) ) + ( z * noiseD ( x + y ) );
-	newW *= abs ( newW ) < 1 ? 1000.0 : abs ( newW ) < 10.0 ? 100.0 : abs ( newW ) < 100 ? 10.0 : 1.0;
-	return ( rndName ( x, y, z, newW, chars, sylls, parts ) );
+char* CRandom::rndName( double x, double y, double z, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
+	double newW = ( x * noiseD( y + z ) ) + ( y * noiseD( x + z ) ) + ( z * noiseD( x + y ) );
+	newW *= abs( newW ) < 1 ? 1000.0 : abs( newW ) < 10.0 ? 100.0 : abs( newW ) < 100 ? 10.0 : 1.0;
+	return ( rndName( x, y, z, newW, chars, sylls, parts ) );
 }
 
 
@@ -1455,8 +1509,8 @@ char* CRandom::rndName ( double x, double y, double z, int32_t chars, int32_t sy
   * @param[in] mW multiWord - allows the name to contain spaces (0-2)
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, double y, double z, double w, bool lN, bool mW ) noexcept {
-	return ( rndName ( x, y, z, w, lN ? 20 : 12, lN ?  6 :  4, mW ?  3 :  1 ) );
+char* CRandom::rndName( double x, double y, double z, double w, bool lN, bool mW ) noexcept {
+	return ( rndName( x, y, z, w, lN ? 20 : 12, lN ? 6 : 4, mW ? 3 : 1 ) );
 }
 
 
@@ -1488,22 +1542,22 @@ char* CRandom::rndName ( double x, double y, double z, double w, bool lN, bool m
   * @param[in] parts set the maximum number of parts the resulting name consists of
   * @return a malloc'd C-string with the name (WARNING: You have to free it after use!)
 **/
-char* CRandom::rndName ( double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
-	std::string name = "";
-	char    syll[5]    = { 0x0, 0x0, 0x0, 0x0, 0x0 };
-	int32_t partsLeft  = std::max ( 1, parts );
-	int32_t syllsLeft  = std::max ( 1 +      partsLeft, sylls );
-	int32_t charsLeft  = std::max ( 2 + ( 3 * syllsLeft ), chars );
-	uint32_t genState  = NameConstants::genPartStart;
-	char    lastChrs[2] = { 0x0, 0x0 }; // This is an explicit array, no C-String, so no \0 ending
-	int32_t syllsDone  = 0;
-	double  index      = ( x * simplex3D ( y, z, w ) )
-	                     + ( y * simplex3D ( x,    z, w ) )
-	                     + ( z * simplex3D ( x, y,    w ) )
-	                     + ( w * simplex3D ( x, y, z ) )
-	                     + seed;
-	double stepping    = getStepping ( index, x, y, z, w, charsLeft, syllsLeft, partsLeft );
-	double endChance   = 0.0;
+char* CRandom::rndName( double x, double y, double z, double w, int32_t chars, int32_t sylls, int32_t parts ) noexcept {
+	std::string name        = "";
+	char        syll[5]     = { 0x0, 0x0, 0x0, 0x0, 0x0 };
+	int32_t     partsLeft   = std::max( 1, parts );
+	int32_t     syllsLeft   = std::max( 1 + partsLeft, sylls );
+	int32_t     charsLeft   = std::max( 2 + ( 3 * syllsLeft ), chars );
+	uint32_t    genState    = NameConstants::genPartStart;
+	char        lastChrs[2] = { 0x0, 0x0 }; // This is an explicit array, no C-String, so no \0 ending
+	int32_t     syllsDone   = 0;
+	double      index       = ( x * simplex3D( y, z, w ) )
+	                          + ( y * simplex3D( x, z, w ) )
+	                          + ( z * simplex3D( x, y, w ) )
+	                          + ( w * simplex3D( x, y, z ) )
+	                          + seed;
+	double      stepping    = getStepping( index, x, y, z, w, charsLeft, syllsLeft, partsLeft );
+	double      endChance   = 0.0;
 
 	// Do - while genState doesn't equal NameConstants::genFinished
 	do {
@@ -1514,32 +1568,36 @@ char* CRandom::rndName ( double x, double y, double z, double w, int32_t chars, 
 		 */
 
 		// Nevertheless we reduce the endchance if this is the first syllable and no multiword selected:
-		if ( !syllsDone && ( 1 == partsLeft ) )
+		if ( !syllsDone && ( 1 == partsLeft ) ) {
 			endChance += static_cast<double> ( syllsLeft ) / 20.0;
+		}
 		/* The initial chance is (8-2)/10 = 0.6 = 20%.
 		 * After this modification it is 0.6 + 0.2 = 10%
 		 * This, however, does not cover weird arguments set by the user!
 		 */
 		// However, we need to raise the chance if we have too few sylls left:
-		if ( syllsLeft < ( partsLeft * 2 ) )
+		if ( syllsLeft < ( partsLeft * 2 ) ) {
 			endChance -= static_cast<double> ( syllsLeft ) / static_cast<double> ( partsLeft * 2 );
+		}
 		/* So if we have three sylls left and two parts, the chance is raised by 0.75
 		 * If we have 5 sylls left and 3 parts, it would be 0,83
 		 */
 
 		// If this is the very first syllable, the chance is halved:
-		if ( 0 == syllsDone )
+		if ( 0 == syllsDone ) {
 			endChance += ( endChance + 1.0 ) / 2.0;
+		}
 
 		// Now test the chance:
-		if ( simplex3D ( index, charsLeft, partsLeft ) > endChance )
+		if ( simplex3D( index, charsLeft, partsLeft ) > endChance ) {
 			genState |= NameConstants::genPartEnd;
+		}
 
 		/// 2) generate syllable:
-		charsLeft -= genSyllable ( index, stepping, syll, genState, lastChrs );
+		charsLeft -= genSyllable( index, stepping, syll, genState, lastChrs );
 
 		/// 3) if we have a syllable (genSyllable produces an empty string on error) it can be added:
-		if ( strlen ( syll ) > 1 ) {
+		if ( strlen( syll ) > 1 ) {
 			name += syll;
 			syllsDone++;
 			syllsLeft--;
@@ -1547,17 +1605,19 @@ char* CRandom::rndName ( double x, double y, double z, double w, int32_t chars, 
 			// If this is a partEnd, react
 			if ( genState & NameConstants::genPartEnd ) {
 				genState = NameConstants::genPartStart;
-				if ( ( charsLeft >= 4 ) && --partsLeft && syllsLeft )
-					name += " "; // add a space, as we will start a new part
-				memset ( lastChrs, 0, sizeof ( char ) ); // Needs to be resetted...
+				if ( ( charsLeft >= 4 ) && --partsLeft && syllsLeft ) {
+					name += " ";
+				} // add a space, as we will start a new part
+				memset( lastChrs, 0, sizeof( char ) ); // Needs to be resetted...
 			}
 		}
 		// 4) If we have work to do, generate a new stepping and index
 		if ( ( charsLeft >= 4 ) && partsLeft && syllsLeft ) {
-			stepping = getStepping ( index, x, y, z, w, charsLeft, syllsLeft, partsLeft );
-			index   += stepping;
-		} else
+			stepping = getStepping( index, x, y, z, w, charsLeft, syllsLeft, partsLeft );
+			index += stepping;
+		} else {
 			genState = NameConstants::genFinished;
+		}
 	} while ( genState != NameConstants::genFinished );
 
 	return ( pwx_strdup ( name.c_str() ) );
@@ -1568,7 +1628,7 @@ char* CRandom::rndName ( double x, double y, double z, double w, int32_t chars, 
   *
   * @param[in] type the new name source type
 **/
-void CRandom::setNST ( eNameSourceType type ) noexcept {
+void CRandom::setNST( eNameSourceType type ) noexcept {
 	nst = type;
 }
 
@@ -1577,12 +1637,12 @@ void CRandom::setNST ( eNameSourceType type ) noexcept {
   * Set the seed to @a newSeed which will cause the simplex table to be
   * reinitialized.
 **/
-void CRandom::setSeed ( int32_t newSeed ) noexcept {
+void CRandom::setSeed( int32_t newSeed ) noexcept {
 	newSeed &= constants::fourthMaxInt;
 	if ( newSeed != seed ) {
 		seed = newSeed;
-		for ( int32_t i = 0; i < 256; i++ ) {
-			spxTab[i]       = hash ( seed + i ) % 256;
+		for ( int32_t i = 0 ; i < 256 ; i++ ) {
+			spxTab[i]       = hash( seed + i ) % 256;
 			spxTab[i + 256] = spxTab[i];
 		}
 	}
@@ -1603,13 +1663,13 @@ void CRandom::setSeed ( int32_t newSeed ) noexcept {
   * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
   * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
 **/
-double CRandom::simplex1D ( double x, double zoom, double smooth ) noexcept {
-	if ( zoom      < 0.001 ) zoom = 0.001;
-	if ( smooth    < 1.0 )   smooth = 1.0;
+double CRandom::simplex1D( double x, double zoom, double smooth ) noexcept {
+	if ( zoom < 0.001 ) zoom   = 0.001;
+	if ( smooth < 1.0 ) smooth = 1.0;
 
 	x += seed;
 
-	return ( getSpx1D ( x / zoom ) / smooth );
+	return ( getSpx1D( x / zoom ) / smooth );
 }
 
 
@@ -1635,15 +1695,15 @@ double CRandom::simplex1D ( double x, double zoom, double smooth ) noexcept {
   * @param[in] reduction Multiplier for the smoothing factor in each round.
   * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
 **/
-double CRandom::simplex1D ( double x, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
-	if ( zoom      < 0.001 ) zoom = 0.001;
-	if ( smooth    < 1.0 )   smooth = 1.0;
-	if ( reduction < 1.0 )   reduction = 1.0;
-	if ( waves     < 1 )     waves = 1;
+double CRandom::simplex1D( double x, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
+	if ( zoom < 0.001 ) zoom         = 0.001;
+	if ( smooth < 1.0 ) smooth       = 1.0;
+	if ( reduction < 1.0 ) reduction = 1.0;
+	if ( waves < 1 ) waves           = 1;
 
 	x += seed;
 
-	double result = getSpx1D ( x / zoom ) / smooth;
+	double result = getSpx1D( x / zoom ) / smooth;
 
 	if ( waves > 1 ) {
 		double currWave   = 1.0;
@@ -1652,12 +1712,12 @@ double CRandom::simplex1D ( double x, double zoom, double smooth, double reducti
 		double currZoom, dX;
 
 		while ( currWave < waves ) {
-			currWave   += 1.0;
+			currWave += 1.0;
 			currSmooth *= reduction;
-			currZoom    = zoom / std::pow ( currWave, 2 );
-			dX          = x / currZoom;
-			result     += getSpx1D ( dX ) / currSmooth;
-			factor     += 1.0 / currSmooth;
+			currZoom = zoom / std::pow( currWave, 2 );
+			dX       = x / currZoom;
+			result += getSpx1D( dX ) / currSmooth;
+			factor += 1.0 / currSmooth;
 		}
 		result /= factor;
 	}
@@ -1682,14 +1742,14 @@ double CRandom::simplex1D ( double x, double zoom, double smooth, double reducti
   * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
   * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
 **/
-double CRandom::simplex2D ( double x, double y, double zoom, double smooth ) noexcept {
-	if ( zoom   < 0.001 ) zoom = 0.001;
-	if ( smooth < 1.0 )   smooth = 1.0;
+double CRandom::simplex2D( double x, double y, double zoom, double smooth ) noexcept {
+	if ( zoom < 0.001 ) zoom   = 0.001;
+	if ( smooth < 1.0 ) smooth = 1.0;
 
 	x += seed;
 	y += seed;
 
-	return ( getSpx2D ( x / zoom, y / zoom ) / smooth );
+	return ( getSpx2D( x / zoom, y / zoom ) / smooth );
 }
 
 
@@ -1716,16 +1776,16 @@ double CRandom::simplex2D ( double x, double y, double zoom, double smooth ) noe
   * @param[in] reduction Multiplier for the smoothing factor in each round.
   * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
 **/
-double CRandom::simplex2D ( double x, double y, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
-	if ( zoom      < 0.001 ) zoom = 0.001;
-	if ( smooth    < 1.0 )   smooth = 1.0;
-	if ( reduction < 1.0 )   reduction = 1.0;
-	if ( waves     < 1 )     waves = 1;
+double CRandom::simplex2D( double x, double y, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
+	if ( zoom < 0.001 ) zoom         = 0.001;
+	if ( smooth < 1.0 ) smooth       = 1.0;
+	if ( reduction < 1.0 ) reduction = 1.0;
+	if ( waves < 1 ) waves           = 1;
 
 	x += seed;
 	y += seed;
 
-	double result = getSpx2D ( x / zoom, y / zoom ) / smooth;
+	double result = getSpx2D( x / zoom, y / zoom ) / smooth;
 
 	if ( waves > 1 ) {
 		double currWave   = 1.0;
@@ -1734,13 +1794,13 @@ double CRandom::simplex2D ( double x, double y, double zoom, double smooth, doub
 		double currZoom, dX, dY;
 
 		while ( currWave < waves ) {
-			currWave   += 1.0;
+			currWave += 1.0;
 			currSmooth *= reduction;
-			currZoom    = zoom / std::pow ( currWave, 2 );
-			dX          = x / currZoom;
-			dY          = y / currZoom;
-			result     += getSpx2D ( dX, dY ) / currSmooth;
-			factor     += 1.0 / currSmooth;
+			currZoom = zoom / std::pow( currWave, 2 );
+			dX       = x / currZoom;
+			dY       = y / currZoom;
+			result += getSpx2D( dX, dY ) / currSmooth;
+			factor += 1.0 / currSmooth;
 		}
 		result /= factor;
 	}
@@ -1766,15 +1826,15 @@ double CRandom::simplex2D ( double x, double y, double zoom, double smooth, doub
   * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
   * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
 **/
-double CRandom::simplex3D ( double x, double y, double z, double zoom, double smooth ) noexcept {
-	if ( zoom   < 0.001 ) zoom = 0.001;
-	if ( smooth < 1.0 )   smooth = 1.0;
+double CRandom::simplex3D( double x, double y, double z, double zoom, double smooth ) noexcept {
+	if ( zoom < 0.001 ) zoom   = 0.001;
+	if ( smooth < 1.0 ) smooth = 1.0;
 
 	x += seed;
 	y += seed;
 	z += seed;
 
-	return ( getSpx3D ( x / zoom, y / zoom, z / zoom ) / smooth );
+	return ( getSpx3D( x / zoom, y / zoom, z / zoom ) / smooth );
 }
 
 
@@ -1802,17 +1862,17 @@ double CRandom::simplex3D ( double x, double y, double z, double zoom, double sm
   * @param[in] reduction Multiplier for the smoothing factor in each round.
   * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
 **/
-double CRandom::simplex3D ( double x, double y, double z, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
-	if ( zoom      < 0.001 ) zoom = 0.001;
-	if ( smooth    < 1.0 )   smooth = 1.0;
-	if ( reduction < 1.0 )   reduction = 1.0;
-	if ( waves     < 1 )     waves = 1;
+double CRandom::simplex3D( double x, double y, double z, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
+	if ( zoom < 0.001 ) zoom         = 0.001;
+	if ( smooth < 1.0 ) smooth       = 1.0;
+	if ( reduction < 1.0 ) reduction = 1.0;
+	if ( waves < 1 ) waves           = 1;
 
 	x += seed;
 	y += seed;
 	z += seed;
 
-	double result = getSpx3D ( x / zoom, y / zoom, z / zoom ) / smooth;
+	double result = getSpx3D( x / zoom, y / zoom, z / zoom ) / smooth;
 
 	if ( waves > 1 ) {
 		double currWave   = 1.0;
@@ -1821,14 +1881,14 @@ double CRandom::simplex3D ( double x, double y, double z, double zoom, double sm
 		double currZoom, dX, dY, dZ;
 
 		while ( currWave < waves ) {
-			currWave   += 1.0;
+			currWave += 1.0;
 			currSmooth *= reduction;
-			currZoom    = zoom / std::pow ( currWave, 2 );
-			dX          = x / currZoom;
-			dY          = y / currZoom;
-			dZ          = z / currZoom;
-			result     += getSpx3D ( dX, dY, dZ ) / currSmooth;
-			factor     += 1.0 / currSmooth;
+			currZoom = zoom / std::pow( currWave, 2 );
+			dX       = x / currZoom;
+			dY       = y / currZoom;
+			dZ       = z / currZoom;
+			result += getSpx3D( dX, dY, dZ ) / currSmooth;
+			factor += 1.0 / currSmooth;
 		}
 		result /= factor;
 	}
@@ -1855,16 +1915,16 @@ double CRandom::simplex3D ( double x, double y, double z, double zoom, double sm
   * @param[in] zoom Zooming factor into the point. Your coordinate will divided by this factor.
   * @param[in] smooth Divisor for the result. The higher, the nearer the result will be to zero.
 **/
-double CRandom::simplex4D ( double x, double y, double z, double w, double zoom, double smooth ) noexcept {
-	if ( zoom   < 0.001 ) zoom = 0.001;
-	if ( smooth < 1.0 )   smooth = 1.0;
+double CRandom::simplex4D( double x, double y, double z, double w, double zoom, double smooth ) noexcept {
+	if ( zoom < 0.001 ) zoom   = 0.001;
+	if ( smooth < 1.0 ) smooth = 1.0;
 
 	x += seed;
 	y += seed;
 	z += seed;
 	w += seed;
 
-	return ( getSpx4D ( x / zoom, y / zoom, z / zoom, w / zoom ) / smooth );
+	return ( getSpx4D( x / zoom, y / zoom, z / zoom, w / zoom ) / smooth );
 }
 
 
@@ -1895,18 +1955,18 @@ double CRandom::simplex4D ( double x, double y, double z, double w, double zoom,
   * @param[in] reduction Multiplier for the smoothing factor in each round.
   * @param[in] waves Number of waves to overlay. The default of 1 returns the pure Simplex Noise Value.
 **/
-double CRandom::simplex4D ( double x, double y, double z, double w, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
-	if ( zoom      < 0.001 ) zoom = 0.001;
-	if ( smooth    < 1.0 )   smooth = 1.0;
-	if ( reduction < 1.0 )   reduction = 1.0;
-	if ( waves     < 1 )     waves = 1;
+double CRandom::simplex4D( double x, double y, double z, double w, double zoom, double smooth, double reduction, int32_t waves ) noexcept {
+	if ( zoom < 0.001 ) zoom         = 0.001;
+	if ( smooth < 1.0 ) smooth       = 1.0;
+	if ( reduction < 1.0 ) reduction = 1.0;
+	if ( waves < 1 ) waves           = 1;
 
 	x += seed;
 	y += seed;
 	z += seed;
 	w += seed;
 
-	double result = getSpx4D ( x / zoom, y / zoom, z / zoom, w / zoom ) / smooth;
+	double result = getSpx4D( x / zoom, y / zoom, z / zoom, w / zoom ) / smooth;
 
 	if ( waves > 1 ) {
 		double currWave   = 1.0;
@@ -1915,15 +1975,15 @@ double CRandom::simplex4D ( double x, double y, double z, double w, double zoom,
 		double currZoom, dX, dY, dZ, dW;
 
 		while ( currWave < waves ) {
-			currWave   += 1.0;
+			currWave += 1.0;
 			currSmooth *= reduction;
-			currZoom    = zoom / std::pow ( currWave, 2 );
-			dX          = x / currZoom;
-			dY          = y / currZoom;
-			dZ          = z / currZoom;
-			dW          = w / currZoom;
-			result     += getSpx4D ( dX, dY, dZ, dW ) / currSmooth;
-			factor     += 1.0 / currSmooth;
+			currZoom = zoom / std::pow( currWave, 2 );
+			dX       = x / currZoom;
+			dY       = y / currZoom;
+			dZ       = z / currZoom;
+			dW       = w / currZoom;
+			result += getSpx4D( dX, dY, dZ, dW ) / currSmooth;
+			factor += 1.0 / currSmooth;
 		}
 		result /= factor;
 	}

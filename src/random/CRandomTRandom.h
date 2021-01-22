@@ -55,33 +55,38 @@ namespace private_ {
 
 typedef std::random_device::result_type rand_t;
 
-const long double maxRandomValue   = static_cast<long double>( std::random_device::max() );
-const long double minRandomValue   = static_cast<long double>( std::random_device::min() );
-const long double randomValueRange = maxRandomValue - minRandomValue;
-
-static std::random_device  privRandDev_;
-static std::atomic<rand_t> lastRndValue = ATOMIC_VAR_INIT( 0 );
-
-
-rand_t private_get_random() noexcept;
+rand_t private_get_random32() noexcept;
+rand_t private_get_random64() noexcept;
 size_t private_random_str( char* dest, size_t min_, size_t max_ ) noexcept;
 
 
+// random number selectors
+template< class T, std::size_t SIZE > struct type_size_less_than : std::integral_constant< bool, ( sizeof( T ) < SIZE ) > {};
+template< class T, std::size_t SIZE > struct type_size_at_least : std::integral_constant< bool, ( sizeof( T ) >= SIZE ) > {};
+template< class T, typename std::enable_if< type_size_less_than< T, 64 >::value >::type* = nullptr >
+	rand_t private_get_random() noexcept { return private_get_random32(); }
+template< class T, typename std::enable_if< type_size_at_least< T, 64 >::value >::type* = nullptr >
+	rand_t private_get_random() noexcept { return private_get_random64(); }
+
+
 /// @internal random number handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-template<typename Tval>
-Tval private_random( Tval min_, Tval max_ ) noexcept {
+template< typename Tval > Tval private_random( Tval min_, Tval max_ ) noexcept {
 	// Type borders:
-	static const Tval realMaxVal = std::numeric_limits<Tval>::max();
-	static const Tval realMinVal = std::numeric_limits<Tval>::lowest();
-	static const long double xMaxVal = static_cast<long double>( realMaxVal );
-	static const long double xMinVal = static_cast<long double>( realMinVal );
+	static const auto maxRandomValue   = static_cast<long double>( std::random_device::max() );
+	static const auto minRandomValue   = static_cast<long double>( std::random_device::min() );
+	static const auto randomValueRange = maxRandomValue - minRandomValue;
+	static const Tval realMaxVal       = std::numeric_limits< Tval >::max();
+	static const Tval realMinVal       = std::numeric_limits< Tval >::lowest();
+	static const auto xMaxVal          = static_cast<long double>( realMaxVal );
+	static const auto xMinVal          = static_cast<long double>( realMinVal );
+
 
 	// Quick exit when no calculation can be done
-	if ( areAlmostEqual( max_, min_ ) )
+	if ( areAlmostEqual( max_, min_ ) ) {
 		return ( max_ );
-	else {
+	} else {
 		// Step 1: Get a new random value
-		rand_t randVal = private_get_random();
+		rand_t randVal = private_get_random< Tval >();
 
 		// Step 2: Reorder min_ and max_ and bring everything to long double and in range
 		long double xMin = static_cast<long double>( std::min( min_, max_ ) );

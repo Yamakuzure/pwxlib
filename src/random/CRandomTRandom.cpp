@@ -36,14 +36,39 @@
 
 #include "random/CRandomTRandom.h"
 
+namespace pwx::private_ {
+struct privRand32_t {
+	rand_t operator()() {
+		try {
+			thread_local static std::random_device privRandDev_;
+			thread_local static std::mt19937       privRandMt32_( privRandDev_() );
+			return privRandMt32_();
+		} catch ( ... ) {}
+		return 0;
+	}
+} privRand32;
+struct privRand64_t {
+	rand_t operator()() {
+		try {
+			thread_local static std::random_device privRandDev_;
+			thread_local static std::mt19937_64    privRandMt64_( privRandDev_() );
+			return privRandMt64_();
+		} catch ( ... ) {}
+		return 0;
+	}
+} privRand64;
+}
 
-/// @internal random number generator. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-pwx::private_::rand_t pwx::private_::private_get_random() noexcept {
-	rand_t randVal = privRandDev_();
-	while ( randVal == lastRndValue.load( std::memory_order_acquire ) )
-		randVal = privRandDev_();
-	lastRndValue.store( randVal, std::memory_order_release );
-	return randVal;
+
+/// @internal random number generator, 32 bit. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+pwx::private_::rand_t pwx::private_::private_get_random32() noexcept {
+	return privRand32();
+}
+
+
+/// @internal random number generator, 64 bit. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
+pwx::private_::rand_t pwx::private_::private_get_random64() noexcept {
+	return privRand64();
 }
 
 
@@ -55,22 +80,24 @@ size_t pwx::private_::private_random_str( char* dest, size_t min_, size_t max_ )
 	size_t pos = 0;
 
 	if ( min_ || max_ ) {
-		size_t xMin   = std::min( min_, max_ );
-		size_t xMax   = std::max( min_, max_ );
+		size_t xMin        = std::min( min_, max_ );
+		size_t xMax        = std::max( min_, max_ );
 		size_t finishRange = xMax - xMin;
 		size_t finishDone  = finishRange;
 
 		while ( ( pos < ( xMax - 1 ) )
-		                && ( ( pos < xMin )
-		                     || ( private_random( static_cast<size_t>( 0 ), finishRange ) <= finishDone ) )
-		      ) {
+		        && ( ( pos < xMin )
+		             || ( private_random( static_cast<size_t>( 0 ), finishRange ) <= finishDone )
+		        )
+			  ) {
 			// Set up next character
-			dest[pos] =  static_cast<uint8_t>( 0x000000ff & ( ( private_::private_get_random() ) % 26 ) )
-			             + ( static_cast<uint8_t>( 0x000000ff & ( ( private_::private_get_random() ) %  2 ) ) ? lowA : uppA );
+			dest[pos] = static_cast<uint8_t>( 0x000000ff & ( ( private_::privRand32() ) % 26 ) )
+			            + ( static_cast<uint8_t>( 0x000000ff & ( ( private_::privRand32() ) % 2 ) ) ? lowA : uppA );
 
 			// Advance pos and reduce finishDone if xMin is already met
-			if ( ++pos >= xMin )
+			if ( ++pos >= xMin ) {
 				--finishDone;
+			}
 		} // end of building string
 
 		// Set the final zero byte as well:
