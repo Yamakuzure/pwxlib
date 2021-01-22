@@ -31,6 +31,7 @@ add_compile_options( -pipe -ftree-vectorize -Wall -Wextra )
 
 set( CMAKE_DEBUG_POSTFIX "_d" )
 
+
 # ---------------------------------------------------
 # --- Default directories if not set from outside ---
 # --- ( or by GNUInstallDirs )                    ---
@@ -269,6 +270,8 @@ if ( BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS )
 	include( CTest )
 	enable_testing()
 	if ( BUILD_TESTING )
+		list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+
 		add_subdirectory( test )
 
 		if ( NOT MSVC )

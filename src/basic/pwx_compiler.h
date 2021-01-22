@@ -111,7 +111,7 @@
   *
   * @def PWX_IS_GCC
   * @brief 1 if GNU gcc is used, 0 otherwise
-  *  GNU gcc is C++17 feature complete enough since gcc-7.1.0
+  *  GNU gcc is C++17 feature complete enough since gcc-8.1.0
   *
   * @def PWX_IS_CLANG
   * @brief 1 if LLVM clang is used, 0 otherwise
