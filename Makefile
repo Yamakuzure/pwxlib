@@ -77,6 +77,9 @@ endif
 ifeq (YES,$(BUILD_STATIC))
 	LIB_TARGETS := ${LIB_TARGETS} ${TARGET_static}
 endif
+ifeq (YES,$(BUILD_DOC))
+	LIB_TARGETS := ${LIB_TARGETS} doc
+endif
 
 
 # -------------------------------
