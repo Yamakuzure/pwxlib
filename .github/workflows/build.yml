@@ -19,6 +19,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Checkout library
+              uses: actions/checkout@v2
             - name: Build shared library
               run: make DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES
             - name: Run tests
@@ -26,4 +28,3 @@ jobs:
             - name: Install full SDK
               run: make install DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES DESTDIR=$(pwd)/install
 
-    
