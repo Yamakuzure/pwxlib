@@ -21,6 +21,8 @@ jobs:
         steps:
             - name: Checkout library
               uses: actions/checkout@v2
+            - name: Add Ninja
+              run: sudo apt-get install ninja
             - name: Build shared library
               run: make DEBUG=YES BUILD_DOC=YES BUILD_TESTS=YES
             - name: Run tests
