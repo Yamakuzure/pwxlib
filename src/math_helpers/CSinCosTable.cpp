@@ -32,7 +32,6 @@
 
 #include <cstring>
 
-#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
 #include "basic/pwx_debug.h"
 
@@ -46,12 +45,7 @@ namespace pwx {
 
 
 CSinCosTable::CSinCosTable( int32_t initial_precision ) :
-	precision( -1 ),
-	precision_last( -1 ),
-	tableCos( nullptr ),
-	tableMultiplier( 0 ),
-	tableSin( nullptr ),
-	tableSize( 0 ) {
+	  precision( -1 ), precision_last( -1 ), tableCos( nullptr ), tableMultiplier( 0 ), tableSin( nullptr ), tableSize( 0 ) {
 	if ( initial_precision > -1 ) {
 		PWX_TRY( this->setPrecision( initial_precision ) )
 		PWX_CATCH_AND_FORGET( CException );
@@ -84,8 +78,8 @@ CSinCosTable::~CSinCosTable() noexcept {
 
 void CSinCosTable::clearTables() noexcept {
 	PWX_LOCK_GUARD( this );
-	if ( tableCos ) delete [] tableCos;
-	if ( tableSin ) delete [] tableSin;
+	if ( tableCos ) delete[] tableCos;
+	if ( tableSin ) delete[] tableSin;
 	tableCos = nullptr;
 	tableSin = nullptr;
 }
@@ -98,8 +92,9 @@ int32_t CSinCosTable::getPrecision() const noexcept {
 
 void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 	if ( newPrecision != precision ) {
-		if (isDestroyed.load())
+		if ( isDestroyed.load() ) {
 			return;
+		}
 
 		/* New tables are not needed when:
 		 * a) This is a switch to live calculation or
@@ -108,8 +103,8 @@ void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 		 */
 		PWX_LOCK_GUARD( this );
 		if ( ( -1 != newPrecision ) // Not situation a)
-		  && ( ( newPrecision != precision_last ) || ( -1 != precision ) ) // Not situation b)
-		   ) {
+		     && ( ( newPrecision != precision_last ) || ( -1 != precision ) ) // Not situation b)
+			  ) {
 			// Neither of the two, create new tables:
 			this->clearTables();
 
@@ -120,27 +115,27 @@ void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 			try {
 				tableCos = new double[tableSize];
 				tableSin = new double[tableSize];
-			} catch ( std::exception& e ) {
+			} catch ( std::exception &e ) {
 				// If the new operator fails, revert to live
 				// and rethrow
 				precision      = -1;
 				precision_last = -1;
-				if ( tableCos ) delete [] tableCos;
-				if ( tableSin ) delete [] tableSin;
+				if ( tableCos ) delete[] tableCos;
+				if ( tableSin ) delete[] tableSin;
 				tableCos = nullptr;
 				tableSin = nullptr;
 				PWX_THROW( "bad_alloc", e.what(), "Allocating new tables in SCT failed" );
 			}
 
 			// If both tables are allocated, fill them.
-			double radiant;
-			for ( int i = 0; i < tableSize; ++i ) {
+			double    radiant;
+			for ( int i     = 0 ; i < tableSize ; ++i ) {
 				radiant = degToRad( static_cast<double>( i ) / static_cast<double>( tableMultiplier ) );
 				tableCos[i] = std::cos( radiant );
 				tableSin[i] = std::sin( radiant );
 			}
 
-			DEBUG_LOG( "SCT.setPrecision", "Initialized %u values needing %7.2f MiB",
+			log_debug( "SCT.setPrecision", "Initialized %u values needing %7.2f MiB",
 			           tableSize * 2,
 			           static_cast<float>( sizeof( double ) ) * 2.f
 			           * static_cast<float>( tableSize )
@@ -149,7 +144,7 @@ void CSinCosTable::setPrecision( const int32_t newPrecision ) {
 
 
 		precision_last = precision;
-		precision = newPrecision;
+		precision      = newPrecision;
 	} // end of having a new precision
 }
 
@@ -162,8 +157,8 @@ double CSinCosTable::privGetCos( const double degree ) const noexcept {
 	if ( precision > -1 ) {
 		int32_t normDeg = static_cast<int32_t>( std::round( degree * tableMultiplier ) );
 
-		if      ( normDeg >= tableSize ) normDeg %= tableSize;
-		else if ( normDeg <  0        ) normDeg  = tableSize - ( -normDeg % tableSize );
+		if ( normDeg >= tableSize ) { normDeg %= tableSize; }
+		else if ( normDeg < 0 ) normDeg = tableSize - ( -normDeg % tableSize );
 
 		return tableCos[normDeg];
 	}
@@ -179,8 +174,8 @@ double CSinCosTable::privGetSin( const double degree ) const noexcept {
 	if ( precision > -1 ) {
 		int32_t normDeg = static_cast<int32_t>( std::round( degree * tableMultiplier ) );
 
-		if      ( normDeg >= tableSize ) normDeg %= tableSize;
-		else if ( normDeg <  0        ) normDeg  = tableSize - ( -normDeg % tableSize );
+		if ( normDeg >= tableSize ) { normDeg %= tableSize; }
+		else if ( normDeg < 0 ) normDeg = tableSize - ( -normDeg % tableSize );
 
 		return tableSin[normDeg];
 	}
@@ -193,12 +188,12 @@ double CSinCosTable::privGetSin( const double degree ) const noexcept {
   * @param[out] cosDest Target for the cosine of @a degree.
   * @param[out] sinDest Target for the sine of @a degree.
 **/
-void CSinCosTable::privGetSinCos( const double degree, double& cosDest, double& sinDest ) const noexcept {
+void CSinCosTable::privGetSinCos( const double degree, double &cosDest, double &sinDest ) const noexcept {
 	if ( precision > -1 ) {
 		int32_t normDeg = static_cast<int32_t>( std::round( degree * tableMultiplier ) );
 
-		if      ( normDeg >= tableSize ) normDeg %= tableSize;
-		else if ( normDeg <  0        ) normDeg  = tableSize - ( -normDeg % tableSize );
+		if ( normDeg >= tableSize ) { normDeg %= tableSize; }
+		else if ( normDeg < 0 ) normDeg = tableSize - ( -normDeg % tableSize );
 
 		cosDest = tableCos[normDeg];
 		sinDest = tableSin[normDeg];
