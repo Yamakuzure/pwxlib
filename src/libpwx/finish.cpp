@@ -30,18 +30,14 @@
 **/
 
 
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
-
 #include "basic/mem_utils.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
 #include "libpwx/finish.h"
 #include "libpwx/worker_PAH.h"
 #include "libpwx/worker_SCT.h"
+#include "log/log.h"
 
 
 /// @namespace pwx
@@ -55,7 +51,10 @@ void finish() {
 
 	// Let's see what the memory map has caught (if debugging is enabled)
 	if ( !mem_map_report() )
-		DEBUG_ERR( "pwxLib Finish", "%s", "The Memory Map reported errors! Fix those ASAP!" );
+		log_debug_error( "pwxLib Finish", "%s", "The Memory Map reported errors! Fix those ASAP!" );
+
+	// Close log if any
+	log_close();
 }
 
 

@@ -3,7 +3,6 @@
 #pragma once
 
 
-
 /** @file finish.h
   *
   * @brief Function to clean up on programs end and to clear up in debugging mode. (see pwx::finish())
@@ -50,11 +49,14 @@ namespace pwx {
   * If you set @a enable_memory_mapping_ to true, which is default in debugging mode, all allocations
   * and deallocations done via the utilities in basic/mem_utils.h are recorded. Call `pwx::finish()`
   * at the end of your program to get an analysis whether everything allocated was freed or not.
+  *
   * @see pwx::finish()
   *
   * @param[in] enable_memory_mapping_  If set to true, all allocations/deallocations are recorded.
+  * @param[in] log_file_path  Full path to the logfile to write (appended). Use NULL or empty string to disable.
+  * @param[in] log_threads  Number of background threads writing log messages. < 1 to disable, maximum is 4.
 **/
-void PWX_API init( bool enable_memory_mapping_, [[maybe_unused]] char const* log_file_path, [[maybe_unused]] int log_threads ) noexcept;
+void PWX_API init( bool enable_memory_mapping_, char const* log_file_path, int log_threads ) noexcept;
 
 
 } // namespace pwx

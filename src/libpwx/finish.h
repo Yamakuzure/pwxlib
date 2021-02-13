@@ -48,14 +48,13 @@ namespace pwx {
   * Call this function last in your program. The best would be as the last statement before the final return
   * in your `main()`.
   *
-  * Apart from freeing the needed resources acquired during the runtime of your program, the library also
-  * cleans up all memory you allocated through the pwxLib memory functions that you forget to free.
+  * Apart from freeing the needed resources acquired during the runtime of your program and closing a possibly
+  * opened log file, the library also cleans up all memory you allocated through the pwxLib memory functions
+  * that you forget to free.
   *
   * **Important**: This is not a garbage collector! The cleanup will issue *error*-messages, and you should
   *                fix your code asap! The cleanup is only done to avoid known memory leaks.
   *
-  * **Also Important**: The memory allocation cleanup and reporting is only done in debugging mode, as it
-  *                     needs quite some overhead, which would cripple programs needing lots of allocations.
 **/
 void PWX_API finish();
 

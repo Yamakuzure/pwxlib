@@ -30,23 +30,39 @@
 **/
 
 
+#include "basic/string_utils.h"
+#include "basic/pwx_trace_info.h"
 #include "libpwx/init.h"
+#include "log/log.h"
+
+
+#include <cerrno>
+#include <cstring>
+#include <iostream>
 
 
 /// @namespace pwx
 namespace pwx {
 
 
-/// @namespace private_
-namespace private_ {
 #ifndef PWX_NODOX
 extern bool enable_memory_mapping;
 #endif // No doxygen on private globals!
-} // namespace private_
 
 
-void init( bool enable_memory_mapping_, [[maybe_unused]] char const* log_file_path, [[maybe_unused]] int log_threads ) noexcept {
-	private_::enable_memory_mapping = enable_memory_mapping_;
+void init( bool enable_memory_mapping_, char const* log_file_path, int log_threads ) noexcept {
+	enable_memory_mapping = enable_memory_mapping_;
+
+	log_enable_threads( log_threads );
+
+	if ( log_file_path && strlen( log_file_path ) ) {
+		int r = log_open( log_file_path, "a" );
+		if ( r ) {
+			r = errno;
+			::std::cerr << pwx::get_trace_info( __FILE__, __LINE__, __func__ )
+			            << " FAILED: " << pwx_strerror( r ) << ::std::endl;
+		}
+	}
 }
 
 
