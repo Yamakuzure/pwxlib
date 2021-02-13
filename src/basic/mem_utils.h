@@ -44,15 +44,13 @@
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
 
-#include "basic/_mem_wrapper.h"
-
 
 /* --- Memory helper macros --- */
-#define pwx_alloc(  type_,       nmem_) (type_*)PWX_alloc_internal(        sizeof(type_) * (nmem_))
-#define pwx_calloc( type_,       nmem_) (type_*)PWX_calloc_internal(       sizeof(type_) * (nmem_))
-#define pwx_free(          mem_       )         PWX_dealloc_internal(mem_                         )
-#define pwx_realloc(type_, mem_, nmem_) (type_*)PWX_realloc_internal(mem_, sizeof(type_) * (nmem_))
-#define pwx_strdup(        src_       )         PWX_strdup_internal( src_                         )
+#define pwx_alloc( type_, nmem_ )         (type_*)::pwx::allocate(   PWX_TRACE_INFO,       sizeof(type_) * (nmem_) )
+#define pwx_calloc( type_, nmem_ )        (type_*)::pwx::callocate(  PWX_TRACE_INFO,       sizeof(type_) * (nmem_) )
+#define pwx_free( mem_ )                          ::pwx::deallocate( (void*)(mem_) )
+#define pwx_realloc( type_, mem_, nmem_ ) (type_*)::pwx::reallocate( PWX_TRACE_INFO, mem_, sizeof(type_) * (nmem_) )
+#define pwx_strdup( src_ )                        ::pwx::strdup(     PWX_TRACE_INFO, src_                          )
 /** @def pwx_alloc
   * @brief Convenient wrapper to call pwx::allocate() with automatic location
   * Makes use of an internal memory map to detect leaks in debug mode. (@see pwx::finish())
@@ -105,8 +103,9 @@ void* allocate( char const* location, size_t new_size ) PWX_API;
 static inline
 void* callocate( char const* location, size_t new_size ) {
 	void* new_mem = allocate( location, new_size );
-	if ( new_mem )
+	if ( new_mem ) {
 		memset( new_mem, 0, new_size );
+	}
 	return new_mem;
 }
 
@@ -122,7 +121,7 @@ void* callocate( char const* location, size_t new_size ) {
   *
   * @param[in] mem The pointer to the memory to be freed.
 **/
-void deallocate( void*  mem ) PWX_API;
+void deallocate( void* mem ) PWX_API;
 
 
 /** @brief Central memory reallocation function
@@ -140,7 +139,7 @@ void deallocate( void*  mem ) PWX_API;
   * @param[in] new_size The size in bytes
   * @return void pointer to the reallocated memory or nullptr on error.
 **/
-void* reallocate( char const* location, void*  mem, size_t new_size ) PWX_API;
+void* reallocate( char const* location, void* mem, size_t new_size ) PWX_API;
 
 
 /** @brief Central string duplication function

@@ -77,6 +77,17 @@ public:
 	CLockGuard( CLockable* objA ) noexcept;
 
 
+	/** @brief One object locking constructor via reference
+	  *
+	  * RAII constructor that returns once @a objA is locked.
+	  * **Important**: @a objA must be derived from pwx::CLockable !
+	  *
+	  * @param[in,out] objA Reference to the object that is to be locked.
+	**/
+	CLockGuard( CLockable &objA ) noexcept
+		  : CLockGuard( &objA ) {}
+
+
 	/** @brief One object locking constructor ; const wrapper
 	  *
 	  * RAII constructor that returns once @a objA is locked.
@@ -85,8 +96,7 @@ public:
 	  * @param[in,out] objA Const pointer to the object that is to be locked.
 	**/
 	CLockGuard( CLockable const* objA ) noexcept
-		: CLockGuard( const_cast<CLockable*>( objA ) )
-	{ }
+		  : CLockGuard( const_cast<CLockable*>( objA ) ) {}
 
 
 	/** @brief Two objects locking constructor
@@ -100,6 +110,18 @@ public:
 	CLockGuard( CLockable* objA, CLockable* objB ) noexcept;
 
 
+	/** @brief Two objects locking constructor via reference
+	  *
+	  * RAII constructor that returns once @a objA and @a objB are locked.
+	  * **Important**: @a objA and @a objB must be derived from pwx::CLockable !
+	  *
+	  * @param[in,out] objA Reference to the first object that is to be locked.
+	  * @param[in,out] objB Reference to the second object that is to be locked.
+	**/
+	CLockGuard( CLockable &objA, CLockable &objB ) noexcept
+		  : CLockGuard( &objA, &objB ) {}
+
+
 	/** @brief Two objects locking constructor ; const wrapper
 	  *
 	  * RAII constructor that returns once @a objA and @a objB are locked.
@@ -109,8 +131,7 @@ public:
 	  * @param[in,out] objB Const pointer to the second object that is to be locked.
 	**/
 	CLockGuard( CLockable const* objA, CLockable const* objB ) noexcept
-		: CLockGuard( const_cast<CLockable*>( objA ), const_cast<CLockable*>( objB ) )
-	{ }
+		  : CLockGuard( const_cast<CLockable*>( objA ), const_cast<CLockable*>( objB ) ) {}
 
 
 	/** @brief Three objects locking constructor
@@ -125,6 +146,19 @@ public:
 	CLockGuard( CLockable* objA, CLockable* objB, CLockable* objC ) noexcept;
 
 
+	/** @brief Three objects locking constructor via reference
+	  *
+	  * RAII constructor that returns once @a objA, @a objB and @a objC are locked.
+	  * **Important**: @a objA, @a objB and @a objC must be derived from pwx::CLockable !
+	  *
+	  * @param[in,out] objA Reference to the first object that is to be locked.
+	  * @param[in,out] objB Reference to the second object that is to be locked.
+	  * @param[in,out] objC Reference to the third object that is to be locked.
+	**/
+	CLockGuard( CLockable &objA, CLockable &objB, CLockable &objC ) noexcept
+		  : CLockGuard( &objA, &objB, &objC ) {}
+
+
 	/** @brief Three objects locking constructor ; const wrapper
 	  *
 	  * RAII constructor that returns once @a objA, @a objB and @a objC are locked.
@@ -135,8 +169,7 @@ public:
 	  * @param[in,out] objC Const pointer to the third object that is to be locked.
 	**/
 	CLockGuard( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept
-		: CLockGuard( const_cast<CLockable*>( objA ), const_cast<CLockable*>( objB ), const_cast<CLockable*>( objC ) )
-	{ }
+		  : CLockGuard( const_cast<CLockable*>( objA ), const_cast<CLockable*>( objB ), const_cast<CLockable*>( objC ) ) {}
 
 
 	/** @brief Copy constructor that takes over the locks from another CLockGuard instance
@@ -147,7 +180,7 @@ public:
 	  *
 	  * @param[in,out] src Reference to the source to copy.
 	**/
-	CLockGuard( CLockGuard& src ) noexcept;
+	CLockGuard( CLockGuard &src ) noexcept;
 
 
 	/** @brief Copy constructor that takes over the locks from another CLockGuard instance ; const wrapper
@@ -158,9 +191,8 @@ public:
 	  *
 	  * @param[in,out] src Const reference to the source to copy.
 	**/
-	CLockGuard( CLockGuard const& src ) noexcept
-		: CLockGuard( const_cast<CLockGuard&>( src ) )
-	{ }
+	CLockGuard( CLockGuard const &src ) noexcept
+		  : CLockGuard( const_cast<CLockGuard &>( src ) ) {}
 
 
 	/// @brief The default destructor unlocks all objects currently held locked.
@@ -183,7 +215,7 @@ public:
 	  *
 	  * @param[in,out] src Reference to the source to take over from.
 	**/
-	CLockGuard& operator=( CLockGuard& src ) noexcept;
+	CLockGuard &operator=( CLockGuard &src ) noexcept;
 
 
 	/* ===============================================

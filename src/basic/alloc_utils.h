@@ -43,6 +43,7 @@
 #include "basic/pwx_macros.h"
 
 #include <cstdlib>
+#include <cstring>
 
 
 /** @brief Allocator with overflow detection (like `malloc`)
@@ -50,7 +51,7 @@
   * @param[in] n  Number of bytes to allocate
   * @return A pointer to the allocated space, or `nullptr` if `sizeof(t) * n` is too large.
 **/
-#define pwx_new(t, n) ((t*)::pwx::malloc_multiply(sizeof(t), (n)))
+#define pwx_new( t, n ) ((t*)::pwx::malloc_multiply(sizeof(t), (n)))
 
 
 /** @brief Nullifying allocator with overflow detection (like `calloc`)
@@ -58,24 +59,24 @@
   * @param[in] n  Number of bytes to allocate
   * @return A pointer to the allocated space, or `nullptr` if `sizeof(t) * n` is too large.
 **/
-#define pwx_new0(t, n) ({                       \
-		t* _ptr_ = pwx_new(t, n);       \
-		if (_ptr_) memset(_ptr_, 0, n); \
-		_ptr_;                          \
-	})
+#define pwx_new0( t, n ) pwx_new0_impl<t>(n)
 
 
 /** @brief Free memory at pointer @a p if it is not `nullptr` and set @a p to nullptr
   * @param[in,out] p  The pointer to free and to set to nullptr
 **/
-#define FREE_PTR(p)   (p) = (decltype(p))::pwx::mfree((void*)(p))
+#define FREE_PTR( p )   (p) = (decltype(p))::pwx::mfree((void*)(p))
 
 
 /** @brief Take over pointer @a ptr and set it to nullptr
   * @param[in] ptr  The pointer to take over, is set to `nullptr` after the transition
   * @return The address of `ptr`. It is not checked. If `ptr` is `nullptr`, that is what is returned.
 **/
-auto TAKE_PTR = [](auto &ptr) { decltype(ptr) _ptr_ = (ptr); (ptr) = nullptr; return _ptr_; };
+static auto TAKE_PTR = []( auto &ptr ) {
+	decltype( ptr ) _ptr_ = ( ptr );
+	( ptr ) = nullptr;
+	return _ptr_;
+};
 
 
 /// @namespace pwx
@@ -102,9 +103,8 @@ static inline void* mfree( void* p ) {
 
 #ifndef PWX_NODOX
 static inline bool size_multiply_overflow( size_t s, size_t n ) {
-	return PWX_UNLIKELY( n && (s > ( SIZE_MAX / n ) ) );
+	return PWX_UNLIKELY( n && ( s > ( SIZE_MAX / n ) ) );
 }
-#endif // No doc
 
 
 /** @brief convenient allocator that only calls `malloc` if `SIZE_MAX` is not exceeded.
@@ -113,11 +113,24 @@ static inline bool size_multiply_overflow( size_t s, size_t n ) {
   * @return A pointer to the allocated space or nullptr if the allocation failed.
 **/
 PWX_MALLOC PWX_ALLOC( 1, 2 ) static inline void* malloc_multiply( size_t s, size_t n ) {
-	if ( size_multiply_overflow( s, n ) )
+	if ( size_multiply_overflow( s, n ) ) {
 		return nullptr;
+	}
 
 	return ::malloc( s * n );
 }
+
+
+/// @brief Implementation tenmplate for pwx_new0
+/// @internal
+template< typename T > static inline T* pwx_new0_impl( size_t num ) {
+	T* _ptr_ = pwx_new( T, num );
+	if ( _ptr_ ) memset( _ptr_, 0, num );
+	return _ptr_;
+}
+
+
+#endif // Do not document with doxygen
 
 
 } // namespace pwx

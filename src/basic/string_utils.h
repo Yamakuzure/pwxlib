@@ -53,7 +53,7 @@
   * @param b  Right hand C-String
   * @return `true` if both C-Strings are equal ignoring case
 **/
-#define STRCEQ(a,b) (a && b && (strcasecmp(a,b) == 0))
+#define STRCEQ( a, b ) (a && b && (strcasecmp(a,b) == 0))
 
 
 /** @brief return `true` if two C-Strings are equal ignoring case with length limit
@@ -66,7 +66,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if both C-Strings are equal ignoring case
 **/
-#define STRNCEQ(a,b,n) (a && b && (strncasecmp(a,b,n) == 0))
+#define STRNCEQ( a, b, n ) (a && b && (strncasecmp(a,b,n) == 0))
 
 
 /** @brief return `true` if two C-Strings are not equal ignoring case
@@ -78,7 +78,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if both C-Strings are not equal ignoring case
 **/
-#define STRCNE(a,b) ((nullptr == (a)) || (nullptr == (b)) || (strcasecmp(a,b) != 0))
+#define STRCNE( a, b ) ((nullptr == (a)) || (nullptr == (b)) || (strcasecmp(a,b) != 0))
 
 
 /** @brief return `true` if two C-Strings are not equal ignoring case with length limit
@@ -91,7 +91,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if both C-Strings are not equal ignoring case
 **/
-#define STRNCNE(a,b,n) ((nullptr == (a)) || (nullptr == (b)) || (strncasecmp(a,b,n) != 0))
+#define STRNCNE( a, b, n ) ((nullptr == (a)) || (nullptr == (b)) || (strncasecmp(a,b,n) != 0))
 
 
 /** @brief `true` if @a a is "lower" than @a b ignoring case
@@ -103,7 +103,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if @a a is "lower" than @a b ignoring case
 **/
-#define STRCLT(a,b) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (strcasecmp(a,b) < 0))
+#define STRCLT( a, b ) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (strcasecmp(a,b) < 0))
 
 
 /** @brief `true` if @a a is "lower" than @a b ignoring case with length limit
@@ -116,7 +116,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if @a a is "lower" than @a b ignoring case
 **/
-#define STRNCLT(a,b,n) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (strncasecmp(a,b,n) < 0))
+#define STRNCLT( a, b, n ) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (strncasecmp(a,b,n) < 0))
 
 
 /** @brief `true` if @a a is "greater" than @a b ignoring case
@@ -128,7 +128,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if @a a is "greater" than @a b ignoring case
 **/
-#define STRCGT(a,b) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (strcasecmp(a,b) > 0))
+#define STRCGT( a, b ) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (strcasecmp(a,b) > 0))
 
 
 /** @brief `true` if @a a is "greater" than @a b ignoring case with length limit
@@ -141,7 +141,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if @a a is "greater" than @a b ignoring case
 **/
-#define STRNCGT(a,b,n) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (strncasecmp(a,b,n) > 0))
+#define STRNCGT( a, b, n ) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (strncasecmp(a,b,n) > 0))
 
 
 /** @brief return `true` if two C-Strings are equal
@@ -153,7 +153,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if both C-Strings are equal
 **/
-#define STREQ(a,b) ((a) && (b) && (std::strcmp(a,b) == 0))
+#define STREQ( a, b ) ((a) && (b) && (std::strcmp(a,b) == 0))
 
 
 /** @brief return `true` if two C-Strings are equal with length limit
@@ -166,7 +166,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if both C-Strings are equal
 **/
-#define STRNEQ(a,b,n) ((a) && (b) && (std::strncmp(a,b,n) == 0))
+#define STRNEQ( a, b, n ) ((a) && (b) && (std::strncmp(a,b,n) == 0))
 
 
 /** @brief return `true` if two C-Strings are not equal
@@ -178,7 +178,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if both C-Strings are not equal
 **/
-#define STRNE(a,b) ((nullptr == (a)) || (nullptr == (b)) || (std::strcmp(a,b) != 0))
+#define STRNE( a, b ) ((nullptr == (a)) || (nullptr == (b)) || (std::strcmp(a,b) != 0))
 
 
 /** @brief return `true` if two C-Strings are not equal with length limit
@@ -191,7 +191,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if both C-Strings are not equal
 **/
-#define STRNNE(a,b,n) ((nullptr == (a)) || (nullptr == (b)) || (std::strncmp(a,b,n) != 0))
+#define STRNNE( a, b, n ) ((nullptr == (a)) || (nullptr == (b)) || (std::strncmp(a,b,n) != 0))
 
 
 /** @brief `true` if @a a is "lower" than @a b
@@ -203,7 +203,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if @a a is "lower" than @a b
 **/
-#define STRLT(a,b) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strcmp(a,b) < 0))
+#define STRLT( a, b ) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strcmp(a,b) < 0))
 
 
 /** @brief `true` if @a a is "lower" than @a b with length limit
@@ -216,7 +216,7 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if @a a is "lower" than @a b
 **/
-#define STRNLT(a,b,n) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strncmp(a,b,n) < 0))
+#define STRNLT( a, b, n ) ((nullptr == (a)) ? true : (nullptr == (b)) ? false : (std::strncmp(a,b,n) < 0))
 
 
 /** @brief `true` if @a a is "greater" than @a b
@@ -228,7 +228,7 @@
   * @param[in] b  Right hand C-String
   * @return `true` if @a a is "greater" than @a b
 **/
-#define STRGT(a,b) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (std::strcmp(a,b) > 0))
+#define STRGT( a, b ) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (std::strcmp(a,b) > 0))
 
 
 /** @brief `true` if @a a is "greater" than @a b with length limit
@@ -241,11 +241,46 @@
   * @param[in] n  Number of characters to compare
   * @return `true` if @a a is "greater" than @a b
 **/
-#define STRNGT(a,b,n) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (std::strncmp(a,b,n) > 0))
+#define STRNGT( a, b, n ) ((nullptr == (a)) ? false : (nullptr == (b)) ? true : (std::strncmp(a,b,n) > 0))
 
 
 /// @namespace pwx
 namespace pwx {
+
+
+/** @brief asprintf with pwxlib memory handling
+  *
+  * @param strp The pointer to the target pointer
+  * @param fmt  Format string
+  * @param ...  Arguments to the format string
+  * @return 0 on success, -1 on failure
+**/
+int pwx_asprintf( char** strp, const char* fmt, ... );
+
+
+/** @brief Thread safe platform independent basename() implementation.
+  *
+  * @param full_path Path to get the last part off
+  * @return const pointer to the theread local static buffer with the result. Do not free!
+**/
+char const* pwx_basename( char const* full_path );
+
+
+/** @brief Thread safe platform independent dirname() implementation.
+  *
+  * @param full_path Path to get all but the last part off
+  * @return const pointer to the thread local static buffer with the result. Do not free!
+**/
+char const* pwx_dirname( char const* full_path );
+
+
+/** brief Thread safe platform independent strerror_r() implementation.
+  *
+  * @param errno_ The errno to interpret
+  * @return const pointer to the thread local static buffer with the result (Do not free!) or nullptr if
+  * the non-GNU variant of strerror_r() is used and it fails.
+**/
+char const* pwx_strerror( int errno_ );
 
 
 /// @brief Return @a s or an empty string if @a s is `nullptr`
@@ -281,8 +316,9 @@ static inline char* startswith( char const* s, char const* prefix ) {
 	size_t l;
 
 	l = strlen( prefix );
-	if ( STRNEQ( s, prefix, l ) )
-		return ( char* ) s + l;
+	if ( STRNEQ( s, prefix, l ) ) {
+		return (char*) s + l;
+	}
 
 	return nullptr;
 }
@@ -297,8 +333,9 @@ static inline char* startswith_no_case( char const* s, char const* prefix ) {
 	size_t l;
 
 	l = strlen( prefix );
-	if ( STRNCEQ( s, prefix, l ) )
-		return ( char* ) s + l;
+	if ( STRNCEQ( s, prefix, l ) ) {
+		return (char*) s + l;
+	}
 
 	return nullptr;
 }
@@ -318,16 +355,19 @@ static inline char* endswith( char const* s, char const* postfix ) {
 	sl = strlen( s );
 	pl = strlen( postfix );
 
-	if ( pl == 0 )
-		return ( char* ) s + sl;
+	if ( pl == 0 ) {
+		return (char*) s + sl;
+	}
 
-	if ( sl < pl )
+	if ( sl < pl ) {
 		return nullptr;
+	}
 
-	if ( memcmp( s + sl - pl, postfix, pl ) != 0 )
+	if ( memcmp( s + sl - pl, postfix, pl ) != 0 ) {
 		return nullptr;
+	}
 
-	return ( char* ) s + sl - pl;
+	return (char*) s + sl - pl;
 }
 
 
@@ -345,27 +385,29 @@ static inline char* endswith_no_case( char const* s, char const* postfix ) {
 	sl = strlen( s );
 	pl = strlen( postfix );
 
-	if ( pl == 0 )
-		return ( char* ) s + sl;
+	if ( pl == 0 ) {
+		return (char*) s + sl;
+	}
 
-	if ( sl < pl )
+	if ( sl < pl ) {
 		return nullptr;
+	}
 
-	if ( STRCEQ( s + sl - pl, postfix ) )
+	if ( STRCEQ( s + sl - pl, postfix ) ) {
 		return nullptr;
+	}
 
-	return ( char* ) s + sl - pl;
+	return (char*) s + sl - pl;
 }
 
 
 /// @brief Return a NULL terminated char array with the binary representation of @a b
-#define byte_to_binary(b) ({                                       \
-		char   _d_[9] = { 0x0 };                           \
-		for (size_t _i_ = 0; _i_ < 8; ++_i_)               \
-			_d_[7-_i_] = ((b >> _i_) & 1) ? '1' : '0'; \
-		_d_;                                               \
-	})                                                         \
-
+#define byte_to_binary( b ) ({                                       \
+        char   _d_[9] = { 0x0 };                           \
+        for (size_t _i_ = 0; _i_ < 8; ++_i_)               \
+            _d_[7-_i_] = ((b >> _i_) & 1) ? '1' : '0'; \
+        _d_;                                               \
+    })                                                         \
 
 } // namespace pwx
 

@@ -11,6 +11,12 @@
 #include "basic/pwx_macros.h"
 
 
+/** @def PWX_TRACE_INFO
+  * @brief Convenience shortcut
+**/
+#define PWX_TRACE_INFO ::pwx::get_trace_info(__FILE__, __LINE__, PWX_FUNC)
+
+
 /// @namespace pwx
 namespace pwx {
 

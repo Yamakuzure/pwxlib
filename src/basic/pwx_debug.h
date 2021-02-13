@@ -44,6 +44,7 @@
 
 #if LIBPWX_DEBUG
 # include "basic/pwx_trace_info.h"
+# include "log/log.h"
 #endif // LIB or THREAD debug mode
 
 
@@ -70,86 +71,47 @@
 # include <valgrind/helgrind.h>
 #endif // ANNOTATIONS
 
-/// @namespace pwx
-namespace pwx {
 
-
-// If any debugging mode is activated, a central logging functions is needed:
-#if LIBPWX_DEBUG
-
-// The main logging function:
-void debug_log( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stdout
-void debug_err( char const* fmt, ... ) PWX_API; //!< internal debug logging function to stderr
-
-// And the main wrappers:
-# define DEBUG_LOG(part, fmt, ...)                   \
-	::pwx::debug_log( ">> [%8s] %s : " fmt "\n", \
-	                  part,                      \
-	                  ::pwx::get_trace_info(     \
-	                          __FILE__,          \
-	                          __LINE__,          \
-	                          PWX_FUNC), __VA_ARGS__ )
-
-# define DEBUG_LOG_THERE(location, part, fmt, ...)    \
-	::pwx::debug_log( ">> [%8s] %s : " fmt "\n",  \
-	                  part, location, __VA_ARGS__ )
-
-# define DEBUG_LOG_CAUGHT_STD(part)                  \
-	catch (::std::exception &e) {                \
-		DEBUG_LOG(part,                      \
-		        "Caught std::exception: %s", \
-		        e.what());                   \
-	}
-
-# define DEBUG_ERR(part, fmt, ...)                   \
-	::pwx::debug_err( ">> [%8s] %s : " fmt "\n", \
-	                  part,                      \
-	                  ::pwx::get_trace_info(     \
-	                          __FILE__,          \
-	                          __LINE__,          \
-	                          PWX_FUNC), __VA_ARGS__ )
-
-# define DEBUG_ERR_THERE(location, part, fmt, ...)    \
-	::pwx::debug_err( ">> [%8s] %s : " fmt "\n",  \
-	                  part, location, __VA_ARGS__ )
-#else
-# define DEBUG_LOG(...)            do{}while(0)
-# define DEBUG_LOG_THERE(...)      do{}while(0)
-# define DEBUG_LOG_CAUGHT_STD(...)
-# define DEBUG_ERR(...)            do{}while(0)
-# define DEBUG_ERR_THERE(...)      do{}while(0)
-/* debug_log() and debug_err() are not defined here, because they would cause
- *   pwx::debug_log(...);
- * to become
- *   pwx::{};
- ' which no compiler is happy with.
-*/
-#endif // LIBPWX_DEBUG
-
-/** @def DEBUG_LOG
-  * @brief Print a debugging information message with automatic location information.
-  * This is a macro that gets removed in release builds.
-  *
-  * @def DEBUG_LOG_THERE
-  * @brief Print a debugging information message with manual location information.
-  * This is a macro that gets removed in release builds.
-  *
-  * @def DEBUG_LOG_CAUGHT_STD
-  * @brief catch an `std::exception` and log its `what()`.
-  * This macro can be used to log an exception that is normally ignored, but might
-  * be somewhat interesting for debugging purposes.
-  *
-  * @def DEBUG_ERR
-  * @brief Print a debugging error message with automatic location information.
-  * This is a macro that gets removed in release builds.
-
-  * @def DEBUG_ERR_THERE
-  * @brief Print a debugging error message with manual location information.
-  * This is a macro that gets removed in release builds.
+/** @def log_debug
+  * @brief Debug log macro that does nothing in release mode
 **/
+#if PWX_IS_DEBUG_MODE
+#  define log_debug( title_, message_, ... ) PWX_log_wrapper(::pwx::LOG_DEBUG, title_, message_, __VA_ARGS__)
+#else
+#  define log_debug( ... ) do {} while(0)
+#endif // debug enabled
 
 
-} // namespace pwx
+/** @def log_debug_there
+  * @brief Special log_debug variant, which a location from elsewhere is given.
+**/
+#if PWX_IS_DEBUG_MODE
+#  define log_debug_there( loc_, title_, message_, ... ) \
+	::pwx::log( loc_, ::pwx::LOG_DEBUG, title_, message_, __VA_ARGS__)
+#else
+#  define log_debug_there( ... ) do {} while(0)
+#endif // debugging enabled
+
+
+/** @def log_debug_error
+  * @brief Special log_debug variant, which marks the debug message as being an error
+**/
+#if PWX_IS_DEBUG_MODE
+#  define log_debug_error( title_, message_, ... ) PWX_log_wrapper(::pwx::LOG_DEBUG, title_, "ERROR:" message_, __VA_ARGS__)
+#else
+#  define log_debug_error( ... ) do {} while(0)
+#endif // debug enabled
+
+
+/** @def log_debug_caught_std
+  * @brief Catch an std exception and use log_debug to log it, but ignore it otherwise
+**/
+# define log_debug_caught_std( part )               \
+       catch (::std::exception &e) {                \
+               log_debug(part,                      \
+                       "Caught std::exception: %s", \
+                       e.what());                   \
+       }
 
 
 #endif // PWX_LIBPWX_SRC_FUNCTIONS_DEBUG_H_INCLUDED

@@ -46,12 +46,11 @@
 #include <cstdint>
 
 
+#ifndef PWX_NODOX
+
+
 /// @namespace pwx
 namespace pwx {
-
-
-/// @namespace private_
-namespace private_ {
 
 
 /** @internal
@@ -87,7 +86,7 @@ void mem_map_del( void const* memory );
   *
   * All entries are logged as errors!
 **/
-bool mem_map_report();
+bool mem_map_report_internal();
 
 
 /** @brief Get the currently recorded size of mapped memory
@@ -102,9 +101,10 @@ bool mem_map_report();
 bool mem_map_sizeof( void const* memory, size_t* old_size );
 
 
-} // namespace private_
 } // namespace pwx
 
+
+#endif // Do not document with doxygen
 
 
 #endif // PWX_PWXLIB_SRC_BASIC__MEM_MAP_H_INCLUDED

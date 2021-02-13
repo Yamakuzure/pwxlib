@@ -49,19 +49,15 @@
 namespace pwx {
 
 
-/// @namespace private_
-namespace private_ {
-
 #ifndef PWX_NODOX
 
-#if defined(PWXLIB_DEBUG)
+#if PWX_IS_DEBUG_MODE
 bool enable_memory_mapping = true;
 #else
 bool enable_memory_mapping = false;
 #endif // PWXLIB_DEBUG
 
 #endif // No doxygen on private globals!
-}
 
 
 /***************************************
@@ -73,21 +69,23 @@ void* allocate( char const* location, size_t new_size ) {
 
 	result = malloc_multiply( 1, new_size );
 
-	if ( result && private_::enable_memory_mapping )
-		private_::mem_map_add( location, new_size, result );
+	if ( result && enable_memory_mapping ) {
+		mem_map_add( location, new_size, result );
+	}
 
 	if ( !result )
-		DEBUG_ERR_THERE( location, "Allocation failed!", "Unable to allocate %ul bytes at %s", new_size );
+		log_debug_there( location, "Allocation failed!", "Unable to allocate %ul bytes at %s", new_size );
 
 	return result;
 }
 
 
-void deallocate( void*  mem ) {
+void deallocate( void* mem ) {
 	if ( mem ) {
 
-		if ( private_::enable_memory_mapping )
-			private_::mem_map_del( mem );
+		if ( enable_memory_mapping ) {
+			mem_map_del( mem );
+		}
 
 		FREE_PTR( mem );
 	}
@@ -97,22 +95,23 @@ void deallocate( void*  mem ) {
 void* reallocate( char const* location, void* mem, size_t new_size ) {
 
 	// Reroute at once if mem is nullptr
-	if ( nullptr == mem )
+	if ( nullptr == mem ) {
 		return allocate( location, new_size );
+	}
 
 	// Fine, it is a reallocation.
-	void*  old_mem  = mem;
-	void*  result   = nullptr;
+	void* old_mem = mem;
+	void* result  = nullptr;
 
 	result = realloc( mem, new_size );
 
-	if ( result && private_::enable_memory_mapping && ( old_mem != result ) ) {
-		private_::mem_map_del( old_mem );
-		private_::mem_map_add( location, new_size, result );
+	if ( result && enable_memory_mapping && ( old_mem != result ) ) {
+		mem_map_del( old_mem );
+		mem_map_add( location, new_size, result );
 	}
 
 	if ( !result )
-		DEBUG_ERR_THERE( location, "Reallocation failed!",
+		log_debug_there( location, "Reallocation failed!",
 		                 "Unable to reallocate to %ul bytes at %s", new_size );
 
 	return result;
@@ -120,14 +119,14 @@ void* reallocate( char const* location, void* mem, size_t new_size ) {
 
 
 char* strdup( char const* location, char const* src ) {
-	size_t nmem   = src ? strlen( src ) : 0;
-	char*  result;
+	size_t nmem = src ? strlen( src ) : 0;
+	char* result;
 
-	result = nmem ? ( char* )allocate( location, ( nmem + 1 ) * sizeof( char ) ) : nullptr;
+	result = nmem ? (char*) allocate( location, ( nmem + 1 ) * sizeof( char ) ) : nullptr;
 
-	if ( result  ) {
+	if ( result ) {
 		memcpy( result, src, nmem * sizeof( char ) );
-		result[ nmem ] = 0x0;
+		result[nmem] = 0x0;
 	}
 
 	return result;
@@ -135,8 +134,9 @@ char* strdup( char const* location, char const* src ) {
 
 
 bool mem_map_report() {
-	if ( private_::enable_memory_mapping )
-		return private_::mem_map_report();
+	if ( enable_memory_mapping ) {
+		return mem_map_report_internal();
+	}
 	return true;
 }
 

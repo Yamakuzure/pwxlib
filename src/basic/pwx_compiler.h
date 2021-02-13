@@ -138,8 +138,8 @@
   #endif
   #define PWX_LOCAL
 #else // not on windows
-	#define PWX_API    __attribute__ ((visibility ("default")))
-	#define PWX_LOCAL  __attribute__ ((visibility ("hidden")))
+  #define PWX_API    __attribute__ ((visibility ("default")))
+  #define PWX_LOCAL  __attribute__ ((visibility ("hidden")))
 #endif // windows versus unix
 /** @def PWX_API
   * @brief Set the right modifier for library export/import
@@ -149,15 +149,29 @@
 */
 
 
+#if LIBPWX_DEBUG
+  #define PWX_IS_DEBUG_MODE   1
+  #define PWX_IS_RELEASE_MODE 0
+  #define PWX_PRIVATE_INLINE
+#else
+  #define PWX_IS_DEBUG_MODE   0
+  #define PWX_IS_RELEASE_MODE 1
+  #if defined(PWX_EXPORTS)
+	#define PWX_PRIVATE_INLINE inline
+  #else
+	#define PWX_PRIVATE_INLINE
+  #endif
+#endif
 /** @def PWX_PRIVATE_INLINE
   * @brief Private methods of the worker classes can be inlined, unless
   *        this is a debugging build
 **/
-#if LIBPWX_DEBUG || !defined(PWX_EXPORTS)
-# define PWX_PRIVATE_INLINE
-#else
-# define PWX_PRIVATE_INLINE inline
-#endif
+/** @def PWX_IS_DEBUG_MODE
+  * @brief Set to 1 in debug mode, and to 0 otherwise
+**/
+/** @def PWX_IS_RELEASE_MODE
+  * @brief Set to 1 in release mode, and to 0 otherwise
+**/
 
 
 /* ---------------------------------------------------------------------

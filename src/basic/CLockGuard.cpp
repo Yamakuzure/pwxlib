@@ -55,7 +55,7 @@ CLockGuard::CLockGuard( CLockable* objA, CLockable* objB, CLockable* objC ) noex
 	reset( objA, objB, objC );
 }
 
-CLockGuard::CLockGuard( CLockGuard& src ) noexcept {
+CLockGuard::CLockGuard( CLockGuard &src ) noexcept {
 	l_a = src.l_a;
 	l_b = src.l_b;
 	l_c = src.l_c;
@@ -67,7 +67,7 @@ CLockGuard::~CLockGuard() noexcept {
 	reset( NULL_LOCK, NULL_LOCK, NULL_LOCK );
 }
 
-CLockGuard& CLockGuard::operator=( CLockGuard& src ) noexcept {
+CLockGuard &CLockGuard::operator=( CLockGuard &src ) noexcept {
 	if ( &src != this ) {
 		l_a = src.l_a;
 		l_b = src.l_b;

@@ -32,12 +32,9 @@
 
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
-#include <cstdlib>
 #include <cstring>
 #include <map>
 
-#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
 #include "basic/pwx_debug.h"
 
@@ -45,38 +42,32 @@
 #include "basic/alloc_utils.h"
 #include "basic/CLockable.h"
 #include "basic/CLockGuard.h"
-#include "basic/mem_utils.h"
-#include "basic/pwx_macros.h"
 
+
+#ifndef PWX_NODOX
 
 
 /// @namespace pwx
 namespace pwx {
 
 
-#ifndef PWX_NODOX
-/// @namespace private_
-namespace private_ {
-
-
-::pwx::CLockable map_lock; //!< std::map isn't thread safe, so we lock ourselves.
+static CLockable map_lock; //!< std::map isn't thread safe, so we lock ourselves.
 
 
 /// @brief information struct with location and size of a map entry
 struct map_item_t {
 	char const* location = nullptr;
-	size_t      mem_size = 0;
+	size_t mem_size = 0;
 
 	explicit
 	map_item_t( char const* loc, size_t siz )
-		: location( ::strdup( loc ? loc : "<nowhere>" ) ) /* use regular strdup to circumvent circular dependencies */
-		, mem_size( siz )
-	{ }
+		  : location( ::strdup( loc ? loc : "<nowhere>" ) ) /* use regular strdup to circumvent circular dependencies */
+		    , mem_size( siz ) {}
 	map_item_t( const map_item_t &rhs ) {
-		location = ::strdup(rhs.location ? rhs.location : "<nowhere>");
+		location = ::strdup( rhs.location ? rhs.location : "<nowhere>" );
 		mem_size = rhs.mem_size;
 	}
-	map_item_t( map_item_t &&rhs ) {
+	map_item_t( map_item_t &&rhs ) noexcept {
 		location = rhs.location;
 		mem_size = rhs.mem_size;
 		rhs.location = nullptr;
@@ -84,12 +75,12 @@ struct map_item_t {
 	}
 	map_item_t &operator=( const map_item_t &rhs ) {
 		if ( &rhs != this ) {
-			location = ::strdup(rhs.location ? rhs.location : "<nowhere>");
+			location = ::strdup( rhs.location ? rhs.location : "<nowhere>" );
 			mem_size = rhs.mem_size;
 		}
 		return *this;
 	}
-	map_item_t &operator=( map_item_t &&rhs ) {
+	map_item_t &operator=( map_item_t &&rhs ) noexcept {
 		if ( &rhs != this ) {
 			location = rhs.location;
 			mem_size = rhs.mem_size;
@@ -103,8 +94,9 @@ struct map_item_t {
 	}
 };
 
+
 // some shortcuts
-typedef std::map<void const*, map_item_t> map_t;
+typedef std::map< void const*, map_item_t > map_t;
 
 /** @brief global memory map
   * We are using the std::map here to have something neutral.
@@ -122,9 +114,9 @@ void mem_map_add( char const* location, size_t mem_size, void const* memory ) {
 	// First check whether the key exists:
 	auto const iter = mem_map.find( memory );
 	if ( iter != mem_map.cend() ) {
-		DEBUG_ERR( "Memory Map Addition Error!",
-		           "The address 0x%08lx is already registered with size %lu from %s",
-		           iter->first, iter->second.mem_size, iter->second.location );
+		log_debug_error( "Memory Map Addition Error!",
+		                 "The address 0x%08lx is already registered with size %lu from %s",
+		                 iter->first, iter->second.mem_size, iter->second.location );
 		// No return, we have to record the new size anyway
 	}
 
@@ -140,9 +132,9 @@ void mem_map_del( void const* memory ) {
 
 	auto const citer = mem_map.find( memory );
 	if ( citer == mem_map.cend() ) {
-		DEBUG_ERR( "Memory Map Deletion Error!",
-		           "The address 0x%08lx is _NOT_ recorded in the memory map!",
-		           memory );
+		log_debug_error( "Memory Map Deletion Error!",
+		                 "The address 0x%08lx is _NOT_ recorded in the memory map!",
+		                 memory );
 		return;
 	}
 
@@ -150,17 +142,17 @@ void mem_map_del( void const* memory ) {
 }
 
 
-bool mem_map_report() {
+bool mem_map_report_internal() {
 	bool result = true;
 
 	PWX_LOCK_GUARD( &map_lock );
 
 	// A simple loop will do
-	for ( auto &[address, item] : mem_map) {
+	for ( auto &[address, item] : mem_map ) {
 		result = false;
-		DEBUG_ERR( "Memory Map Leak Error!",
-		           "The address 0x%08lx is *STILL* registered with size %lu from %s",
-		           address, item.mem_size, item.location );
+		log_debug_error( "Memory Map Leak Error!",
+		                 "The address 0x%08lx is *STILL* registered with size %lu from %s",
+		                 address, item.mem_size, item.location );
 		// The final clearing of the memory map does not touch the pointers,
 		// so it is safe to free the key here.
 		//freep( const_cast<void*>( address ) );
@@ -181,18 +173,17 @@ bool mem_map_sizeof( void const* memory, size_t* old_size ) {
 
 	auto const iter = mem_map.find( memory );
 	if ( iter != mem_map.cend() ) {
-		if ( old_size )
+		if ( old_size ) {
 			*old_size = iter->second.mem_size;
+		}
 		return true;
 	}
 	return false;
 }
 
 
-
-} // namespace private_
-#endif // Private stuff of no concern to Doxygen
-
 } // namespace pwx
 
+
+#endif // Do not document with doxygen
 

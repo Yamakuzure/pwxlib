@@ -6,7 +6,6 @@ set( basic_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/CException.h
      ${CMAKE_CURRENT_LIST_DIR}/CLockGuard.h
      ${CMAKE_CURRENT_LIST_DIR}/CLockable.h
-     ${CMAKE_CURRENT_LIST_DIR}/_mem_wrapper.h
      ${CMAKE_CURRENT_LIST_DIR}/alloc_utils.h
      ${CMAKE_CURRENT_LIST_DIR}/mem_utils.h
      ${CMAKE_CURRENT_LIST_DIR}/pwx_compiler.h
@@ -25,8 +24,8 @@ target_sources( basic PRIVATE
                 CLockable.cpp
                 _mem_map.cpp
                 _mem_map.h
-                debug.cpp
                 mem_utils.cpp
+                string_utils.cpp
                 trace_info.cpp
                 )
 target_compile_definitions( basic PRIVATE PWX_EXPORTS )
