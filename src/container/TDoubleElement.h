@@ -125,18 +125,18 @@ namespace pwx {
   * </TR>
   * </TABLE>
 **/
-template<typename data_t>
+template< typename data_t >
 struct PWX_API TDoubleElement : public VElement {
 
 	/* ===============================================
 	 * === Public types                            ===
 	 * ===============================================
 	*/
-	typedef VElement                base_t;     //!< Base type of this element
-	typedef TDoubleElement<data_t>  elem_t;     //!< Type of this element
-	typedef std::shared_ptr<data_t> share_t;    //!< `data_t` wrapped in `std::shared_ptr`
-	typedef std::atomic<elem_t*>    neighbor_t; //!< `elem_t*` wrapped in `std::atomic`
-	typedef base_t::store_t         store_t;    //!< The element store type to register this element with
+	typedef VElement                  base_t;     //!< Base type of this element
+	typedef TDoubleElement< data_t >  elem_t;     //!< Type of this element
+	typedef std::shared_ptr< data_t > share_t;    //!< `data_t` wrapped in `std::shared_ptr`
+	typedef std::atomic< elem_t* >    neighbor_t; //!< `elem_t*` wrapped in `std::atomic`
+	typedef base_t::store_t           store_t;    //!< The element store type to register this element with
 
 
 	/* ===============================================
@@ -151,9 +151,8 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] data_ A pointer to the data this list element is to hold.
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TDoubleElement ( data_t* data_, void ( *destroy_ ) ( data_t* data_ ) ) noexcept
-		: data ( data_, TVarDeleter<data_t> ( destroy_ ) )
-	{ }
+	TDoubleElement( data_t* data_, void ( * destroy_ )( data_t* data_ ) ) noexcept
+		  : data( data_, TVarDeleter< data_t >( destroy_ ) ) {}
 
 
 	/** @brief explicit constructor
@@ -163,9 +162,8 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] data_ A pointer to the data this list element is to hold.
 	**/
 	explicit
-	TDoubleElement ( data_t* data_ ) noexcept
-		: elem_t ( data_, nullptr )
-	{ }
+	TDoubleElement( data_t* data_ ) noexcept
+		  : elem_t( data_, nullptr ) {}
 
 
 	TDoubleElement() PWX_DELETE; // nullptr data is not allowed!
@@ -185,10 +183,8 @@ struct PWX_API TDoubleElement : public VElement {
 	  *
 	  * @param[in] src reference to the element to copy.
 	**/
-	TDoubleElement ( elem_t const& src ) noexcept
-		: base_t ( src ),
-		  data ( src.data )
-	{ }
+	TDoubleElement( elem_t const &src ) noexcept
+		  : base_t( src ), data( src.data ) {}
 
 
 	virtual ~TDoubleElement() noexcept;
@@ -212,7 +208,7 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] other reference to the data to compare with
 	  * @return +1 one if this data is larger, -1 if the other is larger, 0 if both are equal.
 	**/
-	int32_t compare( data_t const& other ) const noexcept PWX_WARNUNUSED {
+	int32_t compare( data_t const &other ) const noexcept PWX_WARNUNUSED {
 		if ( &other != this->data.get() ) {
 			PWX_LOCK_GUARD( this );
 
@@ -223,12 +219,14 @@ struct PWX_API TDoubleElement : public VElement {
 			data_t* thisData = this->data.get();
 
 			if ( thisData ) {
-				if ( isFloatType( data_t ) && areAlmostEqual( *thisData, other ) )
+				if ( isFloatType( data_t ) && areAlmostEqual( *thisData, other ) ) {
 					return 0;
-				return *thisData > other ?  1
-				       : other > *thisData ? -1 : 0;
-			} else
+				}
+				return *thisData > other ? 1
+				                         : other > *thisData ? -1 : 0;
+			} else {
 				return -1;
+			}
 		} // No else. compare(this->data.get()) always returns 0
 
 		return 0;
@@ -257,25 +255,27 @@ struct PWX_API TDoubleElement : public VElement {
 				bool thisDest = this->destroyed();
 				bool otheDest = other->destroyed();
 
-				if ( thisDest && otheDest ) return  0;
-				if ( thisDest )             return -1;
-				if ( otheDest )             return  1;
+				if ( thisDest && otheDest ) return 0;
+				if ( thisDest ) return -1;
+				if ( otheDest ) return 1;
 
 				// B: check Data status
 				data_t* thisData = this->data.get();
 				data_t* otheData = other->data.get();
 
 				if ( thisData && otheData ) {
-					if ( isFloatType( data_t ) && areAlmostEqual( *thisData, *otheData ) )
+					if ( isFloatType( data_t ) && areAlmostEqual( *thisData, *otheData ) ) {
 						return 0;
-					return *thisData > *otheData ?  1
-					       : *otheData > *thisData ? -1 : 0;
+					}
+					return *thisData > *otheData ? 1
+					                             : *otheData > *thisData ? -1 : 0;
 				}
-				if ( thisData )	return  1;
-				if ( otheData )	return -1;
+				if ( thisData ) return 1;
+				if ( otheData ) return -1;
 			} // No else. compare(this) always returns 0
-		} else
-			return 1; // The other is nullptr, this is always larger
+		} else {
+			return 1;
+		} // The other is nullptr, this is always larger
 
 		return 0;
 	}
@@ -291,8 +291,9 @@ struct PWX_API TDoubleElement : public VElement {
 	elem_t* getNext() const noexcept PWX_WARNUNUSED {
 		if ( beThreadSafe() ) {
 			elem_t* curNext = next.load( memOrdLoad );
-			if ( !curNext && removed() )
+			if ( !curNext && removed() ) {
 				return oldNext.load( memOrdLoad );
+			}
 			return curNext;
 		}
 		return next.load( memOrdLoad );
@@ -309,8 +310,9 @@ struct PWX_API TDoubleElement : public VElement {
 	elem_t* getPrev() const noexcept PWX_WARNUNUSED {
 		if ( beThreadSafe() ) {
 			elem_t* curPrev = prev.load( memOrdLoad );
-			if ( !curPrev && removed() )
+			if ( !curPrev && removed() ) {
 				return oldPrev.load( memOrdLoad );
+			}
 			return curPrev;
 		}
 		return prev.load( memOrdLoad );
@@ -364,8 +366,9 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] new_store optional pointer to the `CThreadElementStore` that will handle this element
 	**/
 	void insertNext( elem_t* new_next, store_t* new_store ) {
-		if ( !new_next || ( new_next == this ) )
+		if ( !new_next || ( new_next == this ) ) {
 			return;
+		}
 
 		if ( beThreadSafe() ) {
 			// Do locking and double checks if this has to be thread safe
@@ -390,19 +393,16 @@ struct PWX_API TDoubleElement : public VElement {
 				}
 
 				// Check again to be sure not to handle destroyed elements
-				if ( destroyed() )
-					PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
-					           "The inserting element has been destroyed while waiting for the lock!" );
+				if ( destroyed() ) PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
+				                              "The inserting element has been destroyed while waiting for the lock!" );
 
-				if ( new_next->destroyed() )
-					PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
-					           "The element to insert has been destroyed while waiting for the lock!" );
+				if ( new_next->destroyed() ) PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
+				                                        "The element to insert has been destroyed while waiting for the lock!" );
 
 				// Before we can go ahead it is important to check the old
 				// next , as it has to get its prev pointer manipulated
-				if ( xOldNext && xOldNext->destroyed() )
-					PWX_THROW( "Illegal_Insert", "The next element is destroyed",
-					           "The next element has been destroyed while waiting for the lock!" );
+				if ( xOldNext && xOldNext->destroyed() ) PWX_THROW( "Illegal_Insert", "The next element is destroyed",
+				                                                    "The next element has been destroyed while waiting for the lock!" );
 
 				// Insert the new element
 				new_next->setNext( xOldNext );
@@ -411,14 +411,13 @@ struct PWX_API TDoubleElement : public VElement {
 
 				// Store new next and prev neighbor
 				setNext( new_next );
-				if ( xOldNext )
+				if ( xOldNext ) {
 					xOldNext->setPrev( new_next );
-			} else if ( destroyed() )
-				PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
-				           "Tried to insert an element after an already destroyed element!" )
-				else
-					PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
-					           "Tried to insert an element that has already been destroyed!" );
+				}
+			} else if ( destroyed() ) PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
+			                                     "Tried to insert an element after an already destroyed element!" )
+			else PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
+			                "Tried to insert an element that has already been destroyed!" );
 		} else {
 			// Otherwise do it directly
 			elem_t* xOldNext = next.load( memOrdLoad );
@@ -426,8 +425,9 @@ struct PWX_API TDoubleElement : public VElement {
 			new_next->prev.store( this, memOrdStore );
 			new_next->insert( new_store );
 			next.store( new_next, memOrdStore );
-			if ( xOldNext )
+			if ( xOldNext ) {
 				xOldNext->prev.store( new_next, memOrdStore );
+			}
 		}
 	}
 
@@ -454,8 +454,9 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] new_store optional pointer to the `CThreadElementStore` that will handle this element
 	**/
 	void insertPrev( elem_t* new_prev, store_t* new_store ) {
-		if ( !new_prev || ( new_prev == this ) )
+		if ( !new_prev || ( new_prev == this ) ) {
 			return;
+		}
 
 		if ( beThreadSafe() ) {
 			// Do locking and double checks if this has to be thread safe
@@ -474,19 +475,16 @@ struct PWX_API TDoubleElement : public VElement {
 				}
 
 				// Check again to be sure not to handle destroyed elements
-				if ( destroyed() )
-					PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
-					           "The inserting element has been destroyed while waiting for the lock!" );
+				if ( destroyed() ) PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
+				                              "The inserting element has been destroyed while waiting for the lock!" );
 
-				if ( new_prev->destroyed() )
-					PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
-					           "The element to insert has been destroyed while waiting for the lock!" );
+				if ( new_prev->destroyed() ) PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
+				                                        "The element to insert has been destroyed while waiting for the lock!" );
 
 				// Before we can go ahead it is important to check the old
 				// prev , as it has to get its prev pointer manipulated
-				if ( xOldPrev && xOldPrev->destroyed() )
-					PWX_THROW( "Illegal_Insert", "The prev element is destroyed",
-					           "The prev element has been destroyed while waiting for the lock!" );
+				if ( xOldPrev && xOldPrev->destroyed() ) PWX_THROW( "Illegal_Insert", "The prev element is destroyed",
+				                                                    "The prev element has been destroyed while waiting for the lock!" );
 
 				// Set the neighborhood of the new prev
 				new_prev->setNext( this );
@@ -495,14 +493,13 @@ struct PWX_API TDoubleElement : public VElement {
 
 				// Store new next and prev neighbor.
 				setPrev( new_prev );
-				if ( xOldPrev )
+				if ( xOldPrev ) {
 					xOldPrev->setNext( new_prev );
-			} else if ( destroyed() )
-				PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
-				           "Tried to insert an element before an already destroyed element!" )
-				else
-					PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
-					           "Tried to insert an element that has already been destroyed!" );
+				}
+			} else if ( destroyed() ) PWX_THROW( "Illegal_Insert", "Destroyed elements can't insert",
+			                                     "Tried to insert an element before an already destroyed element!" )
+			else PWX_THROW( "Illegal_Insert", "Can't insert a destroyed element",
+			                "Tried to insert an element that has already been destroyed!" );
 		} else {
 			// Otherwise do it directly
 			elem_t* xOldPrev = prev.load( memOrdLoad );
@@ -510,8 +507,9 @@ struct PWX_API TDoubleElement : public VElement {
 			new_prev->next.store( this, memOrdStore );
 			new_prev->insert( new_store );
 			prev.store( new_prev, memOrdStore );
-			if ( xOldPrev )
+			if ( xOldPrev ) {
 				xOldPrev->next.store( new_prev, memOrdStore );
+			}
 		}
 	}
 
@@ -549,12 +547,14 @@ struct PWX_API TDoubleElement : public VElement {
 
 
 				// 1: Handle previous neigbor
-				if ( xOldPrev && ( xOldPrev != this ) )
+				if ( xOldPrev && ( xOldPrev != this ) ) {
 					xOldPrev->setNext( xOldNext );
+				}
 
 				// 2: Handle next neighbor
-				if ( xOldNext && ( xOldNext != this ) )
+				if ( xOldNext && ( xOldNext != this ) ) {
 					xOldNext->setPrev( xOldPrev );
+				}
 
 
 			} // End of having at least one neighbor to handle
@@ -567,11 +567,13 @@ struct PWX_API TDoubleElement : public VElement {
 			elem_t* xOldNext = next.load( memOrdLoad );
 			elem_t* xOldPrev = prev.load( memOrdLoad );
 
-			if ( xOldNext && ( xOldNext != this ) )
+			if ( xOldNext && ( xOldNext != this ) ) {
 				xOldNext->prev.store( xOldPrev, memOrdStore );
+			}
 
-			if ( xOldPrev && ( xOldPrev != this ) )
+			if ( xOldPrev && ( xOldPrev != this ) ) {
 				xOldPrev->next.store( xOldNext, memOrdStore );
+			}
 
 			prev.store( nullptr, memOrdStore );
 			next.store( nullptr, memOrdStore );
@@ -629,10 +631,12 @@ struct PWX_API TDoubleElement : public VElement {
 		if ( beThreadSafe() ) {
 			elem_t* currNext = next.load( memOrdLoad );
 			next.store( new_next, memOrdStore );
-			if ( currNext )
+			if ( currNext ) {
 				oldNext.store( currNext, memOrdStore );
-		} else
+			}
+		} else {
 			next.store( new_next, memOrdStore );
+		}
 	}
 
 
@@ -650,10 +654,12 @@ struct PWX_API TDoubleElement : public VElement {
 		if ( beThreadSafe() ) {
 			elem_t* currPrev = prev.load( memOrdLoad );
 			prev.store( new_prev, memOrdStore );
-			if ( currPrev )
+			if ( currPrev ) {
 				oldPrev.store( currPrev, memOrdStore );
-		} else
+			}
+		} else {
 			prev.store( new_prev, memOrdStore );
+		}
 	}
 
 
@@ -671,11 +677,12 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] src const reference of the element to copy
 	  * @return reference to this element
 	**/
-	elem_t& operator= ( elem_t const& src ) noexcept {
+	elem_t &operator=( elem_t const &src ) noexcept {
 		if ( ( this != &src ) && !destroyed() && !src.destroyed() ) {
 			PWX_DOUBLE_LOCK_GUARD( this, &src );
-			if ( !destroyed() && !src.destroyed() )
+			if ( !destroyed() && !src.destroyed() ) {
 				data = src.data;
+			}
 			// note: destroy method wrapped in data!
 		}
 	}
@@ -688,12 +695,11 @@ struct PWX_API TDoubleElement : public VElement {
 	  *
 	  * @return a read/write reference to the stored data.
 	**/
-	data_t& operator*() PWX_WARNUNUSED {
+	data_t &operator*() PWX_WARNUNUSED {
 		PWX_LOCK_GUARD( this );
-		if ( nullptr == data.get() )
-			PWX_THROW ( "NullDataException",
-			            "nullptr TDoubleElement<T>->data",
-			            "The data pointer to dereference is nullptr." );
+		if ( nullptr == data.get() ) PWX_THROW ( "NullDataException",
+		                                         "nullptr TDoubleElement<T>->data",
+		                                         "The data pointer to dereference is nullptr." );
 		return *data;
 	}
 
@@ -705,12 +711,11 @@ struct PWX_API TDoubleElement : public VElement {
 	  *
 	  * @return a read only reference to the stored data.
 	**/
-	data_t const& operator*() const PWX_WARNUNUSED {
+	data_t const &operator*() const PWX_WARNUNUSED {
 		PWX_LOCK_GUARD( this );
-		if ( nullptr == data.get() )
-			PWX_THROW ( "NullDataException",
-			            "nullptr TDoubleElement<T>->data",
-			            "The data pointer to dereference is nullptr." );
+		if ( nullptr == data.get() ) PWX_THROW ( "NullDataException",
+		                                         "nullptr TDoubleElement<T>->data",
+		                                         "The data pointer to dereference is nullptr." );
 		return *data;
 	}
 
@@ -719,9 +724,10 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] data_ const reference of the data to check
 	  * @return true if this element has the same data
 	**/
-	bool operator==( data_t const& data_ ) const noexcept PWX_WARNUNUSED {
-		if ( isFloatType( data_t ) )
+	bool operator==( data_t const &data_ ) const noexcept PWX_WARNUNUSED {
+		if ( isFloatType( data_t ) ) {
 			return areAlmostEqual( *data, data_ );
+		}
 		return *data == data_;
 	}
 
@@ -730,9 +736,10 @@ struct PWX_API TDoubleElement : public VElement {
 	  * @param[in] data_ const reference of the data to check
 	  * @return true if this element has different data
 	**/
-	bool operator!=( data_t const& data_ ) const noexcept PWX_WARNUNUSED {
-		if ( isFloatType( data_t ) )
+	bool operator!=( data_t const &data_ ) const noexcept PWX_WARNUNUSED {
+		if ( isFloatType( data_t ) ) {
 			return !areAlmostEqual( *data, data_ );
+		}
 		return !( *data == data_ );
 	}
 
@@ -779,8 +786,8 @@ private:
   * is only done if, and only if, this is the very last element
   * referencing this data.
 **/
-template<typename data_t>
-TDoubleElement<data_t>::~TDoubleElement() noexcept {
+template< typename data_t >
+TDoubleElement< data_t >::~TDoubleElement() noexcept {
 	PWX_LOCK_GUARD( this );
 	isDestroyed.store( true );
 
@@ -798,14 +805,14 @@ TDoubleElement<data_t>::~TDoubleElement() noexcept {
 			// lock was emptied.
 			if ( 1 == data.use_count() ) {
 				PWX_TRY( data.reset() ) // the shared_ptr will delete the data now
-				DEBUG_LOG_CAUGHT_STD( "TDoubleElement" )
-				catch( ... ) { }
+				log_debug_caught_std( "TDoubleElement" )
+				catch ( ... ) {}
 			}
 		} else {
 			// No thread safety? Then just do it!
 			PWX_TRY( data.reset() )
-			DEBUG_LOG_CAUGHT_STD( "TDoubleElement" )
-			catch( ... ) { }
+			log_debug_caught_std( "TDoubleElement" )
+			catch ( ... ) {}
 		}
 	}
 

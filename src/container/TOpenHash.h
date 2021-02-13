@@ -75,16 +75,16 @@ namespace pwx {
   * level of distribution. For keys not handled by these, or if you think you have
   * a better hash algorithm, you can set your own hash function with the constructor.
 **/
-template<typename key_t, typename data_t, typename elem_t = THashElement<key_t, data_t> >
-class PWX_API TOpenHash : public VTHashBase<key_t, data_t, elem_t> {
+template< typename key_t, typename data_t, typename elem_t = THashElement< key_t, data_t > >
+class PWX_API TOpenHash : public VTHashBase< key_t, data_t, elem_t > {
 public:
 	/* ===============================================
 	 * === Public types                            ===
 	 * ===============================================
 	*/
 
-	typedef VTHashBase<key_t, data_t, elem_t> base_t;     //!< Base type of the hash
-	typedef TOpenHash<key_t, data_t, elem_t> hash_t;     //!< Type of this hash
+	typedef VTHashBase< key_t, data_t, elem_t > base_t;     //!< Base type of the hash
+	typedef TOpenHash< key_t, data_t, elem_t >  hash_t;     //!< Type of this hash
 
 
 	/* ===============================================
@@ -114,10 +114,9 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TOpenHash(  uint32_t initSize, uint32_t keyLen_,
-	            double maxLoad_, double dynGrow_ ) noexcept:
-		base_t( initSize, keyLen_, maxLoad_, dynGrow_ )
-	{ }
+	TOpenHash( uint32_t initSize, uint32_t keyLen_,
+	           double maxLoad_, double dynGrow_ ) noexcept:
+		  base_t( initSize, keyLen_, maxLoad_, dynGrow_ ) {}
 
 
 	/** @brief full constructor with key length
@@ -137,13 +136,12 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TOpenHash(  uint32_t initSize,
-	            void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key, uint32_t keyLen ),
-	            uint32_t keyLen_,
-	            double maxLoad_, double dynGrow_ ) noexcept :
-		base_t( initSize, destroy_, hash_, keyLen_, maxLoad_, dynGrow_ )
-	{ }
+	TOpenHash( uint32_t initSize,
+	           void ( * destroy_ )( data_t* data ),
+	           uint32_t ( * hash_ )( const key_t* key, uint32_t keyLen ),
+	           uint32_t keyLen_,
+	           double maxLoad_, double dynGrow_ ) noexcept:
+		  base_t( initSize, destroy_, hash_, keyLen_, maxLoad_, dynGrow_ ) {}
 
 
 	/** @brief full constructor without key length
@@ -163,12 +161,11 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	TOpenHash(  uint32_t initSize,
-	            void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key ),
-	            double maxLoad_, double dynGrow_ ) :
-		base_t( initSize, destroy_, hash_, maxLoad_, dynGrow_ )
-	{ }
+	TOpenHash( uint32_t initSize,
+	           void ( * destroy_ )( data_t* data ),
+	           uint32_t ( * hash_ )( const key_t* key ),
+	           double maxLoad_, double dynGrow_ ) :
+		  base_t( initSize, destroy_, hash_, maxLoad_, dynGrow_ ) {}
 
 
 	/** @brief limiting user method constructor
@@ -180,11 +177,10 @@ public:
 	  * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
-	TOpenHash(  void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key, uint32_t keyLen ),
-	            uint32_t keyLen_ ) noexcept :
-		base_t( destroy_, hash_, keyLen_, 0.8, 1.5 )
-	{ }
+	TOpenHash( void ( * destroy_ )( data_t* data ),
+	           uint32_t ( * hash_ )( const key_t* key, uint32_t keyLen ),
+	           uint32_t keyLen_ ) noexcept:
+		  base_t( destroy_, hash_, keyLen_, 0.8, 1.5 ) {}
 
 
 	/** @brief user method constructor
@@ -195,10 +191,9 @@ public:
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	  * @param[in] hash_ A pointer to a function that can hash the keys that are stored and takes an optional keyLen
 	**/
-	TOpenHash(  void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key ) ) noexcept :
-		base_t( destroy_, hash_, 0.8, 1.5 )
-	{ }
+	TOpenHash( void ( * destroy_ )( data_t* data ),
+	           uint32_t ( * hash_ )( const key_t* key ) ) noexcept:
+		  base_t( destroy_, hash_, 0.8, 1.5 ) {}
 
 
 	/** @brief destroy method constructor
@@ -207,9 +202,8 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TOpenHash(  void ( *destroy_ ) ( data_t* data ) ) noexcept :
-		base_t( destroy_, 0.8, 1.5 )
-	{ }
+	TOpenHash( void ( * destroy_ )( data_t* data ) ) noexcept:
+		  base_t( destroy_, 0.8, 1.5 ) {}
 
 
 	/** @brief key length constructor
@@ -219,9 +213,8 @@ public:
 	  *
 	  * @param[in] keyLen_ optional limiting key length for C-Strings and std::string keys
 	**/
-	TOpenHash(  uint32_t keyLen_ ) noexcept :
-		base_t ( keyLen_, 0.8, 1.5 )
-	{ }
+	TOpenHash( uint32_t keyLen_ ) noexcept:
+		  base_t( keyLen_, 0.8, 1.5 ) {}
 
 
 	/** @brief empty constructor
@@ -230,9 +223,8 @@ public:
 	  * destroy method and the hash method to the null pointer with
 	  * full key usage
 	**/
-	TOpenHash() noexcept :
-		base_t ( 0.8, 1.5 )
-	{ }
+	TOpenHash() noexcept:
+		  base_t( 0.8, 1.5 ) {}
 
 
 	/** @brief copy constructor
@@ -244,8 +236,8 @@ public:
 	  *
 	  * @param[in] src reference of the hash to copy.
 	**/
-	TOpenHash(  const hash_t& src ) :
-		base_t ( src ) {
+	TOpenHash( const hash_t &src ) :
+		  base_t( src ) {
 		operator+=( src );
 	}
 
@@ -381,7 +373,7 @@ private:
 	  * @param[out] hops if not nullptr, the number of hops done to find the final position is noted in here.
 	  * @return the index an element with this key would have in the table
 	**/
-	virtual uint32_t privGetIndex( const key_t& key, bool allowVacated, uint32_t* hops ) const noexcept {
+	virtual uint32_t privGetIndex( const key_t &key, bool allowVacated, uint32_t* hops ) const noexcept {
 		uint32_t priHash = this->protGetHash( &key );
 
 		// Use multiplication method for the base index
@@ -393,59 +385,61 @@ private:
 		uint32_t idxStep = this->privGetStepping( priHash );
 
 		// Now probe the table until we are done or have found the key
-		bool     isFound     = false;
-		bool     isEmpty     = false;
-		bool     isVacated   = false;
-		bool     beRobinHood = allowVacated && hops;
-		uint32_t pos         = idxBase;
-		for ( uint32_t i = 0; !isFound && ( i < tabSize ); ++i ) {
+		bool           isFound     = false;
+		bool           isEmpty     = false;
+		bool           isVacated   = false;
+		bool           beRobinHood = allowVacated && hops;
+		uint32_t       pos         = idxBase;
+		for ( uint32_t i           = 0 ; !isFound && ( i < tabSize ) ; ++i ) {
 			isEmpty   = protIsEmpty( pos );
 			isVacated = protIsVacated( pos );
 
 			// we are done if ...
 			if ( // a) the hashTable is empty at pos
-			        isEmpty
-			        // b) the hashTable is vacated at pos and allowVacated is true or
-			        || ( isVacated && allowVacated )
-			        // c) the hashTable has an element with the same key
-			        || table_key_equals( pos, key )
-			        // d) beRobinHood is true and the position is taken, but the element has fewer hops
-			        //    with hops being greater than 1 and the resident has at least two less.
-			        || ( beRobinHood && !isVacated && ( *hops > 1 )
-			             && ( table_get( pos )->hops < ( *hops - 1 ) ) ) )
+				  isEmpty
+				  // b) the hashTable is vacated at pos and allowVacated is true or
+				  || ( isVacated && allowVacated )
+				  // c) the hashTable has an element with the same key
+				  || table_key_equals( pos, key )
+				  // d) beRobinHood is true and the position is taken, but the element has fewer hops
+				  //    with hops being greater than 1 and the resident has at least two less.
+				  || ( beRobinHood && !isVacated && ( *hops > 1 )
+				       && ( table_get( pos )->hops < ( *hops - 1 ) )
+				  ) ) {
 				isFound = true;
-			else {
+			} else {
 				pos = ( pos + idxStep ) % tabSize;
 				if ( hops ) ++( *hops );
 
 				// check whether the stepping goes round
 				if ( ( ( i + 1 ) < tabSize ) && ( pos == idxBase ) ) {
 					// This means the idx stepping is screwed
-					DEBUG_ERR( "open hash",
-					           "Unfull probing at hop %s: pos %u == base %u, step %u in size %u",
-					           hops ? pwx::to_string( *hops ).c_str() : "n/a",
-					           pos, idxBase, idxStep, tabSize );
+					log_debug_error( "open hash",
+					                 "Unfull probing at hop %s: pos %u == base %u, step %u in size %u",
+					                 hops ? pwx::to_string( *hops ).c_str() : "n/a",
+					                 pos, idxBase, idxStep, tabSize );
 					idxStep += idxStep % 2 ? 2 : 3;
 					// Be sure idxStep does not end up being tabSize or we'll be here again next round.
-					if ( idxStep >= tabSize )
+					if ( idxStep >= tabSize ) {
 						idxStep = 3;
+					}
 					pos = ( pos + idxStep ) % tabSize;
 				}
 			}
 		} // end of traversing the table
 
-		#if LIBPWX_DEBUG
+#if LIBPWX_DEBUG
 		if ( hops && ( *hops == tabSize ) ) {
 			// This is really bad!
-			DEBUG_ERR( "open hash", "\n---\nHash table seems to be full or %s is screwed:", PWX_FUNC );
-			DEBUG_ERR( "open hash", "  Table size : %u", tabSize );
-			DEBUG_ERR( "open hash", "  Elements   : %u", this->eCount.load( memOrdLoad ) );
-			DEBUG_ERR( "open hash", "  Hops done  : %u", *hops ); // Trivial, but the if() is not part of the output
-			DEBUG_ERR( "open hash", "  Initial Idx: %u", idxBase % tabSize );
-			DEBUG_ERR( "open hash", "  Stepping   : %u", idxStep );
-			DEBUG_ERR( "open hash", "  1st Hash   : %u\n---", priHash );
+			log_debug_error( "open hash", "\n---\nHash table seems to be full or %s is screwed:", PWX_FUNC );
+			log_debug_error( "open hash", "  Table size : %u", tabSize );
+			log_debug_error( "open hash", "  Elements   : %u", this->eCount.load( memOrdLoad ) );
+			log_debug_error( "open hash", "  Hops done  : %u", *hops ); // Trivial, but the if() is not part of the output
+			log_debug_error( "open hash", "  Initial Idx: %u", idxBase % tabSize );
+			log_debug_error( "open hash", "  Stepping   : %u", idxStep );
+			log_debug_error( "open hash", "  1st Hash   : %u\n---", priHash );
 		}
-		#endif // LIBPWX_DEBUG
+#endif // LIBPWX_DEBUG
 
 		// Now "pos" points at the first nullptr place found,
 		// the first vacated position if accepted or to an
@@ -469,7 +463,7 @@ private:
 	  * @param[in] key const reference of the key to evaluate
 	  * @return the index an element with this key would have in the table
 	**/
-	virtual uint32_t privGetIndex( const key_t& key ) const noexcept {
+	virtual uint32_t privGetIndex( const key_t &key ) const noexcept {
 		return privGetIndex( key, false, nullptr );
 	}
 
@@ -481,21 +475,23 @@ private:
 		uint32_t tabSize  = hashSize.load( memOrdLoad );
 		uint32_t secSize  = tabSize - ( tabSize % 2 ? 2 : 1 );
 
-		if ( CHM_Division == CHMethod )
+		if ( CHM_Division == CHMethod ) {
 			stepping = secHash % secSize;
-		else {
+		} else {
 			double dHash = static_cast<double>( secHash ) * 0.618;
-			stepping     = static_cast<uint32_t>( std::floor( ( dHash - std::floor( dHash ) ) * secSize ) );
+			stepping = static_cast<uint32_t>( std::floor( ( dHash - std::floor( dHash ) ) * secSize ) );
 		}
 
 		// Be sure stepping is sane:
-		if ( stepping < 3 )
+		if ( stepping < 3 ) {
 			// On odd sizes a step of 2 always traverses all positions.
 			stepping = tabSize % 2 ? 2 : 3;
+		}
 
 		// Both must not be the same, even or odd
-		if ( ( tabSize % 2 ) == ( stepping % 2 ) )
+		if ( ( tabSize % 2 ) == ( stepping % 2 ) ) {
 			++stepping;
+		}
 
 		/* An important part is to make sure that the stepping
 		* must not be n/(n+1) of the table size, or the stepping
@@ -505,8 +501,8 @@ private:
 		*/
 		bool isAdapted = true;
 		while ( isAdapted ) {
-			isAdapted = false;
-			for ( uint32_t n = 3; !isAdapted && ( n < 9 ); ++n ) {
+			isAdapted        = false;
+			for ( uint32_t n = 3 ; !isAdapted && ( n < 9 ) ; ++n ) {
 				if ( stepping == ( tabSize * n / ( n + 1 ) ) ) {
 					isAdapted = true;
 					stepping += 2;
@@ -522,7 +518,7 @@ private:
 			// And the stepping must not grow larger than tabSize
 			if ( stepping > tabSize ) {
 				isAdapted = true;
-				stepping = stepping % tabSize;
+				stepping  = stepping % tabSize;
 			}
 		} // end of detecting dangerous fractions of tabSize.
 
@@ -532,40 +528,41 @@ private:
 
 	/// @brief private insertion relying on privGetIndex() to resolve collisions
 	virtual uint32_t privInsert( elem_t* elem ) {
-		uint32_t  idx  = privGetIndex( elem->key, true, &( elem->hops ) );
+		uint32_t idx = privGetIndex( elem->key, true, &( elem->hops ) );
 
-		#if LIBPWX_DEBUG
+#if LIBPWX_DEBUG
 		// The position must not be occupied unless the hop count is smaller
 		// Note: This used to be an assert, but the checks are too flat then.
-		uint32_t tabSize  = this->hashSize.load( memOrdLoad );
+		uint32_t tabSize = this->hashSize.load( memOrdLoad );
 		if ( idx >= tabSize ) {
-			DEBUG_ERR( "open hash",
-			           "privGetIndex returned %u on table size %u (insert key: \"%s\")",
-			           idx, tabSize, pwx::to_string( elem->key ).c_str() );
+			log_debug_error( "open hash",
+			                 "privGetIndex returned %u on table size %u (insert key: \"%s\")",
+			                 idx, tabSize, pwx::to_string( elem->key ).c_str() );
 			PWX_THROW( "out of bounds", "Index too large",
 			           "The index returned by privGetIndex() is larger than the table size" );
 		}
 		if ( ( nullptr != table_get( idx ) )
-		                && ( !protIsVacated( idx ) )
-		                && ( ( table_get( idx )->hops >= elem->hops )
-		                     || ( table_key_equals( idx, elem->key ) ) ) ) {
+		     && ( !protIsVacated( idx ) )
+		     && ( ( table_get( idx )->hops >= elem->hops )
+		          || ( table_key_equals( idx, elem->key ) )
+		     ) ) {
 			if ( table_key_equals( idx, elem->key ) ) {
-				DEBUG_ERR( "open hash",
-				           "privInsert called with key \"%s\", already found at index %u",
-				           pwx::to_string( elem->key ).c_str(), idx );
-				DEBUG_ERR( "open hash", " -> table size %u, hops performed %u", tabSize, elem->hops );
+				log_debug_error( "open hash",
+				                 "privInsert called with key \"%s\", already found at index %u",
+				                 pwx::to_string( elem->key ).c_str(), idx );
+				log_debug_error( "open hash", " -> table size %u, hops performed %u", tabSize, elem->hops );
 				PWX_THROW( "illegal index", "key already exists",
 				           "privInsert called with an already stored key!" );
 			} else if ( table_get( idx )->hops >= elem->hops ) {
-				DEBUG_ERR( "open hash",
-				           "Robin Hood failed and delivered %u hops when we have %u",
-				           table_get( idx )->hops, elem->hops );
-				DEBUG_ERR( "open hash", " -> table size %u", tabSize );
+				log_debug_error( "open hash",
+				                 "Robin Hood failed and delivered %u hops when we have %u",
+				                 table_get( idx )->hops, elem->hops );
+				log_debug_error( "open hash", " -> table size %u", tabSize );
 				PWX_THROW( "illegal index", "not enough hops",
 				           "An element to replace has more or equal hops" );
 			}
 		}
-		#endif // LIBPWX_DEBUG
+#endif // LIBPWX_DEBUG
 
 		/* There are two possible situations now:
 		 * a) the position is occupied, but the element
@@ -576,26 +573,28 @@ private:
 		 *    -> insert new element here
 		*/
 		elem_t* oldElem = nullptr;
-		if ( !protIsUnused( idx ) )
+		if ( !protIsUnused( idx ) ) {
 			// This is situation a)
 			oldElem = this->privRemoveIdx( idx );
+		}
 		table_set( idx, elem ); // Fulfills both situations
 		elem->insertAsFirst();
 		eCount.fetch_add( 1, memOrdStore );
 
 		// Now solve situation a)
 		while ( oldElem ) {
-			elem       = oldElem;
-			oldElem    = nullptr;
+			elem    = oldElem;
+			oldElem = nullptr;
 			elem->hops = 0;
 
 			// A quick note: privGetIndex already takes care of counting and comparing hops.
 			// So the index returned points to a vacated position or one with fewer hops than
 			// needed to get there.
 			idx = privGetIndex( elem->key, true, &( elem->hops ) );
-			if ( !protIsUnused( idx ) )
+			if ( !protIsUnused( idx ) ) {
 				// This is situation a) again
 				oldElem = this->privRemoveIdx( idx );
+			}
 			table_set( idx, elem ); // Item is moved
 			elem->insertAsFirst();
 			eCount.fetch_add( 1, memOrdStore );
@@ -614,7 +613,7 @@ private:
 	  * @param[in] index the index to remove
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemoveIdx ( uint32_t index ) noexcept {
+	virtual elem_t* privRemoveIdx( uint32_t index ) noexcept {
 		elem_t* result = nullptr;
 		if ( ( index < this->hashSize.load( memOrdLoad ) ) && ( result = table_get( index ) ) ) {
 			table_vacate( index );
@@ -633,7 +632,7 @@ private:
 	  * @param[in] key the key of the element to remove has
 	  * @return a pointer to the removed element or nullptr if no such element exists
 	**/
-	virtual elem_t* privRemoveKey ( const key_t& key ) noexcept {
+	virtual elem_t* privRemoveKey( const key_t &key ) noexcept {
 		return privRemoveIdx( privGetIndex( key ) );
 	}
 }; // class TOpenHash
@@ -643,9 +642,8 @@ private:
   * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the hash.
 **/
-template<typename key_t, typename data_t, typename elem_t>
-TOpenHash<key_t, data_t, elem_t>::~TOpenHash() noexcept
-{ /* all done in base_t dtor */ }
+template< typename key_t, typename data_t, typename elem_t >
+TOpenHash< key_t, data_t, elem_t >::~TOpenHash() noexcept { /* all done in base_t dtor */ }
 
 
 /** @brief addition operator
@@ -664,9 +662,9 @@ TOpenHash<key_t, data_t, elem_t>::~TOpenHash() noexcept
   * @param[in] rhs right hand side reference
   * @return the new hash.
 **/
-template<typename data_t, typename elem_t>
-TOpenHash<data_t, elem_t> operator+ ( const TOpenHash<data_t, elem_t>& lhs, const TOpenHash<data_t, elem_t>& rhs ) {
-	TOpenHash<data_t, elem_t> result( lhs );
+template< typename data_t, typename elem_t >
+TOpenHash< data_t, elem_t > operator+( const TOpenHash< data_t, elem_t > &lhs, const TOpenHash< data_t, elem_t > &rhs ) {
+	TOpenHash< data_t, elem_t > result( lhs );
 
 	if ( &lhs != &rhs )
 		PWX_TRY_PWX_FURTHER( result += rhs );
@@ -689,14 +687,15 @@ TOpenHash<data_t, elem_t> operator+ ( const TOpenHash<data_t, elem_t>& lhs, cons
   * @param[in] rhs reference of the hash to substract.
   * @return reference to this.
 **/
-template<typename data_t, typename elem_t>
-TOpenHash<data_t, elem_t> operator- ( const TOpenHash<data_t, elem_t>& lhs, const TOpenHash<data_t, elem_t>& rhs ) {
-	TOpenHash<data_t, elem_t> result( lhs );
+template< typename data_t, typename elem_t >
+TOpenHash< data_t, elem_t > operator-( const TOpenHash< data_t, elem_t > &lhs, const TOpenHash< data_t, elem_t > &rhs ) {
+	TOpenHash< data_t, elem_t > result( lhs );
 
 	if ( &lhs != &rhs ) {
 		PWX_TRY_PWX_FURTHER( result -= rhs );
-	} else
+	} else {
 		result.clear();
+	}
 
 	return result;
 }

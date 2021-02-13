@@ -59,72 +59,72 @@ namespace pwx {
 
 /// @brief Support macro to start growing a hashtable only when it is save to do so
 #define HASH_START_GROW \
-	growing.fetch_add(1, memOrdStore); \
-	PWX_LOCK_GUARD(this); \
-	while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
-		PWX_LOCK_GUARD_RESET(this); \
-	}
+    growing.fetch_add(1, memOrdStore); \
+    PWX_LOCK_GUARD(this); \
+    while ( removing.load(memOrdLoad) || inserting.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
+        PWX_LOCK_GUARD_RESET(this); \
+    }
 
 
 /// @brief Support macro to stop growing a hastable
 #define HASH_STOP_GROW \
-	growing.fetch_sub(1, memOrdStore); \
-	PWX_LOCK_GUARD_CLEAR()
+    growing.fetch_sub(1, memOrdStore); \
+    PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to start inserting an element only when it is save to do so
 #define HASH_START_INSERT \
-	PWX_LOCK_GUARD(this); \
-	while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
-		PWX_LOCK_GUARD_RESET(this); \
-	} \
-	inserting.fetch_add(1, memOrdStore)
+    PWX_LOCK_GUARD(this); \
+    while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
+        PWX_LOCK_GUARD_RESET(this); \
+    } \
+    inserting.fetch_add(1, memOrdStore)
 
 
 /// @brief Support macro to stop inserting an element
 #define HASH_STOP_INSERT \
-	inserting.fetch_sub(1, memOrdStore); \
-	PWX_LOCK_GUARD_CLEAR()
+    inserting.fetch_sub(1, memOrdStore); \
+    PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to start removing an element only when it is save to do so
 #define HASH_START_REMOVE \
-	PWX_LOCK_GUARD(this); \
-	if (this->isDestroyed.load()) return 0; \
-	while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
-		PWX_LOCK_GUARD_RESET(this); \
-	}  \
-	removing.fetch_add(1, memOrdStore)
+    PWX_LOCK_GUARD(this); \
+    if (this->isDestroyed.load()) return 0; \
+    while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
+        PWX_LOCK_GUARD_RESET(this); \
+    }  \
+    removing.fetch_add(1, memOrdStore)
 
 
 /// @brief Support macro to stop removing an element
 #define HASH_STOP_REMOVE \
-	removing.fetch_sub(1, memOrdStore); \
-	PWX_LOCK_GUARD_CLEAR()
+    removing.fetch_sub(1, memOrdStore); \
+    PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to wait for possible growing actions to finish
 #define HASH_WAIT_FOR_CLEAR_AND_GROW \
-	PWX_LOCK_GUARD(this); \
-	while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
-		PWX_LOCK_GUARD_RESET(this); \
-	} \
-	PWX_LOCK_GUARD_CLEAR()
+    PWX_LOCK_GUARD(this); \
+    while ( growing.load(memOrdLoad) || clearing.load(memOrdLoad) ) { \
+        PWX_LOCK_GUARD_RESET(this); \
+    } \
+    PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to have the clear method wait until all actions ceased
 #define HASH_START_CLEAR \
-	PWX_LOCK_GUARD(this); \
-	while ( removing.load(memOrdLoad) ||  growing.load(memOrdLoad) ||  inserting.load(memOrdLoad) ) { \
-		PWX_LOCK_GUARD_RESET(this); \
-	} \
-	clearing.fetch_add(1, memOrdStore); \
-	PWX_LOCK_GUARD_CLEAR()
+    PWX_LOCK_GUARD(this); \
+    while ( removing.load(memOrdLoad) ||  growing.load(memOrdLoad) ||  inserting.load(memOrdLoad) ) { \
+        PWX_LOCK_GUARD_RESET(this); \
+    } \
+    clearing.fetch_add(1, memOrdStore); \
+    PWX_LOCK_GUARD_CLEAR()
 
 
 /// @brief Support macro to notifiy other threads that the container is cleared
 #define HASH_STOP_CLEAR \
-	clearing.fetch_sub(1, memOrdStore)
+    clearing.fetch_sub(1, memOrdStore)
 
 
 /** @brief two-type enum determining the hashing type
@@ -155,7 +155,7 @@ enum eChainHashMethod {
   * in TChainHash and TOpenHash to provide the proper
   * collision resolving.
 **/
-template<typename key_t, typename data_t, typename elem_t = THashElement<key_t, data_t> >
+template< typename key_t, typename data_t, typename elem_t = THashElement< key_t, data_t > >
 class VTHashBase : public VContainer {
 public:
 	/* ===============================================
@@ -164,7 +164,7 @@ public:
 	*/
 
 	typedef VContainer                          base_t; //!< Base type of the hash
-	typedef VTHashBase<key_t, data_t, elem_t>   hash_t; //!< Type of this hash
+	typedef VTHashBase< key_t, data_t, elem_t > hash_t; //!< Type of this hash
 
 
 	/* ===============================================
@@ -191,21 +191,22 @@ public:
 	**/
 	VTHashBase( uint32_t initSize, uint32_t keyLen_,
 	            double maxLoad_, double dynGrow_ )
-		: hashBuilder  ( keyLen_ )
-		, hashSize     ( initSize )
-		, dynGrowFactor( dynGrow_ )
-		, maxLoadFactor( maxLoad_ )
-		, hashTable    ( nullptr )
-		, hashTableLock()
-		, vacChar      ( nullptr )
-		, vacated      ( nullptr ) {
+		  : hashBuilder( keyLen_ )
+		    , hashSize( initSize )
+		    , dynGrowFactor( dynGrow_ )
+		    , maxLoadFactor( maxLoad_ )
+		    , hashTable( nullptr )
+		    , hashTableLock()
+		    , vacChar( nullptr )
+		    , vacated( nullptr ) {
 
 		// Generate the hash table
 		try {
 			hashTable = new elem_t* [hashSize];
-			for ( size_t i = 0; i < hashSize; ++i )
+			for ( size_t i = 0 ; i < hashSize ; ++i ) {
 				// We can do this directly in a ctor. No other thread here, yet
 				hashTable[i] = nullptr;
+			}
 			/* Why do we not set this to 'vacated'?
 			 * If an open hash element needs more than one hop, and an element that caused
 			 * one of the hops gets removed, it's bucket is marked as being 'vacated'. This is
@@ -239,13 +240,13 @@ public:
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
 	VTHashBase( uint32_t initSize,
-	            void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key, uint32_t keyLen ),
+	            void ( * destroy_ )( data_t* data ),
+	            uint32_t ( * hash_ )( const key_t* key, uint32_t keyLen ),
 	            uint32_t keyLen_,
 	            double maxLoad_, double dynGrow_ ) noexcept
-		: hash_t( initSize, keyLen_, maxLoad_, dynGrow_ ) {
+		  : hash_t( initSize, keyLen_, maxLoad_, dynGrow_ ) {
 
-		destroy = destroy_;
+		destroy      = destroy_;
 		hash_limited = hash_;
 	}
 
@@ -263,12 +264,12 @@ public:
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
 	VTHashBase( uint32_t initSize,
-	            void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key ),
+	            void ( * destroy_ )( data_t* data ),
+	            uint32_t ( * hash_ )( const key_t* key ),
 	            double maxLoad_, double dynGrow_ )
-		: hash_t( initSize, ( uint32_t )0, maxLoad_, dynGrow_ ) {
+		  : hash_t( initSize, (uint32_t) 0, maxLoad_, dynGrow_ ) {
 
-		destroy = destroy_;
+		destroy   = destroy_;
 		hash_user = hash_;
 	}
 
@@ -284,13 +285,13 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase( void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key, uint32_t keyLen ),
+	VTHashBase( void ( * destroy_ )( data_t* data ),
+	            uint32_t ( * hash_ )( const key_t* key, uint32_t keyLen ),
 	            uint32_t keyLen_,
 	            double maxLoad_, double dynGrow_ ) noexcept
-		: hash_t( ( uint32_t )100, keyLen_, maxLoad_, dynGrow_ ) {
+		  : hash_t( (uint32_t) 100, keyLen_, maxLoad_, dynGrow_ ) {
 
-		destroy = destroy_;
+		destroy      = destroy_;
 		hash_limited = hash_;
 	}
 
@@ -305,12 +306,12 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase( void ( *destroy_ ) ( data_t* data ),
-	            uint32_t ( *hash_ ) ( const key_t* key ),
+	VTHashBase( void ( * destroy_ )( data_t* data ),
+	            uint32_t ( * hash_ )( const key_t* key ),
 	            double maxLoad_, double dynGrow_ ) noexcept
-		: hash_t( ( uint32_t )100, ( uint32_t )0, maxLoad_, dynGrow_ ) {
+		  : hash_t( (uint32_t) 100, (uint32_t) 0, maxLoad_, dynGrow_ ) {
 
-		destroy = destroy_;
+		destroy   = destroy_;
 		hash_user = hash_;
 	}
 
@@ -323,9 +324,9 @@ public:
 	  * @param[in] maxLoad_ maximum load factor that triggers automatic growth.
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
-	VTHashBase( void ( *destroy_ ) ( data_t* data ),
+	VTHashBase( void ( * destroy_ )( data_t* data ),
 	            double maxLoad_, double dynGrow_ ) noexcept
-		: hash_t( ( uint32_t )100, ( uint32_t )0, maxLoad_, dynGrow_ ) {
+		  : hash_t( (uint32_t) 100, (uint32_t) 0, maxLoad_, dynGrow_ ) {
 
 		destroy = destroy_;
 	}
@@ -342,8 +343,7 @@ public:
 	**/
 	VTHashBase( uint32_t keyLen_,
 	            double maxLoad_, double dynGrow_ ) noexcept
-		: hash_t ( ( uint32_t )100, keyLen_, maxLoad_, dynGrow_ )
-	{ }
+		  : hash_t( (uint32_t) 100, keyLen_, maxLoad_, dynGrow_ ) {}
 
 
 	/** @brief pseudo empty constructor
@@ -361,8 +361,7 @@ public:
 	  * @param[in] dynGrow_ growth rate applied when the maximum load factor is reached.
 	**/
 	VTHashBase( double maxLoad_, double dynGrow_ ) noexcept
-		: hash_t ( ( uint32_t )100, ( uint32_t )0, maxLoad_, dynGrow_ )
-	{ }
+		  : hash_t( (uint32_t) 100, (uint32_t) 0, maxLoad_, dynGrow_ ) {}
 
 
 	/// Empty ctor is not available
@@ -381,16 +380,16 @@ public:
 	  *
 	  * @param[in] src reference of the hash to copy.
 	**/
-	VTHashBase( const hash_t& src )
-		: base_t ( src )
-		, destroy( src.destroy )
-		, hash_user( src.hash_user )
-		, hash_limited( src.hash_limited )
-		, hashBuilder ( src.hashBuilder.getKeyLen() )
-		, hashSize ( 0 ) // Set after making sure src isn't growing
-		, hashTable ( nullptr )
-		, maxLoadFactor( src.maxLoadFactor )
-		, dynGrowFactor( src.dynGrowFactor ) {
+	VTHashBase( const hash_t &src )
+		  : base_t( src )
+		    , destroy( src.destroy )
+		    , hash_user( src.hash_user )
+		    , hash_limited( src.hash_limited )
+		    , hashBuilder( src.hashBuilder.getKeyLen() )
+		    , hashSize( 0 ) // Set after making sure src isn't growing
+		    , hashTable( nullptr )
+		    , maxLoadFactor( src.maxLoadFactor )
+		    , dynGrowFactor( src.dynGrowFactor ) {
 
 		PWX_LOCK_GUARD( &src );
 		while ( src.growing.load( memOrdLoad ) > 0 ) {
@@ -403,9 +402,10 @@ public:
 		// Generate the hash table
 		try {
 			hashTable = new elem_t* [hashSize];
-			for ( uint32_t i = 0; i < hashSize; ++i )
+			for ( uint32_t i = 0 ; i < hashSize ; ++i ) {
 				// We can do this directly in a copy ctor. No other thread here, yet
 				hashTable[i] = nullptr;
+			}
 			/* Why do we not set this to 'vacated'? See main ctor why. */
 		}
 		PWX_THROW_STD_FURTHER( "VTHashBaseCopyFailure", "HashTable could not be created" );
@@ -436,7 +436,7 @@ public:
 	  * @param[in] src reference of the element to copy
 	  * @return the resulting number of stored elements
 	**/
-	virtual uint32_t add( const elem_t& src ) {
+	virtual uint32_t add( const elem_t &src ) {
 		// Use double search to only lock if the key is
 		// not found in the first run
 		if ( !this->privGet( src.key ) ) {
@@ -452,11 +452,11 @@ public:
 				double maxSize = sizeMax();
 				if ( ( newSize / maxSize ) > maxLoadFactor ) {
 					PWX_TRY_PWX_FURTHER(
-					        grow( static_cast<uint32_t>( maxSize * dynGrowFactor ) ) )
+						  grow( static_cast<uint32_t>( maxSize * dynGrowFactor ) ) )
 				}
 
 			} else
-				HASH_STOP_INSERT;
+			HASH_STOP_INSERT;
 		}
 
 		return this->size();
@@ -472,7 +472,7 @@ public:
 	  * @param[in] data pointer to the data of the new element
 	  * @return the resulting number of stored elements
 	**/
-	virtual uint32_t add( const key_t& key, data_t* data ) {
+	virtual uint32_t add( const key_t &key, data_t* data ) {
 		// Use double search to only lock if the key is
 		// not found in the first run
 		if ( !this->privGet( key ) ) {
@@ -488,11 +488,11 @@ public:
 				double maxSize = sizeMax();
 				if ( ( newSize / maxSize ) > maxLoadFactor ) {
 					PWX_TRY_PWX_FURTHER(
-					        grow( static_cast<uint32_t>( maxSize * dynGrowFactor ) ) )
+						  grow( static_cast<uint32_t>( maxSize * dynGrowFactor ) ) )
 				}
 
 			} else
-				HASH_STOP_INSERT;
+			HASH_STOP_INSERT;
 		}
 
 		return this->size();
@@ -511,10 +511,10 @@ public:
 		/* IMPORTANT: this method MUST NOT call other public
 		 * methods, or it will freeze waiting for itself to stop!
 		 */
-		elem_t*   toDel   = nullptr;
-		elem_t*   delNext = nullptr;
-		uint32_t  pos     = 0;
-		uint32_t  tabSize = sizeMax();
+		elem_t* toDel   = nullptr;
+		elem_t* delNext = nullptr;
+		uint32_t pos     = 0;
+		uint32_t tabSize = sizeMax();
 
 		if ( !hashTable ) return; // Should never happen
 
@@ -525,8 +525,8 @@ public:
 			// call this method. Otherwise, no matter what we do, the destruction of elements
 			// will cause data races.
 			PWX_DOUBLE_LOCK_GUARD( this, &hashTableLock );
-			toDel = hashTable[ pos ];
-			if ( toDel && (toDel != vacated) && !toDel->destroyed() && toDel->try_lock() ) {
+			toDel = hashTable[pos];
+			if ( toDel && ( toDel != vacated ) && !toDel->destroyed() && toDel->try_lock() ) {
 				// This thread has exclusive access, but it
 				// must be ensured that no other thread is
 				// in the destructor unlock cycle:
@@ -535,13 +535,13 @@ public:
 					continue;
 				}
 
-				hashTable[ pos ] = nullptr;
+				hashTable[pos] = nullptr;
 				PWX_DOUBLE_LOCK_GUARD_CLEAR(); // exclusive enough, now.
 
 				// remove a possible chain:
 				while ( ( delNext = toDel->removeNext() )
-				                && !delNext->destroyed()
-				                && delNext != toDel ) {
+				        && !delNext->destroyed()
+				        && delNext != toDel ) {
 					--eCount;
 					delete delNext;
 					// Note: The destroy() method is used in the delete operator, not here!
@@ -555,8 +555,9 @@ public:
 			};
 
 			// Advance and wrap:
-			if ( ++pos >= tabSize )
+			if ( ++pos >= tabSize ) {
 				pos = 0;
+			}
 		} // end of looping the hash table
 
 		HASH_STOP_CLEAR;
@@ -578,11 +579,11 @@ public:
 	  * @param elem reference to the element to delete
 	  * @return The number of elements after the operation.
 	**/
-	virtual uint32_t delElem( elem_t& elem ) {
+	virtual uint32_t delElem( elem_t &elem ) {
 		HASH_START_REMOVE;
 
 		uint32_t remaining = 0;
-		elem_t*  toDelete  = privRemoveKey( elem.key );
+		elem_t* toDelete = privRemoveKey( elem.key );
 
 		PWX_TRY_PWX_FURTHER( remaining = protDelete( toDelete ) );
 
@@ -606,11 +607,11 @@ public:
 	  * @param key reference to the key to search for
 	  * @return The number of elements after the operation.
 	**/
-	virtual uint32_t delKey( const key_t& key ) {
+	virtual uint32_t delKey( const key_t &key ) {
 		HASH_START_REMOVE;
 
 		uint32_t remaining = 0;
-		elem_t*  toDelete  = privRemoveKey( key );
+		elem_t* toDelete = privRemoveKey( key );
 
 		PWX_TRY_PWX_FURTHER( remaining = protDelete( toDelete ) );
 
@@ -643,9 +644,9 @@ public:
 		// the lock can finish their business first
 		PWX_LOCK_GUARD_RESET( this );
 
-		uint32_t  pos       = 0;
-		uint32_t  tabSize   = this->sizeMax();
-		elem_t*   xCurr     = nullptr;
+		uint32_t pos     = 0;
+		uint32_t tabSize = this->sizeMax();
+		elem_t* xCurr = nullptr;
 		while ( pos < tabSize ) {
 			xCurr = table_get( pos );
 			if ( xCurr ) {
@@ -681,9 +682,9 @@ public:
 
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 
-		uint32_t  pos       = 0;
-		uint32_t  tabSize   = this->sizeMax();
-		elem_t*   xCurr     = nullptr;
+		uint32_t pos     = 0;
+		uint32_t tabSize = this->sizeMax();
+		elem_t* xCurr = nullptr;
 		while ( pos < tabSize ) {
 			xCurr = table_get( pos );
 			if ( xCurr ) {
@@ -698,7 +699,7 @@ public:
 
 
 	/// @brief return true if an element with @a key exists
-	virtual bool exists( const key_t& key ) const noexcept {
+	virtual bool exists( const key_t &key ) const noexcept {
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return this->privGet( key ) ? true : false;
 	}
@@ -709,7 +710,7 @@ public:
 	  * @param[in] key the key to search for
 	  * @return a const pointer to the element or nullptr if the key could not be found.
 	**/
-	virtual elem_t* get( const key_t& key ) const noexcept {
+	virtual elem_t* get( const key_t &key ) const noexcept {
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return this->privGet( key );
 	}
@@ -720,7 +721,7 @@ public:
 	  * @param[in] key the key to search for
 	  * @return a pointer to the element or nullptr if the key could not be found.
 	**/
-	virtual elem_t* get( const key_t& key ) noexcept {
+	virtual elem_t* get( const key_t &key ) noexcept {
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return const_cast<elem_t*>( this->privGet( key ) );
 	}
@@ -734,7 +735,7 @@ public:
 	  * @param[in] key the key to search for
 	  * @return a read/write reference to the stored data.
 	**/
-	virtual data_t& getData( const key_t& key ) const {
+	virtual data_t &getData( const key_t &key ) const {
 		PWX_TRY_PWX_FURTHER( return **( get( key ) ) );
 	}
 
@@ -747,7 +748,7 @@ public:
 	  * @param[in] key the key to search for
 	  * @return a read/write reference to the stored data.
 	**/
-	virtual data_t& getData( const key_t& key ) {
+	virtual data_t &getData( const key_t &key ) {
 		PWX_TRY_PWX_FURTHER( return **( get( key ) ) );
 	}
 
@@ -762,11 +763,12 @@ public:
 	  * @param[in] key The key to search for
 	  * @return number of hops needed.
 	**/
-	virtual uint32_t getHops( const key_t& key ) const noexcept {
+	virtual uint32_t getHops( const key_t &key ) const noexcept {
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		elem_t* elem = privGet( key );
-		if ( elem )
+		if ( elem ) {
 			return elem->hops;
+		}
 		return 0;
 	}
 
@@ -794,7 +796,7 @@ public:
 			uint32_t oldSize = hashSize.load( memOrdLoad );
 
 			if ( targetSize > oldSize ) {
-				DEBUG_LOG( "Hash Grow", "Growing hash table from %u top %u", oldSize, targetSize );
+				log_debug( "Hash Grow", "Growing hash table from %u top %u", oldSize, targetSize );
 
 				// --- Create a new larger table ---
 				PWX_NAMED_LOCK_GUARD( table_lock, &hashTableLock );
@@ -806,8 +808,9 @@ public:
 					eCount.store( 0, memOrdStore );
 
 					// --- "nullify" the new table ---
-					for ( uint32_t i = 0; i < targetSize; ++i )
+					for ( uint32_t i = 0 ; i < targetSize ; ++i ) {
 						table_set( i, nullptr );
+					}
 				}
 				PWX_THROW_STD_FURTHER( "GrowFailure", "Larger HashTable could not be created" );
 
@@ -818,9 +821,9 @@ public:
 				hashSize.store( targetSize, memOrdStore );
 
 				// --- Copy all elements ---
-				elem_t*   toMove    = nullptr;
-				elem_t*   xNext     = nullptr;
-				uint32_t  pos       = 0;
+				elem_t* toMove = nullptr;
+				elem_t* xNext  = nullptr;
+				uint32_t pos = 0;
 
 				while ( pos < oldSize ) {
 					// Note: hashTableLock is still locked, so we can directly edit the tables
@@ -843,7 +846,7 @@ public:
 				}
 
 				// --- Delete old table ---
-				PWX_TRY_STD_FURTHER( delete [] oldTab, "Delete failed",
+				PWX_TRY_STD_FURTHER( delete[] oldTab, "Delete failed",
 				                     "Deleting the old table after growing into a new table failed." )
 			} // End of inner size check
 
@@ -890,14 +893,15 @@ public:
 
 			uint32_t maxPos = sizeMax();
 			uint32_t pos    = maxPos;
-			elem_t*  elem   = nullptr;
+			elem_t* elem = nullptr;
 
 			while ( pos && ( eCount.load( std::memory_order_relaxed ) > 0 ) ) {
 				elem = table_get( --pos );
 				if ( elem && elem->inserted() && !elem->destroyed() ) {
 					PWX_NAMED_LOCK_GUARD( ElemRemover, elem );
-					if ( elem->inserted() && !elem->destroyed() )
+					if ( elem->inserted() && !elem->destroyed() ) {
 						return privRemoveIdx( pos );
+					}
 				}
 			}
 
@@ -928,14 +932,15 @@ public:
 
 			uint32_t maxPos = sizeMax();
 			uint32_t pos    = 0;
-			elem_t*  elem   = nullptr;
+			elem_t* elem = nullptr;
 
 			while ( ( pos < maxPos ) && ( eCount.load( std::memory_order_relaxed ) > 0 ) ) {
 				elem = table_get( pos++ );
 				if ( elem && elem->inserted() && !elem->destroyed() ) {
 					PWX_NAMED_LOCK_GUARD( ElemRemover, elem );
-					if ( elem->inserted() && !elem->destroyed() )
+					if ( elem->inserted() && !elem->destroyed() ) {
 						return privRemoveIdx( pos );
+					}
 				}
 			}
 
@@ -947,37 +952,37 @@ public:
 
 
 	/// @brief simple wrapper to add() to be conformant with the other container types
-	virtual uint32_t push ( const key_t& key, data_t* data ) {
+	virtual uint32_t push( const key_t &key, data_t* data ) {
 		PWX_TRY_PWX_FURTHER( return this->add( key, data ) )
 	}
 
 
 	/// @brief simple wrapper to add() to be conformant with the other container types
-	virtual uint32_t push ( const elem_t& src ) {
+	virtual uint32_t push( const elem_t &src ) {
 		PWX_TRY_PWX_FURTHER( return this->add( src ) )
 	}
 
 
 	/// @brief simple wrapper to add() to be conformant with the other container types
-	virtual uint32_t push_back ( const key_t& key, data_t* data ) {
+	virtual uint32_t push_back( const key_t &key, data_t* data ) {
 		PWX_TRY_PWX_FURTHER( return this->add( key, data ) )
 	}
 
 
 	/// @brief simple wrapper to add() to be conformant with the other container types
-	virtual uint32_t push_back ( const elem_t& src ) {
+	virtual uint32_t push_back( const elem_t &src ) {
 		PWX_TRY_PWX_FURTHER( return this->add( src ) )
 	}
 
 
 	/// @brief simple wrapper to add() to be conformant with the other container types
-	virtual uint32_t push_front ( const key_t& key, data_t* data ) {
+	virtual uint32_t push_front( const key_t &key, data_t* data ) {
 		PWX_TRY_PWX_FURTHER( return this->add( key, data ) )
 	}
 
 
 	/// @brief simple wrapper to add() to be conformant with the other container types
-	virtual uint32_t push_front ( const elem_t& src ) {
+	virtual uint32_t push_front( const elem_t &src ) {
 		PWX_TRY_PWX_FURTHER( return this->add( src ) )
 	}
 
@@ -994,7 +999,7 @@ public:
 	  * @param elem reference of the element to search for
 	  * @return the given pointer or nullptr if the element does not exist
 	**/
-	virtual elem_t* remElem( elem_t& elem ) noexcept {
+	virtual elem_t* remElem( elem_t &elem ) noexcept {
 		HASH_START_REMOVE;
 		elem_t* result = privRemoveKey( elem.key );
 		HASH_STOP_REMOVE;
@@ -1014,7 +1019,7 @@ public:
 	  * @param key reference to the key to search for
 	  * @return a pointer to the element with the key @a key or nullptr
 	**/
-	virtual elem_t* remKey( const key_t& key ) noexcept {
+	virtual elem_t* remKey( const key_t &key ) noexcept {
 		HASH_START_REMOVE;
 		elem_t* result = privRemoveKey( key );
 		HASH_STOP_REMOVE;
@@ -1043,13 +1048,13 @@ public:
 
 
 	/// @brief simple wrapper to add() to be conformant with other containers
-	virtual uint32_t unshift( const key_t& key, data_t* data ) {
+	virtual uint32_t unshift( const key_t &key, data_t* data ) {
 		PWX_TRY_PWX_FURTHER( return this->add( key, data ) )
 	}
 
 
 	/// @brief simple wrapper to add() to be conformant with other containers
-	virtual uint32_t unshift( const elem_t& src ) {
+	virtual uint32_t unshift( const elem_t &src ) {
 		PWX_TRY_PWX_FURTHER( return this->add( src ) )
 	}
 
@@ -1068,7 +1073,7 @@ public:
 	  * @param[in] rhs reference of the hash to copy.
 	  * @return reference to this.
 	**/
-	virtual hash_t& operator= ( const hash_t& rhs ) {
+	virtual hash_t &operator=( const hash_t &rhs ) {
 		if ( &rhs != this ) {
 			HASH_WAIT_FOR_CLEAR_AND_GROW;
 			PWX_DOUBLE_LOCK_GUARD( this, &rhs );
@@ -1101,7 +1106,7 @@ public:
 	  * @param[in] rhs reference of the hash to add.
 	  * @return reference to this.
 	**/
-	virtual hash_t& operator+= ( const hash_t& rhs ) {
+	virtual hash_t &operator+=( const hash_t &rhs ) {
 		if ( &rhs != this ) {
 			HASH_WAIT_FOR_CLEAR_AND_GROW;
 			PWX_DOUBLE_LOCK_GUARD( this, &rhs );
@@ -1114,17 +1119,18 @@ public:
 				PWX_TRY_PWX_FURTHER( this->grow( rhsSize ) );
 
 			// --- copy all elements ---
-			elem_t*  rhsCurr = nullptr;
-			uint32_t rhsPos  = 0;
-			bool     isTS    = this->beThreadSafe();
+			elem_t* rhsCurr = nullptr;
+			uint32_t rhsPos = 0;
+			bool     isTS   = this->beThreadSafe();
 
 			while ( rhsPos < rhsSize ) {
 				if ( !rhs.protIsUnused( rhsPos ) ) {
 					rhsCurr = rhs.table_get( rhsPos );
 					while ( rhsCurr ) {
 						PWX_TRY_PWX_FURTHER( this->add( *rhsCurr ) )
-						if ( !isTS )
+						if ( !isTS ) {
 							this->get( rhsCurr->key )->disable_thread_safety();
+						}
 						rhsCurr = rhsCurr->getNext();
 					}
 				}
@@ -1142,7 +1148,7 @@ public:
 	  * @param[in] rhs reference of the hash to substract.
 	  * @return reference to this.
 	**/
-	virtual hash_t& operator-= ( const hash_t& rhs ) {
+	virtual hash_t &operator-=( const hash_t &rhs ) {
 		if ( &rhs != this ) {
 			HASH_WAIT_FOR_CLEAR_AND_GROW;
 			PWX_DOUBLE_LOCK_GUARD( this, &rhs );
@@ -1150,7 +1156,7 @@ public:
 			uint32_t rhsSize = rhs.sizeMax();
 			elem_t* lhsCurr = nullptr;
 			elem_t* rhsCurr = nullptr;
-			uint32_t  rhsPos  = 0;
+			uint32_t rhsPos = 0;
 
 			while ( rhsPos < rhsSize ) {
 				if ( !rhs.table_elem_equals( rhsPos, rhs.vacated ) ) {
@@ -1191,7 +1197,7 @@ public:
 	  * @param[in] index the index of the element to find.
 	  * @return read-only pointer to the element, or nullptr if there is no element with the specific index.
 	**/
-	virtual const elem_t* operator[] ( const int64_t index ) const noexcept {
+	virtual const elem_t* operator[]( const int64_t index ) const noexcept {
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return privGetByIndex( index );
 	}
@@ -1215,7 +1221,7 @@ public:
 	  * @param[in] index the index of the element to find.
 	  * @return read/write pointer to the element, or nullptr if the hash is empty.
 	**/
-	virtual elem_t* operator[] ( int64_t index ) noexcept {
+	virtual elem_t* operator[]( int64_t index ) noexcept {
 		HASH_WAIT_FOR_CLEAR_AND_GROW;
 		return const_cast<elem_t* > ( privGetByIndex( index ) );
 	}
@@ -1237,13 +1243,13 @@ protected:
 	 */
 
 	/// @brief function pointer to an alternative destroy function to delete @a data
-	void     ( *destroy )      ( data_t* data )                       = nullptr;
+	void ( * destroy )( data_t* data ) = nullptr;
 
 	/// @brief function pointer to an alternative function to hash a single @a key
-	uint32_t ( *hash_user )    ( const key_t*  key )                  = nullptr;
+	uint32_t ( * hash_user )( const key_t* key ) = nullptr;
 
 	/// @brief function pointer to an alternative function to hash a single @a key with given @a keyLen
-	uint32_t ( *hash_limited ) ( const key_t*  key, uint32_t keyLen ) = nullptr;
+	uint32_t ( * hash_limited )( const key_t* key, uint32_t keyLen ) = nullptr;
 
 
 	/** @brief Delete the element @a removed
@@ -1254,8 +1260,9 @@ protected:
 	  * use it without a lock on the hash itself.
 	**/
 	virtual uint32_t protDelete( elem_t* removed ) {
-		if ( removed && removed->inserted() )
-			PWX_THROW( "illegal_delete", "delete non-removed element", "Deleting an element that is not removed is illegal!" );
+		if ( removed && removed->inserted() ) PWX_THROW( "illegal_delete",
+		                                                 "delete non-removed element",
+		                                                 "Deleting an element that is not removed is illegal!" );
 
 		if ( removed ) {
 			// Use double check technique to avoid illegal double deletion
@@ -1305,8 +1312,9 @@ protected:
 	**/
 	bool protIsUnused( const uint32_t idx ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return false;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1320,8 +1328,9 @@ protected:
 
 		bool result = ( hashTable[idx] == nullptr ) || ( hashTable[idx] == vacated );
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return result;
 	}
@@ -1347,10 +1356,11 @@ protected:
 	  * @param[in] data The data to compare.
 	  * @return return true if the data at index @a idx equals @a data
 	**/
-	bool table_data_equals( uint32_t idx, data_t const& data ) const noexcept {
+	bool table_data_equals( uint32_t idx, data_t const &data ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return false;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1364,8 +1374,9 @@ protected:
 
 		bool result = hashTable[idx] ? ( hashTable[idx] != vacated ? *( hashTable[idx] ) == data : false ) : false;
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return result;
 	}
@@ -1381,8 +1392,9 @@ protected:
 	**/
 	bool table_elem_equals( uint32_t idx, elem_t const* elem ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return false;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1394,10 +1406,11 @@ protected:
 			}
 		}
 
-		bool result = hashTable[idx] ? hashTable[idx] == elem : (elem ? false : true);
+		bool result = hashTable[idx] ? hashTable[idx] == elem : ( elem ? false : true );
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return result;
 	}
@@ -1411,10 +1424,11 @@ protected:
 	  * @param[in] key The key to compare.
 	  * @return return true if the data at index @a idx has the key @a key
 	**/
-	bool table_key_equals( uint32_t idx, key_t const& key ) const noexcept {
+	bool table_key_equals( uint32_t idx, key_t const &key ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return false;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1428,8 +1442,9 @@ protected:
 
 		bool result = hashTable[idx] ? ( hashTable[idx] != vacated ? hashTable[idx]->key == key : false ) : false;
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return result;
 	}
@@ -1447,8 +1462,9 @@ protected:
 	**/
 	elem_t* table_get( uint32_t idx ) noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return nullptr;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1462,8 +1478,9 @@ protected:
 
 		elem_t* result = hashTable[idx];
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return result == vacated ? nullptr : result;
 	}
@@ -1481,8 +1498,9 @@ protected:
 	**/
 	elem_t* table_get( uint32_t idx ) const noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return nullptr;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1496,8 +1514,9 @@ protected:
 
 		elem_t* result = hashTable[idx];
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return result == vacated ? nullptr : result;
 	}
@@ -1513,8 +1532,9 @@ protected:
 	**/
 	elem_t* table_set( uint32_t idx, elem_t* elem ) noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return nullptr;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1527,10 +1547,11 @@ protected:
 		}
 
 		elem_t* oldElem = hashTable[idx];
-		hashTable[idx]  = elem;
+		hashTable[idx] = elem;
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return oldElem;
 	}
@@ -1545,8 +1566,9 @@ protected:
 	**/
 	elem_t* table_vacate( uint32_t idx ) noexcept {
 		// Early exit if this was destroyed (Can be through some dtor like in CThreadElementStore)
-		if ( this->isDestroyed.load() || ( nullptr == hashTable ) )
+		if ( this->isDestroyed.load() || ( nullptr == hashTable ) ) {
 			return nullptr;
+		}
 
 		bool doLocking = beThreadSafe();
 
@@ -1559,10 +1581,11 @@ protected:
 		}
 
 		elem_t* oldElem = hashTable[idx];
-		hashTable[idx]  = vacated;
+		hashTable[idx] = vacated;
 
-		if ( doLocking )
+		if ( doLocking ) {
 			hashTableLock.unlock();
+		}
 
 		return oldElem;
 	}
@@ -1604,7 +1627,7 @@ private:
 	  * to call without stopping itself.
 	  * Inserting must be advertised and existence must be tested!
 	**/
-	virtual uint32_t privAdd( const elem_t& src ) {
+	virtual uint32_t privAdd( const elem_t &src ) {
 		// 1: Check source:
 		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
 
@@ -1617,14 +1640,15 @@ private:
 
 		// 2: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY( newElement = new elem_t ( src ) )
-		catch( std::exception& e ) {
+		PWX_TRY( newElement = new elem_t( src ) )
+		catch ( std::exception &e ) {
 			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) )
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new hash element failed." );
 		}
 		PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
-		if ( !this->beThreadSafe() )
+		if ( !this->beThreadSafe() ) {
 			newElement->disable_thread_safety();
+		}
 
 		// 3: Do the real insert
 		return privInsert( newElement );
@@ -1636,15 +1660,15 @@ private:
 	  * to call without stopping itself.
 	  * Inserting must be advertised and existence must be tested!
 	**/
-	virtual uint32_t privAdd( const key_t& key, data_t* data ) {
+	virtual uint32_t privAdd( const key_t &key, data_t* data ) {
 		// 1: Create a new element
 		elem_t* newElement = nullptr;
-		PWX_TRY( newElement = new elem_t ( key, data, destroy ) )
-		catch( std::exception& e )
-			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new hash element failed." );
+		PWX_TRY( newElement = new elem_t( key, data, destroy ) )
+		catch ( std::exception &e ) PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new hash element failed." );
 
-		if ( !this->beThreadSafe() )
+		if ( !this->beThreadSafe() ) {
 			newElement->disable_thread_safety();
+		}
 
 		// 2: Do the real insert
 		return privInsert( newElement );
@@ -1656,12 +1680,13 @@ private:
 	  * @param[in] key the key to search for
 	  * @return a const pointer to the element or nullptr if the key could not be found.
 	**/
-	virtual elem_t* privGet( const key_t& key ) const noexcept {
-		uint32_t  keyIdx = privGetIndex( key );
-		elem_t* xCurr   = table_get( keyIdx );
+	virtual elem_t* privGet( const key_t &key ) const noexcept {
+		uint32_t keyIdx = privGetIndex( key );
+		elem_t* xCurr = table_get( keyIdx );
 
-		while ( xCurr && ( *xCurr != key ) )
+		while ( xCurr && ( *xCurr != key ) ) {
 			xCurr = xCurr->getNext();
+		}
 
 		return xCurr;
 	}
@@ -1675,14 +1700,15 @@ private:
 		// Mod index into range
 		uint32_t xSize = hashSize.load( memOrdLoad );
 		uint32_t xIdx  = static_cast<uint32_t> ( index < 0
-		                 ? xSize - ( std::abs ( index ) % xSize )
-		                 : index % xSize );
+		                                         ? xSize - ( std::abs( index ) % xSize )
+		                                         : index % xSize );
 
 		// Unfortunately this results in xIdx equaling xSize
 		// (which is wrong) if index is a negative multiple of
 		// xSize:
-		if ( xIdx >= xSize )
+		if ( xIdx >= xSize ) {
 			xIdx %= xSize;
+		}
 
 		return table_get( xIdx );
 	}
@@ -1699,7 +1725,7 @@ private:
 	 * Therefore the inherited specialized hash tables need to determine
 	 * how to get the index of a key.
 	*/
-	virtual uint32_t privGetIndex( const key_t& key ) const noexcept PWX_VIRTUAL_PURE;
+	virtual uint32_t privGetIndex( const key_t &key ) const noexcept PWX_VIRTUAL_PURE;
 
 
 	// How collisions are resolved is a hash type specific matter
@@ -1709,11 +1735,11 @@ private:
 	// This method must be implemented by the hash templates themselves, because
 	// the outcome of a remove is different whether it is a chained (nullptr)
 	// or open (vacated) hash.
-	virtual elem_t* privRemoveIdx ( uint32_t index ) noexcept PWX_VIRTUAL_PURE;
+	virtual elem_t* privRemoveIdx( uint32_t index ) noexcept PWX_VIRTUAL_PURE;
 
 
 	// The same applies to removal by key:
-	virtual elem_t* privRemoveKey ( const key_t& key ) noexcept PWX_VIRTUAL_PURE;
+	virtual elem_t* privRemoveKey( const key_t &key ) noexcept PWX_VIRTUAL_PURE;
 
 	/// @brief internal method to set the hashing method according to @a targetSize
 	void privSetHashMethod( uint32_t targetSize ) noexcept {
@@ -1746,18 +1772,20 @@ private:
 				// For this to test the size is simply divided by the first
 				// 8 odd numbers (but 15) and must not be dividable by more
 				// than one
-				int divided = 0;
-				for ( uint32_t divisor = 3; ( divided < 2 ) && ( divisor < 20 ); divisor += 2 ) {
+				int            divided = 0;
+				for ( uint32_t divisor = 3 ; ( divided < 2 ) && ( divisor < 20 ) ; divisor += 2 ) {
 					// 15 is already covered by 3 and 5
 					if ( 15 != divisor ) {
-						if ( !( targetSize % divisor ) )
+						if ( !( targetSize % divisor ) ) {
 							++divided;
+						}
 					}
 				} // End of checking divisors
 
 				// Now if divided is lower than 2, the division method can be used
-				if ( divided < 2 )
+				if ( divided < 2 ) {
 					CHMethod = CHM_Division;
+				}
 			} // End of valid Test 2
 		} // End of checking for an odd number
 	}
@@ -1770,11 +1798,11 @@ private:
 
 	double const dynGrowFactor; //!< When the table is automatically grown, it is grown by this factor.
 	double const maxLoadFactor; //!< When the load factor reaches this, the table is grown.
-	elem_t**     hashTable;     //!< the central array that is our hash
+	elem_t** hashTable;     //!< the central array that is our hash
 	mutable
-	CLockable    hashTableLock; //!< the table_*() methods use this to secure access to the table
-	char*        vacChar;       //!< alias pointer to get around the empty elem_t ctor restriction
-	elem_t*      vacated;       //!< The Open Hash sets empty places to point at this.
+	CLockable hashTableLock; //!< the table_*() methods use this to secure access to the table
+	char  * vacChar;       //!< alias pointer to get around the empty elem_t ctor restriction
+	elem_t* vacated;       //!< The Open Hash sets empty places to point at this.
 	// Note: vacated is placed here, so clear(), disable_thread_safety() and
 	//       enable_thread_safety() can be unified here as well. Otherwise
 	//       the hashes would need individual functions that only differ
@@ -1787,8 +1815,8 @@ private:
   * This destructor will delete all elements currently stored. There is no
   * need to clean up manually before deleting the hash.
 **/
-template<typename key_t, typename data_t, typename elem_t>
-VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
+template< typename key_t, typename data_t, typename elem_t >
+VTHashBase< key_t, data_t, elem_t >::~VTHashBase() noexcept {
 	PWX_DOUBLE_LOCK_GUARD( this, &hashTableLock );
 
 	// Mark as destroyed
@@ -1808,9 +1836,9 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 		memset( hashTable, 0, sizeof( elem_t* ) * hashSize.load() );
 
 		// now delete it.
-		PWX_TRY( delete [] hashTable )
-		DEBUG_LOG_CAUGHT_STD( "delete hashTable" )
-		catch( ... ) { /* Can't do anything about that! */ }
+		PWX_TRY( delete[] hashTable )
+		log_debug_caught_std( "delete hashTable" )
+		catch ( ... ) { /* Can't do anything about that! */ }
 		hashTable = nullptr;
 		hashSize.store( 0 );
 	}
@@ -1819,8 +1847,8 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
 	vacated = nullptr;
 	if ( vacChar ) {
 		PWX_TRY( delete vacChar )
-		DEBUG_LOG_CAUGHT_STD( "delete vacChar" )
-		catch( ... ) { /* Can't do anything about that! */ }
+		log_debug_caught_std( "delete vacChar" )
+		catch ( ... ) { /* Can't do anything about that! */ }
 		vacChar = nullptr;
 	}
 
@@ -1847,9 +1875,9 @@ VTHashBase<key_t, data_t, elem_t>::~VTHashBase() noexcept {
   * @param[in] rhs right hand side reference
   * @return the new hash.
 **/
-template<typename data_t, typename elem_t>
-VTHashBase<data_t, elem_t> operator+ ( const VTHashBase<data_t, elem_t>& lhs, const VTHashBase<data_t, elem_t>& rhs ) {
-	VTHashBase<data_t, elem_t> result( lhs );
+template< typename data_t, typename elem_t >
+VTHashBase< data_t, elem_t > operator+( const VTHashBase< data_t, elem_t > &lhs, const VTHashBase< data_t, elem_t > &rhs ) {
+	VTHashBase< data_t, elem_t > result( lhs );
 
 	if ( &lhs != &rhs ) {
 		PWX_TRY_PWX_FURTHER( result += rhs );
@@ -1873,14 +1901,15 @@ VTHashBase<data_t, elem_t> operator+ ( const VTHashBase<data_t, elem_t>& lhs, co
   * @param[in] rhs reference of the hash to substract.
   * @return reference to this.
 **/
-template<typename data_t, typename elem_t>
-VTHashBase<data_t, elem_t> operator- ( const VTHashBase<data_t, elem_t>& lhs, const VTHashBase<data_t, elem_t>& rhs ) {
-	VTHashBase<data_t, elem_t> result( lhs );
+template< typename data_t, typename elem_t >
+VTHashBase< data_t, elem_t > operator-( const VTHashBase< data_t, elem_t > &lhs, const VTHashBase< data_t, elem_t > &rhs ) {
+	VTHashBase< data_t, elem_t > result( lhs );
 
 	if ( &lhs != &rhs ) {
 		PWX_TRY_PWX_FURTHER( result -= rhs );
-	} else
+	} else {
 		result.clear();
+	}
 
 	return result;
 }
