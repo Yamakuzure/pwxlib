@@ -5,7 +5,7 @@
 # Needed for the tests:
 set( libpwx_SYM ${CMAKE_CURRENT_LIST_DIR}/pwxlib.sym PARENT_SCOPE )
 
-set( pwxlib_h ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h  )
+set( pwxlib_h ${CMAKE_CURRENT_LIST_DIR}/pwxlib.h )
 set( pwxlib_h ${pwxlib_h} PARENT_SCOPE )
 
 set( pwx_WRAPPERS
@@ -78,6 +78,7 @@ add_library( basic OBJECT "" )
 add_library( container OBJECT "" )
 add_library( functions OBJECT "" )
 add_library( libpwx OBJECT "" )
+add_library( log OBJECT "" )
 add_library( math_helpers OBJECT "" )
 add_library( random OBJECT "" )
 add_library( stream_helpers OBJECT "" )
@@ -87,6 +88,7 @@ add_subdirectory( basic )
 add_subdirectory( container )
 add_subdirectory( functions )
 add_subdirectory( libpwx )
+add_subdirectory( log )
 add_subdirectory( math_helpers )
 add_subdirectory( random )
 add_subdirectory( stream_helpers )
@@ -104,6 +106,7 @@ if ( BUILD_SHARED_LIBS )
 	                       container
 	                       functions
 	                       libpwx
+	                       log
 	                       math_helpers
 	                       random
 	                       stream_helpers
@@ -122,6 +125,7 @@ if ( BUILD_STATIC_LIBS )
 	                       container
 	                       functions
 	                       libpwx
+	                       log
 	                       math_helpers
 	                       random
 	                       stream_helpers

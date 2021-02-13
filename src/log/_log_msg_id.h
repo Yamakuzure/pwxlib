@@ -1,4 +1,9 @@
-/** @file
+#ifndef PWXLIB_SRC_LOG_LOG_MSG_ID_H_INCLUDED
+#define PWXLIB_SRC_LOG_LOG_MSG_ID_H_INCLUDED 1
+#pragma once
+
+
+/**
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c)  2007 - 2021 PrydeWorX
@@ -30,59 +35,29 @@
 **/
 
 
-#if LIBPWX_DEBUG
-#  include <cstdarg>
-#  include <thread>
+#include "basic/pwx_compiler.h"
 
-#  include "basic/pwx_compiler.h"
-#  include "basic/pwx_macros.h"
-#  include "basic/pwx_types.h"
-#endif // LIBPWX_DEBUG
+#include <cstdint>
 
-#include "basic/pwx_debug.h"
 
+#ifndef PWX_NODOX
 
 /// @namespace pwx
 namespace pwx {
 
 
-#if LIBPWX_DEBUG
+/// @brief return the id that is due next.
+uint32_t _get_next_msg_id();
 
-/** @namespace private_
-  * @internal
-**/
-namespace private_ {
+/// @brief increase the next id by 1
+void _inc_next_msg_id();
 
-
-/// @brief The central log needs a log lock:
-aflag_t _pwx_internal_LOG_output_lock = ATOMIC_FLAG_INIT;
-
-static void debug_log_out( _IO_FILE* target, char const* fmt, va_list ap ) {
-	while ( _pwx_internal_LOG_output_lock.test_and_set( std::memory_order_acquire ) )
-		std::this_thread::yield();
-
-	vfprintf ( target, fmt, ap );
-
-	_pwx_internal_LOG_output_lock.clear( std::memory_order_release );
-}
-
-} // namespace private_
-
-void debug_log( char const* fmt, ... ) {
-	va_list ap;
-	va_start ( ap, fmt );
-	private_::debug_log_out( stdout, fmt, ap );
-	va_end( ap );
-}
-
-void debug_err( char const* fmt, ... ) {
-	va_list ap;
-	va_start ( ap, fmt );
-	private_::debug_log_out( stderr, fmt, ap );
-	va_end( ap );
-}
-
-
-#endif // LIBPWX_DEBUG
 
 } // namespace pwx
+
+
+#endif // Do not document with doxygen
+
+
+#endif // PWXLIB_SRC_LOG_LOG_MSG_ID_H_INCLUDED
+
