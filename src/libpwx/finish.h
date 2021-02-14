@@ -56,7 +56,7 @@ namespace pwx {
   *                fix your code asap! The cleanup is only done to avoid known memory leaks.
   *
 **/
-void PWX_API finish();
+void PWX_API finish() noexcept;
 
 
 } // namespace pwx

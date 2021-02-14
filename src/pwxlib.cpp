@@ -33,6 +33,10 @@
 #include "pwxlib.h"
 
 
-void PWX_API pwx_init( bool enable_memory_mapping, char const* log_file_path, int log_threads ) noexcept {
+void pwx_init( bool enable_memory_mapping, char const* log_file_path, int log_threads ) noexcept {
 	::pwx::init( enable_memory_mapping, log_file_path, log_threads );
+}
+
+void pwx_finish() noexcept {
+	::pwx::finish();
 }

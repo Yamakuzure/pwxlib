@@ -44,7 +44,7 @@
 namespace pwx {
 
 
-void finish() {
+void finish() noexcept {
 
 	PAH.clearArgs();
 	SCT.clearTables();

@@ -41,13 +41,14 @@
   * The main components are:
   * | Folder            | Content                                                       |
   * | ----------------- | ------------------------------------------------------------- |
-  * | `arg_handler/`    | Components of PAH, the program argument handler               |
-  * | `basic/`          | Core tools for strings, memory, exception and locking         |
-  * | `container/`      | Threadsafe containers from lists to hashes                    |
-  * | `math_helpers/`   | Tools helping with angles, degrees and floating point numbers |
-  * | `random/`         | Components of RNG, the Random NVal Generator                  |
-  * | `stream_helpers/` | Tools helping with handling streams, like alignment           |
-  * | `wavecolor/`      |  Helper for using wavelengths to describe RGB                 |
+  * | `arg_handler/`    | Components of PAH, the program argument handler.              |
+  * | `basic/`          | Core tools for strings, memory, exception and locking.        |
+  * | `container/`      | Threadsafe containers from lists to hashes.                   |
+  * | `log/`            | Easy to use log functions, capable of multi-threading.        |
+  * | `math_helpers/`   | Tools helping with angles, degrees and floating point numbers.|
+  * | `random/`         | Components of RNG, the Random NVal Generator.                 |
+  * | `stream_helpers/` | Tools helping with handling streams, like alignment.          |
+  * | `wavecolor/`      | Helper for using wavelengths to describe RGB.                 |
   *
   * @section unotes Usage Notes
   * You should always call pwx::finish() before your program ends. This will
@@ -116,10 +117,12 @@
   * @subsection contTools Tools
   * Apart from the workers and the containers, there are some tools that might be
   * helpful.
+  *
   * @subsection contTypes Types
-  * @todo write
+  * @todo write the `Types` section
+  *
   * @subsection contGeneral General
-  * @todo write
+  * @todo write the `General` section
   *
   * @section contMain Motivation
   * The original motivation to write this library were random numbers. In 2007
@@ -244,6 +247,19 @@
 #include "PTools"
 #include "PUtils"
 #include "PWorkers"
+
+
+/** @brief convenience wrapper to call pwx::init()
+  * @see pwx::init()
+  * @param[in] enable_memory_mapping_  If set to true, all allocations/deallocations are recorded.
+  * @param[in] log_file_path  Full path to the logfile to write (appended). Use NULL or empty string to disable.
+  * @param[in] log_threads  Number of background threads writing log messages. < 1 to disable, maximum is 4.
+**/
+void PWX_API pwx_init( bool enable_memory_mapping, char const* log_file_path, int log_threads ) noexcept;
+
+
+/// @brief convenience wrapper to call pwx::finish()
+void PWX_API pwx_finish() noexcept;
 
 
 #endif // PWX_LIBPWX_PWX_H_INCLUDED
