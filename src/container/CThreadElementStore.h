@@ -42,11 +42,6 @@
 /// @namespace pwx
 namespace pwx {
 
-/** @namespace private_
-  * @internal
-**/
-namespace private_ {
-
 
 /** @class CThreadElementStore
   * @brief Hash based store for thread individual element handling
@@ -54,7 +49,6 @@ namespace private_ {
   * This class is used by all list based containers to store
   * the currently handled element for each thread.
   *
-  * @internal
   * For this to work there is an important rule:
   * Any container methods that removes an element from the container
   * using this storage **must** report this to their element
@@ -75,7 +69,7 @@ namespace private_ {
   * use the internal hash table but simply change/retrieve on general
   * `curr` pointer. This can be reversed using `beThreadSafe(true)`.
 **/
-class CThreadElementStore : public CLockable {
+class CThreadElementStore final : public CLockable {
 public:
 
 	/* ===============================================
@@ -83,11 +77,11 @@ public:
 	 * ===============================================
 	*/
 
-	typedef CLockable                    base_t;  //!< Base type of `CThreadElementStore`
-	typedef CThreadElementStore          store_t; //!< Storage type, thus `CThreadElementStore` itself
-	typedef VElement                     curr_t;  //!< Type of the `curr` element to handle
-	typedef TOpenHash<size_t, curr_t>    hash_t;  //!< Hash container type with `size_t` and `curr_t`
-	typedef THashElement<size_t, curr_t> elem_t;  //!< Hash element type with `size_t` and `curr_t`
+	typedef CLockable                      base_t;  //!< Base type of `CThreadElementStore`
+	typedef CThreadElementStore            store_t; //!< Storage type, thus `CThreadElementStore` itself
+	typedef VElement                       curr_t;  //!< Type of the `curr` element to handle
+	typedef TOpenHash< size_t, curr_t >    hash_t;  //!< Hash container type with `size_t` and `curr_t`
+	typedef THashElement< size_t, curr_t > elem_t;  //!< Hash element type with `size_t` and `curr_t`
 
 
 	/* ===============================================
@@ -95,17 +89,29 @@ public:
 	 * ===============================================
 	*/
 
+	/** @brief default ctor
+	  *
+	  * Set the initial size of the used hash table here.
+	  * The default initial size is 47, which is a prime number almost exactly between 2^5 and 2^6.
+	  *
+	  * If you intent to use a different size, please try to find a prime number that is as exactly between
+	  * 2^x and 2^(x+1) as possible.
+	  *
+	  * @param[in] initial_size the size to use for the hash table
+	**/
 	explicit
 	CThreadElementStore( uint32_t initial_size ) PWX_API;
-	CThreadElementStore()               noexcept PWX_API;
-	virtual ~CThreadElementStore()      noexcept PWX_API;
+
+	CThreadElementStore() noexcept              PWX_API;
+	~CThreadElementStore() noexcept final
+	PWX_API;
 
 
 	// No copying:
-	CThreadElementStore( CThreadElementStore& )  PWX_DELETE;
-	CThreadElementStore( CThreadElementStore&& ) PWX_DELETE;
-	CThreadElementStore& operator=( CThreadElementStore const&  ) PWX_DELETE;
-	CThreadElementStore& operator=( CThreadElementStore const&& ) PWX_DELETE;
+	CThreadElementStore( CThreadElementStore & ) PWX_DELETE;
+	CThreadElementStore( CThreadElementStore && ) PWX_DELETE;
+	CThreadElementStore &operator=( CThreadElementStore const & ) PWX_DELETE;
+	CThreadElementStore &operator=( CThreadElementStore const && ) PWX_DELETE;
 
 
 	/* ===============================================
@@ -113,15 +119,32 @@ public:
 	 * ===============================================
 	*/
 
-	void    clear()                                    noexcept PWX_API;
-	curr_t* curr()                               const noexcept PWX_API;
-	curr_t* curr()                                     noexcept PWX_API;
-	void    curr( const curr_t* new_curr )       const noexcept PWX_API;
-	void    curr( curr_t* new_curr )                   noexcept PWX_API;
-	void    disable_thread_safety()                    noexcept PWX_API;
-	void    enable_thread_safety()                     noexcept PWX_API;
-	void    invalidate( const curr_t* old_curr ) const noexcept PWX_API;
-	void    invalidate( curr_t* old_curr )             noexcept PWX_API;
+	/// @brief remove all elements
+	void clear() noexcept PWX_API;
+
+	/// @brief return the calling threads current element
+	curr_t* curr() const noexcept PWX_API;
+
+	/// @brief return the calling threads current element
+	curr_t* curr() noexcept PWX_API;
+
+	/// @brief delete old element and add a new one unless const @a new_curr is nullptr
+	void curr( const curr_t* new_curr ) const noexcept PWX_API;
+
+	/// @brief delete old element and add a new one unless @a new_curr is nullptr
+	void curr( curr_t* new_curr ) noexcept PWX_API;
+
+	/// @brief stop using the hash table, maintain one pointer directly
+	void disable_thread_safety() noexcept PWX_API;
+
+	/// @brief stop maintaining one pointer, use the hash table
+	void enable_thread_safety() noexcept PWX_API;
+
+	/// @brief delete all entries that point to const @a old_curr
+	void invalidate( const curr_t* old_curr ) const noexcept PWX_API;
+
+	/// @brief delete all entries that point to @a old_curr
+	[[maybe_unused]] void invalidate( curr_t* old_curr ) const noexcept PWX_API;
 
 
 protected:
@@ -137,15 +160,14 @@ private:
 	 * ===============================================
 	*/
 
-	mutable hash_t  currs;                                   //!< Used when thread safety is enabled (default)
-	mutable abool_t invalidating = ATOMIC_VAR_INIT( false ); //!< If set to true by `invalidate()`, `curr()` will wait for a lock
-	mutable curr_t* oneCurr      = nullptr;                  //!< Used when thread safety is disabled
+	mutable hash_t  currs;                   //!< Used when thread safety is enabled (default)
+	mutable abool_t invalidating{ false }; //!< If set to true by `invalidate()`, `curr()` will wait for a lock
+	mutable curr_t* oneCurr{ nullptr };      //!< Used when thread safety is disabled
 };
 
 
-} // namespace private
-
 } // namespace pwx
+
 
 #endif // PWX_LIBPWX_PWX_INTERNAL_CTHREADELEMENTSTORE_H_INCLUDED
 

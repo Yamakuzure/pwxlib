@@ -45,13 +45,8 @@
 namespace pwx {
 
 
-/** @namespace private_
-  * @internal
-**/
-namespace private_ {
 /// Forward CThreadElementStore, there is a circular dependency.
 class CThreadElementStore;
-}
 
 
 /** @class VElement
@@ -73,9 +68,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef CLockable                     base_t;  //!< Base type of VElement
-	typedef VElement                      elem_t;  //!< Element type, which is VElement itself
-	typedef private_::CThreadElementStore store_t; //!< Storage type for thread ids
+	typedef CLockable           base_t;  //!< Base type of VElement
+	typedef VElement            elem_t;  //!< Element type, which is VElement itself
+	typedef CThreadElementStore store_t; //!< Storage type for thread ids
 
 
 	/* ===============================================
@@ -85,7 +80,7 @@ public:
 
 	explicit VElement() noexcept;              //!< @brief The default constructor, does nothing
 	VElement ( const VElement& src ) noexcept; //!< @brief The copy constructor only delegates to CLockable
-	virtual ~VElement() noexcept;              //!< @brief The destructor removes this from wherever it is in.
+	~VElement() noexcept override;             //!< @brief The destructor removes this from wherever it is in.
 
 
 	/* ===============================================
@@ -146,7 +141,7 @@ public:
 	  * @param[in] nr_ The new number
 	  * @return The previous number
 	**/
-	uint32_t nr( uint32_t const nr_ ) const noexcept;
+	uint32_t nr( uint32_t nr_ ) const noexcept;
 
 
 	/** @brief Mark this element as being removed
@@ -179,7 +174,7 @@ public:
 	  *
 	  * Number and CThreadElementStore must be set by containers.
 	**/
-	virtual VElement& operator=( const VElement& src ) noexcept;
+	VElement& operator=( const VElement& src ) noexcept;
 
 
 protected:

@@ -47,11 +47,9 @@
 /// @namespace pwx
 namespace pwx {
 
-/** @namespace private_
-  * @internal
-  * @brief all private functions, that are to be used in library compilation units only, reside here
-**/
-namespace private_ {
+
+#ifndef PWX_NODOX
+
 
 typedef std::random_device::result_type rand_t;
 
@@ -64,9 +62,9 @@ size_t private_random_str( char* dest, size_t min_, size_t max_ ) noexcept;
 template< class T, std::size_t SIZE > struct type_size_less_than : std::integral_constant< bool, ( sizeof( T ) < SIZE ) > {};
 template< class T, std::size_t SIZE > struct type_size_at_least : std::integral_constant< bool, ( sizeof( T ) >= SIZE ) > {};
 template< class T, typename std::enable_if< type_size_less_than< T, 64 >::value >::type* = nullptr >
-	rand_t private_get_random() noexcept { return private_get_random32(); }
+rand_t private_get_random() noexcept { return private_get_random32(); }
 template< class T, typename std::enable_if< type_size_at_least< T, 64 >::value >::type* = nullptr >
-	rand_t private_get_random() noexcept { return private_get_random64(); }
+rand_t private_get_random() noexcept { return private_get_random64(); }
 
 
 /// @internal random number handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
@@ -105,7 +103,11 @@ template< typename Tval > Tval private_random( Tval min_, Tval max_ ) noexcept {
 }
 
 
-} // namespace private_
+#endif // Do not document with doxygen
+
+
 } // namespace pwx
+
+
 #endif // PWX_LIBPWX_PWX_INTERNAL_CRANDOMTRANDOM_H_INCLUDED
 

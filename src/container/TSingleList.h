@@ -82,10 +82,10 @@ public:
 	 * ===============================================
 	*/
 
-	typedef VContainer                    base_t;     //!< Base type of the list
-	typedef TSingleList<data_t, elem_t>   list_t;     //!< Type of this list
-	typedef typename elem_t::neighbor_t   neighbor_t; //!< Type of elements neighbours, used for curr, head and tail.
-	typedef private_::CThreadElementStore store_t;    //!< Storage for the thread id bound curr pointer
+	typedef VContainer                  base_t;     //!< Base type of the list
+	typedef TSingleList<data_t, elem_t> list_t;     //!< Type of this list
+	typedef typename elem_t::neighbor_t neighbor_t; //!< Type of elements neighbours, used for curr, head and tail.
+	typedef CThreadElementStore         store_t;    //!< Storage for the thread id bound curr pointer
 
 
 	/* ===============================================
@@ -99,7 +99,7 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TSingleList ( void ( *destroy_ ) ( data_t* data_ ) ) noexcept
+	TSingleList ( void ( *destroy_ ) ( data_t* ) ) noexcept
 		: destroy ( destroy_ )
 	{ }
 
@@ -134,7 +134,7 @@ public:
 	  * This destructor will delete all elements currently stored. There is no
 	  * need to clean up manually before deleting the list.
 	**/
-	virtual ~TSingleList() noexcept;
+	~TSingleList() noexcept override;
 
 
 	/* ===============================================
@@ -150,7 +150,7 @@ public:
 	  * assumed that data_t responds to the delete
 	  * operator.
 	**/
-	virtual void clear() noexcept {
+	void clear() noexcept override {
 		if ( !destroyed() )
 			this->privClear();
 	}
@@ -248,7 +248,7 @@ public:
 	  * this method with a lot of elements stored is
 	  * therefore rather costly!
 	  */
-	void enable_thread_safety() noexcept {
+	void enable_thread_safety() noexcept override {
 		this->do_locking( true );
 		this->currStore.enable_thread_safety();
 		elem_t* xCurr = head();

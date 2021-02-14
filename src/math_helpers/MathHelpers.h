@@ -214,12 +214,49 @@ struct sFloatPoint<long double> {
  * === Functions that compare floating type values ===
  * ===================================================
 */
-bool areAlmostEqual( const float       lhs, const float       rhs ) noexcept PWX_API;
-bool areAlmostEqual( const double      lhs, const double      rhs ) noexcept PWX_API;
-bool areAlmostEqual( const long double lhs, const long double rhs ) noexcept PWX_API;
+
+/** @brief test two floats whether they are near enough to be considered equal
+  *
+  * This functions takes two floats and tests whether they can be considered
+  * equal. For this the tolerated difference and the tolerated ULPS
+  * difference are determined. Then an internal function can check these values.
+  *
+  * @param[in] lhs left hand side value
+  * @param[in] rhs right hand side value
+  * @return true if both values can be considered equal although their representation might differ
+**/
+bool areAlmostEqual( float lhs, float rhs ) noexcept PWX_API;
+
+
+/** @brief test two doubles whether they are near enough to be considered equal
+  *
+  * This functions takes two doubles and tests whether they can be considered
+  * equal. For this the tolerated difference and the tolerated ULPS
+  * difference are determined. Then an internal function can check these values.
+  *
+  * @param[in] lhs left hand side value
+  * @param[in] rhs right hand side value
+  * @return true if both values can be considered equal although their representation might differ
+**/
+bool areAlmostEqual( double lhs, double rhs ) noexcept PWX_API;
+
+
+/** @brief test two long doubles whether they are near enough to be considered equal
+  *
+  * This functions takes two long doubles and tests whether they can be considered
+  * equal. For this the tolerated difference and the tolerated ULPS
+  * difference are determined. Then an internal function can check these values.
+  *
+  * @param[in] lhs left hand side value
+  * @param[in] rhs right hand side value
+  * @return true if both values can be considered equal although their representation might differ
+**/
+bool areAlmostEqual( long double lhs, long double rhs ) noexcept PWX_API;
+
+
 /// @brief template dummy to enable areAlmostEqual() to be used with type_traits conditions
 template<typename T>
-bool areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
+static inline bool areAlmostEqual( const T& lhs, const T& rhs ) noexcept {
 	return lhs == rhs;
 }
 

@@ -847,7 +847,7 @@ CRandom::CRandom() noexcept
 	// Initialize Seed
 	static const auto randomValueRange = static_cast<long double>( std::random_device::max() ) -
 	                                     static_cast<long double>( std::random_device::min() );
-	seed = ( ( private_::private_get_random32() - ( randomValueRange / 2 ) ) / 100 );
+	seed = ( ( private_get_random32() - ( randomValueRange / 2 ) ) / 100 );
 
 	// Initialize Simplex values:
 	for ( int32_t i = 0 ; i < 5 ; i++ ) {
@@ -897,7 +897,7 @@ int32_t CRandom::getSeed() const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( int16_t key ) const noexcept {
-	return private_::private_hash_int< int16_t >( key );
+	return private_hash_int< int16_t >( key );
 }
 
 
@@ -907,7 +907,7 @@ uint32_t CRandom::hash( int16_t key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( uint16_t key ) const noexcept {
-	return private_::private_hash_int< uint16_t >( key );
+	return private_hash_int< uint16_t >( key );
 }
 
 
@@ -917,7 +917,7 @@ uint32_t CRandom::hash( uint16_t key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( int32_t key ) const noexcept {
-	return private_::private_hash_int< int32_t >( key );
+	return private_hash_int< int32_t >( key );
 }
 
 
@@ -927,7 +927,7 @@ uint32_t CRandom::hash( int32_t key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( uint32_t key ) const noexcept {
-	return private_::private_hash_int< uint32_t >( key );
+	return private_hash_int< uint32_t >( key );
 }
 
 
@@ -937,7 +937,7 @@ uint32_t CRandom::hash( uint32_t key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( int64_t key ) const noexcept {
-	return private_::private_hash_int< int64_t >( key );
+	return private_hash_int< int64_t >( key );
 }
 
 
@@ -947,7 +947,7 @@ uint32_t CRandom::hash( int64_t key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( uint64_t key ) const noexcept {
-	return private_::private_hash_int< uint64_t >( key );
+	return private_hash_int< uint64_t >( key );
 }
 
 
@@ -957,7 +957,7 @@ uint32_t CRandom::hash( uint64_t key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( float key ) const noexcept {
-	return private_::private_hash_flt< float >( &key );
+	return private_hash_flt< float >( &key );
 }
 
 
@@ -967,7 +967,7 @@ uint32_t CRandom::hash( float key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( double key ) const noexcept {
-	return private_::private_hash_flt< double >( &key );
+	return private_hash_flt< double >( &key );
 }
 
 
@@ -977,7 +977,7 @@ uint32_t CRandom::hash( double key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( long double key ) const noexcept {
-	return private_::private_hash_flt< long double >( &key );
+	return private_hash_flt< long double >( &key );
 }
 
 
@@ -988,7 +988,7 @@ uint32_t CRandom::hash( long double key ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( char const* key, size_t keyLen ) const noexcept {
-	return private_::private_hash_str( key, keyLen );
+	return private_hash_str( key, keyLen );
 }
 
 
@@ -998,7 +998,7 @@ uint32_t CRandom::hash( char const* key, size_t keyLen ) const noexcept {
   * @return unsigned 32 bit integer hash
 **/
 uint32_t CRandom::hash( std::string& key ) const noexcept {
-	return private_::private_hash_str( key.c_str(), key.size() );
+	return private_hash_str( key.c_str(), key.size() );
 }
 
 
@@ -1100,7 +1100,7 @@ eNameSourceType CRandom::prevNST( void ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 int16_t CRandom::random( int16_t max ) noexcept {
-	return private_::private_random< int16_t >( 0, max );
+	return private_random< int16_t >( 0, max );
 }
 
 
@@ -1113,7 +1113,7 @@ int16_t CRandom::random( int16_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 int16_t CRandom::random( int16_t min, int16_t max ) noexcept {
-	return private_::private_random< int16_t >( min, max );
+	return private_random< int16_t >( min, max );
 }
 
 
@@ -1125,7 +1125,7 @@ int16_t CRandom::random( int16_t min, int16_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 uint16_t CRandom::random( uint16_t max ) noexcept {
-	return private_::private_random< uint16_t >( 0, max );
+	return private_random< uint16_t >( 0, max );
 }
 
 
@@ -1138,7 +1138,7 @@ uint16_t CRandom::random( uint16_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 uint16_t CRandom::random( uint16_t min, uint16_t max ) noexcept {
-	return private_::private_random< uint16_t >( min, max );
+	return private_random< uint16_t >( min, max );
 }
 
 
@@ -1150,7 +1150,7 @@ uint16_t CRandom::random( uint16_t min, uint16_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 int32_t CRandom::random( int32_t max ) noexcept {
-	return private_::private_random< int32_t >( 0, max );
+	return private_random< int32_t >( 0, max );
 }
 
 
@@ -1165,7 +1165,7 @@ int32_t CRandom::random( int32_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 int32_t CRandom::random( int32_t min, int32_t max ) noexcept {
-	return private_::private_random< int32_t >( min, max );
+	return private_random< int32_t >( min, max );
 }
 
 
@@ -1179,7 +1179,7 @@ int32_t CRandom::random( int32_t min, int32_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 uint32_t CRandom::random( uint32_t max ) noexcept {
-	return private_::private_random< uint32_t >( 0, max );
+	return private_random< uint32_t >( 0, max );
 }
 
 
@@ -1192,7 +1192,7 @@ uint32_t CRandom::random( uint32_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 uint32_t CRandom::random( uint32_t min, uint32_t max ) noexcept {
-	return private_::private_random< uint32_t >( min, max );
+	return private_random< uint32_t >( min, max );
 }
 
 
@@ -1204,7 +1204,7 @@ uint32_t CRandom::random( uint32_t min, uint32_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 int64_t CRandom::random( int64_t max ) noexcept {
-	return private_::private_random< int64_t >( 0, max );
+	return private_random< int64_t >( 0, max );
 }
 
 
@@ -1217,7 +1217,7 @@ int64_t CRandom::random( int64_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 int64_t CRandom::random( int64_t min, int64_t max ) noexcept {
-	return private_::private_random< int64_t >( min, max );
+	return private_random< int64_t >( min, max );
 }
 
 
@@ -1229,7 +1229,7 @@ int64_t CRandom::random( int64_t min, int64_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 uint64_t CRandom::random( uint64_t max ) noexcept {
-	return private_::private_random< uint64_t >( 0, max );
+	return private_random< uint64_t >( 0, max );
 }
 
 
@@ -1242,7 +1242,7 @@ uint64_t CRandom::random( uint64_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 uint64_t CRandom::random( uint64_t min, uint64_t max ) noexcept {
-	return private_::private_random< uint64_t >( min, max );
+	return private_random< uint64_t >( min, max );
 }
 
 
@@ -1254,7 +1254,7 @@ uint64_t CRandom::random( uint64_t min, uint64_t max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 float CRandom::random( float max ) noexcept {
-	return private_::private_random< float >( 0, max );
+	return private_random< float >( 0, max );
 }
 
 
@@ -1267,7 +1267,7 @@ float CRandom::random( float max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 float CRandom::random( float min, float max ) noexcept {
-	return private_::private_random< float >( min, max );
+	return private_random< float >( min, max );
 }
 
 
@@ -1279,7 +1279,7 @@ float CRandom::random( float min, float max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 double CRandom::random( double max ) noexcept {
-	return private_::private_random< double >( 0, max );
+	return private_random< double >( 0, max );
 }
 
 
@@ -1292,7 +1292,7 @@ double CRandom::random( double max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 double CRandom::random( double min, double max ) noexcept {
-	return private_::private_random< double >( min, max );
+	return private_random< double >( min, max );
 }
 
 
@@ -1304,7 +1304,7 @@ double CRandom::random( double min, double max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 long double CRandom::random( long double max ) noexcept {
-	return private_::private_random< long double >( 0, max );
+	return private_random< long double >( 0, max );
 }
 
 
@@ -1317,7 +1317,7 @@ long double CRandom::random( long double max ) noexcept {
   * @return A random value between 0 and @a max.
 **/
 long double CRandom::random( long double min, long double max ) noexcept {
-	return private_::private_random< long double >( min, max );
+	return private_random< long double >( min, max );
 }
 
 
@@ -1338,7 +1338,7 @@ long double CRandom::random( long double min, long double max ) noexcept {
   * @return number of characters actually written including the final zero-byte.
 **/
 size_t CRandom::random( char* dest, size_t minLen, size_t maxLen ) noexcept {
-	return private_::private_random_str( dest, minLen, maxLen );
+	return private_random_str( dest, minLen, maxLen );
 }
 
 

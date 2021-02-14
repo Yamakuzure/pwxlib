@@ -48,11 +48,6 @@
 /// @namespace pwx
 namespace pwx {
 
-/** @namespace private_
-  * @internal
-**/
-namespace private_ {
-
 
 /** @verbatim
 ===================================================================================================
@@ -166,18 +161,19 @@ that to get integer representations.
   @endverbatim
 **/
 
+
+#ifndef PWX_NODOX
+
 uint32_t private_hash_str( char const* key, size_t keyLen ) noexcept;
-uint32_t private_hash_buf( const uint8_t* key, size_t keyLen ) noexcept;
 
 using constants::fullMaxInt;
 using constants::fullMaxLong;
 
-// These are needed for the float hashes conversion using modf/trunc
-const long double maxInt64inLD = static_cast<long double>( std::numeric_limits<int64_t>::max() );
-const long double minInt64inLD = static_cast<long double>( std::numeric_limits<int64_t>::lowest() );
+#endif // Do not document with doxygen
 
-/// @internal hash handler for integers. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-template<typename Tval>
+
+/// @internal hash handler for integers.
+template< typename Tval >
 uint32_t private_hash_int( Tval key ) noexcept {
 	uint32_t xHash = 0;
 
@@ -186,39 +182,41 @@ uint32_t private_hash_int( Tval key ) noexcept {
 		/* ====================================================================
 		 * === This is hash32shift() like described by Thomas Wang, 01/2007 ===
 		 * ==================================================================== */
-		int32_t xKey = static_cast<int32_t>( key );
-		if ( isSameType( int16_t, Tval ) )
+		auto xKey = static_cast<int32_t>( key );
+		if ( isSameType( int16_t, Tval ) ) {
 			xKey ^= ( xKey << 16 ) ^ ( xKey << 8 );
-		xKey = ( ~xKey ) + ( xKey << 15 );
+		}
+		xKey         = ( ~xKey ) + ( xKey << 15 );
 		xKey ^= ( xKey & fullMaxInt ) >> 12; // xKey >>> 12
 		xKey += xKey << 2;
 		xKey ^= ( xKey & fullMaxInt ) >> 4; // xKey >>> 4
 		xKey *= 2057;
 		xKey ^= ( xKey & fullMaxInt ) >> 16; // xKey >>> 16
-		xHash = static_cast<uint32_t> ( xKey );
+		xHash        = static_cast<uint32_t> ( xKey );
 	}
-	// --- uint16_t and uint32_t can use the same algorithm, too
+		// --- uint16_t and uint32_t can use the same algorithm, too
 	else if ( isSameType( uint16_t, Tval ) || isSameType( uint32_t, Tval ) ) {
 		/* ========================================================================
 		 * === This is hash() like described by Robert Jenkins, 6-shift version ===
 		 * ======================================================================== */
-		uint32_t xKey = static_cast<uint32_t>( key );
-		if ( isSameType( uint16_t, Tval ) )
+		auto xKey = static_cast<uint32_t>( key );
+		if ( isSameType( uint16_t, Tval ) ) {
 			xKey ^= ( xKey << 16 ) ^ ( xKey << 8 );
-		xKey = ( xKey  + 0x7ed55d16 ) + ( xKey << 12 );
-		xKey = ( xKey  ^ 0xc761c23c ) ^ ( xKey >> 19 );
-		xKey = ( xKey  + 0x165667b1 ) + ( xKey << 5 );
-		xKey = ( xKey  + 0xd3a2646c ) ^ ( xKey << 9 );
-		xKey = ( xKey  + 0xfd7046c5 ) + ( xKey << 3 );
-		xHash = ( xKey  ^ 0xb55a4f09 ) ^ ( xKey >> 16 );
+		}
+		xKey          = ( xKey + 0x7ed55d16 ) + ( xKey << 12 );
+		xKey          = ( xKey ^ 0xc761c23c ) ^ ( xKey >> 19 );
+		xKey          = ( xKey + 0x165667b1 ) + ( xKey << 5 );
+		xKey          = ( xKey + 0xd3a2646c ) ^ ( xKey << 9 );
+		xKey          = ( xKey + 0xfd7046c5 ) + ( xKey << 3 );
+		xHash         = ( xKey ^ 0xb55a4f09 ) ^ ( xKey >> 16 );
 	}
-	// --- int64_t needs its own algorithm
+		// --- int64_t needs its own algorithm
 	else if ( isSameType( int64_t, Tval ) ) {
 		/* =====================================================================
 		 * === This is hash64shift() like described by Thomas Wang, 01/2007. ===
 		 * === Modified to result in a unified uint32_t hash.                ===
 		 * ===================================================================== */
-		key  = ( ~key ) + ( key << 21 );
+		key   = ( ~key ) + ( key << 21 );
 		key ^= ( key & fullMaxLong ) >> 24; // key >>> 24
 		key += ( key << 3 ) + ( key << 8 );
 		key ^= ( key & fullMaxLong ) >> 14; // key >>> 14
@@ -226,13 +224,13 @@ uint32_t private_hash_int( Tval key ) noexcept {
 		key ^= ( key & fullMaxLong ) >> 28; // key >>> 28
 		xHash = static_cast<uint32_t> ( 0x00000000ffffffff & ( key + ( key >> 31 ) ) );
 	}
-	// --- int64_t needs its own algorithm
+		// --- int64_t needs its own algorithm
 	else if ( isSameType( uint64_t, Tval ) ) {
 		/* ==============================================================
 		 * === This is a 64 (or 2 x 32) to 32 bit shift hash function ===
 		 * === like described by Thomas Wang, 01/2007                 ===
 		 * ============================================================== */
-		key  = ( ~key ) + ( key << 18 );
+		key   = ( ~key ) + ( key << 18 );
 		key ^= ( key & fullMaxLong ) >> 31; // key >>> 31
 		key *= 21;
 		key ^= ( key & fullMaxLong ) >> 11; // key >>> 11
@@ -240,13 +238,14 @@ uint32_t private_hash_int( Tval key ) noexcept {
 		key ^= ( key & fullMaxLong ) >> 22; // key >>> 22
 		xHash = static_cast<uint32_t> ( key );
 	}
-	// --- __int128_t must be split and combined
+		// --- __int128_t must be split and combined
 	else if ( isSameType( __int128_t, Tval ) ) {
 		static const size_t halfSize = sizeof( Tval ) * 4;
-		int64_t  left  = static_cast<int64_t>( ( key >> halfSize ) & 0xffffffffffffffff );
-		uint64_t right = static_cast<uint64_t>( key              & 0xffffffffffffffff );
-		uint32_t lres  = private_hash_int<int64_t>( left );
-		uint32_t rres  = private_hash_int<int64_t>( right );
+
+		auto     left  = static_cast<int64_t>( ( key >> halfSize ) & 0xffffffffffffffff );
+		auto     right = static_cast<uint64_t>( key & 0xffffffffffffffff );
+		uint32_t lres  = private_hash_int< int64_t >( left );
+		uint32_t rres  = private_hash_int< int64_t >( right );
 		/* Now combine the hashes the following way:
 		 * lres | left 16 bit  | right 16 bit
 		 *   op |     xor      |      +
@@ -254,7 +253,7 @@ uint32_t private_hash_int( Tval key ) noexcept {
 		 *  =>  | new left 16b | new right 16b
 		*/
 		uint32_t lnew = ( ( ( lres >> 16 ) & 0x0000ffff ) ^ ( rres & 0x0000ffff ) ) << 16;
-		uint32_t rnew =  ( ( rres >> 16 ) & 0x0000ffff ) + ( lres & 0x0000ffff );
+		uint32_t rnew = ( ( rres >> 16 ) & 0x0000ffff ) + ( lres & 0x0000ffff );
 		// Finally xor both together
 		xHash = lnew ^ rnew;
 	}
@@ -264,22 +263,15 @@ uint32_t private_hash_int( Tval key ) noexcept {
 
 
 /// @internal hash handler for float and (long) double. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-template<typename Tval>
+template< typename Tval >
 uint32_t private_hash_flt( const Tval* key ) noexcept {
-	/* Try out the new math helpers
-	static const size_t  vSize  = sizeof(Tval);
-	const uint8_t* buf_ptr = reinterpret_cast<const uint8_t*>(key);
-	return private_hash_buf(buf_ptr, vSize);
-	--- */
-	typedef typename pwx::sFloatPoint<Tval>::Ti Ti;
-	pwx::sFloatPoint<Tval> f( *key );
-	return private_hash_int<Ti>( f.i );
+	typedef typename pwx::sFloatPoint< Tval >::Ti Ti;
+	pwx::sFloatPoint< Tval >                      f( *key );
+	return private_hash_int< Ti >( f.i );
 }
 
 
-} // namespace private_
-
 } // namespace pwx
+
+
 #endif // PWX_LIBPWX_PWX_INTERNAL_CRANDOMTHASH_H_INCLUDED
-
-

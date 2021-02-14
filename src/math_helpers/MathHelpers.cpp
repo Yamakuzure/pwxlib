@@ -32,7 +32,6 @@
 
 #include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
 
 #include "math_helpers/MathHelpers.h"
 
@@ -41,55 +40,50 @@
 namespace pwx {
 
 
-/** @namespace private_
-  * @internal
-**/
-namespace private_ {
-
-
-/// @brief check floating point values using Ulps and abs diff
-template<typename Tf, typename Ti>
-bool private_areAlmostEqualUlpsAndAbs(
-        const Tf& lhs, const Tf& rhs,
-        Tf maxDiff, Ti maxUlpsDiff ) noexcept {
+/// @internal check floating point values using Ulps and abs diff
+template< typename Tf, typename Ti >
+static bool private_areAlmostEqualUlpsAndAbs( const Tf &lhs, const Tf &rhs, Tf maxDiff, Ti maxUlpsDiff ) noexcept {
 	// Check if the numbers are really close -- needed
 	// when comparing numbers near zero.
 	Tf absDiff = std::fabs( lhs - rhs );
-	if ( absDiff <= maxDiff )
+	if ( absDiff <= maxDiff ) {
 		return true;
+	}
 
-	sFloatPoint<Tf> uLhs( lhs );
-	sFloatPoint<Tf> uRhs( rhs );
+	sFloatPoint< Tf > uLhs( lhs );
+	sFloatPoint< Tf > uRhs( rhs );
 
 	// Different signs means they do not match.
-	if ( uLhs.Negative() != uRhs.Negative() )
+	if ( uLhs.Negative() != uRhs.Negative() ) {
 		return false;
+	}
 
 	// Find the difference in ULPs.
-	Ti ulpsDiff = abs( uLhs.i - uRhs.i );
-	if ( ulpsDiff <= maxUlpsDiff )
+	Ti ulpsDiff = std::abs( uLhs.i - uRhs.i );
+	if ( ulpsDiff <= maxUlpsDiff ) {
 		return true;
+	}
 
 	return false;
 }
 
 /// @brief check floating point values using relative and diff
-template<typename Tf>
-bool private_areAlmostEqualRelativeAndAbs(
-        const Tf& lhs, const Tf& rhs,
-        Tf maxDiff, Tf maxRelDiff ) noexcept {
+template< typename Tf >
+static bool private_areAlmostEqualRelativeAndAbs( const Tf &lhs, const Tf &rhs, Tf maxDiff, Tf maxRelDiff ) noexcept {
 	// Check if the numbers are really close -- needed
 	// when comparing numbers near zero.
 	Tf diff = std::fabs( lhs - rhs );
-	if ( diff <= maxDiff )
+	if ( diff <= maxDiff ) {
 		return true;
+	}
 
-	Tf flhs = fabs( lhs );
-	Tf frhs = fabs( rhs );
+	Tf flhs    = std::abs( lhs );
+	Tf frhs    = std::abs( rhs );
 	Tf largest = ( frhs > flhs ) ? frhs : flhs;
 
-	if ( diff <= largest * maxRelDiff )
+	if ( diff <= largest * maxRelDiff ) {
 		return true;
+	}
 	return false;
 }
 
@@ -99,94 +93,71 @@ bool private_areAlmostEqualRelativeAndAbs(
  * All other cases, meaning all cases where this warning is indeed very
  * valuable, are already excluded by the sign test.
  */
+#if !PWX_IS_MSVC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif // Not MSVC
 
 
 /// @brief template to dispatch to the correct AlmostEqual function
-template<typename Tf>
-bool private_dispatchAlmostEqual( const Tf& lhs, const Tf& rhs ) noexcept {
-	typedef typename pwx::sFloatPoint<Tf>::Ti Ti;
+template< typename Tf >
+static bool private_dispatchAlmostEqual( const Tf &lhs, const Tf &rhs ) noexcept {
+	typedef typename pwx::sFloatPoint< Tf >::Ti Ti;
 
 	// return at once if the sign differs, but use
 	// operator== to catch -0 versus +0
-	if ( SIGN( lhs ) != SIGN( rhs ) )
+	if ( SIGN( lhs ) != SIGN( rhs ) ) {
 		return lhs == rhs;
+	}
 
 	Tf fLhs = std::fabs( lhs );
 	Tf fRhs = std::fabs( rhs );
 
 	// With very small numbers, the relative check is used
-	if ( ( fLhs <= 1.0 ) && ( fRhs <= 1.0 ) )
-		return private_areAlmostEqualRelativeAndAbs<Tf>(
-		               lhs, rhs, 0.f, pwx::sFloatPoint<Tf>::epsilon() );
+	if ( ( fLhs <= 1.0 ) && ( fRhs <= 1.0 ) ) {
+		return private_areAlmostEqualRelativeAndAbs< Tf >(
+			  lhs, rhs, 0.f, pwx::sFloatPoint< Tf >::epsilon()
+		);
+	}
 
 	// If both numbers are equal or larger than 4, we need to find the magnitude
 	if ( ( fLhs >= 4.0 ) && ( fRhs >= 4.0 ) ) {
 		Tf mag = std::fmin( std::log2( fLhs ), std::log2( fLhs ) );
-		return private_areAlmostEqualUlpsAndAbs<Tf, Ti>(
-		               lhs, rhs, pwx::sFloatPoint<Tf>::epsilon() * mag,
-		               static_cast<Ti>( mag * 2 ) );
+		return private_areAlmostEqualUlpsAndAbs< Tf, Ti >(
+			  lhs, rhs, pwx::sFloatPoint< Tf >::epsilon() * mag,
+			  static_cast<Ti>( mag * 2 )
+		);
 	}
 
 	// With numbers between 1.0 and 4.0 a normal ULPS check is in order
-	if ( ( fLhs >= 1.0 ) && ( fRhs >= 1.0 ) && ( fLhs <= 4.0 ) && ( fRhs <= 4.0 ) )
-		return private_areAlmostEqualUlpsAndAbs<Tf, Ti>(
-		               lhs, rhs, pwx::sFloatPoint<Tf>::epsilon(), 2 );
+	if ( ( fLhs >= 1.0 ) && ( fRhs >= 1.0 ) && ( fLhs <= 4.0 ) && ( fRhs <= 4.0 ) ) {
+		return private_areAlmostEqualUlpsAndAbs< Tf, Ti >(
+			  lhs, rhs, pwx::sFloatPoint< Tf >::epsilon(), 2
+		);
+	}
 
 	// If none of these valid, the numbers are simply different.
 	return false;
 }
 
 
+#if !PWX_IS_MSVC
 #pragma GCC diagnostic pop
+#endif // Not MSVC
 
 
-} // namespace private_
-
-
-/** @brief test two floats whether they are near enough to be considered equal
-  *
-  * This functions takes two floats and tests whether they can be considered
-  * equal. For this the tolerated difference and the tolerated ULPS
-  * difference are determined. Then an internal function can check these values.
-  *
-  * @param[in] lhs left hand side value
-  * @param[in] rhs right hand side value
-  * @return true if both values can be considered equal although their representation might differ
-**/
-bool areAlmostEqual( const float lhs, const float rhs ) noexcept {
-	return private_::private_dispatchAlmostEqual<float>( lhs, rhs );
+bool areAlmostEqual( float lhs, float rhs ) noexcept {
+	return private_dispatchAlmostEqual< float >( lhs, rhs );
 }
 
 
-/** @brief test two doubles whether they are near enough to be considered equal
-  *
-  * This functions takes two doubles and tests whether they can be considered
-  * equal. For this the tolerated difference and the tolerated ULPS
-  * difference are determined. Then an internal function can check these values.
-  *
-  * @param[in] lhs left hand side value
-  * @param[in] rhs right hand side value
-  * @return true if both values can be considered equal although their representation might differ
-**/
-bool areAlmostEqual( const double lhs, const double rhs ) noexcept {
-	return private_::private_dispatchAlmostEqual<double>( lhs, rhs );
+bool areAlmostEqual( double lhs, double rhs ) noexcept {
+	return private_dispatchAlmostEqual< double >( lhs, rhs );
 }
 
 
-/** @brief test two long doubles whether they are near enough to be considered equal
-  *
-  * This functions takes two long doubles and tests whether they can be considered
-  * equal. For this the tolerated difference and the tolerated ULPS
-  * difference are determined. Then an internal function can check these values.
-  *
-  * @param[in] lhs left hand side value
-  * @param[in] rhs right hand side value
-  * @return true if both values can be considered equal although their representation might differ
-**/
-bool areAlmostEqual( const long double lhs, const long double rhs ) noexcept {
-	return private_::private_dispatchAlmostEqual<long double>( lhs, rhs );
+bool areAlmostEqual( long double lhs, long double rhs ) noexcept {
+	return private_dispatchAlmostEqual< long double >( lhs, rhs );
 }
 
 } // namespace pwx

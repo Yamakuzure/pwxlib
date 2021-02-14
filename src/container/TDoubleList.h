@@ -77,9 +77,9 @@ public:
 	 * ===============================================
 	*/
 
-	typedef TSingleList<data_t, elem_t>   base_t;  //!< Base type of this list
-	typedef TDoubleList<data_t, elem_t>   list_t;  //!< Type of this list
-	typedef private_::CThreadElementStore store_t; //!< Storage for the thread id bound curr pointer
+	typedef TSingleList<data_t, elem_t> base_t;  //!< Base type of this list
+	typedef TDoubleList<data_t, elem_t> list_t;  //!< Type of this list
+	typedef CThreadElementStore         store_t; //!< Storage for the thread id bound curr pointer
 
 
 	/* ===============================================
@@ -93,7 +93,7 @@ public:
 	  *
 	  * @param[in] destroy_ A pointer to a function that is to be used to destroy the data
 	**/
-	TDoubleList ( void ( *destroy_ ) ( data_t* data ) ) noexcept :
+	TDoubleList ( void ( *destroy_ ) ( data_t* ) ) noexcept :
 		base_t ( destroy_ )
 	{ }
 

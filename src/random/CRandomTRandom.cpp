@@ -30,50 +30,59 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
 #include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
-
 #include "random/CRandomTRandom.h"
 
-namespace pwx::private_ {
-struct privRand32_t {
+
+namespace pwx {
+
+
+class privRand32_t {
+public:
 	rand_t operator()() {
 		try {
-			thread_local static std::random_device privRandDev_;
-			thread_local static std::mt19937       privRandMt32_( privRandDev_() );
+			thread_local static std::mt19937 privRandMt32_( privRandDev_() );
 			return privRandMt32_();
 		} catch ( ... ) {}
 		return 0;
 	}
+private:
+	thread_local static std::random_device privRandDev_;
+
 } privRand32;
-struct privRand64_t {
+
+
+class privRand64_t {
+public:
 	rand_t operator()() {
 		try {
-			thread_local static std::random_device privRandDev_;
-			thread_local static std::mt19937_64    privRandMt64_( privRandDev_() );
+			thread_local static std::mt19937_64 privRandMt64_( privRandDev_() );
 			return privRandMt64_();
 		} catch ( ... ) {}
 		return 0;
 	}
+private:
+	thread_local static std::random_device privRandDev_;
 } privRand64;
-}
+
+
+} // namespace pwx
 
 
 /// @internal random number generator, 32 bit. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-pwx::private_::rand_t pwx::private_::private_get_random32() noexcept {
+pwx::rand_t pwx::private_get_random32() noexcept {
 	return privRand32();
 }
 
 
 /// @internal random number generator, 64 bit. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-pwx::private_::rand_t pwx::private_::private_get_random64() noexcept {
+pwx::rand_t pwx::private_get_random64() noexcept {
 	return privRand64();
 }
 
 
 /// @internal random character handler. NEVER EXPOSE OR USE OUTSIDE CRandom.cpp !
-size_t pwx::private_::private_random_str( char* dest, size_t min_, size_t max_ ) noexcept {
+size_t pwx::private_random_str( char* dest, size_t min_, size_t max_ ) noexcept {
 	static const uint8_t lowA = 'a';
 	static const uint8_t uppA = 'A';
 
@@ -91,8 +100,10 @@ size_t pwx::private_::private_random_str( char* dest, size_t min_, size_t max_ )
 		        )
 			  ) {
 			// Set up next character
-			dest[pos] = static_cast<uint8_t>( 0x000000ff & ( ( private_::privRand32() ) % 26 ) )
-			            + ( static_cast<uint8_t>( 0x000000ff & ( ( private_::privRand32() ) % 2 ) ) ? lowA : uppA );
+			dest[pos] = static_cast<char>(
+				  (   0x000000ff & ( ( privRand32() ) % 26 ) ) +
+				  ( ( 0x000000ff & ( ( privRand32() ) %  2 ) ) ? lowA : uppA )
+			);
 
 			// Advance pos and reduce finishDone if xMin is already met
 			if ( ++pos >= xMin ) {
@@ -106,4 +117,3 @@ size_t pwx::private_::private_random_str( char* dest, size_t min_, size_t max_ )
 
 	return pos;
 }
-
