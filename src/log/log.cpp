@@ -76,7 +76,7 @@ void pwx::log( char const* location, log_level_t level, char const* title, char 
 	if ( 0 == localtime_s( &tm, &t ) ) {
 #else
 	if ( localtime_r( &t, &tm ) ) {
-#endif // Thanks MS for pwxng their own ideas. Not even compliant to C11 localtime_s()...
+#endif // Thanks MS for having their own ideas. Not even compliant to C11 localtime_s()...
 		snprintf(
 			  timebuf, 20, "%04hu-%02hhu-%02hhu %02hhu:%02hhu:%02hhu",
 			  (uint16_t) ( 1900 + (uint8_t) tm.tm_year ),

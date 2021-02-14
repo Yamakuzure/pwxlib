@@ -86,7 +86,7 @@ void log_close();
   * send them to the log file or stdout/stderr.
   *
   * This allows the program to continue its work after sending the message to the queue
-  * instead of pwxng to wait for the assembling and writing. Further one thread can
+  * instead of having to wait for the assembling and writing. Further one thread can
   * assemble the next message while another is still writing to the log file.
   *
   * A unique id of the queue items ensures that the messages reach the log file in the
@@ -168,7 +168,7 @@ void show_progress( char const* message, ... );
 } // namespace pwx
 
 
-/* --- Log wrapper - Used by the log helper macros below --- */
+/// @brief Log wrapper - Used by the log helper macros
 #define PWX_log_wrapper( _l_, _t_, _m_, ... ) \
     ::pwx::log( \
               ::pwx::get_trace_info(__FILE__, __LINE__, __func__), \
@@ -176,7 +176,7 @@ void show_progress( char const* message, ... );
             )
 
 
-/* --- Log wrapper with errno message fetch - Used by log_errno() --- */
+/// @brief Log wrapper with errno message fetch - Used by log_errno()
 #define PWX_log_errno( _e_, _t_, _m_, ... ) { \
     char const* _err_msg_ = pwx_strerror( _e_ ); \
     PWX_log_wrapper( LOG_ERROR, _t_, _m_ ": %s", __VA_ARGS__, _err_msg_ ); \
@@ -184,11 +184,48 @@ void show_progress( char const* message, ... );
 
 
 /* --- Log helper macros --- */
+
+/** @def log_info
+  * @brief Log an info message
+  * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
+  * @params[in] message_ The message to display, following `printf()` rules
+**/
 #define log_info( title_, message_, ... )          PWX_log_wrapper(LOG_INFO,     title_, message_, __VA_ARGS__)
+
+/** @def log_status
+  * @brief Log a status message
+  * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
+  * @params[in] message_ The message to display, following `printf()` rules
+**/
 #define log_status( title_, message_, ... )        PWX_log_wrapper(LOG_STATUS,   title_, message_, __VA_ARGS__)
+
+/** @def log_warning
+  * @brief Log a warning message
+  * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
+  * @params[in] message_ The message to display, following `printf()` rules
+**/
 #define log_warning( title_, message_, ... )       PWX_log_wrapper(LOG_WARNING,  title_, message_, __VA_ARGS__)
+
+/** @def log_error
+  * @brief Log an error message
+  * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
+  * @params[in] message_ The message to display, following `printf()` rules
+**/
 #define log_error( title_, message_, ... )         PWX_log_wrapper(LOG_ERROR,    title_, message_, __VA_ARGS__)
+
+/** @def log_errno
+  * @brief Log an error message with errno text substitution
+  * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
+  * @param[in] errno_ The errno to get the `strerror()` from
+  * @params[in] message_ The message to display, following `printf()` rules
+**/
 #define log_errno( title_, errno_, message_, ... ) PWX_log_errno(        errno_, title_, message_, __VA_ARGS__)
+
+/** @def log_critical
+  * @brief Log a critical message
+  * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
+  * @params[in] message_ The message to display, following `printf()` rules
+**/
 #define log_critical( title_, message_, ... )      PWX_log_wrapper(LOG_CRITICAL, title_, message_, __VA_ARGS__)
 
 
