@@ -645,7 +645,7 @@ template<>
 #endif // PWX_NODOX
 
 
-#ifdef HAVE___INT128_T
+#if HAVE___INT128_T
 /** @brief convert a value to __int128_t
   *
   * This function can cast integer and float types to __int128_t.
@@ -676,7 +676,7 @@ inline __int128_t to_int128( char* val ) { char const* v = val; return to_int128
 #endif // HAVE___INT128_T
 
 
-#ifdef HAVE___UINT128_T
+#if HAVE___UINT128_T
 /** @brief convert a value to __uint128_t
   *
   * This function can cast integer and float types to __uint128_t.

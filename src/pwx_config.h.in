@@ -29,11 +29,19 @@
 #define PACKAGE_STRING           PROJECT_NAME "-" PWXLIB_VERSION_STR
 
 /* ---- Project Configuration ---- */
-#define HAVE_THREADS_H         @HAVE_THREADS_H@
-#define PWX_ANNOTATIONS        @PWX_ANNOTATIONS@
-#define PWX_SMALL_TESTS        @PWX_SMALL_TESTS@
-#define PWX_USE_FLAGSPIN_YIELD @PWX_USE_FLAGSPIN_YIELD@
-#define PWX_USE_FLAGSPIN       @PWX_USE_FLAGSPIN@
+#define HAVE_CHAR16_T                   @HAVE_CHAR16_T@
+#define HAVE_CHAR32_T                   @HAVE_CHAR32_T@
+#define HAVE_STDDEF_H                   @HAVE_STDDEF_H@
+#define HAVE_STDINT_H                   @HAVE_STDINT_H@
+#define HAVE_STD__CHARS_FORMAT__GENERAL @HAVE_STD__CHARS_FORMAT__GENERAL@
+#define HAVE_SYS_TYPES_H                @HAVE_SYS_TYPES_H@
+#define HAVE_WCHAR_T                    @HAVE_WCHAR_T@
+#define HAVE___INT128_T                 @HAVE___INT128_T@
+#define HAVE___UINT128_T                @HAVE___UINT128_T@
+#define PWX_ANNOTATIONS                 @PWX_ANNOTATIONS@
+#define PWX_SMALL_TESTS                 @PWX_SMALL_TESTS@
+#define PWX_USE_FLAGSPIN                @PWX_USE_FLAGSPIN@
+#define PWX_USE_FLAGSPIN_YIELD          @PWX_USE_FLAGSPIN_YIELD@
 
 
 #endif // PWXLIB_PWX_CONFIG_H_INCLUDED

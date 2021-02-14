@@ -30,18 +30,18 @@
 **/
 
 
+#include "basic/CLockGuard.h"
+#include "basic/CLockable.h"
+#include "basic/_mem_map.h"
+#include "basic/alloc_utils.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
+#include "log/log.h"
+
 #include <cassert>
 #include <cstddef>
 #include <cstring>
 #include <map>
-
-#include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
-
-#include "basic/_mem_map.h"
-#include "basic/alloc_utils.h"
-#include "basic/CLockable.h"
-#include "basic/CLockGuard.h"
 
 
 #ifndef PWX_NODOX
@@ -150,9 +150,11 @@ bool mem_map_report_internal() {
 	// A simple loop will do
 	for ( auto &[address, item] : mem_map ) {
 		result = false;
-		log_debug_error( "Memory Map Leak Error!",
-		                 "The address 0x%08lx is *STILL* registered with size %lu from %s",
-		                 address, item.mem_size, item.location );
+		log_error(
+			  "Memory Map Leak Error!",
+			  "The address 0x%08lx is *STILL* registered with size %lu from %s",
+			  address, item.mem_size, item.location
+		);
 		// The final clearing of the memory map does not touch the pointers,
 		// so it is safe to free the key here.
 		//freep( const_cast<void*>( address ) );

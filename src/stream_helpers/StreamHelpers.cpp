@@ -30,20 +30,19 @@
 **/
 
 
+#include "basic/mem_utils.h"
+#include "basic/pwx_compiler.h"
+#include "basic/pwx_debug.h"
+#include "basic/pwx_macros.h"
+#include "basic/string_utils.h"
+#include "stream_helpers/StreamHelpers.h"
+
 #include <charconv>
 #include <cstdlib>
 #include <cstring>
 #include <string>
 #include <unistd.h>
 #include <vector>
-
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
-
-#include "basic/mem_utils.h"
-#include "basic/string_utils.h"
-#include "stream_helpers/StreamHelpers.h"
 
 
 namespace pwx {
@@ -56,7 +55,7 @@ namespace pwx {
   * @return the stream object
   *
 **/
-std::ostream& operator<<( std::ostream& os, const CAdjLeft& l ) noexcept {
+std::ostream &operator<<( std::ostream &os, const CAdjLeft &l ) noexcept {
 	if ( os.good() ) {
 		os.setf( std::ios_base::left, std::ios_base::adjustfield | std::ios_base::floatfield );
 		l.setFields( os );
@@ -72,7 +71,7 @@ std::ostream& operator<<( std::ostream& os, const CAdjLeft& l ) noexcept {
   * @return the stream object
   *
 **/
-std::ostream& operator<<( std::ostream& os, const CAdjRight& r ) noexcept {
+std::ostream &operator<<( std::ostream &os, const CAdjRight &r ) noexcept {
 	if ( os.good() ) {
 		os.setf( std::ios_base::right, std::ios_base::adjustfield | std::ios_base::floatfield );
 		r.setFields( os );
@@ -90,7 +89,7 @@ std::ostream& operator<<( std::ostream& os, const CAdjRight& r ) noexcept {
   * @param[in,out] data The data string to search
   * @return true if a representation was found.
 **/
-bool cropShell( char const* key, std::string& data ) noexcept {
+bool cropShell( char const* key, std::string &data ) noexcept {
 	std::string shLike = "$";
 	shLike += key;
 	size_t pos    = data.find( shLike );
@@ -129,7 +128,7 @@ bool cropShell( char const* key, std::string& data ) noexcept {
   * @param[in] is the ifstream to manipulate
   * @param[in] value the value to look for and jump after
 **/
-void forwardTo( std::ifstream& is, char value ) noexcept {
+void forwardTo( std::ifstream &is, char value ) noexcept {
 	while ( is.good() && ( is.peek() != value ) ) {
 		is.ignore( 1 );
 	}
@@ -143,7 +142,7 @@ void forwardTo( std::ifstream& is, char value ) noexcept {
   * @param[in,out] text a string reference that will be trimmed
   * @param[in] extra optional extra character to be trimmed as well, defaults to 0
 **/
-void ltrim( std::string& text, char extra ) noexcept {
+void ltrim( std::string &text, char extra ) noexcept {
 	if ( ( extra == '\r' ) || ( extra == '\n' ) || ( extra == ' ' ) || ( extra == '\t' ) ) {
 		extra = 0x0;
 	}
@@ -173,7 +172,7 @@ void ltrim( std::string& text, char extra ) noexcept {
   * @return the file name on success, so you can get rid of the file, or NULL if something went wrong
 **/
 char const* makeTemp( char const* aPath, char const* aTemplate, char const* aSuffix,
-                      std::ofstream& ofs, std::ios_base::openmode mode ) noexcept {
+                      std::ofstream &ofs, std::ios_base::openmode mode ) noexcept {
 	try {
 		std::string fileName( aPath );
 		int32_t     suffLen = aSuffix ? strlen( aSuffix ) : 0;
@@ -232,7 +231,7 @@ char const* makeTemp( char const* aPath, char const* aTemplate, char const* aSuf
   * @param[in,out] text a string reference that will be trimmed
   * @param[in] extra optional extra character to be trimmed as well, defaults to 0
 **/
-void rtrim( std::string& text, char extra ) noexcept {
+void rtrim( std::string &text, char extra ) noexcept {
 	if ( ( extra == '\r' ) || ( extra == '\n' ) || ( extra == ' ' ) || ( extra == '\t' ) ) {
 		extra = 0x0;
 	}
@@ -258,7 +257,7 @@ void rtrim( std::string& text, char extra ) noexcept {
   * @param[in] is an open ifstream
   * @return false if something fails, true if a different char or eof is met
 **/
-bool skipLineBreak( std::ifstream& is ) noexcept {
+bool skipLineBreak( std::ifstream &is ) noexcept {
 	bool    result = false;
 	int32_t peek   = 0;
 
@@ -291,7 +290,7 @@ bool skipLineBreak( std::ifstream& is ) noexcept {
   * @param[in,out] text reference on the string to search
   * @param[in] spacePerTab number of spaces per tab.
 **/
-void tabToSpace( std::string& text, size_t spacePerTab ) noexcept {
+void tabToSpace( std::string &text, size_t spacePerTab ) noexcept {
 	if ( text.size() ) {
 		size_t pos = text.find_first_of( '\t' );
 
@@ -311,7 +310,7 @@ void tabToSpace( std::string& text, size_t spacePerTab ) noexcept {
   * @param[in,out] text a string reference that will be trimmed
   * @param[in] extra optional extra character to be trimmed as well, defaults to 0
 **/
-void trim( std::string& text, char extra ) noexcept {
+void trim( std::string &text, char extra ) noexcept {
 	ltrim( text, extra );
 	rtrim( text, extra );
 }
@@ -344,7 +343,7 @@ CFormat::CFormat() noexcept {}
   *
   * @param[in,out] os an open and valid output stream to format
 **/
-void CFormat::setFields( std::ostream& os ) const noexcept {
+void CFormat::setFields( std::ostream &os ) const noexcept {
 	if ( os.good() && ( left || right ) ) {
 		if ( left ) {
 			os.width( left + ( right ? 1 + right : 0 ) );
@@ -388,20 +387,20 @@ CAdjRight::CAdjRight() noexcept {}
 
 // === Static helpers for the conversion from std::string ===
 template< typename T >
-	static inline T _get_int_from_String( std::string& str ) {
-		auto const tail = str.find_last_not_of( ' ' );
-		if ( tail == std::string::npos ) {
-			return (T) 0;
-		}
-
-		auto const st_end = str.data() + tail + 1; // End of data to be converted
-		T          num;
-
-		return ( std::from_chars( str.data() + str.find_first_not_of( ' ' ), st_end, num, 10 ).ptr == st_end )
-		       ? num : (T) 0;
+static inline T _get_int_from_String( std::string &str ) {
+	auto const tail = str.find_last_not_of( ' ' );
+	if ( tail == std::string::npos ) {
+		return (T) 0;
 	}
 
-#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+	auto const st_end = str.data() + tail + 1; // End of data to be converted
+	T          num{ 0 };
+
+	return ( std::from_chars( str.data() + str.find_first_not_of( ' ' ), st_end, num, 10 ).ptr == st_end )
+	       ? num : (T) 0;
+}
+
+#if HAVE_STD__CHARS_FORMAT__GENERAL
 template<typename T>
 static inline T _get_flt_from_String( std::string &str )
 {
@@ -410,7 +409,7 @@ static inline T _get_flt_from_String( std::string &str )
 		return (T)0;
 
 	auto const st_end = str.data() + tail + 1; // End of data to be converted
-	T num;
+	T num{ 0 };
 
 	return ( std::from_chars( str.data() + str.find_first_not_of(' '), st_end, num, std::chars_format::general).ptr == st_end )
 		   ? num : (T)0;
@@ -430,7 +429,7 @@ template<> bool to_bool( char const* val ) noexcept {
 	);
 }
 
-template<> bool to_bool( std::string& val ) noexcept {
+template<> bool to_bool( std::string &val ) noexcept {
 	return to_bool( val.c_str() );
 }
 
@@ -441,8 +440,8 @@ template<> float to_float( char const* val ) noexcept {
 	return 0.f;
 }
 
-template<> float to_float( std::string& val ) noexcept {
-#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+template<> float to_float( std::string &val ) noexcept {
+#if HAVE_STD__CHARS_FORMAT__GENERAL
 	return _get_flt_from_String<float>( val );
 #else
 	return to_float( val.c_str() );
@@ -457,8 +456,8 @@ template<> double to_double( char const* val ) noexcept {
 	return 0.;
 }
 
-template<> double to_double( std::string& val ) noexcept {
-#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+template<> double to_double( std::string &val ) noexcept {
+#if HAVE_STD__CHARS_FORMAT__GENERAL
 	return _get_flt_from_String<double>( val );
 #else
 	return to_double( val.c_str() );
@@ -472,8 +471,8 @@ template<> long double to_long_double( char const* val ) noexcept {
 	return 0.;
 }
 
-template<> long double to_long_double( std::string& val ) noexcept {
-#ifdef HAVE_STD__CHARS_FORMAT__GENERAL
+template<> long double to_long_double( std::string &val ) noexcept {
+#if HAVE_STD__CHARS_FORMAT__GENERAL
 	return _get_flt_from_String<long double>( val );
 #else
 	return to_long_double( val.c_str() );
@@ -487,7 +486,7 @@ template<> int8_t to_int8( char const* val ) noexcept {
 	return 0;
 }
 
-template<> int8_t to_int8( std::string& val ) noexcept {
+template<> int8_t to_int8( std::string &val ) noexcept {
 	return _get_int_from_String< int8_t >( val );
 }
 
@@ -499,7 +498,7 @@ template<> uint8_t to_uint8( char const* val ) noexcept {
 }
 
 
-template<> uint8_t to_uint8( std::string& val ) noexcept {
+template<> uint8_t to_uint8( std::string &val ) noexcept {
 	return _get_int_from_String< uint8_t >( val );
 }
 
@@ -510,7 +509,7 @@ template<> int16_t to_int16( char const* val ) noexcept {
 	return 0;
 }
 
-template<> int16_t to_int16( std::string& val ) noexcept {
+template<> int16_t to_int16( std::string &val ) noexcept {
 	return _get_int_from_String< int16_t >( val );
 }
 
@@ -521,7 +520,7 @@ template<> uint16_t to_uint16( char const* val ) noexcept {
 	return 0;
 }
 
-template<> uint16_t to_uint16( std::string& val ) noexcept {
+template<> uint16_t to_uint16( std::string &val ) noexcept {
 	return _get_int_from_String< uint16_t >( val );
 }
 
@@ -532,7 +531,7 @@ template<> int32_t to_int32( char const* val ) noexcept {
 	return 0;
 }
 
-template<> int32_t to_int32( std::string& val ) noexcept {
+template<> int32_t to_int32( std::string &val ) noexcept {
 	return _get_int_from_String< int32_t >( val );
 }
 
@@ -543,7 +542,7 @@ template<> uint32_t to_uint32( char const* val ) noexcept {
 	return 0;
 }
 
-template<> uint32_t to_uint32( std::string& val ) noexcept {
+template<> uint32_t to_uint32( std::string &val ) noexcept {
 	return _get_int_from_String< uint32_t >( val );
 }
 
@@ -554,7 +553,7 @@ template<> int64_t to_int64( char const* val ) noexcept {
 	return 0;
 }
 
-template<> int64_t to_int64( std::string& val ) noexcept {
+template<> int64_t to_int64( std::string &val ) noexcept {
 	return _get_int_from_String< int64_t >( val );
 }
 
@@ -565,11 +564,11 @@ template<> uint64_t to_uint64( char const* val ) noexcept {
 	return 0;
 }
 
-template<> uint64_t to_uint64( std::string& val ) noexcept {
+template<> uint64_t to_uint64( std::string &val ) noexcept {
 	return _get_int_from_String< uint64_t >( val );
 }
 
-#ifdef HAVE___INT128_T
+#if HAVE___INT128_T
 template<> __int128_t to_int128( char const* val )  {
 	if ( val && val[0] )
 		return static_cast<__int128_t>( std::strtoll(val, nullptr, 10) );
@@ -581,7 +580,7 @@ template<> __int128_t to_int128( std::string &val )  {
 }
 
 #endif // HAVE___INT128_T
-#ifdef HAVE___UINT128_T
+#if HAVE___UINT128_T
 template<> __uint128_t to_uint128( char const* val )  {
 	if ( val && val[0] )
 		return static_cast<__uint128_t>( std::strtoull(val, nullptr, 10) );

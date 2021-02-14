@@ -44,7 +44,6 @@ set( PROJECT_WRAPPERS "${pwx_WRAPPERS_STR}" PARENT_SCOPE )
 set( pwx_obj_HEADERS
      ${pwx_WRAPPERS}
      ${pwxlib_h}
-     "${PROJECT_BINARY_DIR}/pwx_config.h"
      )
 
 add_library( pwx_obj OBJECT

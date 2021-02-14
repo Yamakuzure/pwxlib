@@ -22,8 +22,6 @@ project( ${PROJECT_NAME}
          LANGUAGES C CXX
          )
 
-set( CMAKE_C_STANDARD 11 )
-set( CMAKE_C_STANDARD_REQUIRED True )
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED True )
 # Always warn about everything!
@@ -60,14 +58,40 @@ endif ()
 find_package( Threads )
 
 
-# -----------------------
-# --- Needed Headers ---
-# -----------------------
-check_include_file( threads.h HAVE_THREADS_H )
-if ( NOT HAVE_THREADS_H )
-	set( HAVE_THREADS_H 0 )
+# --------------------------------
+# --- Check for optional types ---
+# --------------------------------
+include( CheckTypeSize )
+set( HAVE___INT128_T 0 )
+set( HAVE___UINT128_T 0 )
+set( HAVE_CHAR16_T 0 )
+set( HAVE_CHAR32_T 0 )
+set( HAVE_WCHAR_T 0 )
+set( HAVE_STD__CHARS_FORMAT__GENERAL 0 )
+check_type_size( __int128_t __INT128 LANGUAGE CXX )
+check_type_size( __uint128_t __UINT128 LANGUAGE CXX )
+check_type_size( char16_t CHAR16 LANGUAGE CXX )
+check_type_size( char32_t CHAR32 LANGUAGE CXX )
+check_type_size( wchar_t WCHAR LANGUAGE CXX )
+check_type_size( std::chars_format::general CHARS_FORMAT_GENERAL LANGUAGE CXX )
+if ( HAVE___INT128 )
+	set( HAVE___INT128_T 1 )
 endif ()
-
+if ( HAVE___UINT128 )
+	set( HAVE___UINT128_T 1 )
+endif ()
+if ( HAVE_CHAR16 )
+	set( HAVE_CHAR16_T 1 )
+endif ()
+if ( HAVE_CHAR32 )
+	set( HAVE_CHAR32_T 1 )
+endif ()
+if ( HAVE_WCHAR )
+	set( HAVE_WCHAR_T 1 )
+endif ()
+if ( HAVE_CHARS_FORMAT_GENERAL )
+	set( HAVE_STD__CHARS_FORMAT__GENERAL 1 )
+endif ()
 
 # --------------------
 # --- Options List ---
@@ -270,7 +294,7 @@ if ( BUILD_SHARED_LIBS OR BUILD_STATIC_LIBS )
 	include( CTest )
 	enable_testing()
 	if ( BUILD_TESTING )
-		list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+		list( APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure" )
 
 		add_subdirectory( test )
 

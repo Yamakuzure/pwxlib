@@ -131,7 +131,7 @@ template <> void TArgTarget<int64_t>::par_to_val( int64_t* tgt, char const* para
 	}
 }
 
-#ifdef HAVE___INT128_T
+#if HAVE___INT128_T
 template <> void TArgTarget<__int128_t>::par_to_val( __int128_t* tgt, char const* param ) noexcept {
 	if ( tgt ) {
 		*tgt = to_int128 ( param );
@@ -162,7 +162,7 @@ template <> void TArgTarget<uint64_t>::par_to_val( uint64_t* tgt, char const* pa
 	}
 }
 
-#ifdef HAVE___UINT128_T
+#if HAVE___UINT128_T
 template <> void TArgTarget<__uint128_t>::par_to_val( __uint128_t* tgt, char const* param ) noexcept {
 	if ( tgt ) {
 		*tgt = to_uint128 ( param );

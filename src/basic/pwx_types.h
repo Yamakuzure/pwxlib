@@ -49,7 +49,7 @@
 #define isSameType(a, b) std::is_same_v<a, b>
 
 
-#ifdef HAVE_CHAR16_T
+#if HAVE_CHAR16_T
 #  define isChar16(a) (isSameType(a, char16_t) || isSameType(a, unsigned char16_t))
 #else
 #  define isChar16(a) false
@@ -61,7 +61,7 @@
 **/
 
 
-#ifdef HAVE_CHAR32_T
+#if HAVE_CHAR32_T
 #  define isChar32(a) (isSameType(a, char32_t) || isSameType(a, unsigned char32_t))
 #else
 #  define isChar32(a) false
@@ -73,7 +73,7 @@
 **/
 
 
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
 #  define isWChar(a) (isSameType(a, wchar_t) || isSameType(a, unsigned wchar_t))
 #else
 #  define isWChar(a) false

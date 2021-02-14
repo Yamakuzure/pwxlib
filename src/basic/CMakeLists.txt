@@ -9,6 +9,7 @@ set( basic_HEADERS
      ${CMAKE_CURRENT_LIST_DIR}/alloc_utils.h
      ${CMAKE_CURRENT_LIST_DIR}/mem_utils.h
      ${CMAKE_CURRENT_LIST_DIR}/pwx_compiler.h
+     "${PROJECT_BINARY_DIR}/pwx_config.h"
      ${CMAKE_CURRENT_LIST_DIR}/pwx_debug.h
      ${CMAKE_CURRENT_LIST_DIR}/pwx_macros.h
      ${CMAKE_CURRENT_LIST_DIR}/pwx_templates.h
