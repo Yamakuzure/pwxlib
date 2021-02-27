@@ -35,8 +35,8 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
 
 #include "basic/CLockable.h"
 #include "container/TDoubleList.h"

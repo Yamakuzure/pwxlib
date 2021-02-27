@@ -35,9 +35,9 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
+#include "basic/debug.h"
 
 #include "basic/alloc_utils.h"
 #include "basic/_mem_map.h"

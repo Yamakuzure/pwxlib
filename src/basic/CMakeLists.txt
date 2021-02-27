@@ -3,19 +3,19 @@
 # -------------------------------------------------
 
 set( basic_HEADERS
+     "${PROJECT_BINARY_DIR}/pwx_config.h"
      ${CMAKE_CURRENT_LIST_DIR}/CException.h
      ${CMAKE_CURRENT_LIST_DIR}/CLockGuard.h
      ${CMAKE_CURRENT_LIST_DIR}/CLockable.h
      ${CMAKE_CURRENT_LIST_DIR}/alloc_utils.h
+     ${CMAKE_CURRENT_LIST_DIR}/compiler.h
+     ${CMAKE_CURRENT_LIST_DIR}/debug.h
+     ${CMAKE_CURRENT_LIST_DIR}/macros.h
      ${CMAKE_CURRENT_LIST_DIR}/mem_utils.h
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_compiler.h
-     "${PROJECT_BINARY_DIR}/pwx_config.h"
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_debug.h
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_macros.h
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_templates.h
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_trace_info.h
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_types.h
      ${CMAKE_CURRENT_LIST_DIR}/string_utils.h
+     ${CMAKE_CURRENT_LIST_DIR}/templates.h
+     ${CMAKE_CURRENT_LIST_DIR}/trace_info.h
+     ${CMAKE_CURRENT_LIST_DIR}/types.h
      )
 
 target_sources( basic PRIVATE

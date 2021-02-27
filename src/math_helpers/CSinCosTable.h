@@ -33,7 +33,7 @@
   * History and change log are maintained in pwxlib.h
 **/
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 #include "basic/CLockable.h"
 

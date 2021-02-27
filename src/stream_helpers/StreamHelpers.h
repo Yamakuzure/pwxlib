@@ -41,9 +41,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_types.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
+#include "basic/types.h"
 #include "math_helpers/MathHelpers.h"
 
 #if defined(HAVE___INT128_T) || defined(HAVE___UINT128_T)

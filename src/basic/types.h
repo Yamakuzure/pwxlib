@@ -37,7 +37,7 @@
 
 #include <atomic>
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 
 /** @brief true if @a a is of the same type as @a b

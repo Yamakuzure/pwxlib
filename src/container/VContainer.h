@@ -35,10 +35,10 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 #include "basic/CLockable.h"
-#include "basic/pwx_types.h"
+#include "basic/types.h"
 
 
 /// @namespace pwx

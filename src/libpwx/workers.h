@@ -47,7 +47,7 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 #include "libpwx/worker_PAH.h"
 #include "libpwx/worker_RNG.h"

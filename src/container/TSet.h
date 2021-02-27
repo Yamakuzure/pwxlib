@@ -35,13 +35,13 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
 
 #include "basic/CLockable.h"
 #include "container/TDoubleList.h"
 #include "container/TChainHash.h"
-#include "functions/pwx_set_fwd.h"
+#include "functions/set_fwd.h"
 
 
 namespace pwx {
@@ -962,6 +962,6 @@ TSet<data_t>::~TSet() noexcept
 
 } // namespace pwx
 
-#include "functions/pwx_set_func.h"
+#include "functions/set_func.h"
 #endif // PWX_PWXLIB_PWX_CONTAINER_TSET_H_INCLUDED
 

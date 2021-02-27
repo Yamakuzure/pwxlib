@@ -36,8 +36,8 @@
 #include <cstring>
 #include <type_traits>
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_types.h"
+#include "basic/compiler.h"
+#include "basic/types.h"
 
 #include "arg_handler/TArgTarget.h"
 #include "stream_helpers/StreamHelpers.h"

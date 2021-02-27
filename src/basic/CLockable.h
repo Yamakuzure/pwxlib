@@ -39,9 +39,9 @@
 #  include <mutex>
 #endif // PWX_USE_FLAGSPIN
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_types.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
+#include "basic/types.h"
 
 
 /// @namespace pwx

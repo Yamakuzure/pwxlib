@@ -35,7 +35,7 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 
 /** @namespace pwx

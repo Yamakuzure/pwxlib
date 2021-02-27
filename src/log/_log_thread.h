@@ -39,7 +39,7 @@
 #include "_log_queue.h"
 #include "basic/alloc_utils.h"
 #include "basic/mem_utils.h"
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 #include "log_level.h"
 
 #include <algorithm>

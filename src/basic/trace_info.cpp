@@ -37,9 +37,9 @@
 #include <cstring>
 
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_trace_info.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
+#include "basic/trace_info.h"
 
 
 #if PWX_IS_LINUX

@@ -2,8 +2,8 @@
 
 #include "basic/CLockable.h"
 #include "basic/CLockGuard.h"
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
+#include "basic/compiler.h"
+#include "basic/debug.h"
 #include "basic/string_utils.h"
 #include "log.h"
 #include "log_level.h"

@@ -31,7 +31,7 @@
 
 
 #include "basic/string_utils.h"
-#include "basic/pwx_trace_info.h"
+#include "basic/trace_info.h"
 #include "libpwx/init.h"
 #include "log/log.h"
 

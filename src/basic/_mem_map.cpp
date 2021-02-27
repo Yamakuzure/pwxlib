@@ -34,8 +34,8 @@
 #include "basic/CLockable.h"
 #include "basic/_mem_map.h"
 #include "basic/alloc_utils.h"
-#include "basic/pwx_debug.h"
-#include "basic/pwx_macros.h"
+#include "basic/debug.h"
+#include "basic/macros.h"
 #include "log/log.h"
 
 #include <cassert>

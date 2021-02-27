@@ -31,9 +31,9 @@
 
 
 #include "basic/mem_utils.h"
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
-#include "basic/pwx_macros.h"
+#include "basic/compiler.h"
+#include "basic/debug.h"
+#include "basic/macros.h"
 #include "basic/string_utils.h"
 #include "stream_helpers/StreamHelpers.h"
 

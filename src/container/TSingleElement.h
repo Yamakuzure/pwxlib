@@ -35,8 +35,8 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_debug.h"
+#include "basic/compiler.h"
+#include "basic/debug.h"
 
 #include "basic/CException.h"
 #include "container/TVarDeleter.h"

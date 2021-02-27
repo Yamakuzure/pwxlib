@@ -37,8 +37,8 @@
 
 #include <string>
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
 
 #include "arg_handler/sArgError.h"
 #include "arg_handler/TArgTarget.h"

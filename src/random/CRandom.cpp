@@ -35,9 +35,9 @@
 #include <cstring>
 #include <string>
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_macros.h"
-#include "basic/pwx_debug.h"
+#include "basic/compiler.h"
+#include "basic/macros.h"
+#include "basic/debug.h"
 
 #include "basic/mem_utils.h"
 #include "random/CRandom.h"

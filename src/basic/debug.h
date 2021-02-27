@@ -39,11 +39,11 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 
 #if LIBPWX_DEBUG
-# include "basic/pwx_trace_info.h"
+# include "basic/trace_info.h"
 # include "log/log.h"
 #endif // LIB or THREAD debug mode
 

@@ -37,8 +37,8 @@
 
 #include <limits>
 
-#include "basic/pwx_compiler.h"
-#include "basic/pwx_types.h"
+#include "basic/compiler.h"
+#include "basic/types.h"
 
 
 namespace pwx {

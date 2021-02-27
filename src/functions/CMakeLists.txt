@@ -3,8 +3,8 @@
 # -------------------------------------------------
 
 set( functions_HEADERS
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_set_func.h
-     ${CMAKE_CURRENT_LIST_DIR}/pwx_set_fwd.h
+     ${CMAKE_CURRENT_LIST_DIR}/set_func.h
+     ${CMAKE_CURRENT_LIST_DIR}/set_fwd.h
      )
 
 target_sources( functions PRIVATE

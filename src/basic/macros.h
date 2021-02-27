@@ -38,7 +38,7 @@
 **/
 
 
-#include "basic/pwx_compiler.h"
+#include "basic/compiler.h"
 
 
 /* -----------------------------------------------------------------------
@@ -638,7 +638,7 @@ if (object) {               \
 
 
 // Many of them are useless without our trace info getter
-#include "basic/pwx_trace_info.h"
+#include "basic/trace_info.h"
 
 
 #endif // PWX_PWXLIB_BASE_MACROS_H_INCLUDED
