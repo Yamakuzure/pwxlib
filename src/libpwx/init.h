@@ -56,7 +56,7 @@ namespace pwx {
   * @param[in] log_file_path  Full path to the logfile to write (appended). Use NULL or empty string to disable.
   * @param[in] log_threads  Number of background threads writing log messages. < 1 to disable, maximum is 4.
 **/
-void PWX_API init( bool enable_memory_mapping_, char const* log_file_path, int log_threads ) noexcept;
+void init( bool enable_memory_mapping_, char const* log_file_path, int log_threads ) noexcept PWX_API;
 
 
 } // namespace pwx
