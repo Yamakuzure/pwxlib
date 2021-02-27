@@ -1,4 +1,4 @@
-/**
+/** @file namegen.cpp
   * This file is part of the PrydeWorX Library (pwxLib).
   *
   * (c)  2007 - 2021 PrydeWorX
@@ -42,8 +42,8 @@ using pwx::RNG;
 using pwx::to_int32;
 using pwx::to_string;
 
-typedef pwx::CAdjLeft  adjLeft;
-typedef pwx::CAdjRight adjRight;
+typedef pwx::CAdjLeft        adjLeft;
+typedef pwx::CAdjRight       adjRight;
 typedef pwx::eNameSourceType nst_t;
 
 static const int32_t ss_len = 14;
@@ -57,20 +57,20 @@ static void print_arg_err( char const* prog, char const* arg );
 static void print_arg_unknown( char const* prog, char const* arg, char const* param );
 static void print_help( char const* prog );
 static void print_table( bool ss, bool sl, bool ms, bool ml );
-static int  print_type( nst_t type );
+static int print_type( nst_t type );
 
 int main( int argc, char* argv[] ) {
 	int     result     = EXIT_SUCCESS;
 	int32_t name_count = 100;
-	bool    do_ss = true, do_sl = true, do_ms = true, do_ml = true;
-	bool    len_short = true, len_long = true, type_single = true, type_multi = true;
+	bool    do_ss      = true, do_sl = true, do_ms = true, do_ml = true;
+	bool    len_short  = true, len_long = true, type_single = true, type_multi = true;
 
 	pwx::init( true, nullptr, 0 );
 
 	max_nc_len = 3;
 
 	// First the arguments
-	for ( int i = 1; i < argc; ++i ) {
+	for ( int i = 1 ; i < argc ; ++i ) {
 		if ( STREQ( argv[i], "-c" ) || STREQ( argv[i], "--count" ) ) {
 			if ( ++i < argc ) {
 				name_count = to_int32( argv[i] );
@@ -103,14 +103,14 @@ int main( int argc, char* argv[] ) {
 				return EXIT_FAILURE;
 			}
 		} else if ( STREQ( argv[i], "-s" ) || STREQ( argv[i], "--seed" ) ) {
-			if ( ++i < argc )
+			if ( ++i < argc ) {
 				RNG.setSeed( to_int32( argv[i] ) );
-			else {
+			} else {
 				print_arg_err( argv[0], argv[i - 1] );
 				return EXIT_FAILURE;
 			}
 		} else if ( STREQ( argv[i], "-t" ) || STREQ( argv[i], "--type" ) ) {
-			if ( ++i < argc )
+			if ( ++i < argc ) {
 				if ( STRCEQ( argv[i], "single" ) ) {
 					type_single = true;
 					type_multi  = false;
@@ -123,7 +123,8 @@ int main( int argc, char* argv[] ) {
 				} else {
 					print_arg_unknown( argv[0], argv[i - 1], argv[i] );
 					return EXIT_FAILURE;
-				} else {
+				}
+			} else {
 				print_arg_err( argv[0], argv[i - 1] );
 				return EXIT_FAILURE;
 			}
@@ -132,12 +133,12 @@ int main( int argc, char* argv[] ) {
 
 	// Determine which classes to print:
 	if ( !len_short || !type_single ) do_ss = false;
-	if ( !len_short || !type_multi ) do_ms = false;
-	if ( !len_long  || !type_single ) do_sl = false;
-	if ( !len_long  || !type_multi ) do_ml = false;
+	if ( !len_short || !type_multi ) do_ms  = false;
+	if ( !len_long || !type_single ) do_sl  = false;
+	if ( !len_long || !type_multi ) do_ml   = false;
 
 	// Now loop through the name source types
-	for ( nst_t type = ( nst_t )0; ( EXIT_SUCCESS == result ) && ( type < pwx::NST_NUM_TYPES ); ++type ) {
+	for ( auto type = (nst_t) 0 ; ( EXIT_SUCCESS == result ) && ( type < pwx::NST_NUM_TYPES ) ; ++type ) {
 		result = print_type( type );
 
 		if ( EXIT_SUCCESS == result ) {
@@ -146,23 +147,27 @@ int main( int argc, char* argv[] ) {
 			RNG.setNST( type );
 
 			cout << adjLeft( max_nc_len, 0 ) << "nr" << " |";
-			if ( do_ss )
+			if ( do_ss ) {
 				cout << " " << adjLeft( ss_len, 0 ) << "single/short" << " |";
-			if ( do_sl )
+			}
+			if ( do_sl ) {
 				cout << " " << adjLeft( sl_len, 0 ) << "single/long" << " |";
-			if ( do_ms )
+			}
+			if ( do_ms ) {
 				cout << " " << adjLeft( ms_len, 0 ) << "multi/short" << " |";
-			if ( do_ml )
+			}
+			if ( do_ml ) {
 				cout << " " << adjLeft( ml_len, 0 ) << "multi/long" << " |";
+			}
 			cout << endl;
 			print_table( do_ss, do_sl, do_ms, do_ml );
 
 			// Now print the names:
 			for ( int i = 0 ; ( EXIT_SUCCESS == result ) && ( i < name_count ) ; ++i ) {
 				char* single_short = do_ss ? RNG.rndName( x, y, z, w, false, false ) : nullptr;
-				char* single_long  = do_sl ? RNG.rndName( x, y, z, w, true,  false ) : nullptr;
+				char* single_long  = do_sl ? RNG.rndName( x, y, z, w, true, false ) : nullptr;
 				char* multi_short  = do_ms ? RNG.rndName( x, y, z, w, false, true ) : nullptr;
-				char* multi_long   = do_ml ? RNG.rndName( x, y, z, w, true,  true ) : nullptr;
+				char* multi_long   = do_ml ? RNG.rndName( x, y, z, w, true, true ) : nullptr;
 
 				// Check single short
 				if ( do_ss && ( !single_short || !strlen( single_short ) ) ) {
@@ -188,21 +193,25 @@ int main( int argc, char* argv[] ) {
 				// If everything is fine, print the names:
 				if ( EXIT_SUCCESS == result ) {
 					cout << adjLeft( max_nc_len, 0 ) << i << " |";
-					if ( do_ss )
+					if ( do_ss ) {
 						cout << " " << adjLeft( ss_len, 0 ) << single_short << " |";
-					if ( do_sl )
+					}
+					if ( do_sl ) {
 						cout << " " << adjLeft( sl_len, 0 ) << single_long << " |";
-					if ( do_ms )
+					}
+					if ( do_ms ) {
 						cout << " " << adjLeft( ms_len, 0 ) << multi_short << " |";
-					if ( do_ml )
+					}
+					if ( do_ml ) {
 						cout << " " << adjLeft( ml_len, 0 ) << multi_long << " |";
+					}
 					cout << endl;
 
 					// Advance coordinates:
 					int32_t r = RNG.random( 1, 4 );
-					if      ( 1 == r ) ++x;
-					else if ( 2 == r ) ++y;
-					else if ( 3 == r ) ++z;
+					if ( 1 == r ) { ++x; }
+					else if ( 2 == r ) { ++y; }
+					else if ( 3 == r ) { ++z; }
 					else if ( 4 == r ) ++w;
 				} // End of having four names
 
@@ -246,23 +255,23 @@ static void print_help( char const* prog ) {
 }
 
 static void print_table( bool ss, bool sl, bool ms, bool ml ) {
-	for ( int j = 0; j < max_nc_len; ++j ) cout << "-";
+	for ( int j = 0 ; j < max_nc_len ; ++j ) { cout << "-"; }
 	cout << "-+";
 
 	if ( ss ) {
-		for ( int j = 0; j < ss_len; ++j ) cout << "-";
+		for ( int j = 0 ; j < ss_len ; ++j ) { cout << "-"; }
 		cout << "--+";
 	}
 	if ( sl ) {
-		for ( int j = 0; j < sl_len; ++j ) cout << "-";
+		for ( int j = 0 ; j < sl_len ; ++j ) { cout << "-"; }
 		cout << "--+";
 	}
 	if ( ms ) {
-		for ( int j = 0; j < ms_len; ++j ) cout << "-";
+		for ( int j = 0 ; j < ms_len ; ++j ) { cout << "-"; }
 		cout << "--+";
 	}
 	if ( ml ) {
-		for ( int j = 0; j < ml_len; ++j ) cout << "-";
+		for ( int j = 0 ; j < ml_len ; ++j ) { cout << "-"; }
 		cout << "--+";
 	}
 	cout << endl;
@@ -271,7 +280,7 @@ static void print_table( bool ss, bool sl, bool ms, bool ml ) {
 static int print_type( nst_t type ) {
 	int result = EXIT_SUCCESS;
 
-	switch( type ) {
+	switch ( type ) {
 		case pwx::NST_NAMES_ALL:
 			cout << " === NST_NAMES_ALL ===" << endl;
 			break;

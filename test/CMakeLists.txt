@@ -25,14 +25,12 @@ if ( WITH_TESTS )
 	# --------------------------------------------------
 	add_executable( test_cluster
 	                cluster_check.cpp
-	                cluster_check.h
 	                )
 	target_include_directories( test_cluster PRIVATE ${CMAKE_SOURCE_DIR}/src )
 	target_link_libraries( test_cluster PRIVATE pwx )
 
 	add_executable( test_hash
 	                hash_builder.cpp
-	                hash_builder.h
 	                )
 	target_include_directories( test_hash PRIVATE ${CMAKE_SOURCE_DIR}/src )
 	target_link_libraries( test_hash PRIVATE pwx )
