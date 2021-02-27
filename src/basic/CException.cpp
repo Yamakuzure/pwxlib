@@ -30,11 +30,7 @@
 **/
 
 
-#include <cstring>
-
-#include "basic/compiler.h"
 #include "basic/macros.h"
-#include "basic/debug.h"
 
 #include "basic/CException.h"
 #include "basic/mem_utils.h"
@@ -43,47 +39,46 @@
 /// @namespace pwx
 namespace pwx {
 
-CException::CException ( char const* const name_, char const* const what_, char const* const where_,
-                         char const* const func_, char const* const desc_ ) noexcept
-	: std::exception()
-	, txtName  ( pwx_strdup ( name_ ) )
-	, txtWhat  ( pwx_strdup ( what_ ) )
-	, txtWhere ( pwx_strdup ( where_ ) )
-	, txtFunc  ( pwx_strdup ( func_ ) )
-	, txtDesc  ( pwx_strdup ( desc_ ) )
-	, txtTrace ( "Thrown from :\n\t" ) {
+CException::CException( char const* const name_, char const* const what_, char const* const where_,
+                        char const* const func_, char const* const desc_ ) noexcept
+	  : std::exception()
+	    , txtName( pwx_strdup ( name_ ) )
+	    , txtWhat( pwx_strdup ( what_ ) )
+	    , txtWhere( pwx_strdup ( where_ ) )
+	    , txtFunc( pwx_strdup ( func_ ) )
+	    , txtDesc( pwx_strdup ( desc_ ) )
+	    , txtTrace( "Thrown from :\n\t" ) {
 	PWX_TRY ( txtTrace += where_ )
-	PWX_CATCH_AND_FORGET ( std::exception );
+	PWX_CATCH_AND_FORGET ( std::exception )
 }
 
 
-CException::CException ( const CException& src ) noexcept
-	: std::exception ( src )
-	, txtName  ( pwx_strdup ( src.txtName ) )
-	, txtWhat  ( pwx_strdup ( src.txtWhat ) )
-	, txtWhere ( pwx_strdup ( src.txtWhere ) )
-	, txtFunc  ( pwx_strdup ( src.txtFunc ) )
-	, txtDesc  ( pwx_strdup ( src.txtDesc ) )
-	, txtTrace ( src.txtTrace )
-{ /* nothing to be done here */ }
+CException::CException( const CException &src ) noexcept
+	  : std::exception( src )
+	    , txtName( pwx_strdup ( src.txtName ) )
+	    , txtWhat( pwx_strdup ( src.txtWhat ) )
+	    , txtWhere( pwx_strdup ( src.txtWhere ) )
+	    , txtFunc( pwx_strdup ( src.txtFunc ) )
+	    , txtDesc( pwx_strdup ( src.txtDesc ) )
+	    , txtTrace( src.txtTrace ) { /* nothing to be done here */ }
 
 
-void CException::addToTrace ( char const* trace_ ) noexcept {
+void CException::addToTrace( char const* trace_ ) noexcept {
 	if ( txtTrace.empty() ) {
-		PWX_TRY ( txtTrace  = "Thrown from :\n\t"; txtTrace += txtWhere )
-		PWX_CATCH_AND_FORGET ( std::exception );
+		PWX_TRY ( txtTrace = "Thrown from :\n\t"; txtTrace += txtWhere )
+		PWX_CATCH_AND_FORGET ( std::exception )
 	}
 	PWX_TRY ( txtTrace += "\n\t"; txtTrace += trace_; )
-	PWX_CATCH_AND_FORGET ( std::exception );
+	PWX_CATCH_AND_FORGET ( std::exception )
 }
 
 
 CException::~CException() noexcept {
-	pwx_free( txtName  );
-	pwx_free( txtWhat  );
+	pwx_free( txtName );
+	pwx_free( txtWhat );
 	pwx_free( txtWhere );
-	pwx_free( txtFunc  );
-	pwx_free( txtDesc  );
+	pwx_free( txtFunc );
+	pwx_free( txtDesc );
 }
 
 

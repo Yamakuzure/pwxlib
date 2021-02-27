@@ -68,7 +68,7 @@ namespace pwx {
   * | `pfunc()` | Full function name (and template parameters if applicable)         |
   * | `trace()` | A trace of the exception path if it was filled on its way          |
 **/
-class PWX_API CException : public std::exception {
+class PWX_API CException final : public std::exception {
 
 public:
 
@@ -96,25 +96,25 @@ public:
 	  * @param[in] desc_ Description of what wnet wrong.
 	  */
 	explicit
-	CException ( char const* const name_, char const* const what_, char const* const where_,
-	             char const* const func_, char const* const desc_ ) noexcept;
+	CException( char const* name_, char const* what_, char const* where_,
+	            char const* func_, char const* desc_ ) noexcept;
 
 
 	/** @brief copy constructor
 	  *
 	  * @param[in] src the exception to copy
 	  */
-	CException ( const CException& src ) noexcept;
+	CException( const CException &src ) noexcept;
 
 
-	CException () PWX_DELETE; // No empty ctor!
+	CException() PWX_DELETE; // No empty ctor!
 
 
 	/** @brief destructor
 	  *
 	  * As all C-Strings are malloc'd they have to be freed.
 	  */
-	virtual ~CException() noexcept;
+	~CException() noexcept final;
 
 
 	/* ===============================================
@@ -123,27 +123,27 @@ public:
 	*/
 
 	/// @brief Return the name of the exception
-	char const* name () const noexcept;
+	[[nodiscard]] char const* name() const noexcept;
 
 
 	/// @brief Return the exception reason
-	char const* what () const noexcept;
+	[[nodiscard]] char const* what() const noexcept final;
 
 
 	/// @brief Return the original throwing position
-	char const* where () const noexcept;
+	[[nodiscard]] char const* where() const noexcept;
 
 
 	/// @brief Return the exception description
-	char const* desc () const noexcept;
+	[[nodiscard]] char const* desc() const noexcept;
 
 
 	/// @brief Return the pretty function where the original throw occurred.
-	char const* pfunc () const noexcept;
+	[[nodiscard]] char const* pfunc() const noexcept;
 
 
 	/// @brief Return the trace of the exceptions path
-	char const* trace () const noexcept;
+	[[nodiscard]] char const* trace() const noexcept;
 
 
 	/** @brief addToTrace
@@ -158,7 +158,7 @@ public:
 	  *
 	  * @param[in] trace_ Trace information to append
 	  */
-	void addToTrace ( char const* trace_ ) noexcept;
+	void addToTrace( char const* trace_ ) noexcept;
 
 
 	/* ===============================================
@@ -166,7 +166,7 @@ public:
 	 * ===============================================
 	*/
 
-	CException& operator= ( const CException& e ) PWX_DELETE; // No assignment
+	CException &operator=( const CException &e ) PWX_DELETE; // No assignment
 
 
 private:
