@@ -74,6 +74,7 @@ public:
 	  *
 	  * @param[in,out] objA Pointer to the object that is to be locked.
 	**/
+	explicit
 	CLockGuard( CLockable* objA ) noexcept;
 
 
@@ -84,6 +85,7 @@ public:
 	  *
 	  * @param[in,out] objA Reference to the object that is to be locked.
 	**/
+	explicit
 	CLockGuard( CLockable &objA ) noexcept
 		  : CLockGuard( &objA ) {}
 
@@ -95,6 +97,7 @@ public:
 	  *
 	  * @param[in,out] objA Const pointer to the object that is to be locked.
 	**/
+	explicit
 	CLockGuard( CLockable const* objA ) noexcept
 		  : CLockGuard( const_cast<CLockable*>( objA ) ) {}
 
@@ -215,7 +218,7 @@ public:
 	  *
 	  * @param[in,out] src Reference to the source to take over from.
 	**/
-	CLockGuard &operator=( CLockGuard &src ) noexcept;
+	CLockGuard &operator=( CLockGuard &&src ) noexcept;
 
 
 	/* ===============================================

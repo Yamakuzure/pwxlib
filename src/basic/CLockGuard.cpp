@@ -67,7 +67,7 @@ CLockGuard::~CLockGuard() noexcept {
 	reset( NULL_LOCK, NULL_LOCK, NULL_LOCK );
 }
 
-CLockGuard &CLockGuard::operator=( CLockGuard &src ) noexcept {
+CLockGuard &CLockGuard::operator=( CLockGuard &&src ) noexcept {
 	if ( &src != this ) {
 		l_a = src.l_a;
 		l_b = src.l_b;
