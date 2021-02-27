@@ -13,12 +13,9 @@
 
 
 #include <PException>
+#include <PLog>
 
-#include <exception>
-#include <iostream>
-using std::cerr;
-using std::cout;
-using std::endl;
+#include <stdexcept>
 
 
 static void inner_pwx_exception() {
@@ -46,15 +43,18 @@ static int test_pwx_exception() {
 
 	PWX_TRY( outer_pwx_exception() )
 	catch ( pwx::CException &e ) {
-		cout << " ==\n-----\npwx exception \"" << e.name() << "\" caught!\n"
-		     << "What : \"" << e.what() << "\"\n"
-		     << "Desc : \"" << e.desc() << "\"\n"
-		     << "Where: \"" << e.where() << "\"\n"
-		     << "pFunc: \"" << e.pfunc() << "\"\n"
-		     << "\nTrace:\n" << e.trace()
-		     << "\n-----" << endl;
+		log_info(
+			  "pwx exception caught",
+			  "Name : %s\n"
+			  "What : %s\n"
+			  "Desc : %s\n"
+			  "Where: %s\n"
+			  "pFunc: %s\n"
+			  "Trace: \n%s",
+			  e.name(), e.what(), e.desc(), e.where(), e.pfunc(), e.trace()
+		);
 	} catch ( ... ) {
-		cerr << " ==\n-----\nSomething wrong was caught!" << endl;
+		log_error( nullptr, "%s", "Something wrong was caught!" );
 		result = EXIT_FAILURE;
 	}
 
@@ -67,15 +67,18 @@ static int test_std_exception() {
 
 	PWX_TRY( outer_std_exception() )
 	catch ( pwx::CException &e ) {
-		cout << " ==\n-----\npwx exception \"" << e.name() << "\" caught!\n"
-		     << "What : \"" << e.what() << "\"\n"
-		     << "Desc : \"" << e.desc() << "\"\n"
-		     << "Where: \"" << e.where() << "\"\n"
-		     << "pFunc: \"" << e.pfunc() << "\"\n"
-		     << "\nTrace:\n" << e.trace()
-		     << "\n-----" << endl;
+		log_info(
+			  "pwx exception caught",
+			  "Name : %s\n"
+			  "What : %s\n"
+			  "Desc : %s\n"
+			  "Where: %s\n"
+			  "pFunc: %s\n"
+			  "Trace: \n%s",
+			  e.name(), e.what(), e.desc(), e.where(), e.pfunc(), e.trace()
+		);
 	} catch ( ... ) {
-		cerr << " ==\n-----\nSomething wrong was caught!" << endl;
+		log_error( nullptr, "%s", "Something wrong was caught!" );
 		result = EXIT_FAILURE;
 	}
 
@@ -99,6 +102,12 @@ int main() {
 	}
 
 	pwx::finish();
+
+	if ( EXIT_SUCCESS == result ) {
+		log_info( nullptr, "%s", "Test successful" );
+	} else {
+		log_error( nullptr, "%s", "Test FAILED" );
+	}
 
 	return result;
 }
