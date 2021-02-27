@@ -59,7 +59,7 @@
   * @param[in] n  Number of bytes to allocate
   * @return A pointer to the allocated space, or `nullptr` if `sizeof(t) * n` is too large.
 **/
-#define pwx_new0( t, n ) pwx_new0_impl<t>(n)
+#define pwx_new0( t, n ) ::pwx::pwx_new0_impl<t>(n)
 
 
 /** @brief Free memory at pointer @a p if it is not `nullptr` and set @a p to nullptr
@@ -121,7 +121,7 @@ PWX_MALLOC PWX_ALLOC( 1, 2 ) static inline void* malloc_multiply( size_t s, size
 }
 
 
-/// @brief Implementation tenmplate for pwx_new0
+/// @brief Implementation template for pwx_new0
 /// @internal
 template< typename T > static inline T* pwx_new0_impl( size_t num ) {
 	T* _ptr_ = pwx_new( T, num );

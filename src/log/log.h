@@ -179,7 +179,7 @@ void show_progress( char const* message, ... ) noexcept PWX_API;
 /// @brief Log wrapper with errno message fetch - Used by log_errno()
 #define PWX_log_errno( _e_, _t_, _m_, ... ) { \
     char const* _err_msg_ = pwx_strerror( _e_ ); \
-    PWX_log_wrapper( LOG_ERROR, _t_, _m_ ": %s", __VA_ARGS__, _err_msg_ ); \
+    PWX_log_wrapper( ::pwx::LOG_ERROR, _t_, _m_ ": %s", __VA_ARGS__, _err_msg_ ); \
 } do {} while(0)
 
 
@@ -190,28 +190,28 @@ void show_progress( char const* message, ... ) noexcept PWX_API;
   * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
   * @params[in] message_ The message to display, following `printf()` rules
 **/
-#define log_info( title_, message_, ... )          PWX_log_wrapper(LOG_INFO,     title_, message_, __VA_ARGS__)
+#define log_info( title_, message_, ... )          PWX_log_wrapper(::pwx::LOG_INFO, title_, message_, __VA_ARGS__ )
 
 /** @def log_status
   * @brief Log a status message
   * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
   * @params[in] message_ The message to display, following `printf()` rules
 **/
-#define log_status( title_, message_, ... )        PWX_log_wrapper(LOG_STATUS,   title_, message_, __VA_ARGS__)
+#define log_status( title_, message_, ... )        PWX_log_wrapper(::pwx::LOG_STATUS, title_, message_, __VA_ARGS__ )
 
 /** @def log_warning
   * @brief Log a warning message
   * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
   * @params[in] message_ The message to display, following `printf()` rules
 **/
-#define log_warning( title_, message_, ... )       PWX_log_wrapper(LOG_WARNING,  title_, message_, __VA_ARGS__)
+#define log_warning( title_, message_, ... )       PWX_log_wrapper(::pwx::LOG_WARNING, title_, message_, __VA_ARGS__ )
 
 /** @def log_error
   * @brief Log an error message
   * @params[in] title_ An optional title, the message then startes on the next line, or nullptr to not show a title
   * @params[in] message_ The message to display, following `printf()` rules
 **/
-#define log_error( title_, message_, ... )         PWX_log_wrapper(LOG_ERROR,    title_, message_, __VA_ARGS__)
+#define log_error( title_, message_, ... )         PWX_log_wrapper(::pwx::LOG_ERROR, title_, message_, __VA_ARGS__ )
 
 /** @def log_errno
   * @brief Log an error message with errno text substitution
@@ -219,7 +219,7 @@ void show_progress( char const* message, ... ) noexcept PWX_API;
   * @param[in] errno_ The errno to get the `strerror()` from
   * @params[in] message_ The message to display, following `printf()` rules
 **/
-#define log_errno( title_, errno_, message_, ... ) PWX_log_errno(        errno_, title_, message_, __VA_ARGS__)
+#define log_errno( title_, errno_, message_, ... ) PWX_log_errno( errno_, title_, message_, __VA_ARGS__ )
 
 /** @def log_critical
   * @brief Log a critical message
