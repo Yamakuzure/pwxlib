@@ -9,6 +9,18 @@ if ( WITH_TESTS )
 
 	# === Automatic tests, run with the test target via CTest ===
 	# -----------------------------------------------------------
+	add_executable( test_basic_alloc_utils
+	                test_basic_alloc_utils.cpp
+	                ${pwxlib_h}
+	                )
+	target_include_directories( test_basic_alloc_utils PRIVATE ${CMAKE_SOURCE_DIR}/src )
+	target_link_libraries( test_basic_alloc_utils PRIVATE pwx )
+	add_test( NAME test_basic_alloc_utils
+	          COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test_basic_alloc_utils
+	          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	          )
+
+
 	add_executable( test_basic_CException
 	                test_basic_CException.cpp
 	                ${pwxlib_h}
