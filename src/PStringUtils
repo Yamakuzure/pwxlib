@@ -1,0 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PSTRINGUTILS_INCLUDED
+#define PWX_PWXLIB_SRC_PSTRINGUTILS_INCLUDED
+
+
+/** @file PSTRINGUTILS
+  * @brief Add some tools to work with strings (See: basic/string_utils.h)
+**/
+#include "basic/string_utils.h"
+
+
+#endif // PWX_PWXLIB_SRC_PSTRINGUTILS_INCLUDED

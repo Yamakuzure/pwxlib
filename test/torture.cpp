@@ -1,8 +1,8 @@
 
 #include "torture.h"
 
-#include <basic/string_utils.h>
 #include <PStreamHelpers>
+#include <PStringUtils>
 
 
 // --- Prototypes, the implementations are below main() ---
