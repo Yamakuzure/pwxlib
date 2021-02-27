@@ -45,6 +45,155 @@
 
 #include "basic/compiler.h"
 #include "basic/macros.h"
+#include "basic/string_utils.h"
+
+
+/** @brief Simple try{} wrapper
+  *
+  * This macro can be used for single try { ONE_FUNC_CALL } - entries.
+  * It is possible to use more than one call by simply adding them
+  * separated by semicolons, but it won't improve readability though.
+  *
+  * *Prerequisites*: none
+  *
+  * @param[in] func the function body within the try {} statement without final semicolon.
+**/
+#define PWX_TRY(func) \
+	try {         \
+		func; \
+	}
+
+
+/** @brief throw wrapper to throw a `pwx::CException` with trace information
+  *
+  * This macro fills in positional information before throwing `pwx::CException`.
+  *
+  * *Prerequisites*: pwx/types/CException.h
+  *
+  * @param[in] name char const name of the exception
+  * @param[in] msg char const message to be returned by the exceptions what() method
+  * @param[in] desc char const message to be returned by the exceptions desc() method
+**/
+#define PWX_THROW(name, msg, desc) {                         \
+	::pwx::CException _pwx_exception(                        \
+	                        ::pwx::strnull(name),            \
+	                        ::pwx::strnull(msg),             \
+	                        ::pwx::get_trace_info(__FILE__,  \
+	                                              __LINE__,  \
+	                                              PWX_FUNC), \
+	                        __PRETTY_FUNCTION__,             \
+	                        ::pwx::strnull(desc));           \
+	throw(_pwx_exception);                                   \
+}
+
+
+/** @brief catch wrapper to add positional information and re-throw the caught exception
+  *
+  * This macro catches any `pwx::CException exception`, adds positional
+  * data to the trace, and re-throws the exception.
+  *
+  * *Prerequisites*: pwx/types/CException.h
+**/
+#define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) {  \
+	e.addToTrace(::pwx::get_trace_msg("--> Called by",   \
+	             __FILE__, __LINE__, PWX_FUNC));         \
+	throw e;                                             \
+}
+
+
+/** @brief catch wrapper for std::exception to add positional information and throw a `pwx::CException`
+  *
+  * This macro can be used where an `std::exception` is to be caught to transform it into
+  * a tracking `pwx::CException`. The message will always be the return value of the
+  * caught exceptions what() method.
+  *
+  * *Prerequisites*: pwx/types/CException.h
+  *
+  * @param[in] name char const name of the exception
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method
+**/
+#define PWX_THROW_STD_FURTHER(name, desc)       \
+	catch(std::exception &e) {              \
+		PWX_THROW(name, e.what(), desc) \
+	}
+
+
+/** @brief catch wrapper for pwx::CException and std::exception
+  *
+  * This macro can be used where both a `pwx::CExceptioǹ` or an `std::exception` can
+  * be caught. The latter is transformed it into a tracking `pwx::CException`.
+  * If an `std::exception` is caught, the message will always be the return value
+  * of the caught exceptions `what()` method.
+  *
+  * *Prerequisites*: pwx/types/CException.h
+  *
+  * @param[in] name char const name of the exception for `std::exception`
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method if an `std::exception` is caught.
+**/
+#define PWX_THROW_PWXSTD_FURTHER(name, desc) \
+	PWX_THROW_PWX_FURTHER                    \
+	PWX_THROW_STD_FURTHER(name, desc)
+
+
+/** @brief try and throw `pwx::CExceptions` further
+  *
+  * This macro is a convenience wrapper to have a try and a delegation
+  * of a possibly thrown `pwx::CException` in one call.
+  *
+  * *Prerequisites*: pwx/types/CException.h
+  *
+  * @param[in] func the function body within the `try{}` statement without final semicolon.
+**/
+#define PWX_TRY_PWX_FURTHER(func)     \
+	PWX_TRY(func)         \
+	PWX_THROW_PWX_FURTHER
+
+
+/** @brief try and throw `std::exception` as `pwx::CExceptions` further
+  *
+  * This macro is a convenience wrapper to have a try and a delegation
+  * of a possibly thrown `std::exception`, that is transformed into a
+  * `pwx::CException`, further in one call
+  *
+  * *Prerequisites*: pwx/types/CException.h
+  *
+  * @param[in] func the function body within the `try{}` statement without final semicolon.
+  * @param[in] name char const name of the exception.
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method.
+**/
+#define PWX_TRY_STD_FURTHER(func, name, desc)     \
+	PWX_TRY(func)                     \
+	PWX_THROW_STD_FURTHER(name, desc)
+
+
+/** @brief try and throw both `std::exception` and `pwx::CExceptions` further
+  *
+  * This macro is a convenience wrapper to have a try and a delegation
+  * of a possibly thrown `pwx::CException`, that can be a transformation
+  * of an `std::exception`, in one call
+  *
+  * *Prerequisites*: pwx/types/CException.h
+  *
+  * @param[in] func the function body within the `try{}` statement without final semicolon.
+  * @param[in] name char const name of the exception for `std::exception`.
+  * @param[in] desc char const message to be returned by the exceptions `desc()` method if an `std::exception` is caught.
+**/
+#define PWX_TRY_PWXSTD_FURTHER(func, name, desc)   \
+	PWX_TRY(func)                      \
+	PWX_THROW_PWX_FURTHER              \
+	PWX_THROW_STD_FURTHER(name, desc)
+
+
+/** @brief This catches and ignores an exception.
+  *
+  * When a specific exception can occur but does not need any actions,
+  * it can be ignored with this macro.
+  *
+  * *Prerequisites*: none
+  *
+  * @param[in] except anything that can be "caught".
+**/
+#define PWX_CATCH_AND_FORGET(except) catch(except&) { }
 
 
 /// @namespace pwx

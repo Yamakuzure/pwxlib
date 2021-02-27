@@ -9,16 +9,16 @@ if ( WITH_TESTS )
 
 	# === Automatic tests, run with the test target via CTest ===
 	# -----------------------------------------------------------
-#	add_executable( test-libpwx-sym
-#	                test-libpwx-sym.cpp
-#	                ${pwxlib_h}
-#	                )
-#	target_include_directories( test-libpwx-sym PRIVATE ${CMAKE_SOURCE_DIR}/src )
-#	target_link_libraries( test-libpwx-sym PRIVATE pwx )
-#	add_test( NAME test-libpwx-sym
-#	          COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test-libpwx-sym
-#	          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#	          )
+	add_executable( test_basic_CException
+	                test_basic_CException.cpp
+	                ${pwxlib_h}
+	                )
+	target_include_directories( test_basic_CException PRIVATE ${CMAKE_SOURCE_DIR}/src )
+	target_link_libraries( test_basic_CException PRIVATE pwx )
+	add_test( NAME test_basic_CException
+	          COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test_basic_CException
+	          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	          )
 
 
 	# === Manual tests, installable, run by the user ===
