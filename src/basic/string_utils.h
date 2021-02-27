@@ -255,7 +255,7 @@ namespace pwx {
   * @param ...  Arguments to the format string
   * @return 0 on success, -1 on failure
 **/
-int pwx_asprintf( char** strp, const char* fmt, ... );
+int pwx_asprintf( char** strp, const char* fmt, ... ) noexcept PWX_API;
 
 
 /** @brief Thread safe platform independent basename() implementation.
@@ -263,7 +263,7 @@ int pwx_asprintf( char** strp, const char* fmt, ... );
   * @param full_path Path to get the last part off
   * @return const pointer to the theread local static buffer with the result. Do not free!
 **/
-char const* pwx_basename( char const* full_path );
+char const* pwx_basename( char const* full_path ) noexcept PWX_API;
 
 
 /** @brief Thread safe platform independent dirname() implementation.
@@ -271,7 +271,7 @@ char const* pwx_basename( char const* full_path );
   * @param full_path Path to get all but the last part off
   * @return const pointer to the thread local static buffer with the result. Do not free!
 **/
-char const* pwx_dirname( char const* full_path );
+char const* pwx_dirname( char const* full_path ) noexcept PWX_API;
 
 
 /** brief Thread safe platform independent strerror_r() implementation.
@@ -280,29 +280,29 @@ char const* pwx_dirname( char const* full_path );
   * @return const pointer to the thread local static buffer with the result (Do not free!) or nullptr if
   * the non-GNU variant of strerror_r() is used and it fails.
 **/
-char const* pwx_strerror( int errno_ );
+char const* pwx_strerror( int errno_ ) noexcept PWX_API;
 
 
 /// @brief Return @a s or an empty string if @a s is `nullptr`
-static inline char const* strempty( char const* s ) {
+static inline char const* strempty( char const* s ) noexcept {
 	return s ? s : "";
 }
 
 
 /// @brief Return @a s or "(null)" if @a s is `nullptr`
-static inline char const* strnull( char const* s ) {
+static inline char const* strnull( char const* s ) noexcept {
 	return s ? s : "(null)";
 }
 
 
 /// @brief Return @a s or "n/a" if @a s is `nullptr`
-static inline char const* strna( char const* s ) {
+static inline char const* strna( char const* s ) noexcept {
 	return s ? s : "n/a";
 }
 
 
 /// @brief Return `true` if @a p is `nullptr` or empty
-static inline bool isempty( char const* p ) {
+static inline bool isempty( char const* p ) noexcept {
 	return !p || !p[0];
 }
 
@@ -312,7 +312,7 @@ static inline bool isempty( char const* p ) {
   * @param[in] prefix  The string @a s has to start with
   * @return A pointer to the string behind @a prefix, or nullptr if @a s does not start with @a prefix.
 **/
-static inline char* startswith( char const* s, char const* prefix ) {
+static inline char* startswith( char const* s, char const* prefix ) noexcept {
 	size_t l;
 
 	l = strlen( prefix );
@@ -329,7 +329,7 @@ static inline char* startswith( char const* s, char const* prefix ) {
   * @param[in] prefix  The string @a s has to start with, the case is ignored
   * @return A pointer to the string behind @a prefix, or nullptr if @a s does not start with @a prefix.
 **/
-static inline char* startswith_no_case( char const* s, char const* prefix ) {
+static inline char* startswith_no_case( char const* s, char const* prefix ) noexcept {
 	size_t l;
 
 	l = strlen( prefix );
@@ -346,7 +346,7 @@ static inline char* startswith_no_case( char const* s, char const* prefix ) {
   * @param[in] postfix  The string @a s has to end with
   * @return A pointer to part in @a s where @a postfix starts, or nullptr if @a s does not end with @a postfix.
 **/
-static inline char* endswith( char const* s, char const* postfix ) {
+static inline char* endswith( char const* s, char const* postfix ) noexcept {
 	size_t sl, pl;
 
 	assert( s );
@@ -376,7 +376,7 @@ static inline char* endswith( char const* s, char const* postfix ) {
   * @param[in] postfix  The string @a s has to end with ignoring case
   * @return A pointer to part in @a s where @a postfix starts, or nullptr if @a s does not end with @a postfix.
 **/
-static inline char* endswith_no_case( char const* s, char const* postfix ) {
+static inline char* endswith_no_case( char const* s, char const* postfix ) noexcept {
 	size_t sl, pl;
 
 	assert( s );
@@ -402,14 +402,23 @@ static inline char* endswith_no_case( char const* s, char const* postfix ) {
 
 
 /// @brief Return a NULL terminated char array with the binary representation of @a b
-#define byte_to_binary( b ) ({                                       \
-        char   _d_[9] = { 0x0 };                           \
-        for (size_t _i_ = 0; _i_ < 8; ++_i_)               \
-            _d_[7-_i_] = ((b >> _i_) & 1) ? '1' : '0'; \
-        _d_;                                               \
-    })                                                         \
+static inline char const* byte_to_binary( uint8_t byte ) noexcept {
+	static char result[9] = { 0x0 };
+
+	for ( size_t i = 0 ; i < 8 ; ++i ) {
+		result[7 - i] = ( ( byte >> i ) & 1 ) ? '1' : '0';
+	}
+
+	return result;
+}
 
 } // namespace pwx
+
+
+using pwx::pwx_asprintf;
+using pwx::pwx_basename;
+using pwx::pwx_dirname;
+using pwx::pwx_strerror;
 
 
 #endif // PWX_PWXLIB_SRC_BASIC_STRING_UTILS_H_INCLUDED

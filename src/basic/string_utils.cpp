@@ -50,7 +50,7 @@
 #include <cstring>
 
 
-int pwx::pwx_asprintf( char** strp, const char* fmt, ... ) {
+int pwx::pwx_asprintf( char** strp, const char* fmt, ... ) noexcept {
 	va_list ap;
 	va_list ap_test;
 	char* msg_buf = nullptr;
@@ -87,7 +87,7 @@ int pwx::pwx_asprintf( char** strp, const char* fmt, ... ) {
 }
 
 
-char const* pwx_basename( char const* full_path ) {
+char const* pwx::pwx_basename( char const* full_path ) noexcept{
 #if PWX_IS_WINDOWS
 	static thread_local char base_buffer  [_MAX_FNAME + _MAX_EXT] = { 0 };
 	static thread_local char base_filename[_MAX_FNAME]            = { 0 };
@@ -105,7 +105,7 @@ char const* pwx_basename( char const* full_path ) {
 }
 
 
-char const* pwx_dirname( char const* full_path ) {
+char const* pwx::pwx_dirname( char const* full_path ) noexcept {
 #if PWX_IS_WINDOWS
 	static thread_local char base_buffer[_MAX_FNAME + _MAX_EXT] = { 0 };
 	static thread_local char base_dir   [_MAX_FNAME]            = { 0 };
@@ -124,7 +124,7 @@ char const* pwx_dirname( char const* full_path ) {
 }
 
 
-char const* pwx_strerror( int errno_ ) {
+char const* pwx::pwx_strerror( int errno_ ) noexcept {
 	static thread_local char errmsg[256] = { 0x0 };
 
 #if defined(_GNU_SOURCE)
