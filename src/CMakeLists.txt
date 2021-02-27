@@ -10,6 +10,7 @@ set( pwxlib_h ${pwxlib_h} PARENT_SCOPE )
 
 set( pwx_WRAPPERS
      ${CMAKE_CURRENT_LIST_DIR}/PAH
+     ${CMAKE_CURRENT_LIST_DIR}/PAllocUtils
      ${CMAKE_CURRENT_LIST_DIR}/PArgHandler
      ${CMAKE_CURRENT_LIST_DIR}/PBasic
      ${CMAKE_CURRENT_LIST_DIR}/PChainHash
@@ -19,6 +20,7 @@ set( pwx_WRAPPERS
      ${CMAKE_CURRENT_LIST_DIR}/PException
      ${CMAKE_CURRENT_LIST_DIR}/PLockable
      ${CMAKE_CURRENT_LIST_DIR}/PLockGuard
+     ${CMAKE_CURRENT_LIST_DIR}/PLog
      ${CMAKE_CURRENT_LIST_DIR}/PMath
      ${CMAKE_CURRENT_LIST_DIR}/POpenHash
      ${CMAKE_CURRENT_LIST_DIR}/PQueue
@@ -29,6 +31,7 @@ set( pwx_WRAPPERS
      ${CMAKE_CURRENT_LIST_DIR}/PSingleRing
      ${CMAKE_CURRENT_LIST_DIR}/PStack
      ${CMAKE_CURRENT_LIST_DIR}/PStreamHelpers
+     ${CMAKE_CURRENT_LIST_DIR}/PStringUtils
      ${CMAKE_CURRENT_LIST_DIR}/PTools
      ${CMAKE_CURRENT_LIST_DIR}/PUtils
      ${CMAKE_CURRENT_LIST_DIR}/PWaveColor

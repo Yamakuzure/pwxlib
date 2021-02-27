@@ -4,7 +4,7 @@
 
 
 /** @file PSTRINGUTILS
-  * @brief Add some tools to work with strings (See: basic/string_utils.h)
+  * @brief Add some tools to work with strings (@see basic/string_utils.h)
 **/
 #include "basic/string_utils.h"
 

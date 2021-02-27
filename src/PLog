@@ -1,0 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PLOG_INCLUDED
+#define PWX_PWXLIB_SRC_PLOG_INCLUDED
+
+
+/** @file PLOG
+  * @brief Add some tools to unify logging (@see log/log.h)
+**/
+#include "log/log.h"
+
+
+#endif // PWX_PWXLIB_SRC_PLOG_INCLUDED

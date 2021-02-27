@@ -1,0 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PALLOCUTILS_INCLUDED
+#define PWX_PWXLIB_SRC_PALLOCUTILS_INCLUDED
+
+
+/** @file PALLOCUTILS
+  * @brief Add some tools to allocate/free memory (@see basic/alloc_utils.h)
+**/
+#include "basic/alloc_utils.h"
+
+
+#endif // PWX_PWXLIB_SRC_PALLOCUTILS_INCLUDED
