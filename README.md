@@ -131,7 +131,7 @@ they import types from the `pwx` namespace into your namespace.
 This is a basic exception class with tracing functionality. It is meant to
 provide a tracing exception to get as much information as possible.
 
-To make the most out of this system, the file `basic/pwx_macros.h` provides
+To make the most out of this system, the file `basic/macros.h` provides
 many macros to try, catch and throw further exceptions with tracing
 information.
 
@@ -178,7 +178,7 @@ The `<PLockGuard>` wrapper imports `pwx::CLockGuard` into your namespace under
 the alias `PLockGuard`.
 
 ### Debug logging
-> `#include <basic/pwx_debug.h>`
+> `#include <basic/debug.h>`
 
 Besides many useful macros for debugging possible multi-threading issues, this
 header also declares the `debug_log()` and `debug_err()` functions.
@@ -188,7 +188,7 @@ defined, so they can be used everywhere and stay out of the way in release
 builds.
 
 ### General purpose macros
-> `#include <basic/pwx_macros.h>`
+> `#include <basic/macros.h>`
 
 In here are a lot useful macros for various tasks. All of these are prefixed
 with "`PWX_`". The four most prominent groups are the following:

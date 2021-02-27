@@ -62,8 +62,8 @@ namespace pwx {
   * after usage.
   *
   * The exception tracers and debug log macros make extensive use of this function.
-  * @see basic/pwx_debug.h
-  * @see basic/pwx_macros.h
+  * @see basic/debug.h
+  * @see basic/macros.h
   *
   * @param[in] path The path to the file, the function will extract the file name from it.
   * @param[in] line The line number to show
@@ -82,7 +82,7 @@ char const* get_trace_info( char const* path, size_t line, char const* func ) no
   * after usage.
   *
   * The exception tracer `PWX_THROW_PWX_FURTHER` makes use of this.
-  * @see basic/pwx_macros.h
+  * @see basic/macros.h
   *
   * @param[in] msg A message to show first. Formatting sequences will be ignored.
   * @param[in] path The path to the file, the function will extract the file name from it.

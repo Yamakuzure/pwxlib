@@ -56,7 +56,7 @@ namespace pwx {
   *
   * This class is meant to provide a tracing exception to get as much information as possible.
   *
-  * To make the most out of this system, the file `basic/pwx_macros.h` provides many macros
+  * To make the most out of this system, the file `basic/macros.h` provides many macros
   * to try, catch and throw further exceptions with tracing information.
   *
   * | Getter    | Returns...                                                         |
@@ -83,7 +83,7 @@ public:
 	  * is set exactly once with this constructor and must not be changed apart from
 	  * the trace.
 	  *
-	  * You can use the macro `PWX_THROW()` from `basic/pwx_macros.h` to throw this
+	  * You can use the macro `PWX_THROW()` from `basic/macros.h` to throw this
 	  * kind of exceptions in a very convenient way. It'll fill in the positional
 	  * information for you. The macro `PWX_THROW_STD_FURTHER()` from the same file
 	  * can be used to convert an `std::exception` into a `pwx::CException` with
@@ -153,7 +153,7 @@ public:
 	  * are ignored. It is better to have a broken trace than
 	  * a broken unwinding.
 	  *
-	  * The `PWX_THROW()` macro family in `basic/pwx_macros.h`
+	  * The `PWX_THROW()` macro family in `basic/macros.h`
 	  * makes extensive use of this.
 	  *
 	  * @param[in] trace_ Trace information to append

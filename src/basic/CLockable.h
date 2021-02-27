@@ -98,7 +98,7 @@ namespace pwx {
   * or std::unique_lock to do the locking of any object derived from
   * pwx::CLockable. You can use PWX_LOCK_GUARD(pointer); and
   * PWX_DOUBLE_LOCK_GUARD(ptrA, ptrB); to do this rather simply. They
-  * are defined in `basic/pwx_macros.h`.
+  * are defined in `basic/macros.h`.
   *
   * #### `atomic_flag spinlock` versus `std::mutex` ####
   * By default `CLockable` is compiled with PWX_USE_FLAGSPIN defined. This can
