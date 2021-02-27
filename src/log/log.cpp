@@ -45,9 +45,9 @@ static int32_t   verbose_out       = 4;
 *** Static internal functions prototypes     ***
 ************************************************/
 
-static void log_close_internal( bool with_lock );
-static int log_open_internal( char const* file_name, char const* mode );
-static void remove_progress_msg_internal();
+static void log_close_internal( bool with_lock ) noexcept;
+static int log_open_internal( char const* file_name, char const* mode ) noexcept;
+static void remove_progress_msg_internal() noexcept;
 
 } // namespace pwx
 
@@ -58,7 +58,7 @@ static void remove_progress_msg_internal();
 *** Public functions implementations ***
 ***************************************/
 
-void pwx::log( char const* location, log_level_t level, char const* title, char const* message, ... ) {
+void pwx::log( char const* location, log_level_t level, char const* title, char const* message, ... ) noexcept {
 
 	CLockGuard input_guard( input_lock ); // Make sure log messages really come in the order they are issued.
 
@@ -105,7 +105,7 @@ void pwx::log( char const* location, log_level_t level, char const* title, char 
 }
 
 
-void pwx::log_enable_threads( int thread_count ) {
+void pwx::log_enable_threads( int thread_count ) noexcept {
 	if ( ( 0 == log_thread_count ) && ( thread_count > 0 ) ) {
 		log_thread_count = thread_count > 4 ? 4 : thread_count;
 		log_threads_activate( false );
@@ -120,7 +120,7 @@ void pwx::log_close() {
 }
 
 
-char const* pwx::log_file_name() {
+char const* pwx::log_file_name() noexcept {
 	if ( logfile_p ) {
 		return logfile_name.c_str();
 	}
@@ -128,12 +128,12 @@ char const* pwx::log_file_name() {
 }
 
 
-int pwx::log_open( char const* file_name, char const* mode ) {
+int pwx::log_open( char const* file_name, char const* mode ) noexcept {
 	return log_open_internal( file_name, mode );
 }
 
 
-void pwx::log_set_verbosity( int32_t level_logfile, int32_t level_console ) {
+void pwx::log_set_verbosity( int32_t level_logfile, int32_t level_console ) noexcept {
 	CLockGuard guard( output_lock, logfile_lock );
 
 	verbose_log = level_logfile < LOG_DEBUG ? LOG_DEBUG :
@@ -143,7 +143,7 @@ void pwx::log_set_verbosity( int32_t level_logfile, int32_t level_console ) {
 }
 
 
-void pwx::show_progress( char const* message, ... ) {
+void pwx::show_progress( char const* message, ... ) noexcept {
 	CLockGuard guard( output_lock, logfile_lock );
 
 	remove_progress_msg_internal();
@@ -166,7 +166,7 @@ void pwx::show_progress( char const* message, ... ) {
 
 #ifndef PWX_NODOX
 
-void pwx::log_out_internal( log_level_t lvl, char const* msg ) {
+void pwx::log_out_internal( log_level_t lvl, char const* msg ) noexcept {
 	CLockGuard guard( output_lock, logfile_lock );
 
 	// Write into log file if set and covered by verbosity
@@ -190,7 +190,7 @@ void pwx::log_out_internal( log_level_t lvl, char const* msg ) {
 *** Static internal functions implementations ***
 ************************************************/
 
-static void pwx::log_close_internal( bool with_lock ) {
+static void pwx::log_close_internal( bool with_lock ) noexcept {
 	if ( logfile_p ) {
 		if ( with_lock && ( log_thread_count > 1 ) ) {
 			logfile_lock.lock();
@@ -209,7 +209,7 @@ static void pwx::log_close_internal( bool with_lock ) {
 }
 
 
-static int pwx::log_open_internal( char const* file_name, char const* mode ) {
+static int pwx::log_open_internal( char const* file_name, char const* mode ) noexcept {
 	int r = 0;
 
 	if ( file_name || !logfile_name.empty() ) {
@@ -254,7 +254,7 @@ static int pwx::log_open_internal( char const* file_name, char const* mode ) {
 }
 
 
-static void pwx::remove_progress_msg_internal() {
+static void pwx::remove_progress_msg_internal() noexcept {
 	if ( have_progress_msg.load() ) {
 		memset( progress_msg, ' ', progress_len );
 		fprintf( stdout, "\r%s\r", progress_msg );

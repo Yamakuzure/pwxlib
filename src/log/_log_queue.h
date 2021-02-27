@@ -154,7 +154,7 @@ struct log_message_t {
 **/
 void log_direct_out(
 	  char const* time, log_level_t level, char const* location,
-	  size_t instro_size, char const* title, char const* fmt, va_list* ap );
+	  size_t instro_size, char const* title, char const* fmt, va_list* ap ) noexcept;
 
 
 /** @brief get the last message (first added) in the internal queue
@@ -175,7 +175,7 @@ log_message_t* log_queue_pop();
 **/
 void log_queue_push(
 	  char const* time, log_level_t level, char const* location,
-	  size_t intro_size, char const* title, char const* fmt, va_list* ap );
+	  size_t intro_size, char const* title, char const* fmt, va_list* ap ) noexcept;
 
 
 /** @brief re-add a message to the queue

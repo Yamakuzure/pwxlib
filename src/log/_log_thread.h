@@ -58,7 +58,7 @@
 namespace pwx {
 
 // Implementation is in log.cpp
-void log_out_internal( log_level_t lvl, char const* msg );
+void log_out_internal( log_level_t lvl, char const* msg ) noexcept;
 
 
 // Tiny shortcuts...
@@ -215,7 +215,7 @@ public:
 	[[nodiscard]] bool hasExited() const { return isExited.load( ATOMIC_READ ); }
 
 	bool message_deploy( char const* tme, log_level_t lvl, char const* loc,
-	                     size_t is, char const* ttl, char const* fmt, va_list* ap ) {
+	                     size_t is, char const* ttl, char const* fmt, va_list* ap ) noexcept {
 
 		if ( build( tme, lvl, loc, is, ttl, fmt, ap ) ) {
 			log_out_internal( lvl, msg.c_str() );

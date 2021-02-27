@@ -215,14 +215,14 @@ void pwx::log_threads_activate( bool do_activate ) {
 
 void pwx::log_direct_out(
 	  char const* time, log_level_t level, char const* location,
-	  size_t intro_size, char const* title, char const* fmt, va_list* ap ) {
+	  size_t intro_size, char const* title, char const* fmt, va_list* ap ) noexcept {
 	log_handlers[4].message_deploy( time, level, location, intro_size, title, fmt, ap );
 }
 
 
-void pwx::log_queue_push(
+void pwx::log_queue_push (
 	  char const* time, log_level_t level, char const* location,
-	  size_t intro_size, char const* title, char const* fmt, va_list* ap ) {
+	  size_t intro_size, char const* title, char const* fmt, va_list* ap ) noexcept {
 
 	log_message_t* new_msg;
 	CLockGuard guard( q_lock );

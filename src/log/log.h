@@ -68,7 +68,7 @@ namespace pwx {
   * @param[in] title If set, a title will be set as the first log line, the message then follows on line two.
   * @param[in] message Whatever you wish to tell your readers, printf style, with arguments following.
 **/
-void log( char const* location, log_level_t level, char const* title, char const* message, ... );
+void log( char const* location, log_level_t level, char const* title, char const* message, ... ) noexcept PWX_API;
 
 
 /// @brief Flush and close the current log file, if any
@@ -107,7 +107,7 @@ void log_close();
   *
   * @param[in] thread_count Number of threads to start, valid are 2, 3, 4 and 0 to disable threading
 **/
-void log_enable_threads( int thread_count );
+void log_enable_threads( int thread_count ) noexcept PWX_API;
 
 
 /** @brief Return the name of the current log file
@@ -116,7 +116,7 @@ void log_enable_threads( int thread_count );
   *
   * @return constant representation of the current log file name or NULL if none was set
 **/
-char const* log_file_name();
+char const* log_file_name() noexcept PWX_API;
 
 
 /** @brief open a logfile for further writes
@@ -127,7 +127,7 @@ char const* log_file_name();
   * @param[in] mode The open mode. Useful are "a" to append and "w" to overwrite.
   * @return Zero on success, the negative content of errno if opening fails. (See fopen(3), malloc(3), open(2))
 **/
-int log_open( char const* file_name, char const* mode );
+int log_open( char const* file_name, char const* mode ) noexcept PWX_API;
 
 
 /** @brief set the log verbosity
@@ -149,7 +149,7 @@ int log_open( char const* file_name, char const* mode );
   * @param[in] level_logfile  Level from which on to write into the log file
   * @param[in] level_console  Level from which on to write to the console
 **/
-void log_set_verbosity( int32_t level_logfile, int32_t level_console );
+void log_set_verbosity( int32_t level_logfile, int32_t level_console ) noexcept PWX_API;
 
 
 /** @brief Show a line of progess information without breaking the line
@@ -162,7 +162,7 @@ void log_set_verbosity( int32_t level_logfile, int32_t level_console );
   *
   * @param[in] message Whatever you wish to tell your readers, printf style, with arguments following.
 **/
-void show_progress( char const* message, ... );
+void show_progress( char const* message, ... ) noexcept PWX_API;
 
 
 } // namespace pwx
