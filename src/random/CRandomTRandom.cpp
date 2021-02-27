@@ -41,14 +41,12 @@ class privRand32_t {
 public:
 	rand_t operator()() {
 		try {
+			thread_local static std::random_device privRandDev_;
 			thread_local static std::mt19937 privRandMt32_( privRandDev_() );
 			return privRandMt32_();
 		} catch ( ... ) {}
 		return 0;
 	}
-private:
-	thread_local static std::random_device privRandDev_;
-
 } privRand32;
 
 
@@ -56,13 +54,12 @@ class privRand64_t {
 public:
 	rand_t operator()() {
 		try {
+			thread_local static std::random_device privRandDev_;
 			thread_local static std::mt19937_64 privRandMt64_( privRandDev_() );
 			return privRandMt64_();
 		} catch ( ... ) {}
 		return 0;
 	}
-private:
-	thread_local static std::random_device privRandDev_;
 } privRand64;
 
 
