@@ -174,7 +174,7 @@
 
 
 /// @brief Clear the triple lock guard named after the enclosing function, unlocking all currently held objects
-#define PWX_TRIPLE_LOCK_GUARD_CLEAR() PWX_NAMED_DOUBLE_LOCK_GUARD_CLEAR(PWX_FUNC)
+#define PWX_TRIPLE_LOCK_GUARD_CLEAR() PWX_NAMED_TRIPLE_LOCK_GUARD_CLEAR(PWX_FUNC)
 
 
 /** @brief Reset a triple lock guard to two new values

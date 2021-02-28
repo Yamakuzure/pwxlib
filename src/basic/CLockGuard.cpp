@@ -30,13 +30,9 @@
 **/
 
 
-#include <thread>
-
-#include "basic/compiler.h"
-#include "basic/macros.h"
-#include "basic/debug.h"
-
 #include "basic/CLockGuard.h"
+
+#include <thread>
 
 
 /// @namespace pwx
