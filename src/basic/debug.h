@@ -87,7 +87,7 @@
 **/
 #if PWX_IS_DEBUG_MODE
 #  define log_debug_there( loc_, title_, message_, ... ) \
-	::pwx::log( loc_, ::pwx::LOG_DEBUG, title_, message_, __VA_ARGS__)
+    ::pwx::log( loc_, ::pwx::LOG_DEBUG, title_, message_, __VA_ARGS__)
 #else
 #  define log_debug_there( ... ) do {} while(0)
 #endif // debugging enabled

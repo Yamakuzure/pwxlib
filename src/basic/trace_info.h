@@ -61,9 +61,10 @@ namespace pwx {
   * The string is static and thread_local, so you do neither have to lock anything nor to free the string
   * after usage.
   *
-  * The exception tracers and debug log macros make extensive use of this function.
+  * The exception tracers and log functions/macros make extensive use of this function.
   * @see basic/debug.h
   * @see basic/macros.h
+  * @see log/log.h
   *
   * @param[in] path The path to the file, the function will extract the file name from it.
   * @param[in] line The line number to show
@@ -82,7 +83,7 @@ char const* get_trace_info( char const* path, size_t line, char const* func ) no
   * after usage.
   *
   * The exception tracer `PWX_THROW_PWX_FURTHER` makes use of this.
-  * @see basic/macros.h
+  * @see basic/CException.h
   *
   * @param[in] msg A message to show first. Formatting sequences will be ignored.
   * @param[in] path The path to the file, the function will extract the file name from it.
@@ -90,7 +91,7 @@ char const* get_trace_info( char const* path, size_t line, char const* func ) no
   * @param[in] func The name of the function from which this was called.
   * @return thread_local and static C-string buffer, NULL-terminated.
 **/
-char const* get_trace_msg ( char const* msg, char const* path, size_t line, char const* func ) noexcept PWX_WARNUNUSED PWX_API;
+char const* get_trace_msg( char const* msg, char const* path, size_t line, char const* func ) noexcept PWX_WARNUNUSED PWX_API;
 
 
 } // namespace pwx

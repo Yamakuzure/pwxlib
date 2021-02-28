@@ -58,10 +58,10 @@
   *
   * @param[in] func the function body within the try {} statement without final semicolon.
 **/
-#define PWX_TRY(func) \
-	try {         \
-		func; \
-	}
+#define PWX_TRY( func ) \
+    try {         \
+        func; \
+    }
 
 
 /** @brief throw wrapper to throw a `pwx::CException` with trace information
@@ -74,16 +74,16 @@
   * @param[in] msg char const message to be returned by the exceptions what() method
   * @param[in] desc char const message to be returned by the exceptions desc() method
 **/
-#define PWX_THROW(name, msg, desc) {                         \
-	::pwx::CException _pwx_exception(                        \
-	                        ::pwx::strnull(name),            \
-	                        ::pwx::strnull(msg),             \
-	                        ::pwx::get_trace_info(__FILE__,  \
-	                                              __LINE__,  \
-	                                              PWX_FUNC), \
-	                        __PRETTY_FUNCTION__,             \
-	                        ::pwx::strnull(desc));           \
-	throw(_pwx_exception);                                   \
+#define PWX_THROW( name, msg, desc ) {                         \
+    ::pwx::CException _pwx_exception(                        \
+                            ::pwx::strnull(name),            \
+                            ::pwx::strnull(msg),             \
+                            ::pwx::get_trace_info(__FILE__,  \
+                                                  __LINE__,  \
+                                                  PWX_FUNC), \
+                            __PRETTY_FUNCTION__,             \
+                            ::pwx::strnull(desc));           \
+    throw(_pwx_exception);                                   \
 }
 
 
@@ -95,9 +95,9 @@
   * *Prerequisites*: pwx/types/CException.h
 **/
 #define PWX_THROW_PWX_FURTHER catch(::pwx::CException &e) {  \
-	e.addToTrace(::pwx::get_trace_msg("--> Called by",   \
-	             __FILE__, __LINE__, PWX_FUNC));         \
-	throw e;                                             \
+    e.addToTrace(::pwx::get_trace_msg("--> Called by",   \
+                 __FILE__, __LINE__, PWX_FUNC));         \
+    throw e;                                             \
 }
 
 
@@ -112,10 +112,10 @@
   * @param[in] name char const name of the exception
   * @param[in] desc char const message to be returned by the exceptions `desc()` method
 **/
-#define PWX_THROW_STD_FURTHER(name, desc)       \
-	catch(std::exception &e) {              \
-		PWX_THROW(name, e.what(), desc) \
-	}
+#define PWX_THROW_STD_FURTHER( name, desc )       \
+    catch(std::exception &e) {              \
+        PWX_THROW(name, e.what(), desc) \
+    }
 
 
 /** @brief catch wrapper for pwx::CException and std::exception
@@ -130,9 +130,9 @@
   * @param[in] name char const name of the exception for `std::exception`
   * @param[in] desc char const message to be returned by the exceptions `desc()` method if an `std::exception` is caught.
 **/
-#define PWX_THROW_PWXSTD_FURTHER(name, desc) \
-	PWX_THROW_PWX_FURTHER                    \
-	PWX_THROW_STD_FURTHER(name, desc)
+#define PWX_THROW_PWXSTD_FURTHER( name, desc ) \
+    PWX_THROW_PWX_FURTHER                    \
+    PWX_THROW_STD_FURTHER(name, desc)
 
 
 /** @brief try and throw `pwx::CExceptions` further
@@ -144,9 +144,9 @@
   *
   * @param[in] func the function body within the `try{}` statement without final semicolon.
 **/
-#define PWX_TRY_PWX_FURTHER(func)     \
-	PWX_TRY(func)         \
-	PWX_THROW_PWX_FURTHER
+#define PWX_TRY_PWX_FURTHER( func )     \
+    PWX_TRY(func)         \
+    PWX_THROW_PWX_FURTHER
 
 
 /** @brief try and throw `std::exception` as `pwx::CExceptions` further
@@ -161,9 +161,9 @@
   * @param[in] name char const name of the exception.
   * @param[in] desc char const message to be returned by the exceptions `desc()` method.
 **/
-#define PWX_TRY_STD_FURTHER(func, name, desc)     \
-	PWX_TRY(func)                     \
-	PWX_THROW_STD_FURTHER(name, desc)
+#define PWX_TRY_STD_FURTHER( func, name, desc )     \
+    PWX_TRY(func)                     \
+    PWX_THROW_STD_FURTHER(name, desc)
 
 
 /** @brief try and throw both `std::exception` and `pwx::CExceptions` further
@@ -178,10 +178,10 @@
   * @param[in] name char const name of the exception for `std::exception`.
   * @param[in] desc char const message to be returned by the exceptions `desc()` method if an `std::exception` is caught.
 **/
-#define PWX_TRY_PWXSTD_FURTHER(func, name, desc)   \
-	PWX_TRY(func)                      \
-	PWX_THROW_PWX_FURTHER              \
-	PWX_THROW_STD_FURTHER(name, desc)
+#define PWX_TRY_PWXSTD_FURTHER( func, name, desc )   \
+    PWX_TRY(func)                      \
+    PWX_THROW_PWX_FURTHER              \
+    PWX_THROW_STD_FURTHER(name, desc)
 
 
 /** @brief This catches and ignores an exception.
@@ -193,7 +193,7 @@
   *
   * @param[in] except anything that can be "caught".
 **/
-#define PWX_CATCH_AND_FORGET(except) catch(except&) { }
+#define PWX_CATCH_AND_FORGET( except ) catch(except&) { }
 
 
 /// @namespace pwx

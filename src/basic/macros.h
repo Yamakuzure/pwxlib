@@ -45,19 +45,19 @@
  * --- Various attributes and functions that are C++17 and upwards     ---
  * -------------------------------------------------------------------- */
 #define PWX_CARRIES_DEP        [[carries_dependency]]  //!< (C++11)	indicates that dependency chain in release-consume
-                                                       //!<           std::memory_order propagates in and out of the function
+//!<           std::memory_order propagates in and out of the function
 #define PWX_DEPRECATED_SIMPLE  [[deprecated]]          //!< (C++14) indicates that the use of the name or entity declared with
-#define PWX_DEPRECATED(reason) [[deprecated(#reason)]] //!< (C++14)	  this attribute is allowed, but discouraged for some reason
+#define PWX_DEPRECATED( reason ) [[deprecated(#reason)]] //!< (C++14)	  this attribute is allowed, but discouraged for some reason
 #define PWX_FALLTHROUGH        [[fallthrough]]         //!< (C++17)	indicates that the fall through from the previous case label
-                                                       //!<           is intentional and should not be diagnosed by a compiler
-                                                       //!<           that warns on fall-through
+//!<           is intentional and should not be diagnosed by a compiler
+//!<           that warns on fall-through
 #define PWX_MAYBE_UNUSED       [[maybe_unused]]        //!< (C++17) suppresses compiler warnings on unused entities, if any
 #define PWX_NODISCARD_SIMPLE   [[nodiscard]]           //!< (C++17) encourages the compiler to issue a warning if the return
-                                                       //!<           value is discarded
+//!<           value is discarded
 #if PWX_HAS_CXX20
 #define PWX_NODISCARD(reason)  [[nodiscard(#reason)]]  //!< (C++20)	Same as @a see PWX_NODISCARD_SIMPLE with @a reason parameter
 #else
-#define PWX_NODISCARD(reason)
+#define PWX_NODISCARD( reason )
 #endif // Only in C++20 and later
 #define PWX_NORETURN           [[noreturn]]            //!< (C++11)	indicates that the function does not return
 
@@ -84,26 +84,26 @@
 #  define strerror_r(n, b, l) ( strerror_s(b, l, n) ? b : "strerror_s failed" )
 #  define strncasecmp         _strnicmp
 #else
-#  define PWX_PRINTF(a,b) __attribute__ ((format (printf, a, b)))
+#  define PWX_PRINTF( a, b ) __attribute__ ((format (printf, a, b)))
 #  if PWX_IS_CLANG
 #    define PWX_ALLOC(...)
 #  else
-#    define PWX_ALLOC(...) __attribute__ ((alloc_size(__VA_ARGS__)))
+#    define PWX_ALLOC( ... ) __attribute__ ((alloc_size(__VA_ARGS__)))
 #  endif // CLang does not know this attribute, yet.
 #  define PWX_PACKED       __attribute__ ((packed))
 #  define PWX_MALLOC       __attribute__ ((malloc))
 #  define PWX_WEAK         __attribute__ ((weak))
-#  define PWX_LIKELY(x)   (__builtin_expect(!!(x),1))
-#  define PWX_UNLIKELY(x) (__builtin_expect(!!(x),0))
+#  define PWX_LIKELY( x )   (__builtin_expect(!!(x),1))
+#  define PWX_UNLIKELY( x ) (__builtin_expect(!!(x),0))
 #  define PWX_WARNUNUSED  __attribute__ ((warn_unused_result))
 #endif // Macros only for gcc/clang
 
 
 #define VOID_0 ((void)0)
-#define ELEMENTSOF(x) ({                              \
-	static_assert( std::rank<typeof(x)>::value ); \
-	size_t _res_ = sizeof(x)/sizeof((x)[0]);      \
-	_res_;                                        \
+#define ELEMENTSOF( x ) ({                              \
+    static_assert( std::rank<typeof(x)>::value ); \
+    size_t _res_ = sizeof(x)/sizeof((x)[0]);      \
+    _res_;                                        \
 })
 
 
@@ -136,7 +136,7 @@
   * @param[in] expr any expression that can be compared against 0 (zero)
   * @return -1 if @a expr < 0, 1 otherwise
 **/
-#define SIGN(expr) (((expr) < 0) ? -1 : 1)
+#define SIGN( expr ) (((expr) < 0) ? -1 : 1)
 
 
 /** @brief Check whether file @a f exists
@@ -146,7 +146,7 @@
   * @param f A file or directory to check
   * @return true if @a exists
 **/
-#define pwx_file_exists(f) (0 == access(f, F_OK))
+#define pwx_file_exists( f ) (0 == access(f, F_OK))
 
 
 /** @brief Check whether file @a f is executable
@@ -156,7 +156,7 @@
   * @param f A file or directory to check
   * @return true if @a is executable
 **/
-#define pwx_file_isX(f) (0 == access(f, X_OK))
+#define pwx_file_isX( f ) (0 == access(f, X_OK))
 
 
 /** @brief Check whether file @a f is writable
@@ -166,7 +166,7 @@
   * @param f A file or directory to check
   * @return true if @a is writable
 **/
-#define pwx_file_isW(f) (0 == access(f, W_OK))
+#define pwx_file_isW( f ) (0 == access(f, W_OK))
 
 
 /** @brief Check whether file @a f is readable
@@ -176,7 +176,7 @@
   * @param f A file or directory to check
   * @return true if @a is readable
 **/
-#define pwx_file_isR(f) (0 == access(f, R_OK))
+#define pwx_file_isR( f ) (0 == access(f, R_OK))
 
 
 /** @brief Check whether file @a f is readable and writable
@@ -186,7 +186,7 @@
   * @param f A file or directory to check
   * @return true if @a is readable and writable
 **/
-#define pwx_file_isRW(f) (0 == access(f, W_OK | W_OK))
+#define pwx_file_isRW( f ) (0 == access(f, W_OK | W_OK))
 
 
 // Many of them are useless without our trace info getter
