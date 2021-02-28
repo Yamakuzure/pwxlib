@@ -57,37 +57,34 @@ int pwx::pwx_asprintf( char** strp, const char* fmt, ... ) noexcept {
 	size_t text_len;
 
 	// First of all get the full message size
-	va_start ( ap, fmt );
+	va_start( ap, fmt );
 	va_copy( ap_test, ap );
 	text_len = vsnprintf( msg_buf, 0, fmt, ap_test ) + 1;
 	va_end( ap_test );
 
 	// Now generate the buffer
 	if ( text_len > 0 ) {
-		char* new_buf = pwx_realloc( char, msg_buf, text_len );
+		msg_buf = pwx_calloc( char, text_len );
 
-		if ( nullptr == new_buf ) {
+		if ( nullptr == msg_buf ) {
 			log_critical( "out of memory", "Unable to allocate %zu bytes for asprintf buffer!", sizeof( char ) * text_len );
 			return -1;
 		}
 
-		msg_buf = TAKE_PTR( new_buf );
-		memset( msg_buf, 0, text_len );
-
 		text_len = vsnprintf( msg_buf, text_len + 1, fmt, ap );
 	}
-
-	va_end( ap );
 
 	if ( msg_buf && strp ) {
 		*strp = TAKE_PTR( msg_buf );
 	}
 
+	va_end( ap );
+
 	return text_len > 0 ? 0 : -1;
 }
 
 
-char const* pwx::pwx_basename( char const* full_path ) noexcept{
+char const* pwx::pwx_basename( char const* full_path ) noexcept {
 #if PWX_IS_WINDOWS
 	static thread_local char base_buffer  [_MAX_FNAME + _MAX_EXT] = { 0 };
 	static thread_local char base_filename[_MAX_FNAME]            = { 0 };
@@ -119,7 +116,7 @@ char const* pwx::pwx_dirname( char const* full_path ) noexcept {
 	strncpy( base_filename, full_path, PATH_MAX - 1 );
 	snprintf( base_buffer, PATH_MAX - 1, "%s", dirname( base_filename ) );
 #endif // MSVC or not
-	log_debug( NULL, "%s -> %s", full_path, base_buffer );
+	log_debug( nullptr, "%s -> %s", full_path, base_buffer );
 	return base_buffer;
 }
 

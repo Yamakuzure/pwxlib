@@ -5,8 +5,11 @@
 
 /** @file PSTRINGUTILS
   * @brief Add some tools to work with strings (@see basic/string_utils.h)
+  *
+  * Note: Also include <PMemUtils>
 **/
 #include "basic/string_utils.h"
+#include "PMemUtils"
 
 
 #endif // PWX_PWXLIB_SRC_PSTRINGUTILS_INCLUDED
