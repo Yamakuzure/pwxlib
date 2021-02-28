@@ -164,10 +164,6 @@
 #define PWX_LOCK_GUARD(object) PWX_NAMED_LOCK_GUARD(PWX_FUNC, object)
 
 
-/// @brief Helper for a nullptr CLockable
-#define NULL_LOCK static_cast<CLockable*>(nullptr)
-
-
 /** @brief Clear a named lock guard, unlocking all currently locked objects
   *
   * *Prerequisites*: pwx/types/CLockGuard.h

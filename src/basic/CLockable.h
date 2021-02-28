@@ -111,6 +111,10 @@ if (object) {               \
 } do {} while(0)
 
 
+/// @brief Helper for a nullptr CLockable
+#define NULL_LOCK static_cast<CLockable*>(nullptr)
+
+
 /// @namespace pwx
 namespace pwx {
 
