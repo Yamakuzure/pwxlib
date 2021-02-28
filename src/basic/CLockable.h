@@ -52,8 +52,6 @@
   * are very certain that 'foo' can never be `nullptr`, then
   * just use `foo->lock()` instead.
   *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
   * @param object pointer to the object to lock.
 **/
 #define PWX_LOCK( object )   \
@@ -65,8 +63,6 @@ if ( nullptr != (object) ) { \
 /** @brief Use `object->try_lock()` if @a object is defined
   *
   * This is only meant for pointers where you aren't certain they are set.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to try_lock.
   * @return true if the lock could be acquired, false otherwise
@@ -81,8 +77,6 @@ if ( nullptr != (object) ) { \
   * If your compiler freaks out with `PWX_UNLOCK(foo);`, and you
   * are very certain that 'foo' can never be `nullptr`, then
   * just use `foo->unlock()` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to unlock.
 **/
@@ -99,8 +93,6 @@ if (object) {               \
   * If your compiler freaks out with `PWX_RELOCK(foo);`, and you
   * are very certain that 'foo' can never be `nullptr`, then
   * just use `foo->unlock(); foo->lock();` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to cycle the lock.
 **/
