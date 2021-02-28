@@ -12,7 +12,7 @@ bottom of this file and in the dedicated LICENSE file.
 
 Current Build Status
 --------------------
-* master : [![Build Status](https://www.travis-ci.org/Yamakuzure/pwxlib.svg?branch=master)](https://www.travis-ci.org/Yamakuzure/pwxlib)
+* master : [![PrydeWorX Library CI Actions Status](https://github.com/Yamakuzure/pwxlib/workflows/PrydeWorX%20Library%20CI/badge.svg)](https://github.com/Yamakuzure/pwxlib/actions)
 
 
 Usage
