@@ -560,14 +560,15 @@ private:
 		if ( this->beThreadSafe() ) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			while ( tail() && tail()->destroyed() ) {
-				PWX_RELOCK_OBJ( this );
+				this->unlock();
+				this->lock();
 			}
 			// Now tail is either nullptr (ring is empty) or valid and locked.
 			if ( tail() && ( head() != tail()->getNext() ) )
 				tail()->setNext( head() );
-			PWX_UNLOCK_OBJ( this );
+			this->unlock();
 		} // End of thread safe connection
 		else
 			tail()->next.store( head(), memOrdStore );

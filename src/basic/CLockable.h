@@ -48,6 +48,10 @@
   *
   * This is only meant for pointers where you aren't certain they are set.
   *
+  * If your compiler freaks out with `PWX_LOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `foo->lock()` instead.
+  *
   * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to lock.
@@ -58,26 +62,9 @@ if ( nullptr != (object) ) { \
 } do {} while(0)
 
 
-/** @brief Use `object->lock()`, @a object will be asserted
-  *
-  * The background for this slightly changed macro is gcc-7
-  * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a non-null-comparison.
-  *
-  * If your compiler freaks out with `PWX_LOCK(foo);`, and you
-  * are very certain that 'foo' can never be `nullptr`, then
-  * just use `PWX_LOCK_OBJ(foo);` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to lock.
-**/
-#define PWX_LOCK_OBJ( object ) \
-    assert (object);           \
-    (object)->lock()
-
-
 /** @brief Use `object->try_lock()` if @a object is defined
+  *
+  * This is only meant for pointers where you aren't certain they are set.
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
@@ -89,6 +76,12 @@ if ( nullptr != (object) ) { \
 
 /** @brief Use `object->unlock()` if @a object is defined.
   *
+  * This is only meant for pointers where you aren't certain they are set.
+  *
+  * If your compiler freaks out with `PWX_UNLOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `foo->unlock()` instead.
+  *
   * *Prerequisites*: pwx/types/CLockable.h
   *
   * @param object pointer to the object to unlock.
@@ -99,27 +92,13 @@ if (object) {               \
 } do {} while(0)
 
 
-/** @brief Use `object->unlock()`, @a object is asserted.
-  *
-  * The background for this slightly changed macro is gcc-7
-  * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a non-null-comparison.
-  *
-  * If your compiler freaks out with `PWX_UNLOCK(foo);`, and you
-  * are very certain that 'foo' can never be `nullptr`, then
-  * just use `PWX_UNLOCK_OBJ(foo);` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to unlock.
-**/
-#define PWX_UNLOCK_OBJ( object ) { \
-    assert(object);          \
-    (object)->unlock();      \
-} do {} while(0)
-
-
 /** @brief Do an `object->unlock()`, `object->lock()` cycle if @a object is defined.
+  *
+  * This is only meant for pointers where you aren't certain they are set.
+  *
+  * If your compiler freaks out with `PWX_RELOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `foo->unlock(); foo->lock();` instead.
   *
   * *Prerequisites*: pwx/types/CLockable.h
   *
@@ -129,27 +108,6 @@ if (object) {               \
 if (object) {               \
     (object)->unlock(); \
     (object)->lock();   \
-} do {} while(0)
-
-
-/** @brief Do an `object->unlock()`, `object->lock()` cycle, @a object is asserted.
-  *
-  * The background for this slightly changed macro is gcc-7
-  * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a non-null-comparison.
-  *
-  * If your compiler freaks out with `PWX_RELOCK(foo);`, and you
-  * are very certain that 'foo' can never be `nullptr`, then
-  * just use `PWX_RELOCK_OBJ(foo);` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to cycle the lock.
-**/
-#define PWX_RELOCK_OBJ( object ) { \
-    assert(object);          \
-    (object)->unlock();      \
-    (object)->lock();        \
 } do {} while(0)
 
 

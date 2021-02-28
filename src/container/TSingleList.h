@@ -218,7 +218,7 @@ public:
 	  * lot of elements stored is therefore rather costly!
 	  */
 	void disable_thread_safety() noexcept {
-		PWX_LOCK_OBJ( this );
+		this->lock();
 		this->do_locking( false );
 		this->currStore.disable_thread_safety();
 		elem_t* xCurr = head();
@@ -995,18 +995,18 @@ protected:
 			return nullptr;
 
 		// Rule 1: Lock for the basic tests.
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
+		const_cast<list_t*>( this )->lock();
 
 		// Exit if the list has been emptied while we waited for the lock
 		if ( empty() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return nullptr;
 		}
 
 		// Quick exit if curr is already what we want:
 		elem_t* xCurr = curr();
 		if ( xCurr && ( xCurr->data.get() == data ) ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return xCurr;
 		}
 
@@ -1017,7 +1017,7 @@ protected:
 			elem_t* xHead = head();
 			if ( ( xHead != xCurr ) && ( xHead->data.get() == data ) ) {
 				curr( xHead );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+				const_cast<list_t*>( this )->unlock();
 				return xHead;
 			}
 
@@ -1025,7 +1025,7 @@ protected:
 			elem_t* xTail = tail();
 			if ( ( xTail != xCurr ) && ( xTail->data.get() == data ) ) {
 				curr( xTail );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+				const_cast<list_t*>( this )->unlock();
 				return xTail;
 			}
 
@@ -1034,7 +1034,7 @@ protected:
 			xCurr = xHead->getNext(); // head is already checked.
 
 			// This is rule 2: Unlock for traversal
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 
 			while ( !result && !isDone && xCurr ) {
 				// Rule 3: Re-check tail. It might be
@@ -1051,9 +1051,9 @@ protected:
 
 		} // End of handling a search with more than one element
 		else
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 
-			return result;
+		return result;
 	}
 
 
@@ -1070,17 +1070,17 @@ protected:
 			return nullptr;
 
 		// Rule 1
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
+		const_cast<list_t*>( this )->lock();
 
 		if ( empty() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return nullptr;
 		}
 
 		// Quick exit if curr is already what we want:
 		elem_t* xCurr = curr();
 		if ( *xCurr == data ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return xCurr;
 		}
 
@@ -1091,7 +1091,7 @@ protected:
 			elem_t* xHead = head();
 			if ( ( xHead != xCurr ) && ( *xHead == data ) ) {
 				curr( xHead );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+				const_cast<list_t*>( this )->unlock();
 				return xHead;
 			}
 
@@ -1099,7 +1099,7 @@ protected:
 			elem_t* xTail = tail();
 			if ( ( xTail != xCurr ) && ( *xTail == data ) ) {
 				curr( xTail );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+				const_cast<list_t*>( this )->unlock();
 				return xTail;
 			}
 
@@ -1108,7 +1108,7 @@ protected:
 			xCurr = xHead->getNext(); // head is already checked.
 
 			// Rule 2:
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 
 			while ( !result && !isDone && xCurr ) {
 				// Note: The container is not locked any more,
@@ -1125,9 +1125,9 @@ protected:
 
 		} // End of handling a search with more than one element
 		else
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 
-			return result;
+		return result;
 	}
 
 
@@ -1144,10 +1144,10 @@ protected:
 			return nullptr;
 
 		// Rule 1
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
+		const_cast<list_t*>( this )->lock();
 
 		if ( empty() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return nullptr;
 		}
 
@@ -1157,7 +1157,7 @@ protected:
 		int32_t comp  = xCurr->compare( data );
 		if ( ( comp < 0 )
 		                && ( ( nullptr == xNext ) || ( xNext->compare( data ) > -1 ) ) ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return xNext ? xNext : nullptr;
 		}
 
@@ -1165,7 +1165,7 @@ protected:
 		elem_t* xHead = head();
 		if ( xHead && ( xHead->compare( data ) > -1 ) ) {
 			curr( xHead );
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return xHead;
 		}
 
@@ -1173,7 +1173,7 @@ protected:
 		elem_t* xTail = tail();
 		if ( xTail && ( xTail->compare( data ) < 0 ) ) {
 			curr( xTail );
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 			return nullptr; // tail is prev of nullptr by definition.
 		}
 
@@ -1183,7 +1183,7 @@ protected:
 			xCurr = xHead->getNext(); // head is already checked.
 
 		// Rule 2:
-		PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+		const_cast<list_t*>( this )->unlock();
 
 		while ( !result && !isDone && xCurr && xNext ) {
 			// Note: The container is not locked any more,
@@ -1331,12 +1331,13 @@ private:
 		 */
 		elem_t* xHead = nullptr;
 		if ( size() ) {
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			xHead = head();
 			PWX_LOCK( xHead );
 			while ( xHead && ( xHead->removed() || xHead->destroyed() ) ) {
 				while ( waiting () ) {
-					PWX_RELOCK_OBJ( this );
+					this->unlock();
+					this->lock();
 				}
 				PWX_UNLOCK( xHead );
 				xHead = head();
@@ -1350,7 +1351,7 @@ private:
 				tail( nullptr );
 				PWX_UNLOCK( xHead );
 			}
-			PWX_UNLOCK_OBJ( this );
+			this->unlock();
 		} // End of catching head()
 
 		// Now if this call found anything, it can be destroyed:
@@ -1399,7 +1400,7 @@ private:
 
 		// It is necessary to lock briefly to ensure a consistent
 		// start of the search with a minimum of checks
-		PWX_LOCK_OBJ( const_cast<list_t*>( this ) );
+		const_cast<list_t*>( this )->lock();
 
 		uint32_t locCnt = size();
 
@@ -1409,7 +1410,7 @@ private:
 			if ( nullptr == xCurr )
 				xCurr = head();
 
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 
 			// Mod index into range
 			uint32_t xIdx = static_cast<uint32_t> ( index < 0
@@ -1485,7 +1486,7 @@ private:
 			curr( xCurr );
 			return xCurr;
 		} else
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
+			const_cast<list_t*>( this )->unlock();
 
 		return nullptr;
 	}
@@ -1579,11 +1580,11 @@ private:
 			PWX_LOCK( prevElement );
 
 		// 2: Check source:
-		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->lock();
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			if ( prevElement )
 				PWX_UNLOCK( prevElement );
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
@@ -1594,12 +1595,12 @@ private:
 		elem_t* newElement = nullptr;
 		PWX_TRY( newElement = new elem_t ( src ) )
 		catch( std::exception& e ) {
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			if ( prevElement )
 				PWX_UNLOCK( prevElement );
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new list element failed." );
 		}
-		PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->unlock();
 		if ( !this->beThreadSafe() )
 			newElement->disable_thread_safety();
 
@@ -1617,11 +1618,11 @@ private:
 			PWX_LOCK( prev );
 
 		// 2: Check source:
-		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->lock();
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			if ( prev )
 				PWX_UNLOCK( prev );
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
@@ -1632,12 +1633,12 @@ private:
 		elem_t* newElement = nullptr;
 		PWX_TRY( newElement = new elem_t ( src ) )
 		catch( std::exception& e ) {
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			if ( prev )
 				PWX_UNLOCK( prev );
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new list element failed." );
 		}
-		PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->unlock();
 		if ( !this->beThreadSafe() )
 			newElement->disable_thread_safety();
 
@@ -1651,11 +1652,11 @@ private:
 	/// @brief preparation method to insert data before the first greater element
 	virtual uint32_t privInsElemSorted( elem_t const& src ) {
 		// 1: Check source:
-		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->lock();
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
 			           "An element used as source for insertion is destroyed." );
 		}
@@ -1665,7 +1666,7 @@ private:
 		PWX_TRY( newElement = new elem_t ( src ) )
 		catch( std::exception& e )
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new list element failed." );
-		PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->unlock();
 		if ( !this->beThreadSafe() )
 			newElement->disable_thread_safety();
 
@@ -1713,7 +1714,7 @@ private:
 		if ( prev ) {
 			if ( tail() == prev->getNext() ) {
 				// This is possibility b)
-				PWX_LOCK_OBJ( this );
+				this->lock();
 				removed = prev->removeNext();
 				if ( tail() == removed )
 					/* Reason for the lock and the double check:
@@ -1732,7 +1733,7 @@ private:
 					tail( prev );
 				else // Someone came and made this be c)
 					this->doRenumber.store( true, memOrdStore );
-				PWX_UNLOCK_OBJ( this );
+				this->unlock();
 			} else {
 				// Possibility 3: Just do it
 				removed = prev->removeNext();
@@ -1755,14 +1756,14 @@ private:
 		// If something was removed, the count must be decreased:
 		if ( removed ) {
 			if ( 1 == eCount.fetch_sub( 1, memOrdStore ) ) {
-				PWX_LOCK_OBJ( this );
+				this->lock();
 				// The list is empty. Or is it?
 				if ( 0 == eCount.load( memOrdLoad ) ) {
 					head( nullptr );
 					tail( nullptr );
 					currStore.clear();
 				}
-				PWX_UNLOCK_OBJ( this );
+				this->unlock();
 			}
 		}
 

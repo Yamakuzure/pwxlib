@@ -820,10 +820,10 @@ private:
 		if ( this->beThreadSafe() ) {
 			// In this case we do a lock cycle until a valid tail is
 			// found or the ring is empty
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			while ( tail() && tail()->destroyed() ) {
-				PWX_UNLOCK_OBJ( this );
-				PWX_LOCK_OBJ( this );
+				this->unlock();
+				this->lock();
 			}
 			// Now tail is either nullptr (ring is empty) or valid and locked.
 			if ( tail() && ( head() != tail()->getNext() ) )
@@ -831,13 +831,13 @@ private:
 
 			// The same has to be done with head()->prev
 			while ( head() && head()->destroyed() ) {
-				PWX_UNLOCK_OBJ( this );
-				PWX_LOCK_OBJ( this );
+				this->unlock();
+				this->lock();
 			}
 			// Now head is either nullptr (ring is empty) or valid and locked.
 			if ( head() && ( tail() != head()->getPrev() ) )
 				head()->setPrev( tail() );
-			PWX_UNLOCK_OBJ( this );
+			this->unlock();
 		} // End of thread safe connection
 		else {
 			head()->prev.store( tail(), memOrdStore );

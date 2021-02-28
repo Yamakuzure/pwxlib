@@ -296,11 +296,11 @@ public:
 		// a) Nothing is added by another thread and
 		// b) src can not go away before the reset is done.
 		if ( beThreadSafe() ) {
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			if ( this != &src ) {
 				while ( !const_cast<list_t*>( &src )->try_lock() ) {
-					PWX_UNLOCK_OBJ( this );
-					PWX_LOCK_OBJ( this );
+					this->unlock();
+					this->lock();
 				}
 			}
 		}
@@ -312,8 +312,8 @@ public:
 
 		// Unlock if needed
 		if ( beThreadSafe() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( &src ) );
-			PWX_UNLOCK_OBJ( this );
+			const_cast<list_t*>( &src )->unlock();
+			this->unlock();
 		}
 	}
 
@@ -526,10 +526,10 @@ private:
 	virtual void privClear() noexcept {
 		elem_t* xTail = nullptr;
 		while ( tail() ) {
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			xTail = privRemove( tail() );
 			PWX_LOCK( xTail );
-			PWX_UNLOCK_OBJ( this );
+			this->unlock();
 			if ( xTail && !xTail->destroyed() ) {
 				PWX_UNLOCK( xTail );
 				delete xTail;
@@ -873,23 +873,23 @@ private:
 			}
 		} else if ( tail() == elem ) {
 			// Case 2:
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			if ( tail() == elem )
 				tail( tail()->getPrev() );
-			PWX_UNLOCK_OBJ( this );
+			this->unlock();
 		} else
 			this->doRenumber.store( true, memOrdStore );
 		elem->remove();
 
 		if ( 1 == eCount.fetch_sub( 1 ) ) {
 			// The list is empty!
-			PWX_LOCK_OBJ( this );
+			this->lock();
 			// Is it really?
 			if ( 0 == eCount.load( memOrdLoad ) ) {
 				head( nullptr );
 				tail( nullptr );
 			}
-			PWX_UNLOCK_OBJ( this );
+			this->unlock();
 		}
 
 		return elem;

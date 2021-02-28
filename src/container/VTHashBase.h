@@ -1629,11 +1629,11 @@ private:
 	**/
 	virtual uint32_t privAdd( const elem_t &src ) {
 		// 1: Check source:
-		PWX_LOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->lock();
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
 			           "An element used as source for insertion is destroyed." );
 		}
@@ -1642,10 +1642,10 @@ private:
 		elem_t* newElement = nullptr;
 		PWX_TRY( newElement = new elem_t( src ) )
 		catch ( std::exception &e ) {
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+			const_cast<elem_t*>( &src )->unlock();
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new hash element failed." );
 		}
-		PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
+		const_cast<elem_t*>( &src )->unlock();
 		if ( !this->beThreadSafe() ) {
 			newElement->disable_thread_safety();
 		}

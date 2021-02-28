@@ -46,11 +46,11 @@
   * @param b right type
   * @return true if @a and @a b are of the same type
 **/
-#define isSameType(a, b) std::is_same_v<a, b>
+#define isSameType( a, b ) std::is_same_v<a, b>
 
 
 #if HAVE_CHAR16_T
-#  define isChar16(a) (isSameType(a, char16_t) || isSameType(a, unsigned char16_t))
+#  define isChar16( a ) (isSameType(a, char16_t) || isSameType(a, unsigned char16_t))
 #else
 #  define isChar16(a) false
 #endif // HAVE_CHAR16_T
@@ -62,7 +62,7 @@
 
 
 #if HAVE_CHAR32_T
-#  define isChar32(a) (isSameType(a, char32_t) || isSameType(a, unsigned char32_t))
+#  define isChar32( a ) (isSameType(a, char32_t) || isSameType(a, unsigned char32_t))
 #else
 #  define isChar32(a) false
 #endif // HAVE_CHAR32_T
@@ -74,7 +74,7 @@
 
 
 #if HAVE_WCHAR_T
-#  define isWChar(a) (isSameType(a, wchar_t) || isSameType(a, unsigned wchar_t))
+#  define isWChar( a ) (isSameType(a, wchar_t) || isSameType(a, unsigned wchar_t))
 #else
 #  define isWChar(a) false
 #endif // HAVE_WCHAR_T
@@ -90,7 +90,7 @@
   * @param a type to check
   * @return true if @a is a pointer
 **/
-#define isPointer(a) std::is_pointer_v<a>
+#define isPointer( a ) std::is_pointer_v<a>
 
 
 /** @brief true if @a a is an array
@@ -98,7 +98,7 @@
   * @param a type to check
   * @return true if @a is an array
 **/
-#define isArrayType(a) std::is_array_v<a>
+#define isArrayType( a ) std::is_array_v<a>
 
 
 /** @brief true if @a s is any char type
@@ -106,7 +106,7 @@
   * @param a type to check
   * @return true if @a is any char type
 **/
-#define isCharType(a) ( ( isSameType(a, char)          \
+#define isCharType( a ) ( ( isSameType(a, char)          \
                        || isSameType(a, unsigned char) \
                        || isChar16(a)                  \
                        || isChar32(a)                  \
@@ -119,7 +119,7 @@
   * @param a type to check
   * @return true if @a is any char array
 **/
-#define isCharArray(a) ( ( isSameType(a, char)          \
+#define isCharArray( a ) ( ( isSameType(a, char)          \
                         || isSameType(a, unsigned char) \
                         || isChar16(a)                  \
                         || isChar32(a)                  \
@@ -132,7 +132,7 @@
   * @param a type to check
   * @return true if @a is an integer type
 **/
-#define isIntType(a) ( std::is_integral_v<a> && !(isPointer(a) || isArrayType(a)) )
+#define isIntType( a ) ( std::is_integral_v<a> && !(isPointer(a) || isArrayType(a)) )
 
 
 /** @brief true if @a a is a floating point type
@@ -140,7 +140,7 @@
   * @param a type to check
   * @return true if @a is a floating point type
 **/
-#define isFloatType(a) ( std::is_floating_point_v<a> && !(isPointer(a) || isArrayType(a)) )
+#define isFloatType( a ) ( std::is_floating_point_v<a> && !(isPointer(a) || isArrayType(a)) )
 
 
 /** @brief true if @a is either integer or float type
@@ -148,7 +148,7 @@
   * @param a type to check
   * @return true if @a is either an integer or a floating point type
 **/
-#define isNumericType(a) ( std::is_arithmetic_v<a> && !isArrayType(a) )
+#define isNumericType( a ) ( std::is_arithmetic_v<a> && !isArrayType(a) )
 
 
 /// @namespace pwx
