@@ -42,16 +42,36 @@
 
 
 /* -----------------------------------------------------------------------
+ * --- Various attributes and functions that are C++17 and upwards     ---
+ * -------------------------------------------------------------------- */
+#define PWX_CARRIES_DEP        [[carries_dependency]]  //!< (C++11)	indicates that dependency chain in release-consume
+                                                       //!<           std::memory_order propagates in and out of the function
+#define PWX_DEPRECATED_SIMPLE  [[deprecated]]          //!< (C++14) indicates that the use of the name or entity declared with
+#define PWX_DEPRECATED(reason) [[deprecated(#reason)]] //!< (C++14)	  this attribute is allowed, but discouraged for some reason
+#define PWX_FALLTHROUGH        [[fallthrough]]         //!< (C++17)	indicates that the fall through from the previous case label
+                                                       //!<           is intentional and should not be diagnosed by a compiler
+                                                       //!<           that warns on fall-through
+#define PWX_MAYBE_UNUSED       [[maybe_unused]]        //!< (C++17) suppresses compiler warnings on unused entities, if any
+#define PWX_NODISCARD_SIMPLE   [[nodiscard]]           //!< (C++17) encourages the compiler to issue a warning if the return
+                                                       //!<           value is discarded
+#if PWX_HAS_CXX20
+#define PWX_NODISCARD(reason)  [[nodiscard(#reason)]]  //!< (C++20)	Same as @a see PWX_NODISCARD_SIMPLE with @a reason parameter
+#else
+#define PWX_NODISCARD(reason)
+#endif // Only in C++20 and later
+#define PWX_NORETURN           [[noreturn]]            //!< (C++11)	indicates that the function does not return
+
+
+/* -----------------------------------------------------------------------
  * --- Various attributes and functions that are not universal         ---
  * -------------------------------------------------------------------- */
+
 
 #ifndef PWX_NODOX
 #if PWX_IS_MSVC
 // Attributes
 #  define PWX_PRINTF(...)
 #  define PWX_ALLOC(...)
-#  define PWX_UNUSED          [[maybe_unused]]
-#  define PWX_DEPRECATED      [[deprecated]]
 #  define PWX_PACKED
 #  define PWX_MALLOC
 #  define PWX_WEAK
@@ -70,8 +90,6 @@
 #  else
 #    define PWX_ALLOC(...) __attribute__ ((alloc_size(__VA_ARGS__)))
 #  endif // CLang does not know this attribute, yet.
-#  define PWX_UNUSED       __attribute__ ((unused))
-#  define PWX_DEPRECATED   __attribute__ ((deprecated))
 #  define PWX_PACKED       __attribute__ ((packed))
 #  define PWX_MALLOC       __attribute__ ((malloc))
 #  define PWX_WEAK         __attribute__ ((weak))
@@ -79,20 +97,6 @@
 #  define PWX_UNLIKELY(x) (__builtin_expect(!!(x),0))
 #  define PWX_WARNUNUSED  __attribute__ ((warn_unused_result))
 #endif // Macros only for gcc/clang
-
-
-#if PWX_IS_GCC && __GNUC__ >= 7
-#  define PWX_FALLTHROUGH   __attribute__((fallthrough))
-#else
-#  define PWX_FALLTHROUGH
-#endif
-
-
-#if PWX_IS_MSVC || (PWX_IS_GCC && __GNUC__ >= 9)
-#  define _maybe_unused  [[maybe_unused]]
-#else
-#  define _maybe_unused_
-#endif
 
 
 #define VOID_0 ((void)0)
@@ -116,7 +120,7 @@
   * @return The std::thread::id of the current thread.
 **/
 #if PWX_IS_MSVC
-#  define CURRENT_THREAD_ID _Thrd_id()
+#  define CURRENT_THREAD_ID static_cast<size_t>(_Thrd_id())
 #else
 #  define CURRENT_THREAD_ID static_cast<size_t>(__gthread_self())
 #endif // MSVC vs gcc/clang
@@ -133,113 +137,6 @@
   * @return -1 if @a expr < 0, 1 otherwise
 **/
 #define SIGN(expr) (((expr) < 0) ? -1 : 1)
-
-
-/** @brief Use `object->lock()` if @a object is not `nullptr`
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to lock.
-**/
-#define PWX_LOCK(object)    \
-if (nullptr != (object) ) { \
-	(object)->lock();   \
-}
-
-
-/** @brief Use `object->lock()`, @a object will be asserted
-  *
-  * The background for this slightly changed macro is gcc-7
-  * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a non-null-comparison.
-  *
-  * If your compiler freaks out with `PWX_LOCK(foo);`, and you
-  * are very certain that 'foo' can never be `nullptr`, then
-  * just use `PWX_LOCK_OBJ(foo);` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to lock.
-**/
-#define PWX_LOCK_OBJ(object) \
-	assert (object);     \
-	(object)->lock()
-
-
-/** @brief Use `object->try_lock89` if @a object is defined
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to try_lock.
-  * @return true if the lock could be acquired, false otherwise
-**/
-#define PWX_TRY_LOCK(object) ((object) ? (object)->try_lock() : false)
-
-
-/** @brief Use `object->unlock()` if @a object is defined.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to unlock.
-**/
-#define PWX_UNLOCK(object)  \
-if (object) {               \
-	(object)->unlock(); \
-}
-
-
-/** @brief Use `object->unlock()`, @a object is asserted.
-  *
-  * The background for this slightly changed macro is gcc-7
-  * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a non-null-comparison.
-  *
-  * If your compiler freaks out with `PWX_UNLOCK(foo);`, and you
-  * are very certain that 'foo' can never be `nullptr`, then
-  * just use `PWX_UNLOCK_OBJ(foo);` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to unlock.
-**/
-#define PWX_UNLOCK_OBJ(object) { \
-	assert(object);          \
-	(object)->unlock();      \
-}
-
-
-/** @brief Do an `object->unlock()`, `object->lock()` cycle if @a object is defined.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to cycle the lock.
-**/
-#define PWX_RELOCK(object)  \
-if (object) {               \
-	(object)->unlock(); \
-	(object)->lock();   \
-}
-
-
-/** @brief Do an `object->unlock()`, `object->lock()` cycle, @a object is asserted.
-  *
-  * The background for this slightly changed macro is gcc-7
-  * throwing out warnings if the address of a local value or
-  * the 'this'-pointer is used in a non-null-comparison.
-  *
-  * If your compiler freaks out with `PWX_RELOCK(foo);`, and you
-  * are very certain that 'foo' can never be `nullptr`, then
-  * just use `PWX_RELOCK_OBJ(foo);` instead.
-  *
-  * *Prerequisites*: pwx/types/CLockable.h
-  *
-  * @param object pointer to the object to cycle the lock.
-**/
-#define PWX_RELOCK_OBJ(object) { \
-	assert(object);          \
-	(object)->unlock();      \
-	(object)->lock();        \
-}
 
 
 /** @brief Create a lock guard on the given object, that is unlocked when leaving the current scope

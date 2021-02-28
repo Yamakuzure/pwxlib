@@ -44,6 +44,115 @@
 #include "basic/types.h"
 
 
+/** @brief Use `object->lock()` if @a object is not `nullptr`
+  *
+  * This is only meant for pointers where you aren't certain they are set.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to lock.
+**/
+#define PWX_LOCK( object )   \
+if ( nullptr != (object) ) { \
+    (object)->lock();        \
+} do {} while(0)
+
+
+/** @brief Use `object->lock()`, @a object will be asserted
+  *
+  * The background for this slightly changed macro is gcc-7
+  * throwing out warnings if the address of a local value or
+  * the 'this'-pointer is used in a non-null-comparison.
+  *
+  * If your compiler freaks out with `PWX_LOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `PWX_LOCK_OBJ(foo);` instead.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to lock.
+**/
+#define PWX_LOCK_OBJ( object ) \
+    assert (object);           \
+    (object)->lock()
+
+
+/** @brief Use `object->try_lock()` if @a object is defined
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to try_lock.
+  * @return true if the lock could be acquired, false otherwise
+**/
+#define PWX_TRY_LOCK( object ) ((object) ? (object)->try_lock() : false)
+
+
+/** @brief Use `object->unlock()` if @a object is defined.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to unlock.
+**/
+#define PWX_UNLOCK( object )  \
+if (object) {               \
+    (object)->unlock(); \
+} do {} while(0)
+
+
+/** @brief Use `object->unlock()`, @a object is asserted.
+  *
+  * The background for this slightly changed macro is gcc-7
+  * throwing out warnings if the address of a local value or
+  * the 'this'-pointer is used in a non-null-comparison.
+  *
+  * If your compiler freaks out with `PWX_UNLOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `PWX_UNLOCK_OBJ(foo);` instead.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to unlock.
+**/
+#define PWX_UNLOCK_OBJ( object ) { \
+    assert(object);          \
+    (object)->unlock();      \
+} do {} while(0)
+
+
+/** @brief Do an `object->unlock()`, `object->lock()` cycle if @a object is defined.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to cycle the lock.
+**/
+#define PWX_RELOCK( object )  \
+if (object) {               \
+    (object)->unlock(); \
+    (object)->lock();   \
+} do {} while(0)
+
+
+/** @brief Do an `object->unlock()`, `object->lock()` cycle, @a object is asserted.
+  *
+  * The background for this slightly changed macro is gcc-7
+  * throwing out warnings if the address of a local value or
+  * the 'this'-pointer is used in a non-null-comparison.
+  *
+  * If your compiler freaks out with `PWX_RELOCK(foo);`, and you
+  * are very certain that 'foo' can never be `nullptr`, then
+  * just use `PWX_RELOCK_OBJ(foo);` instead.
+  *
+  * *Prerequisites*: pwx/types/CLockable.h
+  *
+  * @param object pointer to the object to cycle the lock.
+**/
+#define PWX_RELOCK_OBJ( object ) { \
+    assert(object);          \
+    (object)->unlock();      \
+    (object)->lock();        \
+} do {} while(0)
+
+
 /// @namespace pwx
 namespace pwx {
 
@@ -96,19 +205,20 @@ namespace pwx {
 
   * **Important** : It is strongly recommended that you use std::lock_guard
   * or std::unique_lock to do the locking of any object derived from
-  * pwx::CLockable. You can use PWX_LOCK_GUARD(pointer); and
-  * PWX_DOUBLE_LOCK_GUARD(ptrA, ptrB); to do this rather simply. They
-  * are defined in `basic/macros.h`.
+  * pwx::CLockable.
+  * An alternative is pwx::CLockGuard, which can guard up to three pwx::CLockable
+  * derived objects simultaniously. It also has the utility macros
+  * PWX_LOCK_GUARD(pointer[, pointer[,pointer]]) to do this rather simply. They
+  * are defined in `basic/CLockGuard.h`.
   *
   * #### `atomic_flag spinlock` versus `std::mutex` ####
   * By default `CLockable` is compiled with PWX_USE_FLAGSPIN defined. This can
-  * be controlled by the `-Dspinlocks` configuration option.
-  * If you think using the full `std::mutex` for doing the locking then you can
-  * set this value to `false` and compare the outcome of the speed tests of the
-  * testlib program.
+  * be controlled by the `-DENABLE_SPINLOCKS=ON` configuration option.
+  * If you wish to use the full `std::mutex` for doing the locking then you can
+  * set this value to `OFF` and compare the outcome.
   *
   * #### Thread debugging versus spinlocks ####
-  * If you enable annotations with the `-Dannotations=true` configuration
+  * If you enable annotations with the `-DWITH_ANNOTATIONS=ON` configuration
   * option, `std::mutex` is enforced. Using spinlocks here would lead to an
   * avalanche of false positives in Helgrind and DND.
 **/
@@ -120,9 +230,9 @@ public:
 	 * ===============================================
 	*/
 
-	#if !PWX_USE_FLAGSPIN
+#if !PWX_USE_FLAGSPIN
 	typedef std::mutex lock_t; //!< Use standard mutex if no spinlocks are used.
-	#endif // !PWX_USE_FLAGSPIN
+#endif // not PWX_USE_FLAGSPIN
 
 
 	/* ===============================================
@@ -142,7 +252,7 @@ public:
 	  * All objects have their private locking.
 	  * Only the state whether to actually do the locking is copied.
 	  */
-	CLockable ( CLockable const& src ) noexcept;
+	CLockable( CLockable const &src ) noexcept;
 
 
 	/** @brief Destructor
@@ -265,7 +375,7 @@ public:
 	  * All objects have their private locking.
 	  * Only the state whether to actually do the locking is copied.
 	  */
-	CLockable& operator= ( CLockable const& src ) noexcept;
+	CLockable &operator=( CLockable const &src ) noexcept;
 
 
 protected:
@@ -276,9 +386,9 @@ protected:
 	*/
 
 	mutable
-	abool_t isDestroyed  = ATOMIC_VAR_INIT( false ); //!< Should be set to true by the destructors of deriving classes.
-	mord_t  memOrdLoad   = std::memory_order_acquire;     //!< to be used with atomic::load()
-	mord_t  memOrdStore  = std::memory_order_release;     //!< to be used with atomic::store()
+	abool_t isDestroyed = ATOMIC_VAR_INIT( false ); //!< Should be set to true by the destructors of deriving classes.
+	mord_t  memOrdLoad  = std::memory_order_acquire;     //!< to be used with atomic::load()
+	mord_t  memOrdStore = std::memory_order_release;     //!< to be used with atomic::store()
 
 
 private:
@@ -291,11 +401,11 @@ private:
 	abool_t CL_Do_Locking = ATOMIC_VAR_INIT( true );  //!< If set to false with do_locking(false), no real locking is done.
 	abool_t CL_Is_Locked  = ATOMIC_VAR_INIT( false ); //!< Set to true if a lock is imposed, atomic_flag can't do it.
 
-	#if PWX_USE_FLAGSPIN
-	aflag_t CL_Lock       = ATOMIC_FLAG_INIT;         //!< Instead of a costly mutex atomic_flag spinlocks are used.
-	#else
+#if PWX_USE_FLAGSPIN
+	aflag_t CL_Lock = ATOMIC_FLAG_INIT;         //!< Instead of a costly mutex atomic_flag spinlocks are used.
+#else
 	lock_t CL_Lock;                                   //!< Use standard mutex to handle locking
-	#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 
 	aui32_t CL_Lock_Count = ATOMIC_VAR_INIT( 0 );     //!< How many times the current thread has locked.
 	asize_t CL_Thread_ID  = ATOMIC_VAR_INIT( 0 );     //!< The owning thread of a lock
@@ -317,11 +427,27 @@ private:
   * This function can handle nullptr arguments, assuming nullptr to
   * be locked; It can't be manipulated anyway.
   *
-  * @param[in] objA the first object to check
-  * @param[in] objB the second object to check
+  * @param[in] objA Pointer to the first object to check
+  * @param[in] objB Pointer to the second object to check
   * @return true if both are locked, false if at least one is not locked
 **/
 bool are_locked( CLockable const* objA, CLockable const* objB ) noexcept PWX_WARNUNUSED PWX_API;
+
+
+/** @brief return true if two given objects are both locked
+  *
+  * This function returns true if both given objects are currently
+  * locked by the calling thread. If at least one is not locked,
+  * the function returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA The first object to check
+  * @param[in] objB The second object to check
+  * @return true if both are locked, false if at least one is not locked
+**/
+bool are_locked( CLockable const &objA, CLockable const &objB ) noexcept PWX_WARNUNUSED PWX_API;
 
 
 /** @brief return true if three given objects are both locked
@@ -333,12 +459,29 @@ bool are_locked( CLockable const* objA, CLockable const* objB ) noexcept PWX_WAR
   * This function can handle nullptr arguments, assuming nullptr to
   * be locked; It can't be manipulated anyway.
   *
-  * @param[in] objA the first object to check
-  * @param[in] objB the second object to check
-  * @param[in] objC the third object to check
+  * @param[in] objA Pointer to the first object to check
+  * @param[in] objB Pointer to the second object to check
+  * @param[in] objC Pointer to the third object to check
   * @return true if all three are locked, false if at least one is not locked
 **/
 bool are_locked( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept PWX_WARNUNUSED PWX_API;
+
+
+/** @brief return true if three given objects are both locked
+  *
+  * This function returns true if all three given objects are
+  * currently locked by the calling thread. If at least one is
+  * not locked, the function returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA The first object to check
+  * @param[in] objB The second object to check
+  * @param[in] objC The third object to check
+  * @return true if all three are locked, false if at least one is not locked
+**/
+bool are_locked( CLockable const &objA, CLockable const &objB, CLockable const &objC ) noexcept PWX_WARNUNUSED PWX_API;
 
 
 /** @brief try to lock two objects at once
@@ -350,11 +493,27 @@ bool are_locked( CLockable const* objA, CLockable const* objB, CLockable const* 
   * This function can handle nullptr arguments, assuming nullptr to
   * be locked; It can't be manipulated anyway.
   *
-  * @param[in] objA the first object to lock
-  * @param[in] objB the second object to lock
+  * @param[in] objA Pointer to the first object to lock
+  * @param[in] objB Pointer to the second object to lock
   * @return true if both could be locked, false if at least one lock failed
 **/
-bool try_locks ( CLockable const* objA, CLockable const* objB ) noexcept PWX_WARNUNUSED PWX_API;
+bool try_locks( CLockable const* objA, CLockable const* objB ) noexcept PWX_WARNUNUSED PWX_API;
+
+
+/** @brief try to lock two objects at once
+  *
+  * This function tries to lock two objects at once, returning
+  * true if both could be locked. If any can not be locked, the
+  * other is unlocked again if neccessary and false is returned.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA The first object to lock
+  * @param[in] objB The second object to lock
+  * @return true if both could be locked, false if at least one lock failed
+**/
+bool try_locks( CLockable const &objA, CLockable const &objB ) noexcept PWX_WARNUNUSED PWX_API;
 
 
 /** @brief try to lock three objects at once
@@ -367,12 +526,30 @@ bool try_locks ( CLockable const* objA, CLockable const* objB ) noexcept PWX_WAR
   * This function can handle nullptr arguments, assuming nullptr to
   * be locked; It can't be manipulated anyway.
   *
-  * @param[in] objA the first object to lock
-  * @param[in] objB the second object to lock
-  * @param[in] objC the third object to lock
+  * @param[in] objA Pointer to the first object to lock
+  * @param[in] objB Pointer to the second object to lock
+  * @param[in] objC Pointer to the third object to lock
   * @return true if all three could be locked, false if at least one lock failed
 **/
-bool try_locks ( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept PWX_WARNUNUSED PWX_API;
+bool try_locks( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept PWX_WARNUNUSED PWX_API;
+
+
+/** @brief try to lock three objects at once
+  *
+  * This function tries to lock three objects at once, returning
+  * true if all three could be locked. If any can not be locked,
+  * the others are unlocked again if necessary and false is
+  * returned.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be locked; It can't be manipulated anyway.
+  *
+  * @param[in] objA The first object to lock
+  * @param[in] objB The second object to lock
+  * @param[in] objC The third object to lock
+  * @return true if all three could be locked, false if at least one lock failed
+**/
+bool try_locks( CLockable const &objA, CLockable const &objB, CLockable const &objC ) noexcept PWX_WARNUNUSED PWX_API;
 
 
 /** @brief unlock two objects if both are currently locked.
@@ -384,11 +561,27 @@ bool try_locks ( CLockable const* objA, CLockable const* objB, CLockable const* 
   * This function can handle nullptr arguments, assuming nullptr to
   * be successfully unlocked; It can't be manipulated anyway.
   *
-  * @param[in] objA the first object to unlock
-  * @param[in] objB the second object to unlock
+  * @param[in] objA Pointer to the first object to unlock
+  * @param[in] objB Pointer to the second object to unlock
   * @return true if both could be unlocked, false if at least one was not locked
 **/
 bool unlock_all( CLockable const* objA, CLockable const* objB ) noexcept PWX_API;
+
+
+/** @brief unlock two objects if both are currently locked.
+  *
+  * This function unlocks two objects if both are currently
+  * locked by the calling thread. If any is not locked, the
+  * function does nothing and returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be successfully unlocked; It can't be manipulated anyway.
+  *
+  * @param[in] objA The first object to unlock
+  * @param[in] objB The second object to unlock
+  * @return true if both could be unlocked, false if at least one was not locked
+**/
+bool unlock_all( CLockable const &objA, CLockable const &objB ) noexcept PWX_API;
 
 
 /** @brief unlock three objects if all are currently locked.
@@ -400,12 +593,28 @@ bool unlock_all( CLockable const* objA, CLockable const* objB ) noexcept PWX_API
   * This function can handle nullptr arguments, assuming nullptr to
   * be successfully unlocked; It can't be manipulated anyway.
   *
-  * @param[in] objA the first object to unlock
-  * @param[in] objB the second object to unlock
-  * @param[in] objC the third object to unlock
+  * @param[in] objA Pointer to the first object to unlock
+  * @param[in] objB Pointer to the second object to unlock
+  * @param[in] objC Pointer to the third object to unlock
   * @return true if all three could be unlocked, false if at least one was not locked
 **/
-bool unlock_all( CLockable const * objA, CLockable const * objB, CLockable const * objC ) noexcept PWX_API;
+bool unlock_all( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept PWX_API;
+
+/** @brief unlock three objects if all are currently locked.
+  *
+  * This function unlocks three objects if all are currently
+  * locked by the calling thread. If any is not locked, the
+  * function does nothing and returns false.
+  *
+  * This function can handle nullptr arguments, assuming nullptr to
+  * be successfully unlocked; It can't be manipulated anyway.
+  *
+  * @param[in] objA The first object to unlock
+  * @param[in] objB The second object to unlock
+  * @param[in] objC The third object to unlock
+  * @return true if all three could be unlocked, false if at least one was not locked
+**/
+bool unlock_all( CLockable const &objA, CLockable const &objB, CLockable const &objC ) noexcept PWX_API;
 
 // Note: A RAII-based class that uses these helpers is pwx::CLockGuard in basic/CLockGuard.h
 

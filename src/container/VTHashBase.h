@@ -1642,7 +1642,7 @@ private:
 		elem_t* newElement = nullptr;
 		PWX_TRY( newElement = new elem_t( src ) )
 		catch ( std::exception &e ) {
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) )
+			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new hash element failed." );
 		}
 		PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );

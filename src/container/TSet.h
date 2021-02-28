@@ -312,7 +312,7 @@ public:
 
 		// Unlock if needed
 		if ( beThreadSafe() ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( &src ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( &src ) );
 			PWX_UNLOCK_OBJ( this );
 		}
 	}

@@ -1073,7 +1073,7 @@ private:
 			curr( xCurr );
 			return xCurr;
 		} else
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 
 			return nullptr;
 	}

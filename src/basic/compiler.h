@@ -42,8 +42,13 @@
  * --- pwxLib needs C++17 features. Sorry, no way around this!         ---
  * -------------------------------------------------------------------- */
 #if ( !defined(__cplusplus) ) || ( __cplusplus < 201703L )
-#pragma error "pwxLib needs at least C++17!"
+  #pragma error "pwxLib needs at least C++17!"
 #endif // __cplusplus defined and large enough?
+#if ( defined(__cplusplus) ) && ( __cplusplus >= 202002L )
+  #define PWX_HAS_CXX20 1
+#else
+  #define PWX_HAS_CXX20 0
+#endif
 
 
 /* -----------------------------------------------------------------------

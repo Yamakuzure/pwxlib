@@ -1006,7 +1006,7 @@ protected:
 		// Quick exit if curr is already what we want:
 		elem_t* xCurr = curr();
 		if ( xCurr && ( xCurr->data.get() == data ) ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return xCurr;
 		}
 
@@ -1017,7 +1017,7 @@ protected:
 			elem_t* xHead = head();
 			if ( ( xHead != xCurr ) && ( xHead->data.get() == data ) ) {
 				curr( xHead );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 				return xHead;
 			}
 
@@ -1025,7 +1025,7 @@ protected:
 			elem_t* xTail = tail();
 			if ( ( xTail != xCurr ) && ( xTail->data.get() == data ) ) {
 				curr( xTail );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 				return xTail;
 			}
 
@@ -1034,7 +1034,7 @@ protected:
 			xCurr = xHead->getNext(); // head is already checked.
 
 			// This is rule 2: Unlock for traversal
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 
 			while ( !result && !isDone && xCurr ) {
 				// Rule 3: Re-check tail. It might be
@@ -1051,7 +1051,7 @@ protected:
 
 		} // End of handling a search with more than one element
 		else
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 
 			return result;
 	}
@@ -1080,7 +1080,7 @@ protected:
 		// Quick exit if curr is already what we want:
 		elem_t* xCurr = curr();
 		if ( *xCurr == data ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return xCurr;
 		}
 
@@ -1091,7 +1091,7 @@ protected:
 			elem_t* xHead = head();
 			if ( ( xHead != xCurr ) && ( *xHead == data ) ) {
 				curr( xHead );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 				return xHead;
 			}
 
@@ -1099,7 +1099,7 @@ protected:
 			elem_t* xTail = tail();
 			if ( ( xTail != xCurr ) && ( *xTail == data ) ) {
 				curr( xTail );
-				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+				PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 				return xTail;
 			}
 
@@ -1108,7 +1108,7 @@ protected:
 			xCurr = xHead->getNext(); // head is already checked.
 
 			// Rule 2:
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 
 			while ( !result && !isDone && xCurr ) {
 				// Note: The container is not locked any more,
@@ -1125,7 +1125,7 @@ protected:
 
 		} // End of handling a search with more than one element
 		else
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 
 			return result;
 	}
@@ -1157,7 +1157,7 @@ protected:
 		int32_t comp  = xCurr->compare( data );
 		if ( ( comp < 0 )
 		                && ( ( nullptr == xNext ) || ( xNext->compare( data ) > -1 ) ) ) {
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return xNext ? xNext : nullptr;
 		}
 
@@ -1165,7 +1165,7 @@ protected:
 		elem_t* xHead = head();
 		if ( xHead && ( xHead->compare( data ) > -1 ) ) {
 			curr( xHead );
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return xHead;
 		}
 
@@ -1173,7 +1173,7 @@ protected:
 		elem_t* xTail = tail();
 		if ( xTail && ( xTail->compare( data ) < 0 ) ) {
 			curr( xTail );
-			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+			PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 			return nullptr; // tail is prev of nullptr by definition.
 		}
 
@@ -1183,7 +1183,7 @@ protected:
 			xCurr = xHead->getNext(); // head is already checked.
 
 		// Rule 2:
-		PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) )
+		PWX_UNLOCK_OBJ( const_cast<list_t*>( this ) );
 
 		while ( !result && !isDone && xCurr && xNext ) {
 			// Note: The container is not locked any more,
@@ -1621,7 +1621,7 @@ private:
 
 		if ( src.destroyed() ) {
 			// What on earth did the caller think?
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) )
+			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
 			if ( prev )
 				PWX_UNLOCK( prev );
 			PWX_THROW( "Illegal Condition", "Source element destroyed",
@@ -1632,7 +1632,7 @@ private:
 		elem_t* newElement = nullptr;
 		PWX_TRY( newElement = new elem_t ( src ) )
 		catch( std::exception& e ) {
-			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) )
+			PWX_UNLOCK_OBJ( const_cast<elem_t*>( &src ) );
 			if ( prev )
 				PWX_UNLOCK( prev );
 			PWX_THROW( "ElementCreationFailed", e.what(), "The Creation of a new list element failed." );

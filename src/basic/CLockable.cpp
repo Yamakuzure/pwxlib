@@ -34,7 +34,6 @@
 
 #include "basic/compiler.h"
 #include "basic/macros.h"
-#include "basic/debug.h"
 
 #include "basic/CLockable.h"
 
@@ -67,33 +66,32 @@ namespace pwx {
  * ---------------------------------------------------------------------------------------------------*/
 
 
-CLockable::CLockable() noexcept
-{ /* nothing to do here */ }
+CLockable::CLockable() noexcept PWX_DEFAULT;
 
 
-CLockable::CLockable ( CLockable const& src ) noexcept
-	:   memOrdLoad( src.memOrdLoad ),
-	    memOrdStore( src.memOrdStore ),
-	    CL_Do_Locking( ATOMIC_VAR_INIT( src.CL_Do_Locking.load( std::memory_order_relaxed ) ) )
-{ /* --- nothing to do here. ---*/ }
+CLockable::CLockable( CLockable const &src ) noexcept
+	  : memOrdLoad( src.memOrdLoad ), memOrdStore( src.memOrdStore ), CL_Do_Locking(
+	  src.CL_Do_Locking
+	     .load( std::memory_order_relaxed )
+) { /* --- nothing to do here. ---*/ }
 
 
 CLockable::~CLockable() noexcept {
 	isDestroyed.store( true, memOrdStore );
-	#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 	// Simply move the id to this thread:
 	CL_Thread_ID.store( CURRENT_THREAD_ID, std::memory_order_relaxed );
-	#else
+#else
 	// Otherwise we have to wait for a real lock.
 	lock();
-	#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 	clear_locks();
 	// the return value is unimportant, we can't do
 	// anything about it in the middle of a dtor anyway.
 }
 
 
-CLockable& CLockable::operator= ( CLockable const& src ) noexcept {
+CLockable &CLockable::operator=( CLockable const &src ) noexcept {
 	do_locking( src.CL_Do_Locking.load( std::memory_order_relaxed ) );
 	return *this;
 }
@@ -104,6 +102,7 @@ CLockable& CLockable::operator= ( CLockable const& src ) noexcept {
 // ======================================
 
 
+PWX_NODISCARD_SIMPLE
 bool CLockable::beThreadSafe() const noexcept {
 	return CL_Do_Locking.load( std::memory_order_relaxed );
 }
@@ -120,20 +119,22 @@ bool CLockable::clear_locks() noexcept {
 			CL_Lock_Count.store( 0, std::memory_order_relaxed );
 			CL_Thread_ID.store( 0, std::memory_order_relaxed );
 			CL_Is_Locked.store( false, std::memory_order_relaxed );
-			#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 			CL_Lock.clear( memOrdStore ); // This *must* be last!
-			#else
+#else
 			CL_Lock.unlock();
-			#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 		} // End of trying from within the right thread
-		else
-			return false; // Not from this thread!
+		else {
+			return false;
+		} // Not from this thread!
 	} // End of having to care about locking
 
 	return true;
 }
 
 
+PWX_NODISCARD_SIMPLE
 bool CLockable::destroyed() const noexcept {
 	return isDestroyed.load( memOrdLoad );
 }
@@ -162,27 +163,27 @@ void CLockable::do_locking( bool doLock ) noexcept {
 				 * to CL_Do_Locking and that has to be false by now.
 				 */
 				std::this_thread::yield(); // to be sure this thread is last
-				#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 				while ( CL_Lock.test_and_set() ) {
-					# if PWX_USE_FLAGSPIN_YIELD
+# if PWX_USE_FLAGSPIN_YIELD
 					std::this_thread::yield();
-					# endif // PWX_USE_FLAGSPIN_YIELD
+# endif // PWX_USE_FLAGSPIN_YIELD
 				}
-				#else
+#else
 				CL_Lock.lock();
-				#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 			} // end of having to gain the lock
 
 			// Nuke all data:
 			CL_Thread_ID.store( 0, std::memory_order_relaxed );
 			CL_Lock_Count.store( 0, std::memory_order_relaxed );
-			#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 			// Note: Here it is in order to clear relaxed, as no
 			//       other thread should be waitng right now.
 			CL_Lock.clear( std::memory_order_relaxed );
-			#else
+#else
 			CL_Lock.unlock();
-			#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 			CL_Is_Locked.store( false, std::memory_order_release );
 			// The memory order is relaxed last
 			memOrdLoad  = std::memory_order_relaxed;
@@ -192,11 +193,13 @@ void CLockable::do_locking( bool doLock ) noexcept {
 }
 
 
+PWX_NODISCARD_SIMPLE
 bool CLockable::is_locked() const noexcept {
 	return CL_Is_Locked.load( memOrdLoad );
 }
 
 
+PWX_NODISCARD_SIMPLE
 bool CLockable::is_locking() const noexcept {
 	return CL_Do_Locking.load( std::memory_order_relaxed );
 }
@@ -204,63 +207,69 @@ bool CLockable::is_locking() const noexcept {
 
 void CLockable::lock() noexcept {
 	// return at once if this object is in destruction
-	if ( isDestroyed.load( memOrdLoad ) )
+	if ( isDestroyed.load( memOrdLoad ) ) {
 		return;
+	}
 
 	if ( CL_Do_Locking.load( std::memory_order_relaxed ) ) {
-		size_t ctid = CURRENT_THREAD_ID;
+		auto ctid = CURRENT_THREAD_ID;
 
 		// For both the spinlock and the mutex an action
 		// is only taken if this object is not already
 		// locked by this thread
 		if ( ctid != CL_Thread_ID.load( std::memory_order_relaxed ) ) {
 			CL_Waiting++;
-			#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 			while ( CL_Lock.test_and_set() ) {
-				# if PWX_USE_FLAGSPIN_YIELD
+# if PWX_USE_FLAGSPIN_YIELD
 				std::this_thread::yield();
-				# endif // PWX_USE_FLAGSPIN_YIELD
+# endif // PWX_USE_FLAGSPIN_YIELD
 			}
-			#else
+#else
 			CL_Lock.lock();
-			#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 
 			// Got it now, so note it:
 			CL_Is_Locked.store( true, std::memory_order_release );
 			CL_Thread_ID.store( ctid, std::memory_order_relaxed );
 			CL_Lock_Count.store( 1, std::memory_order_relaxed );
 			CL_Waiting--;
-		} else
+		} else {
 			// If this thread already has a lock, the call is just counted
 			CL_Lock_Count.fetch_add( 1, std::memory_order_relaxed );
+		}
 	} // End of doing locking
 }
 
 
+PWX_NODISCARD_SIMPLE
 uint32_t CLockable::lock_count() const noexcept {
-	if ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) )
+	if ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) ) {
 		return CL_Lock_Count.load( std::memory_order_relaxed );
+	}
 	return 0;
 }
 
 
+PWX_NODISCARD_SIMPLE
 bool CLockable::try_lock() noexcept {
 	// return at once if this object is in destruction
-	if ( isDestroyed.load( memOrdLoad ) )
+	if ( isDestroyed.load( memOrdLoad ) ) {
 		return false;
+	}
 
 	if ( CL_Do_Locking.load( std::memory_order_relaxed ) ) {
-		size_t ctid = CURRENT_THREAD_ID;
+		auto ctid = CURRENT_THREAD_ID;
 
 		// Same as with locking: Only try if this thread does
 		// not already own the lock
 		if ( ctid != CL_Thread_ID.load( std::memory_order_relaxed ) ) {
 			CL_Waiting++;
-			#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 			if ( !CL_Lock.test_and_set() ) {
-			#else
-			if ( CL_Lock.try_lock() ) {
-			#endif // PWX_USE_FLAGSPIN
+#else
+				if ( CL_Lock.try_lock() ) {
+#endif // PWX_USE_FLAGSPIN
 				// Got it now, so note it:
 				CL_Is_Locked.store( true, std::memory_order_release );
 				CL_Thread_ID.store( ctid, std::memory_order_relaxed );
@@ -280,17 +289,17 @@ bool CLockable::try_lock() noexcept {
 
 void CLockable::unlock() noexcept {
 	if ( CL_Do_Locking.load( std::memory_order_relaxed )
-	  && ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) ) ) {
+	     && ( CURRENT_THREAD_ID == CL_Thread_ID.load( std::memory_order_relaxed ) ) ) {
 
 		if ( 1 == CL_Lock_Count.fetch_sub( 1, std::memory_order_relaxed ) ) {
 			// The lock will go away now:
 			CL_Thread_ID.store( 0, std::memory_order_relaxed );
 			CL_Is_Locked.store( false, std::memory_order_relaxed );
-			#if PWX_USE_FLAGSPIN
+#if PWX_USE_FLAGSPIN
 			CL_Lock.clear( std::memory_order_release );
-			#else
+#else
 			CL_Lock.unlock();
-			#endif // PWX_USE_FLAGSPIN
+#endif // PWX_USE_FLAGSPIN
 		} // end of reducing the lock count
 	}
 }
@@ -301,27 +310,42 @@ void CLockable::unlock() noexcept {
  * ===============================================================
  */
 
+PWX_NODISCARD_SIMPLE
 bool are_locked( CLockable const* objA, CLockable const* objB ) noexcept {
-	bool isLockedA = objA ? objA->is_locked() : true;
-	bool isLockedB = objB ? objB->is_locked() : true;
+	bool isLockedA = objA && objA->is_locked();
+	bool isLockedB = objB && objB->is_locked();
 	return isLockedA && isLockedB;
 }
 
 
+PWX_NODISCARD_SIMPLE
+bool are_locked( CLockable const &objA, CLockable const &objB ) noexcept {
+	return objA.is_locked() && objB.is_locked();
+}
+
+
+PWX_NODISCARD_SIMPLE
 bool are_locked( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept {
-	bool isLockedA = objA ? objA->is_locked() : true;
-	bool isLockedB = objB ? objB->is_locked() : true;
-	bool isLockedC = objC ? objC->is_locked() : true;
+	bool isLockedA = objA && objA->is_locked();
+	bool isLockedB = objB && objB->is_locked();
+	bool isLockedC = objC && objC->is_locked();
 	return isLockedA && isLockedB && isLockedC;
 }
 
 
-bool try_locks( CLockable const* objA, CLockable const* objB ) noexcept {
-	CLockable* xObjA = const_cast<CLockable*>( objA );
-	CLockable* xObjB = const_cast<CLockable*>( objB );
+PWX_NODISCARD_SIMPLE
+bool are_locked( CLockable const &objA, CLockable const &objB, CLockable const &objC ) noexcept {
+	return objA.is_locked() && objB.is_locked() && objC.is_locked();
+}
 
-	bool lockedA = objA ? false : true;
-	bool lockedB = objB ? false : true;
+
+PWX_NODISCARD_SIMPLE
+bool try_locks( CLockable const* objA, CLockable const* objB ) noexcept {
+	auto xObjA = const_cast<CLockable*>( objA );
+	auto xObjB = const_cast<CLockable*>( objB );
+
+	bool lockedA = nullptr == xObjA;
+	bool lockedB = nullptr == xObjB;
 
 	if ( !lockedA || !lockedB ) {
 		if ( xObjA ) lockedA = xObjA->try_lock();
@@ -337,14 +361,21 @@ bool try_locks( CLockable const* objA, CLockable const* objB ) noexcept {
 }
 
 
-bool try_locks( CLockable const * objA, CLockable const * objB, CLockable const * objC ) noexcept {
-	CLockable* xObjA = const_cast<CLockable*>( objA );
-	CLockable* xObjB = const_cast<CLockable*>( objB );
-	CLockable* xObjC = const_cast<CLockable*>( objC );
+PWX_NODISCARD_SIMPLE
+bool try_locks( CLockable const &objA, CLockable const &objB ) noexcept {
+	return try_locks( &objA, &objB );
+}
 
-	bool lockedA = xObjA ? false : true;
-	bool lockedB = xObjB ? false : true;
-	bool lockedC = xObjC ? false : true;
+
+PWX_NODISCARD_SIMPLE
+bool try_locks( CLockable const* objA, CLockable const* objB, CLockable const* objC ) noexcept {
+	auto xObjA = const_cast<CLockable*>( objA );
+	auto xObjB = const_cast<CLockable*>( objB );
+	auto xObjC = const_cast<CLockable*>( objC );
+
+	bool lockedA = nullptr == xObjA;
+	bool lockedB = nullptr == xObjB;
+	bool lockedC = nullptr == xObjC;
 
 	if ( !lockedA || !lockedB || !lockedC ) {
 		if ( xObjA ) lockedA = xObjA->try_lock();
@@ -362,6 +393,12 @@ bool try_locks( CLockable const * objA, CLockable const * objB, CLockable const 
 }
 
 
+PWX_NODISCARD_SIMPLE
+bool try_locks( CLockable const &objA, CLockable const &objB, CLockable const &objC ) noexcept {
+	return try_locks( &objA, &objB, &objC );
+}
+
+
 bool unlock_all( CLockable const* objA, CLockable const* objB ) noexcept {
 	if ( are_locked( objA, objB ) ) {
 		if ( objA ) const_cast<CLockable*>( objA )->unlock();
@@ -369,6 +406,11 @@ bool unlock_all( CLockable const* objA, CLockable const* objB ) noexcept {
 		return true;
 	}
 	return false;
+}
+
+
+bool unlock_all( CLockable const &objA, CLockable const &objB ) noexcept {
+	return unlock_all( &objA, &objB );
 }
 
 
@@ -380,6 +422,11 @@ bool unlock_all( CLockable const* objA, CLockable const* objB, CLockable const* 
 		return true;
 	}
 	return false;
+}
+
+
+bool unlock_all( CLockable const &objA, CLockable const &objB, CLockable const &objC ) noexcept {
+	return unlock_all( &objA, &objB, &objC );
 }
 
 
