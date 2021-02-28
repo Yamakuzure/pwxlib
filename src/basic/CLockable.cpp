@@ -279,7 +279,10 @@ bool CLockable::try_lock() noexcept {
 			}
 			CL_Waiting--;
 			return false; // Nope, and only condition for a no-no.
-		} // end of really having to try
+		} else {
+			// If this thread already has a lock, the call is just counted
+			CL_Lock_Count.fetch_add( 1, std::memory_order_relaxed );
+		}
 	}
 
 	// return true otherwise, we are fine.
