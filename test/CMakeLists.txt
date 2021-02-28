@@ -33,6 +33,18 @@ if ( WITH_TESTS )
 	          )
 
 
+	add_executable( test_basic_CLockable
+	                test_basic_CLockable.cpp
+	                ${pwxlib_h}
+	                )
+	target_include_directories( test_basic_CLockable PRIVATE ${CMAKE_SOURCE_DIR}/src )
+	target_link_libraries( test_basic_CLockable PRIVATE pwx )
+	add_test( NAME test_basic_CLockable
+	          COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test_basic_CLockable
+	          WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	          )
+
+
 	# === Manual tests, installable, run by the user ===
 	# --------------------------------------------------
 	add_executable( test_cluster
