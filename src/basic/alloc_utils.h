@@ -73,7 +73,7 @@
   * @return The address of `ptr`. It is not checked. If `ptr` is `nullptr`, that is what is returned.
 **/
 static auto TAKE_PTR = []( auto &ptr ) {
-	decltype( ptr ) _ptr_ = ( ptr );
+	auto _ptr_ = ( ptr );
 	( ptr ) = nullptr;
 	return _ptr_;
 };
