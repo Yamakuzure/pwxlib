@@ -15,26 +15,24 @@
 #include <PLockable>
 #include <PLog>
 
-#include <cassert>
 
-
-static int test_lock( PLockable &a, PLockable &b, PLockable &c ) {
+static int test_lock( PLockable &a, PLockable* b, PLockable* c ) {
 	int result = EXIT_SUCCESS;
 
-	PWX_LOCK_OBJ( &a );
-	PWX_LOCK( &b );
-	bool locked = PWX_TRY_LOCK( &c );
+	a.lock();
+	PWX_LOCK( b );
+	bool locked = PWX_TRY_LOCK( c );
 
 	if ( !a.is_locked() ) {
-		log_error( nullptr, "%s FAILED", "PWX_LOCK_OBJ" );
+		log_error( nullptr, "%s FAILED", "manual lock" );
 		result = EXIT_FAILURE;
 	}
-	if ( !b.is_locked() ) {
-		log_error( nullptr, "%s FAILED", "PWX_LOCK" );
+	if ( !b->is_locked() ) {
+		log_error( nullptr, "%s FAILED", "PWX_LOCK( b )" );
 		result = EXIT_FAILURE;
 	}
-	if ( !locked || !c.is_locked() ) {
-		log_error( nullptr, "%s FAILED", "PWX_TRY_LOCK" );
+	if ( !locked || !c || !c->is_locked() ) {
+		log_error( nullptr, "%s FAILED", "PWX_TRY_LOCK( c )" );
 		result = EXIT_FAILURE;
 	}
 
@@ -42,12 +40,12 @@ static int test_lock( PLockable &a, PLockable &b, PLockable &c ) {
 		log_error( nullptr, "%s resulted in 'a' having %d/1 locks", "PWX_LOCK_OBJ", a.lock_count() );
 		result = EXIT_FAILURE;
 	}
-	if ( 1 != b.lock_count() ) {
-		log_error( nullptr, "%s resulted in 'b' having %d/1 locks", "PWX_LOCK", b.lock_count() );
+	if ( 1 != b->lock_count() ) {
+		log_error( nullptr, "%s resulted in 'b' having %d/1 locks", "PWX_LOCK", b->lock_count() );
 		result = EXIT_FAILURE;
 	}
-	if ( 1 != c.lock_count() ) {
-		log_error( nullptr, "%s resulted in 'c' having %d/1 locks", "PWX_TRY_LOCK", c.lock_count() );
+	if ( !c || ( 1 != c->lock_count() ) ) {
+		log_error( nullptr, "%s resulted in 'c' having %d/1 locks", "PWX_TRY_LOCK", c ? c->lock_count() : -1 );
 		result = EXIT_FAILURE;
 	}
 
@@ -55,27 +53,28 @@ static int test_lock( PLockable &a, PLockable &b, PLockable &c ) {
 }
 
 
-static int test_relock( PLockable &a, PLockable &b ) {
+static int test_relock( PLockable &a, PLockable* b ) {
 	int result = EXIT_SUCCESS;
 
-	PWX_RELOCK_OBJ( &a );
-	PWX_RELOCK( &b );
+	a.unlock();
+	a.lock();
+	PWX_RELOCK( b );
 
 	if ( !a.is_locked() ) {
-		log_error( nullptr, "%s FAILED", "PWX_RELOCK_OBJ" );
+		log_error( nullptr, "%s FAILED", "manual relock" );
 		result = EXIT_FAILURE;
 	}
-	if ( !b.is_locked() ) {
+	if ( !b->is_locked() ) {
 		log_error( nullptr, "%s FAILED", "PWX_RELOCK" );
 		result = EXIT_FAILURE;
 	}
 
 	if ( 1 != a.lock_count() ) {
-		log_error( nullptr, "%s resulted in 'a' having %d/1 locks", "PWX_RELOCK_OBJ", a.lock_count() );
+		log_error( nullptr, "%s resulted in 'a' having %d/1 locks", "manual relock", a.lock_count() );
 		result = EXIT_FAILURE;
 	}
-	if ( 1 != b.lock_count() ) {
-		log_error( nullptr, "%s resulted in 'b' having %d/1 locks", "PWX_RELOCK", b.lock_count() );
+	if ( 1 != b->lock_count() ) {
+		log_error( nullptr, "%s resulted in 'b' having %d/1 locks", "PWX_RELOCK", b->lock_count() );
 		result = EXIT_FAILURE;
 	}
 
@@ -167,56 +166,56 @@ static int test_unlock_all( PLockable &a, PLockable &b, PLockable &c ) {
 }
 
 
-static int test_clear_locks( PLockable &a, PLockable &b, PLockable &c ) {
+static int test_clear_locks( PLockable &a, PLockable &b, PLockable* c ) {
 	int result = EXIT_SUCCESS;
 
 	if ( !a.clear_locks() ) {
-		log_error(nullptr, "%s FAILED!", "a.clear_locks()");
+		log_error( nullptr, "%s FAILED!", "a.clear_locks()" );
 		result = EXIT_FAILURE;
 	}
 
-	if (a.is_locked()) {
-		log_error(nullptr, "'a' still locked after using %s!", "a.clear_locks()");
+	if ( a.is_locked() ) {
+		log_error( nullptr, "'a' still locked after using %s!", "a.clear_locks()" );
 		result = EXIT_FAILURE;
 	}
 
-	PWX_UNLOCK_OBJ( &b );
-	if (b.is_locked()) {
-		log_error(nullptr, "'b' still locked after using %s!", "PWX_UNLOCK_OBJ( &b )");
+	b.unlock();
+	if ( b.is_locked() ) {
+		log_error( nullptr, "'b' still locked after using %s!", "b.unlock()" );
 		result = EXIT_FAILURE;
 	}
 
-	PWX_UNLOCK( &c );
-	if (c.is_locked()) {
-		log_error(nullptr, "'c' still locked after using %s!", "PWX_UNLOCK( &c )");
+	PWX_UNLOCK( c );
+	if ( c->is_locked() ) {
+		log_error( nullptr, "'c' still locked after using %s!", "PWX_UNLOCK( c )" );
 		result = EXIT_FAILURE;
 	}
 
-	if ( pwx::are_locked( &a, &b ) ) {
-		log_error(nullptr, "%s returned true, must be false!", "pwx::are_locked( &a, &b )");
+	if ( pwx::are_locked( a, b ) ) {
+		log_error( nullptr, "%s returned true, must be false!", "pwx::are_locked( a, b )" );
 		result = EXIT_FAILURE;
 	}
 
-	if ( pwx::are_locked( b, c ) ) {
-		log_error(nullptr, "%s returned true, must be false!", "pwx::are_locked( b, c )");
+	if ( pwx::are_locked( &b, c ) ) {
+		log_error( nullptr, "%s returned true, must be false!", "pwx::are_locked( &b, c )" );
 		result = EXIT_FAILURE;
 	}
 
-	if ( pwx::are_locked( &c, &a ) ) {
-		log_error(nullptr, "%s returned true, must be false!", "pwx::are_locked( &c, &a )");
+	if ( pwx::are_locked( c, &a ) ) {
+		log_error( nullptr, "%s returned true, must be false!", "pwx::are_locked( c, &a )" );
 		result = EXIT_FAILURE;
 	}
 
 	// Note: The utility functions pwx::are_locked() do not use each other, so with these
 	//       we have to test both the pointer and the reference variant.
 
-	if ( pwx::are_locked( &a, &b, &c ) ) {
-		log_error(nullptr, "%s returned true, must be false!", "pwx::are_locked( &a, &b, &c )");
+	if ( pwx::are_locked( &a, &b, c ) ) {
+		log_error( nullptr, "%s returned true, must be false!", "pwx::are_locked( &a, &b, c )" );
 		result = EXIT_FAILURE;
 	}
 
-	if ( pwx::are_locked( a, b, c ) ) {
-		log_error(nullptr, "%s returned true, must be false!", "pwx::are_locked( a, b, c )");
+	if ( pwx::are_locked( a, b, *c ) ) {
+		log_error( nullptr, "%s returned true, must be false!", "pwx::are_locked( a, b, *c )" );
 		result = EXIT_FAILURE;
 	}
 
@@ -239,12 +238,12 @@ int main() {
 	}
 
 	// Add 1 lock to a, b and c
-	if ( EXIT_SUCCESS != test_lock( lock_a, lock_b, lock_c ) ) {
+	if ( EXIT_SUCCESS != test_lock( lock_a, &lock_b, &lock_c ) ) {
 		result = EXIT_FAILURE;
 	}
 
 	// No change in lock count, still 1 for each
-	if ( EXIT_SUCCESS != test_relock( lock_a, lock_b ) ) {
+	if ( EXIT_SUCCESS != test_relock( lock_a, &lock_b ) ) {
 		result = EXIT_FAILURE;
 	}
 
@@ -259,7 +258,7 @@ int main() {
 	}
 
 	// Fully unlock each
-	if ( EXIT_SUCCESS != test_clear_locks( lock_a, lock_b, lock_c ) ) {
+	if ( EXIT_SUCCESS != test_clear_locks( lock_a, lock_b, &lock_c ) ) {
 		result = EXIT_FAILURE;
 	}
 
