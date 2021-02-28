@@ -1,0 +1,12 @@
+#pragma once
+#ifndef PWX_PWXLIB_SRC_PMEMUTILS_INCLUDED
+#define PWX_PWXLIB_SRC_PMEMUTILS_INCLUDED
+
+
+/** @file PMEMUTILS
+  * @brief Add some tools to allocate/free memory with memory mapping (@see basic/mem_utils.h)
+**/
+#include "basic/mem_utils.h"
+
+
+#endif // PWX_PWXLIB_SRC_PMEMUTILS_INCLUDED

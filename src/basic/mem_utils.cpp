@@ -30,19 +30,15 @@
 **/
 
 
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-
-#include "basic/compiler.h"
-#include "basic/macros.h"
-#include "basic/debug.h"
-
-#include "basic/alloc_utils.h"
 #include "basic/_mem_map.h"
+#include "basic/alloc_utils.h"
+#include "basic/compiler.h"
+#include "basic/debug.h"
 #include "basic/mem_utils.h"
 
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
 
 
 /// @namespace pwx
@@ -65,9 +61,7 @@ bool enable_memory_mapping = false;
 ***************************************/
 
 void* allocate( char const* location, size_t new_size ) {
-	void* result = nullptr;
-
-	result = malloc_multiply( 1, new_size );
+	void* result = malloc_multiply( 1, new_size );
 
 	if ( result && enable_memory_mapping ) {
 		mem_map_add( location, new_size, result );
@@ -101,9 +95,7 @@ void* reallocate( char const* location, void* mem, size_t new_size ) {
 
 	// Fine, it is a reallocation.
 	void* old_mem = mem;
-	void* result  = nullptr;
-
-	result = realloc( mem, new_size );
+	void* result  = realloc( mem, new_size );
 
 	if ( result && enable_memory_mapping && ( old_mem != result ) ) {
 		mem_map_del( old_mem );
